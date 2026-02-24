@@ -17,7 +17,6 @@
     "SalaryTransaction": true,
     "WhatsappAuth": true,
     "DailyPrize": true,
-    "Tasks": true,
     "Wallet": true,
     "LuckyBox": false,
     "TribeReward": true,

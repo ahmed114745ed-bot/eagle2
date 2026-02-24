@@ -228,6 +228,10 @@
         {
             "type": "path",
             "url": "packages/Utd/Events"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Tasks"
         }
     ]
 }

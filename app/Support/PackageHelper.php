@@ -7,6 +7,7 @@ use Utd\Achievements\Entities\Achievement;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Events\Entities\WeeklyStar;
 use Utd\Family\Entities\Family;
+use Utd\Tasks\Entities\Day;
 use Utd\TaskStream\Entities\TaskStream;
 use Utd\Charizma\Entities\ExtraDataInRoom;
 use Utd\CP\Entities\Cp;
@@ -37,6 +38,7 @@ class PackageHelper
         'vip' => OVip::class,
         'family' => Family::class,
         'event' => WeeklyStar::class,
+        'task' => Day::class,
     ];
 
     /**

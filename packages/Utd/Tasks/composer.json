@@ -1,0 +1,30 @@
+{
+    "name": "utd/tasks",
+    "description": "Tasks package for Eagle",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "UTD Team",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\Tasks\\": "src/",
+            "Utd\\Tasks\\Database\\": "Database/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Tasks\\TasksServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
