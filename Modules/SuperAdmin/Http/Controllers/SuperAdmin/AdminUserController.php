@@ -11,7 +11,6 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteUser;
 
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 use App\Admin\Controllers\MainController;
 
@@ -42,8 +41,7 @@ class AdminUserController extends EncorUsersController
         $grid =  parent::grid();
 
         $grid->actions(function ( $actions) {
-                $actions->disableDelete();
-                $actions->add(new DeleteSubSuperAdmin());
+                // $actions->disableDelete();
         });
 
         $grid->tools(function ($tools) {
@@ -94,18 +92,27 @@ class AdminUserController extends EncorUsersController
 
     public function destroy ( $id )
     {
-
-        $user = $this->model->find($id);
-        if ($user){
-            if ($user->isRole('admin') || $user->isRole('developer')){
-                return response ()->json (['error'=>'','message'=>__('admin cant be deleted')]);
+        try {
+            $user = $this->model->find($id);
+            if ($user){
+                if ($user->isRole('admin') || $user->isRole('developer')){
+                    return response ()->json (['error'=>'','message'=>__('admin cant be deleted')]);
+                }
             }
+
+            $OldUserAppId = User::find($user->app_id);
+            if ($OldUserAppId) {
+                $OldUserAppId->is_sub_super_admin = 0;
+                $OldUserAppId->save();
+            }
+
+            Agency::query ()->where ('owner_id',$id)->delete ();
+
+            return parent ::destroy ($id);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
         }
-        Agency::query ()->where ('owner_id',$id)->delete ();
-
-
-        return parent ::destroy ($id);
-
     }
 
     public function form ()

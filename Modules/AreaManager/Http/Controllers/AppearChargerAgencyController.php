@@ -2,26 +2,27 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Charge;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
+use App\Admin\Actions\DeleteShippingAgencyAction;
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencySallary;
+use App\Models\Charge;
 use App\Models\CoinLog;
 use App\Models\GiftLog;
-use Illuminate\Http\Request;
-use App\Models\AgencySallary;
 use App\Models\ShippingAgency;
+use App\Models\User;
+use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
+use Encore\Admin\Show;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Controllers\MainController;
-use App\Admin\Actions\DeleteShippingAgencyAction;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 
 class AppearChargerAgencyController extends MainController
@@ -445,22 +446,13 @@ class AppearChargerAgencyController extends MainController
             if ($user)  $form->model()->country_id = $user->country_id;
         });
 
-        // $form->saved(function (Form $form) {
-        //     $checkAgencyUser = UsersJoinedAgency::where([
-        //         'user_id' => $form->model()->app_owner_id,
-        //         'agency_id' => $form->model()->id,
-        //         'type' => 1,
-        //     ])->whereNull('leave_date')->exists();
+        $form->saved(function (Form $form) {
 
-        //     if (!$checkAgencyUser) {
-        //         UsersJoinedAgency::create([
-        //             'user_id' => $form->model()->app_owner_id,
-        //             'agency_id' => $form->model()->id,
-        //             'type' => 1,
-        //             'join_date' => now(),
-        //         ]);
-        //     }
-        // });
+            $appOwnerId = intval($form->model()->app_owner_id);
+
+            $user = User::find($appOwnerId);
+            MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
+        });
 
         return $form;
     }

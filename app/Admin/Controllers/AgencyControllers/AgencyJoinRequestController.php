@@ -2,26 +2,27 @@
 
 namespace App\Admin\Controllers\AgencyControllers;
 
-use App\Models\User;
-use App\Models\Agency;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
-use App\Models\UsersJoinedAgency;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Actions\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
-use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Admin\Controllers\MainController;
+use App\Models\Agency;
+use App\Models\AgencyJoinRequest;
+use App\Models\User;
+use App\Models\UsersJoinedAgency;
+use App\Services\AppFeatureService;
+use Encore\Admin\Actions\Response;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyJoinRequestController extends MainController
 {
@@ -193,9 +194,9 @@ class AgencyJoinRequestController extends MainController
                 $update = DB::table('users')
                     ->where('id', $user_id)
                     ->update(['type_user' => 1]);
-                
-                 uploadMonthlyDiamondReceive($user_id, 0);
-              
+
+                uploadMonthlyDiamondReceive($user_id, 0);
+
                 $user = User::query()->where('id', $form->model()->user_id)->first();
                 if ($user->agency_id) {
                     $error = new MessageBag(
@@ -206,6 +207,7 @@ class AgencyJoinRequestController extends MainController
                     );
                 }
                 return back()->with(compact('error'));
+                MilestoneHelper::grantMilestoneToUser($user, 'host');
 
                 // UserCommon::userVip($user,'agency-join-form-dash');
                 $checkAgencyUser = UsersJoinedAgency::where([
