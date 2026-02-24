@@ -24,8 +24,6 @@ use App\Http\Controllers\Dashboard\Room\AdminGiftRoomController;
 use App\Http\Controllers\Dashboard\Room\AdminRoomCategoriesController;
 use Utd\Room\Http\Controllers\Dashboard\AdminRoomsController;
 use App\Http\Controllers\Dashboard\Users\UsersDashboard;
-// use App\Http\Controllers\Dashboard\Vips\AdminPrivilegeVipsController; // Moved to VIP package
-// use App\Http\Controllers\Dashboard\Vips\AdminVipsController; // Moved to VIP package
 use App\Http\Controllers\Dashboard\Wares\AdminWaresController;
 use App\Http\Controllers\Dashboard\Achievement\AdminAchievementLevelsController;
 use App\Http\Controllers\Dashboard\Achievement\AdminSendAchievementController;
@@ -38,7 +36,6 @@ use Utd\Events\Http\Controllers\Dashboard\PeriodEvent\AdminPeriodEventController
 use Utd\Events\Http\Controllers\Dashboard\PeriodEvent\AdminPeriodEventRewordsController;
 use Utd\Events\Http\Controllers\Dashboard\WeeklyStar\AdminWeeklyStarEvents;
 use Utd\Events\Http\Controllers\Dashboard\WeeklyStar\AdminWeeklyStarEventsRewords;
-// use App\Http\Controllers\Dashboard\GroupChat\AdminGroupChatController; // Moved to Chat package
 use App\Http\Controllers\Dashboard\Interests\AdminInterestsController;
 use App\Http\Controllers\Dashboard\Posts\AdminMomentController;
 use App\Http\Controllers\Dashboard\Posts\AdminReelsController;
@@ -97,7 +94,6 @@ Route::middleware('auth:sanctum','verified')->group(function(){
     });
 
     //********************** Start Rooms ********************** \\
-        //bacground - moved to Room package (packages/Utd/Room/Routes/dashboard.php)
         Route::resource('background-requests', AdminBackgroundRequestController::class);
 
         //Categories
@@ -198,9 +194,6 @@ Route::middleware('auth:sanctum','verified')->group(function(){
     Route::resource('admin-Bans', AdminBansController::class);
     Route::get('get-bans-type',[ AdminBansController::class,'types']);
 
-
-    // Vips routes moved to packages/Utd/Vip/Routes/dashboard.php
-
     //Cuarsel
     Route::controller(AdminCuarselController::class)->group(function(){
         Route::resource('admin-cuarsel', AdminCuarselController::class);
@@ -231,8 +224,6 @@ Route::middleware('auth:sanctum','verified')->group(function(){
     Route::resource('admin-reels',AdminReelsController::class);
 
     //************************** start Events ************************* \\
-        // PK routes moved to packages/Utd/Pk/Routes/dashboard.php
-
         Route::resource('admin-event-WeeklyStar',AdminWeeklyStarEvents::class);
         Route::resource('admin-event-WeeklyStar-rewords',AdminWeeklyStarEventsRewords::class);
 
@@ -247,7 +238,6 @@ Route::middleware('auth:sanctum','verified')->group(function(){
         Route::get('admin-event-delete-reports/{id}/{type}',[AdminGeneralRolesController::class,'delete_reports']);
     //************************** End Events **************************** \\
 
-        // admin-GroupChat route moved to packages/Utd/Chat/Routes/dashboard.php
         Route::resource('admin-codes',AdminCodesController::class);
         Route::resource('admin-countries',AdminCountriesController::class);
         Route::get('enable-admin-countries/{id}/{status}',[AdminCountriesController::class,'enable_country']);

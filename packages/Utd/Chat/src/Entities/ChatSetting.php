@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Utd\Chat\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,5 +10,12 @@ class ChatSetting extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $fillable = ['id', 'user_id', 'chat_with_friends', 'chat_with_followers', 'chat_with_all', 'chat_with_following'];
+    protected $fillable = [
+        'id',
+        'user_id',
+        'chat_with_friends',
+        'chat_with_followers',
+        'chat_with_all',
+        'chat_with_following',
+    ];
 }

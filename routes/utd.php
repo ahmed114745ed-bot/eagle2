@@ -51,7 +51,6 @@ use Utd\Events\Http\Controllers\Utd\EventPeriodController;
 use App\Http\Controllers\utd\ExchangeController;
 use Utd\Family\Http\Controllers\Utd\FamilyController;
 use Utd\Family\Http\Controllers\Api\FamilyLevelController;
-use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\ImageController;

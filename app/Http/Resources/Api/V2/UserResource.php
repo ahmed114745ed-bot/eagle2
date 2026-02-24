@@ -3,7 +3,7 @@
 namespace App\Http\Resources\Api\V2;
 
 use App\Helpers\Common;
-use App\Http\Resources\Api\V1\ChatSettingResource;
+use App\Support\PackageHelper;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\NowRoomResource;
@@ -11,9 +11,9 @@ use App\Http\Resources\Api\V1\ProfileResource;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\UserAgencyResource;
 use App\Http\Resources\Api\V1\UserRoomResource;
-use App\Models\ChatSetting;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Chat\Entities\ChatSetting;
 
 class UserResource extends JsonResource
 {
@@ -61,13 +61,17 @@ class UserResource extends JsonResource
         $isHideCountry = $this->getPackWithTypeV2(13);
         $userHandling = new \App\Classes\UserHandling();
         $color_image = @$this->color_image;
-        $chat_setting = ChatSetting::where("user_id", $this->id)->first();
-        if ($chat_setting == null) {
-            $chat_setting = ChatSetting::create([
-                'user_id'     => $this->id,
-                'chat_with_friends'     =>  1,
-                'chat_with_all'         =>  0,
-            ]);
+        $chat_setting = null;
+        if (PackageHelper::isInstalled('chat')) {
+            $chatSettingClass = ChatSetting::class;
+            $chat_setting = $chatSettingClass::where("user_id", $this->id)->first();
+            if ($chat_setting == null) {
+                $chat_setting = $chatSettingClass::create([
+                    'user_id'     => $this->id,
+                    'chat_with_friends'     =>  1,
+                    'chat_with_all'         =>  0,
+                ]);
+            }
         }
         $show_user_setting = \App\Models\UserSetting::where("user_id", $this->id)->first();
         if ($show_user_setting == null) {
@@ -133,7 +137,7 @@ class UserResource extends JsonResource
             'room_hidden'          => $this->getPackWithTypeV2(16),
             'type_user'            => intval($this->type_user) ?: 0,
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
-            "chat_setting" => new ChatSettingResource($chat_setting),
+            "chat_setting" => $chat_setting ? new \Utd\Chat\Http\Resources\ChatSettingResource($chat_setting) : null,
             "manger_type"          => new MangerTypeResource(@$this->manager),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
             'level' => Common::level_center_v2($this),

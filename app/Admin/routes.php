@@ -46,12 +46,8 @@ use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\GameSettingsController;
-// use App\Admin\Controllers\GiftCategoryController; // Moved to package
-// use App\Admin\Controllers\GiftController; // Moved to package
 use App\Admin\Controllers\GiftLogSummaryController;
 use App\Admin\Controllers\GiftLogTestController;
-// use App\Admin\Controllers\GroupChatController; // Moved to Chat package
-// use App\Admin\Controllers\GroupChatSettingController; // Moved to Chat package
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ImageColorController;
 use App\Admin\Controllers\InterestsController;
@@ -280,12 +276,9 @@ Route::group(
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
-        // Route::resource('family-users', 'UserFamilyController'); // Moved to package
         Route::post('send-request-invite-code', 'UserController@request_invite_code');
         Route::resource('user-statistics', 'UserStatisticsController');
         Route::resource('profiles', 'ProfileController');
-        // VIP level routes moved to packages/Utd/Vip/Routes/web.php
-        // Room routes moved to packages/Utd/Room/Routes/web.php
         Route::resource('all-games', AllGameController::class);
         Route::resource('game-settings', GameSettingsController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
@@ -294,9 +287,7 @@ Route::group(
             Route::get('/', [BlackListUsersController::class, 'index']);
         });
         Route::resource('codes', 'CodeController');
-        
-        // Gifts Routes moved to packages/Utd/Gifts/routes/admin.php
-        
+
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
@@ -307,7 +298,6 @@ Route::group(
         Route::resource('report_user', ReportUserController::class)->middleware('web-agency-feature');
         // Route::resource('coupons', 'CouponController');
         Route::resource('configs', 'ConfigController');
-        // categories (RoomCategoryController) moved to packages/Utd/Room/Routes/web.php
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
         Route::resource('country-categories', CountryCategoryController::class);
         Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
@@ -316,7 +306,6 @@ Route::group(
         Route::get('country-requests/{id}/reject', [ChangeCountryRequestController::class, 'reject']);
         Route::post("accept-change-country", [ChangeCountryRequestController::class, "changeCountry"]);
 
-        // backgrounds moved to packages/Utd/Room/Routes/web.php
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
 
@@ -328,10 +317,6 @@ Route::group(
         });
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
-
-
-
-        // Route::resource('families', 'FamilyController'); // Moved to package
 
         // Target routes - only if agency installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
@@ -421,10 +406,8 @@ Route::group(
         ])->name('agency-manger-export');
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
         //        Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
-        // wares-vips moved to packages/Utd/Vip/Routes/web.php
         // servers
         Route::resource('server-country', ServerCountryController::class);
-        // room-gift-targets moved to packages/Utd/Room/Routes/web.php
 
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
 
@@ -445,7 +428,6 @@ Route::group(
         Route::resource('requests-for-get-salary', 'GetSalaryRequestController');
         Route::resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
         Route::resource('special-id-requests', 'SpecialIdRequestController');
-        // Route::resource('family_levels', 'FamilyLevelController'); // Moved to package
         Route::resource('silver', 'SilverController');
 
         Route::prefix('coins/{paymentGatwayId}')->group(function () {
@@ -499,15 +481,12 @@ Route::group(
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
-        // room-mic moved to packages/Utd/Room/Routes/web.php
-
         Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
         Route::resource('pages', 'PageController');
         Route::resource('exchanges', 'ExchangeController');
 
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
-        // filter-rooms moved to packages/Utd/Room/Routes/web.php
 
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
         Route::get('/Moments-reels', [ReportController::class, 'momentsReels'])
@@ -542,8 +521,6 @@ Route::group(
         ]);
         Route::resource('trashed-users', TrashedUserAccountController::class);
         Route::resource('withdraw-types', WithdrawController::class);
-        // room-vips and room-target moved to packages/Utd/Room/Routes/web.php
-
         // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
 
         // Agency controllers group - only if package installed
@@ -570,21 +547,14 @@ Route::group(
 
         Route::resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
-        // vips_dedicate route moved to packages/Utd/Vip/Routes/web.php
         Route::get('/bans', [BanController::class, 'index']);
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
-        // bans-rooms moved to packages/Utd/Room/Routes/web.php
         Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
-
-        // request-background-image moved to packages/Utd/Room/Routes/web.php
-
-        // GroupChat routes moved to packages/Utd/Chat/Routes/admin.php
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-        Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
 //         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
 
         // Agency manager routes - only if package installed
@@ -614,15 +584,12 @@ Route::group(
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
-        // custom-zego-messages moved to packages/Utd/Room/Routes/web.php
-
         // Agency settings - only if package installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
             Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         }
         Route::resource('app-feature', FeatureAppController::class);
         Route::resource('zego-feature', ZegoFeatureController::class);
-        // chat-settings moved to packages/Utd/Chat/Routes/admin.php
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         Route::get('convert-is_gold', function () {
@@ -659,10 +626,8 @@ Route::group(
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
 
-        // room-settings moved to packages/Utd/Room/Routes/web.php
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
-        // rooms/{room}/pin moved to packages/Utd/Room/Routes/web.php
         Route::resource('notification-templates', NotificationsTemplatesController::class);
         Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
         Route::post('/ware-managements/create', [WareTabController::class, 'store']);

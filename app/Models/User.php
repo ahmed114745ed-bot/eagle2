@@ -30,6 +30,7 @@ use Utd\Agency\Entities\AdditionalInfo;
 use Modules\Badge\Entities\Badge;
 use Modules\Badge\Entities\UserBadge;
 use App\Traits\ChatUserTrait;
+use Utd\Chat\Entities\ChatSetting;
 use Utd\CP\Entities\Cp;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Utd\LuckyBox\Entities\UserLuckyGift;
@@ -498,7 +499,8 @@ class User extends Authenticatable
 
     public function chat_settings()
     {
-        return $this->hasMany(ChatSetting::class);
+        return PackageHelper::checkRelation($this, 'chat', 'hasMany') ??
+            $this->hasMany(ChatSetting::class);
     }
 
     public function userSetting()
@@ -2273,7 +2275,8 @@ class User extends Authenticatable
 
     public function chatSetting()
     {
-        return $this->hasOne(\App\Models\ChatSetting::class, 'user_id')
+        return PackageHelper::checkRelation($this, 'chat', 'hasOne') ??
+            $this->hasOne(ChatSetting::class, 'user_id')
             ->withDefault([
                 'chat_with_friends' => 1,
                 'chat_with_all' => 0,

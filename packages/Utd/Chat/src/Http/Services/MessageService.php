@@ -3,7 +3,6 @@
 namespace Utd\Chat\Http\Services;
 
 use App\Helpers\Common;
-use App\Models\ChatRoom;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Modules\Public\Events\UnreadCounterIndividual;

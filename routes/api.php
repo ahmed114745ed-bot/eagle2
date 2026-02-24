@@ -46,7 +46,6 @@ use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\CommunityController;
-// use App\Http\Controllers\Api\V1\GroupChatController; // Moved to Chat package
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\ReportUserController;
@@ -275,18 +274,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [HomeCarouselController::class, 'index']);
             });
 
-
-
-
-
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
-
-
-
-
-            // group-chat routes moved to packages/Utd/Chat/Routes/api.php
 
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
@@ -296,7 +286,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('change-request', [CountryController::class, 'changeRequest']);
             });
             // user controller
-
 
             Route::prefix('backgrounds')->group(function () {
                 Route::get('/', [BackgroundController::class, 'allBackgrounds']);

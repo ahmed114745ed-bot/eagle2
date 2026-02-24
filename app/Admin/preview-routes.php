@@ -22,8 +22,6 @@ use App\Admin\Controllers\CustomController;
 use Utd\Room\Http\Controllers\Admin\CustomZegoMessageController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\FamilyConfigSettingController;
-// use Utd\Chat\Http\Controllers\Admin\GroupChatController; // Moved to Chat package routes
-// use Utd\Chat\Http\Controllers\Admin\GroupChatSettingController; // Moved to Chat package routes
 use App\Admin\Controllers\ImageColorController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\MomentSettingsController;
@@ -137,13 +135,11 @@ Route::group([
     Route::resource('colors', ColorController::class);
     Route::resource('agency-settings', AgencySettingsController::class);
     Route::get('agency-settings', 'AgencySettingController@index');
-    // chat-settings route moved to Chat package
     // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
     Route::get('lucy-box-settings', [BoxController::class, 'box_settings']);
     Route::resource('moment-settings', MomentSettingsController::class);
     Route::resource('reel-settings', ReelSettingsController::class);
     Route::resource('custom-settings', CustomController::class);
-    // setting-group-char route moved to Chat package
     Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
     Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
     Route::resource('settings', SettingController::class);
@@ -206,7 +202,6 @@ Route::group([
     Route::get('/agency-export-report', [ExportController::class, 'usersAgencyTargets'])->name('agency-export-report');
     Route::get('/dev', 'HomeController@devindex')->name('dev-home');
     Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
-    // wares-vips moved to packages/Utd/Vip/Routes/web.php
     // servers
     Route::resource('server-country', ServerCountryController::class);
     Route::resource('room-gift-targets', RoomGiftTargetController::class);
@@ -278,10 +273,8 @@ Route::group([
     });
 
     Route::resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
-    // vips_dedicate route moved to packages/Utd/Vip/Routes/web.php
     Route::resource('/bans', 'BanController');
     Route::resource('/request-background-image', 'RequestBackgroundImageController');
-    // group-chat route moved to Chat package
     Route::resource('interests', \App\Admin\Controllers\InterestsController::class);
     Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
     Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
