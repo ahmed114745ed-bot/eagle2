@@ -36,15 +36,13 @@ class WeeklyStarWinner extends Command
 
         $giftIds = $weeklyEvent->gifts->pluck('id');
         $leaderboard = GiftLog::whereIn('giftId', $giftIds)
-            ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
+            ->whereBetween('created_at', [$weeklyEvent->start_date, Carbon::parse($weeklyEvent->end_date)->endOfDay()])
             ->with('sender')
             ->select(DB::raw('SUM(giftPrice) AS total_gift_num'), 'sender_id')
             ->groupBy('sender_id')
             ->orderByDesc('total_gift_num')
             ->take(3)
             ->get();
-
-
 
         foreach ($leaderboard as $index => $entry) {
             $alreadyWinner = Winner::where([
