@@ -11,7 +11,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteUser;
 
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
+use Modules\SuperAdmin\Actions\SuperAdmin\DeleteSubSuperAdminAction;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 use App\Admin\Controllers\MainController;
 
@@ -42,8 +42,8 @@ class AdminUserController extends EncorUsersController
         $grid =  parent::grid();
 
         $grid->actions(function ( $actions) {
-                $actions->disableDelete();
-                $actions->add(new DeleteSubSuperAdmin());
+                $actions->disableDelete(); // تعطيل الحذف الافتراضي
+                $actions->add(new DeleteSubSuperAdminAction()); // إضافة action مخصص
         });
 
         $grid->tools(function ($tools) {
@@ -61,7 +61,7 @@ class AdminUserController extends EncorUsersController
                     </button>
 
                 </div>
-                     <script>
+                <script>
                     function copyAreaManagerUrl() {
                         const url = '{$areaManagerUrl}';
                         navigator.clipboard.writeText(url).then(() => {
@@ -70,6 +70,27 @@ class AdminUserController extends EncorUsersController
                             alert('تعذر نسخ الرابط');
                         });
                     }
+                    
+                    // تعديل action الحذف ليشير للسوبر أدمن
+                    $(document).ready(function() {
+                        // البحث عن جميع forms التي تحتوي على _handle_action_
+                        $('form[action*="_handle_action_"]').each(function() {
+                            var currentAction = $(this).attr('action');
+                            if (currentAction.includes('/admin/')) {
+                                var newAction = currentAction.replace('/admin/', '/superadmin/');
+                                $(this).attr('action', newAction);
+                            }
+                        });
+                        
+                        // مراقبة إضافة forms جديدة
+                        $(document).on('submit', 'form[action*="_handle_action_"]', function(e) {
+                            var currentAction = $(this).attr('action');
+                            if (currentAction.includes('/admin/')) {
+                                var newAction = currentAction.replace('/admin/', '/superadmin/');
+                                $(this).attr('action', newAction);
+                            }
+                        });
+                    });
                 </script>
                 HTML;
 
@@ -94,18 +115,30 @@ class AdminUserController extends EncorUsersController
 
     public function destroy ( $id )
     {
-
-        $user = $this->model->find($id);
-        if ($user){
-            if ($user->isRole('admin') || $user->isRole('developer')){
-                return response ()->json (['error'=>'','message'=>__('admin cant be deleted')]);
+        try {
+            $user = $this->model->find($id);
+            if ($user){
+                if ($user->isRole('admin') || $user->isRole('developer')){
+                    return response ()->json (['error' => true, 'message' => __('admin cant be deleted')]);
+                }
             }
+
+            $OldUserAppId = User::find($user->app_id);
+            if ($OldUserAppId) {
+                $OldUserAppId->is_sub_super_admin = 0;
+                $OldUserAppId->save();
+            }
+
+            Agency::query ()->where ('owner_id',$id)->delete ();
+
+            // حذف المستخدم
+            $user->delete();
+            
+            return response()->json(['success' => true, 'message' => 'تم الحذف بنجاح']);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => true, 'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
         }
-        Agency::query ()->where ('owner_id',$id)->delete ();
-
-
-        return parent ::destroy ($id);
-
     }
 
     public function form ()

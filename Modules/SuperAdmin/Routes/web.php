@@ -170,6 +170,8 @@ Route::group(
         'as' => 'superadmin.',
     ],
     function () {
+        Route::post('_handle_action_', '\Encore\Admin\Controllers\HandleController@handleAction')->name('handle-action');
+        
         Route::get('setting', [AuthController::class, 'getSetting']);
         Route::get('auth/setting', [AuthController::class, 'getSetting']);
         Route::put('update-setting', [AuthController::class, 'putSetting']);
