@@ -132,22 +132,19 @@
     </div>
 
     @php
-        if (!request()->has('tab')) {
-            header('Location: ' . url()->current() . '?tab=admins');
-            exit();
-        }
+        $currentTab = request('tab', 'admins');
     @endphp
 
     <div class="agency-tabs">
-        <a href="?tab=admins" class="tab-btn {{ request('tab') == 'admins' ? 'active' : '' }}"
+        <a href="?tab=admins" class="tab-btn {{ $currentTab == 'admins' ? 'active' : '' }}"
            data-target="admins-tab">{{ __('Room Admins') }}</a>
-        <a href="?tab=gifts" class="tab-btn {{ request('tab') == 'gifts' ? 'active' : '' }}"
+        <a href="?tab=gifts" class="tab-btn {{ $currentTab == 'gifts' ? 'active' : '' }}"
            data-target="gifts-tab">{{ __('Room Gifts') }}</a>
-        <a href="?tab=visitors" class="tab-btn {{ request('tab') == 'visitors' ? 'active' : '' }}"
+        <a href="?tab=visitors" class="tab-btn {{ $currentTab == 'visitors' ? 'active' : '' }}"
            data-target="visitors-tab">{{ __('Room Visitors') }}</a>
-        <a href="?tab=pk" class="tab-btn {{ request('tab') == 'pk' ? 'active' : '' }}"
+        <a href="?tab=pk" class="tab-btn {{ $currentTab == 'pk' ? 'active' : '' }}"
            data-target="pk-tab">{{ __('Pk') }}</a>
-        <a href="?tab=boxes" class="tab-btn {{ request('tab') == 'boxes' ? 'active' : '' }}"
+        <a href="?tab=boxes" class="tab-btn {{ $currentTab == 'boxes' ? 'active' : '' }}"
            data-target="boxes-tab">{{ __('Boxes') }}</a>
     </div>
 </div>
@@ -240,7 +237,7 @@
     {{ __('Loading...') }}
 </div>
 
-<div class="tab-content {{ request('tab') == 'admins' ? 'active' : '' }}" id="admins-tab">
+<div class="tab-content {{ $currentTab == 'admins' ? 'active' : '' }}" id="admins-tab">
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">{{ __('Room Administrators') }}</h4>
@@ -309,7 +306,7 @@
     </div>
 </div>
 
-<div class="tab-content {{ request('tab') == 'gifts' ? 'active' : '' }}" id="gifts-tab">
+<div class="tab-content {{ $currentTab == 'gifts' ? 'active' : '' }}" id="gifts-tab">
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">{{ __('Room Gift Reports') }}</h4>
@@ -462,7 +459,7 @@
     </div>
 </div>
 
-<div class="tab-content {{ request('tab') == 'visitors' ? 'active' : '' }}" id="visitors-tab">
+<div class="tab-content {{ $currentTab == 'visitors' ? 'active' : '' }}" id="visitors-tab">
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">{{ __('Room Visitors') }}</h4>
@@ -572,7 +569,7 @@
     </div>
 </div>
 
-<div class="tab-content {{ request('tab') == 'pk' ? 'active' : '' }}" id="pk-tab">
+<div class="tab-content {{ $currentTab == 'pk' ? 'active' : '' }}" id="pk-tab">
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">{{ __('Room PK') }}</h4>
@@ -698,7 +695,7 @@
     </div>
 </div>
 
-<div class="tab-content {{ request('tab') == 'boxes' ? 'active' : '' }}" id="boxes-tab">
+<div class="tab-content {{ $currentTab == 'boxes' ? 'active' : '' }}" id="boxes-tab">
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">{{ __('Boxes in Room') }}</h4>

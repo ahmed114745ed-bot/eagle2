@@ -39,6 +39,13 @@ class RoomController extends MainController
 
     public function index(Content $content)
     {
+        \Log::info('[RoomController@index] Loading rooms list', [
+            'admin_user' => auth()->id(),
+            'filter' => request('filter', 'all'),
+            'page' => request('page', 1),
+            'timestamp' => now()->toDateTimeString()
+        ]);
+
         $content = $content->title(trans('Rooms'));
 
         if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
@@ -63,6 +70,12 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
+        \Log::info('[RoomController@show] Viewing room profile', [
+            'room_id' => $id,
+            'admin_user' => auth()->id(),
+            'timestamp' => now()->toDateTimeString()
+        ]);
+
         $room = Room::with(['owner.profile', 'roomLevel','roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
