@@ -103,15 +103,19 @@ class AdminUserController extends EncorUsersController
 
         // الآن أضع الـ actions مع الاحتفاظ بالعرض والتعديل وإضافة حذف مخصص
         $grid->actions(function (\Encore\Admin\Grid\Displayers\Actions $actions) {
-                \Log::info('Custom Grid actions callback called with full control');
+                \Log::info('Custom Grid actions callback called');
                 
                 $actions->disableDelete(); // تعطيل الحذف الافتراضي فقط
+                \Log::info('Default delete disabled');
                 
-                // إضافة زر حذف مخصص بتنسيق مناسب لـ Laravel Admin
+                // إضافة زر حذف مخصص كـ Action
+                $actions->add(new CustomDeleteAction());
+                \Log::info('Custom delete action added via Action class');
+                
+                // ولنجرب أيضا append مع تنسيق جديد
                 $id = $actions->getKey();
-                $actions->append('<li><a href="javascript:void(0);" onclick="customSuperAdminDelete(' . $id . ')" class="text-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>');
-                
-                \Log::info('Custom delete action added successfully', ['id' => $id]);
+                $actions->append('<a href="javascript:void(0);" onclick="customSuperAdminDelete(' . $id . ')" style="color: red; display: block; padding: 5px;"><i class="fa fa-trash"></i>&nbsp;&nbsp;حذف TEST</a>');
+                \Log::info('Test delete action appended', ['id' => $id]);
         });
 
         $grid->tools(function ($tools) {
