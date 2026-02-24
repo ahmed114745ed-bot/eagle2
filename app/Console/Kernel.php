@@ -85,17 +85,19 @@ class Kernel extends ConsoleKernel
                 ->runInBackground();
         }
 
-        $schedule->command('weekly-star-winner')
-            ->dailyAt('00:00')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/weekly-star-winner.log'))
-            ->runInBackground();
+        if (PackageHelper::isInstalled('event')) {
+            $schedule->command('weekly-star-winner')
+                ->dailyAt('00:00')
+                ->timezone(getTimezone())
+                ->appendOutputTo(storage_path('logs/weekly-star-winner.log'))
+                ->runInBackground();
 
-        $schedule->command('weekly-star-update')
-            ->dailyAt('00:00')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/weekly-star-update.log'))
-            ->runInBackground();
+            $schedule->command('weekly-star-update')
+                ->dailyAt('00:00')
+                ->timezone(getTimezone())
+                ->appendOutputTo(storage_path('logs/weekly-star-update.log'))
+                ->runInBackground();
+        }
 
         $schedule->command('pk-event-winner')
             ->dailyAt('00:00')
