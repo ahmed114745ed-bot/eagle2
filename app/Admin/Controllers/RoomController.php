@@ -572,33 +572,33 @@ class RoomController extends MainController
         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
-        // $grid->model()->with('microphones')->collection(function ($collection) {
-        //     // collect all microphone user IDs from the current page rows
-        //     $allIds = $collection->flatMap(function ($row) {
-        //         return array_filter(explode(',', (string) $row->microphone));
-        //     })->unique()->values()->all();
+        $grid->model()->with('microphones')->collection(function ($collection) {
+            // collect all microphone user IDs from the current page rows
+            $allIds = $collection->flatMap(function ($row) {
+                return array_filter(explode(',', (string) $row->microphone));
+            })->unique()->values()->all();
 
-        //     // fetch all needed users once
-        //     $users = collect();
-        //     if (!empty($allIds)) {
-        //         $users = User::select(['id', 'name'])
-        //             //->with('profile:id,user_id,avatar')
-        //             ->whereIn('id', $allIds)
-        //             ->get()
-        //             ->keyBy('id');
-        //     }
+            // fetch all needed users once
+            $users = collect();
+            if (!empty($allIds)) {
+                $users = User::select(['id', 'name'])
+                    //->with('profile:id,user_id,avatar')
+                    ->whereIn('id', $allIds)
+                    ->get()
+                    ->keyBy('id');
+            }
 
-        //     // attach a ready-to-use collection on each row
-        //     $collection->each(function ($row) use ($users) {
-        //         $ids = array_filter(explode(',', (string) $row->microphone));
-        //         $row->microphone_users = collect($ids)
-        //             ->map(fn($id) => $users->get($id))
-        //             ->filter()
-        //             ->values();
-        //     });
+            // attach a ready-to-use collection on each row
+            $collection->each(function ($row) use ($users) {
+                $ids = array_filter(explode(',', (string) $row->microphone));
+                $row->microphone_users = collect($ids)
+                    ->map(fn($id) => $users->get($id))
+                    ->filter()
+                    ->values();
+            });
 
-        //     return $collection; // IMPORTANT: return the collection
-        // });
+            return $collection; // IMPORTANT: return the collection
+        });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
