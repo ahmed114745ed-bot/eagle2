@@ -256,6 +256,7 @@ class RoomController extends MainController
     {
         $grid = new Grid(new Room);
         $grid->model()->with(['microphones.user.profile']);
+        $grid->paginate(20);
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
@@ -345,6 +346,7 @@ class RoomController extends MainController
                 'rooms.room_admin',
                 'rooms.level',
                 'rooms.level_id',
+                'rooms.created_at',
                 \DB::raw("
         CASE rooms.room_status
             WHEN 1 THEN 100
@@ -517,9 +519,9 @@ class RoomController extends MainController
 
             case 'country':
                 $grid->model()
-                    ->join('users', 'rooms.uid', '=', 'users.id')
-                    ->join('countries', 'users.country_id', '=', 'countries.id')
-                    ->orderBy('countries.id');
+                    ->leftJoin('users', 'rooms.uid', '=', 'users.id')
+                    ->leftJoin('countries', 'users.country_id', '=', 'countries.id')
+                    ->orderByRaw('countries.id IS NULL, countries.id ASC');
                 break;
 
             default:
