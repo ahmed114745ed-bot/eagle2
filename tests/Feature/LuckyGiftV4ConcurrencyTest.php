@@ -101,8 +101,15 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
             'name' => 'Concurrency Multi-Sender Test Gift'
         ]);
 
-        $senders = User::factory()->count($senderCount)->create(['di' => 1000000]);
-        $receivers = User::factory()->count($receiversPerSenderCount)->create();
+        $senders = User::factory()->count($senderCount)->sequence(fn($sq) => ['email' => "sender{$sq->index}_" . uniqid() . "@example.com"])->create(['di' => 1000000]);
+        $receivers = User::factory()->count($receiversPerSenderCount)->sequence(fn($sq) => ['email' => "receiver{$sq->index}_" . uniqid() . "@example.com"])->create();
+
+        // Audit wallets BEFORE test (Real-time Redis state)
+        $walletsBefore = [
+            'global_vault' => \App\Models\FairLuckWallet::getRedisBalance('global_vault'),
+            'jackpot_wallet' => \App\Models\FairLuckWallet::getRedisBalance('jackpot_wallet'),
+            'medium_wallet' => \App\Models\FairLuckWallet::getRedisBalance('medium_wallet'),
+        ];
 
         $room = $this->getRoom($senders->first());
         $receiverIdsString = implode(',', $receivers->pluck('id')->toArray());
@@ -163,6 +170,39 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
 
         $totalEndTime = microtime(true);
         $totalDuration = $totalEndTime - $totalStartTime;
+
+        // Audit wallets AFTER test (Real-time Redis state)
+        $walletsAfter = [
+            'global_vault' => \App\Models\FairLuckWallet::getRedisBalance('global_vault'),
+            'jackpot_wallet' => \App\Models\FairLuckWallet::getRedisBalance('jackpot_wallet'),
+            'medium_wallet' => \App\Models\FairLuckWallet::getRedisBalance('medium_wallet'),
+        ];
+
+        echo "\n" . str_repeat("=", 130) . "\n";
+        echo "WALLET BALANCE AUDIT (Redis State - Real Time)\n";
+        echo str_repeat("-", 130) . "\n";
+        echo sprintf("| %-15s | %-12s | %-12s | %-12s | %-12s |\n", "Wallet", "Before", "After", "Change", "Expected Min");
+        echo str_repeat("-", 130) . "\n";
+
+        $expectedIncreases = [
+            'global_vault' => $senderCount * $receiversPerSenderCount * $giftPrice * 0.60,
+            'jackpot_wallet' => $senderCount * $receiversPerSenderCount * $giftPrice * 0.20,
+            'medium_wallet' => $senderCount * $receiversPerSenderCount * $giftPrice * 0.10,
+        ];
+
+        foreach ($expectedIncreases as $type => $expectedIncrease) {
+            $before = $walletsBefore[$type] ?? 0;
+            $after = $walletsAfter[$type] ?? 0;
+            $change = $after - $before;
+            echo sprintf(
+                "| %-15s | %-12d | %-12d | %-12d | %-12d |\n",
+                $type,
+                $before,
+                $after,
+                $change,
+                $expectedIncrease
+            );
+        }
 
         echo "\n" . str_repeat("=", 130) . "\n";
         echo "DETAILED CONCURRENCY TEST REPORT (SUMMARY TABLE)\n";

@@ -61,8 +61,8 @@ class FairLuckService3
             );
             $isTopLossCandidate = $this->isTopLossCandidate($user->id);
 
-            // Require the player to "pre-pay" a large chunk of the jackpot via distributed losses
-            // Make it dynamic based on user balance to allow smaller bankrolls to access high multipliers
+            $this->distributeBetAmount($betAmount);
+
             $userBalance = (int) $user->di;
             if ($userBalance <= 5000) {
                 $multiplierFactor = 10;
@@ -239,19 +239,8 @@ class FairLuckService3
                 );
 
                 if ($multiplier === 0) {
-                    $newDeviation = $this->deviationCalculator->calculate(
-                        $profile->total_bets + $betAmount,
-                        $profile->total_profit - $betAmount
-                    );
-
-                    return (object) [
-                        'isWinner' => false,
-                        'multiplier' => 0,
-                        'profitAmount' => -$betAmount,
-                        'houseCut' => $betAmount,
-                        'balance' => $user->di - $betAmount,
-                        'newDeviation' => $newDeviation
-                    ];
+                    $isWinner = false;
+                    $forceWin = false;
                 }
 
                 \Illuminate\Support\Facades\Redis::del($lossKey);
@@ -267,19 +256,15 @@ class FairLuckService3
                     if ($jackpotWalletBalance >= $jackpotPayout) {
                         $this->decreaseJackpotWalletBalance((int) round($jackpotPayout));
                     } else {
-                        $newDeviation = $this->deviationCalculator->calculate(
-                            $profile->total_bets + $betAmount,
-                            $profile->total_profit - $betAmount
-                        );
-
-                        return (object) [
-                            'isWinner' => false,
-                            'multiplier' => 0,
-                            'profitAmount' => -$betAmount,
-                            'houseCut' => $betAmount,
-                            'balance' => $user->di - $betAmount,
-                            'newDeviation' => $newDeviation
-                        ];
+                        // Liquidity Protection: Force a loss instead of returning early
+                        $isWinner = false;
+                        $forceWin = false;
+                        $multiplier = 0;
+                        \Illuminate\Support\Facades\Log::warning("FairLuck Jackpot Liquidity Protection Active", [
+                            'user_id' => $user->id,
+                            'payout' => $jackpotPayout,
+                            'balance' => $jackpotWalletBalance
+                        ]);
                     }
 
                     $this->lossLedger->markHighMultiplierAwarded($user->id, (int) round($jackpotPayout));
@@ -295,20 +280,15 @@ class FairLuckService3
                             $this->decreaseMediumWallet((int) round($profit));
                             // لا نخصم أي شيء من المكاسب - اللاعب يستحق كامل مضاعفه
                         } else {
-                            // إذا لم تكن المحفظة المتوسطة كافية، لا ندفع أي شيء
-                            $newDeviation = $this->deviationCalculator->calculate(
-                                $profile->total_bets + $betAmount,
-                                $profile->total_profit - $betAmount
-                            );
-
-                            return (object) [
-                                'isWinner' => false,
-                                'multiplier' => 0,
-                                'profitAmount' => -$betAmount,
-                                'houseCut' => $betAmount,
-                                'balance' => $user->di - $betAmount,
-                                'newDeviation' => $newDeviation
-                            ];
+                            // Liquidity Protection: Force a loss
+                            $isWinner = false;
+                            $forceWin = false;
+                            $multiplier = 0;
+                            \Illuminate\Support\Facades\Log::warning("FairLuck Medium Liquidity Protection Active", [
+                                'user_id' => $user->id,
+                                'profit' => $profit,
+                                'balance' => $mediumWalletBalance
+                            ]);
                         }
                     } else {
                         // للمضاعفات الصغيرة (5x, 10x, 20x) - السحب من المحفظة الرئيسية مباشرة
@@ -397,7 +377,8 @@ class FairLuckService3
                 'medium_wallet_before' => $walletsBeforeDistribution['medium_wallet'],
             ]);
 
-            $this->distributeBetAmount($betAmount);
+            // Moved to the top of transaction
+            // $this->distributeBetAmount($betAmount);
 
             $walletsAfterDistribution = [
                 'global_vault' => $this->getGlobalVaultBalance(),
@@ -1065,9 +1046,9 @@ class FairLuckService3
             return;
         }
 
-        $globalVaultAmount = (int) round($totalAmount * 0.60);  
-        $jackpotAmount = (int) round($totalAmount * 0.20);      
-        $mediumAmount = (int) round($totalAmount * 0.10);       
+        $globalVaultAmount = (int) round($totalAmount * 0.60);
+        $jackpotAmount = (int) round($totalAmount * 0.20);
+        $mediumAmount = (int) round($totalAmount * 0.10);
 
         if ($globalVaultAmount > 0) {
             FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $globalVaultAmount);
