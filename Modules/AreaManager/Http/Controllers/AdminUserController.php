@@ -2,19 +2,21 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Admin;
-use App\Models\Agent;
-use App\Models\Agency;
-use App\Models\Charge;
-use App\Helpers\Common;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
-use Modules\SuperAdmin\Entities\SuperAdmin;
+use App\Helpers\Common;
+use App\Models\Admin;
+use App\Models\Agency;
+use App\Models\Agent;
+use App\Models\Charge;
+use App\Models\User;
+use Encore\Admin\Layout\Content;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Modules\AreaManager\Entities\SubAreaManager;
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
 use Modules\AreaManager\Http\Controllers\EncorUsersController;
+use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 
 
@@ -128,8 +130,36 @@ class AdminUserController extends EncorUsersController
             ->title(__($this->title))
             ->body($this->profile($id));
     }
+    public function showSubSuperAdmin($id)
+    {
+        $subSuperAdmin = SubAreaManager::find($id);
 
+        if ($subSuperAdmin) {
+            return response()->json([
+                'status' => 200,
+                'item' =>  $subSuperAdmin,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => trans('message.notFoundGift'),
+            ]);
+        }
+    }
 
+    public function updateSubSuperAdmin(Request $request,)
+    {
+
+        $subSuperAdmin = SubAreaManager::find($request->id);
+        $subSuperAdmin->name = $request->name;
+        $subSuperAdmin->username = $request->username;
+        if ($request->has('image')) {
+            $image = Common::upload('images', $request->image);
+            $subSuperAdmin->avatar = $image;
+        }
+        $subSuperAdmin->save();
+        return Redirect::back();
+    }
 
     public function profile($id)
     {
@@ -186,5 +216,23 @@ class AdminUserController extends EncorUsersController
         }
 
         return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
+    }
+
+    public function deleteSubSuperAdmin($id)
+    {
+        $oldUser = DB::table('admin_users')->where('id', $id)->first();
+        $OldUserAppId = User::find($oldUser->app_id);
+        if ($OldUserAppId) {
+            $OldUserAppId->sub_area_manger = 0;
+            $OldUserAppId->save();
+        }
+
+        // Delete the SubAdmin record
+        DB::table('admin_users')->where('id', $oldUser->id)->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
     }
 }
