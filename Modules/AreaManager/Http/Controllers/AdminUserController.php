@@ -163,7 +163,6 @@ class AdminUserController extends EncorUsersController
         }
 
         if ($request->filled('password')) {
-dd(123);
             $subSuperAdmin->password = Hash::make($request->password);
         }
         $subSuperAdmin->save();
