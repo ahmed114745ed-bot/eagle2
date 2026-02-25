@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Utd\Gifts\Console;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use App\Models\GiftLog;
 use App\Models\Gift;
+use Illuminate\Console\Command;
+
 class GiftUpdateUsedCountMonthly extends Command
 {
 

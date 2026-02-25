@@ -53,6 +53,10 @@ class CPServiceProvider extends ServiceProvider
         if (file_exists(__DIR__.'/../Routes/web.php')) {
             $this->loadRoutesFrom(__DIR__.'/../Routes/web.php');
         }
+
+        Route::group([], function () {
+            $this->loadRoutesFrom(__DIR__.'/../Routes/utd.php');
+        });
     }
 
     /**

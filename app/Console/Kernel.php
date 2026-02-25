@@ -2,22 +2,21 @@
 
 namespace App\Console;
 
-use App\Support\PackageHelper;
-use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Models\Setting;
+use App\Support\PackageHelper;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\Cache;
-use Utd\TaskStream\Jobs\PkSessionJob;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Cache;
 use Utd\CP\Console\WeeklyCpWinnerConsole;
+use Utd\Room\Console\Commands\UpdateRoomUserNowCron;
+use Utd\TaskStream\Jobs\PkSessionJob;
 
 class Kernel extends ConsoleKernel
 {
     protected $commands = [
-        Commands\UpdateRoomUserNowCron::class,
         Commands\OpenStatusAppFeature::class,
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
@@ -30,6 +29,10 @@ class Kernel extends ConsoleKernel
 
         if (PackageHelper::isInstalled('cp')) {
             $this->commands[] = WeeklyCpWinnerConsole::class;
+        }
+
+        if (PackageHelper::isInstalled('room')) {
+            $this->commands[] = UpdateRoomUserNowCron::class;
         }
     }
 
@@ -61,24 +64,18 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/users-reset-today-days.log'))
             ->runInBackground();
 
-        $schedule->command('update-gift-weakly:cron')
-            ->weeklyOn(0, '00:00')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/update-gift-weekly-cron.log'))
-            ->runInBackground();
-
-        $schedule->command('app:reset-top-room-rank')
-            ->dailyAt('00:00')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/app-reset-top-room-rank.log'))
-            ->runInBackground();
-
         $schedule->command('redis:get_data')
             ->everyFiveMinutes()
             ->appendOutputTo(storage_path('logs/redis-get-data.log'))
             ->runInBackground();
 
         if (PackageHelper::isInstalled('room')) {
+            $schedule->command('app:reset-top-room-rank')
+                ->dailyAt('00:00')
+                ->timezone(getTimezone())
+                ->appendOutputTo(storage_path('logs/app-reset-top-room-rank.log'))
+                ->runInBackground();
+
             $schedule->command('update-room-ban')
                 ->everyFiveMinutes()
                 ->appendOutputTo(storage_path('logs/update-room-ban'))
@@ -132,9 +129,17 @@ class Kernel extends ConsoleKernel
         //     ->runInBackground();
 
 
-        $schedule->command('app:update-gift-rankings')
-            ->everyThirtySeconds()
-            ->runInBackground();
+        if (PackageHelper::isInstalled('gift')) {
+            $schedule->command('update-gift-weakly:cron')
+                ->weeklyOn(0, '00:00')
+                ->timezone(getTimezone())
+                ->appendOutputTo(storage_path('logs/update-gift-weekly-cron.log'))
+                ->runInBackground();
+
+            $schedule->command('app:update-gift-rankings')
+                ->everyThirtySeconds()
+                ->runInBackground();
+        }
 
         $schedule->command('weekly-cp-winner')
             ->weekly()

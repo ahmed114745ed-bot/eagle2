@@ -12,7 +12,6 @@ use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
-use Modules\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\GiftLogController;
@@ -20,9 +19,7 @@ use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\PermissionController;
-use Utd\Pk\Http\Controllers\Api\PkController;
 use App\Http\Controllers\Api\V1\RoleController;
-use Utd\Room\Http\Controllers\Api\RoomController as RoomControllerVi;
 use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -41,22 +38,15 @@ use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\ChargesController;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\CountryController;
-use App\Http\Controllers\utd\CpRelationController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
-// use App\Http\Controllers\utd\DedicateVipController; // Moved to VIP package
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\EmojiController;
-use Utd\Events\Http\Controllers\Utd\EventPeriodController;
 use App\Http\Controllers\utd\ExchangeController;
-use Utd\Family\Http\Controllers\Utd\FamilyController;
-use Utd\Family\Http\Controllers\Api\FamilyLevelController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\ImageController;
 use App\Http\Controllers\utd\InterestController;
-use App\Http\Controllers\utd\LevelController;
-use App\Http\Controllers\utd\LevelGiftController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\OfficialMessageController;
@@ -72,10 +62,6 @@ use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use App\Http\Controllers\utd\RequestTakeSalaryController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
-use Utd\Events\Http\Controllers\Utd\RoleEventController;
-use Utd\Room\Http\Controllers\Api\RoomCategoryController;
-use Utd\Room\Http\Controllers\Utd\RoomController;
-use Utd\Room\Http\Controllers\Api\RoomTargetController;
 use App\Http\Controllers\utd\SalaryRequestController;
 use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\utd\SallariesHistoryController;
@@ -84,11 +70,23 @@ use App\Http\Controllers\utd\SpecialHistoryController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\utd\SpecialIdRequestController;
 use App\Http\Controllers\utd\SpecialWareController;
-use Utd\Events\Http\Controllers\Utd\TargetEventController;
 use App\Http\Controllers\utd\TicketController;
-use Utd\Events\Http\Controllers\Utd\WeeklyEventController;
 use App\Http\Controllers\utd\WithdrawController;
 use Illuminate\Support\Facades\Route;
+use Modules\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
+use Utd\Events\Http\Controllers\Utd\EventPeriodController;
+use Utd\Events\Http\Controllers\Utd\RoleEventController;
+use Utd\Events\Http\Controllers\Utd\TargetEventController;
+use Utd\Events\Http\Controllers\Utd\WeeklyEventController;
+use Utd\Family\Http\Controllers\Api\FamilyLevelController;
+use Utd\Family\Http\Controllers\Utd\FamilyController;
+use Utd\Pk\Http\Controllers\Api\PkController;
+use Utd\Room\Http\Controllers\Api\RoomCategoryController;
+use Utd\Room\Http\Controllers\Api\RoomController as RoomControllerVi;
+use Utd\Room\Http\Controllers\Api\RoomTargetController;
+use Utd\Room\Http\Controllers\Utd\RoomController;
+
+// use App\Http\Controllers\utd\DedicateVipController; // Moved to VIP package
 
 // 'Utd.decreptHeader'
 // Utd apis
@@ -272,34 +270,6 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [ChargeAgencyController::class, 'delete']);
         Route::post('/delete-all', [ChargeAgencyController::class, 'delete_all']);
         Route::get('/{id}', [ChargeAgencyController::class, 'show']);
-    });
-
-    Route::prefix('cp-relations')->group(function () {
-        Route::get('/', [CpRelationController::class, 'index']);
-        Route::post('/create', [CpRelationController::class, 'store']);
-        Route::post('/update/{id}', [CpRelationController::class, 'update']);
-        Route::post('/delete/{id}', [CpRelationController::class, 'delete']);
-        Route::post('/delete-all', [CpRelationController::class, 'delete_all']);
-        Route::get('/{id}', [CpRelationController::class, 'show']);
-    });
-    Route::get('cp-types', [CpRelationController::class, 'types']);
-
-    Route::prefix('cp-levels/{relation_id}')->group(function () {
-        Route::get('/', [LevelController::class, 'index']);
-        Route::post('/create', [LevelController::class, 'store']);
-        Route::post('/update/{id}', [LevelController::class, 'update']);
-        Route::post('/delete/{id}', [LevelController::class, 'delete']);
-        Route::post('/delete-all', [LevelController::class, 'delete_all']);
-        Route::get('/{id}', [LevelController::class, 'show']);
-    });
-
-    Route::prefix('cp-level-gifts/{cp_level_id}')->group(function () {
-        Route::get('/', [LevelGiftController::class, 'index']);
-        Route::post('/create', [LevelGiftController::class, 'store']);
-        Route::get('/show/{id}', [LevelGiftController::class, 'show']);
-        Route::post('/update/{id}', [LevelGiftController::class, 'update']);
-        Route::post('/delete/{id}', [LevelGiftController::class, 'delete']);
-        Route::post('/delete-all', [LevelGiftController::class, 'delete_all']);
     });
 
     Route::prefix('request-agencies')->group(function () {

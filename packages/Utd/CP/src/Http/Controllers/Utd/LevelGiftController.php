@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\CP\Http\Controllers\Utd;
 
-use Exception;
-use App\Models\Ware;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Ware;
+use Exception;
+use Illuminate\Http\Request;
 use Utd\CP\Entities\CpLevelGift;
 
 class LevelGiftController extends Controller

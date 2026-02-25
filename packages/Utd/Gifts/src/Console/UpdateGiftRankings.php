@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Utd\Gifts\Console;
 
 use App\Helpers\AgencyPackageHelper;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Utd\Room\Console\Commands;
 
-use Utd\Room\Entities\RoomTopUser;
 use Illuminate\Console\Command;
+use Utd\Room\Entities\RoomTopUser;
 
 class ResetTodayTopRoomRank extends Command
 {

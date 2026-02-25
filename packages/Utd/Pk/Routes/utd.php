@@ -14,7 +14,7 @@ use Utd\Pk\Http\Controllers\Utd\PkEventController;
 */
 
 Route::group([
-    'middleware' => ['api', 'auth:sanctum'],
+    'middleware' => ['api', 'localization'],
     'prefix' => 'api/utd',
 ], function () {
     Route::prefix('pk-event')->group(function () {

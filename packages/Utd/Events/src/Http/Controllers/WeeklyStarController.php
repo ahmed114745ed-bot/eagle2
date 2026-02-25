@@ -5,7 +5,6 @@ namespace Utd\Events\Http\Controllers;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Models\GiftLog;
-use App\Models\Reward;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,14 +25,14 @@ class WeeklyStarController extends Controller
     {
         $user = $request->user();
         $userId = $user->id;
-    
+
         $weeklyEvent = WeeklyStar::previousEvent()->weeklyStar()->latest()->first();
         if (!$weeklyEvent) {
             return Common::apiResponse(0, __('no weekly star'), null, 422);
         }
-    
+
         $giftIds = $weeklyEvent->gifts->pluck('id')->toArray();
-    
+
         $allSenders = GiftLog::whereIn('giftId', $giftIds)
             ->whereBetween('created_at', [$weeklyEvent->start_date, $weeklyEvent->end_date])
             ->select(DB::raw('SUM(giftPrice) as totalGiftNum'), 'sender_id')
@@ -41,27 +40,27 @@ class WeeklyStarController extends Controller
             ->groupBy('sender_id')
             ->orderByDesc('totalGiftNum')
             ->get();
-    
+
         if ($allSenders->isEmpty()) {
             return Common::apiResponse(1, '', [
                 'top' => [],
                 'user' => new UserWeeklyStar($user, null),
             ]);
         }
-    
+
         $top10 = $allSenders->take(10);
-    
+
         $userLog = $allSenders->firstWhere('sender_id', $userId);
         $userData = in_array($userId, $top10->pluck('sender_id')->toArray())
-            ? (object)[] 
+            ? (object)[]
             : new UserWeeklyStar($user, $userLog);
-    
+
         return Common::apiResponse(1, '', [
             'top'  => TopWeeklyStarUsersResource::collection($top10),
             'user' => $userData,
         ]);
     }
-    
+
 
     public function topUsersEvent(Request $request)
     {

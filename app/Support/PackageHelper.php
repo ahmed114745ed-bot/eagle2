@@ -7,6 +7,7 @@ use Utd\Achievements\Entities\Achievement;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Events\Entities\WeeklyStar;
 use Utd\Family\Entities\Family;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Tasks\Entities\Day;
 use Utd\TaskStream\Entities\TaskStream;
 use Utd\Charizma\Entities\ExtraDataInRoom;
@@ -39,6 +40,7 @@ class PackageHelper
         'family' => Family::class,
         'event' => WeeklyStar::class,
         'task' => Day::class,
+        'gift' => GiftLog::class,
     ];
 
     /**

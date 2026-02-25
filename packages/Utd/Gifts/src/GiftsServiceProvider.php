@@ -5,6 +5,8 @@ namespace Utd\Gifts;
 use App\Contracts\GiftsContract;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Utd\Gifts\Console\GiftUpdateUsedCountMonthly;
+use Utd\Gifts\Console\GiftUpdateUsedCountWeakly;
 use Utd\Gifts\Contracts\GiftSenderInterface;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
@@ -12,9 +14,10 @@ use Utd\Gifts\Events\GiftSent;
 use Utd\Gifts\Listeners\IncrementReceiverDiamond;
 use Utd\Gifts\Listeners\SendGiftNotification;
 use Utd\Gifts\Listeners\UpdateAgencySalary;
-use Utd\Gifts\Listeners\UpdateUserLevels;
 use Utd\Gifts\Services\GiftSenderService;
 use Utd\Gifts\Services\GiftsService;
+
+//use Utd\Gifts\Listeners\UpdateUserLevels;
 
 /**
  * GiftsServiceProvider
@@ -23,6 +26,11 @@ use Utd\Gifts\Services\GiftsService;
  */
 class GiftsServiceProvider extends ServiceProvider
 {
+    protected $commands = [
+        GiftUpdateUsedCountWeakly::class,
+        GiftUpdateUsedCountMonthly::class,
+    ];
+
     /**
      * Register services
      */
@@ -130,7 +138,7 @@ class GiftsServiceProvider extends ServiceProvider
             IncrementReceiverDiamond::class,
             SendGiftNotification::class,
             UpdateAgencySalary::class,
-            UpdateUserLevels::class,
+//            UpdateUserLevels::class,
         ]);
     }
 
@@ -139,16 +147,8 @@ class GiftsServiceProvider extends ServiceProvider
      */
     protected function registerCommands()
     {
-        if (class_exists('Utd\Gifts\Console\Commands\GiftUpdateUsedCountWeakly')) {
-            $this->commands([
-                Console\Commands\GiftUpdateUsedCountWeakly::class,
-            ]);
-        }
-
-        if (class_exists('Utd\Gifts\Console\Commands\GiftUpdateUsedCountMonthly')) {
-            $this->commands([
-                Console\Commands\GiftUpdateUsedCountMonthly::class,
-            ]);
+        if ($this->app->runningInConsole()) {
+            $this->commands($this->commands);
         }
     }
 

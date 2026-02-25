@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Utd\Room\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Traits\HelperTraits\PusherTrait;
+use Illuminate\Console\Command;
 use Utd\Room\Entities\Room;
 
 class UpdateRoomUserNowCron extends Command

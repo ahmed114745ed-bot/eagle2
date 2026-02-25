@@ -15,7 +15,7 @@ use Utd\LuckyBox\Http\Controllers\Utd\BoxUseController;
 */
 
 Route::group([
-    'middleware' => ['api', 'auth:sanctum'],
+    'middleware' => ['api', 'localization'],
     'prefix' => 'api/utd',
 ], function () {
     Route::prefix('boxes')->group(function () {

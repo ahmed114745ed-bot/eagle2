@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Utd\Gifts\Console;
 
+use App\Models\Gift;
+use App\Models\GiftLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use App\Models\GiftLog;
-use App\Models\Gift;
+
 class GiftUpdateUsedCountWeakly extends Command
 {
 
