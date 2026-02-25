@@ -18,6 +18,7 @@ class BdObserver
             $userApp->is_bd = 1;
             $userApp->save();
             MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
+            info('create bd milestone');
         }
     }
 
@@ -41,6 +42,7 @@ class BdObserver
             if ($oldUser) {
                 $oldUser->update(['is_bd' => 0]);
                 MilestoneHelper::removeReward($oldUser, 'bd');
+                info('update bd milestone');
             }
         }
 
@@ -48,6 +50,7 @@ class BdObserver
         if ($newUser) {
             $newUser->update(['is_bd' => 1]);
             MilestoneHelper::grantMilestoneToUser($newUser, 'bd');
+            info('update 2 bd milestone');
         }
     }
 
@@ -58,13 +61,13 @@ class BdObserver
      */
     public function deleted(Bd $bd)
     {
-
         $userAppId = $bd->app_id;
         $userApp = User::find($userAppId);
         if (isset($userApp)) {
             $userApp->is_bd = 0;
             $userApp->save();
             MilestoneHelper::removeReward($userApp, 'bd');
+            info('delete bd milestone');
         }
     }
 }

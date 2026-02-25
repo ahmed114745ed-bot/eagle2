@@ -18,6 +18,7 @@ class SuperAdminObserver
             $userApp->is_super_admin = 1;
             $userApp->save();
             MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
+            info('create super-admin milestone');
         }
     }
 
@@ -37,6 +38,7 @@ class SuperAdminObserver
             if ($oldUser) {
                 $oldUser->update(['is_super_admin' => 0]);
                 MilestoneHelper::removeReward($oldUser, 'super-admin');
+                info('update super-admin milestone');
             }
         }
 
@@ -46,6 +48,7 @@ class SuperAdminObserver
             if ($newUser) {
                 $newUser->update(['is_super_admin' => 1]);
                 MilestoneHelper::grantMilestoneToUser($newUser, 'super-admin');
+                info('update 2 super-admin milestone');
             }
         }
     }
@@ -64,6 +67,7 @@ class SuperAdminObserver
             $userApp->is_super_admin = 0;
             $userApp->save();
             MilestoneHelper::removeReward($userApp, 'super-admin');
+            info('delete super-admin milestone');
         }
     }
 }
