@@ -30,44 +30,46 @@ class AdminPeriodEventRewordsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'event_id'    => 'required|exists:weekly_stars,id',
-            'expire'      => 'required|numeric',
-            'level'       => 'required|numeric',
-            'type'        => 'required',
-            'img'         => 'nullable',
+            'event_id' => 'required|exists:weekly_stars,id',
+            'expire' => 'required|numeric',
+            'level' => 'required|numeric',
+            'type' => 'required',
+            'img' => 'nullable',
         ]);
         $img = null;
         if ($request->type !== 'achievement') {
             $request->validate([
-                'target'       => 'required|numeric',
+                'target' => 'required|numeric',
             ]);
         } else {
             $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'events') : null;
         }
         Reward::insert([
-            'weekly_star_id'  =>  $request->event_id,
-            'expire'       =>  $request->expire,
-            'level'        => $request->level ,
-            'type'         => $request->type ,
-            'target'         => $request->type !== 'achievement' ? $request->target : $img ?? 'sasa' ,
+            'weekly_star_id' => $request->event_id,
+            'expire' => $request->expire,
+            'level' => $request->level,
+            'type' => $request->type,
+            'target' => $request->type !== 'achievement' ? $request->target : $img ?? 'sasa',
         ]);
-        return $img ;
+
+        return $img;
     }
 
     public function show(string $id)
     {
         $data = Reward::find($id);
-        return new AdminWeeklyStarEventsResource( $data);
+
+        return new AdminWeeklyStarEventsResource($data);
     }
 
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'event_id'    => 'required|exists:weekly_stars,id',
-            'expire'      => 'required|numeric',
-            'level'       => 'required|numeric',
-            'type'        => 'required',
-            'img'         => 'nullable',
+            'event_id' => 'required|exists:weekly_stars,id',
+            'expire' => 'required|numeric',
+            'level' => 'required|numeric',
+            'type' => 'required',
+            'img' => 'nullable',
         ]);
 
         $pkReward = Reward::findOrFail($id);
@@ -77,11 +79,9 @@ class AdminPeriodEventRewordsController extends Controller
                 'target' => 'required|numeric',
             ]);
         } else {
-            if($request->hasFile('img'))
-            {
+            if ($request->hasFile('img')) {
                 $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'events') : null;
-            }
-            else{
+            } else {
                 $img = $pkReward->target;
             }
         }
@@ -100,11 +100,11 @@ class AdminPeriodEventRewordsController extends Controller
     public function destroy(string $id)
     {
         $PkReward = Reward::find($id);
-        if( $PkReward->type == 'achievement' && $PkReward->target)
-        {
+        if ($PkReward->type === 'achievement' && $PkReward->target) {
             $this->delete_img($PkReward->target);
         }
         $PkReward->delete();
+
         return 200;
     }
 }

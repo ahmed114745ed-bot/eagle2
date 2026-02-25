@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('general_roles', function (Blueprint $table) {
             $table->id();
-            $table->char("type",255)->nullable();
-            $table->char("sub_type",255)->nullable();
-            $table->text("desc_en")->nullable();
-            $table->text("desc_ar")->nullable();
+            $table->char('type', 255)->nullable();
+            $table->char('sub_type', 255)->nullable();
+            $table->text('desc_en')->nullable();
+            $table->text('desc_ar')->nullable();
             $table->timestamps();
         });
     }

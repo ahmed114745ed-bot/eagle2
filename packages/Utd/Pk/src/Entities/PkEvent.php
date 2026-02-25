@@ -3,12 +3,12 @@
 namespace Utd\Pk\Entities;
 
 use App\Models\User;
+use App\Traits\EventModel;
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\EventModel;
 
 class PkEvent extends Model
 {

@@ -1,15 +1,15 @@
 <?php
 
-use Utd\Events\Http\Controllers\web\TargetEventController;
-use Utd\Events\Http\Controllers\web\RewardTargetController;
-use Utd\Events\Http\Controllers\web\WeeklyEventGiftNController;
-use Utd\Events\Http\Controllers\web\EventPeriodController;
-use Utd\Events\Http\Controllers\web\WeeklyEventNController;
-use Utd\Events\Http\Controllers\web\GeneralRoleController;
-use Utd\Events\Http\Controllers\web\EventReportController;
+use Illuminate\Support\Facades\Route;
 use Utd\Events\Entities\RewardTarget;
 use Utd\Events\Entities\WeeklyStar;
-use Illuminate\Support\Facades\Route;
+use Utd\Events\Http\Controllers\web\EventPeriodController;
+use Utd\Events\Http\Controllers\web\EventReportController;
+use Utd\Events\Http\Controllers\web\GeneralRoleController;
+use Utd\Events\Http\Controllers\web\RewardTargetController;
+use Utd\Events\Http\Controllers\web\TargetEventController;
+use Utd\Events\Http\Controllers\web\WeeklyEventGiftNController;
+use Utd\Events\Http\Controllers\web\WeeklyEventNController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,10 +22,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
+        'prefix' => config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
@@ -33,7 +32,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('event-period', EventPeriodController::class);
@@ -50,7 +49,7 @@ Route::group(
         });
 
         Route::delete('target-events-gift/{id}/{targets}', [RewardTargetController::class, 'destroyBulk'])
-        ->where('targets', '.*');
+            ->where('targets', '.*');
         Route::prefix('target-events-gift/{charge_event_id}')->group(function () {
             Route::get('/', [RewardTargetController::class, 'index']);
             Route::get('/create', [RewardTargetController::class, 'create']);
@@ -63,9 +62,9 @@ Route::group(
 
         Route::resource('general-rols', GeneralRoleController::class);
         Route::resource('event-reports', EventReportController::class);
-        Route::get("update-weekly-star", function () {
+        Route::get('update-weekly-star', function () {
             WeeklyStar::whereNull('type')->update([
-                'type' => "weekly_star"
+                'type' => 'weekly_star',
             ]);
         });
 

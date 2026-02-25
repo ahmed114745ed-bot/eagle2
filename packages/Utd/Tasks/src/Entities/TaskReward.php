@@ -2,12 +2,12 @@
 
 namespace Utd\Tasks\Entities;
 
-use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Vip\Entities\OVip;
 
 class TaskReward extends Model
 {

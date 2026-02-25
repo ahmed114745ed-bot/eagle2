@@ -3,19 +3,20 @@
 namespace Utd\CP\Repositories;
 
 use App\Models\GiftLog;
-use Illuminate\Support\Facades\DB;
 use App\Support\PackageHelper;
+use Illuminate\Support\Facades\DB;
+use Utd\CP\Entities\Cp;
 use Utd\Events\Entities\GeneralRole;
 use Utd\Events\Entities\WeeklyStar;
-use Utd\CP\Entities\Cp;
 
 class WeeklyCpRepository
 {
     public function currentWeeklyCp()
     {
-        if (!PackageHelper::isInstalled('event')) {
+        if (! PackageHelper::isInstalled('event')) {
             return null;
         }
+
         return WeeklyStar::currentEvent()->WeeklyCP()->with('gifts', 'weeklyCpGifts')->first();
     }
 
@@ -28,17 +29,19 @@ class WeeklyCpRepository
 
     public function perviousWeeklyCp($withRelation = [])
     {
-        if (!PackageHelper::isInstalled('event')) {
+        if (! PackageHelper::isInstalled('event')) {
             return null;
         }
+
         return WeeklyStar::previousEvent()->WeeklyCP()->with($withRelation)->latest()->first();
     }
 
     public function perviousWeeklyCpWinners($limit = 3)
     {
-        if (!PackageHelper::isInstalled('event')) {
+        if (! PackageHelper::isInstalled('event')) {
             return collect([]);
         }
+
         return WeeklyStar::previousEvent()->WeeklyCP()->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
             $query->where('type_relation', 'lovely')->with('userOne.profile', 'userTwo.profile');
         }])->limit($limit)->get();
@@ -46,9 +49,10 @@ class WeeklyCpRepository
 
     public function role()
     {
-        if (!PackageHelper::isInstalled('event')) {
+        if (! PackageHelper::isInstalled('event')) {
             return null;
         }
+
         return GeneralRole::where('type', 'weekly_cp')->first();
     }
 

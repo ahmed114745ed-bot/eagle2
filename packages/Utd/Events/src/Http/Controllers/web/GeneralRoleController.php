@@ -2,23 +2,25 @@
 
 namespace Utd\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Enums\TypeGeneralRole;
+use App\Services\AppFeatureService;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Enums\TypeGeneralRole;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
+use Encore\Admin\Show;
 use Utd\Events\Entities\GeneralRole;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class GeneralRoleController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'general-roles';
+
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("event_role");
+        (new AppFeatureService)->validateStatusEnable('event_role');
     }
 
     public function index(Content $content)
@@ -31,8 +33,7 @@ class GeneralRoleController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -45,8 +46,7 @@ class GeneralRoleController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -62,6 +62,7 @@ class GeneralRoleController extends MainController
             ->title(trans('General rules'))
             ->body($this->form()));
     }
+
     protected function grid()
     {
         $grid = new Grid(new GeneralRole());
@@ -74,6 +75,7 @@ class GeneralRoleController extends MainController
         $grid->desc_tr(__('Description tr'));
         $grid->desc_hi(__('Description hi'));
         $this->extendGrid($grid);
+
         return $grid;
     }
 
@@ -91,9 +93,9 @@ class GeneralRoleController extends MainController
         //        $show->created_at(trans('admin.created_at'));
         //        $show->updated_at(trans('admin.updated_at'));
         $this->extendShow($show);
+
         return $show;
     }
-
 
     protected function form()
     {
@@ -101,11 +103,11 @@ class GeneralRoleController extends MainController
         $this->disableFormTools($form);
 
         $form->display('ID');
-        if (!request('type')) {
+        if (! request('type')) {
             $form->select('type', __('type'))->options(
                 TypeGeneralRole::getTranslatedOptions()
-            )->creationRules(['required', "unique:general_roles"], ['unique' => __('This type is used before; please modify it')])
-                ->updateRules(['required', "unique:general_roles,type,{{id}}"]);
+            )->creationRules(['required', 'unique:general_roles'], ['unique' => __('This type is used before; please modify it')])
+                ->updateRules(['required', 'unique:general_roles,type,{{id}}']);
         } else {
             $form->hidden('type')->value(request('type'));
         }

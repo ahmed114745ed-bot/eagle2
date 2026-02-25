@@ -2,6 +2,7 @@
 
 namespace Utd\Room\Console\Commands;
 
+use DB;
 use Illuminate\Console\Command;
 use Utd\Room\Entities\RoomTopUser;
 
@@ -28,11 +29,11 @@ class ResetTodayTopRoomRank extends Command
     {
         RoomTopUser::query()->update(['coins' => 0]);
 
-        \DB::statement("
+        DB::statement('
             UPDATE rooms
             SET  top_user_id = null
-        ");
+        ');
 
-       $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+        $this->info(now()->toDateTimeString().' '.$this->signature.' Run successful...');
     }
 }

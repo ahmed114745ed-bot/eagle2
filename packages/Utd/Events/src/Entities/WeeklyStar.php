@@ -5,6 +5,8 @@ namespace Utd\Events\Entities;
 use App\Models\Gift;
 use App\Models\User;
 use App\Support\PackageHelper;
+use App\Traits\CpWeeklyStar;
+use App\Traits\EventModel;
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,14 +14,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\CpWeeklyStar;
-use App\Traits\EventModel;
 use Utd\CP\Entities\WeeklyCpGift;
 use Utd\CP\Entities\WeeklyCpWinner;
 
 class WeeklyStar extends Model
 {
-    use EventModel, HasFactory, SoftDeletes, TimestampsWithTimezone, CpWeeklyStar;
+    use CpWeeklyStar, EventModel, HasFactory, SoftDeletes, TimestampsWithTimezone;
 
     protected $guarded = [];
 
@@ -62,8 +62,6 @@ class WeeklyStar extends Model
             $this->hasMany(WeeklyCpWinner::class, 'weekly_cp_id');
     }
 
-
-
     public function scopeWeeklyStar(Builder $query)
     {
         return $query->where('type', 'weekly_star');
@@ -73,7 +71,6 @@ class WeeklyStar extends Model
     {
         return $query->where('type', 'event_period');
     }
-
 
     protected static function boot()
     {
@@ -100,7 +97,6 @@ class WeeklyStar extends Model
             }
         });
     }
-
 
     protected static function convertArabicNumbers($string)
     {

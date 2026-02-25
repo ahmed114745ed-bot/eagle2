@@ -2,19 +2,18 @@
 
 namespace Utd\Events\Http\Controllers\Utd;
 
-use Exception;
-use App\Models\Gift;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
-use Utd\Events\Entities\Reward;
 use App\Http\Controllers\Controller;
-use Utd\Events\Entities\WeeklyStar;
+use App\Models\Gift;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Utd\Events\Entities\Reward;
+use Utd\Events\Entities\WeeklyStar;
 use Utd\Events\Transformers\WeeklyRewardResource;
 
 class WeeklyEventController extends Controller
 {
-
     public function index(Request $request)
     {
         $id = $request->id;
@@ -23,6 +22,7 @@ class WeeklyEventController extends Controller
         $data = WeeklyStar::where('type', $request->type)->with('gifts')->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -42,12 +42,13 @@ class WeeklyEventController extends Controller
         try {
             $lastStartDate = WeeklyStar::max('start_date');
             $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
-            if ($minStartDate == $request->start_date) {
-                return Common::apiResponse(0, __('date must be after ' . $minStartDate),);
+            if ($minStartDate === $request->start_date) {
+                return Common::apiResponse(0, __('date must be after '.$minStartDate));
             }
 
             $weeklyEvent = WeeklyStar::create($request->all());
             $weeklyEvent->gifts()->sync($request->gifts);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -64,9 +65,10 @@ class WeeklyEventController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
-        $lastStartDate = WeeklyStar::where("type", $request->type)->max('start_date');
+        $lastStartDate = WeeklyStar::where('type', $request->type)->max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
+
         return Common::apiResponse(true, 'done', $minStartDate);
     }
 
@@ -74,7 +76,8 @@ class WeeklyEventController extends Controller
     {
         try {
             $data = WeeklyStar::with('gifts')->findOrFail($id);
-            return Common::apiResponse(true, ' successfully',  $data);
+
+            return Common::apiResponse(true, ' successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -103,6 +106,7 @@ class WeeklyEventController extends Controller
             $data = WeeklyStar::findOrFail($id);
             $data->update($request->all());
             $data->gifts()->sync($request->gifts);
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -116,7 +120,7 @@ class WeeklyEventController extends Controller
             $data = WeeklyStar::findOrFail($id);
             $data->delete();
 
-            return Common::apiResponse(true, 'deleted successfully',  $data);
+            return Common::apiResponse(true, 'deleted successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -139,6 +143,7 @@ class WeeklyEventController extends Controller
         $data = Reward::where('weekly_star_id', $request->weekly_star_id)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', WeeklyRewardResource::collection($data));
     }
 
@@ -151,7 +156,7 @@ class WeeklyEventController extends Controller
             'target1' => 'nullable',
             'target2' => 'nullable',
             'target3' => 'nullable',
-            'expire'  => 'required',
+            'expire' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -166,9 +171,10 @@ class WeeklyEventController extends Controller
                 'weekly_star_id' => $request->weekly_star_id,
                 'level' => $request->level,
                 'type' => $request->type,
-                'expire'  => $request->expire,
+                'expire' => $request->expire,
             ];
             Reward::create($data);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -185,7 +191,7 @@ class WeeklyEventController extends Controller
             'target1' => 'nullable',
             'target2' => 'nullable',
             'target3' => 'nullable',
-            'expire'  => 'required',
+            'expire' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -202,18 +208,19 @@ class WeeklyEventController extends Controller
                 'level' => $request->level,
                 'type' => $request->type,
             ];
-            $reward =  Reward::findOrFail($id);
-            if ($request->type == 'ware') {
+            $reward = Reward::findOrFail($id);
+            if ($request->type === 'ware') {
                 $reward->target = $request->target1;
-            } elseif ($request->type == 'vip') {
+            } elseif ($request->type === 'vip') {
                 $reward->target = $request->target2;
-            } elseif ($request->type == 'coins') {
+            } elseif ($request->type === 'coins') {
                 $reward->target = $request->target3;
-            } elseif ($request->type == 'achievement' && $request->hasFile('target4')) {
+            } elseif ($request->type === 'achievement' && $request->hasFile('target4')) {
                 $file = $request->file('target4');
                 $reward->target = Common::upload('images', $file);
             }
             $reward->update($data);
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -224,9 +231,10 @@ class WeeklyEventController extends Controller
     public function destroyGift($id)
     {
         try {
-            $data =  Reward::findOrFail($id);
+            $data = Reward::findOrFail($id);
             $data->delete();
-            return Common::apiResponse(true, 'deleted successfully',  $data);
+
+            return Common::apiResponse(true, 'deleted successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -236,7 +244,8 @@ class WeeklyEventController extends Controller
     public function showGift($id)
     {
         try {
-            $data =  Reward::with('ware', 'vip')->findOrFail($id);
+            $data = Reward::with('ware', 'vip')->findOrFail($id);
+
             return Common::apiResponse(true, 'done', new WeeklyRewardResource($data));
         } catch (Exception $exception) {
 
@@ -252,6 +261,7 @@ class WeeklyEventController extends Controller
         $data = Gift::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->orderBy('sort')->orderBy('type')->where('enable', 1)->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', $data);
     }
 }

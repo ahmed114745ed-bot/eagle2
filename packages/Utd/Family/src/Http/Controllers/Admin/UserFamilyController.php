@@ -3,31 +3,29 @@
 namespace Utd\Family\Http\Controllers\Admin;
 
 use Carbon\Carbon;
-use Utd\Family\Entities\Family;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Helpers\Common;
-use App\Models\Country;
-use Utd\Vip\Entities\UserVip;
-use App\Models\MangerType;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
-use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
-use Encore\Admin\Facades\Admin;
-use Illuminate\Validation\Rule;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Session;
-use Utd\Family\Admin\Actions\KickOfFamilyAction;
 use Encore\Admin\Widgets\Table;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
+use RuntimeException;
+use Utd\Family\Admin\Actions\KickOfFamilyAction;
+use Utd\Family\Entities\Family;
 
 // use Encore\Admin\Actions\Response;
 
 class UserFamilyController extends MainController
 {
     public $permission_name = 'users-family';
+
     public $hiddenColumns = [
         'is_host',
         'status',
@@ -38,8 +36,9 @@ class UserFamilyController extends MainController
         'di',
         'gold',
         'coins',
-        'actions'
+        'actions',
     ];
+
     /**
      * Title for current resource.
      *
@@ -48,18 +47,31 @@ class UserFamilyController extends MainController
     protected $title;
 
     protected string $userModel;
+
     protected string $packModel;
+
     protected string $wareModel;
+
     protected string $countryModel;
+
     protected string $profileFormClass;
+
     protected string $infoBoxClass;
+
     protected string $imageColorsClass;
+
     protected string $deletePackActionClass;
+
     protected string $editPackExpireActionClass;
+
     protected string $deleteUserVipActionClass;
+
     protected ?string $userActionClass = null;
+
     protected ?string $agencyHelperClass = null;
+
     protected ?string $userHandlingFacadeClass = null;
+
     protected ?string $userVipModel = null;
 
     public function __construct()
@@ -86,7 +98,6 @@ class UserFamilyController extends MainController
         // if (!Admin::user()->can('*')) {
         //     Permission::check('browse-users');
         // }
-
 
         $forms = [
             'one' => $this->profileFormClass,
@@ -128,6 +139,153 @@ class UserFamilyController extends MainController
             });
     }
 
+    public function stop_charge(Request $request)
+    {
+        if ($request->stop_charge === 'false') {
+            settings()->set('stop_charge', '0');
+        } else {
+            settings()->set('stop_charge', '1');
+        }
+    }
+
+    public function make_rooms_top(Request $request)
+    {
+        if ($request->make_rooms_top === 'true') {
+            settings()->set('make_rooms_top', '1');
+        } else {
+            settings()->set('make_rooms_top', '0');
+        }
+    }
+
+    public function transferSalary(Request $request)
+    {
+        if ($request->transfer_salary === 'true') {
+            settings()->set('transfer_salary', '1');
+        } else {
+            settings()->set('transfer_salary', '0');
+        }
+    }
+
+    public function show($id, Content $content)
+    {
+        $userModel = $this->userModel;
+        $infoBoxClass = $this->infoBoxClass;
+
+        return $content->row(
+            function ($row) use ($id, $userModel, $infoBoxClass) {
+                $user = $userModel::find($id);
+                if ($user) {
+                    $user->flowers = 0;
+                    $user->save();
+                }
+
+                $type = $user->type_user;
+                switch ($type) {
+                    case 0:
+                        $userType = __('User');
+                        break;
+                    case 1:
+                        $userType = __('Host');
+                        break;
+                    case 2:
+                        $userType = __('Host Agent');
+                        break;
+                    case 3:
+                        $userType = __('Shipping Agent');
+                        break;
+                    case 4:
+                        $userType = __('Resort & Shipping Agent');
+                        break;
+                    case 5:
+                        $userType = __('Admin');
+                        break;
+                    default:
+                        $userType = $type; // Keep the original value if no match is found
+                        break;
+                }
+                $row->column(2, new $infoBoxClass($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
+                $row->column(2, new $infoBoxClass(family_helper('common')::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
+                $row->column(2, new $infoBoxClass(family_helper('common')::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
+                $row->column(2, new $infoBoxClass($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
+                $row->column(2, new $infoBoxClass($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
+                $row->column(2, new $infoBoxClass($userType ?? '', '', 'green', '?type=balance_details', __('type')));
+            }
+        )->row('<h3>'.__('pack').'</h3>')->row(function ($row) use ($id) {
+            $row->column(12, $this->packList($id));
+        })
+            ->row('<h3>'.__('vips').'</h3>')->row(function ($row) use ($id) {
+                $row->column(12, $this->vipList($id));
+            });
+    }
+
+    public function showAdditionalInfo($id, Content $content)
+    {
+        $userModel = $this->userModel;
+        $infoBoxClass = $this->infoBoxClass;
+
+        return $content
+            ->row(function (Row $row) {
+                $row->column(12, $this->showColSearch());
+            })
+            ->row(
+                function ($row) use ($id, $userModel, $infoBoxClass) {
+                    $user = $userModel::find($id);
+                    if ($user) {
+                        $user->flowers = 0;
+                        $user->save();
+                    }
+                    $type = $user->type_user;
+                    switch ($type) {
+                        case 0:
+                            $userType = __('User');
+                            break;
+                        case 1:
+                            $userType = __('Host');
+                            break;
+                        case 2:
+                            $userType = __('Host Agent');
+                            break;
+                        case 3:
+                            $userType = __('Shipping Agent');
+                            break;
+                        case 4:
+                            $userType = __('Resort & Shipping Agent');
+                            break;
+                        case 5:
+                            $userType = __('Admin');
+                            break;
+                        default:
+                            $userType = $type; // Keep the original value if no match is found
+                            break;
+                    }
+
+                    $row->column(2, new $infoBoxClass(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
+                    $row->column(2, new $infoBoxClass(__('Level'), 'dollar', 'orange', '?type=balance_details', family_helper('common')::level_center($user)['sender_level']));
+                    $row->column(2, new $infoBoxClass(__('worth'), 'dollar', 'blue', '?type=balance_details', family_helper('common')::level_center($user)['receiver_level']));
+                    $row->column(2, new $infoBoxClass(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->getTotalDiamonds()));
+                    $row->column(2, new $infoBoxClass(__('coins'), 'dollar', 'red', '?type=balance_details', $user->di));
+                    $row->column(2, new $infoBoxClass(__('type'), 'dollar', 'red', '?type=balance_details', $userType));
+                }
+            );
+    }
+
+    public function update($id)
+    {
+        unset(request()['level']);
+        unset(request()['worth']);
+
+        return $this->form()->update($id);
+    }
+
+    public function request_invite_code(Request $request)
+    {
+        if ($request->stop_invite_code === 'true') {
+            settings()->set('stop_invite_code', '1');
+        } else {
+            settings()->set('stop_invite_code', '0');
+        }
+    }
+
     protected function grid2()
     {
         $transfer_salary = settings()->get('transfer_salary');
@@ -139,20 +297,21 @@ class UserFamilyController extends MainController
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary',])),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary'])),
         ))->collapsable()->class('box collapsed-box');
     }
+
     protected function grid()
     {
         $userModel = $this->userModel;
         $grid = new Grid(new $userModel());
-        $haveCoins = (request()->have_coins == 1);
+        $haveCoins = (request()->have_coins === 1);
         // $grid->model()->with("ownerRoom")->whereHas('family')->whereHas('familyType', fn($q) => $q->where('status',1))->orderByDesc('id');
         $grid->model()
             ->select('users.*') // Select all user fields
             ->leftJoin('family_user as fu', 'users.id', '=', 'fu.user_id') // Join familyType relation
             ->whereHas('family')
-            ->whereHas('familyType', fn($q) => $q->where('status', 1))
+            ->whereHas('familyType', fn ($q) => $q->where('status', 1))
             ->orderByDesc('fu.user_type') // Sort by user_type from family_users
             ->orderByDesc('users.id');
 
@@ -170,7 +329,7 @@ class UserFamilyController extends MainController
                             ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
                     }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
                 });
-                $filter->equal('familyType.user_type', __('type'))->select([2 =>  __('Owner'), 1 => __('Admin'),0 => __('Member')]);
+                $filter->equal('familyType.user_type', __('type'))->select([2 => __('Owner'), 1 => __('Admin'), 0 => __('Member')]);
 
             });
         });
@@ -182,19 +341,19 @@ class UserFamilyController extends MainController
         }
 
         $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid
-                ? __("uuid") . ' : ' . $this->uuid
-                : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
+            return $this->uuid === $this->original_uuid
+                ? __('uuid').' : '.$this->uuid
+                : __('uuid').' : '.$this->uuid.'<br>'.__('special uuid').' : '.$this->original_uuid;
         });
         $grid->column('name', __('Name'))
             ->display(function ($name) {
                 $uid = @$this->uuid;
                 $path = @$this->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
+                $defaultImage = asset('images/businessman-icon.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Check if the image exists
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -215,20 +374,19 @@ class UserFamilyController extends MainController
                 __('reel count') => $this->reals()->count() ?? 0,
                 __('moment_count') => $this->moments()->count() ?? 0,
                 __('total_days') => $this->total_days ?? 0,
-                __('total_hours') => $this->liveTime->sum("hours") ?? 0,
+                __('total_hours') => $this->liveTime->sum('hours') ?? 0,
             ];
 
             return new Table([__('Field Name'), __('Value')], $results);
         });
 
-
-
         $grid->column('profile.avatar', __('image'))->display(function ($path) {
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 
@@ -254,18 +412,18 @@ class UserFamilyController extends MainController
         // });
 
         $grid->column('family_id', __('family'))->modal('family', function () {
-            $agency =  Family::query()->find(@$this->family_id);
+            $agency = Family::query()->find(@$this->family_id);
             $path = @$agency?->image;
-            $defaultImage = asset("images/icon-agency.jpg");
+            $defaultImage = asset('images/icon-agency.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
             $results = [
                 __('name') => @$agency->owner->name ?? '',
-                __('img') => "<img src='" . $url . "' style='width:100px;height:100px' class='img img-thumbnail'$ />",
+                __('img') => "<img src='".$url."' style='width:100px;height:100px' class='img img-thumbnail'$ />",
 
             ];
 
@@ -317,7 +475,7 @@ class UserFamilyController extends MainController
                 $target =
                     [
                         'id' => $target->id,
-                        'add_month' => $target->add_month . '/' . $target->add_year,
+                        'add_month' => $target->add_month.'/'.$target->add_year,
                         'target_usd' => $target->target_usd,
                         'target_agency_share' => $target->target_agency_share,
                         'user_diamonds' => $target->user_diamonds,
@@ -329,17 +487,17 @@ class UserFamilyController extends MainController
                         'updated_at' => $target->updated_at,
                     ];
 
-
                 return $target;
             });
 
             $tableClass = family_admin('table');
+
             return new $tableClass(
                 [
                     'ID',
-                    __('month') . '/' . __('year'),
-                    __('usd') . ' ' . __('deserved') . '(%)',
-                    __('agency share') . '(%)',
+                    __('month').'/'.__('year'),
+                    __('usd').' '.__('deserved').'(%)',
+                    __('agency share').'(%)',
                     __('user diamonds'),
                     __('user hours'),
                     __('user days'),
@@ -354,48 +512,52 @@ class UserFamilyController extends MainController
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         $userModelForCounters = $this->userModel;
         $grid->column('custom_button2', __('accounts number'))->display(function () use ($userModelForCounters) {
-            $id           = $this->id;
+            $id = $this->id;
             $device_token = $this->device_token;
-            $count        = $userModelForCounters::where('device_token', $device_token)->where('device_token', '!=', null)->count();
-            $class        = 1 == 0 ? 'btn-danger' : 'btn-success';
+            $count = $userModelForCounters::where('device_token', $device_token)->where('device_token', '!=', null)->count();
+            $class = 1 === 0 ? 'btn-danger' : 'btn-success';
+
             return $count;
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) use ($userModelForCounters) {
-            $device_token  = $this->device_token;
-            $users         =
+            $device_token = $this->device_token;
+            $users =
                 $userModelForCounters::select('name', 'uuid', 'phone')->where('device_token', $device_token)->where('device_token', '!=', null)->get();
             $filteredUsers = $users->map(function ($user) {
-                return $user->only(["name", "uuid", "phone"]);
+                return $user->only(['name', 'uuid', 'phone']);
             });
+
             return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
         });
 
         $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
             $contract = family_contract_or_fail('user_achievement');
-            $achivement      = app($contract);
+            $achivement = app($contract);
             $data_achivement = $achivement->getUserAchievement($model);
 
             $filtered = $data_achivement->map(function ($user) {
 
-                $img = $user["valid_image"] ?? $user["custom_image"];
-                $img = getDriverUrl() . '/' . $img;
-                $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+                $img = $user['valid_image'] ?? $user['custom_image'];
+                $img = getDriverUrl().'/'.$img;
+                $img = "<img src='".$img."' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+
                 //                $user->only(["user_achievement_levels.id","achievement_levels.valid_image"]);
                 return [
-                    'id'     => $user['id'],
+                    'id' => $user['id'],
                     'target' => $user['target'],
-                    'image'  => $img,
+                    'image' => $img,
                 ];
             });
-            return (new Table([__('Id'), __('target'), __('image')], $filtered->toArray()));
+
+            return new Table([__('Id'), __('target'), __('image')], $filtered->toArray());
         });
 
         $grid->column('custom_button3', __('تبديل الحساب'))->modal('حسابات اخري علي نفس الجهاز', function ($model) use ($userModelForCounters) {
             $userAccountClass = family_module('switch_account', 'user_account');
-            if (!$userAccountClass) {
+            if (! $userAccountClass) {
                 return __('Module not available');
             }
 
-            $device_token  = $this->device_token;
+            $device_token = $this->device_token;
             $accounts = $userAccountClass::where('device_token', $device_token)->get();
             $parentUserIds = $accounts->pluck('parent_user_id');
             $childUserIds = $accounts->pluck('child_user_id');
@@ -403,18 +565,21 @@ class UserFamilyController extends MainController
             $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
             $userId = $this->id;
             $filteredIds = array_filter($allIds, function ($id) use ($userId) {
-                return $id != $userId;
+                return $id !== $userId;
             });
             $filteredIds = array_values($filteredIds);
             $users = $userModelForCounters::query()->whereIn('id', $filteredIds)->select('name', 'uuid', 'phone')->get();
             $filteredUsers = $users->map(function ($user) {
                 return $user->only(['name', 'uuid', 'phone']);
             });
+
             return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
         });
         $grid->disableExport();
         $appEnv = config('app.env');
-        if ($appEnv == 'production') $grid->disableCreateButton();
+        if ($appEnv === 'production') {
+            $grid->disableCreateButton();
+        }
 
         $this->extendGrid($grid);
         $userActionClass = $this->userActionClass;
@@ -423,7 +588,8 @@ class UserFamilyController extends MainController
             $model = $actions->row;
 
             if ($userActionClass && class_exists($userActionClass)) {
-                $actions->add(new class($userActionClass) extends \Encore\Admin\Actions\RowAction {
+                $actions->add(new class($userActionClass) extends \Encore\Admin\Actions\RowAction
+                {
                     public $name = 'Status User';
 
                     public function __construct(private string $userActionClass)
@@ -458,86 +624,7 @@ class UserFamilyController extends MainController
             }
         });
 
-
         return $grid;
-    }
-
-    public function stop_charge(Request $request)
-    {
-        if ($request->stop_charge == "false") {
-            settings()->set("stop_charge", "0");
-        } else {
-            settings()->set("stop_charge", "1");
-        }
-    }
-
-    public function make_rooms_top(Request $request)
-    {
-        if ($request->make_rooms_top == "true") {
-            settings()->set("make_rooms_top", "1");
-        } else {
-            settings()->set("make_rooms_top", "0");
-        }
-    }
-
-    public function transferSalary(Request $request)
-    {
-        if ($request->transfer_salary == "true") {
-            settings()->set("transfer_salary", "1");
-        } else {
-            settings()->set("transfer_salary", "0");
-        }
-    }
-
-    public function show($id, Content $content)
-    {
-        $userModel = $this->userModel;
-        $infoBoxClass = $this->infoBoxClass;
-        return $content->row(
-            function ($row) use ($id, $userModel, $infoBoxClass) {
-                $user = $userModel::find($id);
-                if ($user) {
-                    $user->flowers = 0;
-                    $user->save();
-                }
-
-                $type = $user->type_user;
-                switch ($type) {
-                    case 0:
-                        $userType = __("User");
-                        break;
-                    case 1:
-                        $userType = __("Host");
-                        break;
-                    case 2:
-                        $userType = __("Host Agent");
-                        break;
-                    case 3:
-                        $userType = __("Shipping Agent");
-                        break;
-                    case 4:
-                        $userType = __("Resort & Shipping Agent");
-                        break;
-                    case 5:
-                        $userType = __("Admin");
-                        break;
-                    default:
-                        $userType = $type; // Keep the original value if no match is found
-                        break;
-                }
-                $row->column(2, new $infoBoxClass($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
-                $row->column(2, new $infoBoxClass(family_helper('common')::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
-                $row->column(2, new $infoBoxClass(family_helper('common')::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
-                $row->column(2, new $infoBoxClass($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
-                $row->column(2, new $infoBoxClass($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
-                $row->column(2, new $infoBoxClass($userType ?? '', '', 'green', '?type=balance_details', __('type')));
-            }
-        )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
-            $row->column(12, $this->packList($id));
-        })
-            ->row("<h3>" . __('vips') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->vipList($id));
-            });
     }
 
     protected function packList($id)
@@ -563,14 +650,14 @@ class UserFamilyController extends MainController
         );
         $grid->column('type', __('type'))->using(
             [
-                1  => trans('Gemstone'),
-                3  => trans('Card Scroll'),
-                4  => trans('Avatar Frame'),
-                5  => trans('Bubble Frame'),
-                6  => trans('Entering Special Effects'),
-                7  => trans('Microphone Aperture'),
-                8  => trans('Badge'),
-                9  => trans('NoKick'),
+                1 => trans('Gemstone'),
+                3 => trans('Card Scroll'),
+                4 => trans('Avatar Frame'),
+                5 => trans('Bubble Frame'),
+                6 => trans('Entering Special Effects'),
+                7 => trans('Microphone Aperture'),
+                8 => trans('Badge'),
+                9 => trans('NoKick'),
                 10 => trans('Icon'),
                 11 => trans('intro animation'),
                 12 => trans('wapel'),
@@ -588,13 +675,15 @@ class UserFamilyController extends MainController
         );
         $grid->column('target_id', __('img'))->display(function () use ($wareModel) {
             $ware = $wareModel::query()->where('id', $this->target_id)->value('show_img');
-            $src  = getDriverUrl() . '/' . $ware;
+            $src = getDriverUrl().'/'.$ware;
+
             return "<img width='30' src='$src'>";
         });
         $grid->column('expire', __('expire'))->display(function ($row) {
             if ($this->expire) {
                 return Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s');
             }
+
             return __('no time');
         });
 
@@ -617,8 +706,8 @@ class UserFamilyController extends MainController
 
     protected function vipList($id)
     {
-        if (!$this->userVipModel) {
-            throw new \RuntimeException('Vip module is not configured for the family package.');
+        if (! $this->userVipModel) {
+            throw new RuntimeException('Vip module is not configured for the family package.');
         }
 
         $userVipModel = $this->userVipModel;
@@ -633,6 +722,7 @@ class UserFamilyController extends MainController
             if ($this->expire) {
                 return Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s');
             }
+
             return __('no time');
         });
         $grid->column('qty', __('qty'));
@@ -655,71 +745,12 @@ class UserFamilyController extends MainController
         return $grid;
     }
 
-    public function showAdditionalInfo($id, Content $content)
-    {
-        $userModel = $this->userModel;
-        $infoBoxClass = $this->infoBoxClass;
-        return $content
-            ->row(function (Row $row) {
-                $row->column(12, $this->showColSearch());
-            })
-            ->row(
-                function ($row) use ($id, $userModel, $infoBoxClass) {
-                    $user = $userModel::find($id);
-                    if ($user) {
-                        $user->flowers = 0;
-                        $user->save();
-                    }
-                    $type = $user->type_user;
-                    switch ($type) {
-                        case 0:
-                            $userType = __("User");
-                            break;
-                        case 1:
-                            $userType = __("Host");
-                            break;
-                        case 2:
-                            $userType = __("Host Agent");
-                            break;
-                        case 3:
-                            $userType = __("Shipping Agent");
-                            break;
-                        case 4:
-                            $userType = __("Resort & Shipping Agent");
-                            break;
-                        case 5:
-                            $userType = __("Admin");
-                            break;
-                        default:
-                            $userType = $type; // Keep the original value if no match is found
-                            break;
-                    }
-
-                    $row->column(2, new $infoBoxClass(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                    $row->column(2, new $infoBoxClass(__('Level'), 'dollar', 'orange', '?type=balance_details', family_helper('common')::level_center($user)['sender_level']));
-                    $row->column(2, new $infoBoxClass(__('worth'), 'dollar', 'blue', '?type=balance_details', family_helper('common')::level_center($user)['receiver_level']));
-                    $row->column(2, new $infoBoxClass(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->getTotalDiamonds()));
-                    $row->column(2, new $infoBoxClass(__('coins'), 'dollar', 'red', '?type=balance_details', $user->di));
-                    $row->column(2, new $infoBoxClass(__('type'), 'dollar', 'red', '?type=balance_details', $userType));
-                }
-            );
-    }
-
     protected function showColSearch()
     {
         $form = new Box();
         $form->view('admin.grid.users.userChargeView');
 
         return $form;
-    }
-
-    public function update($id)
-    {
-        unset(request()['level']);
-        unset(request()['worth']);
-
-
-        return $this->form()->update($id);
     }
 
     /**
@@ -735,20 +766,19 @@ class UserFamilyController extends MainController
         $userHandlingFacade = $this->userHandlingFacadeClass;
         $form = new Form(new $userModel());
         if ($form->isEditing()) {
-            $userId           = request()->segment(3);
+            $userId = request()->segment(3);
 
-            $user             = $userModel::findOrFail($userId);
-            $oldDiValue       = $user->getOriginal('di');
+            $user = $userModel::findOrFail($userId);
+            $oldDiValue = $user->getOriginal('di');
             $oldDiamoundValue = $user->getOriginal('user_diamond');
         } else {
-            $oldDiValue       = null;
+            $oldDiValue = null;
             $oldDiamoundValue = null;
         }
 
-
         $loggedInUserId = Admin::user()->id;
         $form->display('id', __('id'));
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             // Add a hidden field for 'uuid' in the edit form
             $form->text('uuid', __('uuid'))->creationRules([
                 'required',
@@ -757,7 +787,7 @@ class UserFamilyController extends MainController
                     if (DB::table('wares')->where('value', $value)->exists()) {
                         return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
                     }
-                }
+                },
             ])
                 ->updateRules([
                     'required',
@@ -767,22 +797,21 @@ class UserFamilyController extends MainController
                         if (DB::table('wares')->where('value', $value)->exists()) {
                             return $fail(__('القيمة موجودة بالفعل في جدول wares.'));
                         }
-                    }
+                    },
                 ]);
         }
 
         $form->belongsTo('image_color_id', $imageColorsClass, __('Color'));
-
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
             $form->hidden('oldDiValue')->default($oldDiValue);
             $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
         }
-        $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+        $form->text('uuid', __('uuid'))->updateRules(['required', 'unique:users,uuid,{{id}}']);
 
         $form->image('profile.avatar', __('image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
         });
 
         $form->image('profile.image_id', __('image Id'));
@@ -791,21 +820,22 @@ class UserFamilyController extends MainController
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
 
-        $form->switch('charge_status', __("charge status"))->states($state);
-        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
-        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
-        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
+        $form->switch('charge_status', __('charge status'))->states($state);
+        $form->switch('transfer_salary', __('transfer_salary'))->states($state);
+        $form->switch('userSetting.show_invite_code', __('show invite code'))->states($state);
+        $form->switch('userSetting.hide_chat', __('hide_chat'))->states($state);
         $form->select('country_id', trans('country'))->options(function () use ($countryModel) {
-            $ops       = [null => __('no country')];
+            $ops = [null => __('no country')];
             $countries = $countryModel::all();
             foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ?  ($country->e_name ?? $country->name) : $country->name;
+                $ops[$country->id] = App::isLocale('en') ? ($country->e_name ?? $country->name) : $country->name;
             }
+
             return $ops;
         });
         $states = [
-            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
-            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
+            'default' => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
+            'on' => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
             'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
         ];
         if ($form->isCreating()) {
@@ -815,11 +845,12 @@ class UserFamilyController extends MainController
                 if ($userHandlingFacade && method_exists($userHandlingFacade, 'chickLevelToPlay')) {
                     $can_play = $userHandlingFacade::chickLevelToPlay($this);
                 }
+
                 return $can_play ? 'on' : 'off';
             })->states($states);
         }
 
-        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
+        if ($loggedInUserId === 1 || $loggedInUserId === 2) {
             $form->number('di', __('Coins'))->default(0)->disable();
 
             $form->number('user_diamond', __('Diamonds'))->default(0);
@@ -832,20 +863,19 @@ class UserFamilyController extends MainController
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
-        $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
+        $form->text('phone', __('phone'))->creationRules(['required', 'unique:users,phone,{{id}}'])->updateRules(['required', 'unique:users,phone,{{id}}']);
         $form->switch('status', __('block status'))->options(family_helper('common')::getSwitchStates2());
 
         $form->select('type_user', trans('User Type'))->options([
             $form->model()->type_user => $form->model()->type_user,
-            0                         => 'مستخدم',
-            1                         => 'مضيف',
-            2                         => 'وكيل مضيفين',
-            3                         => 'وكيل شحن',
-            4                         => ' وكيل مصيفين ووكيل شحن',
-            5                         => 'اداري',
+            0 => 'مستخدم',
+            1 => 'مضيف',
+            2 => 'وكيل مضيفين',
+            3 => 'وكيل شحن',
+            4 => ' وكيل مصيفين ووكيل شحن',
+            5 => 'اداري',
 
         ])->default(0);
-
 
         if (Session::has('show_alert')) {
             $form->html('<script>
@@ -857,13 +887,13 @@ class UserFamilyController extends MainController
         $agencyHelper = $this->agencyHelperClass;
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue, $userModel, $agencyHelper) {
             $type_user = request()->type_user;
-            $model     = $form->model();
-            $user_id   = $model->id;
-            if ($form->oldDiValue != $oldDiValue) {
+            $model = $form->model();
+            $user_id = $model->id;
+            if ($form->oldDiValue !== $oldDiValue) {
                 $form->di = $oldDiValue;
             }
 
-            if ($form->oldDiamoundValue != $oldDiamoundValue) {
+            if ($form->oldDiamoundValue !== $oldDiamoundValue) {
                 $form->user_diamond = $oldDiamoundValue;
             }
 
@@ -876,15 +906,13 @@ class UserFamilyController extends MainController
             }
             if ($agancy) {
 
-
-                if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
+                if (in_array((int) $type_user, [0, 1, 5]) && $model->isDirty('type_user')) {
                     session()->flash('show_alert', 'Your alert message');
+
                     return redirect()->back();
                 }
 
-
                 switch ($type_user) {
-
 
                     case 2:
                         $userModel::where('id', $user_id)->update(['type_user' => 2]);
@@ -903,17 +931,6 @@ class UserFamilyController extends MainController
             }
         });
 
-
         return $form;
-    }
-
-
-    public function request_invite_code(Request $request)
-    {
-        if ($request->stop_invite_code == "true") {
-            settings()->set("stop_invite_code", "1");
-        } else {
-            settings()->set("stop_invite_code", "0");
-        }
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Utd\Events;
 
+use App\Contracts\LoseWinnerRewardsContract;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
-use App\Contracts\LoseWinnerRewardsContract;
 use Utd\Events\Console\WeeklyStarUpdate;
 use Utd\Events\Console\WeeklyStarWinner;
 use Utd\Events\Services\LoseWinnerRewards;
@@ -23,6 +23,57 @@ class EventsServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+    }
+
+    /**
+     * Register translations.
+     */
+    public function registerTranslations(): void
+    {
+        $langPath = resource_path('lang/modules/events');
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, 'events');
+            $this->loadJsonTranslationsFrom($langPath);
+        } else {
+            $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'events');
+            $this->loadJsonTranslationsFrom(__DIR__.'/../Resources/lang');
+        }
+    }
+
+    /**
+     * Register views.
+     */
+    public function registerViews(): void
+    {
+        $viewPath = resource_path('views/modules/events');
+        $sourcePath = __DIR__.'/../Resources/views';
+
+        $this->publishes([
+            $sourcePath => $viewPath,
+        ], ['views', 'events-module-views']);
+
+        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), 'events');
+
+        $componentNamespace = 'Utd\\Events\\View\\Components';
+        Blade::componentNamespace($componentNamespace, 'events');
+    }
+
+    /**
+     * Register the service provider.
+     */
+    public function register(): void
+    {
+        $this->app->register(RouteServiceProvider::class);
+        $this->app->bind(LoseWinnerRewardsContract::class, LoseWinnerRewards::class);
+    }
+
+    /**
+     * Get the services provided by the provider.
+     */
+    public function provides(): array
+    {
+        return [];
     }
 
     /**
@@ -48,22 +99,6 @@ class EventsServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register translations.
-     */
-    public function registerTranslations(): void
-    {
-        $langPath = resource_path('lang/modules/events');
-
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'events');
-            $this->loadJsonTranslationsFrom($langPath);
-        } else {
-            $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'events');
-            $this->loadJsonTranslationsFrom(__DIR__.'/../Resources/lang');
-        }
-    }
-
-    /**
      * Register config.
      */
     protected function registerConfig(): void
@@ -73,24 +108,6 @@ class EventsServiceProvider extends ServiceProvider
         ], 'config');
 
         $this->mergeConfigFrom(__DIR__.'/../Config/config.php', 'events');
-    }
-
-    /**
-     * Register views.
-     */
-    public function registerViews(): void
-    {
-        $viewPath = resource_path('views/modules/events');
-        $sourcePath = __DIR__.'/../Resources/views';
-
-        $this->publishes([
-            $sourcePath => $viewPath,
-        ], ['views', 'events-module-views']);
-
-        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), 'events');
-
-        $componentNamespace = 'Utd\\Events\\View\\Components';
-        Blade::componentNamespace($componentNamespace, 'events');
     }
 
     private function getPublishableViewPaths(): array
@@ -103,22 +120,5 @@ class EventsServiceProvider extends ServiceProvider
         }
 
         return $paths;
-    }
-
-    /**
-     * Register the service provider.
-     */
-    public function register(): void
-    {
-        $this->app->register(RouteServiceProvider::class);
-        $this->app->bind(LoseWinnerRewardsContract::class, LoseWinnerRewards::class);
-    }
-
-    /**
-     * Get the services provided by the provider.
-     */
-    public function provides(): array
-    {
-        return [];
     }
 }

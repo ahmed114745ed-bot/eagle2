@@ -4,9 +4,10 @@ namespace Utd\Tasks\Http\Controllers;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
-use Utd\Tasks\Services\TaskService;
 use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
+use Utd\Tasks\Services\TaskService;
 
 class TaskCompleteController extends Controller
 {
@@ -22,8 +23,9 @@ class TaskCompleteController extends Controller
         try {
             $userId = $request->user()->id;
             $result = $this->taskService->collectTaskPoints($taskId, $userId);
+
             return $result;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }

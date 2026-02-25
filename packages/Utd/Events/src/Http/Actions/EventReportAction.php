@@ -3,7 +3,6 @@
 namespace Utd\Events\Http\Actions;
 
 use App\Models\Pack;
-use Utd\Vip\Entities\UserVip;
 use App\Support\PackageHelper;
 use Encore\Admin\Actions\Action;
 use Illuminate\Http\Request;
@@ -11,51 +10,59 @@ use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Events\Entities\RewardWinnerPk;
 use Utd\Events\Entities\WinnerReward;
 use Utd\Events\Services\LoseWinnerRewards;
+use Utd\Vip\Entities\UserVip;
+
+use function request;
 
 class EventReportAction extends Action
 {
     public $name;
+
     public $options = [];
-    public $id ;
+
+    public $id;
+
     public $type;
 
     protected $selector = '.salary_action';
 
-    public function __construct ($id=0,$type=null)
+    public function __construct($id = 0, $type = null)
     {
         $this->id = $id;
-        $this->type=$type;
-        parent::__construct ();
+        $this->type = $type;
+        parent::__construct();
     }
 
     public function handle(Request $request)
     {
         $type = $request->input('type');
-        $winner_reward_id=\request('id');
-        if ($type == "weekly"){
-            $winner_reward=WinnerReward::query()->find($winner_reward_id);
-        }elseif ($type == "pk"){
+        $winner_reward_id = request('id');
+        if ($type === 'weekly') {
+            $winner_reward = WinnerReward::query()->find($winner_reward_id);
+        } elseif ($type === 'pk') {
             $winner_reward = RewardWinnerPk::query()->find($winner_reward_id);
         }
-        $winner=$winner_reward?->winner;
-        if ($winner_reward && $winner){
-            if ($winner_reward->reward->type == 'coins'){
-                $target=$winner_reward->reward->target;
+        $winner = $winner_reward?->winner;
+        if ($winner_reward && $winner) {
+            if ($winner_reward->reward->type === 'coins') {
+                $target = $winner_reward->reward->target;
                 $winner_reward->winner->di -= $target;
                 $winner_reward->winner->save();
-            }elseif ($winner_reward->reward->type == 'vip'){
-                $userVip = PackageHelper::isInstalled('vip') ? UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first() : null;
-                if ($userVip) $userVip->delete();
+            } elseif ($winner_reward->reward->type === 'vip') {
+                $userVip = PackageHelper::isInstalled('vip') ? UserVip::query()->where(['user_id' => $winner->id, 'vip_id' => $winner_reward->reward->target])->latest()->first() : null;
+                if ($userVip) {
+                    $userVip->delete();
+                }
                 /*if ($userVip){
 
                     Pack::query()->where(['user_id'=>$winner->id,"target_id"=>$winner_reward->reward->target])->delete();
                 }*/
-                (new LoseWinnerRewards())->removePacksVip($winner_reward,$userVip, $winner,$winner_reward->reward->expire);
-            }elseif ($winner_reward->reward->type == 'ware'){
-                Pack::query()->where(['user_id'=>$winner->id,"target_id"=>$winner_reward->reward->target])->delete();
-            }elseif ($winner_reward->reward->type == "achievement"){
+                (new LoseWinnerRewards())->removePacksVip($winner_reward, $userVip, $winner, $winner_reward->reward->expire);
+            } elseif ($winner_reward->reward->type === 'ware') {
+                Pack::query()->where(['user_id' => $winner->id, 'target_id' => $winner_reward->reward->target])->delete();
+            } elseif ($winner_reward->reward->type === 'achievement') {
                 $attributes = [
-                    'user_id'       => $winner->sender_id,
+                    'user_id' => $winner->sender_id,
                     'custom_image' => $winner_reward->reward->target,
                 ];
 
@@ -63,9 +70,9 @@ class EventReportAction extends Action
             }
             $winner_reward->delete();
         }
+
         return $this->response()->success('success')->refresh();
     }
-
 
     public function form()
     {
@@ -76,7 +83,8 @@ class EventReportAction extends Action
     public function html()
     {
         $return = __('return');
-        return '<a href="javascript:void(0);" onclick="pu('.$this->id.')" class="btn btn-sm btn-danger salary_action ">' .$return. '</a>
+
+        return '<a href="javascript:void(0);" onclick="pu('.$this->id.')" class="btn btn-sm btn-danger salary_action ">'.$return.'</a>
         <script>
         function pu(val) {
           $("#vid").val(val)
@@ -85,5 +93,4 @@ class EventReportAction extends Action
         </script>
         ';
     }
-
 }

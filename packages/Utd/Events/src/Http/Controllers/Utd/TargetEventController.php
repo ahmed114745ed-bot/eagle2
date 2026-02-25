@@ -2,18 +2,17 @@
 
 namespace Utd\Events\Http\Controllers\Utd;
 
-use Exception;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Utd\Events\Entities\ChargeTargetEvent;
 use Utd\Events\Entities\RewardTarget;
 use Utd\Events\Transformers\TargetEventResource;
-use Utd\Events\Entities\ChargeTargetEvent;
 
 class TargetEventController extends Controller
 {
-
     public function index(Request $request)
     {
         $id = $request->id;
@@ -22,6 +21,7 @@ class TargetEventController extends Controller
         $data = ChargeTargetEvent::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->select('id', 'value')->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -36,6 +36,7 @@ class TargetEventController extends Controller
         }
         try {
             ChargeTargetEvent::create($request->all());
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -46,8 +47,9 @@ class TargetEventController extends Controller
     public function show($id)
     {
         try {
-            $data =  ChargeTargetEvent::select('id', 'value')->findOrFail($id);
-            return Common::apiResponse(true, ' successfully',  $data);
+            $data = ChargeTargetEvent::select('id', 'value')->findOrFail($id);
+
+            return Common::apiResponse(true, ' successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -65,8 +67,9 @@ class TargetEventController extends Controller
         }
 
         try {
-            $data =  ChargeTargetEvent::findOrFail($id);
+            $data = ChargeTargetEvent::findOrFail($id);
             $data->update($request->all());
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -77,9 +80,10 @@ class TargetEventController extends Controller
     public function destroy($id)
     {
         try {
-            $data =  ChargeTargetEvent::findOrFail($id);
+            $data = ChargeTargetEvent::findOrFail($id);
             $data->delete();
-            return Common::apiResponse(true, 'deleted successfully',  $data);
+
+            return Common::apiResponse(true, 'deleted successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -94,6 +98,7 @@ class TargetEventController extends Controller
         $data = RewardTarget::where('charge_event_id', $targetId)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', TargetEventResource::collection($data));
     }
 
@@ -105,7 +110,7 @@ class TargetEventController extends Controller
             'target1' => 'nullable',
             'target2' => 'nullable',
             'target3' => 'nullable',
-            'expire'  => 'required',
+            'expire' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -119,9 +124,10 @@ class TargetEventController extends Controller
             $data = [
                 'charge_event_id' => $request->charge_event_id,
                 'type' => $request->type,
-                'expire'  => $request->expire,
+                'expire' => $request->expire,
             ];
             RewardTarget::create($data);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -137,7 +143,7 @@ class TargetEventController extends Controller
             'target1' => 'nullable',
             'target2' => 'nullable',
             'target3' => 'nullable',
-            'expire'  => 'required',
+            'expire' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -151,20 +157,21 @@ class TargetEventController extends Controller
             $data = [
                 'charge_event_id' => $request->charge_event_id,
                 'type' => $request->type,
-                'expire'  => $request->expire,
+                'expire' => $request->expire,
             ];
-            $reward =  RewardTarget::findOrFail($id);
-            if ($request->type == 'ware') {
+            $reward = RewardTarget::findOrFail($id);
+            if ($request->type === 'ware') {
                 $reward->target = $request->target1;
-            } elseif ($request->type == 'vip') {
+            } elseif ($request->type === 'vip') {
                 $reward->target = $request->target2;
-            } elseif ($request->type == 'coins') {
+            } elseif ($request->type === 'coins') {
                 $reward->target = $request->target3;
-            } elseif ($request->type == 'achievement' && $request->hasFile('target4')) {
+            } elseif ($request->type === 'achievement' && $request->hasFile('target4')) {
                 $file = $request->file('target4');
                 $reward->target = Common::upload('images', $file);
             }
             $reward->update($data);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -175,9 +182,10 @@ class TargetEventController extends Controller
     public function destroyGift($id)
     {
         try {
-            $data =  RewardTarget::findOrFail($id);
+            $data = RewardTarget::findOrFail($id);
             $data->delete();
-            return Common::apiResponse(true, 'deleted successfully',  $data);
+
+            return Common::apiResponse(true, 'deleted successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -187,7 +195,8 @@ class TargetEventController extends Controller
     public function showGift($id)
     {
         try {
-            $data =  RewardTarget::with('ware', 'vip')->findOrFail($id);
+            $data = RewardTarget::with('ware', 'vip')->findOrFail($id);
+
             return Common::apiResponse(true, 'done', new TargetEventResource($data));
         } catch (Exception $exception) {
 

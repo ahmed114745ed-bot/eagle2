@@ -3,24 +3,25 @@
 namespace Utd\Events\Http\Controllers;
 
 use App\Enums\UserCoinLogType;
-use App\Helpers\UserCoinLogHelper;
-use Carbon\Carbon;
-use Utd\Vip\Entities\OVip;
-use App\Models\User;
-use App\Support\PackageHelper;
-use App\Models\Ware;
 use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Ware;
+use App\Support\PackageHelper;
+use Carbon\Carbon;
+use DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Utd\Achievements\Entities\UserAchievementLevel;
+use Utd\Events\Entities\ChargeTargetEvent;
 use Utd\Events\Entities\RewardTarget;
 use Utd\Events\Entities\UserChargeEvent;
-use Utd\Events\Entities\ChargeTargetEvent;
 use Utd\Events\Transformers\TargetsResource;
-use Utd\Events\Transformers\UserChargeResource;
-use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Events\Transformers\TopUserChargeResource;
+use Utd\Events\Transformers\UserChargeResource;
+use Utd\Vip\Entities\OVip;
 
 class ChargeEventController extends Controller
 {
@@ -29,8 +30,7 @@ class ChargeEventController extends Controller
         $fromDate = Carbon::now()->subMonth()->startOfMonth()->toDateString();
         $tillDate = Carbon::now()->subMonth()->endOfMonth()->toDateString();
 
-
-        $user =  User::query()
+        $user = User::query()
             // ->leftJoinSub(
             //     function ($query) use ($fromDate,$tillDate) {
             //         $query->select('user_id', \DB::raw('SUM(amount) as charges_sum_amount'))
@@ -44,10 +44,10 @@ class ChargeEventController extends Controller
             // )
             ->leftJoinSub(
                 function ($query) use ($fromDate, $tillDate) {
-                    $query->select('charges.user_id', \DB::raw('SUM(charges.amount) as charges_sum_amount'))
+                    $query->select('charges.user_id', DB::raw('SUM(charges.amount) as charges_sum_amount'))
                         ->from('charges')
                         ->where('charges.user_type', 'user')
-                        ->whereBetween('charges.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])
+                        ->whereBetween('charges.created_at', [$fromDate.' 00:00:00', $tillDate.' 23:59:59'])
                         ->groupBy('charges.user_id');
                 },
                 'charges',
@@ -56,17 +56,17 @@ class ChargeEventController extends Controller
             )
             ->leftJoinSub(
                 function ($query) use ($fromDate, $tillDate) {
-                    $query->select('user_id', \DB::raw('SUM(obtained_coins) as coin_logs_sum_obtained_coins'))
+                    $query->select('user_id', DB::raw('SUM(obtained_coins) as coin_logs_sum_obtained_coins'))
                         ->from('coin_logs')
                         //   ->whereBetween('created_at',[$fromDate,$tillDate])
-                        ->whereBetween('coin_logs.created_at', [$fromDate . ' 00:00:00', $tillDate . ' 23:59:59'])->where('coin_logs.status', 1)
+                        ->whereBetween('coin_logs.created_at', [$fromDate.' 00:00:00', $tillDate.' 23:59:59'])->where('coin_logs.status', 1)
                         ->groupBy('user_id');
                 },
                 'coin_logs',
                 'users.id',
                 'coin_logs.user_id'
             )
-            ->select(['users.*', \DB::raw('IFNULL(charges_sum_amount, 0) + IFNULL(coin_logs_sum_obtained_coins, 0) as total_sum')])
+            ->select(['users.*', DB::raw('IFNULL(charges_sum_amount, 0) + IFNULL(coin_logs_sum_obtained_coins, 0) as total_sum')])
             ->orderBy('total_sum', 'desc')->limit(1)->first();
 
         return Common::apiResponse(1, '', new TopUserChargeResource($user));
@@ -78,21 +78,23 @@ class ChargeEventController extends Controller
         $end = now()->endOfMonth();
 
         $user = Auth::user()->load([
-            'charges' => fn($q) => $q->whereBetween('created_at', [$start, $end]),
-            'coinLogs' => fn($q) => $q->whereBetween('created_at', [$start, $end])->where('status', 1),
+            'charges' => fn ($q) => $q->whereBetween('created_at', [$start, $end]),
+            'coinLogs' => fn ($q) => $q->whereBetween('created_at', [$start, $end])->where('status', 1),
         ]);
 
         return Common::apiResponse(1, '', new UserChargeResource($user));
     }
+
     public function targets()
     {
-        $targets = ChargeTargetEvent::query()->with("rewards", 'users')->orderBy('value', 'asc')->get();
+        $targets = ChargeTargetEvent::query()->with('rewards', 'users')->orderBy('value', 'asc')->get();
         $currentMonth = now()->month;
         $user = User::withSum(['charges' => function ($query) use ($currentMonth) {
             $query->whereMonth('created_at', $currentMonth);
         }], 'amount')->withSum(['coinLogs' => function ($query) use ($currentMonth) {
             $query->whereMonth('created_at', $currentMonth)->where('status', 1);
         }], 'obtained_coins')->find(auth()->user()->id);
+
         return Common::apiResponse(1, '', new TargetsResource(
             $targets,
             $user->charges_sum_amount ?? 0,
@@ -110,19 +112,19 @@ class ChargeEventController extends Controller
         }], 'amount')->withSum(['coinLogs' => function ($query) use ($currentMonth) {
             $query->whereMonth('created_at', $currentMonth)->where('status', 1);
         }], 'obtained_coins')->find(auth()->user()->id);
-        if ($user->type_user == 3) {
+        if ($user->type_user === 3) {
             return Common::apiResponse(0, __('api_responses.notAllowed'));
         }
         $charges_sum_amount = $user->charges_sum_amount ?? 0;
         $coin_logs_sum_obtained_coins = $user->coin_logs_sum_obtained_coins ?? 0;
         $target = ChargeTargetEvent::query()->find($request->target_id);
-        if ($target == null) {
+        if ($target === null) {
             return Common::apiResponse(0, 'لا يوجد تارجيت');
         }
         $total = $charges_sum_amount + $coin_logs_sum_obtained_coins;
         //  dd($total ,$target->value);
         // $percentage = ((($charges_sum_amount + $coin_logs_sum_obtained_coins) * 100 ) /$target->value);
-        $checkChargeEvent = UserChargeEvent::query()->where(["user_id" => $user->id, 'charge_event_id' => $request->target_id])->first();
+        $checkChargeEvent = UserChargeEvent::query()->where(['user_id' => $user->id, 'charge_event_id' => $request->target_id])->first();
 
         if ($checkChargeEvent) {
             return Common::apiResponse(0, __('you_have_charge_target'));
@@ -136,9 +138,9 @@ class ChargeEventController extends Controller
             'user_id' => $user->id,
             'charge_event_id' => $request->target_id,
         ]);
-        $rewards =  RewardTarget::where('charge_event_id', $target->id)->get();
+        $rewards = RewardTarget::where('charge_event_id', $target->id)->get();
         foreach ($rewards as $reward) {
-            if ($reward->type == "coins") {
+            if ($reward->type === 'coins') {
 
                 $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(
@@ -150,27 +152,30 @@ class ChargeEventController extends Controller
 
                 $user->di += $reward->target;
                 $user->save();
-            } elseif ($reward->type == "vip") {
+            } elseif ($reward->type === 'vip') {
                 $vip = null;
                 if (PackageHelper::isInstalled('vip')) {
                     $vip = OVip::query()->find($reward->target);
                 }
-                if ($vip) UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'charge-event');
-            } elseif ($reward->type == "ware") {
+                if ($vip) {
+                    UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'charge-event');
+                }
+            } elseif ($reward->type === 'ware') {
                 $ware = Ware::query()->find($reward->target);
                 UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
-            } elseif ($reward->type == "achievement") {
+            } elseif ($reward->type === 'achievement') {
                 if (class_exists(UserAchievementLevel::class)) {
                     $attributes = [
-                        'user_id'       => $user->id,
+                        'user_id' => $user->id,
                         'custom_image' => $reward->target,
                     ];
                     UserAchievementLevel::create($attributes);
                 }
-            } elseif ($reward->type == 'badge') {
+            } elseif ($reward->type === 'badge') {
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'charge-event');
             }
         }
+
         return Common::apiResponse(1, __('تم الاضافه بنجاح'));
     }
 }

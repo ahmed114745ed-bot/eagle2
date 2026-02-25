@@ -5,13 +5,13 @@ namespace Utd\CP\Console;
 use App\Helpers\UserRewardsWeeklyCp;
 use App\Models\GiftLog;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use App\Support\PackageHelper;
-use Utd\Events\Entities\WeeklyStar;
 use Utd\CP\Entities\CpWinnerReward;
 use Utd\CP\Entities\WeeklyCpWinner;
 use Utd\CP\Services\CpService;
+use Utd\Events\Entities\WeeklyStar;
 
 class WeeklyCpWinnerConsole extends Command
 {
@@ -30,7 +30,7 @@ class WeeklyCpWinnerConsole extends Command
 
     public function handle()
     {
-        if (!PackageHelper::isInstalled('event')) {
+        if (! PackageHelper::isInstalled('event')) {
             return '';
         }
 

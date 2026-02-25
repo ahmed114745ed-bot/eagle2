@@ -10,6 +10,7 @@ use Utd\Tasks\Repositories\TaskProgressRepository;
 class DayTasksService
 {
     protected $dailyTaskRepository;
+
     protected $taskProgressRepository;
 
     public function __construct(DailyTaskRepository $dailyTaskRepository, TaskProgressRepository $taskProgressRepository)
@@ -27,6 +28,7 @@ class DayTasksService
 
             $tasksWithCompletion = $tasks->map(function ($task) use ($taskProgress) {
                 $progress = $taskProgress->firstWhere('task_id', $task->id);
+
                 return [
                     'id' => $task->id,
                     'title' => $task->title,
@@ -35,12 +37,12 @@ class DayTasksService
                     'count' => $task->count,
                     'total_points' => $task->total_points,
                     'is_completed' => $progress ? $progress->is_completed : false,
-                    'is_collect' => $progress ? $progress->is_collect : false
+                    'is_collect' => $progress ? $progress->is_collect : false,
                 ];
             });
 
             return Common::apiResponse(true, 'Tasks fetched successfully.', [
-                'tasks' => $tasksWithCompletion
+                'tasks' => $tasksWithCompletion,
             ], 200);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 500);

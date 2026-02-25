@@ -2,13 +2,13 @@
 
 namespace Utd\Tasks\Http\Controllers;
 
-use Utd\Tasks\Entities\DailyTask;
-use Utd\Tasks\Entities\Day;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Utd\Tasks\Entities\DailyTask;
+use Utd\Tasks\Entities\Day;
 
 class DailyTaskController extends AdminController
 {
@@ -38,7 +38,19 @@ class DailyTaskController extends AdminController
     public function update($id)
     {
         $id = request()->route('id');
+
         return $this->form()->update($id);
+    }
+
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+        $form = $this->form()->edit($id);
+
+        return $content
+            ->header(trans('admin.edit'))
+            ->description(trans('admin.description'))
+            ->body($form);
     }
 
     /**
@@ -68,28 +80,17 @@ class DailyTaskController extends AdminController
         $grid->tools(function ($tools) use ($dayId) {
             $day = Day::find($dayId);
             $createUrl = url('admin/days');
-            $tools->append('<a href="' . $createUrl . '" class="btn btn-success btn-sm">الذهاب الي قائمه الايام</a>');
+            $tools->append('<a href="'.$createUrl.'" class="btn btn-success btn-sm">الذهاب الي قائمه الايام</a>');
             $tools->append('<div><h5 style="color:yellow">قائمه مهام '.$day?->title.' </h5></div>');
         });
 
         return $grid;
     }
 
-    public function edit($id, Content $content)
-    {
-        $id = request()->route('id');
-        $form = $this->form()->edit($id);
-
-        return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
-            ->body($form);
-    }
-
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

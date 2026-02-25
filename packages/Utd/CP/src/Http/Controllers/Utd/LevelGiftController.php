@@ -18,32 +18,33 @@ class LevelGiftController extends Controller
         $perPage = request('per_page') ?? 10;
 
         $result = CpLevelGift::where('vip_id', $cp_level_id)
-        ->when($search,function($q)use($search){
-            $q->where('id', $search);
-        })
-        ->paginate($perPage)
-        ->through(function($gift){
-            return [
-                'id' => $gift->id,
-                'type' => $gift->type,
-                'gift_id' => match ($gift->type) {
-                    'ware' => optional($gift->ware)->name,
-                    'vip' => optional($gift->vip)->name,
-                    'coins' => $gift->item_id,
-                    'achievement' => $gift->item_id,
-                    default => null,
-                },
-                'created_at' => $gift->created_at,
-            ];
-        });
+            ->when($search, function ($q) use ($search) {
+                $q->where('id', $search);
+            })
+            ->paginate($perPage)
+            ->through(function ($gift) {
+                return [
+                    'id' => $gift->id,
+                    'type' => $gift->type,
+                    'gift_id' => match ($gift->type) {
+                        'ware' => optional($gift->ware)->name,
+                        'vip' => optional($gift->vip)->name,
+                        'coins' => $gift->item_id,
+                        'achievement' => $gift->item_id,
+                        default => null,
+                    },
+                    'created_at' => $gift->created_at,
+                ];
+            });
 
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function show($cpLevelId,$id)
+    public function show($cpLevelId, $id)
     {
         try {
             $data = CpLevelGift::findOrFail($id);
+
             return Common::apiResponse(true, 'done', $data);
         } catch (Exception $exception) {
 
@@ -61,7 +62,7 @@ class LevelGiftController extends Controller
     public function delete_all($cp_level_id, Request $request)
     {
         $request->validate([
-            'ids' => 'required'
+            'ids' => 'required',
         ]);
 
         $ids = explode(',', $request->ids);
@@ -110,7 +111,6 @@ class LevelGiftController extends Controller
         }
 
         $result = CpLevelGift::create($data);
-
 
         return Common::apiResponse(true, 'Success', $result);
     }

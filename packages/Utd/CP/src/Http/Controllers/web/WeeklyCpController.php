@@ -6,6 +6,7 @@ use App\Admin\Controllers\MainController;
 use App\Helpers\UserCommon;
 use App\Selectables\Gifts;
 use App\Services\AppFeatureService;
+use App\Support\PackageHelper;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -13,7 +14,6 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use App\Support\PackageHelper;
 use Utd\Events\Entities\WeeklyStar;
 
 class WeeklyCpController extends MainController
@@ -96,8 +96,9 @@ class WeeklyCpController extends MainController
     protected function grid()
     {
         $grid = new Grid(new WeeklyStar());
-        if (!PackageHelper::isInstalled('event')) {
+        if (! PackageHelper::isInstalled('event')) {
             $grid->model()->whereRaw('1 = 0');
+
             return $grid;
         }
         $grid->model()->whereType('weekly_cp');

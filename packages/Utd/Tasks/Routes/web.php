@@ -12,8 +12,8 @@
 */
 
 use Illuminate\Support\Facades\Route;
-use Utd\Tasks\Http\Controllers\DayController;
 use Utd\Tasks\Http\Controllers\DailyTaskController;
+use Utd\Tasks\Http\Controllers\DayController;
 use Utd\Tasks\Http\Controllers\TaskRewardController;
 
 Route::group(
@@ -26,7 +26,7 @@ Route::group(
             'multiLanguage',
             'appFeatureEnable:achievement',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('days', DayController::class);

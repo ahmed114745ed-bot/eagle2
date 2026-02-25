@@ -3,7 +3,6 @@
 namespace Utd\Events\Entities;
 
 use App\Helpers\Common;
-use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
@@ -12,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\Badge\Entities\Badge;
+use Utd\Vip\Entities\OVip;
 
 class Reward extends Model
 {

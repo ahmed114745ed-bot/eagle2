@@ -2,10 +2,11 @@
 
 namespace Utd\Tasks\Services;
 
-use Illuminate\Support\Facades\DB;
-use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
 use App\Helpers\Common;
 use App\Repositories\User\UserRepository;
+use Exception;
+use Illuminate\Support\Facades\DB;
+use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
 use Utd\Tasks\Repositories\DailyTaskRepository;
 use Utd\Tasks\Repositories\DayRepository;
 use Utd\Tasks\Repositories\TaskProgressRepository;
@@ -16,12 +17,19 @@ use Utd\Tasks\Repositories\UserTaskRewardRepository;
 class TaskService
 {
     protected $dailyTaskRepo;
+
     protected $taskProgressRepo;
+
     protected $taskRewardRepo;
+
     protected $dayRepo;
+
     protected $dailyGiftController;
+
     protected $userTaskRewardRepo;
+
     protected $userRepository;
+
     protected $userDayProgressRepository;
 
     public function __construct(
@@ -52,17 +60,19 @@ class TaskService
             $taskProgress = $this->taskProgressRepo->getAll(['user_id' => $userId, 'task_id' => $taskId])->first();
             $userDayProgressRow = $this->userDayProgressRepository->getAll(['user_id' => $userId, 'day_id' => $task->day_id])->first();
 
-            if (!$taskProgress) {
+            if (! $taskProgress) {
                 DB::rollBack();
+
                 return Common::apiResponse(false, 'Task progress not found', null, 404);
             }
 
             if ($taskProgress->is_completed || $taskProgress->is_collect) {
                 DB::rollBack();
+
                 return Common::apiResponse(true, 'Task progress already collected', null, 200);
             }
 
-            if ($taskProgress->count == $task->count) {
+            if ($taskProgress->count === $task->count) {
                 $taskProgress->is_completed = true;
                 $taskProgress->is_collect = true;
 
@@ -82,7 +92,7 @@ class TaskService
                         'points' => $task->total_points,
                         'is_completed' => false,
                         'get_rewards' => false,
-                        'created_at' => now()
+                        'created_at' => now(),
                     ]);
                 }
             }
@@ -98,18 +108,21 @@ class TaskService
             if ($allTasksCompleted) {
                 $rewards = $this->taskRewardRepo->getAll(['day_id' => $task->day_id]);
                 DB::commit();
+
                 return Common::apiResponse(true, 'Points collected successfully and the day is completed successfully', [
                     'total_points' => $user->total_points,
-                    'rewards' => $rewards
-                ], 200);
-            } else {
-                DB::commit();
-                return Common::apiResponse(true, 'Points collected successfully', [
-                    'total_points' => $user->total_points,
+                    'rewards' => $rewards,
                 ], 200);
             }
-        } catch (\Exception $e) {
+            DB::commit();
+
+            return Common::apiResponse(true, 'Points collected successfully', [
+                'total_points' => $user->total_points,
+            ], 200);
+
+        } catch (Exception $e) {
             DB::rollBack();
+
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }
@@ -119,10 +132,11 @@ class TaskService
         $tasks = $this->dailyTaskRepo->getAll(['day_id' => $dayId]);
         foreach ($tasks as $task) {
             $progress = $this->taskProgressRepo->getAll(['user_id' => $userId, 'task_id' => $task->id])->first();
-            if (!$progress || !$progress->is_completed) {
+            if (! $progress || ! $progress->is_completed) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -144,7 +158,7 @@ class TaskService
         $rewards = $this->taskRewardRepo->getAll(['day_id' => $dayId]);
 
         foreach ($rewards as $reward) {
-            if (!$this->userTaskRewardRepo->getAll(['user_id' => $userId, 'task_reward_id' => $reward->id])->first()) {
+            if (! $this->userTaskRewardRepo->getAll(['user_id' => $userId, 'task_reward_id' => $reward->id])->first()) {
                 $this->dailyGiftController->assignGiftToUser(
                     $reward->type,
                     $user,

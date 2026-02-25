@@ -51,7 +51,7 @@ Route::group([
         Route::post('/{roomId}/background', [BackgroundController::class, 'setBackground']);
     });
 
-// Room VIPs
+    // Room VIPs
     Route::middleware(['auth:sanctum'])->prefix('room-vips')->group(function () {
         Route::get('/all', [RoomVipsController::class, 'index']);
         Route::post('/show/{id}', [RoomVipsController::class, 'show']);

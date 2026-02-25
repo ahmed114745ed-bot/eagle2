@@ -2,37 +2,38 @@
 
 namespace Utd\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Helpers\UserCommon;
 use App\Models\Gift;
 use App\Models\Ware;
+use App\Selectables\Gifts;
+use App\Services\AppFeatureService;
+use App\Support\PackageHelper;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Selectables\Gifts;
-use App\Helpers\UserCommon;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
-use Utd\Vip\Entities\OVip;
-use Encore\Admin\Facades\Admin;
-use App\Support\PackageHelper;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Modules\Badge\Entities\Badge;
-use App\Services\AppFeatureService;
 use Utd\Events\Entities\Reward;
 use Utd\Events\Entities\WeeklyStar;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Vip\Entities\OVip;
 
 class WeeklyEventNController extends MainController
 {
     use HasResourceActions;
 
     public $permission_name = 'weekly-star';
+
     public $hiddenColumns = [];
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("weekly_star");
+        (new AppFeatureService)->validateStatusEnable('weekly_star');
     }
 
     public function index(Content $content)
@@ -52,17 +53,43 @@ class WeeklyEventNController extends MainController
                 })
         );
     }
+
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
             ->title(trans('weekly-events-new'))
             ->body($this->form()->edit($id)));
     }
+
     public function create(Content $content)
     {
         return parent::create($content
             ->title(trans('weekly-events-new'))
             ->body($this->form()));
+    }
+
+    public function store()
+    {
+        $data = request()->all();
+        $data['start_date'] = UserCommon::convertArabicNumbers(request()['start_date']);
+        request()->merge($data);
+
+        return parent::store();
+    }
+
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content->title(__('weekly-events-new'))
+
+            ->row('<h3>'.__('weekly Star').'</h3>')->row(function ($row) use ($id) {
+                $row->column(12, $this->weeklyStar($id));
+            })
+            ->row('<h3>'.__('gifts').'</h3>')->row(function ($row) use ($id) {
+                $row->column(12, $this->giftList($id));
+            })
+            ->row('<h3>'.__('Rewards').'</h3>')->row(function ($row) use ($id) {
+                $row->column(12, $this->rewardList($id));
+            }));
     }
 
     protected function grid2()
@@ -72,14 +99,14 @@ class WeeklyEventNController extends MainController
 
         return $form;
     }
+
     protected function grid()
     {
         $grid = new Grid(new WeeklyStar());
-        $grid->model()->whereType("weekly_star")->orderByDesc("id");
+        $grid->model()->whereType('weekly_star')->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
@@ -107,29 +134,23 @@ class WeeklyEventNController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        if (!request()->filled('_export_')) {
-            if (Admin::user()->can('browse-' . 'weekly_star_rewards') || Admin::user()->can('*')) {
+        if (! request()->filled('_export_')) {
+            if (Admin::user()->can('browse-'.'weekly_star_rewards') || Admin::user()->can('*')) {
                 $grid->column(__('procedures'))->display(function () {
                     // توليد الروابط
-                    $url1 = url('admin/weekly-events-gift/' . $this->id);
+                    $url1 = url('admin/weekly-events-gift/'.$this->id);
 
                     // إنشاء أزرار HTML
-                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
+                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('winners gifts').'</a>';
+
                     // دمج الأزرار في سلسلة واحدة وإرجاعها
                     return $button1;
                 });
             }
         }
         $this->extendGrid($grid);
-        return $grid;
-    }
 
-    public function store()
-    {
-        $data = request()->all();
-        $data['start_date'] = UserCommon::convertArabicNumbers(request()['start_date']);
-        request()->merge($data);
-        return parent::store();
+        return $grid;
     }
 
     protected function form()
@@ -140,24 +161,26 @@ class WeeklyEventNController extends MainController
         $form->display(__('admin.ID'));
         $form = new Form(new WeeklyStar());
         $form->hidden('type', 'Type')->default('weekly_star');
-        $lastStartDate = \Utd\Events\Entities\WeeklyStar::where("type", 'weekly_star')->max('start_date');
+        $lastStartDate = WeeklyStar::where('type', 'weekly_star')->max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
+        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date('Y-m-d'))
             ->rules(function ($form) {
 
-                $lastStartDate = \Utd\Events\Entities\WeeklyStar::where("type", 'weekly_star')->max('start_date');
+                $lastStartDate = WeeklyStar::where('type', 'weekly_star')->max('start_date');
 
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
                 if ($minStartDate) {
-                    if (!$id = $form->model()->id) {
-                        return 'required|after:' . $minStartDate;
-                    } else {
-                        return 'required';
+                    if (! $id = $form->model()->id) {
+                        return 'required|after:'.$minStartDate;
                     }
-                } else {
-                    return 'required|date';
+
+                    return 'required';
+
                 }
+
+                return 'required|date';
+
             });
         $form->belongsToMany('gifts', Gifts::class)
             ->rules('required|array|size:3', [
@@ -174,30 +197,13 @@ class WeeklyEventNController extends MainController
         $show->field('id', __('Id'));
         $show->field('start_date', __('Start date'));
         $show->field('type', __('Type'))->as(function ($type) {
-            return  $type == 1 ? "gifts" : ($type == 0 ? "charges" : "PK");
+            return $type === 1 ? 'gifts' : ($type === 0 ? 'charges' : 'PK');
         });
-
 
         $this->extendShow($show);
 
         return $show;
     }
-
-    public function show($id, Content $content)
-    {
-        return parent::show($id, $content->title(__('weekly-events-new'))
-
-            ->row("<h3>" . __('weekly Star') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->weeklyStar($id));
-            })
-            ->row("<h3>" . __('gifts') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->giftList($id));
-            })
-            ->row("<h3>" . __('Rewards') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->rewardList($id));
-            }));
-    }
-
 
     protected function weeklyStar($id)
     {
@@ -209,7 +215,7 @@ class WeeklyEventNController extends MainController
         $grid->column('end_date', __('End date'));
         $grid->column('type', __('Type'))->display(function ($type) {
 
-            return  $type == 1 ? "gifts" : ($type == 0 ? "charges" : "PK");
+            return $type === 1 ? 'gifts' : ($type === 0 ? 'charges' : 'PK');
         });
 
         $grid->disableActions();
@@ -220,6 +226,7 @@ class WeeklyEventNController extends MainController
 
         return $grid;
     }
+
     protected function rewardList($id)
     {
 
@@ -229,25 +236,32 @@ class WeeklyEventNController extends MainController
         $grid->column('level', trans('winners'));
         $grid->column('type', trans('type'))->display(function ($type) {
 
-            return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
+            return $type === 'coins' ? 'coins' : ($type === 'ware' ? 'ware' : ($type === 'vip' ? 'vip' : 'achievement'));
         });
         $grid->column('target', trans('gift'))->display(function ($target) {
 
-            if ($this->type == "coins") {
+            if ($this->type === 'coins') {
                 return $target;
-            } elseif ($this->type == "ware") {
-                $ware = Ware::find($target);
-                return  $ware ? ($ware->name ?? '') : "";
-            } elseif ($this->type == "vip") {
-                $vip = PackageHelper::isInstalled('vip') ? OVip::find($target) : null;
-                return  $vip ? ($vip->name ?? '') : "";
-            } elseif ($this->type == "badge") {
-                $vip = Badge::find($target);
-                return $vip ? (@$vip->name ?? '') : "";
-            } else {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
             }
+            if ($this->type === 'ware') {
+                $ware = Ware::find($target);
+
+                return $ware ? ($ware->name ?? '') : '';
+            }
+            if ($this->type === 'vip') {
+                $vip = PackageHelper::isInstalled('vip') ? OVip::find($target) : null;
+
+                return $vip ? ($vip->name ?? '') : '';
+            }
+            if ($this->type === 'badge') {
+                $vip = Badge::find($target);
+
+                return $vip ? (@$vip->name ?? '') : '';
+            }
+            $value = getDriverUrl().'/'.@$this->target;
+
+            return "<img src='$value' width='80' height='80'>";
+
         });
         $grid->column('expire', trans('expire'));
 
@@ -259,7 +273,6 @@ class WeeklyEventNController extends MainController
 
         return $grid;
     }
-
 
     protected function giftList($id)
     {

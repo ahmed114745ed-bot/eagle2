@@ -2,19 +2,17 @@
 
 namespace Utd\Events\Http\Controllers\Utd;
 
-use Exception;
-use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Enums\TypeGeneralRole;
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Utd\Events\Entities\GeneralRole;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Utd\Events\Entities\GeneralRole;
 
 class RoleEventController extends Controller
 {
-
-
     public function all(Request $request)
     {
         $id = $request->id;
@@ -22,7 +20,8 @@ class RoleEventController extends Controller
         $page = $request->page;
         $data = GeneralRole::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
-        })->paginate($perPage, ['*'], 'page', $page);;
+        })->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -42,6 +41,7 @@ class RoleEventController extends Controller
 
         try {
             GeneralRole::create($request->all());
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -55,7 +55,7 @@ class RoleEventController extends Controller
             'type' => [
                 'required',
                 'string',
-                Rule::unique('general_roles', 'type')->ignore($id)
+                Rule::unique('general_roles', 'type')->ignore($id),
             ],
             'url' => 'required',
             'sub_type' => 'nullable|string',
@@ -69,6 +69,7 @@ class RoleEventController extends Controller
 
         try {
             GeneralRole::where('id', $id)->update($request->all());
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -79,6 +80,7 @@ class RoleEventController extends Controller
     public function show($id)
     {
         $data = GeneralRole::findOrFail($id);
+
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -86,6 +88,7 @@ class RoleEventController extends Controller
     {
         try {
             GeneralRole::where('id', $id)->delete();
+
             return Common::apiResponse(true, 'deleted successfully');
         } catch (Exception $exception) {
 
@@ -106,6 +109,7 @@ class RoleEventController extends Controller
         }
         try {
             $data = GeneralRole::where('type', $request->type)->first();
+
             return Common::apiResponse(true, 'done', $data);
         } catch (Exception $exception) {
 
@@ -116,6 +120,7 @@ class RoleEventController extends Controller
     public function types()
     {
         $data = TypeGeneralRole::getTranslatedOptions();
+
         return Common::apiResponse(true, 'done', $data);
     }
 }

@@ -8,10 +8,8 @@ use App\Tik\Services\BackgroundService;
 use App\Tik\Services\RequestBackgroundImagService;
 use Illuminate\Http\Request;
 
-
 class BackgroundController extends Controller
 {
-
     protected $backgroundService;
 
     public function __construct(
@@ -21,17 +19,17 @@ class BackgroundController extends Controller
         $this->backgroundService = $backgroundService;
     }
 
-
     public function roomBackground()
     {
         $data = $this->backgroundService->index();
+
         return Common::apiResponse(1, '', $data);
     }
-
 
     public function allBackgrounds(Request $request)
     {
         $data = $this->backgroundService->index();
+
         return Common::apiResponse(1, Common::getConfig('cost_request_background'), $data, 200);
     }
 
@@ -41,6 +39,7 @@ class BackgroundController extends Controller
             'cost' => Common::getConfig('cost_request_background'),
             'expire' => Common::getConfig('background_expiration'),
         ];
+
         return Common::apiResponse(1, '', $data, 200);
     }
 
@@ -49,6 +48,7 @@ class BackgroundController extends Controller
         $user = $request->user();
         $costRequestBackGround = Common::getConfig('cost_request_background');
         $data = $this->requestBackgroundImagService->findByUserId($user->id);
+
         return Common::apiResponse(1, $costRequestBackGround, $data, 200);
     }
 }

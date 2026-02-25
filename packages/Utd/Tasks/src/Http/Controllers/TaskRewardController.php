@@ -2,17 +2,17 @@
 
 namespace Utd\Tasks\Http\Controllers;
 
-use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
-use Utd\Tasks\Entities\TaskReward;
-use Utd\Tasks\Entities\Day;
+use App\Support\PackageHelper;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Utd\Achievements\Entities\Achievement;
-use App\Support\PackageHelper;
+use Utd\Tasks\Entities\Day;
+use Utd\Tasks\Entities\TaskReward;
+use Utd\Vip\Entities\OVip;
 
 class TaskRewardController extends AdminController
 {
@@ -37,7 +37,25 @@ class TaskRewardController extends AdminController
     public function update($id)
     {
         $id = request()->route('id');
+
         return $this->form()->update($id);
+    }
+
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+        $model = TaskReward::findOrFail($id);
+
+        $form = $this->form()->edit($id);
+
+        if ($model->type === 'coins') {
+            $form->coins = (int) $model->target;
+        }
+
+        return $content
+            ->header(trans('admin.edit'))
+            ->description(trans('admin.description'))
+            ->body($form);
     }
 
     protected function grid()
@@ -45,19 +63,23 @@ class TaskRewardController extends AdminController
         $dayId = request('day_id');
         $grid = new Grid(new TaskReward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("day_id", $dayId);
+        $grid->model()->where('day_id', $dayId);
 
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
+            if ($this->type === 'ware') {
                 return @$this->ware->name;
-            } elseif ($this->type == "vip") {
+            }
+            if ($this->type === 'vip') {
                 return @$this->vip->name;
-            } elseif ($this->type == "coins") {
+            }
+            if ($this->type === 'coins') {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+            }
+            if ($this->type === 'achievement') {
+                $value = getDriverUrl().'/'.@$this->target;
+
                 return "<img src='$value' width='80' height='80'>";
             }
         });
@@ -66,7 +88,7 @@ class TaskRewardController extends AdminController
         $grid->tools(function ($tools) use ($dayId) {
             $day = Day::find($dayId);
             $createUrl = url('admin/days');
-            $tools->append('<a href="' . $createUrl . '" class="btn btn-success btn-sm">الذهاب الي قائمه الايام</a>');
+            $tools->append('<a href="'.$createUrl.'" class="btn btn-success btn-sm">الذهاب الي قائمه الايام</a>');
             $tools->append('<div><h5 style="color:yellow">قائمه هدايا  '.$day?->title.' </h5></div>');
         });
 
@@ -88,23 +110,6 @@ class TaskRewardController extends AdminController
         return $show;
     }
 
-    public function edit($id, Content $content)
-    {
-        $id = request()->route('id');
-        $model = TaskReward::findOrFail($id);
-
-        $form = $this->form()->edit($id);
-
-        if ($model->type == 'coins') {
-            $form->coins = (int) $model->target;
-        }
-
-        return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
-            ->body($form);
-    }
-
     protected function form()
     {
         $form = new Form(new TaskReward());
@@ -118,35 +123,36 @@ class TaskRewardController extends AdminController
         }
 
         $typeOptions = [
-            "ware" => __('ware'),
-            "coins" => __('coins'),
+            'ware' => __('ware'),
+            'coins' => __('coins'),
         ];
         if (PackageHelper::isInstalled('vip')) {
-            $typeOptions["vip"] = __('vip');
+            $typeOptions['vip'] = __('vip');
         }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
 
         $form->select('type', trans('type'))->options($typeOptions)
-            ->when("ware", function () use ($form) {
+            ->when('ware', function () use ($form) {
                 $form->select('target', trans('wares'))->options(function () {
                     $ops = [0 => ''];
                     $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
                     foreach ($wares as $ware) {
-                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
-                        if ($ware->type == 4) {
+                        $ops[$ware->id] = $ware->name.'_'.$ware->id;
+                        if ($ware->type === 4) {
                             $ops[$ware->id] .= '_bubble';
-                        } elseif ($ware->type == 5) {
+                        } elseif ($ware->type === 5) {
                             $ops[$ware->id] .= '_intro';
-                        } elseif ($ware->type == 6) {
+                        } elseif ($ware->type === 6) {
                             $ops[$ware->id] .= '_frame';
                         }
                     }
+
                     return $ops;
                 });
             })
-            ->when("vip", function () use ($form) {
+            ->when('vip', function () use ($form) {
                 $form->select('target', trans('vips'))->options(function () {
                     $ops = [];
                     if (PackageHelper::isInstalled('vip')) {
@@ -155,37 +161,38 @@ class TaskRewardController extends AdminController
                             $ops[$vip->id] = $vip->name;
                         }
                     }
+
                     return $ops;
                 });
             })
-            ->when("coins", function () use ($form) {
-                $form->number("coins", __("coins"));
+            ->when('coins', function () use ($form) {
+                $form->number('coins', __('coins'));
             })
-            ->when("achievement", function () use ($form) {
-                $form->image("achievement", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
+            ->when('achievement', function () use ($form) {
+                $form->image('achievement', __('image'))->name(function ($file) {
+                    return now()->timestamp.'.'.$file->guessExtension();
                 })->disk('gcs');
             });
 
         $form->number('expire', __('expire'));
 
         $form->saving(function (Form $form) {
-            if ($form->type == 'ware') {
+            if ($form->type === 'ware') {
                 $ware = Ware::find($form->target);
                 if ($ware) {
-                    if ($ware->type == 4) {
+                    if ($ware->type === 4) {
                         $form->sub_type = 'bubble';
-                    } elseif ($ware->type == 5) {
+                    } elseif ($ware->type === 5) {
                         $form->sub_type = 'intro';
-                    } elseif ($ware->type == 6) {
+                    } elseif ($ware->type === 6) {
                         $form->sub_type = 'frame';
                     }
                 }
-            } elseif ($form->type == 'vip') {
+            } elseif ($form->type === 'vip') {
                 // No special handling for vip
-            } elseif ($form->type == 'coins') {
+            } elseif ($form->type === 'coins') {
                 $form->target = $form->coins;
-            } elseif ($form->type == 'achievement') {
+            } elseif ($form->type === 'achievement') {
                 $form->target = $form->achievement;
             }
         });

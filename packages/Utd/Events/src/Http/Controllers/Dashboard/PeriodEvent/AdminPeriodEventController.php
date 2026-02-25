@@ -12,10 +12,10 @@ use Utd\Events\Entities\WeeklyStarGift;
 
 class AdminPeriodEventController extends Controller
 {
-
     public function index()
     {
-        $data = WeeklyStar::where('type','event_period')->get();
+        $data = WeeklyStar::where('type', 'event_period')->get();
+
         return $data;
     }
 
@@ -36,16 +36,13 @@ class AdminPeriodEventController extends Controller
         $data->type = 'event_period';
         $data->save();
 
-        if($request->gifts_id)
-        {
-            for($i=0 ; $i < count($request->gifts_id); $i++)
-            {
+        if ($request->gifts_id) {
+            for ($i = 0; $i < count($request->gifts_id); $i++) {
                 $item = Gift::find($request->gifts_id[$i]);
-                if($item)
-                {
+                if ($item) {
                     WeeklyStarGift::insert([
-                        'gift_id'          =>    $request->gifts_id[$i],
-                        'weekly_star_id'   => $data->id ,
+                        'gift_id' => $request->gifts_id[$i],
+                        'weekly_star_id' => $data->id,
                     ]);
                 }
             }
@@ -54,15 +51,15 @@ class AdminPeriodEventController extends Controller
         return 200;
     }
 
-
     public function show(string $id)
     {
         $data = WeeklyStar::with('gifts')->find($id);
-        $gifts_id = WeeklyStarGift::where('weekly_star_id',$data->id)->pluck('gift_id')->toArray();
+        $gifts_id = WeeklyStarGift::where('weekly_star_id', $data->id)->pluck('gift_id')->toArray();
+
         return [
-            'data' =>$data,
-            'gifts' => AdminGiftsResource::collection($data->gifts)  ,
-            'gifts_id' => $gifts_id
+            'data' => $data,
+            'gifts' => AdminGiftsResource::collection($data->gifts),
+            'gifts_id' => $gifts_id,
         ];
     }
 
@@ -74,27 +71,25 @@ class AdminPeriodEventController extends Controller
         ]);
 
         $data = WeeklyStar::find($id);
-        WeeklyStarGift::where('weekly_star_id',$data->id)->delete();
+        WeeklyStarGift::where('weekly_star_id', $data->id)->delete();
         $start = Carbon::parse($request->start_date)->format('Y-m-d');
         $end = Carbon::parse($request->end_date)->format('Y-m-d');
         $data->start_date = $start;
         $data->end_date = $end;
         $data->save();
 
-        if($request->gifts_id)
-        {
-            for($i=0 ; $i < count($request->gifts_id); $i++)
-            {
+        if ($request->gifts_id) {
+            for ($i = 0; $i < count($request->gifts_id); $i++) {
                 $item = Gift::find($request->gifts_id[$i]);
-                if($item)
-                {
+                if ($item) {
                     WeeklyStarGift::insert([
-                        'gift_id'          =>    $request->gifts_id[$i],
-                        'weekly_star_id'   => $data->id ,
+                        'gift_id' => $request->gifts_id[$i],
+                        'weekly_star_id' => $data->id,
                     ]);
                 }
             }
         }
+
         return 200;
     }
 
@@ -102,6 +97,7 @@ class AdminPeriodEventController extends Controller
     {
         $PkEvent = WeeklyStar::find($id);
         $PkEvent->delete();
+
         return 200;
     }
 }

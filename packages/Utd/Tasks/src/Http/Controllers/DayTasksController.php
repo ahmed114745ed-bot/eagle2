@@ -18,6 +18,7 @@ class DayTasksController extends Controller
     {
         $userId = auth()->id();
         $response = $this->dayTasksService->getDayTasks($userId, $dayId);
+
         return $response;
     }
 }

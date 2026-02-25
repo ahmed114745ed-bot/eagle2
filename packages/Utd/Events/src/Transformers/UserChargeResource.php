@@ -4,10 +4,9 @@ namespace Utd\Events\Transformers;
 
 use App\Models\Target;
 use Carbon\Carbon;
-use App\Helpers\Common;
-
-use Utd\Events\Entities\GeneralRole;
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
+use Utd\Events\Entities\GeneralRole;
 
 class UserChargeResource extends JsonResource
 {
@@ -15,10 +14,8 @@ class UserChargeResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
-
-
     public function toArray($request)
     {
 
@@ -28,30 +25,30 @@ class UserChargeResource extends JsonResource
         $timeDifference = $currentDate->diff($endOfMonth);
 
         $timeComponents = [
-            'day'    => $timeDifference->d,
-            'hour'   => $timeDifference->h,
+            'day' => $timeDifference->d,
+            'hour' => $timeDifference->h,
             'minute' => $timeDifference->i,
             'second' => $timeDifference->s,
         ];
-        $TotalAmount  = $this->charges->sum('amount') + $this->coinLogs->sum('obtained_coins');
-        $rule = GeneralRole::query()->where("type", 'charge_event')->first();
-        if ($TotalAmount < 0 ){
-            $TotalAmount = 0 ;
+        $TotalAmount = $this->charges->sum('amount') + $this->coinLogs->sum('obtained_coins');
+        $rule = GeneralRole::query()->where('type', 'charge_event')->first();
+        if ($TotalAmount < 0) {
+            $TotalAmount = 0;
         }
         $next_target = Target::where('diamonds', '>', $this->monthly_diamond_received)->orderBy('diamonds')->first();
 
         return [
             'user' => [
-                'user_id'   => $this->id,
-                'uuid'      => $this->uuid ?? 0,
-                'name'      => $this->name ?? '',
-                'avatar'    => $this->profile->avatar ?? '',
-                'amount'    => $TotalAmount ?? 0,
-                'next_target' => $next_target->diamonds ?? $this->monthly_diamond_received ,
-                'remaining' => $this->monthly_diamond_received
+                'user_id' => $this->id,
+                'uuid' => $this->uuid ?? 0,
+                'name' => $this->name ?? '',
+                'avatar' => $this->profile->avatar ?? '',
+                'amount' => $TotalAmount ?? 0,
+                'next_target' => $next_target->diamonds ?? $this->monthly_diamond_received,
+                'remaining' => $this->monthly_diamond_received,
             ],
 
-            'role'      => $rule != null ? app()->getLocale() == 'ar' ? $rule->desc_ar : $rule->desc_en : "",
+            'role' => $rule !== null ? app()->getLocale() === 'ar' ? $rule->desc_ar : $rule->desc_en : '',
             'remainingTime' => $timeComponents,
         ];
     }

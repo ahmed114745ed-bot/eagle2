@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('general_roles', 'desc_tr')) {
+        if (! Schema::hasColumn('general_roles', 'desc_tr')) {
             Schema::table('general_roles', function (Blueprint $table) {
                 $table->text('desc_tr')->nullable();
             });
         }
-        if (!Schema::hasColumn('general_roles', 'desc_hi')) {
+        if (! Schema::hasColumn('general_roles', 'desc_hi')) {
             Schema::table('general_roles', function (Blueprint $table) {
                 $table->text('desc_hi')->nullable();
             });

@@ -2,11 +2,11 @@
 
 namespace Utd\Events\Transformers\Dashboard;
 
-use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Vip\Entities\OVip;
 
 class AdminWeeklyStarEventsResource extends JsonResource
 {
@@ -15,51 +15,48 @@ class AdminWeeklyStarEventsResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    function get_name($id , $type) {
-        if($type == 'ware')
-        {
+    public function get_name($id, $type)
+    {
+        if ($type === 'ware') {
             $item = Ware::find($id);
-            if($item)
-            {
+            if ($item) {
                 return [
                     'name' => $item->name,
-                    'id' => $item->id
+                    'id' => $item->id,
                 ];
             }
-            else{
-                return '';
-            }
-        }
-        else if($type == 'vip')
-        {
+
+            return '';
+
+        } elseif ($type === 'vip') {
             $item = PackageHelper::isInstalled('vip') ? OVip::find($id) : null;
-            if($item)
-            {
+            if ($item) {
                 return [
                     'name' => $item->name,
-                    'id' => $item->id
+                    'id' => $item->id,
                 ];
             }
-            else{
-                return '';
-            }
+
+            return '';
+
         }
-        else{
-            return null;
-        }
+
+        return null;
+
     }
+
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'event_type' => null,
-            'event_id'   => $this->weekly_star_id ,
-            'type'       => $this->type,
-            'level'      => $this->level,
-            'expire'     => $this->expire,
-            'target'     => $this->target,
-            'vip'        => $this->get_name($this->target ,$this->type ),
-            'ware'       => $this->get_name($this->target ,$this->type ) ,
+            'event_id' => $this->weekly_star_id,
+            'type' => $this->type,
+            'level' => $this->level,
+            'expire' => $this->expire,
+            'target' => $this->target,
+            'vip' => $this->get_name($this->target, $this->type),
+            'ware' => $this->get_name($this->target, $this->type),
         ];
     }
 }

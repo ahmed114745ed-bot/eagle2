@@ -14,20 +14,20 @@ class AdminEventReportResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    function get_user($id) {
-        $user = User::where('id',$id)->first();
-        if($user)
-        {
+    public function get_user($id)
+    {
+        $user = User::where('id', $id)->first();
+        if ($user) {
             return [
-                'id'   =>$user->id ,
-                'uuid'   =>$user->uuid ,
-                'name' =>$user->name ?? '',
-                'img'  =>$user->profile->avatar ?? null,
+                'id' => $user->id,
+                'uuid' => $user->uuid,
+                'name' => $user->name ?? '',
+                'img' => $user->profile->avatar ?? null,
             ];
         }
-        else{
-            return null;
-        }
+
+        return null;
+
     }
 
     public function toArray(Request $request): array
@@ -36,8 +36,8 @@ class AdminEventReportResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'user' =>$this->get_user($this->pk_winner_id),
-            'reword' => new AdminPKEventRewardsResource($this->reward)
+            'user' => $this->get_user($this->pk_winner_id),
+            'reword' => new AdminPKEventRewardsResource($this->reward),
         ];
     }
 }

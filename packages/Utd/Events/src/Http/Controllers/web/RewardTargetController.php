@@ -2,32 +2,34 @@
 
 namespace Utd\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use App\Models\Ware;
+use App\Selectables\Badges;
+use App\Selectables\Wares;
+use App\Services\AppFeatureService;
+use App\Support\PackageHelper;
+use Encore\Admin\Admin;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Admin;
-use App\Selectables\Wares;
-use App\Selectables\Badges;
-
-use Utd\Vip\Entities\OVip;
-use App\Support\PackageHelper;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
-use App\Services\AppFeatureService;
-use App\Admin\Controllers\MainController;
-use Utd\Events\Entities\RewardTarget;
-use Utd\Events\Entities\ChargeTargetEvent;
-use Encore\Admin\Controllers\HasResourceActions;
 use Utd\Achievements\Entities\Achievement;
+use Utd\Events\Entities\ChargeTargetEvent;
+use Utd\Events\Entities\RewardTarget;
+use Utd\Vip\Entities\OVip;
 
 class RewardTargetController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'gift-target-event';
+
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("target_events");
+        (new AppFeatureService)->validateStatusEnable('target_events');
     }
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -35,6 +37,7 @@ class RewardTargetController extends MainController
             ->description(trans('admin.description'))
             ->body($this->grid()));
     }
+
     public function create(Content $content)
     {
         return parent::create($content
@@ -46,12 +49,14 @@ class RewardTargetController extends MainController
     public function update($id)
     {
         $id = request()->route('id');
+
         return $this->form()->update($id);
     }
 
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
+
         return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
@@ -65,6 +70,21 @@ class RewardTargetController extends MainController
             ->description(trans('admin.description'))
             ->body($this->detail($id)));
     }
+
+    public function destroyBulk($id, $targets)
+    {
+        $targetIds = explode(',', $targets);
+
+        RewardTarget::where('charge_event_id', $id)
+            ->whereIn('id', $targetIds)
+            ->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => __('deleted_success'),
+        ]);
+    }
+
     protected function grid()
     {
 
@@ -72,37 +92,42 @@ class RewardTargetController extends MainController
         $target = ChargeTargetEvent::query()->find($charge_event_id);
         $grid = new Grid(new RewardTarget());
         $grid->column('created_at')->hide();
-        $grid->model()->where("charge_event_id", $charge_event_id);
+        $grid->model()->where('charge_event_id', $charge_event_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
 
-        if (!request()->filled('_export_')) { 
-             $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
-                return @$this->ware->name ?? '';
-            } elseif ($this->type == "vip") {
-                return @$this->vip->name ?? '';
-            } elseif ($this->type == "badge") {
-                return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
-                return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
-            }
-        });
-  
+        if (! request()->filled('_export_')) {
+            $grid->column('gift_id', __('gifts'))->display(function () {
+                if ($this->type === 'ware') {
+                    return @$this->ware->name ?? '';
+                }
+                if ($this->type === 'vip') {
+                    return @$this->vip->name ?? '';
+                }
+                if ($this->type === 'badge') {
+                    return @$this->badge->name ?? '';
+                }
+                if ($this->type === 'coins') {
+                    return @$this->target;
+                }
+                if ($this->type === 'achievement') {
+                    $value = getDriverUrl().'/'.@$this->target;
+
+                    return "<img src='$value' width='80' height='80'>";
+                }
+            });
+
             $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->type == 'ware') {
+                if ($this->type === 'ware') {
                     $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->type == 'vip') {
+                    $path = $ware->img2 ?? ($ware->show_img ?? '');
+                } elseif ($this->type === 'vip') {
                     $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                     $path = $vips->img ?? '';
-                } elseif ($this->type == 'badge') {
+                } elseif ($this->type === 'badge') {
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
-                } elseif ($this->type == 'achievement') {
+                } elseif ($this->type === 'achievement') {
                     $path = $this->target;
                 } else {
                     $path = 'coin.png';
@@ -110,17 +135,19 @@ class RewardTargetController extends MainController
 
                 /** @var Gift $this */
                 $url = getImagePath($path);
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
-        
+
         }
         $grid->column('expire', __('expire'))->display(function ($expire) {
-            if ($this->type == 'coins') {
-               return  '-';
+            if ($this->type === 'coins') {
+                return '-';
             }
-            return $expire ;
+
+            return $expire;
         });
-                $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($target) {
             $url = url('admin/target-events');
@@ -155,36 +182,38 @@ class RewardTargetController extends MainController
         $this->disableFormTools($form);
 
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
-        $typeOptions = ["ware" => __('ware'),"badge"=>__('badge'), "coins" => __('coins')];
+        $typeOptions = ['ware' => __('ware'), 'badge' => __('badge'), 'coins' => __('coins')];
         if (PackageHelper::isInstalled('vip')) {
-            $typeOptions["vip"] = __('vip');
+            $typeOptions['vip'] = __('vip');
         }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
         $form->select('type', trans('type'))->options($typeOptions)
-            ->when("ware", function () use ($form) {
+            ->when('ware', function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
             })
-            ->when("vip", function () use ($form) {
+            ->when('vip', function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
                     $vips = PackageHelper::isInstalled('vip') ? OVip::query()->select('id', 'name')->get() : collect();
-                    foreach ($vips as  $vip) {
+                    foreach ($vips as $vip) {
                         $ops[$vip->id] = $vip->name;
                     }
+
                     return $ops ?? [];
                 })->rules('required');
-            })->when("badge", function () use ($form) {
+            })->when('badge', function () use ($form) {
                 $this->addBadgeField($form);
             })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"))->rules('required');
-            })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
+            ->when('coins', function () use ($form) {
+                $form->number('target3', __('coins'))->rules('required');
+            })->when('achievement', function () use ($form) {
+                $form->image('target4', __('image'))->name(function ($file) {
+                    return now()->timestamp.'.'.$file->guessExtension();
                 })->disk('gcs');
             });
         $form->number('expire', __('expire'))->default(1);
+
         return $form;
     }
 
@@ -192,16 +221,19 @@ class RewardTargetController extends MainController
     {
         $prefix = 'badges';
         $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target5')
+            $form->setElementName($prefix.'target5')
                 ->select('id', __('badges'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Badge::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
@@ -209,21 +241,4 @@ class RewardTargetController extends MainController
             $this->addWareJs();
         });
     }
-
-
-
-    public function destroyBulk($id, $targets)
-    {
-        $targetIds = explode(',', $targets);
-
-        RewardTarget::where('charge_event_id', $id) 
-            ->whereIn('id', $targetIds)
-            ->delete();
-
-        return response()->json([
-            'status'  => true,
-            'message' => __('deleted_success'),
-        ]);
-    }
-
 }

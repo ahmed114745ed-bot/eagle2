@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 
 class GiftUpdateUsedCountMonthly extends Command
 {
-
     protected $signature = 'update-gift-monthly:cron';
 
     protected $description = 'Command description';
@@ -19,10 +18,10 @@ class GiftUpdateUsedCountMonthly extends Command
 
     public function handle()
     {
-        $gifts = Gift::orderBy("use_count", "asc")->where("enable",1)->take(5)->get();
+        $gifts = Gift::orderBy('use_count', 'asc')->where('enable', 1)->take(5)->get();
         if ($gifts) {
             foreach ($gifts as $gift) {
-                $gift->enable=2;
+                $gift->enable = 2;
                 $gift->save();
             }
         }

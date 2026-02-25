@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('weekly_stars', function (Blueprint $table) {
-            $table->string("type")->default("weekly_star")->change();
+            $table->string('type')->default('weekly_star')->change();
         });
     }
 

@@ -38,7 +38,7 @@ return new class extends Migration
                 AND TABLE_NAME = 'weekly_cp_gifts' 
                 AND CONSTRAINT_NAME = 'weekly_cp_gifts_weekly_cp_id_foreign'
             ");
-            if (!empty($fkExists)) {
+            if (! empty($fkExists)) {
                 Schema::table('weekly_cp_gifts', function (Blueprint $table) {
                     $table->dropForeign(['weekly_cp_id']);
                 });

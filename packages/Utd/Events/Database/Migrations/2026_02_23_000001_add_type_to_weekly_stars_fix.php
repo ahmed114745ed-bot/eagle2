@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasColumn('weekly_stars', 'type')) {
+        if (! Schema::hasColumn('weekly_stars', 'type')) {
             Schema::table('weekly_stars', function (Blueprint $table) {
                 $table->string('type')->nullable()->default('weekly_star');
             });

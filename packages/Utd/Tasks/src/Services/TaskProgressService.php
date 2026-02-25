@@ -4,6 +4,7 @@ namespace Utd\Tasks\Services;
 
 use App\Helpers\Common;
 use App\Repositories\User\UserRepository;
+use Exception;
 use Utd\Tasks\Repositories\DailyTaskRepository;
 use Utd\Tasks\Repositories\DayRepository;
 use Utd\Tasks\Repositories\TaskProgressRepository;
@@ -12,9 +13,13 @@ use Utd\Tasks\Repositories\UserDayProgressRepository;
 class TaskProgressService
 {
     protected $dayRepository;
+
     protected $userRepository;
+
     protected $dailyTaskRepository;
+
     protected $taskProgressRepository;
+
     protected $userDayProgressRepository;
 
     public function __construct(
@@ -50,9 +55,9 @@ class TaskProgressService
             } else {
                 $progressDayIds = $userProgress->pluck('day_id')->toArray();
                 $targetDay = $days->firstWhere(function ($day) use ($progressDayIds) {
-                    return !in_array($day->id, $progressDayIds);
+                    return ! in_array($day->id, $progressDayIds);
                 });
-                if (!$targetDay) {
+                if (! $targetDay) {
                     $targetDay = $days->first();
                 }
             }
@@ -60,6 +65,7 @@ class TaskProgressService
             $tasks = $this->dailyTaskRepository->getAll(['day_id' => $targetDay->id], orderBy: ['id' => 'asc'])
                 ->map(function ($task) use ($userId) {
                     $progress = $this->taskProgressRepository->getByUserIdAndTaskId($userId, $task->id);
+
                     return [
                         'id' => $task->id,
                         'title' => $task->title,
@@ -70,12 +76,13 @@ class TaskProgressService
                         'total_points' => $task->total_points,
                         'is_completed' => $progress ? $progress->is_completed : false,
                         'is_collect' => $progress ? $progress->is_collect : false,
-                        'created_at' => $task->created_at
+                        'created_at' => $task->created_at,
                     ];
                 });
 
             $daysWithProgress = $days->map(function ($day) use ($userProgress) {
                 $progress = $userProgress->firstWhere('day_id', $day->id);
+
                 return [
                     'id' => $day->id,
                     'day_number' => $day->day_number,
@@ -92,7 +99,7 @@ class TaskProgressService
                 'days' => $daysWithProgress,
                 'tasks' => $tasks,
             ], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }

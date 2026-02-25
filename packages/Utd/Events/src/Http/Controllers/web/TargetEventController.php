@@ -2,16 +2,15 @@
 
 namespace Utd\Events\Http\Controllers\web;
 
-
+use App\Admin\Controllers\MainController;
+use App\Services\AppFeatureService;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Column;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
-use App\Services\AppFeatureService;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Content;
 use Utd\Events\Entities\ChargeTargetEvent;
 
 class TargetEventController extends MainController
@@ -22,9 +21,10 @@ class TargetEventController extends MainController
      * @var string
      */
     public $permission_name = 'target-event';
+
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("target_events");
+        (new AppFeatureService)->validateStatusEnable('target_events');
     }
 
     public function index(Content $content)
@@ -43,8 +43,7 @@ class TargetEventController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -57,8 +56,7 @@ class TargetEventController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -74,6 +72,7 @@ class TargetEventController extends MainController
             ->title(trans('Charging Events'))
             ->body($this->form()));
     }
+
     protected function grid()
     {
         //        dd(ChargeTargetEvent::with('rewards.ware')->first());
@@ -85,36 +84,38 @@ class TargetEventController extends MainController
             if (request()->filled('_export_')) {
                 return $value;
             }
+
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <span>{$value}</span>
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
 
-        if (!request()->filled('_export_')) {
-     
-            if (Admin::user()->can('browse-' . 'gift-target-event') || Admin::user()->can('*')) {
+        if (! request()->filled('_export_')) {
+
+            if (Admin::user()->can('browse-'.'gift-target-event') || Admin::user()->can('*')) {
                 $grid->column(__('procedures'))->display(function () {
 
                     if (request()->filled('_export_')) {
                         return '';
                     }
-                    $url1 = url('admin/target-events-gift/' . $this->id);
+                    $url1 = url('admin/target-events-gift/'.$this->id);
                     $gifts = __('gifts');
-                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
+                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".$gifts.'</a>';
 
                     return $button1;
                 });
             }
         }
         $this->extendGrid($grid);
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -142,8 +143,9 @@ class TargetEventController extends MainController
 
         $form->number('value', __('value'));
         $form->saved(function (Form $form) {
-            return redirect()->to('admin/target-events-gift/' . $form->model()->id);
+            return redirect()->to('admin/target-events-gift/'.$form->model()->id);
         });
+
         return $form;
     }
 }

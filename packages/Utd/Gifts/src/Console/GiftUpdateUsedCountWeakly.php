@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class GiftUpdateUsedCountWeakly extends Command
 {
-
     protected $signature = 'update-gift-weakly:cron';
 
     protected $description = 'Command description';
@@ -24,21 +23,23 @@ class GiftUpdateUsedCountWeakly extends Command
         Gift::query()->update(['use_count' => 0]);
         $currentDateTime = \Carbon\Carbon::now();
         $oneMonthFromNow = $currentDateTime->subMonth();
-        $gift_logs = GiftLog::query()->with("gift")->select(['giftId', DB::raw('sum(giftNum) as total')])
-                    ->whereDate("created_at","<=",date("Y-m-d"))
-                    ->whereDate("created_at",">=",$oneMonthFromNow)
-                    ->groupBy('giftId')
-                    ->get();
+        $gift_logs = GiftLog::query()->with('gift')->select(['giftId', DB::raw('sum(giftNum) as total')])
+            ->whereDate('created_at', '<=', date('Y-m-d'))
+            ->whereDate('created_at', '>=', $oneMonthFromNow)
+            ->groupBy('giftId')
+            ->get();
 
-//        if ($gift_logs) {
-            foreach ($gift_logs as $gift_log) {
-                $gift=Gift::find($gift_log?->giftId);
-                if (!$gift) continue;
-                $gift->use_count =$gift_log?->total ?? 0;
-                $gift->save();
+        //        if ($gift_logs) {
+        foreach ($gift_logs as $gift_log) {
+            $gift = Gift::find($gift_log?->giftId);
+            if (! $gift) {
+                continue;
             }
-//        }
+            $gift->use_count = $gift_log?->total ?? 0;
+            $gift->save();
+        }
+        //        }
 
-//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+        //        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 }

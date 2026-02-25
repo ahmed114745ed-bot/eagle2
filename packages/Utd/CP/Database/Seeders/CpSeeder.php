@@ -5,8 +5,8 @@ namespace Utd\CP\Database\Seeders;
 use App\Models\GiftLog;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Utd\Events\Entities\WeeklyStar;
 use Utd\CP\Entities\Cp;
+use Utd\Events\Entities\WeeklyStar;
 
 class CpSeeder extends Seeder
 {

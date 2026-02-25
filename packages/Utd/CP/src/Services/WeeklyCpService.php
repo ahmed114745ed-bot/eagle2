@@ -3,8 +3,8 @@
 namespace Utd\CP\Services;
 
 use Exception;
-use Utd\Events\Entities\WeeklyStar;
 use Utd\CP\Repositories\WeeklyCpRepository;
+use Utd\Events\Entities\WeeklyStar;
 
 class WeeklyCpService
 {

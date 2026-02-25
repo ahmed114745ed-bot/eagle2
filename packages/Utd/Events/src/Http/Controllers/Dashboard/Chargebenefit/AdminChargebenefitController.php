@@ -8,40 +8,41 @@ use Utd\Events\Entities\ChargeTargetEvent;
 
 class AdminChargebenefitController extends Controller
 {
-
     public function index()
     {
         $data = ChargeTargetEvent::all();
+
         return $data;
     }
-
 
     public function store(Request $request)
     {
         $request->validate([
-            'value' => 'required'
+            'value' => 'required',
         ]);
         $data = new ChargeTargetEvent();
         $data->value = $request->value;
         $data->save();
+
         return 200;
     }
-
 
     public function show(string $id)
     {
         $data = ChargeTargetEvent::find($id);
-        return  $data;
+
+        return $data;
     }
 
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'value' => 'required'
+            'value' => 'required',
         ]);
         $data = ChargeTargetEvent::find($id);
         $data->value = $request->value;
         $data->save();
+
         return 200;
     }
 
@@ -49,6 +50,7 @@ class AdminChargebenefitController extends Controller
     {
         $ChargeTargetEvent = ChargeTargetEvent::find($id);
         $ChargeTargetEvent->delete();
+
         return 200;
     }
 }

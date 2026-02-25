@@ -9,45 +9,50 @@ use Utd\CP\Entities\CpRelation;
 
 class CpRelationController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $search = request('search');
         $perPage = request('per_page') ?? 10;
 
-        $result = CpRelation::when($search, function($q)use($search){
+        $result = CpRelation::when($search, function ($q) use ($search) {
             $q->where('id', $search);
         })
-        ->paginate($perPage);
+            ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function types(){
+    public function types()
+    {
         $types = [
             'bro',
             'friend',
             'lovely',
-            'solution'
+            'solution',
         ];
 
         return Common::apiResponse(true, 'Success', $types);
     }
 
-    public function show($id){
+    public function show($id)
+    {
 
         $result = CpRelation::findOrFail($id);
 
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         CpRelation::findOrFail($id)->delete();
 
         return Common::apiResponse(true, 'Success');
     }
 
-    public function delete_all(Request $request){
+    public function delete_all(Request $request)
+    {
         $request->validate([
-            'ids' => 'required'
+            'ids' => 'required',
         ]);
 
         $ids = explode(',', $request->ids);
@@ -57,7 +62,8 @@ class CpRelationController extends Controller
         return Common::apiResponse(true, 'Success');
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
         $validated = $request->validate([
             'title' => 'required',
@@ -65,7 +71,7 @@ class CpRelationController extends Controller
             'image' => 'required|image',
             'price' => 'required',
             'type' => 'required',
-            'relations_number' => 'required'
+            'relations_number' => 'required',
         ]);
 
         $validated['image'] = Common::upload('images', $request->file('image'));
@@ -75,7 +81,9 @@ class CpRelationController extends Controller
         return Common::apiResponse(true, 'Success', $result);
 
     }
-    public function update($id, Request $request){
+
+    public function update($id, Request $request)
+    {
 
         $validated = $request->validate([
             'title' => 'required',
@@ -83,10 +91,10 @@ class CpRelationController extends Controller
             'image' => 'nullable|image',
             'price' => 'required',
             'type' => 'required',
-            'relations_number' => 'required'
+            'relations_number' => 'required',
         ]);
 
-        if($request->hasFile('image')){
+        if ($request->hasFile('image')) {
             $validated['image'] = Common::upload('images', $request->file('image'));
         }
 
@@ -94,7 +102,7 @@ class CpRelationController extends Controller
 
         $result->update($validated);
 
-        return Common::apiResponse(true,'Success');
+        return Common::apiResponse(true, 'Success');
 
     }
 }

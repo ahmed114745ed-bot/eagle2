@@ -2,20 +2,20 @@
 
 namespace Utd\Events\Console;
 
-use Carbon\Carbon;
-use App\Models\Ware;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Helpers\UserCommon;
 use App\Enums\UserCoinLogType;
-use Utd\Vip\Entities\OVip;
-use Illuminate\Console\Command;
-use App\Support\PackageHelper;
+use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserCommon;
+use App\Models\GiftLog;
+use App\Models\Ware;
+use App\Support\PackageHelper;
+use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Utd\Events\Entities\Winner;
-use Utd\Events\Entities\WeeklyStar;
 use Utd\Achievements\Entities\UserAchievementLevel;
+use Utd\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\Winner;
+use Utd\Vip\Entities\OVip;
 
 class WeeklyStarWinner extends Command
 {
@@ -30,7 +30,7 @@ class WeeklyStarWinner extends Command
             ->latest()
             ->first();
 
-        if (!$weeklyEvent) {
+        if (! $weeklyEvent) {
             return '';
         }
 
@@ -47,10 +47,10 @@ class WeeklyStarWinner extends Command
         foreach ($leaderboard as $index => $entry) {
             $alreadyWinner = Winner::where([
                 'weekly_star_id' => $weeklyEvent->id,
-                'user_id' => $entry->sender_id
+                'user_id' => $entry->sender_id,
             ])->exists();
 
-            if (!$alreadyWinner) {
+            if (! $alreadyWinner) {
                 $winner = Winner::create([
                     'weekly_star_id' => $weeklyEvent->id,
                     'user_id' => $entry->sender_id,
@@ -61,7 +61,7 @@ class WeeklyStarWinner extends Command
                     foreach ($rewardIds as $reward) {
 
                         $expiredAt = now()->addDays($reward->expire);
-                        if ($reward->type == "coins") {
+                        if ($reward->type === 'coins') {
 
                             $amountBefore = $entry?->sender?->di;
                             UserCoinLogHelper::logByType(
@@ -73,29 +73,31 @@ class WeeklyStarWinner extends Command
 
                             $entry->sender->di += $reward->target;
                             $entry->sender->save();
-                        } elseif ($reward->type == "vip") {
+                        } elseif ($reward->type === 'vip') {
                             $vip = null;
                             if (PackageHelper::isInstalled('vip')) {
                                 $vip = OVip::query()->find($reward->target);
                             }
-                            if ($vip) UserCommon::addVipToUser($entry->sender, $vip, $reward->expire, null, 'weekly-star');
-                        } elseif ($reward->type == "ware") {
+                            if ($vip) {
+                                UserCommon::addVipToUser($entry->sender, $vip, $reward->expire, null, 'weekly-star');
+                            }
+                        } elseif ($reward->type === 'ware') {
                             $ware = Ware::query()->find($reward->target);
                             UserCommon::addWareToUser($entry->sender, $ware, $reward->expire, null, 'weekly-star');
-                        } elseif ($reward->type == "achievement") {
+                        } elseif ($reward->type === 'achievement') {
                             if (class_exists(UserAchievementLevel::class)) {
                                 // $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                                 $dateTimestamp = optional(Carbon::make($reward->expire))->format('Y-m-d H:i:s');
                                 $attributes = [
-                                    'user_id'       => $entry->sender_id,
+                                    'user_id' => $entry->sender_id,
                                     'custom_image' => $reward->target,
                                     'end_at' => $dateTimestamp,
                                 ];
 
                                 UserAchievementLevel::create($attributes);
                             }
-                        } elseif ($reward->type == 'badge') {
-                            Common::userBadge($entry->sender_id, $reward->target,$reward->expire, 'weekly-star');
+                        } elseif ($reward->type === 'badge') {
+                            Common::userBadge($entry->sender_id, $reward->target, $reward->expire, 'weekly-star');
                         } else {
                             continue;
                         }
