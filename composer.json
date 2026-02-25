@@ -61,7 +61,7 @@
         "utd/lucky-box": "*",
         "utd/moments": "*",
         "utd/pk": "*",
-        "utd/ranking-reward": "*",
+        "utd/ranking-reward": "dev-achievmentPackage",
         "utd/reals": "*",
         "utd/room": "*",
         "utd/room-boom": "*",
@@ -236,6 +236,7 @@
             "url": "packages/Utd/Tasks"
         },
         {
+
             "type": "path",
             "url": "packages/Utd/HostLevel"
         },
