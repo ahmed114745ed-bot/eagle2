@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Utd\Room\Console\Commands;
 
 use App\Classes\Gifts\RoomJobFactory;
 use App\Dragon\DTO\RoomJobClass;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 class HandlingRoomZigoRequests extends Command

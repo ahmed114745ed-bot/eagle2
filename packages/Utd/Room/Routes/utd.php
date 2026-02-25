@@ -6,6 +6,7 @@ use Utd\Room\Http\Controllers\BackgroundController;
 use Utd\Room\Http\Controllers\MicrophoneController;
 use Utd\Room\Http\Controllers\RoomCategoryController;
 use Utd\Room\Http\Controllers\RoomController;
+use Utd\Room\Http\Controllers\Utd\RequestBackgroundImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,5 +59,13 @@ Route::group([
         Route::post('/delete/{id}', [RoomVipsController::class, 'destroy']);
         Route::post('create', [RoomVipsController::class, 'store']);
         Route::post('update/{id}', [RoomVipsController::class, 'update']);
+    });
+
+    Route::prefix('request-background-image')->group(function () {
+        Route::get('/', [RequestBackgroundImageController::class, 'all']);
+        Route::get('/show/{id}', [RequestBackgroundImageController::class, 'show']);
+        Route::post('/create', [RequestBackgroundImageController::class, 'create']);
+        Route::delete('/delete/{id}', [RequestBackgroundImageController::class, 'destroy']);
+        Route::post('/update/{id}', [RequestBackgroundImageController::class, 'update']);
     });
 });

@@ -1,16 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace Utd\Room\Http\Controllers\Api;
 
-
-use Exception;
 
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\RequestBackgroundImagService;
-
-
+use Exception;
+use Illuminate\Http\Request;
 
 
 class RequestBackgroundImageController extends Controller

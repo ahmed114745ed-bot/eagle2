@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace Utd\Room\Entities;
 
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\BackgroundService;
-use Illuminate\Support\Facades\Validator;
 use App\Tik\Services\RequestBackgroundImagService;
-
+use Illuminate\Http\Request;
 
 
 class BackgroundController extends Controller

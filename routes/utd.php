@@ -59,7 +59,6 @@ use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\utd\ReportController;
 use App\Http\Controllers\utd\ReportUserController;
 use App\Http\Controllers\utd\RequestAgenciesController;
-use App\Http\Controllers\utd\RequestBackgroundImageController;
 use App\Http\Controllers\utd\RequestTakeSalaryController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\SalaryRequestController;
@@ -81,6 +80,7 @@ use Utd\Events\Http\Controllers\Utd\WeeklyEventController;
 use Utd\Family\Http\Controllers\Api\FamilyLevelController;
 use Utd\Family\Http\Controllers\Utd\FamilyController;
 use Utd\Pk\Http\Controllers\Api\PkController;
+use Utd\Room\Http\Controllers\Api\BackgroundController;
 use Utd\Room\Http\Controllers\Api\RoomCategoryController;
 use Utd\Room\Http\Controllers\Api\RoomController as RoomControllerVi;
 use Utd\Room\Http\Controllers\Api\RoomTargetController;
@@ -153,11 +153,11 @@ Route::middleware([])->group(function () {
 
 
     Route::prefix('backgrounds')->group(function () {
-        Route::get('/', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'index']);
-        Route::post('/', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'store']);
-        Route::post('/update/{id}', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'update']);
-        Route::post('/delete/{id}', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'destroy']);
-        Route::get('/{id}', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'show']);
+        Route::get('/', [BackgroundController::class, 'index']);
+        Route::post('/', [BackgroundController::class, 'store']);
+        Route::post('/update/{id}', [BackgroundController::class, 'update']);
+        Route::post('/delete/{id}', [BackgroundController::class, 'destroy']);
+        Route::get('/{id}', [BackgroundController::class, 'show']);
     });
 
     Route::prefix('percentage-target')->group(function () {
@@ -666,14 +666,6 @@ Route::middleware([])->group(function () {
         Route::post('/create', [OfferController::class, 'store']);
         Route::delete('/delete/{id}', [OfferController::class, 'delete']);
         Route::post('/update/{id}', [OfferController::class, 'update']);
-    });
-
-    Route::prefix('request-background-image')->group(function () {
-        Route::get('/', [RequestBackgroundImageController::class, 'all']);
-        Route::get('/show/{id}', [RequestBackgroundImageController::class, 'show']);
-        Route::post('/create', [RequestBackgroundImageController::class, 'create']);
-        Route::delete('/delete/{id}', [RequestBackgroundImageController::class, 'destroy']);
-        Route::post('/update/{id}', [RequestBackgroundImageController::class, 'update']);
     });
 
     // Route::prefix('request-agency')->group(function () {

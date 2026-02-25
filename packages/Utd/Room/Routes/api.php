@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use Illuminate\Support\Facades\Route;
+use Utd\Room\Entities\BackgroundController;
 use Utd\Room\Http\Controllers\Api\EnteranceController;
 use Utd\Room\Http\Controllers\Api\MicrophoneController;
+use Utd\Room\Http\Controllers\Api\RequestBackgroundImageController;
 use Utd\Room\Http\Controllers\Api\RoomCategoryController;
 use Utd\Room\Http\Controllers\Api\RoomController;
 
@@ -91,5 +91,11 @@ Route::prefix('api')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBa
         Route::get('classes', [RoomCategoryController::class, 'allClasses']);
         Route::get('types', [RoomCategoryController::class, 'getTypes']);
         Route::get('types_by_class/{id}', [RoomCategoryController::class, 'getClassChildren']);
+    });
+
+    Route::prefix('backgrounds')->group(function () {
+        Route::get('/', [BackgroundController::class, 'allBackgrounds']);
+        Route::get('/me', [BackgroundController::class, 'allMyBackgrounds']);
+        Route::get('/setting', [BackgroundController::class, 'backgroundSetting']);
     });
 });
