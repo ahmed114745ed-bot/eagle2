@@ -29,5 +29,5 @@
     "SuperAdmin": true,
     "TaskStream": false,
     "UsersWallet": true,
-    "RankingReward": true
+    "RankingReward": false
 }

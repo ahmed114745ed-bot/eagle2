@@ -968,21 +968,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'ranking rewards',
-                'sort' => 42,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 42],
-                ],
-                'permissions' => [
-                    ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    //                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
-                    //                        PermissionType::ADMIN->value => $defaultMethods,
-                    //                    ],],
-                ],
-            ],
-            [
                 'name' => 'emojis',
                 'sort' => 43,
                 'types' => [
@@ -1303,6 +1288,24 @@ class PermissionTypeSeeder extends Seeder
 
                         ],
                     ],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('rankingReward')) {
+            $categories[] = [
+                'name' => 'ranking rewards',
+                'sort' => 42,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 42],
+                ],
+                'permissions' => [
+                    ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+//                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
+//                        PermissionType::ADMIN->value => $defaultMethods,
+//                    ],],
                 ],
             ];
         }

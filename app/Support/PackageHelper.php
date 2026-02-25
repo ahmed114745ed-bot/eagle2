@@ -8,6 +8,7 @@ use Utd\Chat\Entities\ChatMessage;
 use Utd\Events\Entities\WeeklyStar;
 use Utd\Family\Entities\Family;
 use Utd\Gifts\Entities\GiftLog;
+use Utd\RankingReward\Entities\RankingReward;
 use Utd\Tasks\Entities\Day;
 use Utd\TaskStream\Entities\TaskStream;
 use Utd\Charizma\Entities\ExtraDataInRoom;
@@ -43,6 +44,7 @@ class PackageHelper
         'task' => Day::class,
         'gift' => GiftLog::class,
         'hostLevel' => HostLevel::class,
+        'rankingReward' => RankingReward::class,
     ];
 
     /**

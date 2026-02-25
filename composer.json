@@ -61,6 +61,7 @@
         "utd/lucky-box": "*",
         "utd/moments": "*",
         "utd/pk": "*",
+        "utd/ranking-reward": "*",
         "utd/reals": "*",
         "utd/room": "*",
         "utd/room-boom": "*",
@@ -237,6 +238,10 @@
         {
             "type": "path",
             "url": "packages/Utd/HostLevel"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/RankingReward"
         }
     ]
 }

@@ -188,26 +188,28 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/remaining-diamonds.log'))
             ->runInBackground();
 
-        $schedule->command('monthly-ranking')
-            ->monthly()
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/monthly-ranking.log'))
-            ->runInBackground();
+        if (PackageHelper::isInstalled('rankingReward')) {
+            $schedule->command('monthly-ranking')
+                ->monthly()
+                ->timezone(getTimezone())
+                ->appendOutputTo(storage_path('logs/monthly-ranking.log'))
+                ->runInBackground();
 
-        $schedule->command('daily-ranking')
-            ->dailyAt('00:00')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/daily-ranking.log'))
-            ->runInBackground();
-        $weekEnd = Common::getSettingValue('week_start') ?? 'monday';
+            $schedule->command('daily-ranking')
+                ->dailyAt('00:00')
+                ->timezone(getTimezone())
+                ->appendOutputTo(storage_path('logs/daily-ranking.log'))
+                ->runInBackground();
+            $weekEnd = Common::getSettingValue('week_start') ?? 'monday';
 
-        // Convert string to Carbon constant
-        $carbonDay = constant('Carbon\\Carbon::' . strtoupper($weekEnd));
-        $schedule->command('weekly-ranking')
-            ->weeklyOn($carbonDay, '00:00')
-            ->timezone(getTimezone())
-            ->appendOutputTo(storage_path('logs/weekly-ranking.log'))
-            ->runInBackground();
+            // Convert string to Carbon constant
+            $carbonDay = constant('Carbon\\Carbon::' . strtoupper($weekEnd));
+            $schedule->command('weekly-ranking')
+                ->weeklyOn($carbonDay, '00:00')
+                ->timezone(getTimezone())
+                ->appendOutputTo(storage_path('logs/weekly-ranking.log'))
+                ->runInBackground();
+        }
     }
 
     protected function commands(): void
