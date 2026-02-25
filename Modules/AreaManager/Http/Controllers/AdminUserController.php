@@ -159,10 +159,10 @@ class AdminUserController extends EncorUsersController
             $subSuperAdmin->avatar = $image;
         }
 
-        if ($request->password) {
-    dd(123);
-            $subSuperAdmin->password = Hash::make($request->password);
-        }
+        if ($request->filled('password')) {
+           
+        $subSuperAdmin->password = Hash::make($request->password);
+    }
         $subSuperAdmin->save();
         return Redirect::back();
     }

@@ -307,6 +307,9 @@ class AdminUserController extends EncorUsersController
         if ($request->password) {
             $subSuperAdmin->password = Hash::make($request->password);
         }
+        if ($request->filled('password')) {
+            $subSuperAdmin->password = Hash::make($request->password);
+        }
         $subSuperAdmin->save();
         return Redirect::back();
     }
