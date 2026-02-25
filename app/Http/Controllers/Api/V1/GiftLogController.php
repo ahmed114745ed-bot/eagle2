@@ -25,18 +25,22 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\RoomBoom\Entities\TotalRoomGift;
+use App\Services\Gifts\LuckyGiftService;
 
 
 class GiftLogController extends Controller
 {
 
     private $roomTopUsersRepository;
+    private $luckyGiftService;
     public function __construct(
         RoomTopUsersRepository $roomTopUsersRepository,
         private GiftLogService $giftLogService,
+        LuckyGiftService $luckyGiftService,
     ) {
 
         $this->roomTopUsersRepository = $roomTopUsersRepository;
+        $this->luckyGiftService = $luckyGiftService;
     }
 
     public function updateRoomPercentageAndHost($ownerId, array $receiverIds, $totalCoins, $coinsPerUser)
