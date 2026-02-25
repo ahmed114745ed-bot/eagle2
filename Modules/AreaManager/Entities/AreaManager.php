@@ -59,6 +59,11 @@ class AreaManager extends Authenticatable
         });
     }
 
+    public function subAreaManager()
+    {
+        return $this->hasMany(SubAreaManager::class, 'parent_id', 'id');
+    }
+
     public function appUser()
     {
         return $this->belongsTo(User::class, 'app_id');

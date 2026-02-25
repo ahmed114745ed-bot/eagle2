@@ -458,7 +458,7 @@ class AreaManagerController extends MainController
             'currentAreaManagerId' => $currentAreaManagerId,
         ])->render();
 
-        $marker = '<div class="full-column-width">'.$mapHtml.'</div>';
+        $marker = '<div class="full-column-width">' . $mapHtml . '</div>';
         $form->html($marker, '')->setWidth(12, 0);
     }
 
@@ -607,6 +607,7 @@ class AreaManagerController extends MainController
             ->paginate(10, ['*'], 'charges_page');
         $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
         $prefix = dashboardName();
+        $subAreaManagers = $areaManager->subAreaManager()->with('appUser')->paginate(10, ['*'], 'sub_super_admin_page');
         switch ($tab) {
             case 'agencies':
                 $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
@@ -616,7 +617,7 @@ class AreaManagerController extends MainController
                 break;
         }
 
-        return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
+        return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'subAreaManagers', 'charges'));
     }
 
     public function profilePreview()
@@ -654,6 +655,7 @@ class AreaManagerController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
+        $subAreaManagers = $superAdmin->subAreaManager()->with('appUser')->paginate(10, ['*'], 'sub_super_admin_page');
 
         switch ($tab) {
             case 'agencies':
@@ -661,7 +663,7 @@ class AreaManagerController extends MainController
                 break;
         }
 
-        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'totalSpent'));
+        return view('superadmin.super_admin_profile', compact('superAdmin', 'agencies', 'totalCharges', 'subAreaManagers', 'totalSpent'));
     }
 
     protected function detail($id)

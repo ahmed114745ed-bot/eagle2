@@ -2,42 +2,37 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
-use App\Models\User;
+use App\Helpers\Common;
 use App\Models\Admin;
 use App\Models\Agent;
-use App\Models\Agency;
-use Encore\Admin\Form;
+use App\Models\User;
 use Encore\Admin\Layout\Content;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\RoleRewards\Actions\DeleteUser;
-
-use Modules\SuperAdmin\Actions\SuperAdmin\DeleteSubSuperAdminAction;
-use Modules\SuperAdmin\Actions\SuperAdmin\CustomDeleteAction;
-use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
-use App\Admin\Controllers\MainController;
-
+use Illuminate\Support\Facades\Redirect;
+use Modules\SuperAdmin\Entities\SubAdmin;
 
 class AdminUserController extends EncorUsersController
 {
-// \Encore\Admin\Controllers\UserController
+    // \Encore\Admin\Controllers\UserController
 
     protected $model;
 
     public $permission_name = 'auth-users';
 
-    public function __construct ()
+    public function __construct()
     {
         $userModel = Admin::class;
         $this->model = new $userModel;
     }
 
-    public function edit ( $id , Content $content )
+    public function edit($id, Content $content)
     {
 
-        return parent ::edit ( $id , $content );
+        return parent::edit($id, $content);
     }
 
-    public function grid ()
+    public function grid()
     {
         \Log::info('AdminUserController grid method called - COMPLETE OVERRIDE', [
             'controller_class' => get_class($this),
@@ -103,7 +98,7 @@ class AdminUserController extends EncorUsersController
             $id = $this->id;
             $viewUrl = url("superadmin/auth-users/{$id}");
             $editUrl = url("superadmin/auth-users/{$id}/edit");
-            
+
             return "
             <div class='btn-group'>
                 <button type='button' class='btn btn-sm btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
@@ -121,11 +116,11 @@ class AdminUserController extends EncorUsersController
         $grid->disableActions();
 
         $grid->tools(function ($tools) {
-                $logoutUrl = route('superadmin.superadmin.logout');
-                $loginText = __('login');
-                $areaManagerUrl = url('/superadmin/login');
+            $logoutUrl = route('superadmin.superadmin.logout');
+            $loginText = __('login');
+            $areaManagerUrl = url('/superadmin/login');
 
-                $customButtonHTML = <<<HTML
+            $customButtonHTML = <<<HTML
                 <div style="display: contents; align-items: center;">
                     <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
                         <i class="fa fa-sign-in"></i> {$loginText}
@@ -198,26 +193,25 @@ class AdminUserController extends EncorUsersController
                 </script>
                 HTML;
 
-                $tools->append($customButtonHTML);
-            });
+            $tools->append($customButtonHTML);
+        });
 
         return $grid;
-
     }
 
-    public function update ( $id )
+    public function update($id)
     {
-        $user = Admin::query ()->findOrFail ($id);
-        if (\request ('password') != $user->password || \request ('username') != $user->username){
-            Agent::where("id",$user->id)->update([
+        $user = Admin::query()->findOrFail($id);
+        if (\request('password') != $user->password || \request('username') != $user->username) {
+            Agent::where("id", $user->id)->update([
                 "remember_token" => null
             ]);
-            DB::table ('sessions')->where ('user_id',$user->id)->delete ();
+            DB::table('sessions')->where('user_id', $user->id)->delete();
         }
-        return parent ::update ($id);
+        return parent::update($id);
     }
 
-    public function destroy ( $id )
+    public function destroy($id)
     {
         \Log::info('AdminUserController destroy method called', [
             'id' => $id,
@@ -227,13 +221,13 @@ class AdminUserController extends EncorUsersController
             'request_path' => request()->path(),
             'current_route' => request()->route()->getName()
         ]);
-        
+
         try {
             $user = $this->model->find($id);
-            if ($user){
-                if ($user->isRole('admin') || $user->isRole('developer')){
+            if ($user) {
+                if ($user->isRole('admin') || $user->isRole('developer')) {
                     \Log::warning('Attempted to delete admin/developer user', ['user_id' => $id]);
-                    return response ()->json (['error' => true, 'message' => __('admin cant be deleted')]);
+                    return response()->json(['error' => true, 'message' => __('admin cant be deleted')]);
                 }
             }
 
@@ -241,36 +235,35 @@ class AdminUserController extends EncorUsersController
             if ($OldUserAppId) {
                 $OldUserAppId->is_sub_super_admin = 0;
                 $OldUserAppId->save();
-                
+
                 \Log::info('Updated user is_sub_super_admin in destroy method', [
                     'user_id' => $OldUserAppId->id,
                     'app_id' => $user->app_id
                 ]);
             }
 
-            Agency::query ()->where ('owner_id',$id)->delete ();
+            //  Agency::query ()->where ('owner_id',$id)->delete ();
 
             // حذف المستخدم
             $user->delete();
-            
+
             \Log::info('User deleted successfully in destroy method', ['user_id' => $id]);
-            
+
             return response()->json(['success' => true, 'message' => 'تم الحذف بنجاح']);
-            
         } catch (\Exception $e) {
             \Log::error('Error in AdminUserController destroy method', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json(['error' => true, 'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
         }
     }
 
-    public function form ()
+    public function form()
     {
 
-        $form =  parent ::form ();
+        $form =  parent::form();
         $form->select('app_id', __('validation.select_user'))->options(function ($value) {
             $ops2 = [];
             foreach (User::Where('id', $value)->get() as $user) {
@@ -282,4 +275,35 @@ class AdminUserController extends EncorUsersController
     }
 
 
+
+    public function showSubSuperAdmin($id)
+    {
+        $subSuperAdmin = SubAdmin::find($id);
+
+        if ($subSuperAdmin) {
+            return response()->json([
+                'status' => 200,
+                'item' =>  $subSuperAdmin,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => trans('message.notFoundGift'),
+            ]);
+        }
+    }
+
+    public function updateSubSuperAdmin(Request $request,)
+    {
+
+        $subSuperAdmin = SubAdmin::find($request->id);
+        $subSuperAdmin->name = $request->name;
+        $subSuperAdmin->username = $request->username;
+        if ($request->has('image')) {
+            $image = Common::upload('images', $request->image);
+            $subSuperAdmin->avatar = $image;
+        }
+        $subSuperAdmin->save();
+        return Redirect::back();
+    }
 }
