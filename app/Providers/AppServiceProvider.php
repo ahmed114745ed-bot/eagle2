@@ -88,6 +88,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('ManagerHelper', fn($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
 
+        // Register FairLuckService3 dependencies
+        $this->registerFairLuckService();
+
         // Register custom event dispatcher for Octane broadcaster refresh
         if (\App\Services\OctaneBroadcasterService::isOctane()) {
             $this->app->singleton('events', \App\Services\OctaneEventDispatcher::class);
@@ -381,5 +384,23 @@ class AppServiceProvider extends ServiceProvider
     {
         $router = $this->app['router'];
         $router->aliasMiddleware('admin.pjax', \App\Admin\Middleware\PjaxOverride::class);
+    }
+
+    /**
+     * Register FairLuckService3 and its dependencies
+     */
+    protected function registerFairLuckService(): void
+    {
+        $this->app->singleton(\App\Services\FairLuck\FairLuckService3::class, function ($app) {
+            return new \App\Services\FairLuck\FairLuckService3(
+                new \App\Services\FairLuck\ProfileManager(),
+                new \App\Services\FairLuck\DeviationCalculator(),
+                new \App\Services\FairLuck\BeginnerProtection(),
+                new \App\Services\FairLuck\ProbabilityEngine(),
+                new \App\Services\FairLuck\MultiplierSelector(),
+                new \App\Services\FairLuck\HighMultiplierLedger(),
+                new \App\Services\FairLuck\LossLedger()
+            );
+        });
     }
 }
