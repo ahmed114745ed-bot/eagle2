@@ -150,7 +150,10 @@ class AdminUserController extends EncorUsersController
 
     public function updateSubSuperAdmin(Request $request,)
     {
+        $validated = $request->validate([
 
+            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
         $subSuperAdmin = SubAreaManager::find($request->id);
         $subSuperAdmin->name = $request->name;
         $subSuperAdmin->username = $request->username;
@@ -160,9 +163,9 @@ class AdminUserController extends EncorUsersController
         }
 
         if ($request->filled('password')) {
-           
-        $subSuperAdmin->password = Hash::make($request->password);
-    }
+dd(123);
+            $subSuperAdmin->password = Hash::make($request->password);
+        }
         $subSuperAdmin->save();
         return Redirect::back();
     }

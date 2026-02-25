@@ -296,7 +296,10 @@ class AdminUserController extends EncorUsersController
 
     public function updateSubSuperAdmin(Request $request,)
     {
+        $validated = $request->validate([
 
+            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
         $subSuperAdmin = SubAdmin::find($request->id);
         $subSuperAdmin->name = $request->name;
         $subSuperAdmin->username = $request->username;
@@ -308,6 +311,7 @@ class AdminUserController extends EncorUsersController
             $subSuperAdmin->password = Hash::make($request->password);
         }
         if ($request->filled('password')) {
+            dd(654);
             $subSuperAdmin->password = Hash::make($request->password);
         }
         $subSuperAdmin->save();

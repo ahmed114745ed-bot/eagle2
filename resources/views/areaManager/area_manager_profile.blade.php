@@ -1347,11 +1347,11 @@
                                     <label class="form-label">{{ __('admin.username') }}</label>
                                     <input type="text" name="username" class="form-control" id="username">
                                 </div>
-                                {{-- <div class="col-lg-6 mb-3 form-group">
+                                <div class="col-lg-6 mb-3 form-group">
                                     <label class="form-label">{{ __('admin.password') }}</label>
-                                       <input type="password" name="password" class="form-control" id="password" placeholder="Leave blank if not changing">
+                                       <input type="password" name="password" class="form-control"  placeholder="Leave blank if not changing">
 
-                                </div> --}}
+                                </div>
 
                                 <div class="col-lg-6 form-group mb-3">
                                     <label class="form-label">{{ __('image') }}</label>
