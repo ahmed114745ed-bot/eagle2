@@ -31,6 +31,7 @@ class AgencyObserver
         $user = User::find($agency->app_owner_id);
 
         MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
+        info('create host-agency-owner milestone');
     }
 
     /**
@@ -52,6 +53,7 @@ class AgencyObserver
             if ($oldOwner) {
                 $oldOwner->update(['agency_id' => 0, 'is_host'  => 0]);
                 MilestoneHelper::removeReward($oldOwner, 'host-agency-owner');
+                info('update host-agency-owner milestone');
             }
         }
 
@@ -60,8 +62,10 @@ class AgencyObserver
             if ($newUser) {
                 $newUser->update(['agency_id' => $agency->id, 'is_host'  => 1]);
                 MilestoneHelper::grantMilestoneToUser($newUser, 'host-agency-owner');
+                info('update 2 host-agency-owner milestone');
             }
         }
+
         User::query()->where('id', $agency->app_owner_id)->update(['agency_id' => $agency->id]);
     }
 
@@ -70,8 +74,7 @@ class AgencyObserver
          *
          * @return void
          */
-        public
-        function deleted(Agency $agency)
+        public function deleted(Agency $agency)
         {
             if ($agency->Host_agency) {
                 AgencyJoinRequest::query()->where('agency_id', $agency->id)->delete();
@@ -82,6 +85,7 @@ class AgencyObserver
                 $user = User::find($agency->app_owner_id);
                 Admin::where('username', $user->uuid)->delete();
                 MilestoneHelper::removeReward($user, 'host-agency-owner');
+                info('delete 2 host-agency-owner milestone');
             }
         }
     }

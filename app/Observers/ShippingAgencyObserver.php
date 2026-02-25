@@ -17,7 +17,6 @@ class ShippingAgencyObserver
      */
     public function created(ShippingAgency $agency)
     {
-
         $user = User::find($agency->app_owner_id);
         if ($user) MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
     }
@@ -27,7 +26,31 @@ class ShippingAgencyObserver
      *
      * @return void
      */
+    public function updated(ShippingAgency $agency)
+    {
+        if (!$agency->wasChanged('app_owner_id')) {
+            return;
+        }
 
+        $originalOwnerId = $agency->getOriginal('app_owner_id');
+        $newOwnerId = $agency->app_owner_id;
+
+        if ($originalOwnerId) {
+            $oldOwner = User::find($originalOwnerId);
+            if ($oldOwner) {
+                $oldOwner->update(['agency_id' => 0]);
+                MilestoneHelper::removeReward($oldOwner, 'charge-agency-owner');
+            }
+        }
+
+        if ($newOwnerId) {
+            $newUser = User::find($newOwnerId);
+            if ($newUser) {
+                $newUser->update(['agency_id' => $agency->id]);
+                MilestoneHelper::grantMilestoneToUser($newUser, 'charge-agency-owner');
+            }
+        }
+    }
 
     /**
      * Handle the Agency "deleted" event.
