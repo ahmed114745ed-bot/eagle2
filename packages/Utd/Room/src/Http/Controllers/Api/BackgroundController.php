@@ -1,70 +1,56 @@
 <?php
 
-namespace Utd\Room\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Utd\Room\Entities\Background;
+use App\Http\Controllers\Controller;
+use App\Tik\Services\BackgroundService;
+use Illuminate\Support\Facades\Validator;
+use App\Tik\Services\RequestBackgroundImagService;
+
+
 
 class BackgroundController extends Controller
 {
-    public function index()
-    {
 
-        $perPage = request('per_page') ?? 10;
-        $search = request('search');
-        $backgrounds = Background::when($search, function ($q) use ($search) {
-            $q->where('id', $search);
-        })->paginate($perPage);
+    protected $backgroundService;
 
-        return Common::apiResponse(true, '', $backgrounds, 200);
+    public function __construct(
+        BackgroundService $backgroundService,
+        private RequestBackgroundImagService $requestBackgroundImagService
+    ) {
+        $this->backgroundService = $backgroundService;
     }
 
-    public function store(Request $request)
+
+    public function roomBackground()
     {
-
-        if ($request->hasFile('img')) {
-            $image = Common::upload('images', $request->img);
-        }
-
-        $background = Background::create([
-            'img' => $image ?? '',
-            'enable' => $request->enable,
-        ]);
-
-        return Common::apiResponse(true, '', $background, 200);
+        $data = $this->backgroundService->index();
+        return Common::apiResponse(1, '', $data);
     }
 
-    public function update(Request $request, $id)
+
+    public function allBackgrounds(Request $request)
     {
-
-        if ($request->hasFile('img')) {
-            $image = Common::upload('images', $request->img);
-            Background::findOrFail($id)->update([
-                'img' => $image,
-            ]);
-        }
-        Background::findOrFail($id)->update([
-            'enable' => $request->enable,
-        ]);
-
-        return Common::apiResponse(1, 'Background updated successfully');
-
+        $data = $this->backgroundService->index();
+        return Common::apiResponse(1, Common::getConfig('cost_request_background'), $data, 200);
     }
 
-    public function show($id)
+    public function backgroundSetting(Request $request)
     {
-        $background = Background::findOrFail($id);
-
-        return Common::apiResponse(true, '', $background, 200);
+        $data = [
+            'cost' => Common::getConfig('cost_request_background'),
+            'expire' => Common::getConfig('background_expiration'),
+        ];
+        return Common::apiResponse(1, '', $data, 200);
     }
 
-    public function destroy($id)
+    public function allMyBackgrounds(Request $request)
     {
-
-        Background::findOrFail($id)->delete();
-
-        return Common::apiResponse(1, 'success', null, 200);
+        $user = $request->user();
+        $costRequestBackGround = Common::getConfig('cost_request_background');
+        $data = $this->requestBackgroundImagService->findByUserId($user->id);
+        return Common::apiResponse(1, $costRequestBackGround, $data, 200);
     }
 }
