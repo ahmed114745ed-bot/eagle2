@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Modules\SuperAdmin\Entities\SubAdmin;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserController extends EncorUsersController
 {
@@ -302,6 +303,9 @@ class AdminUserController extends EncorUsersController
         if ($request->has('image')) {
             $image = Common::upload('images', $request->image);
             $subSuperAdmin->avatar = $image;
+        }
+        if ($request->password) {
+            $subSuperAdmin->password = Hash::make($request->password);
         }
         $subSuperAdmin->save();
         return Redirect::back();

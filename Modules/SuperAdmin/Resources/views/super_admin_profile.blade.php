@@ -1299,6 +1299,11 @@
                                     <input type="text" name="username" class="form-control" id="username">
                                 </div>
 
+                                 <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.password') }}</label>
+                                    <input type="password" name="password" class="form-control" id="password">
+                                </div>
+
                                 <div class="col-lg-6 form-group mb-3">
                                     <label class="form-label">{{ __('image') }}</label>
                                     <input class="form-control" name="image" accept="image/*" type="file"/>
@@ -1411,6 +1416,7 @@
                             const image =  "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
                             $('#name').val(response.item.name);
                             $('#username').val(response.item.username);
+                           // $('#password').val(response.item.password);
                            
                             $('#img_edit').attr('src', image);
                             $('.item_id').val(response.item.id);
