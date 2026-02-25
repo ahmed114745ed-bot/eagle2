@@ -890,7 +890,7 @@ class AgencyController extends MainController
 
             $user = User::find($appOwnerId);
 
-            
+
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
@@ -1133,14 +1133,11 @@ class AgencyController extends MainController
 
         MilestoneHelper::removeReward($user, 'host');
 
-
         return response()->json([
             'status' => true,
             'message' => __('done')
         ]);
     }
-
-
 
     public function rejectJoin($id)
     {

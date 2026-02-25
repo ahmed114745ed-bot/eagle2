@@ -15,17 +15,15 @@ use Modules\Milestones\Http\Controllers\web\MilestoneRewardController;
 |
 */
 
-Route::prefix('milestones')->group(function() {
+Route::prefix('milestones')->group(function () {
     Route::get('/', 'MilestonesController@index');
 });
 
 
-
-
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'web',
         'middleware' => [
             'web',
             'admin',
@@ -33,12 +31,9 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix') . '.',
     ],
     function () {
-
-
-
         Route::resource('milestones', MilestoneController::class);
         Route::get('milestones/{id}/sync', [MilestoneController::class, 'syncMilestone'])->name('milestones.sync');
         Route::prefix('milestone-rewards/{milestone_id}')->group(function () {

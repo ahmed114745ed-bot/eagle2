@@ -5,7 +5,6 @@ namespace App\Observers;
 use App\Models\User;
 use App\Models\Family;
 use App\Models\FamilyUser;
-use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class FamilyObserver
@@ -21,6 +20,5 @@ class FamilyObserver
         MilestoneHelper::removeReward($owner, 'family-owner');
         User::query()->where('family_id', $family->id)->update(['family_id' => null]);
         FamilyUser::query()->where('family_id', $family->id)->delete();
-        MilestoneHelper::removeReward($owner, 'family-owner');
     }
 }

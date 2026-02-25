@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\User;
 use Modules\Milestones\Helpers\MilestoneHelper;

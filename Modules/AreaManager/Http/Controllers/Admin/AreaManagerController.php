@@ -27,7 +27,6 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\AreaManager\Entities\RegionCountry;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use App\Admin\Actions\FrozenWalletSuperAdminAction;
 
 class AreaManagerController extends MainController
@@ -330,14 +329,12 @@ class AreaManagerController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_area_manager = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'area-manager');
                     }
 
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_area_manager = 1;
                     $newUserAppId->save();
                     $form->app_id = $newAppId;
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'area-manager');
                 }
             }
 
@@ -353,7 +350,7 @@ class AreaManagerController extends MainController
             if (isset($userApp)) {
                 $userApp->is_area_manager = 1;
                 $userApp->save();
-              
+
             }
             $userId = $form->model()->id;
 

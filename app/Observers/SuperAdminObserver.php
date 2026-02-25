@@ -3,10 +3,8 @@
 namespace App\Observers;
 
 use App\Models\User;
-use Modules\AreaManager\Entities\AreaManager;
 use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-
 
 
 class SuperAdminObserver
@@ -24,7 +22,33 @@ class SuperAdminObserver
     }
 
 
-    public function updated(SuperAdmin $superAdmin) {}
+    public function updated(SuperAdmin $superAdmin)
+    {
+        if (!$superAdmin->wasChanged('app_id')) {
+            return;
+        }
+
+        $originalAppId = $superAdmin->getOriginal('app_id');
+        $newAppId = $superAdmin->app_id;
+
+        if ($originalAppId && $originalAppId != $newAppId) {
+            $oldUser = User::find($originalAppId);
+
+            if ($oldUser) {
+                $oldUser->update(['is_super_admin' => 0]);
+                MilestoneHelper::removeReward($oldUser, 'super-admin');
+            }
+        }
+
+        if ($newAppId) {
+            $newUser = User::find($newAppId);
+
+            if ($newUser) {
+                $newUser->update(['is_super_admin' => 1]);
+                MilestoneHelper::grantMilestoneToUser($newUser, 'super-admin');
+            }
+        }
+    }
 
     /**
      * Handle the Agency "deleted" event.

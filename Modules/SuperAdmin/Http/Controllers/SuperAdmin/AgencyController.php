@@ -18,7 +18,6 @@ use App\Models\Target;
 use App\Models\User;
 use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
-use App\Models\UserTarget;
 use App\Services\AppFeatureService;
 use Carbon\Carbon;
 use Encore\Admin\Actions\Response;
@@ -29,13 +28,11 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Table;
 use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\MessageBag;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Actions\SuperAdmin\DeleteAgencyAction;
 
 class AgencyController extends MainController
@@ -721,7 +718,7 @@ class AgencyController extends MainController
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
-            
+
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,

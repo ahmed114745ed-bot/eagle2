@@ -7,7 +7,6 @@ use App\Models\User;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 
-
 class BdObserver
 {
 
@@ -23,7 +22,34 @@ class BdObserver
     }
 
 
-    public function updated(Bd $bd) {}
+    public function updated(Bd $bd)
+    {
+        if (!$bd->wasChanged('app_id')) {
+            return;
+        }
+
+        $originalAppId = $bd->getOriginal('app_id');
+        $newAppId = $bd->app_id;
+
+        if ($newAppId === null) {
+            return;
+        }
+
+        if ($originalAppId && $originalAppId != $newAppId) {
+            $oldUser = User::find($originalAppId);
+
+            if ($oldUser) {
+                $oldUser->update(['is_bd' => 0]);
+                MilestoneHelper::removeReward($oldUser, 'bd');
+            }
+        }
+
+        $newUser = User::find($newAppId);
+        if ($newUser) {
+            $newUser->update(['is_bd' => 1]);
+            MilestoneHelper::grantMilestoneToUser($newUser, 'bd');
+        }
+    }
 
     /**
      * Handle the Agency "deleted" event.
