@@ -323,7 +323,7 @@ class AgencyJoinRequestController extends MainController
                 }
 
                 uploadMonthlyDiamondReceive($user_id, 0);
-                 MilestoneHelper::grantMilestoneToUser($user, 'host');
+                
             }
         });
 

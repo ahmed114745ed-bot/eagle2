@@ -347,7 +347,6 @@ class BdController extends MainController
             if (isset($userApp)) {
                 $userApp->is_bd = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();

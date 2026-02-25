@@ -353,7 +353,7 @@ class AreaManagerController extends MainController
             if (isset($userApp)) {
                 $userApp->is_area_manager = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'area-manager');
+              
             }
             $userId = $form->model()->id;
 

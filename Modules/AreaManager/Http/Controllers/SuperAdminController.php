@@ -345,7 +345,6 @@ class SuperAdminController extends MainController
             if (isset($userApp)) {
                 $userApp->is_super_admin = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();

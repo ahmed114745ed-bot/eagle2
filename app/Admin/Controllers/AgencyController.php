@@ -890,7 +890,7 @@ class AgencyController extends MainController
 
             $user = User::find($appOwnerId);
 
-            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
+            
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
@@ -1078,7 +1078,6 @@ class AgencyController extends MainController
         }
         // add vip to user
         // UserCommon::userVip($user,'acceptJoin');
-        MilestoneHelper::grantMilestoneToUser($user, 'host');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([
