@@ -395,8 +395,41 @@ class FairLuckService3
                 }
             }
 
-            // توزيع الرهان على المحافظ بالنسب الجديدة (سواء فوز أو خسارة)
+            $walletsBeforeDistribution = [
+                'global_vault' => $this->getGlobalVaultBalance(),
+                'jackpot_wallet' => $this->getJackpotWalletBalance(),
+                'medium_wallet' => $this->getMediumWalletBalance(),
+            ];
+
+            \Illuminate\Support\Facades\Log::info('FairLuckService3 BEFORE DISTRIBUTION', [
+                'user_id' => $user->id,
+                'bet_amount' => $betAmount,
+                'global_vault_before' => $walletsBeforeDistribution['global_vault'],
+                'jackpot_wallet_before' => $walletsBeforeDistribution['jackpot_wallet'],
+                'medium_wallet_before' => $walletsBeforeDistribution['medium_wallet'],
+            ]);
+
             $this->distributeBetAmount($betAmount);
+
+            $walletsAfterDistribution = [
+                'global_vault' => $this->getGlobalVaultBalance(),
+                'jackpot_wallet' => $this->getJackpotWalletBalance(),
+                'medium_wallet' => $this->getMediumWalletBalance(),
+            ];
+
+            \Illuminate\Support\Facades\Log::info('FairLuckService3 AFTER DISTRIBUTION', [
+                'user_id' => $user->id,
+                'bet_amount' => $betAmount,
+                'global_vault_after' => $walletsAfterDistribution['global_vault'],
+                'jackpot_wallet_after' => $walletsAfterDistribution['jackpot_wallet'],
+                'medium_wallet_after' => $walletsAfterDistribution['medium_wallet'],
+                'global_vault_increase' => $walletsAfterDistribution['global_vault'] - $walletsBeforeDistribution['global_vault'],
+                'jackpot_wallet_increase' => $walletsAfterDistribution['jackpot_wallet'] - $walletsBeforeDistribution['jackpot_wallet'],
+                'medium_wallet_increase' => $walletsAfterDistribution['medium_wallet'] - $walletsBeforeDistribution['medium_wallet'],
+                'expected_60_percent' => round($betAmount * 0.60),
+                'expected_20_percent' => round($betAmount * 0.20),
+                'expected_10_percent' => round($betAmount * 0.10),
+            ]);
 
             $houseEdgeCut = $this->calculateHouseEdgeCut($betAmount, $isWinner, (int) $multiplier);
             // لا نحتاج لتوزيع houseEdgeCut إضافي لأن distributeBetAmount تتولى التوزيع الكامل
@@ -990,7 +1023,19 @@ class FairLuckService3
             return;
         }
 
+        $balanceBefore = $this->getGlobalVaultBalance();
         FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
+        $balanceAfter = $this->getGlobalVaultBalance();
+
+        \Illuminate\Support\Facades\Log::debug('decreaseGlobalVaultBalance', [
+            'table' => 'fair_luck_wallets',
+            'wallet_type' => 'global_vault',
+            'amount_decreased' => $amount,
+            'balance_before' => $balanceBefore,
+            'balance_after' => $balanceAfter,
+            'decreased_by' => $balanceBefore - $balanceAfter,
+            'success' => ($balanceBefore - $balanceAfter) === $amount,
+        ]);
     }
 
     private function decreaseJackpotWalletBalance(int $amount): void
@@ -998,7 +1043,20 @@ class FairLuckService3
         if ($amount <= 0) {
             return;
         }
+
+        $balanceBefore = $this->getJackpotWalletBalance();
         FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount);
+        $balanceAfter = $this->getJackpotWalletBalance();
+
+        \Illuminate\Support\Facades\Log::debug('decreaseJackpotWalletBalance', [
+            'table' => 'fair_luck_wallets',
+            'wallet_type' => 'jackpot_wallet',
+            'amount_decreased' => $amount,
+            'balance_before' => $balanceBefore,
+            'balance_after' => $balanceAfter,
+            'decreased_by' => $balanceBefore - $balanceAfter,
+            'success' => ($balanceBefore - $balanceAfter) === $amount,
+        ]);
     }
 
     private function settleGlobalVaultBalance(bool $isWinner, int $multiplier, float $betAmount): void
@@ -1099,17 +1157,55 @@ class FairLuckService3
      */
     private function distributeBetAmount(float $betAmount): void
     {
+        \Illuminate\Support\Facades\Log::debug('distributeBetAmount START', [
+            'bet_amount' => $betAmount,
+            'table_name' => 'fair_luck_wallets',
+        ]);
+
         // 60% للمحفظة الرئيسية الاقتصادية (للمضاعفات الصغيرة)
         $globalVaultAmount = $betAmount * 0.60;
-        $this->increaseGlobalVaultBalance((int) round($globalVaultAmount));
+        $globalVaultAmountInt = (int) round($globalVaultAmount);
+        
+        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO GLOBAL_VAULT', [
+            'amount' => $globalVaultAmountInt,
+            'percentage' => 0.60,
+            'expected' => round($betAmount * 0.60),
+        ]);
+        
+        $this->increaseGlobalVaultBalance($globalVaultAmountInt);
         
         // 20% لمحفظة الجاكبوت 
         $jackpotWalletAmount = $betAmount * 0.20;
-        $this->increaseJackpotWallet((int) round($jackpotWalletAmount));
+        $jackpotWalletAmountInt = (int) round($jackpotWalletAmount);
+        
+        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO JACKPOT_WALLET', [
+            'amount' => $jackpotWalletAmountInt,
+            'percentage' => 0.20,
+            'expected' => round($betAmount * 0.20),
+        ]);
+        
+        $this->increaseJackpotWallet($jackpotWalletAmountInt);
         
         // 10% للمحفظة المتوسطة
         $mediumWalletAmount = $betAmount * 0.10;
-        $this->increaseMediumWallet((int) round($mediumWalletAmount));
+        $mediumWalletAmountInt = (int) round($mediumWalletAmount);
+        
+        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO MEDIUM_WALLET', [
+            'amount' => $mediumWalletAmountInt,
+            'percentage' => 0.10,
+            'expected' => round($betAmount * 0.10),
+        ]);
+        
+        $this->increaseMediumWallet($mediumWalletAmountInt);
+        
+        \Illuminate\Support\Facades\Log::debug('distributeBetAmount COMPLETED', [
+            'bet_amount' => $betAmount,
+            'total_distributed' => $globalVaultAmountInt + $jackpotWalletAmountInt + $mediumWalletAmountInt,
+            'global_vault' => $globalVaultAmountInt,
+            'jackpot_wallet' => $jackpotWalletAmountInt,
+            'medium_wallet' => $mediumWalletAmountInt,
+            'remaining_app_profit' => round($betAmount * 0.10),
+        ]);
         
         // 10% ربح التطبيق (لا يضاف للمحافظ - هو صافي ربح)
     }
