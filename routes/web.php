@@ -1580,3 +1580,21 @@ Route::get('/fix-total-room-gifts', function () {
         'results' => $results,
     ]);
 });
+
+// Route for seeding FairLuckSettings
+Route::get('/seed/fairluck-settings', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'FairLuckSettingsSeeder']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'FairLuckSettingsSeeder executed successfully',
+            'output' => \Illuminate\Support\Facades\Artisan::output(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+});
+
