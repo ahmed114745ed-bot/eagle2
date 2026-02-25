@@ -36,21 +36,23 @@ class LuckyGiftService
 
     private UpdateUserWhenSendGift $updateUserWhenSendGift;
 
-    public function send($data) {}
+    public function send($data)
+    {
+    }
 
     public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
-        $userId   = $user->id;
+        $userId = $user->id;
         $ownerId = @$data['owner_id'];
         $roomId = @$data['room_id'];
-        $giftId   = $data['id'];
-        $number   = $data['num'];
-        $count    = $data['count'] ?? 1;
+        $giftId = $data['id'];
+        $number = $data['num'];
+        $count = $data['count'] ?? 1;
         $amountBefore = $user->di;
-        $appPercentage   = getGiftPercentage('app_wallet_lucky_gift')  / 10;
-        $roomrPercentage = getGiftPercentage('owner_lucky_gift')  / 10;
-        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+        $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 10;
+        $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
+        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
         $total_cashback_percentage = 0;
 
 
@@ -59,18 +61,19 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
+        if (!$gift)
+            throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
-        $giftPrice       = $gift->price;
+        $giftPrice = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
         $numberOfGift = $number * count($receiversIds);
-        $totalPrice   = $giftPrice * $numberOfGift;
+        $totalPrice = $giftPrice * $numberOfGift;
 
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
         if ($userCoins < $totalPrice) {
-            throw  new InvalidArgumentException(__('api_responses.insufficient'));
+            throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
 
@@ -89,24 +92,26 @@ class LuckyGiftService
             $ownerId = $room?->uid;
         }
 
-        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
+        if (!$room)
+            throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
-        $roomId   = $room->id;
+        $roomId = $room->id;
 
 
 
         /// todo check visitors
 
-        [$ownerWallet, $appWallet]      = $this->getCoreWallets();
-        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
+        [$ownerWallet, $appWallet] = $this->getCoreWallets();
+        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet))
+            throw new InvalidArgumentException('app dosn\'t resolved ');
         $firstAppWalletCoins = $appWallet->coins;
         $firstOwnerWalletCoins = $ownerWallet->coins;
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
         $receiverName = $receivedUsers->first()?->name;
-        $receiversCount  = $receivedUsers->count();
-        $isToRoom      = $receiversCount > 1;
+        $receiversCount = $receivedUsers->count();
+        $isToRoom = $receiversCount > 1;
 
 
 
@@ -115,9 +120,9 @@ class LuckyGiftService
 
         $index = $count;
 
-        $coinsForReceiver   = $number * ($giftPrice * $hostPercentage);
-        $price              = $coinsForReceiver * $receiversCount;
-        $total_user_win  = 0;
+        $coinsForReceiver = $number * ($giftPrice * $hostPercentage);
+        $price = $coinsForReceiver * $receiversCount;
+        $total_user_win = 0;
         $total_count_win = 0;
 
         UserCoinLogHelper::logByType(
@@ -129,18 +134,18 @@ class LuckyGiftService
         );
 
         $totalPrice = $giftPrice * $number * $receiversCount;
-        $coinsForApp   = $totalPrice * $appPercentage;
+        $coinsForApp = $totalPrice * $appPercentage;
         $coinsForOwner = $totalPrice * $roomrPercentage;
 
         while ($user->di >= $totalPrice && $index > 0) {
 
             // $appWallet->coins   += $price * 8;
-            $appWallet->coins   += $coinsForApp;
+            $appWallet->coins += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
-            $isWinner       = $this->is_winner($gift);
+            $isWinner = $this->is_winner($gift);
 
-            $isPopular      = false;
+            $isPopular = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
             if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
@@ -152,7 +157,7 @@ class LuckyGiftService
                 if ($cashback_percentage > 0) {
 
                     $user->enableSaving = false;
-                    $user->di           += $cashback_value;
+                    $user->di += $cashback_value;
                     //                $user->save();
                     $appWallet->coins -= $cashback_value;
                     //                $appWallet->save();
@@ -180,13 +185,13 @@ class LuckyGiftService
                 $this->getSendMessage($giftPrice, $message ?? null, $receiverName, $number, isToRoom: $isToRoom);
 
             $responseData['combo'][] = [
-                'status'        => 0,
-                'data'          => [
-                    'win_coins'       => (int)($totalGiftPrice * $cashback_percentage),
-                    'is_win'          => $isWinner,
-                    'is_popular'      => $isPopular,
+                'status' => 0,
+                'data' => [
+                    'win_coins' => (int) ($totalGiftPrice * $cashback_percentage),
+                    'is_win' => $isWinner,
+                    'is_popular' => $isPopular,
                     'comment_message' => $commentMessage,
-                    'winner_comment'  => $sendMessage,
+                    'winner_comment' => $sendMessage,
                 ],
                 'error_message' => '',
             ];
@@ -218,16 +223,16 @@ class LuckyGiftService
 
         if ($index > 0) {
             $count -= $index;
-            $responseData['combo'][] =   [
-                'status'          => 1,
+            $responseData['combo'][] = [
+                'status' => 1,
                 'data' => null,
-                'error_message'   => __('api_responses.insufficient'),
+                'error_message' => __('api_responses.insufficient'),
             ];
         }
 
         // update room session
         // $room->session      += (int)$gift->price * $number * $count * 0.1;
-        $room->session      +=  $coinsForOwner;
+        $room->session += $coinsForOwner;
         $room->save();
 
 
@@ -242,7 +247,7 @@ class LuckyGiftService
         // $responseData['total_user_win'] = $total_user_win;
 
         //update user coins and diamond and sender level
-        $totalDiamond           = $totalPrice * $count;
+        $totalDiamond = $totalPrice * $count;
         $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
         $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
@@ -275,7 +280,7 @@ class LuckyGiftService
         // ]);
 
         if ($room->type == 'audio') {
-            $serviceLevel  = new UpgradeRoomLevelServices();
+            $serviceLevel = new UpgradeRoomLevelServices();
             // \Log::info('sendLuckyGift2 - Upgrading Room Level', [
             //     'room_id' => $room->id,
             //     'diamonds' => $totalPrice,
@@ -284,7 +289,7 @@ class LuckyGiftService
             $serviceLevel->sendGift($room, $totalPrice);
         }
 
-        return  $responseData;
+        return $responseData;
     }
 
     /**
@@ -293,11 +298,11 @@ class LuckyGiftService
     public function sendLuckyGift4(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
-        $userId   = $user->id;
-        $ownerId  = $data['owner_id'];
-        $giftId   = $data['id'];
-        $number   = $data['num'];
-        $count    = $data['count'] ?? 1;
+        $userId = $user->id;
+        $ownerId = $data['owner_id'];
+        $giftId = $data['id'];
+        $number = $data['num'];
+        $count = $data['count'] ?? 1;
 
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
@@ -305,14 +310,15 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
+        if (!$gift)
+            throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
-     
 
-        $giftPrice       = $gift->price;
+
+        $giftPrice = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
         $numberOfGift = $number * count($receiversIds);
-        $totalPrice   = $giftPrice * $numberOfGift;
+        $totalPrice = $giftPrice * $numberOfGift;
 
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
@@ -320,23 +326,24 @@ class LuckyGiftService
 
 
         if ($userCoins < $totalPrice) {
-       
-            throw  new InvalidArgumentException(__('api_responses.insufficient'));
+
+            throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
         $room = Room::withoutAppends()
             ->where('uid', $ownerId)
             ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
             ->first();
-        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
+        if (!$room)
+            throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
-        $roomId   = $room->id;
+        $roomId = $room->id;
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
         $receiverName = $receivedUsers->first()->name;
-        $receiversCount  = $receivedUsers->count();
-        $isToRoom      = $receiversCount > 1;
+        $receiversCount = $receivedUsers->count();
+        $isToRoom = $receiversCount > 1;
 
         $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
@@ -418,11 +425,11 @@ class LuckyGiftService
                 $responseData['combo'][] = [
                     'status' => 0,
                     'data' => [
-                        'win_coins'       => (int)$iterationWin,
-                        'is_win'          => $isWinner,
-                        'is_popular'      => $isPopular,
+                        'win_coins' => (int) $iterationWin,
+                        'is_win' => $isWinner,
+                        'is_popular' => $isPopular,
                         'comment_message' => $commentMessage,
-                        'winner_comment'  => $sendMessage,
+                        'winner_comment' => $sendMessage,
                     ],
                     'error_message' => '',
                 ];
@@ -433,7 +440,7 @@ class LuckyGiftService
             $index--;
         }
 
-  
+
 
         if ($total_user_win > 0) {
             UserCoinLogHelper::logByType(
@@ -448,15 +455,15 @@ class LuckyGiftService
 
         if ($index > 0) {
             $count -= $index;
-       
+
             $responseData['combo'][] = [
-                'status'          => 1,
+                'status' => 1,
                 'data' => null,
-                'error_message'   => __('api_responses.insufficient'),
+                'error_message' => __('api_responses.insufficient'),
             ];
         }
 
-        $room->session += (int)$gift->price * $number * $count * 0.1;
+        $room->session += (int) $gift->price * $number * $count * 0.1;
         $room->save();
 
         $responseData['session'] = $room->session_string;
@@ -468,10 +475,10 @@ class LuckyGiftService
 
         // Update user coins and diamond
         $totalDiamond = $totalPrice * $count;
-        $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
+        $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_diamond_send, $totalDiamond, $user->sub_sender_level);
         $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
-   
+
 
         $coinsForReceiver = $number * ($giftPrice * 0.1) * $count;
         $number = $number * $count;
@@ -496,16 +503,16 @@ class LuckyGiftService
     public function sendLuckyGift2V2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
-        $userId   = $user->id;
+        $userId = $user->id;
         $ownerId = @$data['owner_id'];
         $roomId = @$data['room_id'];
-        $giftId   = $data['id'];
-        $number   = $data['num'];
-        $count    = $data['count'] ?? 1;
+        $giftId = $data['id'];
+        $number = $data['num'];
+        $count = $data['count'] ?? 1;
         $amountBefore = $user->di;
-        $appPercentage   = getGiftPercentage('app_wallet_lucky_gift')  / 10;
-        $roomrPercentage = getGiftPercentage('owner_lucky_gift')  / 10;
-        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+        $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 10;
+        $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
+        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
         $total_cashback_percentage = 0;
 
 
@@ -514,18 +521,19 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
+        if (!$gift)
+            throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
-        $giftPrice       = $gift->price;
+        $giftPrice = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
         $numberOfGift = $number * count($receiversIds);
-        $totalPrice   = $giftPrice * $numberOfGift;
+        $totalPrice = $giftPrice * $numberOfGift;
 
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
         if ($userCoins < $totalPrice) {
-            throw  new InvalidArgumentException(__('api_responses.insufficient'));
+            throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
 
@@ -545,22 +553,24 @@ class LuckyGiftService
             $ownerId = $room?->uid;
         }
 
-        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
+        if (!$room)
+            throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
-        $roomId   = $room->id;
+        $roomId = $room->id;
 
         /// todo check visitors
 
-        [$ownerWallet, $appWallet]      = $this->getCoreWallets();
-        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
+        [$ownerWallet, $appWallet] = $this->getCoreWallets();
+        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet))
+            throw new InvalidArgumentException('app dosn\'t resolved ');
         $firstAppWalletCoins = $appWallet->coins;
         $firstOwnerWalletCoins = $ownerWallet->coins;
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
         $receiverName = $receivedUsers->first()?->name;
-        $receiversCount  = $receivedUsers->count();
-        $isToRoom      = $receiversCount > 1;
+        $receiversCount = $receivedUsers->count();
+        $isToRoom = $receiversCount > 1;
 
 
 
@@ -569,9 +579,9 @@ class LuckyGiftService
 
         $index = $count;
 
-        $coinsForReceiver   = $number * ($giftPrice * $hostPercentage);
-        $price              = $coinsForReceiver * $receiversCount;
-        $total_user_win  = 0;
+        $coinsForReceiver = $number * ($giftPrice * $hostPercentage);
+        $price = $coinsForReceiver * $receiversCount;
+        $total_user_win = 0;
         $total_count_win = 0;
 
         UserCoinLogHelper::logByType(
@@ -583,16 +593,16 @@ class LuckyGiftService
         );
 
         $totalPrice = $giftPrice * $number * $receiversCount;
-        $coinsForApp   = $totalPrice * $appPercentage;
+        $coinsForApp = $totalPrice * $appPercentage;
         $coinsForOwner = $totalPrice * $roomrPercentage;
 
         while ($user->di >= $totalPrice && $index > 0) {
 
-            $appWallet->coins   += $coinsForApp;
+            $appWallet->coins += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
-            $isWinner       = $this->is_winner($gift);
+            $isWinner = $this->is_winner($gift);
 
-            $isPopular      = false;
+            $isPopular = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
             if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
@@ -604,7 +614,7 @@ class LuckyGiftService
                 if ($cashback_percentage > 0) {
 
                     $user->enableSaving = false;
-                    $user->di           += $cashback_value;
+                    $user->di += $cashback_value;
                     //                $user->save();
                     $appWallet->coins -= $cashback_value;
                     //                $appWallet->save();
@@ -630,13 +640,13 @@ class LuckyGiftService
                 $this->getSendMessage($giftPrice, $message ?? null, $receiverName, $number, isToRoom: $isToRoom);
 
             $responseData['combo'][] = [
-                'status'        => 0,
-                'data'          => [
-                    'win_coins'       => (int)($totalGiftPrice * $cashback_percentage),
-                    'is_win'          => $isWinner,
-                    'is_popular'      => $isPopular,
+                'status' => 0,
+                'data' => [
+                    'win_coins' => (int) ($totalGiftPrice * $cashback_percentage),
+                    'is_win' => $isWinner,
+                    'is_popular' => $isPopular,
                     'comment_message' => $commentMessage,
-                    'winner_comment'  => $sendMessage,
+                    'winner_comment' => $sendMessage,
                 ],
                 'error_message' => '',
             ];
@@ -668,16 +678,16 @@ class LuckyGiftService
 
         if ($index > 0) {
             $count -= $index;
-            $responseData['combo'][] =   [
-                'status'          => 1,
+            $responseData['combo'][] = [
+                'status' => 1,
                 'data' => null,
-                'error_message'   => __('api_responses.insufficient'),
+                'error_message' => __('api_responses.insufficient'),
             ];
         }
 
         // update room session
         // $room->session      += (int)$gift->price * $number * $count * 0.1;
-        $room->session      +=  $coinsForOwner;
+        $room->session += $coinsForOwner;
         $room->save();
 
         // add session to response
@@ -692,7 +702,7 @@ class LuckyGiftService
         $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ?? $gift->name;
 
         //update user coins and diamond and sender level
-        $totalDiamond           = $totalPrice * $count;
+        $totalDiamond = $totalPrice * $count;
         $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
         $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
@@ -735,22 +745,22 @@ class LuckyGiftService
             $serviceLevel->sendGift($room, $totalPrice);
         }
 
-        return  $responseData;
+        return $responseData;
     }
 
     public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
-        $userId   = $user->id;
+        $userId = $user->id;
         $ownerId = @$data['owner_id'];
         $roomId = @$data['room_id'];
-        $giftId   = $data['id'];
-        $number   = $data['num'];
-        $count    = $data['count'] ?? 1;
+        $giftId = $data['id'];
+        $number = $data['num'];
+        $count = $data['count'] ?? 1;
         $amountBefore = $user->di;
-        $appPercentage   = getGiftPercentage('app_wallet_lucky_gift')  / 10;
-        $roomrPercentage = getGiftPercentage('owner_lucky_gift')  / 10;
-        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+        $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 10;
+        $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
+        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
         $total_cashback_percentage = 0;
 
 
@@ -758,18 +768,19 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
+        if (!$gift)
+            throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
-        $giftPrice       = $gift->price;
+        $giftPrice = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
         $numberOfGift = $number * count($receiversIds);
-        $totalPrice   = $giftPrice * $numberOfGift;
+        $totalPrice = $giftPrice * $numberOfGift;
 
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
         if ($userCoins < $totalPrice) {
-            throw  new InvalidArgumentException(__('api_responses.insufficient'));
+            throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
 
@@ -788,24 +799,26 @@ class LuckyGiftService
             $ownerId = $room?->uid;
         }
 
-        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
+        if (!$room)
+            throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
-        $roomId   = $room->id;
+        $roomId = $room->id;
 
 
 
         /// todo check visitors
 
-        [$ownerWallet, $appWallet]      = $this->getCoreWallets();
-        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
+        [$ownerWallet, $appWallet] = $this->getCoreWallets();
+        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet))
+            throw new InvalidArgumentException('app dosn\'t resolved ');
         $firstAppWalletCoins = $appWallet->coins;
         $firstOwnerWalletCoins = $ownerWallet->coins;
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
         $receiverName = $receivedUsers->first()?->name;
-        $receiversCount  = $receivedUsers->count();
-        $isToRoom      = $receiversCount > 1;
+        $receiversCount = $receivedUsers->count();
+        $isToRoom = $receiversCount > 1;
 
 
 
@@ -814,14 +827,14 @@ class LuckyGiftService
 
         $index = $count;
 
-        $coinsForReceiver   = $number * ($giftPrice * $hostPercentage);
-        $price              = $coinsForReceiver * $receiversCount;
-        $total_user_win  = 0;
-        $max_single_win  = 0;
+        $coinsForReceiver = $number * ($giftPrice * $hostPercentage);
+        $price = $coinsForReceiver * $receiversCount;
+        $total_user_win = 0;
+        $max_single_win = 0;
         $total_count_win = 0;
 
         $totalPrice = $giftPrice * $number * $receiversCount;
-        $coinsForApp   = $totalPrice * $appPercentage;
+        $coinsForApp = $totalPrice * $appPercentage;
         $coinsForOwner = $totalPrice * $roomrPercentage;
 
         while ($user->di >= $totalPrice && $index > 0) {
@@ -834,7 +847,7 @@ class LuckyGiftService
                 $gift?->name,
             );
 
-            $appWallet->coins   += $coinsForApp;
+            $appWallet->coins += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
 
             $iterationTotalWin = 0;
@@ -854,8 +867,8 @@ class LuckyGiftService
 
                         if ($cashback_percentage > 0) {
                             $user->enableSaving = false;
-                            $user->di           += $cashback_value;
-                            $appWallet->coins   -= $cashback_value;
+                            $user->di += $cashback_value;
+                            $appWallet->coins -= $cashback_value;
 
                             $iterationTotalWin += $cashback_value;
                             $total_user_win += $cashback_value;
@@ -883,13 +896,13 @@ class LuckyGiftService
                 $this->getSendMessage($giftPrice, $message ?? null, $receiverName, $number, isToRoom: $isToRoom);
 
             $responseData['combo'][] = [
-                'status'        => 0,
-                'data'          => [
-                    'win_coins'       => $iterationTotalWin,
-                    'is_win'          => $iterationTotalWin > 0,
-                    'is_popular'      => $iterationPopular,
+                'status' => 0,
+                'data' => [
+                    'win_coins' => $iterationTotalWin,
+                    'is_win' => $iterationTotalWin > 0,
+                    'is_popular' => $iterationPopular,
                     'comment_message' => $commentMessage,
-                    'winner_comment'  => $sendMessage,
+                    'winner_comment' => $sendMessage,
                 ],
                 'error_message' => '',
             ];
@@ -915,16 +928,16 @@ class LuckyGiftService
 
         if ($index > 0) {
             $count -= $index;
-            $responseData['combo'][] =   [
-                'status'          => 1,
+            $responseData['combo'][] = [
+                'status' => 1,
                 'data' => null,
-                'error_message'   => __('api_responses.insufficient'),
+                'error_message' => __('api_responses.insufficient'),
             ];
         }
 
         // update room session
         // $room->session      += (int)$gift->price * $number * $count * 0.1;
-        $room->session      +=  $coinsForOwner * $count;
+        $room->session += $coinsForOwner * $count;
         $room->save();
 
         // add session to response
@@ -938,13 +951,13 @@ class LuckyGiftService
         $responseData['total_user_win'] = $total_user_win;
         $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ?? $gift->name;
         $responseData['summary'] = [
-            'total_win'       => $total_user_win,
-            'max_single_win'  => $max_single_win,
+            'total_win' => $total_user_win,
+            'max_single_win' => $max_single_win,
             'total_win_count' => $total_count_win,
         ];
 
         //update user coins and diamond and sender level
-        $totalDiamond           = $totalPrice * $count;
+        $totalDiamond = $totalPrice * $count;
         $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
         $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
@@ -975,9 +988,9 @@ class LuckyGiftService
             $settings = $settings->pluck('value', 'key')->toArray();
         }
         $roomBoomSettings = $settings['room_boom'] ?? 1;
-         $totalHostDiamond = (int)$totalPrice * $hostPercentage;
+        $totalHostDiamond = (int) $totalPrice * $hostPercentage;
         if ($roomBoomSettings) {
-           
+
             (new NewRoomBoomGiftService())->sendGift($room, $totalHostDiamond, $userId);
         } else {
             $tz = getTimezone();
@@ -991,61 +1004,64 @@ class LuckyGiftService
             $serviceLevel->sendGift($room, $totalPrice * $count);
         }
 
-        return  $responseData;
+        return $responseData;
     }
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
-        $userId   = $user->id;
-        $ownerId  = $data['owner_id'];
-        $giftId   = $data['id'];
-        $number   = $data['num'];
-        $count    = $data['count'] ?? 1;
+        $userId = $user->id;
+        $ownerId = $data['owner_id'];
+        $giftId = $data['id'];
+        $number = $data['num'];
+        $count = $data['count'] ?? 1;
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
+        if (!$gift)
+            throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
         // update gift count
         (new LuckyStrategyService())->getUpdateGiftCountForCategory($gift);
 
-        $giftPrice       = $gift->price;
+        $giftPrice = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
         $numberOfGift = $number * count($receiversIds);
-        $totalPrice   = $giftPrice * $numberOfGift;
+        $totalPrice = $giftPrice * $numberOfGift;
 
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
         if ($userCoins < $totalPrice) {
-            throw  new InvalidArgumentException(__('api_responses.insufficient'));
+            throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
         $room = Room::withoutAppends()
             ->where('uid', $ownerId)
             ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
             ->first();
-        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
+        if (!$room)
+            throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
-        $roomId   = $room->id;
+        $roomId = $room->id;
 
 
         /// todo check visitors
 
-        [$ownerWallet, $appWallet]      = $this->getCoreWallets();
+        [$ownerWallet, $appWallet] = $this->getCoreWallets();
 
-        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
+        if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet))
+            throw new InvalidArgumentException('app dosn\'t resolved ');
         $firstAppWalletCoins = $appWallet->coins;
         $firstOwnerWalletCoins = $ownerWallet->coins;
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
         $receiverName = $receivedUsers->first()->name;
-        $receiversCount  = $receivedUsers->count();
-        $isToRoom      = $receiversCount > 1;
+        $receiversCount = $receivedUsers->count();
+        $isToRoom = $receiversCount > 1;
 
 
 
@@ -1053,17 +1069,17 @@ class LuckyGiftService
 
         $index = $count;
 
-        $coinsForReceiver   = $number * ($giftPrice * 0.1);
-        $price              = $coinsForReceiver * $receiversCount;
-        $total_user_win  = 0;
+        $coinsForReceiver = $number * ($giftPrice * 0.1);
+        $price = $coinsForReceiver * $receiversCount;
+        $total_user_win = 0;
         $total_count_win = 0;
         while ($user->di >= $totalPrice && $index > 0) {
 
-            $appWallet->coins   += $price * 8;
+            $appWallet->coins += $price * 8;
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
-            $isWinner       = $this->is_winner($gift);
-            $isPopular      = false;
+            $isWinner = $this->is_winner($gift);
+            $isPopular = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
             if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
@@ -1074,7 +1090,7 @@ class LuckyGiftService
                 $cashback_value = $cashback_percentage * $giftPrice * $number;
                 if ($cashback_percentage > 0) {
                     $user->enableSaving = false;
-                    $user->di           += $cashback_value;
+                    $user->di += $cashback_value;
                     //                $user->save();
                     $appWallet->coins -= $cashback_value;
                     //                $appWallet->save();
@@ -1097,15 +1113,15 @@ class LuckyGiftService
             [$commentMessage, $sendMessage] =
                 $this->getSendMessage($giftPrice, $message ?? null, $receiverName, $number, isToRoom: $isToRoom);
             // UPDATE user win
-            (new LuckyStrategyService())->getUpdateUserStatistic($user, $totalGiftPrice, (int)($totalGiftPrice * $cashback_percentage));
+            (new LuckyStrategyService())->getUpdateUserStatistic($user, $totalGiftPrice, (int) ($totalGiftPrice * $cashback_percentage));
             $responseData['combo'][] = [
-                'status'        => 0,
-                'data'          => [
-                    'win_coins'       => (int)($totalGiftPrice * $cashback_percentage),
-                    'is_win'          => $isWinner,
-                    'is_popular'      => $isPopular,
+                'status' => 0,
+                'data' => [
+                    'win_coins' => (int) ($totalGiftPrice * $cashback_percentage),
+                    'is_win' => $isWinner,
+                    'is_popular' => $isPopular,
                     'comment_message' => $commentMessage,
-                    'winner_comment'  => $sendMessage,
+                    'winner_comment' => $sendMessage,
                 ],
                 'error_message' => '',
             ];
@@ -1120,15 +1136,15 @@ class LuckyGiftService
 
         if ($index > 0) {
             $count -= $index;
-            $responseData['combo'][] =   [
-                'status'          => 1,
+            $responseData['combo'][] = [
+                'status' => 1,
                 'data' => null,
-                'error_message'   => __('api_responses.insufficient'),
+                'error_message' => __('api_responses.insufficient'),
             ];
         }
 
         // update room session
-        $room->session      += (int)$gift->price * $number * $count * 0.1;
+        $room->session += (int) $gift->price * $number * $count * 0.1;
         $room->save();
 
         // add session to response
@@ -1138,7 +1154,7 @@ class LuckyGiftService
         $responseData['user_coins'] = $userCoins;
 
         //update user coins and diamond and sender level
-        $totalDiamond           = $totalPrice * $count;
+        $totalDiamond = $totalPrice * $count;
         $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
         $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
@@ -1164,7 +1180,7 @@ class LuckyGiftService
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
 
-        return  $responseData;
+        return $responseData;
     }
 
     /**
@@ -1190,7 +1206,7 @@ class LuckyGiftService
 
         $positions = [];
         $userInMic = [];
-        $mics      = explode(',', $roomMics);
+        $mics = explode(',', $roomMics);
 
         foreach ($mics as $key => $value) {
             $founded = in_array($value, $receiversIds);
@@ -1206,13 +1222,13 @@ class LuckyGiftService
         }
 
         return [
-            'gift_image'      => $gift->img,
-            'receiver_name'   => $receiverName,
-            'receivers_ids'   => $receiversIds,
-            'sender_id'       => $user->id ?? 0,
-            'sender_name'     => $user->name ?? '',
-            'sender_img'      => $user->profile->avatar ?? '',
-            'position'        => $positions,
+            'gift_image' => $gift->img,
+            'receiver_name' => $receiverName,
+            'receivers_ids' => $receiversIds,
+            'sender_id' => $user->id ?? 0,
+            'sender_name' => $user->name ?? '',
+            'sender_img' => $user->profile->avatar ?? '',
+            'position' => $positions,
             'combo' => [],
         ];
     }
@@ -1235,13 +1251,13 @@ class LuckyGiftService
         }
 
         return [
-            'gift_image'      => $gift->img,
-            'receiver_name'   => $receiverName,
-            'receivers_ids'   => $receiversIds,
-            'sender_id'       => $user->id ?? 0,
-            'sender_name'     => $user->name ?? '',
-            'sender_img'      => $user->profile->avatar ?? '',
-            'position'        => $positions,
+            'gift_image' => $gift->img,
+            'receiver_name' => $receiverName,
+            'receivers_ids' => $receiversIds,
+            'sender_id' => $user->id ?? 0,
+            'sender_name' => $user->name ?? '',
+            'sender_img' => $user->profile->avatar ?? '',
+            'position' => $positions,
             'combo' => [],
         ];
     }
@@ -1278,7 +1294,7 @@ class LuckyGiftService
      */
     public function updateCache(mixed $userId, $roomId, array $receiversIds, mixed $giftId, mixed $data, mixed $number, float $price, float $coinsForReceiver, float $userCoinsBefore = 0, float $userCoinsAfter = 0, int $total_user_win = 0, int $total_count_win = 0): void
     {
-        $key  = 'luckyGift_' . $userId . '_' . $roomId . '_' . implode($receiversIds) . '_' . $giftId;
+        $key = 'luckyGift_' . $userId . '_' . $roomId . '_' . implode($receiversIds) . '_' . $giftId;
         $data = RedisService::getUnSerialize($key);
         if ($data) {
             if (isset($data['number'])) {
@@ -1291,17 +1307,17 @@ class LuckyGiftService
             }
         } else {
             $data = [
-                'number'          => $number,
+                'number' => $number,
                 'room_id' => $roomId,
                 'giftId' => $giftId,
                 'price' => $price,
-                'receiversIds'    => $receiversIds,
+                'receiversIds' => $receiversIds,
                 'coins_for_receiver' => $coinsForReceiver,
                 'user_id' => $userId,
                 'user_coin_befor' => $userCoinsBefore,
                 'user_coin_after' => $userCoinsAfter,
                 'total_num_win' => $total_count_win,
-                'total_user_win'  => $total_user_win
+                'total_user_win' => $total_user_win
             ];
             RedisService::updateUnSerialize($key, $data);
         }
@@ -1328,24 +1344,24 @@ class LuckyGiftService
     public function sendPopularToZego(mixed $userId, User $user, Gift $gift, mixed $ownerId, Room $room, mixed $cashback_percentage, $cashbackValue = 0): void
     {
         $zigoData = [
-            'user_id'      => $userId,
-            'user_image'   => @$user->profile->avatar ?? '',
-            'gift_image'   => @$gift->img ?? '',
-            'owner_id'     => $ownerId,
-            'user_name'    => $user->name ?? '',
-            'room_id'      => $room->id,
-            'percentage'   => $cashback_percentage,
+            'user_id' => $userId,
+            'user_image' => @$user->profile->avatar ?? '',
+            'gift_image' => @$gift->img ?? '',
+            'owner_id' => $ownerId,
+            'user_name' => $user->name ?? '',
+            'room_id' => $room->id,
+            'percentage' => $cashback_percentage,
             'is_room_pass' => ($room->room_pass != null && $room->room_pass != ''),
-            'gift_price'   => $gift->price,
-            'cache_value'  => ceil($cashbackValue ?? 0.0),
-            'room_name'   => $room->room_name ?: '',
-            'room_cover'   => $room->room_cover ?? '',
-            'room_background'   => $room->final_room_image ?? '',
-            'room_mode'   =>  $room->mode,
-            'room_uuid'   => $room->owner?->uuid ?: 0,
-            'room_owner_id'   => $room->uid ?: 0,
-            'is_password'   =>  (bool)(@$room->room_pass),
-            'room_type'   => (@$room->type),
+            'gift_price' => $gift->price,
+            'cache_value' => ceil($cashbackValue ?? 0.0),
+            'room_name' => $room->room_name ?: '',
+            'room_cover' => $room->room_cover ?? '',
+            'room_background' => $room->final_room_image ?? '',
+            'room_mode' => $room->mode,
+            'room_uuid' => $room->owner?->uuid ?: 0,
+            'room_owner_id' => $room->uid ?: 0,
+            'is_password' => (bool) (@$room->room_pass),
+            'room_type' => (@$room->type),
 
         ];
         $this->sendToZegoLuckyGift($zigoData);
@@ -1353,24 +1369,24 @@ class LuckyGiftService
     public function sendPopularToZegoV2(mixed $userId, User $user, Gift $gift, mixed $ownerId, Room $room, mixed $cashback_percentage, $cashbackValue = 0): void
     {
         $zigoData = [
-            'user_id'      => $userId,
-            'user_image'   => @$user->profile->avatar ?? '',
-            'gift_image'   => @$gift->img ?? '',
-            'owner_id'     => $ownerId,
-            'user_name'    => $user->name ?? '',
-            'room_id'      => $room->id,
-            'percentage'   => $cashback_percentage,
+            'user_id' => $userId,
+            'user_image' => @$user->profile->avatar ?? '',
+            'gift_image' => @$gift->img ?? '',
+            'owner_id' => $ownerId,
+            'user_name' => $user->name ?? '',
+            'room_id' => $room->id,
+            'percentage' => $cashback_percentage,
             'is_room_pass' => ($room->room_pass != null && $room->room_pass != ''),
-            'gift_price'   => $gift->price,
-            'cache_value'  => ceil($cashbackValue ?? 0.0),
-            'room_name'   => $room->room_name ?: '',
-            'room_cover'   => $room->room_cover ?? '',
-            'room_background'   => $room->final_room_image ?? '',
-            'room_mode'   =>  $room->mode,
-            'room_uuid'   => $room->owner?->uuid ?: 0,
-            'room_owner_id'   => $room->uid ?: 0,
-            'is_password'   =>  (bool)(@$room->room_pass),
-            'room_type'   => (@$room->type),
+            'gift_price' => $gift->price,
+            'cache_value' => ceil($cashbackValue ?? 0.0),
+            'room_name' => $room->room_name ?: '',
+            'room_cover' => $room->room_cover ?? '',
+            'room_background' => $room->final_room_image ?? '',
+            'room_mode' => $room->mode,
+            'room_uuid' => $room->owner?->uuid ?: 0,
+            'room_owner_id' => $room->uid ?: 0,
+            'is_password' => (bool) (@$room->room_pass),
+            'room_type' => (@$room->type),
 
         ];
         $this->sendToZegoLuckyGiftV2($zigoData);
@@ -1396,14 +1412,15 @@ class LuckyGiftService
      */
     public function getTimesOfPrice(mixed $appWalletCoins, float|int $totalGiftPrice, mixed $properties): mixed
     {
-        $valueTimes  = floor($appWalletCoins / ($totalGiftPrice));
-        if ($valueTimes == 0) return 0;
-        $times       = min($valueTimes, 1010);
+        $valueTimes = floor($appWalletCoins / ($totalGiftPrice));
+        if ($valueTimes == 0)
+            return 0;
+        $times = min($valueTimes, 1010);
         $probability = $this->getProbabilityTimes();
 
 
         $cashback_percentage = $properties ? $valueTimes : rand(1, $times);
-        $properties1         = $properties ? explode(',', $properties) : null;
+        $properties1 = $properties ? explode(',', $properties) : null;
         $cashback_percentage = $this->getRandomDuplicate($probability, $cashback_percentage, $properties1);
         return $cashback_percentage;
     }
@@ -1418,10 +1435,10 @@ class LuckyGiftService
 
         if ($calculatedMultiplier > 1) {
             $roundedMultiplier = round($calculatedMultiplier, 2);
-            $roundedInt        = round($roundedMultiplier);
+            $roundedInt = round($roundedMultiplier);
 
             if (abs($roundedMultiplier - $roundedInt) < 0.01) {
-                return (int)$roundedInt;
+                return (int) $roundedInt;
             }
 
             return $roundedMultiplier;

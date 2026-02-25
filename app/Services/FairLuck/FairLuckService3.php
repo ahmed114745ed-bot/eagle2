@@ -27,13 +27,13 @@ class FairLuckService3
         $this->houseEdgeRate = (float) config('fairluck.house_edge_rate', 0.02);
     }
 
-    public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null): object
+    public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null, $receiverId = null): object
     {
         return DB::transaction(function () use ($user, $gift, $betAmount, $roomId) {
             // 1. Load context
             $profile = $this->profileManager->getProfile($user->id);
             $deviation = (float) $profile->current_deviation;
-            
+
             // --- LOAD STATS FIRST ---
             $lossKey = "fairluck_loss_streak_" . $user->id;
             $jackpotKey = "fairluck_jackpot_pity_" . $user->id;
@@ -44,7 +44,7 @@ class FairLuckService3
             $jackpotPity = (int) (\Illuminate\Support\Facades\Redis::get($jackpotKey) ?? 0);
             $contributionBank = (int) (\Illuminate\Support\Facades\Redis::get($contributionKey) ?? 0);
             $isDrainLocked = (bool) \Illuminate\Support\Facades\Redis::get($drainLockKey);
-            
+
             $forceWin = $consecutiveLosses >= 15;
 
             $globalVault = $this->getGlobalVaultBalance();
@@ -97,23 +97,23 @@ class FairLuckService3
                 $targetLossRate = max($targetLossRate, 0.25);
             }
 
-            
+
             if ($jackpotPity > 800) {
                 $targetLossRate = max($targetLossRate, 0.30);
             }
 
             if ($jackpotPity > 1000) {
                 // Post-jackpot or persistent winner drain
-                $targetLossRate = max($targetLossRate, 0.45); 
+                $targetLossRate = max($targetLossRate, 0.45);
             }
 
             if ($isDrainLocked) {
                 $targetLossRate = max($targetLossRate, 0.70); // تقليل العقوبة
             }
-            
+
             $targetRTP = (1.0 - $targetLossRate);
-            $localTargetRTP = $targetRTP; 
-            
+            $localTargetRTP = $targetRTP;
+
             // Adaptive scaling based on deviation (lifetime performance)
             if ($deviation >= 0.05) {
                 // EXTREME recovery if player is in profit > 5%
@@ -134,7 +134,7 @@ class FairLuckService3
 
             $protectionMultiplier = $this->beginnerProtection->getMultiplier($profile);
             $finalProbability = $this->probabilityEngine->calculate($baseProb, $deviation, $protectionMultiplier);
-            
+
             // Forced Win Loop: تقليل الحد الأقصى للخسائر المتتالية لتحسين RTP
             if ($consecutiveLosses >= 20) { // تقليل من 50 إلى 25
                 $finalProbability = 1.0; // فوز مضمون بعد 25 خسارة
@@ -157,12 +157,12 @@ class FairLuckService3
                 $finalProbability = max($finalProbability, 0.18);
                 $forceMiniWins = true;
             }
-            
+
             // Targeted Jackpot Guarantee: تعتمد على الحظ والرصيد المتاح
             $forceJackpot = false;
             if (!$isDrainLocked) {
                 $nearBankrupt = $user->di <= ($betAmount * 20);
-                
+
                 // حساب احتمالية الجاكبوت بناءً على الرصيد المتاح
                 if ($jackpotPity >= 800 && $jackpotPity <= 1000 && $deviation < 0.2 && $hasPaidForJackpot) {
                     $baseJackpotProb = 0.10;
@@ -173,13 +173,13 @@ class FairLuckService3
                         $this->getGlobalVaultBalance(),
                         250
                     );
-                    
+
                     $finalProbability = max($finalProbability, $adjustedJackpotProb);
                     if ($adjustedJackpotProb >= 0.05) { // فقط إذا كانت الاحتمالية معقولة
                         $forceJackpot = true;
                     }
                 }
-                
+
                 if (!$forceJackpot && $jackpotPity >= 780 && $jackpotPity < 800 && $hasPaidForJackpot && $nearBankrupt) {
                     $baseJackpotProb = 0.14;
                     $adjustedJackpotProb = DeviationCalculator::calculateJackpotProbability(
@@ -189,13 +189,13 @@ class FairLuckService3
                         $this->getGlobalVaultBalance(),
                         250
                     );
-                    
+
                     $finalProbability = max($finalProbability, $adjustedJackpotProb);
                     if ($adjustedJackpotProb >= 0.08) {
                         $forceJackpot = true;
                     }
                 }
-                
+
                 // الحالات الحرجة (بغض النظر عن الرصيد)
                 if ($jackpotPity > 1100 && $hasPaidForJackpot) {
                     $forceJackpot = true;
@@ -235,15 +235,15 @@ class FairLuckService3
                     $betUnit,
                     $poolBalance,
                     $hasPaidForJackpot,
-                    $betAmount 
+                    $betAmount
                 );
-                
+
                 if ($multiplier === 0) {
                     $newDeviation = $this->deviationCalculator->calculate(
                         $profile->total_bets + $betAmount,
                         $profile->total_profit - $betAmount
                     );
-                    
+
                     return (object) [
                         'isWinner' => false,
                         'multiplier' => 0,
@@ -253,7 +253,7 @@ class FairLuckService3
                         'newDeviation' => $newDeviation
                     ];
                 }
-                
+
                 \Illuminate\Support\Facades\Redis::del($lossKey);
                 if ($multiplier >= 250) {
                     $jackpotPayout = max(0, $multiplier * $betAmount);
@@ -262,7 +262,7 @@ class FairLuckService3
                     \Illuminate\Support\Facades\Redis::set($contributionKey, -$postJackpotDebt);
                     \Illuminate\Support\Facades\Redis::expire($contributionKey, 259200);
                     \Illuminate\Support\Facades\Redis::setex($drainLockKey, 86400, 1);
-                    
+
                     $jackpotWalletBalance = $this->getJackpotWalletBalance();
                     if ($jackpotWalletBalance >= $jackpotPayout) {
                         $this->decreaseJackpotWalletBalance((int) round($jackpotPayout));
@@ -271,7 +271,7 @@ class FairLuckService3
                             $profile->total_bets + $betAmount,
                             $profile->total_profit - $betAmount
                         );
-                        
+
                         return (object) [
                             'isWinner' => false,
                             'multiplier' => 0,
@@ -281,13 +281,13 @@ class FairLuckService3
                             'newDeviation' => $newDeviation
                         ];
                     }
-                    
+
                     $this->lossLedger->markHighMultiplierAwarded($user->id, (int) round($jackpotPayout));
                 } else {
                     \Illuminate\Support\Facades\Redis::incr($jackpotKey);
-                    
+
                     $profit = max(0, $multiplier * $betAmount);
-                    
+
                     // السحب من المحفظة المتوسطة للمضاعفات 50, 70, 100 - بدون شروط إضافية
                     if (in_array($multiplier, [50, 70, 100])) {
                         $mediumWalletBalance = $this->getMediumWalletBalance();
@@ -300,7 +300,7 @@ class FairLuckService3
                                 $profile->total_bets + $betAmount,
                                 $profile->total_profit - $betAmount
                             );
-                            
+
                             return (object) [
                                 'isWinner' => false,
                                 'multiplier' => 0,
@@ -343,13 +343,13 @@ class FairLuckService3
                 \Illuminate\Support\Facades\Redis::incr($jackpotKey);
                 $updatedBank = min($contributionBank + $betAmount, $requiredContribution * 5);
                 \Illuminate\Support\Facades\Redis::set($contributionKey, (int) round($updatedBank));
-                \Illuminate\Support\Facades\Redis::expire($lossKey, 3600); 
-                \Illuminate\Support\Facades\Redis::expire($jackpotKey, 86400); 
-                \Illuminate\Support\Facades\Redis::expire($contributionKey, 259200); 
-                
+                \Illuminate\Support\Facades\Redis::expire($lossKey, 3600);
+                \Illuminate\Support\Facades\Redis::expire($jackpotKey, 86400);
+                \Illuminate\Support\Facades\Redis::expire($contributionKey, 259200);
+
                 // تم نقل التوزيع لأعلى في distributeBetAmount
                 // $this->distributeLossAmount($betAmount);
-                
+
                 $this->lossLedger->addToGlobalPool((int) round($betAmount));
             }
 
@@ -358,7 +358,7 @@ class FairLuckService3
 
             // 6. Update Stats
             $profitAmount = $isWinner || $forceWin ? ($multiplier * $betAmount) : -$betAmount;
-            
+
             // تحديث عداد الخسائر المتتالية
             if ($isWinner || $forceWin) {
                 // إعادة تعيين عداد الخسائر المتتالية عند الفوز
@@ -372,10 +372,10 @@ class FairLuckService3
             // تحديد مصدر المكسب وتسجيله
             $mediumWalletWin = 0;
             $jackpotWalletWin = 0;
-            
+
             if ($isWinner && $multiplier > 1) {
                 $winAmount = $multiplier * $betAmount; // المضاعف الكامل
-                
+
                 if ($multiplier >= 250) {
                     $jackpotWalletWin = $winAmount;
                 } elseif ($multiplier >= 50 && $multiplier <= 100) {
@@ -429,17 +429,17 @@ class FairLuckService3
                 $isWinner,
                 $multiplier
             );
-            
+
             $newDeviation = $this->deviationCalculator->calculate(
                 $profile->total_bets + $betAmount,
                 $profile->total_profit + $profitAmount
             );
 
             $this->profileManager->updateStats(
-                $profile, 
-                $betAmount, 
-                $profitAmount, 
-                $isWinner, 
+                $profile,
+                $betAmount,
+                $profitAmount,
+                $isWinner,
                 $newDeviation
             );
 
@@ -490,14 +490,14 @@ class FairLuckService3
     private function validateMultiplierAvailability(int $selectedMultiplier, float $betAmount): int
     {
         $requiredPayout = max(0, ($selectedMultiplier - 1) * $betAmount);
-    
-        
+
+
         if (in_array($selectedMultiplier, [5, 10, 20])) {
             $globalBalance = $this->getGlobalVaultBalance();
-            
-        
+
+
             if ($globalBalance >= $requiredPayout) {
-                return $selectedMultiplier; 
+                return $selectedMultiplier;
             } else {
                 if ($selectedMultiplier == 20) {
                     $requiredFor10 = max(0, (10 - 1) * $betAmount);
@@ -517,24 +517,24 @@ class FairLuckService3
                         return 5;
                     }
                 }
-                
+
                 $mediumBalance = $this->getMediumWalletBalance();
                 $requiredFor50 = max(0, (50 - 1) * $betAmount);
                 if ($mediumBalance >= $requiredFor50) {
                     \Illuminate\Support\Facades\Log::debug('Switching to medium multiplier', ['from' => $selectedMultiplier, 'to' => 50]);
                     return 50;
                 }
-                
-             
-                return 0; 
+
+
+                return 0;
             }
         }
-        
+
         if (in_array($selectedMultiplier, [50, 70, 100])) {
             $mediumBalance = $this->getMediumWalletBalance();
-            
-        
-            
+
+
+
             if ($mediumBalance >= $requiredPayout) {
                 return $selectedMultiplier; // المضاعف متاح
             } else {
@@ -557,30 +557,30 @@ class FairLuckService3
                         return 50;
                     }
                 }
-                
+
                 $globalBalance = $this->getGlobalVaultBalance();
                 $requiredFor5 = max(0, (5 - 1) * $betAmount);
                 if ($globalBalance >= $requiredFor5) {
                     \Illuminate\Support\Facades\Log::debug('Switching to basic multiplier from medium', ['from' => $selectedMultiplier, 'to' => 5]);
                     return 5;
                 }
-                
+
                 \Illuminate\Support\Facades\Log::warning('NO LIQUIDITY FOR MEDIUM MULTIPLIER', [
                     'requested_multiplier' => $selectedMultiplier,
                     'medium_wallet' => $mediumBalance,
                     'global_vault' => $globalBalance,
                 ]);
-                return 0; 
+                return 0;
             }
         }
-        
+
         if (in_array($selectedMultiplier, [250, 500, 1000])) {
             $jackpotBalance = $this->getJackpotWalletBalance();
-            
-          
-            
+
+
+
             if ($jackpotBalance >= $requiredPayout) {
-                return $selectedMultiplier; 
+                return $selectedMultiplier;
             } else {
                 if ($selectedMultiplier == 500) {
                     $requiredFor250 = max(0, (250 - 1) * $betAmount);
@@ -601,22 +601,22 @@ class FairLuckService3
                         return 250;
                     }
                 }
-                
+
                 $mediumBalance = $this->getMediumWalletBalance();
                 $requiredFor50 = max(0, (50 - 1) * $betAmount);
                 if ($mediumBalance >= $requiredFor50) {
                     \Illuminate\Support\Facades\Log::debug('Switching to medium multiplier from jackpot', ['from' => $selectedMultiplier, 'to' => 50]);
                     return 50;
                 }
-                
-               
-                return 0; 
+
+
+                return 0;
             }
         }
-        
+
         return $selectedMultiplier;
     }
-    
+
     /**
      * Smart weight-based selection to keep user in suspense.
      */
@@ -642,7 +642,7 @@ class FairLuckService3
         $multipliers = $this->getAvailableMultipliers();
         $weights = [];
         $hasPaidForJackpot = $hasPaidForJackpot || ($unlockContribution > 0 && $contributionBank >= $unlockContribution);
-        
+
         $highTierAvailability = $this->resolveHighTierAvailability(
             $betUnit,
             $globalVaultBalance,
@@ -680,7 +680,7 @@ class FairLuckService3
                     $jackpotBalance = $this->getJackpotWalletBalance();
                     $globalBalance = $this->getGlobalVaultBalance();
                     $totalAvailable = $jackpotBalance + $globalBalance;
-                    
+
                     if ($totalAvailable >= $requiredPayout) {
                         // السيولة كافية، استخدم النسب الطبيعية
                         $weight = $baseWeight;
@@ -702,12 +702,12 @@ class FairLuckService3
                         $weight = 0;
                     }
                 }
-                
+
                 // المضاعفات البسيطة (5, 10, 20) تعتمد على معامل الانحراف - مع الحفاظ على النسب النسبية
                 if (in_array($m, [5, 10, 20])) {
                     // معامل التعديل العام حسب الانحراف
                     $deviationMultiplier = 1.0;
-                    
+
                     if ($deviation >= 0.1) {
                         // المستخدم في ربح كبير - قلل المضاعفات البسيطة
                         $deviationMultiplier = 0.1;
@@ -727,27 +727,30 @@ class FairLuckService3
                         // المستخدم في خسارة كبيرة - أعطي أولوية عالية للمضاعفات البسيطة
                         $deviationMultiplier = 3.0;
                     }
-                    
+
                     // تطبيق المعامل مع الحفاظ على النسب النسبية الأصلية
                     $weight *= $deviationMultiplier;
                 }
-                
+
                 // للمضاعفات المتوسطة (50, 70, 100) - توزيع من المحفظة المتوسطة
                 if (in_array($m, [50, 70, 100]) && $weight > 0) {
                     $requiredPayout = max(0, $m * $betAmount); // المضاعف الكامل
                     $mediumBalance = $this->getMediumWalletBalance();
-                    
+
                     if ($mediumBalance >= $requiredPayout) {
                         // السيولة متوفرة في المحفظة المتوسطة، ارفع الوزن بشدة
                         $liquidityMultiplier = min(3.0, $mediumBalance / max(1, $requiredPayout));
-                        
+
                         // عندما تصل المحفظة لأكثر من 5000، اجبر التوزيع بقوة هائلة!
                         if ($mediumBalance >= 5000) {
                             $weight *= 200.0; // تشجيع هائل للتفريغ الفوري
                             // اجعل المضاعفات المتوسطة تهيمن على الاختيار
-                            if ($m == 50) $weight *= 10.0;  // 50x يصبح مهيمن
-                            if ($m == 70) $weight *= 8.0;   // 70x قوي جداً
-                            if ($m == 100) $weight *= 6.0;  // 100x قوي أيضاً
+                            if ($m == 50)
+                                $weight *= 10.0;  // 50x يصبح مهيمن
+                            if ($m == 70)
+                                $weight *= 8.0;   // 70x قوي جداً
+                            if ($m == 100)
+                                $weight *= 6.0;  // 100x قوي أيضاً
                         } elseif ($mediumBalance >= 3000) {
                             $weight *= 100.0;
                         } elseif ($mediumBalance >= 1500) {
@@ -760,14 +763,14 @@ class FairLuckService3
                         $weight *= 0.01;
                     }
                 }
-                
+
                 // للمضاعفات العالية (250, 500, 1000) - توزيع من محفظة الجاكبوت
                 if (in_array($m, [250, 500, 1000]) && $weight > 0 && !$forceJackpot) {
                     $requiredPayout = max(0, ($m - 1) * $betAmount);
                     $jackpotBalance = $this->getJackpotWalletBalance();
                     $globalBalance = $this->getGlobalVaultBalance();
                     $totalAvailable = $jackpotBalance + $globalBalance;
-                    
+
                     if ($totalAvailable >= $requiredPayout && $hasPaidForJackpot) {
                         // السيولة متوفرة ودفع الشرط المطلوب، ارفع الوزن
                         $weight *= ($jackpotBalance >= $requiredPayout) ? 3.0 : 2.0;
@@ -779,7 +782,7 @@ class FairLuckService3
                         $weight = 0;
                     }
                 }
-                
+
                 // تطبيق تعديلات طفيفة بناءً على الحالة
                 if ($weight > 0) {
                     if ($deviation >= 0.05) {
@@ -787,7 +790,7 @@ class FairLuckService3
                     } elseif ($deviation <= -0.15) {
                         $weight *= 1.2; // زيادة الفرص للمستخدمين في خسارة
                     }
-                    
+
                     if ($streak >= 8) {
                         $weight *= 1.1; // زيادة طفيفة بعد سلسلة خسائر
                     }
@@ -798,7 +801,7 @@ class FairLuckService3
         }
 
         $selectedMultiplier = $this->weightedRandom($multipliers, $weights);
-        
+
         // تحقق من توفر السيولة واتخذ قرار نهائي
         return $this->validateMultiplierAvailability($selectedMultiplier, $betAmount);
     }
@@ -947,7 +950,7 @@ class FairLuckService3
             $weight *= 1.15;
         }
 
-        $availableHighCount = count(array_filter([250, 500, 1000], fn ($tier) => $highTierAvailability[$tier] ?? false));
+        $availableHighCount = count(array_filter([250, 500, 1000], fn($tier) => $highTierAvailability[$tier] ?? false));
 
         if ($availableHighCount > 1 && $multiplier === 250) {
             $weight *= max(0.65, 1 - 0.15 * ($availableHighCount - 1));
@@ -997,18 +1000,19 @@ class FairLuckService3
     protected function weightedRandom(array $values, array $weights): int
     {
         $totalWeight = array_sum($weights);
-        if ($totalWeight <= 0) return $values[0];
-        
-        $random = rand(1, (int)$totalWeight);
+        if ($totalWeight <= 0)
+            return $values[0];
+
+        $random = rand(1, (int) $totalWeight);
         $currentWeight = 0;
-        
+
         foreach ($values as $index => $value) {
             $currentWeight += $weights[$index];
             if ($random <= $currentWeight) {
                 return $value;
             }
         }
-        
+
         // احتياط - إذا لم يتم اختيار أي شيء، اختر عشوائياً من القائمة
         $availableValues = [];
         foreach ($values as $index => $value) {
@@ -1016,23 +1020,23 @@ class FairLuckService3
                 $availableValues[] = $value;
             }
         }
-        
+
         return $availableValues ? $availableValues[array_rand($availableValues)] : $values[0];
     }
 
     private function getGlobalVaultBalance(): int
     {
-        return FairLuckWallet::getBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
+        return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
     }
 
     private function getMediumWalletBalance(): int
     {
-        return FairLuckWallet::getBalance(FairLuckWallet::TYPE_MEDIUM_WALLET);
+        return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET);
     }
 
     private function getJackpotWalletBalance(): int
     {
-        return FairLuckWallet::getBalance(FairLuckWallet::TYPE_JACKPOT_WALLET);
+        return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET);
     }
 
     private function decreaseMediumWallet(int $amount): void
@@ -1040,7 +1044,7 @@ class FairLuckService3
         if ($amount <= 0) {
             return;
         }
-        FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount);
+        FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount);
     }
 
 
@@ -1051,32 +1055,28 @@ class FairLuckService3
             return;
         }
 
-        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
+        FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
     }
 
-    /**
-     * توزيع الأموال بالنسب الجديدة لكل رمية
-     * 60% للمحفظة الرئيسية، 20% للجاكبوت، 10% للمتوسطة، 10% ربح التطبيق
-     */
+
     private function distributeHouseCut(int $totalAmount): void
     {
         if ($totalAmount <= 0) {
             return;
         }
 
-        // توزيع بالنسب الجديدة
-        $globalVaultAmount = (int) round($totalAmount * 0.60);  // 60% للمضاعفات الصغيرة
-        $jackpotAmount = (int) round($totalAmount * 0.20);      // 20% للجاكبوت
-        $mediumAmount = (int) round($totalAmount * 0.10);       // 10% للمتوسطة
+        $globalVaultAmount = (int) round($totalAmount * 0.60);  
+        $jackpotAmount = (int) round($totalAmount * 0.20);      
+        $mediumAmount = (int) round($totalAmount * 0.10);       
 
         if ($globalVaultAmount > 0) {
-            FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $globalVaultAmount);
+            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $globalVaultAmount);
         }
         if ($jackpotAmount > 0) {
-            FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $jackpotAmount);
+            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $jackpotAmount);
         }
         if ($mediumAmount > 0) {
-            FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $mediumAmount);
+            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $mediumAmount);
         }
     }
 
@@ -1087,11 +1087,11 @@ class FairLuckService3
         }
 
         $balanceBefore = $this->getGlobalVaultBalance();
-        FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
+        FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
         $balanceAfter = $this->getGlobalVaultBalance();
 
         \Illuminate\Support\Facades\Log::debug('decreaseGlobalVaultBalance', [
-            'table' => 'fair_luck_wallets',
+            'table' => 'fair_luck_wallets (Redis optimized)',
             'wallet_type' => 'global_vault',
             'amount_decreased' => $amount,
             'balance_before' => $balanceBefore,
@@ -1108,11 +1108,11 @@ class FairLuckService3
         }
 
         $balanceBefore = $this->getJackpotWalletBalance();
-        FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount);
+        FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount);
         $balanceAfter = $this->getJackpotWalletBalance();
 
         \Illuminate\Support\Facades\Log::debug('decreaseJackpotWalletBalance', [
-            'table' => 'fair_luck_wallets',
+            'table' => 'fair_luck_wallets (Redis optimized)',
             'wallet_type' => 'jackpot_wallet',
             'amount_decreased' => $amount,
             'balance_before' => $balanceBefore,
@@ -1184,9 +1184,9 @@ class FairLuckService3
         // }
 
         $payoutPortion = max(0, ($multiplier - 1) * $betUnit);
-        
+
         $jackpotBalance = $this->getJackpotWalletBalance();
-        
+
         return $jackpotBalance >= $payoutPortion;
     }
 
@@ -1228,39 +1228,39 @@ class FairLuckService3
         // 60% للمحفظة الرئيسية الاقتصادية (للمضاعفات الصغيرة)
         $globalVaultAmount = $betAmount * 0.60;
         $globalVaultAmountInt = (int) round($globalVaultAmount);
-        
+
         \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO GLOBAL_VAULT', [
             'amount' => $globalVaultAmountInt,
             'percentage' => 0.60,
             'expected' => round($betAmount * 0.60),
         ]);
-        
+
         $this->increaseGlobalVaultBalance($globalVaultAmountInt);
-        
+
         // 20% لمحفظة الجاكبوت 
         $jackpotWalletAmount = $betAmount * 0.20;
         $jackpotWalletAmountInt = (int) round($jackpotWalletAmount);
-        
+
         \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO JACKPOT_WALLET', [
             'amount' => $jackpotWalletAmountInt,
             'percentage' => 0.20,
             'expected' => round($betAmount * 0.20),
         ]);
-        
+
         $this->increaseJackpotWallet($jackpotWalletAmountInt);
-        
+
         // 10% للمحفظة المتوسطة
         $mediumWalletAmount = $betAmount * 0.10;
         $mediumWalletAmountInt = (int) round($mediumWalletAmount);
-        
+
         \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO MEDIUM_WALLET', [
             'amount' => $mediumWalletAmountInt,
             'percentage' => 0.10,
             'expected' => round($betAmount * 0.10),
         ]);
-        
+
         $this->increaseMediumWallet($mediumWalletAmountInt);
-        
+
         \Illuminate\Support\Facades\Log::debug('distributeBetAmount COMPLETED', [
             'bet_amount' => $betAmount,
             'total_distributed' => $globalVaultAmountInt + $jackpotWalletAmountInt + $mediumWalletAmountInt,
@@ -1269,7 +1269,7 @@ class FairLuckService3
             'medium_wallet' => $mediumWalletAmountInt,
             'remaining_app_profit' => round($betAmount * 0.10),
         ]);
-        
+
         // 10% ربح التطبيق (لا يضاف للمحافظ - هو صافي ربح)
     }
 
@@ -1282,7 +1282,7 @@ class FairLuckService3
             return;
         }
 
-        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount);
+        FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount);
     }
 
     /**
@@ -1294,6 +1294,6 @@ class FairLuckService3
             return;
         }
 
-        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount);
+        FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount);
     }
 }
