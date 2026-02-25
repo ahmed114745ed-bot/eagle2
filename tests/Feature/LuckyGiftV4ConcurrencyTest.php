@@ -89,18 +89,19 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
      */
     public function test_multi_sender_concurrency()
     {
-        $senderCount = 10;
-        $receiversPerSenderCount = 7;
+        $senderCount = 50;
+        $receiversPerSenderCount = 10;
+        $giftPrice = 1000;
 
         // Use a specific test gift with low price to avoid balance issues
         $gift = Gift::factory()->create([
             'type' => 6,
-            'price' => 10,
+            'price' => $giftPrice,
             'enable' => 1,
             'name' => 'Concurrency Multi-Sender Test Gift'
         ]);
 
-        $senders = User::factory()->count($senderCount)->create(['di' => 100000]);
+        $senders = User::factory()->count($senderCount)->create(['di' => 1000000]);
         $receivers = User::factory()->count($receiversPerSenderCount)->create();
 
         $room = $this->getRoom($senders->first());
@@ -108,6 +109,10 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
 
         $responses = [];
         $totalStartTime = microtime(true);
+        $expectedLogsPerSender = count($receivers->pluck('id')->toArray()); // Corrected variable name
+        $totalExpectedLogs = $senderCount * $expectedLogsPerSender;
+
+        $logsBefore = \App\Models\FairLuckTransaction::count();
 
         foreach ($senders as $index => $sender) {
             $senderStartTime = microtime(true);
@@ -133,9 +138,8 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
                 foreach ($responseData['data']['combo'] as $comboItem) {
                     if ($comboItem['data']['is_win'] ?? false) {
                         $hasWin = true;
-                        // Multiplier extraction might vary based on how it's returned, 
-                        // but usually win_coins / gift_price
-                        $multiplier = ($comboItem['data']['win_coins'] ?? 0) / $gift->price;
+                        $winCoins = $comboItem['data']['win_coins'] ?? 0;
+                        $multiplier = $gift->price > 0 ? ($winCoins / $gift->price) : 0;
                         $winData[] = "{$multiplier}x";
                     }
                 }
@@ -143,6 +147,7 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
 
             $responses[] = [
                 'index' => $index + 1,
+                'sender_id' => $sender->id,
                 'status' => $response->status(),
                 'duration' => round($duration, 4),
                 'balance_before' => $balanceBefore,
@@ -153,34 +158,58 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
             ];
         }
 
+        $logsAfter = \App\Models\FairLuckTransaction::count();
+        $logsCreated = $logsAfter - $logsBefore;
+
         $totalEndTime = microtime(true);
         $totalDuration = $totalEndTime - $totalStartTime;
 
-        echo "\n" . str_repeat("=", 80) . "\n";
-        echo sprintf("| %-6s | %-10s | %-10s | %-6s | %-12s | %-10s |\n", "Sender", "Before", "After", "Win?", "Multipliers", "Time (s)");
-        echo str_repeat("=", 80) . "\n";
+        echo "\n" . str_repeat("=", 130) . "\n";
+        echo "DETAILED CONCURRENCY TEST REPORT (SUMMARY TABLE)\n";
+        echo str_repeat("=", 130) . "\n";
+        echo sprintf(
+            "| %-4s | %-6s | %-10s | %-10s | %-6s | %-15s | %-10s | %-10s | %-10s |\n",
+            "Req",
+            "ID",
+            "Before",
+            "After",
+            "Win?",
+            "Multipliers",
+            "Total Win",
+            "Session",
+            "Time (s)"
+        );
+        echo str_repeat("-", 130) . "\n";
 
         foreach ($responses as $item) {
+            $totalWin = $item['response']['data']['total_user_win'] ?? 0;
+            $session = $item['response']['data']['session'] ?? '-';
+
             echo sprintf(
-                "| %-6d | %-10d | %-10d | %-6s | %-12s | %-10.4f |\n",
+                "| %-4d | %-6d | %-10d | %-10d | %-6s | %-15s | %-10d | %-10s | %-10.4f |\n",
                 $item['index'],
+                $item['sender_id'],
                 $item['balance_before'],
                 $item['balance_after'],
                 $item['has_win'] ? 'YES' : 'NO',
                 $item['multipliers'] ?: '-',
+                $totalWin,
+                $session,
                 $item['duration']
             );
 
             $this->assertEquals(200, $item['status'], "Request failed for sender {$item['index']}");
         }
 
-        echo str_repeat("=", 80) . "\n";
-        echo sprintf("Total Concurrency Test Duration: %.4f seconds\n", $totalDuration);
-        echo sprintf("Average Time per Sender: %.4f seconds\n", ($totalDuration / $senderCount));
-        echo str_repeat("=", 80) . "\n";
+        echo str_repeat("=", 130) . "\n";
+        echo sprintf("Total Concurrency Test Duration: %.4f seconds | Average Time per Sender: %.4f seconds\n", $totalDuration, ($totalDuration / $senderCount));
+        echo sprintf("Expected DB Logs: %d | Actual DB Logs: %d\n", $totalExpectedLogs, $logsCreated);
+        if ($logsCreated < $totalExpectedLogs) {
+            echo "WARNING: Some transaction logs were NOT recorded in the database (Liquidity Protection active).\n";
+        }
+        echo str_repeat("=", 130) . "\n";
 
-        // Also echo full responses for the first sender as a sample
-        echo "\nSample Response (Sender 1):\n";
+        echo "\nSample Response Structure (Sender 1):\n";
         echo json_encode($responses[0]['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n";
 
         echo "\nSuccess: Tested {$senderCount} senders, each sending to {$receiversPerSenderCount} users.\n";
