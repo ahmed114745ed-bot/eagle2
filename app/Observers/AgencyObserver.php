@@ -85,7 +85,7 @@ class AgencyObserver
                 $user = User::find($agency->app_owner_id);
                 Admin::where('username', $user->uuid)->delete();
                 MilestoneHelper::removeReward($user, 'host-agency-owner');
-                info('delete 2 host-agency-owner milestone');
+                info('delete host-agency-owner milestone');
 //            }
         }
     }
