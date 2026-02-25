@@ -9,7 +9,7 @@ use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class LuckyGiftV4ConcurrencyTest extends TestCase
+class LuckyGiftV4ConcurrencyTest2 extends TestCase
 {
     protected function setUp(): void
     {
@@ -87,6 +87,146 @@ class LuckyGiftV4ConcurrencyTest extends TestCase
     /**
      * Test multiple senders each sending gifts to multiple recipients simultaneously.
      */
+    /**
+     * Test sustained activity: 2 users sending 100 times each.
+     */
+    public function test_sustained_individual_activity()
+    {
+        $senderCount = 2;
+        $requestsPerSender = 100;
+        $receiversPerSenderCount = 10;
+        $giftPrice = 1000;
+
+        $gift = Gift::factory()->create([
+            'type' => 6,
+            'price' => $giftPrice,
+            'enable' => 1,
+            'name' => 'Sustained Activity Test Gift'
+        ]);
+
+        $senders = User::factory()->count($senderCount)->sequence(fn($sq) => ['email' => "sustained_sender{$sq->index}_" . uniqid() . "@example.com"])->create(['di' => 5000000]);
+        $receivers = User::factory()->count($receiversPerSenderCount)->sequence(fn($sq) => ['email' => "sustained_receiver{$sq->index}_" . uniqid() . "@example.com"])->create();
+
+        $walletsBefore = [
+            'global_vault' => \App\Models\FairLuckWallet::getRedisBalance('global_vault'),
+            'jackpot_wallet' => \App\Models\FairLuckWallet::getRedisBalance('jackpot_wallet'),
+            'medium_wallet' => \App\Models\FairLuckWallet::getRedisBalance('medium_wallet'),
+        ];
+
+        $room = $this->getRoom($senders->first());
+        $receiverIdsString = implode(',', $receivers->pluck('id')->toArray());
+
+        $responses = [];
+        $totalStartTime = microtime(true);
+        $logsBefore = \App\Models\FairLuckTransaction::count();
+
+        foreach ($senders as $sIndex => $sender) {
+            echo "\nProcessing Sender " . ($sIndex + 1) . " (100 requests)...\n";
+            for ($i = 0; $i < $requestsPerSender; $i++) {
+                $reqStartTime = microtime(true);
+                $balanceBefore = $sender->di;
+
+                $response = $this->actingAs($sender, 'sanctum')
+                    ->postJson('api/gifts/v4/send-lucky-gift-combo', [
+                        'id' => $gift->id,
+                        'num' => 1,
+                        'owner_id' => $room->uid,
+                        'toUid' => $receiverIdsString,
+                    ]);
+
+                $duration = microtime(true) - $reqStartTime;
+                $sender->refresh();
+                $balanceAfter = $sender->di;
+
+                $responseData = $response->json();
+                $winData = [];
+                $hasWin = false;
+
+                if (isset($responseData['data']['combo'])) {
+                    foreach ($responseData['data']['combo'] as $comboItem) {
+                        if ($comboItem['data']['is_win'] ?? false) {
+                            $hasWin = true;
+                            $winCoins = $comboItem['data']['win_coins'] ?? 0;
+                            $multiplier = $gift->price > 0 ? ($winCoins / $gift->price) : 0;
+                            $winData[] = "{$multiplier}x";
+                        }
+                    }
+                }
+
+                $responses[] = [
+                    'sender_index' => $sIndex + 1,
+                    'req_index' => $i + 1,
+                    'sender_id' => $sender->id,
+                    'status' => $response->status(),
+                    'duration' => round($duration, 4),
+                    'balance_before' => $balanceBefore,
+                    'balance_after' => $balanceAfter,
+                    'has_win' => $hasWin,
+                    'multipliers' => implode(', ', $winData),
+                    'response' => $responseData
+                ];
+
+                if (($i + 1) % 10 === 0)
+                    echo ".";
+            }
+        }
+
+        $logsAfter = \App\Models\FairLuckTransaction::count();
+        $logsCreated = $logsAfter - $logsBefore;
+        $totalExpectedLogs = $senderCount * $requestsPerSender * $receiversPerSenderCount;
+
+        $totalEndTime = microtime(true);
+        $totalDuration = $totalEndTime - $totalStartTime;
+
+        $walletsAfter = [
+            'global_vault' => \App\Models\FairLuckWallet::getRedisBalance('global_vault'),
+            'jackpot_wallet' => \App\Models\FairLuckWallet::getRedisBalance('jackpot_wallet'),
+            'medium_wallet' => \App\Models\FairLuckWallet::getRedisBalance('medium_wallet'),
+        ];
+
+        echo "\n" . str_repeat("=", 130) . "\n";
+        echo "SUSTAINED ACTIVITY REPORT (2 Senders x 100 Requests)\n";
+        echo str_repeat("=", 130) . "\n";
+        echo sprintf(
+            "| %-3s | %-3s | %-10s | %-10s | %-6s | %-15s | %-10s | %-8s |\n",
+            "Snd",
+            "Req",
+            "Before",
+            "After",
+            "Win?",
+            "Multipliers",
+            "Total Win",
+            "Time(s)"
+        );
+        echo str_repeat("-", 130) . "\n";
+
+        foreach ($responses as $idx => $item) {
+            // Only show every 10th request to keep output manageable, plus winners
+            if ($item['req_index'] % 10 === 0 || $item['has_win']) {
+                $totalWin = $item['response']['data']['total_user_win'] ?? 0;
+                echo sprintf(
+                    "| %-3d | %-3d | %-10d | %-10d | %-6s | %-15s | %-10d | %-8.4f |\n",
+                    $item['sender_index'],
+                    $item['req_index'],
+                    $item['balance_before'],
+                    $item['balance_after'],
+                    $item['has_win'] ? 'YES' : 'NO',
+                    $item['multipliers'] ?: '-',
+                    $totalWin,
+                    $item['duration']
+                );
+            }
+        }
+
+        echo str_repeat("=", 130) . "\n";
+        echo "WALLET BALANCE AUDIT\n";
+        echo sprintf("| %-15s | %-12d | %-12d | %-12d |\n", "Global", $walletsBefore['global_vault'], $walletsAfter['global_vault'], $walletsAfter['global_vault'] - $walletsBefore['global_vault']);
+        echo sprintf("| %-15s | %-12d | %-12d | %-12d |\n", "Jackpot", $walletsBefore['jackpot_wallet'], $walletsAfter['jackpot_wallet'], $walletsAfter['jackpot_wallet'] - $walletsBefore['jackpot_wallet']);
+        echo str_repeat("=", 130) . "\n";
+        echo sprintf("Total Expected Logs: %d | Actual Logs: %d\n", $totalExpectedLogs, $logsCreated);
+        echo sprintf("Total Duration: %.4f seconds\n", $totalDuration);
+    }
+
     public function test_multi_sender_concurrency()
     {
         $senderCount = 50;
