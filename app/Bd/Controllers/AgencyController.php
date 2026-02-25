@@ -32,7 +32,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -797,9 +796,7 @@ class AgencyController extends MainController
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
-             $user = User::find($appOwnerId);
 
-            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
                 'agency_id' => $form->model()->id,

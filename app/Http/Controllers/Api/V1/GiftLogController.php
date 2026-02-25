@@ -25,18 +25,22 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\RoomBoom\Entities\TotalRoomGift;
+use App\Services\Gifts\LuckyGiftService;
 
 
 class GiftLogController extends Controller
 {
 
     private $roomTopUsersRepository;
+    private $luckyGiftService;
     public function __construct(
         RoomTopUsersRepository $roomTopUsersRepository,
         private GiftLogService $giftLogService,
+        LuckyGiftService $luckyGiftService,
     ) {
 
         $this->roomTopUsersRepository = $roomTopUsersRepository;
+        $this->luckyGiftService = $luckyGiftService;
     }
 
     public function updateRoomPercentageAndHost($ownerId, array $receiverIds, $totalCoins, $coinsPerUser)
@@ -425,6 +429,36 @@ class GiftLogController extends Controller
 
         try {
             $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+        return Common::apiResponse(1, __('api_responses.success'), $data);
+    }
+
+    public function sendLuckyGift4(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+        $stopLucky = settings()->get('stop_luckyGift');
+        if ($stopLucky == 1) {
+            return Common::apiResponse(0, __('api_responses.try_again'));
+        }
+
+        $validator = Validator::make($request->all(), [
+            'id'       => 'required',
+            'owner_id' => 'nullable',
+            'toUid'    => 'required',
+            'num'      => 'required|integer|min:1',
+            'count'    => 'sometimes|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        $data = $request->all();
+        $user = $request->user();
+
+        try {
+            $data = $this->luckyGiftService->sendLuckyGift4($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }

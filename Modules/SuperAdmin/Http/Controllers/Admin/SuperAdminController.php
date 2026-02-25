@@ -28,11 +28,9 @@ use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
 use Modules\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use App\Admin\Actions\FrozenWalletSuperAdminAction;
 use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
-use Modules\SuperAdmin\Entities\SubAdmin;
 
 class SuperAdminController extends MainController
 {
@@ -481,13 +479,12 @@ class SuperAdminController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_super_admin = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'super-admin');
                     }
 
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_super_admin = 1;
                     $newUserAppId->save();
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'super-admin');
+
                     $form->app_id = $newAppId;
                 }
             }
@@ -519,7 +516,6 @@ class SuperAdminController extends MainController
             if (isset($userApp)) {
                 $userApp->is_super_admin = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();

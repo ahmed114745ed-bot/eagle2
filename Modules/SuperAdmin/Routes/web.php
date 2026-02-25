@@ -13,6 +13,7 @@ use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeReportController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdminCountryController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdminNotificationController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AdminUserController;
 
 
 /*
@@ -68,7 +69,8 @@ Route::group(
         Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
         Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
-
+       Route::get('show-sub-super-admin/{id}', [AdminUserController::class,'showSubSuperAdmin']);
+        Route::post('update-sub-super-admin', [AdminUserController::class,'updateSubSuperAdmin']);
 
 
         Route::post('/set-preview-superadmin', function () {
@@ -98,7 +100,7 @@ Route::group(
 |
 */
 
-use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AdminUserController;
+
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AgencyController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AgencyUserController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AppearChargerAgencyController;
@@ -252,7 +254,8 @@ Route::group(
         });
         Route::resource('roles', RoleController::class);
         Route::resource('auth-users', AdminUserController::class);
-
+        Route::get('show-sub-super-admin', [AdminUserController::class,'showSubSuperAdmin']);
+        Route::post('update-sub-super-admin', [AdminUserController::class,'updateSubSuperAdmin']);
         Route::prefix('statistics')->name('statistics.')->group(function () {
             Route::get('top-users-data', [HomeController::class, 'topUsersData']);
             Route::get('comparison-user-signup', [HomeController::class, 'comparisonUserSignUp']);

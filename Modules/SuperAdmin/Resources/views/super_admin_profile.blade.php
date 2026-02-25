@@ -1026,10 +1026,16 @@
                                       <td>
                                                 
                                                     @if (\Encore\Admin\Facades\Admin::user()->can('delete-' . 'auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                                                        <button class="btn-action kick-member-btn" data-id="{{ $subSuperAdmin->id }}">
+                                                        <button class="btn btn-info kick-member-btn" data-id="{{ $subSuperAdmin->id }}">
                                                             {{ __('delete') }}
                                                         </button>
                                                     @endif
+
+                                                     @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                                <button type="submit" class="btn btn-info edit_user_item_model_btn" data-id="{{ $subSuperAdmin->id }}">
+                                                                    {{ __('edit') }}
+                                                                </button>
+                                                            @endif
                                                
                                             </td>
 
@@ -1263,6 +1269,65 @@
 
 </div>
 
+
+<div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg mt-6" role="document">
+        <div class="modal-content border-0">
+            <div class="modal-content position-relative">
+                <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
+                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form action="{{  url(request()->segment(1) . '/update-sub-super-admin')}}" id="country_update_form" method="POST"
+                      enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-0">
+
+                        <div class="p-4">
+                            <div class="row flex-evenly">
+                                <input type="hidden" name=id class="item_id">
+
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.name') }}</label>
+                                    <input type="text" name="name" class="form-control"
+                                           id="name">
+                                </div>
+
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.username') }}</label>
+                                    <input type="text" name="username" class="form-control" id="username">
+                                </div>
+
+                                 <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.password') }}</label>
+                                    <input type="password" name="password" class="form-control" id="password" placeholder="Leave blank if not changing">
+                                </div>
+
+                                <div class="col-lg-6 form-group mb-3">
+                                    <label class="form-label">{{ __('image') }}</label>
+                                    <input class="form-control" name="image" accept="image/*" type="file"/>
+                                    <div class="mt-2">
+                                       <img src="" class="w-40 " style="width: 100px" id="img_edit"
+                                                alt="">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary cancel_user_item_model_btn" type="button"
+                                data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
@@ -1328,6 +1393,44 @@
 
     $(document).ready(function () {
 
+
+        $(document).on('click', '.edit_user_item_model_btn', function () {
+            $('#item_modal_update').modal('show');
+             const id = $(this).data('id');
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: 'get',
+                    dataType: 'json',
+                    url: '/'+ DASHBOARD_PREFIX + "/show-sub-super-admin/" + id ,
+                    success: function(response) {
+                        if (response.status == 404) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Sorry',
+                                text: response.message,
+                            })
+                        } else {
+                           
+                            const image =  "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
+                            $('#name').val(response.item.name);
+                            $('#username').val(response.item.username);
+                           // $('#password').val(response.item.password);
+                           
+                            $('#img_edit').attr('src', image);
+                            $('.item_id').val(response.item.id);
+                            $('#item_modal_update').modal('show');
+                        }
+                        }
+                })
+        });
+
+        $(document).on('click', '.cancel_user_item_model_btn', function () {
+            $('#item_modal_update').modal('hide');
+        });
+
+     
 
 
                     $('.kick-member-btn').click(function () {

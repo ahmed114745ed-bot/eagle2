@@ -20,7 +20,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class BdController extends MainController
@@ -317,12 +316,10 @@ class BdController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
-                         MilestoneHelper::removeReward($OldUserAppId, 'bd');
                     }
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
                     $form->app_id = $newAppId;
                 }
             } else {
@@ -347,7 +344,6 @@ class BdController extends MainController
             if (isset($userApp)) {
                 $userApp->is_bd = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();

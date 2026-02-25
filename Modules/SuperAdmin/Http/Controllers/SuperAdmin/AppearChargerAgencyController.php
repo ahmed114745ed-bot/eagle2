@@ -17,15 +17,11 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Box;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use Modules\Milestones\Helpers\MilestoneHelper;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -439,7 +435,7 @@ class AppearChargerAgencyController extends MainController
             setTimeout(initPhoneInput, 100);
         });
     JS);
-        
+
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
 
@@ -447,7 +443,7 @@ class AppearChargerAgencyController extends MainController
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
-            
+
 
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
                 //  Common::createUserAdmin($appOwnerId);
@@ -460,13 +456,7 @@ class AppearChargerAgencyController extends MainController
             }
         });
 
-        $form->saved(function (Form $form) {
 
-            $appOwnerId = intval($form->model()->app_owner_id);
-
-            $user = User::find($appOwnerId);
-            MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
-        });
 
         return $form;
     }
