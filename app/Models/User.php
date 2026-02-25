@@ -32,7 +32,7 @@ use Modules\Badge\Entities\UserBadge;
 use App\Traits\ChatUserTrait;
 use Utd\Chat\Entities\ChatSetting;
 use Utd\CP\Entities\Cp;
-use Modules\HostLevel\Entities\HostLevelWinner;
+use Utd\HostLevel\Entities\HostLevelWinner;
 use Utd\LuckyBox\Entities\UserLuckyGift;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
@@ -2488,7 +2488,8 @@ class User extends Authenticatable
 
     public function hostLevelWinner()
     {
-        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id');
+        return PackageHelper::checkRelation($this, 'hostLevel', 'hasOne') ??
+            $this->hasOne(HostLevelWinner::class, 'user_id', 'id');
     }
 
 
@@ -2502,7 +2503,8 @@ class User extends Authenticatable
 
     public function lastHostLevelWinner()
     {
-        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id')->latest('created_at');
+        return PackageHelper::checkRelation($this, 'hostLevel', 'hasOne') ??
+            $this->hasOne(HostLevelWinner::class, 'user_id', 'id')->latest('created_at');
     }
 
     /**

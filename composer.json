@@ -57,6 +57,7 @@
         "utd/events": "*",
         "utd/family": "*",
         "utd/gifts": "*",
+        "utd/host-level": "dev-achievmentPackage",
         "utd/lucky-box": "*",
         "utd/moments": "*",
         "utd/pk": "*",
@@ -232,6 +233,10 @@
         {
             "type": "path",
             "url": "packages/Utd/Tasks"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/HostLevel"
         }
     ]
 }

@@ -45,42 +45,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'host level',
-                'sort' => 2,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 2],
-                ],
-                'permissions' => [
-                    [
-                        'key' => 'host-level',
-                        'except' => [],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
-
-                        ],
-                    ],
-                    [
-                        'key' => 'host-level-settings',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'host-level-reward',
-                        'except' => [],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
-
-                        ],
-                    ],
-                ],
-            ],
-            [
                 'name' => 'Area manager',
                 'sort' => 3,
                 'types' => [
@@ -1300,6 +1264,45 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'event_report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['return-switch'], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'return-switch'],
                     ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('hostLevel')) {
+            $categories[] = [
+                'name' => 'host level',
+                'sort' => 2,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 2],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'host-level',
+                        'except' => [],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+
+                        ],
+                    ],
+                    [
+                        'key' => 'host-level-settings',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'host-level-reward',
+                        'except' => [],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+
+                        ],
+                    ],
                 ],
             ];
         }

@@ -28,7 +28,6 @@
     "Form": true,
     "SuperAdmin": true,
     "TaskStream": false,
-    "HostLevel": true,
     "UsersWallet": true,
     "RankingReward": true
 }

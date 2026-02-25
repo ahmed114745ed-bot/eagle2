@@ -20,6 +20,7 @@ use Utd\Room\Entities\Room;
 use Utd\RoomBoom\Entities\RoomBoom;
 use Utd\RoomCup\Entities\RoomCupTarget;
 use Utd\Vip\Entities\OVip;
+use Utd\HostLevel\Entities\HostLevel;
 
 class PackageHelper
 {
@@ -41,6 +42,7 @@ class PackageHelper
         'event' => WeeklyStar::class,
         'task' => Day::class,
         'gift' => GiftLog::class,
+        'hostLevel' => HostLevel::class,
     ];
 
     /**
