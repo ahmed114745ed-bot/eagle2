@@ -9,31 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
-/**
- * FairLuckService3: The Intelligent Hybrid System (Neural-inspired Adaptive Logic)
- * 
- * Instead of switching between two modes, this service uses a continuous "Luck Mood"
- * that adapts to the user's every move, ensuring:
- * 1. Unpredictability (No fixed rhythm).
- * 2. Guaranteed App Profit (Long-term 1% target).
- * 3. User Engagement (Bait wins and "near-miss" simulation).
- * 
- * === نسب المضاعفات المحسنة ===
- * 5x = 28% | 10x = 18% | 20x = 12% | 50x = 7% | 70x = 4%
- * 100x = 2% | 250x = 0.8% | 500x = 0.2% | 1000x = 0.05%
- * إجمالي نسبة الفوز: ~72% (RTP محسن لأكثر من 80%)
- * - 10% → ربح التطبيق (المحفظة الرئيسية)
- * - 20% → محفظة الجاكبوت (للمضاعفات ≥250x)
- * - 10% → المحفظة المتوسطة (للمضاعفات 50x-100x)
- * - 60% → باقي النظام (للعمليات العادية)
- * 
- * === حساب معامل الانحراف الجديد ===
- * معامل الانحراف = (الخسارة المستهدفة - الخسارة الفعلية) / القيمة الصافية للرهانات
- * القيمة الصافية = إجمالي الرهانات - النسب المخصومة (35%)
- * 
- * هذا النظام يضمن حساب معامل الانحراف بناءً على القيمة الفعلية للهدية
- * بعد خصم نسب المحافظ المختلفة.
- */
+
 class FairLuckService3
 {
     private const GLOBAL_SAFETY_BUFFER = 5000;
