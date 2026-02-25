@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateRankingRangesTable extends Migration
 {
@@ -13,7 +13,7 @@ class CreateRankingRangesTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('ranking_ranges')) {
+        if (! Schema::hasTable('ranking_ranges')) {
             Schema::create('ranking_ranges', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('ranking_type_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();

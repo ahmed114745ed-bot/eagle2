@@ -2,31 +2,32 @@
 
 namespace Utd\HostLevel\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
 use App\Models\Ware;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Selectables\Wares;
 use App\Selectables\Badges;
-use Utd\Vip\Entities\OVip;
+use App\Selectables\Wares;
 use App\Support\PackageHelper;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Modules\Badge\Entities\Badge;
-use App\Admin\Controllers\MainController;
-use Utd\HostLevel\Entities\HostLevelReward;
 use Utd\Achievements\Entities\Achievement;
+use Utd\HostLevel\Entities\HostLevelReward;
+use Utd\Vip\Entities\OVip;
 use Utd\Vip\Selectables\OVips;
 
 class HostLevelRewardController extends MainController
 {
+    public $permission_name = 'host-level-reward';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'Host level reward';
-    public $permission_name = 'host-level-reward';
 
     public function index(Content $content)
     {
@@ -38,8 +39,7 @@ class HostLevelRewardController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -52,8 +52,7 @@ class HostLevelRewardController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -79,36 +78,41 @@ class HostLevelRewardController extends MainController
     {
         $host_level_id = request('host_level_id');
         $grid = new Grid(new HostLevelReward());
-        $grid->model()->where("host_level_id", $host_level_id);
+        $grid->model()->where('host_level_id', $host_level_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('gift_id', __('gifts'))->display(function () {
-                if ($this->type == "ware") {
+                if ($this->type === 'ware') {
                     return @$this->ware->name ?? '';
-                } elseif ($this->type == "vip") {
+                }
+                if ($this->type === 'vip') {
                     return @$this->vip->name ?? '';
-                } elseif ($this->type == "badge") {
+                }
+                if ($this->type === 'badge') {
                     return @$this->badge->name ?? '';
-                } elseif ($this->type == "coins") {
+                }
+                if ($this->type === 'coins') {
                     return @$this->target;
-                } elseif ($this->type == "achievement") {
-                    $value = getDriverUrl() . '/' . @$this->target;
+                }
+                if ($this->type === 'achievement') {
+                    $value = getDriverUrl().'/'.@$this->target;
+
                     return "<img src='$value' width='80' height='80'>";
                 }
             });
 
             $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->type == 'ware') {
+                if ($this->type === 'ware') {
                     $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->type == 'vip') {
+                    $path = $ware->img2 ?? ($ware->show_img ?? '');
+                } elseif ($this->type === 'vip') {
                     $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                     $path = $vips->img ?? '';
-                } elseif ($this->type == 'badge') {
+                } elseif ($this->type === 'badge') {
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
-                } elseif ($this->type == 'achievement') {
+                } elseif ($this->type === 'achievement') {
                     $path = $this->target;
                 } else {
                     $path = 'coin.png';
@@ -116,15 +120,16 @@ class HostLevelRewardController extends MainController
 
                 /** @var Gift $this */
                 $url = getImagePath($path);
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
         }
 
-
         $grid->column('expire', __('expire'))->display(function ($expire) {
-            if ($this->type == 'coins') {
-                return  '-';
+            if ($this->type === 'coins') {
+                return '-';
             }
+
             return $expire;
         });
         $grid->column('created_at', __('Created at'));
@@ -158,7 +163,7 @@ class HostLevelRewardController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -188,41 +193,41 @@ class HostLevelRewardController extends MainController
         $form->hidden('host_level_id')->value(request('host_level_id'));
 
         $typeOptions = [
-            "coins"        => __('Coins'),
-            "ware"         => __('Wares'),
-            "badge"        => __('Badge'),
+            'coins' => __('Coins'),
+            'ware' => __('Wares'),
+            'badge' => __('Badge'),
         ];
         if (PackageHelper::isInstalled('vip')) {
-            $typeOptions["vip"] = __('vip');
+            $typeOptions['vip'] = __('vip');
         }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('Achievement');
         }
         $form->select('type', __('Type'))->options($typeOptions)
-            ->when("ware", function (Form $form) {
+            ->when('ware', function (Form $form) {
                 $form->belongsTo('target1', Wares::class, trans('Wares'))->rules('required');
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
-            ->when("vip", function (Form $form) {
+            ->when('vip', function (Form $form) {
                 if (PackageHelper::isInstalled('vip')) {
                     $form->belongsTo('target2', OVips::class, trans('vip'));
                 }
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
-            ->when("achievement", function (Form $form) {
+            ->when('achievement', function (Form $form) {
 
-                $form->image("target4", __('Image'))
-                    ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
+                $form->image('target4', __('Image'))
+                    ->name(fn ($file) => now()->timestamp.'.'.$file->guessExtension())
                     ->disk('gcs');
 
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
-            ->when("badge", function () use ($form) {
+            ->when('badge', function () use ($form) {
                 $this->addBadgeField($form);
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
-            ->when("coins", function (Form $form) {
-                $form->number("target3", __('Coins'))->rules('required|integer|min:1');
+            ->when('coins', function (Form $form) {
+                $form->number('target3', __('Coins'))->rules('required|integer|min:1');
             });
         $this->addSavedRedirect($form);
 
@@ -233,16 +238,19 @@ class HostLevelRewardController extends MainController
     {
         $prefix = 'badges';
         $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target5')
+            $form->setElementName($prefix.'target5')
                 ->select('id', __('badges'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Badge::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
@@ -254,7 +262,8 @@ class HostLevelRewardController extends MainController
     protected function addSavedRedirect(Form $form)
     {
         $form->saved(function (Form $form) {
-            $route = url('admin/host-level-reward/' . request('host_level_id'));
+            $route = url('admin/host-level-reward/'.request('host_level_id'));
+
             return redirect($route);
         });
     }

@@ -2,15 +2,12 @@
 
 namespace Utd\HostLevel\Transformers;
 
-use App\Helpers\Common;
-use App\Models\GiftLog;
 use App\Support\PackageHelper;
-use Utd\HostLevel\Entities\HostLevel;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\HostLevel\Entities\HostLevel;
 
 class HostLevelResource extends JsonResource
 {
-
     public function toArray($request)
     {
         $user = request()->user();

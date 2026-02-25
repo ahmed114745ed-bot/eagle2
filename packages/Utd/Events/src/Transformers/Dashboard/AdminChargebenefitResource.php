@@ -28,7 +28,8 @@ class AdminChargebenefitResource extends JsonResource
 
             return '';
 
-        } elseif ($type === 'vip') {
+        }
+        if ($type === 'vip') {
             $item = PackageHelper::isInstalled('vip') ? OVip::find($id) : null;
             if ($item) {
                 return [

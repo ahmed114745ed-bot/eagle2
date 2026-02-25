@@ -9,7 +9,6 @@ class RankingRange extends Model
 {
     protected $fillable = ['ranking_type_id', 'min', 'max'];
 
-
     public function rewards()
     {
         return $this->hasMany(RankingReward::class, 'ranking_range_id');

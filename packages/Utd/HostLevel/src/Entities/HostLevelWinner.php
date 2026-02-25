@@ -2,16 +2,15 @@
 
 namespace Utd\HostLevel\Entities;
 
-use Carbon\Carbon;
 use App\Traits\HostLevelTrait;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use Illuminate\Database\Eloquent\Model;
 
 class HostLevelWinner extends Model
 {
-    use HasFactory, TimestampsWithTimezone, HostLevelTrait;
+    use HasFactory, HostLevelTrait, TimestampsWithTimezone;
+
     protected $guarded = [];
 
     public function hostLevel()

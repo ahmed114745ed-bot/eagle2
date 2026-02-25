@@ -2,28 +2,28 @@
 
 namespace Utd\RankingReward\Http\Controllers;
 
-use Carbon\Carbon;
+use App\Admin\Controllers\MainController;
 use App\Models\Ware;
+use App\Selectables\Badges;
+use App\Selectables\WaresByType;
+use App\Support\DynamicReals;
+use App\Support\PackageHelper;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Selectables\Badges;
-use Encore\Admin\Widgets\Box;
-use Utd\Vip\Entities\OVip;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
-use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
-use Modules\Badge\Entities\Badge;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
+use Encore\Admin\Widgets\Table;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\MessageBag;
-use App\Admin\Controllers\MainController;
-use Utd\RankingReward\Entities\RankingType;
+use Modules\Badge\Entities\Badge;
+use Utd\Achievements\Entities\Achievement;
 use Utd\RankingReward\Entities\RankingRange;
 use Utd\RankingReward\Entities\RankingReward;
-use App\Support\DynamicReals;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Utd\Achievements\Entities\Achievement;
-use App\Support\PackageHelper;
+use Utd\RankingReward\Entities\RankingType;
+use Utd\Vip\Entities\OVip;
 
 class RankingTypeController extends MainController
 {
@@ -64,11 +64,74 @@ class RankingTypeController extends MainController
             ->body($this->form()));
     }
 
+    public function getRewards($id)
+    {
+        // Load the RankingRange and its rewards
+        $model = RankingRange::with(['rewards.ware', 'rewards.vip', 'rewards.badge'])->findOrFail($id);
+        $members = $model->rewards->map(function ($reward) {
+
+            $gift = '';
+            $path = '';
+
+            switch ($reward->target_type) {
+                case 'ware':
+                    $gift = optional($reward->ware)->name;
+                    $path = optional($reward->ware)->img2;
+                    break;
+
+                case 'vip':
+                    $gift = optional($reward->vip)->name;
+                    $path = optional($reward->vip)->img;
+                    break;
+
+                case 'badge':
+                    $gift = optional($reward->badge)->name;
+                    $path = optional($reward->badge)->image;
+                    break;
+
+                case 'coin':
+                    $gift = $reward->target;
+                    $path = 'coin.png';
+                    break;
+
+                case 'a':
+                    $gift = "<img src='".getDriverUrl()."/{$reward->target}' width='80'>";
+                    $path = $reward->target;
+                    break;
+            }
+
+            $defaultImage = asset('images/reward.jpg');
+            $url = getImagePath($path) ?? $defaultImage;
+            if (! isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithSvga($reward->id, $url, 50, 50);
+
+            // Build HTML columns
+            $giftColumn = $reward->target_type === 'achievement' ? $gift : e($gift);
+
+            return [
+                'ID' => $reward->id,
+                'Type' => $reward->target_type,
+                'Gift' => $giftColumn,
+                'Image' => $image,
+                'Expire' => $reward->expire_days,
+            ];
+        });
+
+        // Return a Laravel-Admin Table (HTML)
+        $table = new Table([__('ID'), __('type'), __('gift'), __('image'), __('expire')], $members->toArray());
+
+        // Render HTML for modal
+        return $table->render();
+    }
+
     protected function grid2($type, $schedule)
     {
         return new Box('', view('admin.grid.users.ranking_tabs', [
             'type' => $type,
-            'schedule' => $schedule
+            'schedule' => $schedule,
         ])->render());
     }
 
@@ -93,13 +156,13 @@ class RankingTypeController extends MainController
             if ($this->max === null) {
                 return "<span class='label label-info'>{$this->min}</span>";
             }
+
             return "<span class='label label-info'>{$this->min} - {$this->max}</span>";
         });
 
-
-
         $grid->column('members', __('Rewards'))->display(function () {
             $text = __('View Rewards'); // Translation key
+
             return "<button class='btn btn-sm btn-primary show-rewards-modal' data-id='{$this->id}'>$text</button>";
         });
 
@@ -108,7 +171,7 @@ class RankingTypeController extends MainController
         Admin::script("
     $(document).on('click', '.show-rewards-modal', function() {
         var id = $(this).data('id');
-        var modalTitle = '" . e($modalTitle) . "'; // escape for JS
+        var modalTitle = '".e($modalTitle)."'; // escape for JS
 
         // Show modal
         if (!$('#rewardsModal').length) {
@@ -141,9 +204,6 @@ class RankingTypeController extends MainController
     });
 ");
 
-
-
-
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
         });
@@ -152,9 +212,9 @@ class RankingTypeController extends MainController
 
         $grid->tools(function ($tools) use ($type, $schedule) {
             $tools->append(
-                "<a href='" . admin_url("ranking-types/create?type={$type}&schedule={$schedule}") . "' class='btn btn-sm btn-success'>
-                    <i class='fa fa-plus'></i>&nbsp;&nbsp;" . __('New') . "
-                </a>"
+                "<a href='".admin_url("ranking-types/create?type={$type}&schedule={$schedule}")."' class='btn btn-sm btn-success'>
+                    <i class='fa fa-plus'></i>&nbsp;&nbsp;".__('New').'
+                </a>'
             );
         });
 
@@ -174,74 +234,9 @@ class RankingTypeController extends MainController
                 transform: scaleX(1) scale(1) !important;
             }
         ');
+
         return $grid;
     }
-
-
-
-
-    public function getRewards($id)
-    {
-        // Load the RankingRange and its rewards
-        $model = RankingRange::with(['rewards.ware', 'rewards.vip', 'rewards.badge'])->findOrFail($id);
-        $members = $model->rewards->map(function ($reward) {
-
-            $gift = '';
-            $path = '';
-
-            switch ($reward->target_type) {
-                case 'ware':
-                    $gift = optional($reward->ware)->name;
-                    $path = optional($reward->ware)->img2;
-                    break;
-
-                case 'vip':
-                    $gift = optional($reward->vip)->name;
-                    $path = optional($reward->vip)->img;
-                    break;
-
-                case 'badge':
-                    $gift = optional($reward->badge)->name;
-                    $path = optional($reward->badge)->image;
-                    break;
-
-                case 'coin':
-                    $gift = $reward->target;
-                    $path = 'coin.png';
-                    break;
-
-                case 'a':
-                    $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
-                    $path = $reward->target;
-                    break;
-            }
-
-            $defaultImage = asset('images/reward.jpg');
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) $url = $defaultImage;
-
-            $image = handleShowImageWithSvga($reward->id, $url, 50, 50);
-
-            // Build HTML columns
-            $giftColumn = $reward->target_type === 'achievement' ? $gift : e($gift);
-
-            return [
-                'ID'     => $reward->id,
-                'Type'   => $reward->target_type,
-                'Gift'   => $giftColumn,
-                'Image'  => $image,
-                'Expire' => $reward->expire_days,
-            ];
-        });
-
-        // Return a Laravel-Admin Table (HTML)
-        $table = new Table([__('ID'), __('type'), __('gift'), __('image'), __('expire')], $members->toArray());
-
-        // Render HTML for modal
-        return $table->render();
-    }
-
-
 
     protected function detail($id)
     {
@@ -265,13 +260,13 @@ class RankingTypeController extends MainController
 
         $form->ignore(['target_type', 'target1', 'target2', 'target3', 'target4', 'target5', 'expire_days', 'action']);
 
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             $type = request('type', 'wealth');
             $schedule = request('schedule', 'daily');
 
             $rankingType = RankingType::firstOrCreate([
                 'type' => $type,
-                'schedule' => $schedule
+                'schedule' => $schedule,
             ]);
 
             $form->hidden('ranking_type_id')->value($rankingType->id);
@@ -283,12 +278,13 @@ class RankingTypeController extends MainController
                     if ($r->max === null) {
                         return "Rank {$r->min}";
                     }
+
                     return "{$r->min} - {$r->max}";
                 })
                 ->implode(', ');
 
             if ($existingRanges) {
-                $form->html("<div class='alert alert-info'> " . __('Existing ranges:') . " <strong>{$existingRanges}</strong></div>");
+                $form->html("<div class='alert alert-info'> ".__('Existing ranges:')." <strong>{$existingRanges}</strong></div>");
             }
         }
 
@@ -306,7 +302,7 @@ class RankingTypeController extends MainController
                 $html = '
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-gift"></i> ' . __('Added Rewards') . '</h3>
+                        <h3 class="box-title"><i class="fa fa-gift"></i> '.__('Added Rewards').'</h3>
                     </div>
                     <div class="box-body">
                     <div class="row" id="added-rewards-list">';
@@ -315,34 +311,34 @@ class RankingTypeController extends MainController
                     $name = $reward->target;
                     $url = '';
 
-                    if ($reward->target_type == 'ware') {
+                    if ($reward->target_type === 'ware') {
                         $ware = Ware::find($reward->target);
                         $name = $ware->name ?? $reward->target;
                         $url = getImagePath($ware->img2 ?? $ware->show_img ?? '');
-                    } elseif ($reward->target_type == 'badge') {
+                    } elseif ($reward->target_type === 'badge') {
                         $badge = Badge::find($reward->target);
                         $name = $badge->name ?? $reward->target;
                         $url = getImagePath($badge->img ?? '');
-                    } elseif ($reward->target_type == 'vip') {
+                    } elseif ($reward->target_type === 'vip') {
                         $vip = null;
                         if (PackageHelper::isInstalled('vip')) {
                             $vip = OVip::find($reward->target);
                         }
                         $name = $vip->name ?? $reward->target;
                         $url = getImagePath($vip->img ?? '');
-                    } elseif ($reward->target_type == 'coins') {
-                        $name = $reward->target . ' coins';
+                    } elseif ($reward->target_type === 'coins') {
+                        $name = $reward->target.' coins';
                         $url = getImagePath('coin.png');
-                    } elseif ($reward->target_type == 'achievement') {
+                    } elseif ($reward->target_type === 'achievement') {
                         $name = 'Achievement';
                         $url = getImagePath($reward->target);
                     }
                     $showImage = handleShowImageWithTypes($reward->id, $url, -1, 60, 4, 'cover');
 
                     $html .= '
-                    <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
+                    <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-'.$reward->id.'">
                         <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
-                            <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
+                            <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="'.$reward->id.'"
                                 style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0; z-index: 10;">
                                 <i class="fa fa-times"></i>
                             </button>
@@ -355,12 +351,12 @@ class RankingTypeController extends MainController
                                 justify-content: center;
                                 margin-bottom: 8px;
                             ">
-                                ' . $showImage . '
+                                '.$showImage.'
                             </div>
 
-                            <div style="font-weight: bold; font-size: 12px; color: #333;">' . e($name) . '</div>
-                            <span class="label label-info" style="font-size: 10px;">' . $reward->target_type . '</span>
-                            ' . ($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">' . $reward->expire_days . ' ' . __('days') . '</div>' : '') . '
+                            <div style="font-weight: bold; font-size: 12px; color: #333;">'.e($name).'</div>
+                            <span class="label label-info" style="font-size: 10px;">'.$reward->target_type.'</span>
+                            '.($reward->expire_days ? '<div style="font-size: 10px; color: #888; margin-top: 5px;">'.$reward->expire_days.' '.__('days').'</div>' : '').'
                         </div>
                     </div>';
                 }
@@ -375,26 +371,26 @@ class RankingTypeController extends MainController
         }
 
         $targetTypeOptions = [
-            "ware" => __('ware'),
-            "badge" => __('badge'),
-            "coins" => __('coins'),
+            'ware' => __('ware'),
+            'badge' => __('badge'),
+            'coins' => __('coins'),
         ];
         if (PackageHelper::isInstalled('vip')) {
-            $targetTypeOptions["vip"] = __('vip');
+            $targetTypeOptions['vip'] = __('vip');
         }
         if (class_exists(Achievement::class)) {
             $targetTypeOptions['achievement'] = __('achievement');
         }
         $form->select('target_type', trans('type'))->options($targetTypeOptions)
-            ->when("ware", function () use ($form) {
+            ->when('ware', function () use ($form) {
                 $this->addWareField($form);
                 $form->number('expire_days', __('expire'))->default(1);
             })
-            ->when("badge", function () use ($form) {
+            ->when('badge', function () use ($form) {
                 $this->addBadgeField($form);
                 $form->number('expire_days', __('expire'))->default(1);
             })
-            ->when("vip", function () use ($form) {
+            ->when('vip', function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
                     $ops = [];
                     if (PackageHelper::isInstalled('vip')) {
@@ -403,16 +399,17 @@ class RankingTypeController extends MainController
                             $ops[$vip->id] = $vip->name;
                         }
                     }
+
                     return $ops ?? [];
                 });
                 $form->number('expire_days', __('expire'))->default(1);
             })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"));
+            ->when('coins', function () use ($form) {
+                $form->number('target3', __('coins'));
             })
-            ->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
+            ->when('achievement', function () use ($form) {
+                $form->image('target4', __('image'))->name(function ($file) {
+                    return now()->timestamp.'.'.$file->guessExtension();
                 })->disk('gcs');
                 $form->number('expire_days', __('expire'))->default(1);
             });
@@ -422,12 +419,12 @@ class RankingTypeController extends MainController
             $(document).on("click", ".delete-reward", function() {
                 var id = $(this).data("id");
                 var item = $("#reward-item-" + id);
-                var rankingRangeId = "' . $rankingRangeId . '";
+                var rankingRangeId = "'.$rankingRangeId.'";
 
                 item.css("opacity", "0.5");
 
                 $.ajax({
-                    url: "' . admin_url('ranking-rewards') . '/" + rankingRangeId + "/" + id,
+                    url: "'.admin_url('ranking-rewards').'/" + rankingRangeId + "/" + id,
                     type: "POST",
                     data: {
                         _token: LA.token,
@@ -459,7 +456,7 @@ class RankingTypeController extends MainController
 
                 var form = btn.closest("form");
 
-                btn.html("<i class=\"fa fa-spinner fa-spin\"></i> ' . __('Loading...') . '");
+                btn.html("<i class=\"fa fa-spinner fa-spin\"></i> '.__('Loading...').'");
                 btn.prop("disabled", true);
 
                 $("input[name=action]").val("add_continue");
@@ -476,7 +473,7 @@ class RankingTypeController extends MainController
         $form->html('
             <div class="box-footer">
                 <button type="button" id="btn-add-continue" class="btn btn-success">
-                    <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
+                    <i class="fa fa-plus"></i> '.__('Add & Continue').'
                 </button>
             </div>
         ');
@@ -487,10 +484,11 @@ class RankingTypeController extends MainController
             if ($action === 'add_continue') {
                 $targetType = request('target_type');
 
-                if (!$targetType) {
+                if (! $targetType) {
                     $error = new MessageBag([
                         'target_type' => [__('Please select reward type')],
                     ]);
+
                     return back()->withErrors($error)->withInput();
                 }
 
@@ -518,6 +516,7 @@ class RankingTypeController extends MainController
                     $error = new MessageBag([
                         $fieldName => [__('Please select or enter reward value')],
                     ]);
+
                     return back()->withErrors($error)->withInput();
                 }
             }
@@ -533,6 +532,7 @@ class RankingTypeController extends MainController
                 $error = new MessageBag([
                     'min' => [__('Min rank must be less than or equal to max rank')],
                 ]);
+
                 return back()->withErrors($error)->withInput();
             }
 
@@ -549,8 +549,9 @@ class RankingTypeController extends MainController
                 if ($this->rangesOverlap($min, $effectiveMax, $existingMin, $existingMax)) {
                     $display = $range->max === null ? "Rank {$range->min}" : "{$range->min} - {$range->max}";
                     $error = new MessageBag([
-                        'min' => [__('Range overlaps with existing:') . $display],
+                        'min' => [__('Range overlaps with existing:').$display],
                     ]);
+
                     return back()->withErrors($error)->withInput();
                 }
             }
@@ -588,7 +589,6 @@ class RankingTypeController extends MainController
 
                 $rewards = RankingReward::where('ranking_range_id', $rankingRange->id)->get();
                 $intervalImage = DynamicReals::newInterventionImage();
-
 
                 $images = [];
 
@@ -630,7 +630,7 @@ class RankingTypeController extends MainController
                     }
                 }
 
-                if (!empty($images) && $intervalImage) {
+                if (! empty($images) && $intervalImage) {
                     $intervalImageUrl = $intervalImage->combineImages($images);
                     if ($intervalImageUrl) {
                         $rankingRange->generate_image = $intervalImageUrl;
@@ -638,12 +638,11 @@ class RankingTypeController extends MainController
                     }
                 }
 
-
                 if ($action === 'add_continue') {
                     admin_toastr(__('Reward added!'));
 
                     throw new HttpResponseException(
-                        redirect(admin_url('ranking-types/' . $rankingRange->id . '/edit'))
+                        redirect(admin_url('ranking-types/'.$rankingRange->id.'/edit'))
                     );
                 }
             }
@@ -669,16 +668,19 @@ class RankingTypeController extends MainController
     {
         $prefix = 'wares';
         $form->belongsTo('target1', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target1')
+            $form->setElementName($prefix.'target1')
                 ->select('id', __('wares'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Ware::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
@@ -691,16 +693,19 @@ class RankingTypeController extends MainController
     {
         $prefix = 'badges';
         $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target5')
+            $form->setElementName($prefix.'target5')
                 ->select('id', __('badges'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Badge::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');

@@ -77,8 +77,8 @@ class WeeklyStarController extends Controller
         $data =
             GiftLog::whereIn('giftId', $giftIds)->with('sender')->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
                 ->groupBy('sender_id')->whereBetween('created_at', [
-                       $weeklyEvent->start_date, $weeklyEvent->end_date,
-                   ])
+                    $weeklyEvent->start_date, $weeklyEvent->end_date,
+                ])
                 // ->orWhere(fn($q) => $q->where('sender_id', $authenticatedUserId->id)->whereBetween('created_at', [
                 //     $weeklyEvent->start_date, $weeklyEvent->end_date
                 // ]))

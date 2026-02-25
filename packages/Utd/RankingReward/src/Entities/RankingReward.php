@@ -4,18 +4,19 @@ namespace Utd\RankingReward\Entities;
 
 use App\Helpers\Common;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\Badge\Entities\Badge;
-use App\Support\PackageHelper;
 use Utd\Vip\Entities\OVip;
 
 class RankingReward extends Model
 {
     protected $fillable = ['ranking_range_id', 'target_type', 'target', 'expire_days'];
+
     protected $appends = ['target1', 'target2', 'target3', 'target4', 'target5'];
 
     public function getAppends2(): array
@@ -62,6 +63,11 @@ class RankingReward extends Model
     public function getTarget5Attribute()
     {
         return $this->target;
+    }
+
+    public function rankingRange(): BelongsTo
+    {
+        return $this->belongsTo(RankingRange::class);
     }
 
     protected static function boot()
@@ -115,9 +121,5 @@ class RankingReward extends Model
             unset($model->target4);
             unset($model->target5);
         });
-    }
-    public function rankingRange(): BelongsTo
-    {
-        return $this->belongsTo(RankingRange::class);
     }
 }

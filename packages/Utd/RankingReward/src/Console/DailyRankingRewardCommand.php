@@ -2,24 +2,24 @@
 
 namespace Utd\RankingReward\Console;
 
-use Carbon\Carbon;
+use App\Enums\UserCoinLogType;
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserCommon;
+use App\Jobs\SendFirebaseNotificationIndividualUserJob;
+use App\Models\CoinGameUser;
+use App\Models\GiftLog;
 use App\Models\User;
 use App\Models\Ware;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Helpers\UserCommon;
-use App\Models\CoinGameUser;
-use App\Enums\UserCoinLogType;
-use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\RankingReward\Entities\RankingType;
 use Utd\RankingReward\Entities\WinnerRanking;
-use Utd\Achievements\Entities\UserAchievementLevel;
-use App\Jobs\SendFirebaseNotificationIndividualUserJob;
-use Illuminate\Support\Facades\Log;
-use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 
 class DailyRankingRewardCommand extends Command
 {
@@ -27,25 +27,22 @@ class DailyRankingRewardCommand extends Command
 
     protected $description = 'Command description';
 
-
     public function handle()
     {
         $rankingTypes = RankingType::where('schedule', 'daily')->get();
-
 
         foreach ($rankingTypes as $rankingType) {
 
             // 1) Get the ranking list dynamically
             $rankingList = $this->getRankingList($rankingType);
 
-            if (!$rankingList || $rankingList->isEmpty()) {
+            if (! $rankingList || $rankingList->isEmpty()) {
                 continue;
             }
 
-
             // 2) Apply ranges to give rewards
             $this->applyRanges($rankingList, $rankingType);
-            $this->info("✅ All data aggregated successfully.");
+            $this->info('✅ All data aggregated successfully.');
         }
     }
 
@@ -73,11 +70,11 @@ class DailyRankingRewardCommand extends Command
         $timezone = getTimezone();
 
         $start = Carbon::yesterday($timezone)->startOfDay();
-        $end   = Carbon::yesterday($timezone)->endOfDay();
+        $end = Carbon::yesterday($timezone)->endOfDay();
 
         $map = [
             'wealth' => 'sender_id',
-            'charm'  => 'receiver_id',
+            'charm' => 'receiver_id',
         ];
 
         $column = $map[$type];
@@ -97,11 +94,11 @@ class DailyRankingRewardCommand extends Command
     {
         $timezone = getTimezone();
         $start = Carbon::yesterday($timezone)->startOfDay();
-        $end   = Carbon::yesterday($timezone)->endOfDay();
+        $end = Carbon::yesterday($timezone)->endOfDay();
 
         return User::query()
             ->leftJoinSub(
-                fn($q) => $q->select('user_id', DB::raw('SUM(amount) AS total_charge'))
+                fn ($q) => $q->select('user_id', DB::raw('SUM(amount) AS total_charge'))
                     ->from('charges')
                     ->where('user_type', 'user')
                     ->whereBetween('created_at', [$start, $end])
@@ -111,7 +108,7 @@ class DailyRankingRewardCommand extends Command
                 'charges.user_id'
             )
             ->leftJoinSub(
-                fn($q) => $q->select('user_id', DB::raw('SUM(obtained_coins) AS total_restore'))
+                fn ($q) => $q->select('user_id', DB::raw('SUM(obtained_coins) AS total_restore'))
                     ->from('coin_logs')
                     ->where('status', 1)
                     ->whereBetween('created_at', [$start, $end])
@@ -122,38 +119,26 @@ class DailyRankingRewardCommand extends Command
             )
             ->select([
                 'users.*',
-                DB::raw('IFNULL(total_charge,0) + IFNULL(total_restore,0) AS total_sum')
+                DB::raw('IFNULL(total_charge,0) + IFNULL(total_restore,0) AS total_sum'),
             ])
             ->havingRaw('total_sum > 0')
             ->orderByDesc('total_sum')
             ->get()->values();
     }
 
-
     public function gameRanking()
     {
         $timezone = getTimezone();
         $start = Carbon::yesterday($timezone)->startOfDay();
-        $end   = Carbon::yesterday($timezone)->endOfDay();
+        $end = Carbon::yesterday($timezone)->endOfDay();
 
         return CoinGameUser::query()
-            ->select('user_id', DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp"))
+            ->select('user_id', DB::raw('SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp'))
             ->whereBetween('created_at', [$start, $end])
             ->whereHas('user')
             ->groupBy('user_id')
             ->orderByDesc('exp')
             ->get()->values();
-    }
-
-    protected function getUserIdKey(string $type): string
-    {
-        return match ($type) {
-            'wealth' => 'sender_id',
-            'charm'  => 'receiver_id',
-            'charge',
-            'game'   => 'user_id',
-            default  => 'user_id',
-        };
     }
 
     public function applyRanges($rankingList, RankingType $rankingType)
@@ -179,62 +164,25 @@ class DailyRankingRewardCommand extends Command
         }
     }
 
-
-    protected function dispatchNotification($userIds, $range)
-    {
-        $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
-
-        if (empty($userIds)) {
-            Log::warning('No user IDs found for notification');
-            return;
-        }
-
-        $min = $range->min;
-        $max = $range->max ?? $min;
-
-        $tokens = User::whereIn('id', $userIds)
-            ->whereNotNull('notification_id')
-            ->pluck('notification_id')
-            ->toArray();
-
-
-        $image = $range->generate_image;
-        $icon  = getImagePath($image);
-        $data['image'] = $icon;
-
-        if (!empty($tokens)) {
-            SendFirebaseNotificationIndividualUserJob::dispatch(
-                tokens: $tokens,
-                data: $data,
-                min: $min,
-                max: $max,
-                dataType: $image
-            )->onQueue('notification_heavy');
-        } else {
-            Log::warning('No tokens found to send notification', [
-                'user_ids' => $userIds
-            ]);
-        }
-    }
-
-
-
     public function giveReward($record, $range, $type)
     {
         $type = $type === 'wealth' ? 'sender' : ($type === 'charm' ? 'receiver' : $type);
-        $userId =  $record[$type . '_id'] ?? $record['user_id'] ?? $record['id'];
-        if (!$userId) return;
+        $userId = $record[$type.'_id'] ?? $record['user_id'] ?? $record['id'];
+        if (! $userId) {
+            return;
+        }
 
         $user = User::find($userId);
-        if (!$user) return;
-
+        if (! $user) {
+            return;
+        }
 
         foreach ($range->rewards as $reward) {
 
             $exists = WinnerRanking::where([
                 'winner_id' => $user->id,
                 'reward_id' => $reward->id,
-                'type'      => $type,
+                'type' => $type,
             ])
                 ->whereDate('created_at', now())
                 ->exists();
@@ -244,7 +192,7 @@ class DailyRankingRewardCommand extends Command
             }
 
             // Coins
-            if ($reward->target_type == "coins") {
+            if ($reward->target_type === 'coins') {
                 $amountBefore = $user->di;
 
                 UserCoinLogHelper::logByType(
@@ -258,7 +206,7 @@ class DailyRankingRewardCommand extends Command
             }
 
             // VIP
-            elseif ($reward->target_type == "vip") {
+            elseif ($reward->target_type === 'vip') {
                 if (PackageHelper::isInstalled('vip')) {
                     $vip = OVip::find($reward->target);
                     UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, receiveType: 'gift-ranking', sendNotification: 0);
@@ -266,24 +214,24 @@ class DailyRankingRewardCommand extends Command
             }
 
             // Ware
-            elseif ($reward->target_type == "ware") {
+            elseif ($reward->target_type === 'ware') {
                 $ware = Ware::find($reward->target);
                 UserCommon::addWareToUser($user, $ware, $reward->expire_days, null, 'gift-ranking', sendNotification: 0);
             }
 
             // Achievement
-            elseif ($reward->target_type == "achievement") {
+            elseif ($reward->target_type === 'achievement') {
                 if (class_exists(UserAchievementLevel::class)) {
                     UserAchievementLevel::create([
-                        "user_id"     => $user->id,
-                        "custom_image" => $reward->target,
-                        "end_at"      => now()->addDays($reward->expire_days),
+                        'user_id' => $user->id,
+                        'custom_image' => $reward->target,
+                        'end_at' => now()->addDays($reward->expire_days),
                     ]);
                 }
             }
 
             // Badge
-            elseif ($reward->target_type == "badge") {
+            elseif ($reward->target_type === 'badge') {
                 Common::userBadge($user->id, $reward->target, $reward->expire_days, 'gift-ranking');
             }
 
@@ -291,9 +239,57 @@ class DailyRankingRewardCommand extends Command
             DB::table('winner_rankings')->insert([
                 'winner_id' => $user->id,
                 'reward_id' => $reward->id,
-                'type'      => $type,
+                'type' => $type,
                 'created_at' => now(),
                 'updated_at' => now(),
+            ]);
+        }
+    }
+
+    protected function getUserIdKey(string $type): string
+    {
+        return match ($type) {
+            'wealth' => 'sender_id',
+            'charm' => 'receiver_id',
+            'charge',
+            'game' => 'user_id',
+            default => 'user_id',
+        };
+    }
+
+    protected function dispatchNotification($userIds, $range)
+    {
+        $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
+
+        if (empty($userIds)) {
+            Log::warning('No user IDs found for notification');
+
+            return;
+        }
+
+        $min = $range->min;
+        $max = $range->max ?? $min;
+
+        $tokens = User::whereIn('id', $userIds)
+            ->whereNotNull('notification_id')
+            ->pluck('notification_id')
+            ->toArray();
+
+        $image = $range->generate_image;
+        $icon = getImagePath($image);
+        $data['image'] = $icon;
+
+        if (! empty($tokens)) {
+            SendFirebaseNotificationIndividualUserJob::dispatch(
+                tokens: $tokens,
+                data: $data,
+                min: $min,
+                max: $max,
+                dataType: $image
+            )->onQueue('notification_heavy');
+        } else {
+            Log::warning('No tokens found to send notification', [
+                'user_ids' => $userIds,
             ]);
         }
     }

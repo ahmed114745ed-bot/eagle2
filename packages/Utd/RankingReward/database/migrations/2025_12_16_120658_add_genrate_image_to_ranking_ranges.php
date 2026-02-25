@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ranking_ranges', function (Blueprint $table) {
-           $table->string('generate_image')->nullable();
+            $table->string('generate_image')->nullable();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ranking_ranges', function (Blueprint $table) {
-           $table->dropColumn('generate_image');
+            $table->dropColumn('generate_image');
         });
     }
 };

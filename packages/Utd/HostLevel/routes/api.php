@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Utd\HostLevel\Http\Controllers\Api\HostLevelController;
 
@@ -16,7 +15,6 @@ use Utd\HostLevel\Http\Controllers\Api\HostLevelController;
 */
 
 Route::middleware(['auth:sanctum', 'update.last.seen'])->group(function () {
-
 
     Route::middleware(['host.level'])->prefix('host-level')->group(function () {
         Route::get('/', [HostLevelController::class, 'hostLevel']);

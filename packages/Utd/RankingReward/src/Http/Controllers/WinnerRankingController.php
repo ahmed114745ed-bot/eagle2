@@ -2,20 +2,19 @@
 
 namespace Utd\RankingReward\Http\Controllers;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
 use App\Models\Ware;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Utd\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Facades\Admin;
+use Encore\Admin\Show;
 use Modules\Badge\Entities\Badge;
-use App\Admin\Services\UserService;
-use App\Admin\Controllers\MainController;
 use Utd\RankingReward\Entities\WinnerRanking;
+use Utd\Vip\Entities\OVip;
 
-class WinnerRankingController extends  MainController
-
+class WinnerRankingController extends MainController
 {
     /**
      * Title for current resource.
@@ -30,7 +29,6 @@ class WinnerRankingController extends  MainController
             ->title(trans($this->title))
             ->body($this->grid()));
     }
-
 
     /**
      * Make a grid builder.
@@ -169,8 +167,7 @@ class WinnerRankingController extends  MainController
             'user.country',
             'user.senderLevel',
             'user.receiverLevel',
-            'user.packs' => fn($q) =>
-            $q->where('type', 25)->where('is_used', true)->with('ware:id,value'),
+            'user.packs' => fn ($q) => $q->where('type', 25)->where('is_used', true)->with('ware:id,value'),
             'reward:id,target,target_type',
             'reward.ware:id,name,img2,show_img',
             'reward.vip:id,name,img',
@@ -202,18 +199,17 @@ class WinnerRankingController extends  MainController
                     $input = $this->input;
                     $query->whereHas(
                         'user',
-                        fn($q) =>
-                        $q->where('id', $input)->orWhere('uuid', $input)
+                        fn ($q) => $q->where('id', $input)->orWhere('uuid', $input)
                     );
                 }, __('User'))->placeholder(__('Search by ID, UUID'));
             });
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('type', __('type'))->select([
-                    'sender'   => __('wealth'),
+                    'sender' => __('wealth'),
                     'receiver' => __('charm'),
-                    'game'     => __('game'),
-                    'charge'   => __('charge'),
+                    'game' => __('game'),
+                    'charge' => __('charge'),
                 ]);
             });
         });
@@ -228,8 +224,8 @@ class WinnerRankingController extends  MainController
                 : __('No User');
         });
 
-        $grid->column('type', __('type'))->display(fn($type) => [
-            'sender'   => 'wealth',
+        $grid->column('type', __('type'))->display(fn ($type) => [
+            'sender' => 'wealth',
             'receiver' => 'charm',
         ][$type] ?? $type);
 
@@ -237,22 +233,22 @@ class WinnerRankingController extends  MainController
 
         $grid->column('gift_id', __('gifts'))->display(function () {
             return match ($this->reward->target_type) {
-                'ware'        => $this->reward->ware?->name,
-                'vip'         => $this->reward->vip?->name,
-                'badge'       => $this->reward->badge?->name,
-                'coins'       => $this->reward->target,
-                'achievement' => "<img src='" . getDriverUrl() . "/{$this->reward->target}' width='80' height='80'>",
-                default       => '',
+                'ware' => $this->reward->ware?->name,
+                'vip' => $this->reward->vip?->name,
+                'badge' => $this->reward->badge?->name,
+                'coins' => $this->reward->target,
+                'achievement' => "<img src='".getDriverUrl()."/{$this->reward->target}' width='80' height='80'>",
+                default => '',
             };
         });
 
         $grid->column('image', __('image'))->display(function () {
             $path = match ($this->reward->target_type) {
-                'ware'        => $this->reward->ware->img2 ?? $this->reward->ware->show_img,
-                'vip'         => $this->reward->vip->img ?? '',
-                'badge'       => $this->reward->badge->image ?? '',
+                'ware' => $this->reward->ware->img2 ?? $this->reward->ware->show_img,
+                'vip' => $this->reward->vip->img ?? '',
+                'badge' => $this->reward->badge->image ?? '',
                 'achievement' => $this->reward->target,
-                default       => 'coin.png',
+                default => 'coin.png',
             };
 
             return handleShowImageWithTypes(
@@ -281,11 +277,10 @@ class WinnerRankingController extends  MainController
         return $grid;
     }
 
-
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

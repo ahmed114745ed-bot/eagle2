@@ -3,12 +3,13 @@
 namespace Utd\RankingReward\Entities;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class WinnerRanking extends Model
 {
     use HasFactory;
+
     protected $fillable = ['type', 'winner_id', 'reward_id'];
 
     public function user()

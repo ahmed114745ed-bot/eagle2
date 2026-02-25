@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateRankingTypesTable extends Migration
 {
@@ -13,7 +13,7 @@ class CreateRankingTypesTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('ranking_types')) {
+        if (! Schema::hasTable('ranking_types')) {
             Schema::create('ranking_types', function (Blueprint $table) {
                 $table->id();
                 $table->string('type');

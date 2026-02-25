@@ -16,12 +16,10 @@ use Utd\HostLevel\Http\Controllers\Web\HostLevelSettingController;
 |
 */
 
-
-
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'Web',
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'Web',
         'middleware' => [
             'web',
             'admin',
@@ -30,7 +28,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('host-levels', HostLevelController::class);

@@ -2,24 +2,22 @@
 
 namespace Utd\HostLevel\Http\Services;
 
-use Carbon\Carbon;
-use App\Models\Ware;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Helpers\UserCommon;
 use App\Enums\UserCoinLogType;
-use Utd\Vip\Entities\OVip;
+use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserCommon;
+use App\Models\GiftLog;
+use App\Models\Ware;
 use App\Support\PackageHelper;
+use Exception;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Events\Entities\GeneralRole;
 use Utd\HostLevel\Entities\HostLevel;
 use Utd\HostLevel\Entities\HostLevelWinner;
-use Utd\Achievements\Entities\UserAchievementLevel;
+use Utd\Vip\Entities\OVip;
 
 class HostLevelService
 {
-
-
     public function hostLevelIndex()
     {
         return HostLevel::with('rewards')->orderBy('level', 'asc')->get();
@@ -27,9 +25,10 @@ class HostLevelService
 
     public function roles()
     {
-        if (!PackageHelper::isInstalled('event')) {
+        if (! PackageHelper::isInstalled('event')) {
             return null;
         }
+
         return GeneralRole::where('type', 'host_level')->first();
     }
 
@@ -57,7 +56,6 @@ class HostLevelService
         return [$diamonds, $nextLevel->level ?? 0, $courant ?? 0, $level, $eventType];
     }
 
-
     public function pickHostLevel($user, $HistLevelId)
     {
 
@@ -66,12 +64,16 @@ class HostLevelService
         $eventType = $this->getEventType();
 
         $checkPick = HostLevelWinner::where('user_id', $userId)->where('host_level_id', $HistLevelId)->filterByEventType($eventType)->first();
-        if ($checkPick) throw new \Exception(__('you have already picked this host level before'));
+        if ($checkPick) {
+            throw new Exception(__('you have already picked this host level before'));
+        }
         $hostLevel = $this->hostLevel($HistLevelId);
-        if (!$hostLevel) throw new \Exception(__('host level not found'));
+        if (! $hostLevel) {
+            throw new Exception(__('host level not found'));
+        }
         $diamonds = $this->computeDiamonds($userId);
-        if (!$diamonds || ($diamonds < $hostLevel->diamonds_required)) {
-            throw new \Exception(__('you do not meet the diamond requirement to pick this host level'));
+        if (! $diamonds || ($diamonds < $hostLevel->diamonds_required)) {
+            throw new Exception(__('you do not meet the diamond requirement to pick this host level'));
         }
 
         HostLevelWinner::create(
@@ -80,14 +82,14 @@ class HostLevelService
                 'host_level_id' => $HistLevelId,
             ]
         );
-        if (!$hostLevel->rewards)  return true;
-
+        if (! $hostLevel->rewards) {
+            return true;
+        }
 
         $this->assignReward($user, $hostLevel->rewards);
 
         return true;
     }
-
 
     public function hostLevel($id)
     {
@@ -99,7 +101,7 @@ class HostLevelService
         $notifications = [];
 
         foreach ($rewards as $reward) {
-            if ($reward->type == "coins") {
+            if ($reward->type === 'coins') {
 
                 $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(
@@ -114,9 +116,9 @@ class HostLevelService
 
                 $notifications[] = [
                     'title' => __('Coin Reward'),
-                    'body'  => str_replace(':coin', $reward->target, __('You have received :coin coin.')),
+                    'body' => str_replace(':coin', $reward->target, __('You have received :coin coin.')),
                 ];
-            } elseif ($reward->type == "vip") {
+            } elseif ($reward->type === 'vip') {
                 $vip = null;
                 if (PackageHelper::isInstalled('vip')) {
                     $vip = OVip::query()->find($reward->target);
@@ -126,24 +128,24 @@ class HostLevelService
 
                     $notifications[] = [
                         'title' => __('congratulations'),
-                        'body'  => __('vip_message', ['vip_name' => $vip->name]),
+                        'body' => __('vip_message', ['vip_name' => $vip->name]),
                     ];
                 }
-            } elseif ($reward->type == "ware") {
+            } elseif ($reward->type === 'ware') {
                 $ware = Ware::query()->find($reward->target);
-                if ($ware){
+                if ($ware) {
                     UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
 
                     $wareName = $ware->name ?? __('a special ware');
                     $notifications[] = [
                         'title' => __('congratulations'),
-                        'body'  => str_replace(':ware', $wareName, __('You have received a gift: :ware')),
+                        'body' => str_replace(':ware', $wareName, __('You have received a gift: :ware')),
                     ];
                 }
-            } elseif ($reward->type == "achievement") {
+            } elseif ($reward->type === 'achievement') {
                 if (class_exists(UserAchievementLevel::class)) {
                     $attributes = [
-                        'user_id'       => $user->id,
+                        'user_id' => $user->id,
                         'custom_image' => $reward->target,
                     ];
                     UserAchievementLevel::create($attributes);
@@ -151,14 +153,14 @@ class HostLevelService
 
                 $notifications[] = [
                     'title' => __('Achievement Reward'),
-                    'body'  => __('You have received a new achievement.'),
+                    'body' => __('You have received a new achievement.'),
                 ];
-            } elseif ($reward->type == 'badge') {
+            } elseif ($reward->type === 'badge') {
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'charge-event');
 
                 $notifications[] = [
                     'title' => __('congratulations'),
-                    'body'  => __('badge_gift_message'),
+                    'body' => __('badge_gift_message'),
                 ];
             }
         }
@@ -174,7 +176,6 @@ class HostLevelService
         }
     }
 
-
     private function getEventType(): string
     {
         return Common::getSettingValue('host_level_type') ?? 'daily';
@@ -184,9 +185,9 @@ class HostLevelService
     {
         $eventType = $this->getEventType();
 
-        return  GiftLog::where('receiver_id', $userId)
+        return GiftLog::where('receiver_id', $userId)
             ->filterByEventType($eventType)
-            ->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total_diamond')->groupBy("receiver_id")
+            ->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total_diamond')->groupBy('receiver_id')
             ->value('total_diamond');
     }
 }

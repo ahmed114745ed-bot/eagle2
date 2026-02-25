@@ -2,37 +2,34 @@
 
 namespace Utd\HostLevel\Http\Controllers\Web;
 
-
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use Encore\Admin\Layout\Column;
-use App\Admin\Controllers\MainController;
 use Illuminate\Support\MessageBag;
 use Utd\HostLevel\Entities\HostLevel;
 
 class HostLevelController extends MainController
 {
+    public $permission_name = 'host-level';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'Host level';
-    public $permission_name = 'host-level';
-
 
     public function index(Content $content)
     {
         return parent::index($content
             ->title(trans($this->title))
             ->row(function (Row $row) {
-
-
 
                 $row->column(12, function (Column $column) {
                     $column->row($this->grid2());
@@ -42,19 +39,10 @@ class HostLevelController extends MainController
         // ->body($this->grid()));
     }
 
-    protected function grid2()
-    {
-        $form = new Box();
-        $form->view('hostlevel::generalRole');
-
-        return $form;
-    }
-
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -67,8 +55,7 @@ class HostLevelController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -85,6 +72,14 @@ class HostLevelController extends MainController
             ->body($this->form()));
     }
 
+    protected function grid2()
+    {
+        $form = new Box();
+        $form->view('hostlevel::generalRole');
+
+        return $form;
+    }
+
     /**
      * Make a grid builder.
      *
@@ -98,11 +93,12 @@ class HostLevelController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('img', __('Img'))->display(function ($path) {
             /** @var Ware $this */
-            $defaultImage = asset("images/image.png");
+            $defaultImage = asset('images/image.png');
             $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('level', __('Level'));
@@ -117,15 +113,15 @@ class HostLevelController extends MainController
                     </div>";
         });
 
-        if (Admin::user()->can('browse-' . 'host_level_reward') || Admin::user()->can('*')) {
+        if (Admin::user()->can('browse-'.'host_level_reward') || Admin::user()->can('*')) {
             $grid->column(__('procedures'))->display(function () {
 
                 if (request()->filled('_export_')) {
                     return '';
                 }
-                $url1 = url('admin/host-level-reward/' . $this->id);
+                $url1 = url('admin/host-level-reward/'.$this->id);
                 $gifts = __('gifts');
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".$gifts.'</a>';
 
                 return $button1;
             });
@@ -138,7 +134,7 @@ class HostLevelController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -168,12 +164,10 @@ class HostLevelController extends MainController
         $form->number('level', __('Level'))->rules('required|unique:host_levels,level,{{id}}');
         $form->number('diamonds', __('diamonds'))->required();
 
-
         $form->saving(function (Form $form) {
 
             $level = $form->level;
             $diamonds = $form->diamonds;
-
 
             // Get previous level (< this one)
             $previous = HostLevel::where('level', '<', $level)
@@ -184,9 +178,9 @@ class HostLevelController extends MainController
                 ->first();
             if ($previous && ($diamonds <= $previous->diamonds)) {
                 $error = new MessageBag([
-                    'title'   => 'Forbidden',
-                    'message' => __("Diamonds must be greater than previous level (:level) diamonds (:diamonds)", [
-                        'level'    => $previous->level,
+                    'title' => 'Forbidden',
+                    'message' => __('Diamonds must be greater than previous level (:level) diamonds (:diamonds)', [
+                        'level' => $previous->level,
                         'diamonds' => $previous->diamonds,
                     ]),
                 ]);
@@ -194,6 +188,7 @@ class HostLevelController extends MainController
                 return redirect()->back()->with(compact('error'));
             }
         });
+
         return $form;
     }
 }
