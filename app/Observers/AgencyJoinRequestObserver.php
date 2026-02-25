@@ -25,7 +25,6 @@ class AgencyJoinRequestObserver
                     $user->save();
                     uploadMonthlyDiamondReceive($user->id, 0);
                 }
-                // CustomNotification::acceptAgency($agency, $user);
             }
         }
     }
