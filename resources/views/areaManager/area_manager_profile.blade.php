@@ -862,7 +862,7 @@
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
         <a href="?tab=superAdmin" class="tab-btn {{ $activeTab == 'superAdmin' ? 'active' : '' }}"
            data-target="superAdmin-tab">{{ __('country manager') }}</a>
-        <a href="?tab=users" class="tab-btn {{ $activeTab === 'users' ? 'active' : '' }}">{{ __('users') }}</a>
+        <a href="?tab=users" class="tab-btn {{ $activeTab === 'users' ? 'active' : '' }}">{{ __('Employees Country Manager') }}</a>
 
 
 
@@ -1191,7 +1191,7 @@
         <div class="tab-content active" id="users-tab">
             <div class="card">
                 <div class="card-header">
-                    <h3>{{ __('Super Admins') }}</h3>
+                    <h3>{{ __('Employees Country Manager') }}</h3>
                     <span class="badge count-badge">{{ optional($subAreaManagers)->total() ?? 0 }}</span>
                 </div>
                 @if($subAreaManagers && $subAreaManagers->count())
@@ -1347,6 +1347,11 @@
                                     <label class="form-label">{{ __('admin.username') }}</label>
                                     <input type="text" name="username" class="form-control" id="username">
                                 </div>
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.password') }}</label>
+                                       <input type="password" name="password" class="form-control"  placeholder="Leave blank if not changing">
+
+                                </div>
 
                                 <div class="col-lg-6 form-group mb-3">
                                     <label class="form-label">{{ __('image') }}</label>
@@ -1461,6 +1466,7 @@
                             const image =  "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
                             $('#name').val(response.item.name);
                             $('#username').val(response.item.username);
+                          //  $('#password').val(response.item.password);
                            
                             $('#img_edit').attr('src', image);
                             $('.item_id').val(response.item.id);

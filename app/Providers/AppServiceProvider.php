@@ -2,65 +2,73 @@
 
 namespace App\Providers;
 
-use App\Models\Pk;
-use Carbon\Carbon;
-use App\Models\Gift;
-use App\Models\Room;
-use App\Models\User;
-use App\Models\Ware;
-use App\Models\Emoji;
-use App\Models\Agency;
-use App\Models\Family;
-use Encore\Admin\Form;
-use App\Helpers\Common;
-use App\Models\Setting;
-use App\Models\Language;
-use App\Models\FamilyUser;
 use App\Admin\Fields\Image;
-use App\Helpers\RoomHelper;
-use App\Models\UserSallary;
-use App\Helpers\CacheHelper;
-use Illuminate\Http\Request;
-use App\Classes\UserHandling;
-use App\Observers\PKObserver;
-use Modules\Vip\Entities\Vip;
-use App\Helpers\ManagerHelper;
-use App\Observers\VipObserver;
-use App\Services\RedisService;
 use App\Admin\Fields\ImagePath;
-use App\Observers\GiftObserver;
-use App\Observers\RoomObserver;
-use App\Observers\UserObserver;
-use App\Observers\WareObserver;
-use Encore\Admin\Facades\Admin;
-use App\Observers\EmojiObserver;
-use App\Models\AgencyJoinRequest;
-use App\Observers\AgencyObserver;
-use App\Observers\ConfigObserver;
-use App\Observers\FamilyObserver;
-use App\Observers\SettingObserver;
-use Illuminate\Support\Facades\DB;
+use App\Classes\UserHandling;
+use App\Helpers\CacheHelper;
+use App\Helpers\Common;
 use App\Helpers\CustomNotification;
-use App\Repositories\Room\RoomRepo;
-use App\Repositories\User\UserRepo;
-use Illuminate\Support\Facades\URL;
-use App\Observers\FamilyUserObserver;
-use Illuminate\Support\Facades\Cache;
-use App\Observers\UserSallaryObserver;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\ServiceProvider;
-use App\Observers\RoomBoomLevelObserver;
-use App\Services\Gifts\LuckyGiftService;
+use App\Helpers\ManagerHelper;
+use App\Helpers\RoomHelper;
+use App\Models\Agency;
+use App\Models\AgencyJoinRequest;
+use App\Models\Bd;
+use App\Models\Emoji;
+use App\Models\Family;
+use App\Models\FamilyUser;
+use App\Models\Gift;
+use App\Models\Language;
+use App\Models\Pk;
+use App\Models\Room;
+use App\Models\Setting;
+use App\Models\ShippingAgency;
+use App\Models\User;
+use App\Models\UserSallary;
+use App\Models\Ware;
 use App\Observers\AgencyJoinRequestObserver;
-use App\Repositories\Room\RoomRepoInterface;
-use App\Repositories\User\UserRepoInterface;
-use Illuminate\Database\Eloquent\Collection;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
+use App\Observers\AgencyObserver;
+use App\Observers\AreaManagerObserver;
+use App\Observers\BdObserver;
+use App\Observers\ConfigObserver;
+use App\Observers\EmojiObserver;
+use App\Observers\FamilyObserver;
+use App\Observers\FamilyUserObserver;
+use App\Observers\GiftObserver;
+use App\Observers\PKObserver;
+use App\Observers\RoomBoomLevelObserver;
+use App\Observers\RoomObserver;
+use App\Observers\SettingObserver;
+use App\Observers\ShippingAgencyObserver;
+use App\Observers\SuperAdminObserver;
+use App\Observers\UserObserver;
+use App\Observers\UserSallaryObserver;
+use App\Observers\VipObserver;
+use App\Observers\WareObserver;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
-use Illuminate\Support\Str;
+use App\Repositories\Room\RoomRepo;
+use App\Repositories\Room\RoomRepoInterface;
+use App\Repositories\User\UserRepo;
+use App\Repositories\User\UserRepoInterface;
+use App\Services\Gifts\LuckyGiftService;
+use App\Services\RedisService;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
 use Illuminate\Broadcasting\BroadcastManager;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Modules\AreaManager\Entities\AreaManager;
+use Modules\RoomBoom\Entities\RoomBoomLevel;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\Vip\Entities\Vip;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -103,13 +111,13 @@ class AppServiceProvider extends ServiceProvider
     {
         // Override admin.pjax middleware for Swoole/Octane compatibility
         $this->overridePjaxMiddleware();
-        
+
         $this->dashboardAdminConfig();
         $this->setupAppSettings();
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
-        
+
         // ⭐ CRITICAL: Register Queue Job listener for Pusher config refresh
         // This ensures ALL queue jobs use fresh Pusher config from database
         $this->registerQueuePusherConfigRefresh();
@@ -126,7 +134,7 @@ class AppServiceProvider extends ServiceProvider
             });
         }
     }
-    
+
     /**
      * Register Queue Job listener to refresh Pusher config before each job
      * This is critical for ensuring broadcast events use fresh credentials
@@ -137,11 +145,11 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Queue\Events\JobProcessing::class,
             function ($event) {
                 static $lastConfigHash = null;
-                
+
                 try {
                     // Check if Pusher config changed
                     $forceUpdate = \Illuminate\Support\Facades\Cache::has('pusher_config_changed');
-                    
+
                     // Get fresh config from DB
                     $freshConfig = getPusherConfig();
                     $currentHash = md5(json_encode([
@@ -149,7 +157,7 @@ class AppServiceProvider extends ServiceProvider
                         $freshConfig['app_secret'] ?? '',
                         $freshConfig['app_id'] ?? '',
                     ]));
-                    
+
                     // Update if changed or forced
                     if ($forceUpdate || $lastConfigHash !== $currentHash) {
                         // Update Laravel runtime config
@@ -159,19 +167,17 @@ class AppServiceProvider extends ServiceProvider
                             'broadcasting.connections.pusher.app_id' => $freshConfig['app_id'],
                             'broadcasting.connections.pusher.options.cluster' => $freshConfig['app_cluster'] ?? 'mt1',
                         ]);
-                        
 
-                            $broadcastManager = app(BroadcastManager::class);
-                            $broadcastManager->forgetDrivers();
-                            $broadcastManager->driver('pusher');
 
-                            $lastConfigHash = $currentHash;
+                        $broadcastManager = app(BroadcastManager::class);
+                        $broadcastManager->forgetDrivers();
+                        $broadcastManager->driver('pusher');
 
-                            if ($forceUpdate) {
-                                Cache::forget('pusher_config_changed');
-                            }
-                 
-                        
+                        $lastConfigHash = $currentHash;
+
+                        if ($forceUpdate) {
+                            Cache::forget('pusher_config_changed');
+                        }
                     }
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::error('Queue: Pusher config refresh failed', [
@@ -361,6 +367,10 @@ class AppServiceProvider extends ServiceProvider
         FamilyUser::observe(FamilyUserObserver::class);
         Pk::observe(PKObserver::class);
         Agency::observe(AgencyObserver::class);
+        AreaManager::observe(AreaManagerObserver::class);
+        SuperAdmin::observe(SuperAdminObserver::class);
+        Bd::observe(BdObserver::class);
+        ShippingAgency::observe(ShippingAgencyObserver::class);
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);
         RoomBoomLevel::observe(RoomBoomLevelObserver::class);

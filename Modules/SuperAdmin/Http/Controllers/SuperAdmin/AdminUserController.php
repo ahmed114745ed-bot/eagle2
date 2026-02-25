@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Modules\SuperAdmin\Entities\SubAdmin;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserController extends EncorUsersController
 {
@@ -295,13 +296,22 @@ class AdminUserController extends EncorUsersController
 
     public function updateSubSuperAdmin(Request $request,)
     {
+        $validated = $request->validate([
 
+            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
         $subSuperAdmin = SubAdmin::find($request->id);
         $subSuperAdmin->name = $request->name;
         $subSuperAdmin->username = $request->username;
         if ($request->has('image')) {
             $image = Common::upload('images', $request->image);
             $subSuperAdmin->avatar = $image;
+        }
+        if ($request->password) {
+            $subSuperAdmin->password = Hash::make($request->password);
+        }
+        if ($request->filled('password')) {
+            $subSuperAdmin->password = Hash::make($request->password);
         }
         $subSuperAdmin->save();
         return Redirect::back();

@@ -487,7 +487,7 @@ class SuperAdminController extends MainController
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_super_admin = 1;
                     $newUserAppId->save();
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'super-admin');
+                   
                     $form->app_id = $newAppId;
                 }
             }

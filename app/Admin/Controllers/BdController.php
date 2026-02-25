@@ -521,7 +521,6 @@ class BdController extends MainController
                 if (isset($userApp)) {
                     $userApp->is_bd = 1;
                     $userApp->save();
-                    MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
                 }
             }
 

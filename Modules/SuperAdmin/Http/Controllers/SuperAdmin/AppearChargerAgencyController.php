@@ -460,13 +460,7 @@ class AppearChargerAgencyController extends MainController
             }
         });
 
-        $form->saved(function (Form $form) {
-
-            $appOwnerId = intval($form->model()->app_owner_id);
-
-            $user = User::find($appOwnerId);
-            MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
-        });
+       
 
         return $form;
     }

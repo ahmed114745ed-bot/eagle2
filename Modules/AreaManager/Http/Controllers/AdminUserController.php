@@ -12,10 +12,11 @@ use App\Models\User;
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\AreaManager\Http\Controllers\EncorUsersController;
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
+use Modules\RoleRewards\Actions\DeleteSubAreaManager;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 
 
@@ -47,7 +48,7 @@ class AdminUserController extends EncorUsersController
 
         $grid->actions(function ($actions) {
             $actions->disableDelete();
-            $actions->add(new DeleteSubSuperAdmin());
+            $actions->add(new DeleteSubAreaManager());
         });
         $grid->disableExport();
         $grid->tools(function ($tools) {
@@ -149,13 +150,20 @@ class AdminUserController extends EncorUsersController
 
     public function updateSubSuperAdmin(Request $request,)
     {
+        $validated = $request->validate([
 
+            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
         $subSuperAdmin = SubAreaManager::find($request->id);
         $subSuperAdmin->name = $request->name;
         $subSuperAdmin->username = $request->username;
         if ($request->has('image')) {
             $image = Common::upload('images', $request->image);
             $subSuperAdmin->avatar = $image;
+        }
+
+        if ($request->filled('password')) {
+            $subSuperAdmin->password = Hash::make($request->password);
         }
         $subSuperAdmin->save();
         return Redirect::back();
