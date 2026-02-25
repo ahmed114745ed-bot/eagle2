@@ -76,7 +76,7 @@ class AgencyObserver
          */
         public function deleted(Agency $agency)
         {
-            if ($agency->Host_agency) {
+//            if ($agency->Host_agency) {
                 AgencyJoinRequest::query()->where('agency_id', $agency->id)->delete();
                 UserHandling::kickOfAllUsersFromAgency($agency);
                 User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);
@@ -86,6 +86,6 @@ class AgencyObserver
                 Admin::where('username', $user->uuid)->delete();
                 MilestoneHelper::removeReward($user, 'host-agency-owner');
                 info('delete 2 host-agency-owner milestone');
-            }
+//            }
         }
     }
