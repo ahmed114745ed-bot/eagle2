@@ -299,13 +299,6 @@ class LuckyGiftService
         $number   = $data['num'];
         $count    = $data['count'] ?? 1;
 
-        Log::info('sendLuckyGift4 START', [
-            'user_id' => $userId,
-            'gift_id' => $giftId,
-            'number' => $number,
-            'count' => $count,
-            'user_balance' => $user->di,
-        ]);
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
@@ -314,11 +307,7 @@ class LuckyGiftService
             ->first();
         if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
-        Log::info('sendLuckyGift4 GIFT FOUND', [
-            'gift_id' => $gift->id,
-            'gift_name' => $gift->name,
-            'gift_price' => $gift->price,
-        ]);
+     
 
         $giftPrice       = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
@@ -328,20 +317,10 @@ class LuckyGiftService
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
-        Log::info('sendLuckyGift4 CALCULATION', [
-            'gift_price' => $giftPrice,
-            'receivers_count' => count($receiversIds),
-            'number' => $number,
-            'total_price' => $totalPrice,
-            'user_coins' => $userCoins,
-        ]);
+
 
         if ($userCoins < $totalPrice) {
-            Log::warning('sendLuckyGift4 INSUFFICIENT COINS', [
-                'user_id' => $userId,
-                'user_coins' => $userCoins,
-                'required' => $totalPrice,
-            ]);
+       
             throw  new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
@@ -353,10 +332,6 @@ class LuckyGiftService
 
         $roomId   = $room->id;
 
-        Log::info('sendLuckyGift4 ROOM FOUND', [
-            'room_id' => $roomId,
-            'owner_id' => $ownerId,
-        ]);
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
         $receiverName = $receivedUsers->first()->name;
@@ -369,134 +344,96 @@ class LuckyGiftService
         $total_user_win = 0;
         $total_count_win = 0;
         $unitPrice = $giftPrice * $number;
-
-        // Get FairLuckService3
         $fairService = app(\App\Services\FairLuck\FairLuckService3::class);
-
-        Log::info('sendLuckyGift4 LOOP START', [
-            'unit_price' => $unitPrice,
-            'count' => $count,
-            'receiver_count' => $receiversCount,
-        ]);
-
         $throwNumber = 0;
-        while ($user->di >= $totalPrice && $index > 0) {
-            $throwNumber++;
-            Log::info("sendLuckyGift4 THROW #{$throwNumber}", [
-                'user_id' => $userId,
-                'user_balance_before' => $user->di,
-                'unit_price' => $unitPrice,
-            ]);
 
-            // Use FairLuckService3 to calculate winning for this throw
-            try {
-                Log::debug("sendLuckyGift4 CALLING processBet", [
-                    'user_id' => $userId,
-                    'bet_amount' => $unitPrice,
-                    'room_id' => $roomId,
-                ]);
+        while ($user->di >= $unitPrice && $index > 0) {
 
-                $result = $fairService->processBet($user, $gift, $unitPrice, $roomId);
+            foreach ($receiversIds as $receiverId) {
 
-                Log::info("sendLuckyGift4 processBet RESULT", [
-                    'is_winner' => $result->isWinner ?? false,
-                    'multiplier' => $result->multiplier ?? 0,
-                    'profit_amount' => $result->profitAmount ?? 0,
-                ]);
-            } catch (\Throwable $e) {
-                Log::error('FairLuckService3 processBet FAILED', [
-                    'user_id' => $userId,
-                    'throw_number' => $throwNumber,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-                $result = null;
-            }
+                if ($user->di < $unitPrice) {
+                    $index = 0;
+                    break;
+                }
 
-            $iterationWin = 0;
-            $isWinner = false;
-            $multiplier = 0;
-            $message = null;
+                $throwNumber++;
 
-            if ($result) {
-                $isWinner = (bool) ($result->isWinner ?? false);
-                $multiplier = (float) ($result->multiplier ?? 0);
-                $iterationWin = (float) ($result->profitAmount ?? 0);
-
-                Log::info("sendLuckyGift4 THROW RESULT", [
-                    'throw_number' => $throwNumber,
-                    'is_winner' => $isWinner,
-                    'multiplier' => $multiplier,
-                    'iteration_win' => $iterationWin,
-                    'user_balance_before_win' => $user->di,
-                ]);
-
-                if ($isWinner && $iterationWin > 0) {
-                    $user->enableSaving = false;
-                    $user->di += $iterationWin;
-                    $total_user_win += $iterationWin;
-                    $total_count_win++;
-
-                    Log::info("sendLuckyGift4 WIN APPLIED", [
+                try {
+                    $result = $fairService->processBet($user, $gift, $unitPrice, $roomId, $receiverId);
+                } catch (\Throwable $e) {
+                    Log::error('FairLuckService3 processBet FAILED', [
+                        'user_id' => $userId,
                         'throw_number' => $throwNumber,
-                        'win_amount' => $iterationWin,
-                        'user_balance_after' => $user->di,
-                        'total_user_win_cumulative' => $total_user_win,
+                        'receiver_id' => $receiverId,
+                        'error' => $e->getMessage(),
                     ]);
+                    $result = null;
+                }
 
-                    if ($multiplier > 1) {
-                        $message = $this->winnerMessage($multiplier);
+                $iterationWin = 0;
+                $isWinner = false;
+                $multiplier = 0;
+                $message = null;
+
+                if ($result) {
+                    $isWinner = (bool) ($result->isWinner ?? false);
+                    $multiplier = (float) ($result->multiplier ?? 0);
+                    $iterationWin = (float) ($result->profitAmount ?? 0);
+
+                    if ($isWinner && $iterationWin > 0) {
+                        $user->enableSaving = false;
+                        $user->di += $iterationWin;
+
+                        $total_user_win += $iterationWin;
+                        $total_count_win++;
+
+                        if ($multiplier > 1) {
+                            $message = $this->winnerMessage($multiplier);
+                        }
                     }
                 }
-            } else {
-                Log::warning("sendLuckyGift4 NO RESULT FROM processBet", [
-                    'throw_number' => $throwNumber,
-                    'user_id' => $userId,
-                ]);
+
+                $isPopular = $multiplier >= 5;
+
+                if ($isPopular && $iterationWin > 0) {
+                    $this->sendPopularToZego(
+                        $userId,
+                        $user,
+                        $gift,
+                        $ownerId,
+                        $room,
+                        $multiplier,
+                        cashbackValue: $iterationWin
+                    );
+                }
+
+                [$commentMessage, $sendMessage] = $this->getSendMessage(
+                    $giftPrice,
+                    $message,
+                    $receiverName,
+                    $number,
+                    isToRoom: $isToRoom
+                );
+
+                $responseData['combo'][] = [
+                    'status' => 0,
+                    'data' => [
+                        'win_coins'       => (int)$iterationWin,
+                        'is_win'          => $isWinner,
+                        'is_popular'      => $isPopular,
+                        'comment_message' => $commentMessage,
+                        'winner_comment'  => $sendMessage,
+                    ],
+                    'error_message' => '',
+                ];
+
+                $user->di -= $unitPrice;
             }
-
-            $isPopular = $multiplier >= 5;
-
-            if ($isPopular && $iterationWin > 0) {
-                Log::info("sendLuckyGift4 POPULAR WIN", [
-                    'throw_number' => $throwNumber,
-                    'multiplier' => $multiplier,
-                    'win_amount' => $iterationWin,
-                ]);
-                $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $multiplier, cashbackValue: $iterationWin);
-            }
-
-            [$commentMessage, $sendMessage] = $this->getSendMessage($giftPrice, $message, $receiverName, $number, isToRoom: $isToRoom);
-
-            $responseData['combo'][] = [
-                'status'        => 0,
-                'data'          => [
-                    'win_coins'       => (int)$iterationWin,
-                    'is_win'          => $isWinner,
-                    'is_popular'      => $isPopular,
-                    'comment_message' => $commentMessage,
-                    'winner_comment'  => $sendMessage,
-                ],
-                'error_message' => '',
-            ];
-
-            $user->di -= $totalPrice;
-            Log::debug("sendLuckyGift4 DEDUCTED COST", [
-                'throw_number' => $throwNumber,
-                'total_price' => $totalPrice,
-                'user_balance_after_deduction' => $user->di,
-            ]);
 
             $index--;
         }
 
-        Log::info("sendLuckyGift4 LOOP END", [
-            'user_id' => $userId,
-            'total_throws' => $throwNumber,
-            'total_user_win' => $total_user_win,
-            'total_count_win' => $total_count_win,
-            'remaining_index' => $index,
-        ]);
+  
 
         if ($total_user_win > 0) {
             UserCoinLogHelper::logByType(
@@ -506,19 +443,12 @@ class LuckyGiftService
                 UserCoinLogType::CASHBACK,
                 null,
             );
-            Log::info("sendLuckyGift4 LOGGED CASHBACK", [
-                'user_id' => $userId,
-                'total_win' => $total_user_win,
-            ]);
+
         }
 
         if ($index > 0) {
             $count -= $index;
-            Log::warning("sendLuckyGift4 INSUFFICIENT COINS DURING LOOP", [
-                'user_id' => $userId,
-                'remaining_throws' => $index,
-                'completed_throws' => $throwNumber,
-            ]);
+       
             $responseData['combo'][] = [
                 'status'          => 1,
                 'data' => null,
@@ -541,13 +471,7 @@ class LuckyGiftService
         $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
         $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
-        Log::info("sendLuckyGift4 UPDATED USER COINS", [
-            'user_id' => $userId,
-            'old_balance' => $oldUserCoin,
-            'new_balance' => $user->di,
-            'total_diamond' => $totalDiamond,
-            'sender_level' => $senderLevel,
-        ]);
+   
 
         $coinsForReceiver = $number * ($giftPrice * 0.1) * $count;
         $number = $number * $count;
@@ -563,13 +487,6 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
-        Log::info('sendLuckyGift4 COMPLETED', [
-            'user_id' => $userId,
-            'total_throws' => $throwNumber,
-            'total_user_win' => $total_user_win,
-            'total_win_count' => $total_count_win,
-            'final_user_balance' => $user->di,
-        ]);
 
         return $responseData;
     }
