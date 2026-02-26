@@ -14,6 +14,8 @@
     "Operation log": "Operation Log",
     "App": "Application",
     "Email": "Email",
+    "server_secret_key":"server secret key",
+    "server_secret":"server secret",
     "Browse change country request":"Browse country request",
     "All status switch change country request": "Toggle All Change Country Requests",
 "History switch change country request": "Change Country Requests History",

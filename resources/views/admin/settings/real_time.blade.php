@@ -70,8 +70,19 @@
                                                     <label
                                                         for="zego_server_secret">{{ __('utd zego token') }}:</label>
                                                     <input type="text" id="zego_server_secret"
-                                                        name="zego_token" placeholder="server_secret"
+                                                        name="zego_token" placeholder="{{ __('server_secret') }}"
                                                         value="{{ $zego_token }}" class="form-control"
+                                                        required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-10">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="zego_server_secret">{{ __('utd zego Key') }}:</label>
+                                                    <input type="text" id="zego_server_secret_key"
+                                                        name="zego_key" placeholder="{{ __('server_secret_key') }}"
+                                                        value="{{ $zego_key }}" class="form-control"
                                                         required>
                                                 </div>
                                             </div>
