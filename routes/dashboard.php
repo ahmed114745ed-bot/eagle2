@@ -42,7 +42,6 @@ use App\Http\Controllers\Dashboard\Posts\AdminReelsController;
 use App\Http\Controllers\Dashboard\Reports\AdminReportsController;
 use App\Http\Controllers\Dashboard\Trash\AdminTrashController;
 use App\Http\Controllers\Dashboard\Wallet\AdminCoreWalletController;
-use App\Http\Controllers\Dashboard\Wares\AdminSpecialIdController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -81,17 +80,7 @@ Route::middleware('auth:sanctum','verified')->group(function(){
         route::get('/wares-autocomplete','autocomplete');
     });
 
-    //Wares
-    Route::controller(AdminSpecialIdController::class)->group(function(){
-        Route::resource('admin-special-id', AdminSpecialIdController::class);
-        route::get('/Sort-special-id','sort');
-        route::post('/Change-Sort-special-id','change_sort');
-        route::post('/Send-special-id','send');
-        route::get('/enable-special-id/{ware_id}/{status}','enable_special_id');
-
-        route::get('/special-id-history','special_id_history');
-        route::get('/Sort-special-id','sort');
-    });
+    // special-id dashboard routes moved to packages/Utd/SpecialId/routes/dashboard.php
 
     //********************** Start Rooms ********************** \\
         Route::resource('background-requests', AdminBackgroundRequestController::class);

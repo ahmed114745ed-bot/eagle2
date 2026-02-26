@@ -14,7 +14,7 @@ use Utd\Events\Entities\WinnerReward;
 use App\Http\Resources\Dashboard\Events\AdminEventReportResource;
 use App\Http\Resources\Dashboard\Posts\AdminMomentResource;
 use App\Http\Resources\Dashboard\Posts\AdminReelsResource;
-use App\Http\Resources\Dashboard\Wares\AdminSpecialHistoryResource;
+use Utd\SpecialId\Http\Resources\AdminSpecialHistoryResource;
 use App\Models\Ban;
 use App\Models\Profile;
 use App\Support\PackageHelper;
@@ -23,7 +23,7 @@ use App\Traits\Dashboard\DashBoardTrait;
 use Carbon\Carbon;
 use DB;
 use Modules\Moment\Entities\Moment;
-use Modules\SpecialId\Entities\SpecialHistory;
+use Utd\SpecialId\Entities\SpecialHistory;
 use Utd\Chat\Entities\GroupChat;
 use Utd\Chat\Http\Resources\Dashboard\GroupChatResource;
 
@@ -282,8 +282,12 @@ class UsersDashboard extends Controller
             }
             $array[$item['name']]  = MyPacksResource::collection($data);
         }
-        $SpecialHistory = SpecialHistory::where('user_id',$id)->orderBy('id','desc')->with('user','ware')->paginate(10);
-        $array['special_id_history']  = AdminSpecialHistoryResource::collection($SpecialHistory);
+        if (PackageHelper::isInstalled('specialId')) {
+            $SpecialHistory = SpecialHistory::where('user_id',$id)->orderBy('id','desc')->with('user','ware')->paginate(10);
+            $array['special_id_history']  = AdminSpecialHistoryResource::collection($SpecialHistory);
+        } else {
+            $array['special_id_history'] = [];
+        }
         $array['medals']  = $user->medals;
         $array['Vips']  =  $user->UserVip;
         return $array;

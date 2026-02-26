@@ -6,7 +6,7 @@
     "FixedTarget": true,
     "Achievement": true,
     "SpechialId": true,
-    "SpecialId": true,
+    "SpecialId": false,
     "SwitchAccount": true,
     "Chat": false,
     "Public": true,

@@ -23,6 +23,7 @@ use Utd\RoomBoom\Entities\RoomBoom;
 use Utd\RoomCup\Entities\RoomCupTarget;
 use Utd\Vip\Entities\OVip;
 use Utd\HostLevel\Entities\HostLevel;
+use Utd\SpecialId\Entities\SpecialHistory;
 
 class PackageHelper
 {
@@ -47,6 +48,7 @@ class PackageHelper
         'hostLevel' => HostLevel::class,
         'rankingReward' => RankingReward::class,
         'dailyPrize' => DailyGift::class,
+        'specialId' => SpecialHistory::class,
     ];
 
     /**

@@ -55,6 +55,7 @@
         "utd/chat": "*",
         "utd/cp": "*",
         "utd/daily-prize": "dev-achievmentPackage",
+        "utd/special-id": "dev-achievmentPackage",
         "utd/events": "*",
         "utd/family": "*",
         "utd/gifts": "*",
@@ -248,6 +249,10 @@
         {
             "type": "path",
             "url": "packages/Utd/DailyPrize"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/SpecialId"
         }
     ]
 }
