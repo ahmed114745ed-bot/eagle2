@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchAccount Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #7c3aed;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #6d28d9;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #7c3aed;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #7c3aed;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #8b5cf6;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #cbd5e1;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #6d28d9;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #be185d;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #f5f3ff;
+            border-left: 4px solid #7c3aed;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #6d28d9;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #7c3aed;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6d28d9;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f1f5f9;
+            font-weight: bold;
+            color: #6d28d9;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .file-structure {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>🔄 SwitchAccount Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the SwitchAccount system for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: February 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#requirements">1. Requirements</a></li>
+            <li><a href="#installation">2. Installation Steps</a></li>
+            <li><a href="#configuration">3. Configuration</a></li>
+            <li><a href="#database">4. Database Tables</a></li>
+            <li><a href="#routes">5. Routes & Middleware</a></li>
+            <li><a href="#contracts">6. Contracts & Dependencies</a></li>
+            <li><a href="#verification">7. Verification</a></li>
+            <li><a href="#troubleshooting">8. Troubleshooting</a></li>
+            <li><a href="#api-reference">9. API Reference</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Requirements -->
+    <h1 id="requirements">1. Requirements</h1>
+    
+    <h2>1.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✔</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✔</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✔</span></td>
+        </tr>
+    </table>
+
+    <h2>1.2 Required Packages</h2>
+    <div class="warning">
+        <div class="warning-title">ℹ️ Note</div>
+        <p>The SwitchAccount package has no required dependencies on other Utd packages.</p>
+    </div>
+
+    <h2>1.3 Package Structure</h2>
+    <div class="file-structure">
+packages/Utd/SwitchAccount/
+├── composer.json
+├── INSTALLATION_GUIDE.html
+├── CLIENT_INSTALLATION.html
+├── config/
+│   └── switchaccount.php
+├── Database/
+│   ├── Migrations/
+│   │   ├── 2024_03_24_132430_create_user_devices_histories_table.php
+│   │   ├── 2024_03_24_165757_create_special_user_accounts_table.php
+│   │   └── 2024_03_25_105536_add_device_name_to_user_devices_histories.php
+│   └── Seeders/
+│       ├── SwitchAccountDatabaseSeeder.php
+│       └── SwitchAccountMenuSeeder.php
+├── resources/
+│   ├── lang/
+│   │   └── ar.json
+│   └── views/
+│       ├── index.blade.php
+│       └── layouts/
+│           └── master.blade.php
+├── routes/
+│   ├── api.php
+│   └── web.php
+└── src/
+    ├── SwitchAccountServiceProvider.php
+    ├── Entities/
+    │   ├── UserAccount.php
+    │   └── UserDevicesHistory.php
+    ├── Http/
+    │   ├── Controllers/
+    │   │   ├── SwitchAccountController.php
+    │   │   └── web/
+    │   │       └── UsersDevicesHistoriesController.php
+    │   └── Services/
+    │       └── SwitchAccountServices.php
+    └── Transformers/
+        └── AccountResource.php
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Installation -->
+    <h1 id="installation">2. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>SwitchAccount</code> folder to your project:</p>
+        <pre><code>packages/Utd/SwitchAccount</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/SwitchAccount"
+        }
+    ],
+    "require": {
+        "utd/switch-account": "*"
+    }
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/switch-account</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Setup Commands</span>
+        <p>Run migrations, seeders, and clear cache:</p>
+        <pre><code>php artisan migrate
+php artisan db:seed --class="Utd\SwitchAccount\Database\Seeders\SwitchAccountDatabaseSeeder"
+php artisan db:seed --class=PermissionTypeSeeder
+php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Configuration -->
+    <h1 id="configuration">3. Configuration</h1>
+
+    <h2>3.1 Publish Configuration</h2>
+    <p>Publish the configuration file:</p>
+    <pre><code>php artisan vendor:publish --tag=config</code></pre>
+
+    <h2>3.2 Configuration Options</h2>
+    <p>The published config file <code>config/switchaccount.php</code> contains:</p>
+    <pre><code>return [
+    'name' => 'SwitchAccount',
+];</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Database -->
+    <h1 id="database">4. Database Tables</h1>
+
+    <h2>4.1 user_devices_histories</h2>
+    <table>
+        <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        <tr><td>id</td><td>bigint</td><td>Primary key</td></tr>
+        <tr><td>user_id</td><td>bigint</td><td>FK to users table</td></tr>
+        <tr><td>device_token</td><td>text (nullable)</td><td>Device token identifier</td></tr>
+        <tr><td>device_name</td><td>string (nullable)</td><td>Device name</td></tr>
+        <tr><td>created_at</td><td>timestamp</td><td>Creation date</td></tr>
+        <tr><td>updated_at</td><td>timestamp</td><td>Last update</td></tr>
+    </table>
+
+    <h2>4.2 special_user_accounts</h2>
+    <table>
+        <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        <tr><td>id</td><td>bigint</td><td>Primary key</td></tr>
+        <tr><td>parent_user_id</td><td>bigint</td><td>Parent user ID</td></tr>
+        <tr><td>child_user_id</td><td>bigint</td><td>Child/linked user ID</td></tr>
+        <tr><td>device_token</td><td>text (nullable)</td><td>Device token</td></tr>
+        <tr><td>created_at</td><td>timestamp</td><td>Creation date</td></tr>
+        <tr><td>updated_at</td><td>timestamp</td><td>Last update</td></tr>
+    </table>
+
+    <h2>4.3 Relationships</h2>
+    <ul>
+        <li><code>UserAccount</code> belongs to <code>User</code> (parent_user_id)</li>
+        <li><code>UserAccount</code> belongs to <code>User</code> (child_user_id)</li>
+        <li><code>UserDevicesHistory</code> belongs to <code>User</code></li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Routes -->
+    <h1 id="routes">5. Routes & Middleware</h1>
+
+    <h2>5.1 Available API Routes</h2>
+
+    <h3>API Routes (Authenticated)</h3>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/add-account</td>
+            <td>Add/link a new account to current user</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/switch-account</td>
+            <td>Switch to a linked account</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/my-accounts</td>
+            <td>Get all linked accounts for current user</td>
+        </tr>
+    </table>
+
+    <h3>Admin Web Routes</h3>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/user-devices-histories</td>
+            <td>List all user device histories</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/user-devices-histories/{id}</td>
+            <td>View device history details</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>/admin/user-devices-histories/{id}</td>
+            <td>Delete device history record</td>
+        </tr>
+    </table>
+
+    <h2>5.2 Middleware</h2>
+    <p>API routes are protected by:</p>
+    <ul>
+        <li><code>auth:sanctum</code> - Authentication required</li>
+        <li><code>checkLatestToken</code> - Token validation</li>
+        <li><code>generalBan</code> - Ban check</li>
+    </ul>
+    <p>Admin routes are protected by:</p>
+    <ul>
+        <li><code>web</code> - Web middleware group</li>
+        <li><code>admin</code> - Admin authentication</li>
+        <li><code>adminIp</code> - Admin IP restriction</li>
+        <li><code>multiLanguage</code> - Multi-language support</li>
+    </ul>
+
+    <h2>5.3 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr switch-account
+php artisan route:list | findstr user-devices</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Contracts -->
+    <h1 id="contracts">6. Contracts & Dependencies</h1>
+
+    <h2>6.1 PackageHelper Integration</h2>
+    <p>The SwitchAccount package is registered in <code>App\Support\PackageHelper</code>:</p>
+
+    <pre><code>// In PackageHelper::$packages
+'switchAccount' => \Utd\SwitchAccount\Entities\UserAccount::class,</code></pre>
+
+    <h2>6.2 Checking Package Availability</h2>
+    <p>You can check if the SwitchAccount package is installed before using it:</p>
+    <pre><code>use App\Support\PackageHelper;
+
+if (PackageHelper::isInstalled('switchAccount')) {
+    // SwitchAccount package is available
+    $entity = PackageHelper::getEntity('switchAccount');
+}</code></pre>
+
+    <h2>6.3 Service Provider</h2>
+    <p>The <code>SwitchAccountServiceProvider</code> auto-registers via Laravel package discovery. It loads:</p>
+    <ul>
+        <li>Routes (API + Web)</li>
+        <li>Migrations</li>
+        <li>Views</li>
+        <li>Configuration</li>
+        <li>Translations</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Verification -->
+    <h1 id="verification">7. Verification</h1>
+
+    <h2>7.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/switch-account</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>switch_account migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>3. Routes Registered</td>
+            <td><code>php artisan route:list | findstr account</code></td>
+            <td>switch-account routes visible</td>
+        </tr>
+        <tr>
+            <td>4. Admin Page</td>
+            <td>Visit /admin/user-devices-histories</td>
+            <td>Page loads without errors</td>
+        </tr>
+    </table>
+
+    <h2>7.2 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test Get My Accounts
+curl -X GET "https://your-domain.com/api/my-accounts" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Add Account
+curl -X POST "https://your-domain.com/api/add-account" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "1234567890", "password": "secret"}'
+
+# Test Switch Account
+curl -X POST "https://your-domain.com/api/switch-account" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": 123}'</code></pre>
+
+    <div class="success">
+        <strong>✅ Success!</strong>
+        <p>If the API returns data, your SwitchAccount package installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: Troubleshooting -->
+    <h1 id="troubleshooting">8. Troubleshooting</h1>
+
+    <h2>8.1 Common Issues</h2>
+
+    <h3>Issue: Class Not Found Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>composer dump-autoload
+php artisan cache:clear</code></pre>
+    </div>
+
+    <h3>Issue: Views Not Found</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan view:clear
+php artisan config:clear
+php artisan package:discover</code></pre>
+    </div>
+
+    <h3>Issue: Service Provider Not Registered</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan config:clear
+php artisan package:discover</code></pre>
+    </div>
+
+    <h3>Issue: Routes Not Found (404)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan route:clear
+php artisan optimize:clear</code></pre>
+    </div>
+
+    <h2>8.2 Rollback Migrations</h2>
+    <p>To rollback SwitchAccount migrations:</p>
+    <pre><code>php artisan migrate:rollback --path=packages/Utd/SwitchAccount/Database/Migrations</code></pre>
+
+    <h2>8.3 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 9: API Reference -->
+    <h1 id="api-reference">9. API Reference</h1>
+
+    <h2>9.1 Get My Accounts</h2>
+    <pre><code>GET /api/my-accounts
+
+Headers:
+  Authorization: Bearer YOUR_TOKEN
+
+Response:
+{
+    "success": true,
+    "data": [
+        {
+            "id": 1,
+            "user_id": 123,
+            "name": "Account Name",
+            "uuid": "ABC123",
+            "avatar": "https://example.com/avatar.jpg"
+        }
+    ]
+}</code></pre>
+
+    <h2>9.2 Add Account</h2>
+    <pre><code>POST /api/add-account
+
+Headers:
+  Authorization: Bearer YOUR_TOKEN
+
+Request Body:
+{
+    "phone": "1234567890",
+    "password": "secret"
+}
+
+Response:
+{
+    "success": true,
+    "message": "Account added successfully",
+    "data": {
+        "id": 1,
+        "auth_token": "token_here"
+    }
+}</code></pre>
+
+    <h2>9.3 Switch Account</h2>
+    <pre><code>POST /api/switch-account
+
+Headers:
+  Authorization: Bearer YOUR_TOKEN
+
+Request Body:
+{
+    "user_id": 123
+}
+
+Response:
+{
+    "success": true,
+    "message": "Switched successfully",
+    "data": {
+        "auth_token": "new_token_here"
+    }
+}</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">🎉 Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your SwitchAccount package is now ready to use.</p>
+        
+        <div style="margin-top: 40px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+            <h3 style="color: #7c3aed;">Quick Links:</h3>
+            <ul>
+                <li>My Accounts: <code>GET /api/my-accounts</code></li>
+                <li>Add Account: <code>POST /api/add-account</code></li>
+                <li>Switch: <code>POST /api/switch-account</code></li>
+                <li>Admin: <code>/admin/user-devices-histories</code></li>
+            </ul>
+        </div>
+        
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: February 2026
+        </p>
+    </div>
+
+</body>
+</html>
