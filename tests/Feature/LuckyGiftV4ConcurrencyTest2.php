@@ -184,37 +184,58 @@ class LuckyGiftV4ConcurrencyTest2 extends TestCase
             'medium_wallet' => \App\Models\FairLuckWallet::getRedisBalance('medium_wallet'),
         ];
 
-        echo "\n" . str_repeat("=", 130) . "\n";
-        echo "SUSTAINED ACTIVITY REPORT (2 Senders x 100 Requests)\n";
-        echo str_repeat("=", 130) . "\n";
+        echo "\n" . str_repeat("=", 160) . "\n";
+        echo "SUSTAINED ACTIVITY REPORT (2 Senders x 100 Requests - Sampled Output)\n";
+        echo str_repeat("=", 160) . "\n";
         echo sprintf(
-            "| %-3s | %-3s | %-10s | %-10s | %-6s | %-15s | %-10s | %-8s |\n",
-            "Snd",
-            "Req",
-            "Before",
-            "After",
-            "Win?",
-            "Multipliers",
-            "Total Win",
-            "Time(s)"
+            "| %-6s | %-4s | %-15s | %-20s | %-20s | %-20s | %-20s | %-7s |\n",
+            "SndReq",
+            "Hit#",
+            "Result (Multi)",
+            "Sender B->A",
+            "Global B->A",
+            "Jackpot B->A",
+            "Medium B->A",
+            "Win Amt"
         );
-        echo str_repeat("-", 130) . "\n";
+        echo str_repeat("-", 160) . "\n";
 
         foreach ($responses as $idx => $item) {
-            // Only show every 10th request to keep output manageable, plus winners
+            // Only show every 10th request or winners to keep output manageable
             if ($item['req_index'] % 10 === 0 || $item['has_win']) {
-                $totalWin = $item['response']['data']['total_user_win'] ?? 0;
-                echo sprintf(
-                    "| %-3d | %-3d | %-10d | %-10d | %-6s | %-15s | %-10d | %-8.4f |\n",
-                    $item['sender_index'],
-                    $item['req_index'],
-                    $item['balance_before'],
-                    $item['balance_after'],
-                    $item['has_win'] ? 'YES' : 'NO',
-                    $item['multipliers'] ?: '-',
-                    $totalWin,
-                    $item['duration']
-                );
+                $combo = $item['response']['data']['combo'] ?? [];
+                $senderReq = "S" . $item['sender_index'] . "-R" . $item['req_index'];
+
+                foreach ($combo as $hitIdx => $hit) {
+                    $isWin = $hit['data']['is_win'] ?? false;
+                    $winCoins = $hit['data']['win_coins'] ?? 0;
+                    $multiplier = $giftPrice > 0 && $winCoins > 0 ? ($winCoins / $giftPrice) . 'x' : '-';
+
+                    $sB = $hit['sender_balance_before'] ?? '-';
+                    $sA = $hit['sender_balance_after'] ?? '-';
+
+                    $wb = $hit['wallets_before'] ?? [];
+                    $wa = $hit['wallets_after'] ?? [];
+
+                    $gbB = $wb['global_vault'] ?? '-';
+                    $gbA = $wa['global_vault'] ?? '-';
+                    $jbB = $wb['jackpot_wallet'] ?? '-';
+                    $jbA = $wa['jackpot_wallet'] ?? '-';
+                    $mbB = $wb['medium_wallet'] ?? '-';
+                    $mbA = $wa['medium_wallet'] ?? '-';
+
+                    echo sprintf(
+                        "| %-6s | %-4d | %-15s | %-20s | %-20s | %-20s | %-20s | %-7d |\n",
+                        $senderReq,
+                        $hitIdx + 1,
+                        $isWin ? "WIN ($multiplier)" : 'LOSS',
+                        "$sB -> $sA",
+                        "$gbB -> $gbA",
+                        "$jbB -> $jbA",
+                        "$mbB -> $mbA",
+                        $winCoins
+                    );
+                }
             }
         }
 
@@ -344,40 +365,55 @@ class LuckyGiftV4ConcurrencyTest2 extends TestCase
             );
         }
 
-        echo "\n" . str_repeat("=", 130) . "\n";
-        echo "DETAILED CONCURRENCY TEST REPORT (SUMMARY TABLE)\n";
-        echo str_repeat("=", 130) . "\n";
+        echo "\n" . str_repeat("=", 160) . "\n";
+        echo "DETAILED CONCURRENCY TEST REPORT (PER THROW)\n";
+        echo str_repeat("=", 160) . "\n";
         echo sprintf(
-            "| %-4s | %-6s | %-10s | %-10s | %-6s | %-15s | %-10s | %-10s | %-10s |\n",
-            "Req",
-            "ID",
-            "Before",
-            "After",
-            "Win?",
-            "Multipliers",
-            "Total Win",
-            "Session",
-            "Time (s)"
+            "| %-6s | %-4s | %-15s | %-20s | %-20s | %-20s | %-20s | %-7s |\n",
+            "Sender",
+            "Hit#",
+            "Result (Multi)",
+            "Sender B->A",
+            "Global B->A",
+            "Jackpot B->A",
+            "Medium B->A",
+            "Win Amt"
         );
-        echo str_repeat("-", 130) . "\n";
+        echo str_repeat("-", 160) . "\n";
 
         foreach ($responses as $item) {
-            $totalWin = $item['response']['data']['total_user_win'] ?? 0;
-            $session = $item['response']['data']['session'] ?? '-';
+            $senderId = $item['sender_id'];
+            $combo = $item['response']['data']['combo'] ?? [];
+            foreach ($combo as $idx => $hit) {
+                $isWin = $hit['data']['is_win'] ?? false;
+                $winCoins = $hit['data']['win_coins'] ?? 0;
+                $multiplier = $giftPrice > 0 && $winCoins > 0 ? ($winCoins / $giftPrice) . 'x' : '-';
 
-            echo sprintf(
-                "| %-4d | %-6d | %-10d | %-10d | %-6s | %-15s | %-10d | %-10s | %-10.4f |\n",
-                $item['index'],
-                $item['sender_id'],
-                $item['balance_before'],
-                $item['balance_after'],
-                $item['has_win'] ? 'YES' : 'NO',
-                $item['multipliers'] ?: '-',
-                $totalWin,
-                $session,
-                $item['duration']
-            );
+                $sB = $hit['sender_balance_before'] ?? '-';
+                $sA = $hit['sender_balance_after'] ?? '-';
 
+                $wb = $hit['wallets_before'] ?? [];
+                $wa = $hit['wallets_after'] ?? [];
+
+                $gbB = $wb['global_vault'] ?? '-';
+                $gbA = $wa['global_vault'] ?? '-';
+                $jbB = $wb['jackpot_wallet'] ?? '-';
+                $jbA = $wa['jackpot_wallet'] ?? '-';
+                $mbB = $wb['medium_wallet'] ?? '-';
+                $mbA = $wa['medium_wallet'] ?? '-';
+
+                echo sprintf(
+                    "| %-6d | %-4d | %-15s | %-20s | %-20s | %-20s | %-20s | %-7d |\n",
+                    $senderId,
+                    $idx + 1,
+                    $isWin ? "WIN ($multiplier)" : 'LOSS',
+                    "$sB -> $sA",
+                    "$gbB -> $gbA",
+                    "$jbB -> $jbA",
+                    "$mbB -> $mbA",
+                    $winCoins
+                );
+            }
             $this->assertEquals(200, $item['status'], "Request failed for sender {$item['index']}");
         }
 
