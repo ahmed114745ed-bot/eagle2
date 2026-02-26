@@ -1,7 +1,7 @@
 <?php
 
-use Utd\SwitchAccount\Http\Controllers\web\UsersDevicesHistoriesController;
 use Illuminate\Support\Facades\Route;
+use Utd\SwitchAccount\Http\Controllers\web\UsersDevicesHistoriesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
+        'prefix' => config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
             'adminIp',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('user-devices-histories', UsersDevicesHistoriesController::class);

@@ -10,7 +10,6 @@ use Utd\DailyPrize\Transformers\WeeklyStarGift;
 
 class DailyPrizeService
 {
-
     public function reset(Carbon $lastActive, int $userId)
     {
         $lastActiveAddDay = $lastActive->addHours(24);
@@ -19,7 +18,7 @@ class DailyPrizeService
 
             $dailyGift = $this->getUserDailyGiftData($userId);
             if ($dailyGift) {
-                $dailyGift->day_count   = 0;
+                $dailyGift->day_count = 0;
                 $dailyGift->last_active = null;
                 $dailyGift->save();
             }
@@ -30,7 +29,7 @@ class DailyPrizeService
         return false;
     }
 
-    public function getUserDailyGiftData(int $userId): DailyGiftCount|null
+    public function getUserDailyGiftData(int $userId): ?DailyGiftCount
     {
         return DailyGiftCount::query()->where('user_id', $userId)->first();
     }
@@ -39,28 +38,32 @@ class DailyPrizeService
     {
         $dailyGift = $this->getUserDailyGiftData($userId);
 
-        if (!$dailyGift || !$dailyGift->last_active) return true;
-        $last_active      = Carbon::parse($dailyGift->last_active);
+        if (! $dailyGift || ! $dailyGift->last_active) {
+            return true;
+        }
+        $last_active = Carbon::parse($dailyGift->last_active);
         $lastActiveAddDay = $last_active->copy()->addHours(24);
+
         return $lastActiveAddDay <= Carbon::now();
     }
 
     public function getDayGift(int $day)
     {
-        $day = ($day % ($this->dailyGiftsCount() ?: 1)) ;
-        if ($day == 0) $day = 7;
+        $day = ($day % ($this->dailyGiftsCount() ?: 1));
+        if ($day === 0) {
+            $day = 7;
+        }
+
         return DailyGift::with('ware')->selectRaw('daily_gifts.*, (SELECT SUM((type - 1) * 7 + `order`) FROM daily_gifts as dg WHERE dg.id = daily_gifts.id) as day')
-                        ->having('day', '=', $day)
-                        ->first();
+            ->having('day', '=', $day)
+            ->first();
     }
 
-    /**
-     * @return int
-     */
     public function dailyGiftsCount(): int
     {
         $count = RedisService::get('daily-gift-count');
-        return intval($count ?? 28);
+
+        return (int) ($count ?? 28);
     }
 
     public function getWeekGifts(int $currentDay): array
@@ -76,7 +79,7 @@ class DailyPrizeService
 
         for ($day = $startDay; $day <= $endDay; $day++) {
             $gifts[] = [
-                'day'  => $day,
+                'day' => $day,
                 'gift' => $this->getGift($day) ?? (object) [],
             ];
         }
@@ -87,7 +90,7 @@ class DailyPrizeService
     public function getGift($currentDay)
     {
         $data = $this->getDayGift($currentDay);
-        return  $data != null ? new WeeklyStarGift($data) : null;
-    }
 
+        return $data !== null ? new WeeklyStarGift($data) : null;
+    }
 }

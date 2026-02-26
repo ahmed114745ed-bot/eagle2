@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Utd\SpecialId\Http\Controllers\Utd\SpecialHistoryController;
 use Utd\SpecialId\Http\Controllers\Utd\SpecialIdFramController;
 use Utd\SpecialId\Http\Controllers\Utd\SpecialIdRequestController;
 use Utd\SpecialId\Http\Controllers\Utd\SpecialWareController;
-use Utd\SpecialId\Http\Controllers\Utd\SpecialHistoryController;
 
 Route::prefix('special-id-fram')->group(function () {
     Route::get('/', [SpecialIdFramController::class, 'index']);

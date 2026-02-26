@@ -2,30 +2,30 @@
 
 namespace Utd\SpecialId\Http\Controllers\Api;
 
-
 use App\Enums\UserCoinLogType;
+use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
+use App\Models\Config;
 use App\Models\Pack;
 use App\Models\Ware;
-use App\Models\Config;
-use App\Helpers\Common;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Utd\SpecialId\Entities\SpecialIdFram;
-use Utd\SpecialId\Entities\SpecialHistory;
 use Modules\Public\Http\Services\UpgradeLevelServices;
+use Utd\SpecialId\Entities\SpecialHistory;
+use Utd\SpecialId\Entities\SpecialIdFram;
 use Utd\SpecialId\Transformers\SpecialUsersRecourse;
 
 class SpecialIdController extends Controller
 {
     public function buySpecialId(Request $request)
     {
-        $user       = $request->user();
+        $user = $request->user();
         $special_id = $request->special_id;
 
-        if (!$special_id) {
+        if (! $special_id) {
             return Common::apiResponse(false, 'missing params', null, 422);
         }
 
@@ -36,7 +36,7 @@ class SpecialIdController extends Controller
             ->where('enable', 1)
             ->first();
 
-        if (!$ware) {
+        if (! $ware) {
             return Common::apiResponse(false, 'item not found or not for sale', null, 404);
         }
 
@@ -56,20 +56,19 @@ class SpecialIdController extends Controller
             DB::beginTransaction();
 
             // If no pack, create new
-            
-                $pack = Pack::create([
-                    'user_id'       => $user->id,
-                    'type'          => $ware->type,
-                    'get_type'      => $ware->get_type,
-                    'target_id'     => $ware->id,
-                    'num'           => 1,
-                    'days'          => $ware->expire,
-                    'is_read'       => 1,
-                    'use_num'       => $ware->num,
-                    'price'         => $total_price,
-                    'receive_type'  => 'buy-special-id',
-                ]);
-            
+
+            $pack = Pack::create([
+                'user_id' => $user->id,
+                'type' => $ware->type,
+                'get_type' => $ware->get_type,
+                'target_id' => $ware->id,
+                'num' => 1,
+                'days' => $ware->expire,
+                'is_read' => 1,
+                'use_num' => $ware->num,
+                'price' => $total_price,
+                'receive_type' => 'buy-special-id',
+            ]);
 
             // Deduct balance + log
             $this->deductAndLog($user, $total_price, $ware->name);
@@ -80,48 +79,30 @@ class SpecialIdController extends Controller
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
 
             return Common::apiResponse(true, 'success process');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
+
             return Common::apiResponse(false, 'an error occurred please try again later!', null, 400);
         }
     }
 
-    /**
-     * Deduct balance and log transaction
-     */
-    protected function deductAndLog($user, $amount, $wareName)
-    {
-        $amountBefore = $user->di;
-        $logAmount    = -abs($amount);
-
-        UserCoinLogHelper::logByType(
-            $user->id,
-            $logAmount,
-            $amountBefore,
-            UserCoinLogType::PACK,
-            $wareName
-        );
-
-        $user->decrement('di', $amount);
-    }
-
-
     public function usePackItem(Request $request)
     {
-        $user    = $request->user();
+        $user = $request->user();
         $item_id = $request->item_id;
         $status = $request->used ?? 0;
-        if (!$item_id) return Common::apiResponse(0, 'missing params');
+        if (! $item_id) {
+            return Common::apiResponse(0, 'missing params');
+        }
 
         $pack = Pack::query()
             ->where(['user_id' => $user->id])
             ->where('id', $item_id)->with('ware')
             ->first();
 
-
         if ($pack) {
             // Un use all packs
-            /// TODO @m2led
+            // / TODO @m2led
             if ($status) {
                 Pack::where('type', 25)
                     ->where('user_id', $user->id)
@@ -129,20 +110,18 @@ class SpecialIdController extends Controller
                     ->update(['is_used' => 0]);
             }
             if (is_null($pack->expire)) {
-                $expire =    $pack->days ? now()->addDays($pack->days)->timestamp  : 0;
+                $expire = $pack->days ? now()->addDays($pack->days)->timestamp : 0;
                 $pack->update(['is_used' => $status, 'use_num' => 1, 'expire' => $expire]);
             } else {
                 $pack->update(['is_used' => $status, 'use_num' => 1]);
             }
 
-
             SpecialHistory::where('user_id', $user->id)->where('ware_id', '!=', $pack->target_id)->update(['status' => 0]);
-            $specialHistory =  SpecialHistory::where([
+            $specialHistory = SpecialHistory::where([
                 'user_id' => $user->id,
                 'ware_id' => $pack->target_id,
             ])->first();
-            if (!$specialHistory) {
-
+            if (! $specialHistory) {
 
                 SpecialHistory::create([
                     'status' => $status,
@@ -154,30 +133,39 @@ class SpecialIdController extends Controller
                 $specialHistory->save();
             }
 
-
-            $user->special_id = $status == 0 ? null : $pack->ware->value;
+            $user->special_id = $status === 0 ? null : $pack->ware->value;
             $user->save();
-            return Common::apiResponse(1, 'update successfully', ['target_id' => !$status ? null : $pack->target_id], 200);
+
+            return Common::apiResponse(1, 'update successfully', ['target_id' => ! $status ? null : $pack->target_id], 200);
         }
+
         return Common::apiResponse(0, 'item not found', null, 404);
     }
 
     public function upload_special_id(Request $request)
     {
-        $user    = $request->user();
+        $user = $request->user();
         $special_id = $request->value;
-        if (!$special_id || !$request->frame_id) return Common::apiResponse(0, 'missing params', null, 422);
+        if (! $special_id || ! $request->frame_id) {
+            return Common::apiResponse(0, 'missing params', null, 422);
+        }
         $ware = Ware::query()->whereDoesntHave('ware_users')->where('value', $special_id)
             ->where('enable', 1)
             ->first();
-        if ($ware) return Common::apiResponse(0, 'item exist before go to mall to buy it', null, 404);
+        if ($ware) {
+            return Common::apiResponse(0, 'item exist before go to mall to buy it', null, 404);
+        }
 
-        $pack        = Pack::query()->where("user_id", '!=', $user->id)->where('expire', '>=', now()->timestamp)->whereHas('ware', function ($q) use ($special_id) {
-            $q->where("value", $special_id);
+        $pack = Pack::query()->where('user_id', '!=', $user->id)->where('expire', '>=', now()->timestamp)->whereHas('ware', function ($q) use ($special_id) {
+            $q->where('value', $special_id);
         })->first();
-        if ($pack) return Common::apiResponse(0, 'item is used with anther user', null, 404);
+        if ($pack) {
+            return Common::apiResponse(0, 'item is used with anther user', null, 404);
+        }
         $total_price = Config::query()->where('name', 'upload_special_id_price')->first()?->value ?? 0;
-        if ($user->di < $total_price) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        if ($user->di < $total_price) {
+            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        }
 
         $expire = Config::query()->where('name', 'custom_special_id_expire')->first()?->value ?? 30;
 
@@ -201,23 +189,44 @@ class SpecialIdController extends Controller
             'enable' => 0,
         ]);
         $ware->ware_users()->attach($user->id, ['disable' => false]);
-        return Common::apiResponse(1, __("api_responses.request_sent"));
+
+        return Common::apiResponse(1, __('api_responses.request_sent'));
     }
 
     public function specialIdFrame()
     {
         $data = SpecialIdFram::get();
+
         return Common::apiResponse(1, '', $data, 200);
     }
 
     public function specialUsers(Request $request)
     {
-        $data = SpecialHistory::when(isset($request['startDate']) && $request['startDate'] != 'null' && isset($request['endDate']) && $request['endDate'] != 'null', function ($query) use ($request) {
+        $data = SpecialHistory::when(isset($request['startDate']) && $request['startDate'] !== 'null' && isset($request['endDate']) && $request['endDate'] !== 'null', function ($query) use ($request) {
             $query->whereBetween('created_at', [Carbon::createFromFormat('Y-m-d', $request['startDate'])->startOfDay(), Carbon::createFromFormat('Y-m-d', $request['endDate'])->endOfDay()]);
-        })->when(isset($request['ware_id']) && $request['ware_id'] != 'null', function ($query) use ($request) {
+        })->when(isset($request['ware_id']) && $request['ware_id'] !== 'null', function ($query) use ($request) {
             $query->where('ware_id', $request['ware_id']);
         })->where('status', 1)->with('user', 'ware')->get();
 
         return Common::apiResponse(1, '', SpecialUsersRecourse::collection($data), 200);
+    }
+
+    /**
+     * Deduct balance and log transaction
+     */
+    protected function deductAndLog($user, $amount, $wareName)
+    {
+        $amountBefore = $user->di;
+        $logAmount = -abs($amount);
+
+        UserCoinLogHelper::logByType(
+            $user->id,
+            $logAmount,
+            $amountBefore,
+            UserCoinLogType::PACK,
+            $wareName
+        );
+
+        $user->decrement('di', $amount);
     }
 }

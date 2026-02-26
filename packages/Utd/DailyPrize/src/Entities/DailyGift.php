@@ -2,16 +2,16 @@
 
 namespace Utd\DailyPrize\Entities;
 
-use App\Models\Ware;
 use App\Helpers\Common;
-use Utd\Vip\Entities\OVip;
-use Illuminate\Http\UploadedFile;
+use App\Models\Ware;
 use App\Support\PackageHelper;
-use Modules\Badge\Entities\Badge;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Modules\Badge\Entities\Badge;
+use Utd\Vip\Entities\OVip;
 
 class DailyGift extends Model
 {
@@ -31,6 +31,7 @@ class DailyGift extends Model
         return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
             $this->hasOne(OVip::class, 'id', 'target');
     }
+
     public function badge()
     {
         return $this->hasOne(Badge::class, 'id', 'target');
@@ -76,7 +77,7 @@ class DailyGift extends Model
             } elseif ($model->gift_type === 'achievement') {
                 $file = request('target4', $model->target);
                 if ($file instanceof UploadedFile) {
-                    $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
+                    $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
                 }
                 $model->target = $url ?? '';
             }
@@ -99,7 +100,7 @@ class DailyGift extends Model
             } elseif ($model->gift_type === 'achievement') {
                 $file = request('target4', $model->target);
                 if ($file instanceof UploadedFile) {
-                    $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
+                    $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
                     $file = str_replace('\\', '/', $model->target);
                     Storage::delete($file);
                 }

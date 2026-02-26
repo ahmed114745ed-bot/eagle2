@@ -14,7 +14,7 @@ class WeeklyStarGift extends JsonResource
 
         switch ($this->gift_type) {
             case 'ware':
-                $expire = ($this->expire ?? $this->ware?->expire) . ' days';
+                $expire = ($this->expire ?? $this->ware?->expire).' days';
                 $type = match ($this->ware?->type) {
                     6 => trans('Intro Frame'),
                     5 => trans('Bubble Frame'),
@@ -24,19 +24,19 @@ class WeeklyStarGift extends JsonResource
                 break;
 
             case 'vip':
-                $expire = ($this->expire ?? $this->vip?->expire) . ' days';
+                $expire = ($this->expire ?? $this->vip?->expire).' days';
                 $type = $this->vip?->name ?? 'VIP';
                 $image = $this->vip?->img;
                 break;
-                
-            case "badge":
-                $expire = $this->expire . ' days';
+
+            case 'badge':
+                $expire = $this->expire.' days';
                 $type = $this->badge?->name ?? '';
                 $image = $this->badge?->image ?? '';
                 break;
 
             case 'achievement':
-                $expire = ($this->expire ?? 0) . ' days';
+                $expire = ($this->expire ?? 0).' days';
                 $type = 'achievement';
                 $image = $this->resolveAchievementImage();
                 break;
@@ -48,7 +48,7 @@ class WeeklyStarGift extends JsonResource
         }
 
         return [
-            'name'  => "{$expire} /{$type}",
+            'name' => "{$expire} /{$type}",
             'image' => $image,
         ];
     }
@@ -56,7 +56,7 @@ class WeeklyStarGift extends JsonResource
     protected function resolveAchievementImage(): string
     {
         if (is_string($this->target)) {
-            return str_starts_with($this->target, '/') ? substr($this->target, 1) : $this->target;
+            return str_starts_with($this->target, '/') ? mb_substr($this->target, 1) : $this->target;
         }
 
         return 'achievement.png';

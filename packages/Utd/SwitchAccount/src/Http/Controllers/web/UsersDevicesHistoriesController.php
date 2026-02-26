@@ -2,22 +2,23 @@
 
 namespace Utd\SwitchAccount\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Utd\SwitchAccount\Entities\UserDevicesHistory;
 
 class UsersDevicesHistoriesController extends MainController
 {
+    public $permission_name = 'users-devices';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'UserDevicesHistory';
-    public $permission_name = 'users-devices';
 
     public function index(Content $content)
     {
@@ -39,6 +40,7 @@ class UsersDevicesHistoriesController extends MainController
             ->title(trans(__($this->title)))
             ->body($this->form()));
     }
+
     public function show($id, Content $content)
     {
         return parent::show($id, $content
@@ -62,7 +64,6 @@ class UsersDevicesHistoriesController extends MainController
             });
         });
 
-      
         $grid->column('user.name', __('name'));
         $grid->column('user.uuid', __('uuid'));
         $grid->column('device_token', __('Device token'));
@@ -73,15 +74,13 @@ class UsersDevicesHistoriesController extends MainController
         });
         $grid->disableCreateButton();
 
-        
-
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

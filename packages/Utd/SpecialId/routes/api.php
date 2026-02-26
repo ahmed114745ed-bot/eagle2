@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Utd\SpecialId\Http\Controllers\Api\SpecialIdController;
 
 /*
@@ -14,10 +13,10 @@ use Utd\SpecialId\Http\Controllers\Api\SpecialIdController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan' ,'update.last.seen'])->group(function () {
-    Route::post('buy-special-id',[SpecialIdController::class,'buySpecialId']);
-    Route::post('use-special-id',[SpecialIdController::class,'usePackItem']);
-    Route::post('upload-special-id',[SpecialIdController::class,'upload_special_id']);
-    Route::get('special-frame',[SpecialIdController::class,'specialIdFrame']);
-    Route::get('special-users',[SpecialIdController::class,'specialUsers']);
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'update.last.seen'])->group(function () {
+    Route::post('buy-special-id', [SpecialIdController::class, 'buySpecialId']);
+    Route::post('use-special-id', [SpecialIdController::class, 'usePackItem']);
+    Route::post('upload-special-id', [SpecialIdController::class, 'upload_special_id']);
+    Route::get('special-frame', [SpecialIdController::class, 'specialIdFrame']);
+    Route::get('special-users', [SpecialIdController::class, 'specialUsers']);
 });

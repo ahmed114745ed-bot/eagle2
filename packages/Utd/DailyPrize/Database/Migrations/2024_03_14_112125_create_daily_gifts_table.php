@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('type')->nullable();
             $table->integer('order')->nullable();
-            $table->char('gift_type',100)->nullable();
+            $table->char('gift_type', 100)->nullable();
             $table->integer('target')->nullable();
             $table->integer('expir')->nullable();
             $table->timestamps();

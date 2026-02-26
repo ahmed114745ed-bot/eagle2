@@ -18,8 +18,8 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('id')
                 ->on('users')->onDelete('cascade');
-//            $table->foreign('ware_id')->references('id')
-//                ->on('wares')->onDelete('cascade');
+            //            $table->foreign('ware_id')->references('id')
+            //                ->on('wares')->onDelete('cascade');
         });
     }
 

@@ -1,9 +1,9 @@
 <?php
 
-use Utd\SpecialId\Http\Controllers\web\SpecialWareController;
-use Utd\SpecialId\Http\Controllers\web\SpecialIdFramController;
-use Utd\SpecialId\Http\Controllers\web\SpecialHistoryController;
 use Illuminate\Support\Facades\Route;
+use Utd\SpecialId\Http\Controllers\web\SpecialHistoryController;
+use Utd\SpecialId\Http\Controllers\web\SpecialIdFramController;
+use Utd\SpecialId\Http\Controllers\web\SpecialWareController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'web',
         'middleware' => [
             'web',
             'admin',
@@ -27,7 +27,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('special-wares', SpecialWareController::class);

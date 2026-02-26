@@ -45,21 +45,6 @@ class HostLevelServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the package routes.
-     */
-    protected function registerRoutes(): void
-    {
-        Route::prefix('api')
-            ->middleware('api')
-            ->namespace($this->namespace)
-            ->group(__DIR__.'/../routes/api.php');
-
-        Route::middleware('web')
-            ->namespace($this->namespace)
-            ->group(__DIR__.'/../routes/web.php');
-    }
-
-    /**
      * Register views.
      *
      * @return void
@@ -101,6 +86,21 @@ class HostLevelServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    /**
+     * Register the package routes.
+     */
+    protected function registerRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(__DIR__.'/../routes/api.php');
+
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(__DIR__.'/../routes/web.php');
     }
 
     /**

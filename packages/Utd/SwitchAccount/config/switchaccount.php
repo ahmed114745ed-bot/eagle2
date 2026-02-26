@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'name' => 'SwitchAccount'
+    'name' => 'SwitchAccount',
 ];

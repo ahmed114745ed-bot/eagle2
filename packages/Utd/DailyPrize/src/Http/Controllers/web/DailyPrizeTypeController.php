@@ -2,18 +2,19 @@
 
 namespace Utd\DailyPrize\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Admin\Controllers\MainController;
-use Utd\DailyPrize\Entities\DailyGiftType;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Utd\DailyPrize\Entities\DailyGiftType;
 
 class DailyPrizeTypeController extends MainController
 {
-    protected $title = 'DailyGiftType';
     public $permission_name = 'daily-prize';
+
+    protected $title = 'DailyGiftType';
 
     public function index(Content $content)
     {
@@ -55,17 +56,20 @@ class DailyPrizeTypeController extends MainController
                     3 => __('third_week'),
                     4 => __('fourth_week'),
                 ];
+
                 return $weeks[$type] ?? $type;
             });
 
-        if (Admin::user()->can('browse-' . 'daily-gift') || Admin::user()->can('*')) {
+        if (Admin::user()->can('browse-'.'daily-gift') || Admin::user()->can('*')) {
             $grid->column(__('procedures'))->display(function () {
-                $url1 = url('admin/daily-gifts/' . $this->type);
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('add a daily login gift') . "</a>";
+                $url1 = url('admin/daily-gifts/'.$this->type);
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('add a daily login gift').'</a>';
+
                 return $button1;
             });
         }
         $this->extendGrid($grid);
+
         return $grid;
     }
 

@@ -4,24 +4,24 @@ namespace Utd\SwitchAccount\Transformers;
 
 use App\Helpers\Common;
 use App\Support\PackageHelper;
-use Utd\SwitchAccount\Entities\UserAccount;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Chat\Entities\ChatRoom;
+use Utd\SwitchAccount\Entities\UserAccount;
 
 class AccountResource extends JsonResource
 {
     public function toArray($request)
     {
-        $authId      = auth()->id();
-        $accountId   = $this->id;
+        $authId = auth()->id();
+        $accountId = $this->id;
 
         $userAccount = UserAccount::where(function ($q) use ($authId, $accountId) {
-            $q->where('parent_user_id',  $authId)
-                ->where('child_user_id',   $accountId);
+            $q->where('parent_user_id', $authId)
+                ->where('child_user_id', $accountId);
         })->orWhere(function ($q) use ($authId, $accountId) {
-            $q->where('parent_user_id',  $accountId)
-                ->where('child_user_id',   $authId);
+            $q->where('parent_user_id', $accountId)
+                ->where('child_user_id', $authId);
         })
             ->first();
 
@@ -32,25 +32,25 @@ class AccountResource extends JsonResource
         }
 
         return [
-            'id'            =>  $this->id,
-            'image'         =>  $this->profile->avatar,
-            'name'          =>  $this->name,
-            'uuid'          => $this->uuid,
-            'user_type'     => $this->type_user,
-            'sender_level'  => $this->total_sender_level ?? 0,
-            'received_level'  => $this->total_received_level ?? 0,
-            'unread_messages'  => $total_unread_message ?? 0,
-            'key'           =>  $userAccount?->key,
-            'expire'        =>  $userAccount?->expire,
-            'can_switch'    => ($this->id == $authId ? false : true),
+            'id' => $this->id,
+            'image' => $this->profile->avatar,
+            'name' => $this->name,
+            'uuid' => $this->uuid,
+            'user_type' => $this->type_user,
+            'sender_level' => $this->total_sender_level ?? 0,
+            'received_level' => $this->total_received_level ?? 0,
+            'unread_messages' => $total_unread_message ?? 0,
+            'key' => $userAccount?->key,
+            'expire' => $userAccount?->expire,
+            'can_switch' => ($this->id === $authId ? false : true),
             'vip' => Common::ovip_center(@$this),
-            'special_color'    => @$this->color_id ?? '',
-            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
-            'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
-            'image_color'          => @$this->color_image,
-            'level'=> [
-                'receiver_img' => $this->getImageReceiverOrSender('receiver_id',1)->img ??'',
-                'sender_img' => $this->getImageReceiverOrSender('sender_id',2)->img ??'',
+            'special_color' => @$this->color_id ?? '',
+            'special_id' => @$this->specialId?->ware?->id ?? 0,
+            'special_id_image' => @$this->specialId?->ware?->show_img ?? '',
+            'image_color' => @$this->color_image,
+            'level' => [
+                'receiver_img' => $this->getImageReceiverOrSender('receiver_id', 1)->img ?? '',
+                'sender_img' => $this->getImageReceiverOrSender('sender_id', 2)->img ?? '',
             ],
             'user_types' => $this->user_types,
             'country' => @$this->country ? [
@@ -60,7 +60,7 @@ class AccountResource extends JsonResource
                 'language' => @$this->country->language ?? '',
                 'e_name' => @$this->country->e_name ?? '',
                 'phone_code' => @$this->country->phone_code ?? '',
-                'iso' => substr(@$this->country->iso, 0, 2),
+                'iso' => mb_substr(@$this->country->iso, 0, 2),
             ] : null,
         ];
     }

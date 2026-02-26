@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->char('gift_type',100)->nullable();
+            $table->char('gift_type', 100)->nullable();
             $table->integer('target')->nullable();
             $table->timestamps();
         });

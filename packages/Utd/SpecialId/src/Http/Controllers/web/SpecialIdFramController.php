@@ -7,14 +7,16 @@ use App\Models\Emoji;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Utd\SpecialId\Entities\SpecialIdFram;
-use Encore\Admin\Layout\Content;
 
 class SpecialIdFramController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'special-frame';
+
     public function index(Content $content)
     {
         return $content
@@ -47,10 +49,11 @@ class SpecialIdFramController extends MainController
     {
         $grid = new Grid(new SpecialIdFram);
 
-        $grid->id( __ ('ID'));
+        $grid->id(__('ID'));
         $grid->title(__('name'));
-        $grid->column('image',__ ('img'))->image ('',30);
-        $grid->column('color',__('color'));
+        $grid->column('image', __('img'))->image('', 30);
+        $grid->column('color', __('color'));
+
         return $grid;
     }
 
@@ -62,6 +65,7 @@ class SpecialIdFramController extends MainController
         $show->title('name');
         $show->color('color');
         $show->image('image');
+
         return $show;
     }
 

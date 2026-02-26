@@ -2,20 +2,20 @@
 
 namespace Utd\SpecialId\Http\Controllers\web;
 
-use App\Models\Ware;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
-use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
+use App\Models\Ware;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
-class SpecialWareController extends  MainController
+class SpecialWareController extends MainController
 {
     /**
      * Title for current resource.
@@ -23,8 +23,10 @@ class SpecialWareController extends  MainController
      * @var string
      */
     use HasResourceActions;
-    protected $title = 'Ware';
+
     public $permission_name = 'featured-ids';
+
+    protected $title = 'Ware';
 
     public function index(Content $content)
     {
@@ -32,6 +34,7 @@ class SpecialWareController extends  MainController
             ->title(__('Featured ids'))
             ->body($this->grid()));
     }
+
     public function show($id, Content $content)
     {
         return parent::show($id, $content
@@ -42,8 +45,7 @@ class SpecialWareController extends  MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -59,11 +61,11 @@ class SpecialWareController extends  MainController
             ->title(__($this->title))
             ->body($this->form()));
     }
+
     /**
      * Make a grid builder.
      *
      * @return Grid
-     *
      */
     protected function grid()
     {
@@ -79,19 +81,21 @@ class SpecialWareController extends  MainController
         });
         $grid->column('value', __('value'))->display(function ($coin) {
             $icon = asset('images/coin.png'); // Ensure this path is correct
-            return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+
+            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">'.$coin ?? 0;
         });
         $grid->column('price', __('price'))->display(function ($coin) {
             $icon = asset('images/coin.png'); // Ensure this path is correct
-            return '<img src="' . $icon . '" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
+
+            return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">'.number_format($coin);
         });
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('expire', __('expire'))->display(function ($value) {
 
-            if (@$this->get_type == 6) {
+            if (@$this->get_type === 6) {
                 return $value;
             }
-            if ($this->get_type == 4) {
+            if ($this->get_type === 4) {
                 return '∞';
             }
         });
@@ -101,13 +105,14 @@ class SpecialWareController extends  MainController
         $grid->sort(__('sort'), __('sort'));
         $this->extendGrid($grid);
         $grid->disableExport();
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -169,7 +174,7 @@ class SpecialWareController extends  MainController
                     if (DB::table('wares')->where('value', $value)->exists()) {
                         return $fail(__('لا يمكنك استخدام القيمه هذه'));
                     }
-                }
+                },
             ])
             ->updateRules([
                 'required',
@@ -177,7 +182,7 @@ class SpecialWareController extends  MainController
             ]);
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
 
                 $form->number('price', trans('price'))->rules('required|max:9', [
@@ -200,21 +205,19 @@ class SpecialWareController extends  MainController
         $form->number('level', trans('level'));
         $form->text('key', trans('key'));
         $form->image('show_img', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
         })->default('1.png')->rules('required');
         $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            return 'svga_'.Str::random(6).'.'.$file->getClientOriginalExtension();
         })->rules('required');
         $form->color('color', trans('color'));
 
-
         $form->number('num', __('num'));
         $form->saving(function (Form $form) {
-            if (request('get_type') == 4) {
+            if (request('get_type') === 4) {
                 $form->expire = 0;
             }
         });
-
 
         return $form;
     }

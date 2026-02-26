@@ -2,27 +2,26 @@
 
 namespace Utd\DailyPrize\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use App\Models\Ware;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Selectables\Wares;
 use App\Selectables\Badges;
-use Utd\Vip\Entities\OVip;
+use App\Selectables\Wares;
 use App\Support\PackageHelper;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Modules\Badge\Entities\Badge;
-use App\Admin\Controllers\MainController;
-use Utd\DailyPrize\Entities\DailyGift;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Show;
 use Utd\Achievements\Entities\Achievement;
+use Utd\DailyPrize\Entities\DailyGift;
+use Utd\Vip\Entities\OVip;
 use Utd\Vip\Selectables\OVips;
 
 class DailyPrizeController extends MainController
 {
-    protected $title = 'daily login gift';
     public $permission_name = 'daily-gift';
+
+    protected $title = 'daily login gift';
 
     public function index(Content $content)
     {
@@ -56,6 +55,77 @@ class DailyPrizeController extends MainController
             ->body($this->form()));
     }
 
+    public function update($id)
+    {
+        $id = request()->route('id');
+        $response = $this->form()->update($id);
+
+        if ($response instanceof \Illuminate\Http\RedirectResponse) {
+            $errors = session()->get('errors');
+            if ($errors) {
+                info('Validation errors: ', $errors->all());
+            }
+
+            return $response;
+        }
+
+        $type = request()->route('type');
+        admin_toastr(__('admin.save_succeeded'));
+
+        return redirect()->route('admin.daily-gifts.index', ['type' => $type]);
+    }
+
+    public function store()
+    {
+        $data = request()->all();
+
+        $type = request()->route('type');
+        $data['type'] = $type;
+
+        switch ($data['gift_type']) {
+            case 'ware':
+                $data['target'] = $data['target1'] ?? null;
+                break;
+            case 'vip':
+                $data['target'] = $data['target2'] ?? null;
+                break;
+            case 'badge':
+                $data['target'] = $data['target5'] ?? null;
+                break;
+            case 'coins':
+                $data['target'] = $data['target3'] ?? null;
+                $data['expire'] = null;
+                break;
+            case 'achievement':
+                if (request()->hasFile('target4')) {
+                    $image = request()->file('target4');
+                    $filename = now()->timestamp.'.'.$image->getClientOriginalExtension();
+                    $path = $image->storeAs('uploads/achievements', $filename, 'public');
+                    $data['target'] = $path;
+                }
+                break;
+        }
+
+        $validated = validator($data, [
+            'type' => 'required|string',
+            'order' => 'required|unique:daily_gifts,order,NULL,id,type,'.$type,
+            'gift_type' => 'required|in:ware,vip,coins,achievement,badge',
+            'target' => 'required',
+        ])->validate();
+
+        DailyGift::create([
+            'type' => $data['type'],
+            'order' => $data['order'],
+            'gift_type' => $data['gift_type'],
+            'target' => $data['target'],
+            'expire' => $data['expire'] ?? null,
+        ]);
+
+        admin_toastr(__('admin.save_succeeded'));
+
+        return redirect()->route('admin.daily-gifts.index', ['type' => $type]);
+    }
+
     protected function grid()
     {
         $type = request('type');
@@ -72,6 +142,7 @@ class DailyPrizeController extends MainController
                     6 => __('sixth_day'),
                     7 => __('seventh_day'),
                 ];
+
                 return $days[$order] ?? $order;
             });
 
@@ -80,15 +151,17 @@ class DailyPrizeController extends MainController
             $grid->column('details', __('gift details'))->display(function () {
                 switch ($this->gift_type) {
                     case 'ware':
-                        $ware = \App\Models\Ware::find($this->target);
+                        $ware = Ware::find($this->target);
+
                         return $ware
-                            ? __('name') . ': ' . $ware->name . ', ' . __('id') . ': ' . $ware->id
+                            ? __('name').': '.$ware->name.', '.__('id').': '.$ware->id
                             : __('Not Found');
 
                     case 'vip':
                         $vip = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
+
                         return $vip
-                            ? __('name') . ': ' . $vip->name . ', ' . __('id') . ': ' . $vip->id
+                            ? __('name').': '.$vip->name.', '.__('id').': '.$vip->id
                             : __('Not Found');
 
                     case 'achievement':
@@ -101,23 +174,24 @@ class DailyPrizeController extends MainController
         }
 
         $grid->column('image', __('image'))->display(function ($path) {
-            if ($this->gift_type == 'ware') {
+            if ($this->gift_type === 'ware') {
                 $ware = Ware::find($this->target);
                 $path = $ware->img2 ?? $ware?->show_img;
-            } elseif ($this->gift_type == 'vip') {
+            } elseif ($this->gift_type === 'vip') {
                 $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                 $path = $vips?->img;
-            } elseif ($this->gift_type == 'achievement') {
+            } elseif ($this->gift_type === 'achievement') {
                 $path = $this->target;
             } else {
                 $path = 'coin.png';
             }
 
             if (request()->filled('_export_')) {
-                return '=IMAGE("' . getImagePath($path) . '","flag",1)';
+                return '=IMAGE("'.getImagePath($path).'","flag",1)';
             }
 
             $url = getImagePath($path);
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 
@@ -161,24 +235,6 @@ class DailyPrizeController extends MainController
         return $show;
     }
 
-    public function update($id)
-    {
-        $id = request()->route('id');
-        $response = $this->form()->update($id);
-
-        if ($response instanceof \Illuminate\Http\RedirectResponse) {
-            $errors = session()->get('errors');
-            if ($errors) {
-                info('Validation errors: ', $errors->all());
-            }
-            return $response;
-        }
-
-        $type = request()->route('type');
-        admin_toastr(__('admin.save_succeeded'));
-        return redirect()->route('admin.daily-gifts.index', ['type' => $type]);
-    }
-
     protected function form()
     {
         $form = new Form(new DailyGift());
@@ -195,15 +251,15 @@ class DailyPrizeController extends MainController
             5 => __('fifth_day'),
             6 => __('sixth_day'),
             7 => __('seventh_day'),
-        ])->rules('required|unique:daily_gifts,order,' . $orderId . ',id,type,' . $typeId);
+        ])->rules('required|unique:daily_gifts,order,'.$orderId.',id,type,'.$typeId);
 
         $giftTypeOptions = [
-            "ware"        => __('ware'),
-            "coins"       => __('coins'),
-            "badge" => __('badge'),
+            'ware' => __('ware'),
+            'coins' => __('coins'),
+            'badge' => __('badge'),
         ];
         if (PackageHelper::isInstalled('vip')) {
-            $giftTypeOptions["vip"] = __('vip');
+            $giftTypeOptions['vip'] = __('vip');
         }
         if (class_exists(Achievement::class)) {
             $giftTypeOptions['achievement'] = __('achievement');
@@ -214,7 +270,7 @@ class DailyPrizeController extends MainController
                 $form->belongsTo('target1', Wares::class, trans('wares'));
                 $form->number('expire', __('expire'));
             })
-            ->when("badge", function () use ($form) {
+            ->when('badge', function () use ($form) {
                 $form->belongsTo('target5', Badges::class, trans('Badges'));
                 $form->number('expire', __('expire'));
             })
@@ -229,7 +285,7 @@ class DailyPrizeController extends MainController
             })
             ->when('achievement', function () use ($form) {
                 $form->image('target4', __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
+                    return now()->timestamp.'.'.$file->guessExtension();
                 });
                 $form->number('expire', __('expire'));
             })
@@ -241,84 +297,52 @@ class DailyPrizeController extends MainController
 
             switch ($type) {
                 case 'ware':
-                    if (!$form->target1) $errors[] = __('wares') . ' ' . __('is required');
-                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    if (! $form->target1) {
+                        $errors[] = __('wares').' '.__('is required');
+                    }
+                    if (empty($form->expire) || ! is_numeric($form->expire)) {
+                        $errors[] = __('expire').' '.__('is required and must be numeric');
+                    }
                     break;
                 case 'badge':
-                    if (!$form->target5) $errors[] = __('badge') . ' ' . __('is required');
-                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    if (! $form->target5) {
+                        $errors[] = __('badge').' '.__('is required');
+                    }
+                    if (empty($form->expire) || ! is_numeric($form->expire)) {
+                        $errors[] = __('expire').' '.__('is required and must be numeric');
+                    }
                     break;
                 case 'vip':
-                    if (!$form->target2) $errors[] = __('vips') . ' ' . __('is required');
-                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    if (! $form->target2) {
+                        $errors[] = __('vips').' '.__('is required');
+                    }
+                    if (empty($form->expire) || ! is_numeric($form->expire)) {
+                        $errors[] = __('expire').' '.__('is required and must be numeric');
+                    }
                     break;
                 case 'coins':
-                    if (empty($form->target3) || !is_numeric($form->target3)) $errors[] = __('coins') . ' ' . __('is required and must be numeric');
+                    if (empty($form->target3) || ! is_numeric($form->target3)) {
+                        $errors[] = __('coins').' '.__('is required and must be numeric');
+                    }
                     $form->expire = null;
                     break;
                 case 'achievement':
-                    if (!$form->target4) $errors[] = __('image') . ' ' . __('is required');
-                    if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
+                    if (! $form->target4) {
+                        $errors[] = __('image').' '.__('is required');
+                    }
+                    if (empty($form->expire) || ! is_numeric($form->expire)) {
+                        $errors[] = __('expire').' '.__('is required and must be numeric');
+                    }
                     break;
             }
 
             if (count($errors)) {
                 admin_error(__('Validation error'), implode('<br>', $errors));
+
                 return back();
             }
         });
 
         return $form;
-    }
-
-    public function store()
-    {
-        $data = request()->all();
-
-        $type = request()->route('type');
-        $data['type'] = $type;
-
-        switch ($data['gift_type']) {
-            case 'ware':
-                $data['target'] = $data['target1'] ?? null;
-                break;
-            case 'vip':
-                $data['target'] = $data['target2'] ?? null;
-                break;
-            case 'badge':
-                $data['target'] = $data['target5'] ?? null;
-                break;
-            case 'coins':
-                $data['target'] = $data['target3'] ?? null;
-                $data['expire'] = null;
-                break;
-            case 'achievement':
-                if (request()->hasFile('target4')) {
-                    $image = request()->file('target4');
-                    $filename = now()->timestamp . '.' . $image->getClientOriginalExtension();
-                    $path = $image->storeAs('uploads/achievements', $filename, 'public');
-                    $data['target'] = $path;
-                }
-                break;
-        }
-
-        $validated = validator($data, [
-            'type' => 'required|string',
-            'order' => 'required|unique:daily_gifts,order,NULL,id,type,' . $type,
-            'gift_type' => 'required|in:ware,vip,coins,achievement,badge',
-            'target' => 'required',
-        ])->validate();
-
-        DailyGift::create([
-            'type' => $data['type'],
-            'order' => $data['order'],
-            'gift_type' => $data['gift_type'],
-            'target' => $data['target'],
-            'expire' => $data['expire'] ?? null,
-        ]);
-
-        admin_toastr(__('admin.save_succeeded'));
-
-        return redirect()->route('admin.daily-gifts.index', ['type' => $type]);
     }
 }

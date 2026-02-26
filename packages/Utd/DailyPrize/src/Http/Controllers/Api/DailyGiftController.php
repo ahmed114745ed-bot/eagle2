@@ -3,30 +3,24 @@
 namespace Utd\DailyPrize\Http\Controllers\Api;
 
 use App\Enums\UserCoinLogType;
+use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use Carbon\Carbon;
-use Utd\Vip\Entities\OVip;
+use App\Helpers\UserCommon;
 use App\Models\Ware;
 use App\Support\PackageHelper;
-use App\Helpers\Common;
-use App\Helpers\UserCommon;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
+use DateTimeImmutable;
+use Exception;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\Support\Renderable;
-use Utd\Achievements\Entities\Achievement;
-use Utd\DailyPrize\Entities\DailyUserGift;
-use Utd\DailyPrize\Entities\DailyGiftCount;
-use Utd\Achievements\Entities\UserAchievement;
-use Utd\DailyPrize\Transformers\WeeklyStarGift;
 use Utd\Achievements\Entities\UserAchievementLevel;
+use Utd\DailyPrize\Entities\DailyGiftCount;
+use Utd\DailyPrize\Entities\DailyUserGift;
 use Utd\DailyPrize\Http\Services\DailyPrizeService;
+use Utd\Vip\Entities\OVip;
 
 class DailyGiftController extends Controller
 {
-
     public function __construct(private DailyPrizeService $dailyPrizeService) {}
 
     public function current_day()
@@ -37,13 +31,14 @@ class DailyGiftController extends Controller
 
         $currentDay = $this->getCurrentDay();
 
-        $check_received = DailyGiftCount::query()->where('user_id', $user->id)->where("day_count", $currentDay)->first();
+        $check_received = DailyGiftCount::query()->where('user_id', $user->id)->where('day_count', $currentDay)->first();
         $data = [
-            'total_days'    => $currentDay,
-            'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
-            'gift'          => $this->getWeekGifts($currentDay),
-            'is_received'   => $check_received != null ? true : false,
+            'total_days' => $currentDay,
+            'current_day' => ($currentDay % 7 === 0 ? 7 : $currentDay % 7),
+            'gift' => $this->getWeekGifts($currentDay),
+            'is_received' => $check_received !== null ? true : false,
         ];
+
         return Common::apiResponse(1, '', $data);
     }
 
@@ -59,25 +54,26 @@ class DailyGiftController extends Controller
 
         for ($day = $startDay; $day <= $endDay; $day++) {
             $gifts[] = [
-                'day'  => $day,
+                'day' => $day,
                 'gift' => $this->dailyPrizeService->getGift($day) ?? (object) [],
             ];
         }
 
         return $gifts;
     }
+
     public function receive_daily_prize()
     {
         $user = Auth::user();
         $currentDay = $this->getCurrentDay();
 
         $dailyGift = $this->dailyPrizeService->getDayGift($currentDay);
-        if (!$dailyGift) {
+        if (! $dailyGift) {
             return Common::apiResponse(0, '  لا يوجد هديه اليوم ', [], 400);
         }
 
         $result = DailyGiftCount::query()->where('user_id', $user->id)->orderByDesc('id')->first();
-        if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
+        if (! $this->dailyPrizeService->isNewDay($user->id) && $result !== null) {
             return Common::apiResponse(0, __('It has not been 24 hours yet to receive the next gift.'), [], 400);
         }
         try {
@@ -96,13 +92,13 @@ class DailyGiftController extends Controller
 
             ]);
             DailyUserGift::create([
-                'user_id'   => $user->id,
+                'user_id' => $user->id,
                 'gift_type' => $type,
-                'target'    => $target,
+                'target' => $target,
             ]);
 
             return Common::apiResponse(1, 'تم استلام الجائزه بنجاح', [], 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
@@ -113,7 +109,7 @@ class DailyGiftController extends Controller
         $user = Auth::user();
         $result = DailyGiftCount::query()->where('user_id', $user->id)->first();
         $currentDay = 1;
-        if ($result != null) {
+        if ($result !== null) {
             $currentDay = $result->day_count;
             if ($this->dailyPrizeService->isNewDay($user->id)) {
                 $currentDay += 1;
@@ -122,12 +118,13 @@ class DailyGiftController extends Controller
 
         return $currentDay;
     }
+
     public function assignGiftToUser(mixed $type, \App\Models\Admin|\Illuminate\Contracts\Auth\Authenticatable|null $user, mixed $target, mixed $expire): void
     {
 
-        if ($type == "coins") {
+        if ($type === 'coins') {
 
-            $amountBefore =  Common::getCurrentBalance($user->id);
+            $amountBefore = Common::getCurrentBalance($user->id);
             UserCoinLogHelper::logByType(
                 $user->id,
                 $target,
@@ -137,40 +134,45 @@ class DailyGiftController extends Controller
 
             $user->di += $target;
             $user->save();
-        } elseif ($type == "vip") {
+        } elseif ($type === 'vip') {
             $vip = null;
             if (PackageHelper::isInstalled('vip')) {
                 $vip = OVip::query()->find($target);
             }
-            if ($vip) UserCommon::addVipToUser($user, $vip, $expire, null, 'daily-gift');
-        } elseif ($type == "ware") {
+            if ($vip) {
+                UserCommon::addVipToUser($user, $vip, $expire, null, 'daily-gift');
+            }
+        } elseif ($type === 'ware') {
 
             $ware = Ware::query()->find($target);
 
-            if ($ware) UserCommon::addWareToUser($user, $ware, $expire, null, 'daily-gifts');
-        } elseif ($type == "achievement") {
+            if ($ware) {
+                UserCommon::addWareToUser($user, $ware, $expire, null, 'daily-gifts');
+            }
+        } elseif ($type === 'achievement') {
             if (class_exists(UserAchievementLevel::class)) {
                 $attributes = [
-                    'user_id'      => $user->id,
+                    'user_id' => $user->id,
                     'custom_image' => $target,
-                    'end_at' =>  Carbon::parse($expire)->format("Y-m-d H:i:s"),
+                    'end_at' => Carbon::parse($expire)->format('Y-m-d H:i:s'),
                 ];
                 UserAchievementLevel::create($attributes);
             }
-        } elseif ($type == 'badge') {
+        } elseif ($type === 'badge') {
             Common::userBadge($user->id, $target, $expire, 'daily-gifts');
         }
     }
 
     public function check_date_hours($date)
     {
-        $specificDateTime = new \DateTime($date);
-        $now = new \DateTime();
+        $specificDateTime = new DateTimeImmutable($date);
+        $now = new DateTimeImmutable();
         $diff = $now->diff($specificDateTime);
         $hoursDifference = ($diff->days * 24) + $diff->h + ($diff->i / 60) + ($diff->s / 3600);
         if ($hoursDifference > 24) {
             return false;
         }
+
         return true;
     }
 }

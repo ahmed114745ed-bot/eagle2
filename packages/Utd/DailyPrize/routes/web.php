@@ -1,21 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Admin\Controllers\DailyPrzeTypeController;
 use Utd\DailyPrize\Http\Controllers\web\DailyPrizeController;
 use Utd\DailyPrize\Http\Controllers\web\DailyPrizeTypeController;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'web',
         'middleware' => [
             'web',
             'admin',
             'adminIp',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('daily-gift-types', DailyPrizeTypeController::class);

@@ -2,15 +2,14 @@
 
 namespace Utd\SpecialId\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Show;
 use Utd\SpecialId\Entities\SpecialHistory;
-use Encore\Admin\Facades\Admin;
 
 class SpecialHistoryController extends MainController
 {
@@ -54,7 +53,7 @@ class SpecialHistoryController extends MainController
         $grid = new Grid(new SpecialHistory());
         $countryID = session('filter_country_id');
 
-        $grid->model()->with(['user','user.profile', 'ware','user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')])->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
+        $grid->model()->with(['user', 'user.profile', 'ware', 'user.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')])->when($countryID, fn ($q) => $q->whereHas('user', fn ($q) => $q->where('country_id', $countryID)));
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
@@ -67,7 +66,7 @@ class SpecialHistoryController extends MainController
                 $filter->where(function ($query) {
                     if ($from = request('from_date')) {
                         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
-                        $query->whereDate('created_at',  $start);
+                        $query->whereDate('created_at', $start);
                     }
                 }, __('start date'), 'from_date')->date();
             });
@@ -77,11 +76,11 @@ class SpecialHistoryController extends MainController
             });
         });
         if ($end = request('end_date')) {
-            $endDate = \Carbon\Carbon::parse(convertArabicToEnglishNumbers($end))->toDateString();
+            $endDate = Carbon::parse(convertArabicToEnglishNumbers($end))->toDateString();
 
             $grid->model()->whereHas('ware', function ($q) use ($endDate) {
                 $q->whereRaw(
-                    "DATE(DATE_ADD(special_id_histories.created_at, INTERVAL wares.expire DAY)) = ?",
+                    'DATE(DATE_ADD(special_id_histories.created_at, INTERVAL wares.expire DAY)) = ?',
                     [$endDate]
                 );
             });
@@ -94,31 +93,33 @@ class SpecialHistoryController extends MainController
 
                 return "{$name} (UUID: {$uid})";
             }
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             return '
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="' . $url . '" alt="User Image" style="width: 40px; height: 40px;">
+                    <img src="'.$url.'" alt="User Image" style="width: 40px; height: 40px;">
                     <div>
-                        <a href="/admin/users/' . $this->user_id . '" style="text-decoration: none; font-weight: bold;">' . $name . '</a>
-                        <div style="font-size: 12px;">' . 'Uuid: ' . $this->user?->uuid . '</div>
+                        <a href="/admin/users/'.$this->user_id.'" style="text-decoration: none; font-weight: bold;">'.$name.'</a>
+                        <div style="font-size: 12px;">'.'Uuid: '.$this->user?->uuid.'</div>
                     </div>
                 </div>
             ';
         });
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('ware.value', __('value'))->display(function ($coin) {
                 $icon = asset('images/coin.png');
-                return '<img src="' . $icon . '" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . $coin ?? 0;
+
+                return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">'.$coin ?? 0;
             });
             $grid->column('ware.show_img', __('image'))->display(function ($path) {
                 if ($this->ware) {
                     $url = getImagePath($path);
+
                     return handleShowImageWithTypes($this->id, $url, 50, 50);
                 }
             });
@@ -127,6 +128,7 @@ class SpecialHistoryController extends MainController
                     if (is_null($value)) {
                         return "<span style='color:red;'>⚠️ نوع غير متوفر</span>";
                     }
+
                     return $value;
                 })
                 ->select([
@@ -139,43 +141,48 @@ class SpecialHistoryController extends MainController
                 if (@$this->ware && request()->filled('_export_')) {
                     $name = $vale ?? '';
                     $id = $this->ware->id ?? 0;
+
                     return "{$name} (ID: {$id})";
-                } else {
-                    return '-';
                 }
+
+                return '-';
+
             });
 
             $grid->column('ware.get_type', __('get_type'))->display(function ($status) {
 
                 if (@$this->ware->get_type && request()->filled('_export_')) {
-                    return $status == 4 ? trans('purchase') : trans('limited time purchase');
-                } else {
-                    return '';
+                    return $status === 4 ? trans('purchase') : trans('limited time purchase');
                 }
+
+                return '';
+
             });
         }
         $grid->column('status', __('status'))->display(function ($status) {
             if (request()->filled('_export_')) {
-                return $status == 1 ? __('active') : __('inactive');
+                return $status === 1 ? __('active') : __('inactive');
             }
-            return $status == 1 ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
-                "></span>" : "<span class='label-warning' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
-                "></span>";
+
+            return $status === 1 ? "<span class='label-success' ".'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"'.
+                '></span>' : "<span class='label-warning' ".'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"'.
+                '></span>';
         });
 
         $grid->column('created_at', __('start date'))
             ->display(function ($value) {
                 $timezone = getTimezone();
+
                 return Carbon::parse($value)->setTimezone($timezone)->format('Y-m-d');
             });
 
         $grid->column('ware.expire', __('end date'))
             ->display(function ($value) {
                 $timezone = getTimezone();
-                if (!@$this->ware->get_type) {
+                if (! @$this->ware->get_type) {
                     return '-';
                 }
-                if ($this->ware->get_type == 4) {
+                if ($this->ware->get_type === 4) {
                     return '∞';
                 }
 
@@ -196,6 +203,7 @@ class SpecialHistoryController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+
         return $grid;
     }
 
