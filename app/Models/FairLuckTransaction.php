@@ -12,11 +12,13 @@ class FairLuckTransaction extends Model
     use HasFactory;
 
     public $timestamps = false; // Only created_at in migration
-    
+
     protected $fillable = [
         'user_id',
         'gift_id',
         'bet_amount',
+        'app_fee',
+        'receiver_fee',
         'is_winner',
         'multiplier',
         'profit_amount',
@@ -33,6 +35,8 @@ class FairLuckTransaction extends Model
         'is_beginner_protected' => 'boolean',
         'created_at' => 'datetime',
         'bet_amount' => 'decimal:2',
+        'app_fee' => 'decimal:2',
+        'receiver_fee' => 'decimal:2',
         'profit_amount' => 'decimal:2',
         'deviation_before' => 'decimal:6',
         'calculated_probability' => 'decimal:4',

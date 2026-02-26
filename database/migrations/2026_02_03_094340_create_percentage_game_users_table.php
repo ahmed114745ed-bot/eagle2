@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('percentage_game_users', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('percentage_game_id');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('percentage_game_users')) {
+            Schema::create('percentage_game_users', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('percentage_game_id');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

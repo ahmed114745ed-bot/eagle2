@@ -23,14 +23,10 @@ class FairLuckWallet extends Model
         'last_updated' => 'datetime',
     ];
 
-    // أنواع المحافظ
     const TYPE_GLOBAL_VAULT = 'global_vault';
     const TYPE_JACKPOT_WALLET = 'jackpot_wallet';
     const TYPE_MEDIUM_WALLET = 'medium_wallet';
 
-    /**
-     * الحصول على رصيد محفظة معينة
-     */
     public static function getBalance(string $walletType): int
     {
         $wallet = self::where('wallet_type', $walletType)->first();
@@ -40,65 +36,67 @@ class FairLuckWallet extends Model
     /**
      * زيادة رصيد محفظة معينة
      */
-    public static function increaseBalance(string $walletType, int $amount): bool
+    public static function increaseBalance(string $walletType, int $amount, ?string $description = null, ?int $userId = null): bool
     {
         if ($amount <= 0) {
             return false;
         }
 
-        return DB::transaction(function () use ($walletType, $amount) {
+        return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
             $wallet = self::where('wallet_type', $walletType)
                 ->lockForUpdate()
                 ->first();
 
             if (!$wallet) {
-                // إنشاء المحفظة إذا لم تكن موجودة
                 $wallet = self::create([
                     'wallet_type' => $walletType,
                     'balance' => $amount,
                     'last_updated' => now(),
                 ]);
+                self::logHistory($walletType, $amount, 0, $amount, $description, $userId);
                 return true;
             }
 
+            $before = $wallet->balance;
             $wallet->increment('balance', $amount);
             $wallet->update(['last_updated' => now()]);
+            self::logHistory($walletType, $amount, $before, $wallet->balance, $description, $userId);
 
             return true;
         });
     }
 
-    /**
-     * تقليل رصيد محفظة معينة
-     */
-    public static function decreaseBalance(string $walletType, int $amount): bool
+    public static function decreaseBalance(string $walletType, int $amount, ?string $description = null, ?int $userId = null): bool
     {
         if ($amount <= 0) {
             return false;
         }
 
-        return DB::transaction(function () use ($walletType, $amount) {
+        return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
             $wallet = self::where('wallet_type', $walletType)
                 ->lockForUpdate()
                 ->first();
 
-            if (!$wallet || $wallet->balance < $amount) {
+            $limit = ($walletType === self::TYPE_GLOBAL_VAULT) ? self::getNegativeLimit() : 0;
+
+            if (!$wallet || ($wallet->balance + $limit) < $amount) {
                 return false;
             }
 
-            $newBalance = max(0, $wallet->balance - $amount);
+            $before = $wallet->balance;
+            $newBalance = $wallet->balance - $amount;
             $wallet->update([
                 'balance' => $newBalance,
                 'last_updated' => now(),
             ]);
 
+            self::logHistory($walletType, -$amount, $before, $newBalance, $description, $userId);
+
             return true;
         });
     }
 
-    /**
-     * تعيين رصيد محفظة معينة
-     */
+   
     public static function setBalance(string $walletType, int $balance): bool
     {
         return DB::transaction(function () use ($walletType, $balance) {
@@ -174,9 +172,6 @@ class FairLuckWallet extends Model
         return (int) Redis::incrby($key, $amount);
     }
 
-    /**
-     * تقليل الرصيد في Redis (Atomic with Check)
-     */
     public static function decrementRedisBalance(string $walletType, int $amount): bool
     {
         if ($amount <= 0) {
@@ -185,21 +180,43 @@ class FairLuckWallet extends Model
 
         $key = "fairluck:wallet:{$walletType}";
 
-        // Initialize if not exists
         if (Redis::get($key) === null) {
             self::getRedisBalance($walletType);
         }
 
+        $limit = ($walletType === self::TYPE_GLOBAL_VAULT) ? self::getNegativeLimit() : 0;
+
         $script = '
             local current = redis.call("get", KEYS[1])
-            if not current or tonumber(current) < tonumber(ARGV[1]) then
+            if not current then
                 return 0
             end
-            redis.call("decrby", KEYS[1], ARGV[1])
+            local new_balance = tonumber(current) - tonumber(ARGV[1])
+            if new_balance < -tonumber(ARGV[2]) then
+                return 0
+            end
+            redis.call("set", KEYS[1], new_balance)
             return 1
         ';
 
-        return (bool) Redis::eval($script, 1, $key, $amount);
+        return (bool) Redis::eval($script, 1, $key, $amount, $limit);
+    }
+
+    public static function getNegativeLimit(): int
+    {
+        return (int) FairLuckSetting::getByKey('global_vault_negative_limit', 30000);
+    }
+
+    public static function logHistory(string $walletType, int $amount, int $before, int $after, ?string $description = null, ?int $userId = null): void
+    {
+        FairLuckWalletHistory::create([
+            'wallet_type' => $walletType,
+            'amount' => $amount,
+            'balance_before' => $before,
+            'balance_after' => $after,
+            'description' => $description,
+            'user_id' => $userId,
+        ]);
     }
 
     /**
