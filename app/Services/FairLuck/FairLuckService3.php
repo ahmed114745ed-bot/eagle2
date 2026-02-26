@@ -108,20 +108,18 @@ class FairLuckService3
             }
 
             if ($isDrainLocked) {
-                $targetLossRate = max($targetLossRate, 0.70); // تقليل العقوبة
+                $targetLossRate = max($targetLossRate, 0.70); 
             }
 
             $targetRTP = (1.0 - $targetLossRate);
             $localTargetRTP = $targetRTP;
 
-            // Adaptive scaling based on deviation (lifetime performance)
             if ($deviation >= 0.05) {
                 // EXTREME recovery if player is in profit > 5%
                 $localTargetRTP = 0.10 * $chaosFactor; // زيادة الحد الأدنى
             } elseif ($deviation >= 0) {
                 $localTargetRTP = 0.40 * $chaosFactor; // تحسين للاعبين في الربح
             } elseif ($deviation < -0.15) {
-                // أكثر سخاء للاعبين الخاسرين
                 $localTargetRTP = 0.92 * $chaosFactor;
             }
 
@@ -135,12 +133,11 @@ class FairLuckService3
             $protectionMultiplier = $this->beginnerProtection->getMultiplier($profile);
             $finalProbability = $this->probabilityEngine->calculate($baseProb, $deviation, $protectionMultiplier);
 
-            // Forced Win Loop: تقليل الحد الأقصى للخسائر المتتالية لتحسين RTP
-            if ($consecutiveLosses >= 20) { // تقليل من 50 إلى 25
-                $finalProbability = 1.0; // فوز مضمون بعد 25 خسارة
-            } elseif ($consecutiveLosses >= 15) { // إضافة مستوى وسطي
-                $finalProbability = max($finalProbability, 0.60); // زيادة احتمالية الفوز
-            } elseif ($consecutiveLosses >= 8) { // تحسين مبكر
+            if ($consecutiveLosses >= 20) {
+                $finalProbability = 1.0; 
+            } elseif ($consecutiveLosses >= 15) { 
+                $finalProbability = max($finalProbability, 0.60); 
+            } elseif ($consecutiveLosses >= 12) { 
                 $finalProbability = max($finalProbability, 0.35);
             }
 
@@ -158,12 +155,10 @@ class FairLuckService3
                 $forceMiniWins = true;
             }
 
-            // Targeted Jackpot Guarantee: تعتمد على الحظ والرصيد المتاح
             $forceJackpot = false;
             if (!$isDrainLocked) {
                 $nearBankrupt = $user->di <= ($betAmount * 20);
 
-                // حساب احتمالية الجاكبوت بناءً على الرصيد المتاح
                 if ($jackpotPity >= 800 && $jackpotPity <= 1000 && $deviation < 0.2 && $hasPaidForJackpot) {
                     $baseJackpotProb = 0.10;
                     $adjustedJackpotProb = DeviationCalculator::calculateJackpotProbability(
