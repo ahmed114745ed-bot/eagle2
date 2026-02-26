@@ -339,5 +339,7 @@ return [
     'confirm_disable_transfer_salary' => 'هل أنت متأكد أنك تريد تعطيل تحويل الراتب؟',
 
     'remove_bans' => 'إزالة الحظر',
+    'no_default_country_manager_to_transfer' => 'لا يوجد مدير دولة افتراضي لنقل الـ BDs إليه.',
+    'no_default_bd_to_transfer_agencies' => 'لا يوجد BD افتراضي لنقل الوكالات إليه.',
 
 ];
