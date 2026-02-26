@@ -1518,6 +1518,7 @@
                             const image =  "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
                             $('#name').val(response.item.name);
                             $('#username').val(response.item.username);
+                            $('#password').val(response.item.password);
                             if (response.item.app_id) {
                                 // Clear any previous selection
                                 $('#user_id').val(null).trigger('change');

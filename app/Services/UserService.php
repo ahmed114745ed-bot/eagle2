@@ -157,10 +157,10 @@ class UserService
         return $this->userRepository->userBdByCountries($areaManagerId, $key, $page, $perPage);
     }
 
-    public function superAdminUsers($key, $page)
+    public function superAdminUsers($key, $page,$selectedId = null)
     {
         $perPage = 10;
-        return $this->userRepository->superAdminUsers($key, $page, $perPage);
+        return $this->userRepository->superAdminUsers($key, $page, $perPage, $selectedId);
     }
 
 
