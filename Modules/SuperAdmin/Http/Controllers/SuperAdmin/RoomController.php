@@ -601,79 +601,160 @@ class RoomController extends MainController
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
 
 
-        $grid->column('microphone',__('microphone'))->display(function () {
+        // $grid->column('microphone',__('microphone'))->display(function () {
 
-            $usersForRow = $this->microphone_users ?? collect();
-            if ($usersForRow->isEmpty()) {
-                return '';
-            }
-            $ids = array_filter(explode(',', $this->microphone ?? ''));
-            if (empty($ids)) {
+        //     $usersForRow = $this->microphone_users ?? collect();
+        //     if ($usersForRow->isEmpty()) {
+        //         return '';
+        //     }
+        //     $ids = array_filter(explode(',', $this->microphone ?? ''));
+        //     if (empty($ids)) {
+        //         return '';
+        //     }
+
+        //     $html = '<div class="image-container">';
+        //     foreach ($usersForRow as $user) {
+
+        //         if (!$user) continue;
+
+        //         $url = $user->profile?->avatar
+        //             ? getImagePath($user->profile?->avatar)
+        //             : asset("images/businessman-icon.jpg");
+
+        //        $userUrl = 'superadmin/users/' . $user->id;
+        //         $html .= <<<HTML
+        //         <div class="image-wrapper" onclick="window.location.href='{$userUrl}'">
+        //             <img src="{$url}" title="{$user->name}"
+        //             style="width: 40px; height: 40px; border-radius: 50%;
+        //                             object-fit: cover; border: 2px solid white;
+        //                             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        //                             transition: transform 0.3s ease;"/>
+        //         </div>
+        //     HTML;
+        //     }
+
+
+        //     $html .= '</div>';
+
+        //     static $appended = false;
+        //     if (!$appended) {
+        //         $html .= '
+        //         <style>
+        //             .image-container {
+        //                 display: flex;
+        //                 justify-content: start;
+        //                 align-items: center;
+        //                 gap: -10px; /* Overlap the images slightly */
+        //                 padding: 8px 0;
+        //                 overflow-y: overlay;
+        //                 width: 218px;
+        //                 padding-right: 16px;
+        //             }
+        //             .image-wrapper {
+        //                 display: inline-block;
+        //                 position: relative;
+        //                 margin-right: -12px;
+        //             }
+        //             .image-wrapper img {
+        //                 width: 40px;
+        //                 height: 40px;
+        //                 border-radius: 50%;
+        //                 object-fit: cover;
+        //                 border: 2px solid #fff;
+        //                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        //                 transition: transform 0.3s ease, box-shadow 0.3s ease;
+        //                 cursor: pointer;
+        //             }
+        //             .image-wrapper img:hover {
+        //                 transform: scale(1.2);
+        //                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        //             }
+        //         </style>';
+        //         $appended = true;
+        //     }
+
+        //     return $html;
+        // })->sortable();
+
+        $grid->column(__('microphone'))->display(function () {
+
+            $microphones = $this->microphones->sortBy('position');
+
+
+            if ($microphones->isEmpty()) {
                 return '';
             }
 
             $html = '<div class="image-container">';
-            foreach ($usersForRow as $user) {
+
+            foreach ($microphones as $mic) {
+                $user = $mic->user;
 
                 if (!$user) continue;
 
                 $url = $user->profile?->avatar
-                    ? getImagePath($user->profile?->avatar)
+                    ? getImagePath($user->profile->avatar)
                     : asset("images/businessman-icon.jpg");
 
+                $name = e($user->name);
+                $id   = e($user->id);
+                $userUrl = ('users/' . $user->id);
                 $html .= <<<HTML
-                <div class="image-wrapper" onclick="window.location.href='{$user->id}'">
-                    <img src="{$url}" title="{$user->name}"
+                <div class="image-wrapper" onclick="window.location.href='{$userUrl}'">
+                    <img src="{$url}" title="{$name}"
                     style="width: 40px; height: 40px; border-radius: 50%;
-                                    object-fit: cover; border: 2px solid white;
-                                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                                    transition: transform 0.3s ease;"/>
+                            object-fit: cover; border: 2px solid white;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                            transition: transform 0.3s ease;"/>
                 </div>
-            HTML;
+             HTML;
             }
-
 
             $html .= '</div>';
 
+            // Add the same CSS block only once
             static $appended = false;
             if (!$appended) {
                 $html .= '
-                <style>
-                    .image-container {
-                        display: flex;
-                        justify-content: start;
-                        align-items: center;
-                        gap: -10px; /* Overlap the images slightly */
-                        padding: 8px 0;
-                        overflow-y: overlay;
-                        width: 218px;
-                        padding-right: 16px;
-                    }
-                    .image-wrapper {
-                        display: inline-block;
-                        position: relative;
-                        margin-right: -12px;
-                    }
-                    .image-wrapper img {
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        object-fit: cover;
-                        border: 2px solid #fff;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-                        transition: transform 0.3s ease, box-shadow 0.3s ease;
-                        cursor: pointer;
-                    }
-                    .image-wrapper img:hover {
-                        transform: scale(1.2);
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                    }
+              <style>
+
+
+
+                .image-container {
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    gap: -10px; /* Overlap the images slightly */
+                    padding: 8px 0;
+                    overflow-y: overlay;
+                    width: 218px;
+                    padding-right: 16px;
+                }
+                .image-wrapper {
+                    display: inline-block;
+                    position: relative;
+                    margin-right: -12px;
+                }
+                .image-wrapper img {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #fff;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    cursor: pointer;
+                }
+                .image-wrapper img:hover {
+                    transform: scale(1.2);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                }
                 </style>';
                 $appended = true;
             }
 
             return $html;
-        })->sortable();
+        });
     }
 
 
