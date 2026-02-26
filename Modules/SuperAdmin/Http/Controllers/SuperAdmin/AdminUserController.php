@@ -314,7 +314,8 @@ class AdminUserController extends EncorUsersController
         }
         $plainPassword = $request->password; // input from user
         $hash = $subSuperAdmin->password;
-        if (!Hash::check($plainPassword, $hash)) {
+        if (Hash::check($plainPassword, $hash)) {
+
             $subSuperAdmin->password = Hash::make($request->password);
         }
         if ($request->user_id != $subSuperAdmin->app_id) {
