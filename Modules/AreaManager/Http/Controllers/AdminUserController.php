@@ -133,19 +133,28 @@ class AdminUserController extends EncorUsersController
     }
     public function showSubSuperAdmin($id)
     {
-        $subSuperAdmin = SubAreaManager::find($id);
+        $subSuperAdmin = SubAreaManager::with('appUser')->find($id);
 
-        if ($subSuperAdmin) {
-            return response()->json([
-                'status' => 200,
-                'item' =>  $subSuperAdmin,
-            ]);
-        } else {
+        if (!$subSuperAdmin) {
             return response()->json([
                 'status' => 404,
                 'message' => trans('message.notFoundGift'),
             ]);
         }
+
+        // Build a payload that includes the linked app user display name
+        $item = $subSuperAdmin->toArray();
+        $item['app_user_name'] = null;
+        if ($subSuperAdmin->appUser) {
+            $appUser = $subSuperAdmin->appUser;
+            $display = trim(($appUser->name ?? '') . ' - ' . ($appUser->uuid ?? ''));
+            $item['app_user_name'] = $display;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'item' => $item,
+        ]);
     }
 
     public function updateSubSuperAdmin(Request $request,)
