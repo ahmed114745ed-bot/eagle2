@@ -133,27 +133,33 @@ class AdminUserController extends EncorUsersController
     }
     public function showSubSuperAdmin($id)
     {
-        $subSuperAdmin = SubAreaManager::find($id);
+        $subSuperAdmin = SubAreaManager::with('appUser')->find($id);
 
-        if ($subSuperAdmin) {
-            return response()->json([
-                'status' => 200,
-                'item' =>  $subSuperAdmin,
-            ]);
-        } else {
+        if (!$subSuperAdmin) {
             return response()->json([
                 'status' => 404,
                 'message' => trans('message.notFoundGift'),
             ]);
         }
+
+        // Build a payload that includes the linked app user display name
+        $item = $subSuperAdmin->toArray();
+        $item['app_user_name'] = null;
+        if ($subSuperAdmin->appUser) {
+            $appUser = $subSuperAdmin->appUser;
+            $display = trim(($appUser->name ?? '') . ' - ' . ($appUser->uuid ?? ''));
+            $item['app_user_name'] = $display;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'item' => $item,
+        ]);
     }
 
     public function updateSubSuperAdmin(Request $request,)
     {
-        $validated = $request->validate([
 
-            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-        ]);
         $subSuperAdmin = SubAreaManager::find($request->id);
         $subSuperAdmin->name = $request->name;
         $subSuperAdmin->username = $request->username;
@@ -161,9 +167,25 @@ class AdminUserController extends EncorUsersController
             $image = Common::upload('images', $request->image);
             $subSuperAdmin->avatar = $image;
         }
-
-        if ($request->filled('password')) {
+        $plainPassword = $request->password; // input from user
+        $hash = $subSuperAdmin->password;
+        if (Hash::check($plainPassword, $hash)) {
             $subSuperAdmin->password = Hash::make($request->password);
+        }
+
+        if ($request->user_id != $subSuperAdmin->app_id) {
+           // dd($request->user_id, $subSuperAdmin->app_id, $request->password);
+            $oldUser = User::find($subSuperAdmin->app_id);
+            if ($oldUser) {
+                $oldUser->sub_area_manger = 0;
+                $oldUser->save();
+            }
+            $subSuperAdmin->app_id = $request->user_id;
+            $appUser = User::find($request->user_id);
+            if ($appUser) {
+                $appUser->sub_area_manger = 1;
+                $appUser->save();
+            }
         }
         $subSuperAdmin->save();
         return Redirect::back();

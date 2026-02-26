@@ -26,9 +26,10 @@ class FairLuckService3
         $this->houseEdgeRate = (float) config('fairluck.house_edge_rate', 0.02);
     }
 
-    public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null, $receiverId = null): object
+    public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null, $receiverId = null, float $appFee = 0, float $receiverFee = 0, float $senderBalanceBefore = 0, float $senderBalanceAfter = 0): object
     {
-        return DB::transaction(function () use ($user, $gift, $betAmount, $roomId) {
+        return DB::transaction(function () use ($user, $gift, $betAmount, $roomId, $appFee, $receiverFee, $senderBalanceBefore, $senderBalanceAfter) {
+            $totalAmount = $betAmount + $appFee + $receiverFee;
 
             $profile = $this->profileManager->getProfile($user->id);
             $deviation = (float) $profile->current_deviation;
@@ -46,6 +47,15 @@ class FairLuckService3
             $forceWin = $consecutiveLosses >= 15;
 
             $globalVault = $this->getGlobalVaultBalance();
+            $jackpotVault = $this->getJackpotWalletBalance();
+            $mediumVault = $this->getMediumWalletBalance();
+
+            $walletsBefore = [
+                'global_vault' => $globalVault,
+                'jackpot_wallet' => $jackpotVault,
+                'medium_wallet' => $mediumVault,
+            ];
+
             $poolBalance = $this->lossLedger->poolBalance();
             $betUnit = max(1, (int) round($betAmount));
             $globalVaultInt = (int) round($globalVault);
@@ -59,7 +69,7 @@ class FairLuckService3
             );
             $isTopLossCandidate = $this->isTopLossCandidate($user->id);
 
-            $this->distributeBetAmount($betAmount);
+            $this->distributeBetAmount($totalAmount, $appFee);
 
             $userBalance = (int) $user->di;
             if ($userBalance <= 5000) {
@@ -78,7 +88,7 @@ class FairLuckService3
 
             $chaosFactor = mt_rand(85, 115) / 100;
 
-            $targetLossRate = 0.15;
+            $targetLossRate = 0.20;
 
             if ($jackpotPity > 400) {
                 $targetLossRate = max($targetLossRate, 0.18);
@@ -221,7 +231,7 @@ class FairLuckService3
                     $betUnit,
                     $poolBalance,
                     $hasPaidForJackpot,
-                    $betAmount
+                    $totalAmount
                 );
 
                 if ($multiplier === 0) {
@@ -231,7 +241,7 @@ class FairLuckService3
 
                 \Illuminate\Support\Facades\Redis::del($lossKey);
                 if ($multiplier >= 250) {
-                    $jackpotPayout = max(0, $multiplier * $betAmount);
+                    $jackpotPayout = max(0, $multiplier * $totalAmount);
                     \Illuminate\Support\Facades\Redis::del($jackpotKey);
                     $postJackpotDebt = $unlockContribution > 0 ? $unlockContribution : $betAmount;
                     \Illuminate\Support\Facades\Redis::set($contributionKey, -$postJackpotDebt);
@@ -240,25 +250,23 @@ class FairLuckService3
 
                     $jackpotWalletBalance = $this->getJackpotWalletBalance();
                     if ($jackpotWalletBalance >= $jackpotPayout) {
-                        $this->decreaseJackpotWalletBalance((int) round($jackpotPayout));
+                        $this->decreaseJackpotWalletBalance((int) round($jackpotPayout), "Win payout (Jackpot {$multiplier}x)", $user->id);
                     } else {
-
                         $isWinner = false;
                         $forceWin = false;
                         $multiplier = 0;
-
                     }
 
                     $this->lossLedger->markHighMultiplierAwarded($user->id, (int) round($jackpotPayout));
                 } else {
                     \Illuminate\Support\Facades\Redis::incr($jackpotKey);
 
-                    $profit = max(0, $multiplier * $betAmount);
+                    $profit = max(0, $multiplier * $totalAmount);
 
                     if (in_array($multiplier, [50, 70, 100])) {
                         $mediumWalletBalance = $this->getMediumWalletBalance();
                         if ($mediumWalletBalance >= $profit) {
-                            $this->decreaseMediumWallet((int) round($profit));
+                            $this->decreaseMediumWallet((int) round($profit), "Win payout (Medium {$multiplier}x)", $user->id);
 
                         } else {
 
@@ -272,12 +280,12 @@ class FairLuckService3
                         if (in_array($multiplier, [5, 10, 20])) {
                             $globalVaultBalance = $this->getGlobalVaultBalance();
                             if ($globalVaultBalance >= $profit) {
-                                $this->decreaseGlobalVaultBalance((int) round($profit));
+                                $this->decreaseGlobalVaultBalance((int) round($profit), "Win payout (Global Vault {$multiplier}x)", $user->id);
 
                             } else {
 
                                 if ($globalVaultBalance > 0) {
-                                    $this->decreaseGlobalVaultBalance($globalVaultBalance);
+                                    $this->decreaseGlobalVaultBalance($globalVaultBalance, "Win payout (Global Vault {$multiplier}x) Partial", $user->id);
                                 }
 
                                 $remainingProfit = $profit - $globalVaultBalance;
@@ -298,16 +306,16 @@ class FairLuckService3
             } else {
                 \Illuminate\Support\Facades\Redis::incr($lossKey);
                 \Illuminate\Support\Facades\Redis::incr($jackpotKey);
-                $updatedBank = min($contributionBank + $betAmount, $requiredContribution * 5);
+                $updatedBank = min($contributionBank + $totalAmount, $requiredContribution * 5);
                 \Illuminate\Support\Facades\Redis::set($contributionKey, (int) round($updatedBank));
                 \Illuminate\Support\Facades\Redis::expire($lossKey, 3600);
                 \Illuminate\Support\Facades\Redis::expire($jackpotKey, 86400);
                 \Illuminate\Support\Facades\Redis::expire($contributionKey, 259200);
 
-                $this->lossLedger->addToGlobalPool((int) round($betAmount));
+                $this->lossLedger->addToGlobalPool((int) round($totalAmount));
             }
 
-            $profitAmount = $isWinner || $forceWin ? ($multiplier * $betAmount) : -$betAmount;
+            $profitAmount = $isWinner || $forceWin ? ($multiplier * $totalAmount) : -$totalAmount;
 
             if ($isWinner || $forceWin) {
 
@@ -331,13 +339,7 @@ class FairLuckService3
                 }
             }
 
-            $walletsBeforeDistribution = [
-                'global_vault' => $this->getGlobalVaultBalance(),
-                'jackpot_wallet' => $this->getJackpotWalletBalance(),
-                'medium_wallet' => $this->getMediumWalletBalance(),
-            ];
-
-            $walletsAfterDistribution = [
+            $walletsAfter = [
                 'global_vault' => $this->getGlobalVaultBalance(),
                 'jackpot_wallet' => $this->getJackpotWalletBalance(),
                 'medium_wallet' => $this->getMediumWalletBalance(),
@@ -346,35 +348,35 @@ class FairLuckService3
             \Illuminate\Support\Facades\Log::info('FairLuckService3 AFTER DISTRIBUTION', [
                 'user_id' => $user->id,
                 'bet_amount' => $betAmount,
-                'global_vault_after' => $walletsAfterDistribution['global_vault'],
-                'jackpot_wallet_after' => $walletsAfterDistribution['jackpot_wallet'],
-                'medium_wallet_after' => $walletsAfterDistribution['medium_wallet'],
-                'global_vault_increase' => $walletsAfterDistribution['global_vault'] - $walletsBeforeDistribution['global_vault'],
-                'jackpot_wallet_increase' => $walletsAfterDistribution['jackpot_wallet'] - $walletsBeforeDistribution['jackpot_wallet'],
-                'medium_wallet_increase' => $walletsAfterDistribution['medium_wallet'] - $walletsBeforeDistribution['medium_wallet'],
-                'expected_60_percent' => round($betAmount * 0.60),
-                'expected_20_percent' => round($betAmount * 0.20),
-                'expected_10_percent' => round($betAmount * 0.10),
+                'global_vault_after' => $walletsAfter['global_vault'],
+                'jackpot_wallet_after' => $walletsAfter['jackpot_wallet'],
+                'medium_wallet_after' => $walletsAfter['medium_wallet'],
+                'global_vault_increase' => $walletsAfter['global_vault'] - $walletsBefore['global_vault'],
+                'jackpot_wallet_increase' => $walletsAfter['jackpot_wallet'] - $walletsBefore['jackpot_wallet'],
+                'medium_wallet_increase' => $walletsAfter['medium_wallet'] - $walletsBefore['medium_wallet'],
+                'expected_55_percent' => round($totalAmount * 0.55),
+                'expected_15_percent' => round($totalAmount * 0.15),
+                'expected_10_percent' => round($totalAmount * 0.10),
             ]);
 
-            $houseEdgeCut = $this->calculateHouseEdgeCut($betAmount, $isWinner, (int) $multiplier);
+            $houseEdgeCut = $totalAmount * 0.20; // 20% total fee/house cut
 
             $this->highMultiplierLedger->recordOutcome(
                 $user->id,
-                $betAmount,
+                $totalAmount,
                 $profitAmount,
                 $isWinner,
                 $multiplier
             );
 
             $newDeviation = $this->deviationCalculator->calculate(
-                $profile->total_bets + $betAmount,
+                $profile->total_bets + $totalAmount,
                 $profile->total_profit + $profitAmount
             );
 
             $this->profileManager->updateStats(
                 $profile,
-                $betAmount,
+                $totalAmount,
                 $profitAmount,
                 $isWinner,
                 $newDeviation
@@ -395,6 +397,8 @@ class FairLuckService3
                 'user_id' => $user->id,
                 'gift_id' => $gift->id,
                 'bet_amount' => $betAmount,
+                'app_fee' => $appFee,
+                'receiver_fee' => $receiverFee,
                 'is_winner' => $isWinner,
                 'multiplier' => $isWinner ? $multiplier : null,
                 'profit_amount' => $profitAmount,
@@ -403,6 +407,10 @@ class FairLuckService3
                 'is_beginner_protected' => ($protectionMultiplier > 1),
                 'protection_multiplier' => $protectionMultiplier,
                 'room_id' => $roomId,
+                'sender_balance_before' => $senderBalanceBefore,
+                'sender_balance_after' => $senderBalanceAfter,
+                'wallets_before' => $walletsBefore,
+                'wallets_after' => $walletsAfter,
             ]);
 
             return (object) [
@@ -410,8 +418,10 @@ class FairLuckService3
                 'multiplier' => $multiplier,
                 'profitAmount' => $profitAmount,
                 'newDeviation' => $newDeviation,
-                'mood' => $localTargetRTP > 1 ? 'Generous' : ($localTargetRTP < 0.95 ? 'Recovery' : 'Stable'),
+                'mood' => $localTargetRTP > 0.85 ? 'Generous' : ($localTargetRTP < 0.75 ? 'Recovery' : 'Stable'),
                 'houseCut' => $houseEdgeCut,
+                'wallets_before' => $walletsBefore,
+                'wallets_after' => $walletsAfter,
             ];
         });
     }
@@ -422,24 +432,25 @@ class FairLuckService3
 
         if (in_array($selectedMultiplier, [5, 10, 20])) {
             $globalBalance = $this->getGlobalVaultBalance();
+            $limit = FairLuckWallet::getNegativeLimit();
 
-            if ($globalBalance >= $requiredPayout) {
+            if ($globalBalance + $limit >= $requiredPayout) {
                 return $selectedMultiplier;
             } else {
                 if ($selectedMultiplier == 20) {
                     $requiredFor10 = max(0, (10 - 1) * $betAmount);
-                    if ($globalBalance >= $requiredFor10) {
+                    if ($globalBalance + $limit >= $requiredFor10) {
 
                         return 10;
                     }
                     $requiredFor5 = max(0, (5 - 1) * $betAmount);
-                    if ($globalBalance >= $requiredFor5) {
+                    if ($globalBalance + $limit >= $requiredFor5) {
 
                         return 5;
                     }
                 } elseif ($selectedMultiplier == 10) {
                     $requiredFor5 = max(0, (5 - 1) * $betAmount);
-                    if ($globalBalance >= $requiredFor5) {
+                    if ($globalBalance + $limit >= $requiredFor5) {
 
                         return 5;
                     }
@@ -943,21 +954,23 @@ class FairLuckService3
         return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET);
     }
 
-    private function decreaseMediumWallet(int $amount): void
+    private function decreaseMediumWallet(int $amount, ?string $description = null, ?int $userId = null): void
     {
         if ($amount <= 0) {
             return;
         }
         FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount);
+        FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount, $description, $userId);
     }
 
-    private function increaseGlobalVaultBalance(int $amount): void
+    private function increaseGlobalVaultBalance(int $amount, ?string $description = null, ?int $userId = null): void
     {
         if ($amount <= 0) {
             return;
         }
 
         FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
+        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount, $description, $userId);
     }
 
     private function distributeHouseCut(int $totalAmount): void
@@ -981,46 +994,24 @@ class FairLuckService3
         }
     }
 
-    private function decreaseGlobalVaultBalance(int $amount): void
+    private function decreaseGlobalVaultBalance(int $amount, ?string $description = null, ?int $userId = null): void
     {
         if ($amount <= 0) {
             return;
         }
 
-        $balanceBefore = $this->getGlobalVaultBalance();
         FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
-        $balanceAfter = $this->getGlobalVaultBalance();
-
-        \Illuminate\Support\Facades\Log::debug('decreaseGlobalVaultBalance', [
-            'table' => 'fair_luck_wallets (Redis optimized)',
-            'wallet_type' => 'global_vault',
-            'amount_decreased' => $amount,
-            'balance_before' => $balanceBefore,
-            'balance_after' => $balanceAfter,
-            'decreased_by' => $balanceBefore - $balanceAfter,
-            'success' => ($balanceBefore - $balanceAfter) === $amount,
-        ]);
+        FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount, $description, $userId);
     }
 
-    private function decreaseJackpotWalletBalance(int $amount): void
+    private function decreaseJackpotWalletBalance(int $amount, ?string $description = null, ?int $userId = null): void
     {
         if ($amount <= 0) {
             return;
         }
 
-        $balanceBefore = $this->getJackpotWalletBalance();
         FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount);
-        $balanceAfter = $this->getJackpotWalletBalance();
-
-        \Illuminate\Support\Facades\Log::debug('decreaseJackpotWalletBalance', [
-            'table' => 'fair_luck_wallets (Redis optimized)',
-            'wallet_type' => 'jackpot_wallet',
-            'amount_decreased' => $amount,
-            'balance_before' => $balanceBefore,
-            'balance_after' => $balanceAfter,
-            'decreased_by' => $balanceBefore - $balanceAfter,
-            'success' => ($balanceBefore - $balanceAfter) === $amount,
-        ]);
+        FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount, $description, $userId);
     }
 
     private function settleGlobalVaultBalance(bool $isWinner, int $multiplier, float $betAmount): void
@@ -1106,68 +1097,57 @@ class FairLuckService3
         return (int) min($cut, (int) ceil($base));
     }
 
-    private function distributeBetAmount(float $betAmount): void
+    private function distributeBetAmount(float $totalAmount, float $appFee = 0): void
     {
 
-        $globalVaultAmount = $betAmount * 0.60;
+        $globalVaultAmount = $totalAmount * 0.55;
         $globalVaultAmountInt = (int) round($globalVaultAmount);
 
-        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO GLOBAL_VAULT', [
-            'amount' => $globalVaultAmountInt,
-            'percentage' => 0.60,
-            'expected' => round($betAmount * 0.60),
-        ]);
+    
 
-        $this->increaseGlobalVaultBalance($globalVaultAmountInt);
+        $this->increaseGlobalVaultBalance($globalVaultAmountInt, "Bet contribution (55%)", null);
 
-        $jackpotWalletAmount = $betAmount * 0.20;
+        $jackpotWalletAmount = $totalAmount * 0.15;
         $jackpotWalletAmountInt = (int) round($jackpotWalletAmount);
 
-        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO JACKPOT_WALLET', [
-            'amount' => $jackpotWalletAmountInt,
-            'percentage' => 0.20,
-            'expected' => round($betAmount * 0.20),
-        ]);
 
-        $this->increaseJackpotWallet($jackpotWalletAmountInt);
+        $this->increaseJackpotWallet($jackpotWalletAmountInt, "Bet contribution (15%)", null);
 
-        $mediumWalletAmount = $betAmount * 0.10;
+        $mediumWalletAmount = $totalAmount * 0.10;
         $mediumWalletAmountInt = (int) round($mediumWalletAmount);
 
-        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO MEDIUM_WALLET', [
-            'amount' => $mediumWalletAmountInt,
-            'percentage' => 0.10,
-            'expected' => round($betAmount * 0.10),
-        ]);
 
-        $this->increaseMediumWallet($mediumWalletAmountInt);
+        $this->increaseMediumWallet($mediumWalletAmountInt, "Bet contribution (10%)", null);
 
-        \Illuminate\Support\Facades\Log::debug('distributeBetAmount COMPLETED', [
-            'bet_amount' => $betAmount,
-            'total_distributed' => $globalVaultAmountInt + $jackpotWalletAmountInt + $mediumWalletAmountInt,
-            'global_vault' => $globalVaultAmountInt,
-            'jackpot_wallet' => $jackpotWalletAmountInt,
-            'medium_wallet' => $mediumWalletAmountInt,
-            'remaining_app_profit' => round($betAmount * 0.10),
-        ]);
+        // Store app fee (10%) in app_wallet (core_wallets table)
+        $appFeeInt = (int) round($appFee);
+        if ($appFeeInt > 0) {
+            \DB::table('core_wallets')
+                ->where('name', 'app_wallet')
+                ->increment('coins', $appFeeInt);
+        }
+
+    
 
     }
 
-    private function increaseJackpotWallet(int $amount): void
+    private function increaseJackpotWallet(int $amount, ?string $description = null, ?int $userId = null): void
     {
         if ($amount <= 0) {
             return;
         }
 
         FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount);
+        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_JACKPOT_WALLET, $amount, $description, $userId);
     }
 
-    private function increaseMediumWallet(int $amount): void
+    private function increaseMediumWallet(int $amount, ?string $description = null, ?int $userId = null): void
     {
         if ($amount <= 0) {
             return;
         }
 
         FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount);
+        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_MEDIUM_WALLET, $amount, $description, $userId);
     }
 }

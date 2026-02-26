@@ -115,7 +115,7 @@ class VersionController extends Controller
             'is_show_grid_view' => (bool) Common::getConf('show_room') ?? false,
 
             "room_boom" => [
-                "enabled" =>(bool) ($settings['audio_room'] ?? true),
+                "enabled" => ($settings['enable_room_boom'] ?? 0) && ($settings['room_boom'] ?? 0),
                 "cache_assets" => $boomThemes,
             ],
 
