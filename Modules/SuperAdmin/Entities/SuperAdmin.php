@@ -118,7 +118,7 @@ class SuperAdmin extends Model
                     ->update(['parent_id' => $defaultSuperAdmin->id]);
             } else {
 
-                throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                throw new Exception(__('dashboard.no_default_country_manager_to_transfer'));
             }
             $userApp = User::find($superAdmin->app_id);
             if ($userApp) {

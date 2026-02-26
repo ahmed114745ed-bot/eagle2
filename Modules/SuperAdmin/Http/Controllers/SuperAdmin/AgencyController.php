@@ -678,7 +678,7 @@ class AgencyController extends MainController
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
                 } else {
-                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                    throw new \Exception(__('dashboard.no_default_bd_to_transfer_agencies'));
                 }
             }
             $form->country_id = Auth::user()->country_id;

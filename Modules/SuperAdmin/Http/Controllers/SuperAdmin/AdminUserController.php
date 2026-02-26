@@ -281,17 +281,25 @@ class AdminUserController extends EncorUsersController
     {
         $subSuperAdmin = SubAdmin::with('appUser')->find($id);
 
-        if ($subSuperAdmin) {
-            return response()->json([
-                'status' => 200,
-                'item' =>  $subSuperAdmin,
-            ]);
-        } else {
+        if (!$subSuperAdmin) {
             return response()->json([
                 'status' => 404,
                 'message' => trans('message.notFoundGift'),
             ]);
         }
+
+        $item = $subSuperAdmin->toArray();
+        $item['app_user_name'] = null;
+        if ($subSuperAdmin->appUser) {
+            $appUser = $subSuperAdmin->appUser;
+            $display = trim(($appUser->name ?? '') . ' - ' . ($appUser->uuid ?? ''));
+            $item['app_user_name'] = $display;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'item' => $item,
+        ]);
     }
 
     public function updateSubSuperAdmin(Request $request,)
