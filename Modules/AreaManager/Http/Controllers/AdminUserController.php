@@ -133,19 +133,28 @@ class AdminUserController extends EncorUsersController
     }
     public function showSubSuperAdmin($id)
     {
-        $subSuperAdmin = SubAreaManager::find($id);
+        $subSuperAdmin = SubAreaManager::with('appUser')->find($id);
 
-        if ($subSuperAdmin) {
-            return response()->json([
-                'status' => 200,
-                'item' =>  $subSuperAdmin,
-            ]);
-        } else {
+        if (!$subSuperAdmin) {
             return response()->json([
                 'status' => 404,
                 'message' => trans('message.notFoundGift'),
             ]);
         }
+
+        // Build a payload that includes the linked app user display name
+        $item = $subSuperAdmin->toArray();
+        $item['app_user_name'] = null;
+        if ($subSuperAdmin->appUser) {
+            $appUser = $subSuperAdmin->appUser;
+            $display = trim(($appUser->name ?? '') . ' - ' . ($appUser->uuid ?? ''));
+            $item['app_user_name'] = $display;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'item' => $item,
+        ]);
     }
 
     public function updateSubSuperAdmin(Request $request,)
@@ -164,6 +173,21 @@ class AdminUserController extends EncorUsersController
 
         if ($request->filled('password')) {
             $subSuperAdmin->password = Hash::make($request->password);
+        }
+
+        if ($request->app_id) {
+
+            $oldUser = User::find($subSuperAdmin->app_id);
+            if ($oldUser) {
+                $oldUser->sub_area_manger = 0;
+                $oldUser->save();
+            }
+            $subSuperAdmin->app_id = $request->app_id;
+            $appUser = User::find($request->app_id);
+            if ($appUser) {
+                $appUser->sub_area_manger = 1;
+                $appUser->save();
+            }
         }
         $subSuperAdmin->save();
         return Redirect::back();

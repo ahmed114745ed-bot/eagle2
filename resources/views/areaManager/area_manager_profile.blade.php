@@ -1319,7 +1319,7 @@
 
 </div>
 
-<div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="updateProjectModal modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
         <div class="modal-content border-0">
             <div class="modal-content position-relative">
@@ -1348,13 +1348,13 @@
                                     <input type="text" name="username" class="form-control" id="username">
                                 </div>
 
-                                {{-- <div class="col-lg-6 mb-3 form-group">
+                                <div class="col-lg-6 mb-3 form-group">
                                     <label for="user_id" class="form-label">{{ __('admin.users') }}</label>
-                                    <select name="user_id" id="user_id" class="form-control select2" required>
+                                    <select class="form-control" id="user_id" name="user_id">
                                         <option value="">{{ __('admin.selectUser') }}</option>
                                     </select>
 
-                                </div> --}}
+                                </div>
                                 <div class="col-lg-6 mb-3 form-group">
                                     <label class="form-label">{{ __('admin.password') }}</label>
                                        <input type="password" name="password" class="form-control"  placeholder="Leave blank if not changing">
@@ -1451,6 +1451,50 @@
     $(document).ready(function () {
 
 
+                
+
+              $('#user_id').select2({
+                    dropdownParent: $('#item_modal_update'),
+                    width: '100%',
+                    placeholder: 'Select user',
+                    allowClear: true,
+                    minimumInputLength: 1,
+                    ajax: {
+                        url: '/api/search/users-area-manager',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term || '',
+                                page: params.page || 1,
+                                selected_id: $('#user_id').val() || null
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.data.map(item => ({
+                                    id: item.id,
+                                    text: item.name
+                                })),
+                                pagination: {
+                                    more: data.current_page < data.last_page
+                                }
+                            };
+                        }
+                    }
+                });
+
+                // Safe pre-select when the page provides data attributes
+                // Example: <select id="user_id" data-selected-id="..." data-selected-text="...">
+                (function () {
+                    var preId = $('#user_id').data('selected-id');
+                    var preText = $('#user_id').data('selected-text');
+                    if (preId) {
+                        $('#user_id').val(null).trigger('change');
+                        var selectedUser = new Option(preText || preId, preId, true, true);
+                        $('#user_id').append(selectedUser).trigger('change');
+                    }
+                })();
 
           $(document).on('click', '.edit_user_item_model_btn', function () {
             $('#item_modal_update').modal('show');
@@ -1474,7 +1518,27 @@
                             const image =  "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
                             $('#name').val(response.item.name);
                             $('#username').val(response.item.username);
-                          //  $('#password').val(response.item.password);
+                            if (response.item.app_id) {
+                                // Clear any previous selection
+                                $('#user_id').val(null).trigger('change');
+
+                                // Prefer server-provided formatted name, then try nested appUser, then fall back
+                                var displayText = response.item.app_user_name || null;
+                                if (!displayText && response.item.appUser) {
+                                    var au = response.item.appUser;
+                                    displayText = (au.name ? au.name : '') + ' - ' + (au.uuid ? au.uuid : '');
+                                }
+                                if (!displayText) displayText = response.item.name || response.item.app_id;
+
+                                var selectedUser = new Option(
+                                    displayText,
+                                    response.item.app_id,
+                                    true,
+                                    true
+                                );
+
+                                $('#user_id').append(selectedUser).trigger('change');
+                            }
                            
                             $('#img_edit').attr('src', image);
                             $('.item_id').val(response.item.id);

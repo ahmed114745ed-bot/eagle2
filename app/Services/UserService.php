@@ -183,10 +183,10 @@ class UserService
     }
 
 
-    public function usersAreaManager($key, $page)
+    public function usersAreaManager($key, $page, $selectedId = null)
     {
         $perPage = 10;
-        return $this->userRepository->usersAreaManager($key, $page, $perPage);
+        return $this->userRepository->usersAreaManager($key, $page, $perPage, $selectedId);
     }
 
     public function usersByCountry($superAdminId, $key, $page)
