@@ -54,6 +54,7 @@
         "utd/charizma": "*",
         "utd/chat": "*",
         "utd/cp": "*",
+        "utd/daily-prize": "dev-achievmentPackage",
         "utd/events": "*",
         "utd/family": "*",
         "utd/gifts": "*",
@@ -243,6 +244,10 @@
         {
             "type": "path",
             "url": "packages/Utd/RankingReward"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/DailyPrize"
         }
     ]
 }

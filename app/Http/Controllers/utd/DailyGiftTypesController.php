@@ -5,7 +5,7 @@ namespace App\Http\Controllers\utd;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\DailyPrize\Entities\DailyGiftType;
+use Utd\DailyPrize\Entities\DailyGiftType;
 
 class DailyGiftTypesController extends Controller
 {

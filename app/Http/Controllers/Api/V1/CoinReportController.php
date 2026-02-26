@@ -17,7 +17,7 @@ use App\Http\Resources\Api\V1\RechargeCoinsReportResource;
 use App\Models\Charge;
 use App\Models\CoinLog;
 use App\Models\ExchangeLog;
-use Modules\DailyPrize\Entities\DailyUserGift;
+use Utd\DailyPrize\Entities\DailyUserGift;
 use Utd\Events\Entities\WinnerReward;
 use App\Support\PackageHelper;
 
@@ -119,11 +119,14 @@ class CoinReportController extends Controller
     {
         $user = auth()->user();
 
-        $result1 = $this->getCoinsData(
-            DailyUserGift::class,
-            ['user_id' => $user->id, 'gift_type' => 'coins'],
-            'daily_prize'
-        );
+        $result1 = [];
+        if (PackageHelper::isInstalled('dailyPrize')) {
+            $result1 = $this->getCoinsData(
+                DailyUserGift::class,
+                ['user_id' => $user->id, 'gift_type' => 'coins'],
+                'daily_prize'
+            );
+        }
 
         $result2 = [];
         if (PackageHelper::isInstalled('event')) {

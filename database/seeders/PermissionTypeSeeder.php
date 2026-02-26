@@ -788,12 +788,14 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'language', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'daily-prize', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'daily-gift', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
+                    ...(PackageHelper::isInstalled('dailyPrize') ? [
+                        ['key' => 'daily-prize', 'except' => [], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],],
+                        ['key' => 'daily-gift', 'except' => [], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],],
+                    ] : []),
                 ],
             ],
             [

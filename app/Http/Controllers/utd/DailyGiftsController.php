@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DailyGiftResource;
 use App\Models\Ware;
 use Illuminate\Http\Request;
-use Modules\DailyPrize\Entities\DailyGift;
+use Utd\DailyPrize\Entities\DailyGift;
 
 class DailyGiftsController extends Controller
 {

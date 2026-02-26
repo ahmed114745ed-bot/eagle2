@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Chat\Entities\ChatMessage;
+use Utd\DailyPrize\Entities\DailyGift;
 use Utd\Events\Entities\WeeklyStar;
 use Utd\Family\Entities\Family;
 use Utd\Gifts\Entities\GiftLog;
@@ -45,6 +46,7 @@ class PackageHelper
         'gift' => GiftLog::class,
         'hostLevel' => HostLevel::class,
         'rankingReward' => RankingReward::class,
+        'dailyPrize' => DailyGift::class,
     ];
 
     /**
