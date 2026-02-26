@@ -357,6 +357,10 @@ class LuckyGiftService
         $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
         $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
 
+        $senderBalanceBefore = $user->di;
+        $totalWalletsBefore = null;
+        $totalWalletsAfter = null;
+
         while ($user->di >= $unitPrice && $index > 0) {
 
             foreach ($receiversIds as $receiverId) {
@@ -368,6 +372,8 @@ class LuckyGiftService
 
                 $throwNumber++;
 
+                $senderBalanceBeforeHit = $user->di;
+
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
                 $netBetAmount = $unitPrice - $appFee - $receiverFee;
@@ -378,7 +384,7 @@ class LuckyGiftService
                 }
 
                 try {
-                    $result = $fairService->processBet($user, $gift, $netBetAmount, $roomId, $receiverId, $appFee, $receiverFee);
+                    $result = $fairService->processBet($user, $gift, $netBetAmount, $roomId, $receiverId, $appFee, $receiverFee, $senderBalanceBeforeHit, $user->di - $unitPrice);
                 } catch (\Throwable $e) {
                     Log::error('FairLuckService3 processBet FAILED', [
                         'user_id' => $userId,
@@ -410,6 +416,11 @@ class LuckyGiftService
                             $message = $this->winnerMessage($multiplier);
                         }
                     }
+
+                    if ($totalWalletsBefore === null) {
+                        $totalWalletsBefore = $result->wallets_before ?? null;
+                    }
+                    $totalWalletsAfter = $result->wallets_after ?? null;
                 }
 
                 $isPopular = $multiplier >= 5;
@@ -434,6 +445,9 @@ class LuckyGiftService
                     isToRoom: $isToRoom
                 );
 
+                // After this hit: deduct unitPrice, add iterationWin if winner
+                $senderBalanceAfterHit = (int) ($senderBalanceBeforeHit - $unitPrice + ($iterationWin > 0 ? $iterationWin : 0));
+
                 $responseData['combo'][] = [
                     'status' => 0,
                     'data' => [
@@ -444,6 +458,10 @@ class LuckyGiftService
                         'winner_comment' => $sendMessage,
                     ],
                     'error_message' => '',
+                    'sender_balance_before' => (int) $senderBalanceBeforeHit,
+                    'sender_balance_after' => $senderBalanceAfterHit,
+                    'wallets_before' => $result->wallets_before ?? null,
+                    'wallets_after' => $result->wallets_after ?? null,
                 ];
 
                 $user->di -= $unitPrice;
@@ -484,6 +502,17 @@ class LuckyGiftService
         $responseData['total_price'] = $totalPrice;
         $responseData['total_user_win'] = $total_user_win;
         $responseData['total_win_count'] = $total_count_win;
+
+        $responseData['balances'] = [
+            'sender' => [
+                'before' => (int) $senderBalanceBefore,
+                'after' => (int) $user->di,
+            ],
+            'wallets' => [
+                'before' => $totalWalletsBefore,
+                'after' => $totalWalletsAfter,
+            ],
+        ];
 
         // Update user coins and diamond
         $totalDiamond = $totalPrice * $count;

@@ -330,6 +330,8 @@ return [
     'system_default_manager'           => 'UUID value for a client to become the app manager',
     'add_coins' => "Add coins",
     'remove_bans' => 'Remove Bans',
+    'no_default_country_manager_to_transfer' => 'No default Country Manager found to transfer BDs to.',
+    'no_default_bd_to_transfer_agencies' => 'No default BD found to transfer agencies to.',
 
 
 

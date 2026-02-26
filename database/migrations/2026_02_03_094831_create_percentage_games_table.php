@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('percentage_games', function (Blueprint $table) {
-            $table->id();
-            $table->string('title')->nullable();
-            $table->integer('percentage_game')->default(2);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('percentage_games')) {
+            Schema::create('percentage_games', function (Blueprint $table) {
+                $table->id();
+                $table->string('title')->nullable();
+                $table->integer('percentage_game')->default(2);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

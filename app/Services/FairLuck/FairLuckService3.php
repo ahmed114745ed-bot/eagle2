@@ -26,9 +26,9 @@ class FairLuckService3
         $this->houseEdgeRate = (float) config('fairluck.house_edge_rate', 0.02);
     }
 
-    public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null, $receiverId = null, float $appFee = 0, float $receiverFee = 0): object
+    public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null, $receiverId = null, float $appFee = 0, float $receiverFee = 0, float $senderBalanceBefore = 0, float $senderBalanceAfter = 0): object
     {
-        return DB::transaction(function () use ($user, $gift, $betAmount, $roomId, $appFee, $receiverFee) {
+        return DB::transaction(function () use ($user, $gift, $betAmount, $roomId, $appFee, $receiverFee, $senderBalanceBefore, $senderBalanceAfter) {
             $totalAmount = $betAmount + $appFee + $receiverFee;
 
             $profile = $this->profileManager->getProfile($user->id);
@@ -47,6 +47,15 @@ class FairLuckService3
             $forceWin = $consecutiveLosses >= 15;
 
             $globalVault = $this->getGlobalVaultBalance();
+            $jackpotVault = $this->getJackpotWalletBalance();
+            $mediumVault = $this->getMediumWalletBalance();
+
+            $walletsBefore = [
+                'global_vault' => $globalVault,
+                'jackpot_wallet' => $jackpotVault,
+                'medium_wallet' => $mediumVault,
+            ];
+
             $poolBalance = $this->lossLedger->poolBalance();
             $betUnit = max(1, (int) round($betAmount));
             $globalVaultInt = (int) round($globalVault);
@@ -276,7 +285,7 @@ class FairLuckService3
                             } else {
 
                                 if ($globalVaultBalance > 0) {
-                                    $this->decreaseGlobalVaultBalance($globalVaultBalance, "Win payout (Global Vault {$multiplier}x)", $user->id);
+                                    $this->decreaseGlobalVaultBalance($globalVaultBalance, "Win payout (Global Vault {$multiplier}x) Partial", $user->id);
                                 }
 
                                 $remainingProfit = $profit - $globalVaultBalance;
@@ -304,7 +313,6 @@ class FairLuckService3
                 \Illuminate\Support\Facades\Redis::expire($contributionKey, 259200);
 
                 $this->lossLedger->addToGlobalPool((int) round($totalAmount));
-                $this->increaseGlobalVaultBalance((int) round($totalAmount), "Loss bet (User loss)", $user->id);
             }
 
             $profitAmount = $isWinner || $forceWin ? ($multiplier * $totalAmount) : -$totalAmount;
@@ -331,13 +339,7 @@ class FairLuckService3
                 }
             }
 
-            $walletsBeforeDistribution = [
-                'global_vault' => $this->getGlobalVaultBalance(),
-                'jackpot_wallet' => $this->getJackpotWalletBalance(),
-                'medium_wallet' => $this->getMediumWalletBalance(),
-            ];
-
-            $walletsAfterDistribution = [
+            $walletsAfter = [
                 'global_vault' => $this->getGlobalVaultBalance(),
                 'jackpot_wallet' => $this->getJackpotWalletBalance(),
                 'medium_wallet' => $this->getMediumWalletBalance(),
@@ -346,12 +348,12 @@ class FairLuckService3
             \Illuminate\Support\Facades\Log::info('FairLuckService3 AFTER DISTRIBUTION', [
                 'user_id' => $user->id,
                 'bet_amount' => $betAmount,
-                'global_vault_after' => $walletsAfterDistribution['global_vault'],
-                'jackpot_wallet_after' => $walletsAfterDistribution['jackpot_wallet'],
-                'medium_wallet_after' => $walletsAfterDistribution['medium_wallet'],
-                'global_vault_increase' => $walletsAfterDistribution['global_vault'] - $walletsBeforeDistribution['global_vault'],
-                'jackpot_wallet_increase' => $walletsAfterDistribution['jackpot_wallet'] - $walletsBeforeDistribution['jackpot_wallet'],
-                'medium_wallet_increase' => $walletsAfterDistribution['medium_wallet'] - $walletsBeforeDistribution['medium_wallet'],
+                'global_vault_after' => $walletsAfter['global_vault'],
+                'jackpot_wallet_after' => $walletsAfter['jackpot_wallet'],
+                'medium_wallet_after' => $walletsAfter['medium_wallet'],
+                'global_vault_increase' => $walletsAfter['global_vault'] - $walletsBefore['global_vault'],
+                'jackpot_wallet_increase' => $walletsAfter['jackpot_wallet'] - $walletsBefore['jackpot_wallet'],
+                'medium_wallet_increase' => $walletsAfter['medium_wallet'] - $walletsBefore['medium_wallet'],
                 'expected_55_percent' => round($totalAmount * 0.55),
                 'expected_15_percent' => round($totalAmount * 0.15),
                 'expected_10_percent' => round($totalAmount * 0.10),
@@ -405,6 +407,10 @@ class FairLuckService3
                 'is_beginner_protected' => ($protectionMultiplier > 1),
                 'protection_multiplier' => $protectionMultiplier,
                 'room_id' => $roomId,
+                'sender_balance_before' => $senderBalanceBefore,
+                'sender_balance_after' => $senderBalanceAfter,
+                'wallets_before' => $walletsBefore,
+                'wallets_after' => $walletsAfter,
             ]);
 
             return (object) [
@@ -414,6 +420,8 @@ class FairLuckService3
                 'newDeviation' => $newDeviation,
                 'mood' => $localTargetRTP > 0.85 ? 'Generous' : ($localTargetRTP < 0.75 ? 'Recovery' : 'Stable'),
                 'houseCut' => $houseEdgeCut,
+                'wallets_before' => $walletsBefore,
+                'wallets_after' => $walletsAfter,
             ];
         });
     }

@@ -49,22 +49,69 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    var historyData = {!! json_encode($history->map(function ($h) {
+    return [
+        'date' => $h->created_at ? $h->created_at->format('m-d H:i:s') : '',
+        'before' => (int) $h->balance_before,
+        'change' => (int) $h->amount,
+        'after' => (int) $h->balance_after,
+        'desc' => $h->description ?? 'Transaction'
+    ];
+})->toArray()) !!};
+
+    var labels = historyData.map(function (d) { return d.date; });
+    var dataPoints = historyData.map(function (d) { return d.after; });
+
     var ctx = document.getElementById('vaultChart').getContext('2d');
     var chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {!! json_encode($history->pluck('created_at')->map(fn($d) => $d->format('m-d H:i'))->toArray()) !!},
+            labels: labels,
             datasets: [{
                 label: 'Global Vault Balance',
-                data: {!! json_encode($history->pluck('balance_after')->toArray()) !!},
+                data: dataPoints,
                 borderColor: 'rgba(60,141,188,0.8)',
                 backgroundColor: 'rgba(60,141,188,0.2)',
                 fill: true,
-                tension: 0.1
+                tension: 0.1,
+                pointBackgroundColor: function (context) {
+                    var val = dataPoints[context.dataIndex] || 0;
+                    return val < 0 ? 'rgba(255,99,132,1)' : 'rgba(60,141,188,1)';
+                },
+                pointBorderColor: '#fff',
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
             maintainAspectRatio: false,
+            interaction: {
+                mode: 'nearest',
+                intersect: false,
+            },
+            plugins: {
+                tooltip: {
+                    padding: 10,
+                    callbacks: {
+                        label: function (context) {
+                            var data = historyData[context.dataIndex];
+                            var lines = [];
+                            lines.push('🎯 Balance After:  ' + data.after.toLocaleString());
+                            lines.push('💰 Change Amt:  ' + (data.change > 0 ? '+' : '') + data.change.toLocaleString());
+                            lines.push('⏳ Balance Before: ' + data.before.toLocaleString());
+
+                            // Wrap long description across lines if needed, or truncate (assuming descriptions are usually 1 line here)
+                            var desc = data.desc.replace('Win payout', '🏆 Win').replace('Loss bet', '💔 Loss').replace('Bet contribution', '💸 Bet');
+                            lines.push('📝 Info: ' + desc);
+
+                            if (data.after < 0) {
+                                lines.push('⚠️ Status: Wallet is Negative!');
+                            }
+                            return lines;
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: false
