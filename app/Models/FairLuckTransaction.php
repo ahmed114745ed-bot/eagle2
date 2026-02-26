@@ -27,6 +27,10 @@ class FairLuckTransaction extends Model
         'is_beginner_protected',
         'protection_multiplier',
         'room_id',
+        'sender_balance_before',
+        'sender_balance_after',
+        'wallets_before',
+        'wallets_after',
         'created_at',
     ];
 
@@ -41,6 +45,8 @@ class FairLuckTransaction extends Model
         'deviation_before' => 'decimal:6',
         'calculated_probability' => 'decimal:4',
         'protection_multiplier' => 'decimal:2',
+        'wallets_before' => 'array',
+        'wallets_after' => 'array',
     ];
 
     public function user(): BelongsTo
