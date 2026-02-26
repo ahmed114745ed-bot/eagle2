@@ -69,7 +69,7 @@ class FairLuckService3
             );
             $isTopLossCandidate = $this->isTopLossCandidate($user->id);
 
-            $this->distributeBetAmount($totalAmount);
+            $this->distributeBetAmount($totalAmount, $appFee);
 
             $userBalance = (int) $user->di;
             if ($userBalance <= 5000) {
@@ -1097,50 +1097,37 @@ class FairLuckService3
         return (int) min($cut, (int) ceil($base));
     }
 
-    private function distributeBetAmount(float $totalAmount): void
+    private function distributeBetAmount(float $totalAmount, float $appFee = 0): void
     {
 
         $globalVaultAmount = $totalAmount * 0.55;
         $globalVaultAmountInt = (int) round($globalVaultAmount);
 
-        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO GLOBAL_VAULT', [
-            'amount' => $globalVaultAmountInt,
-            'percentage' => 0.55,
-            'expected' => round($totalAmount * 0.55),
-        ]);
+    
 
         $this->increaseGlobalVaultBalance($globalVaultAmountInt, "Bet contribution (55%)", null);
 
         $jackpotWalletAmount = $totalAmount * 0.15;
         $jackpotWalletAmountInt = (int) round($jackpotWalletAmount);
 
-        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO JACKPOT_WALLET', [
-            'amount' => $jackpotWalletAmountInt,
-            'percentage' => 0.15,
-            'expected' => round($totalAmount * 0.15),
-        ]);
 
         $this->increaseJackpotWallet($jackpotWalletAmountInt, "Bet contribution (15%)", null);
 
         $mediumWalletAmount = $totalAmount * 0.10;
         $mediumWalletAmountInt = (int) round($mediumWalletAmount);
 
-        \Illuminate\Support\Facades\Log::debug('DISTRIBUTING TO MEDIUM_WALLET', [
-            'amount' => $mediumWalletAmountInt,
-            'percentage' => 0.10,
-            'expected' => round($totalAmount * 0.10),
-        ]);
 
         $this->increaseMediumWallet($mediumWalletAmountInt, "Bet contribution (10%)", null);
 
-        \Illuminate\Support\Facades\Log::debug('distributeBetAmount COMPLETED', [
-            'total_amount' => $totalAmount,
-            'total_distributed' => $globalVaultAmountInt + $jackpotWalletAmountInt + $mediumWalletAmountInt,
-            'global_vault' => $globalVaultAmountInt,
-            'jackpot_wallet' => $jackpotWalletAmountInt,
-            'medium_wallet' => $mediumWalletAmountInt,
-            'app_and_receiver_fees' => round($totalAmount * 0.20),
-        ]);
+        // Store app fee (10%) in app_wallet (core_wallets table)
+        $appFeeInt = (int) round($appFee);
+        if ($appFeeInt > 0) {
+            \DB::table('core_wallets')
+                ->where('name', 'app_wallet')
+                ->increment('coins', $appFeeInt);
+        }
+
+    
 
     }
 
