@@ -175,15 +175,15 @@ class AdminUserController extends EncorUsersController
             $subSuperAdmin->password = Hash::make($request->password);
         }
 
-        if ($request->app_id) {
+        if ($request->user_id != $subSuperAdmin->app_id) {
 
             $oldUser = User::find($subSuperAdmin->app_id);
             if ($oldUser) {
                 $oldUser->sub_area_manger = 0;
                 $oldUser->save();
             }
-            $subSuperAdmin->app_id = $request->app_id;
-            $appUser = User::find($request->app_id);
+            $subSuperAdmin->app_id = $request->user_id;
+            $appUser = User::find($request->user_id);
             if ($appUser) {
                 $appUser->sub_area_manger = 1;
                 $appUser->save();
