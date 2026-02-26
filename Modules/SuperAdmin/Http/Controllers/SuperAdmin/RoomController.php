@@ -621,8 +621,9 @@ class RoomController extends MainController
                     ? getImagePath($user->profile?->avatar)
                     : asset("images/businessman-icon.jpg");
 
+               $userUrl = 'superadmin/users/' . $user->id;
                 $html .= <<<HTML
-                <div class="image-wrapper" onclick="window.location.href='{$user->id}'">
+                <div class="image-wrapper" onclick="window.location.href='{$userUrl}'">
                     <img src="{$url}" title="{$user->name}"
                     style="width: 40px; height: 40px; border-radius: 50%;
                                     object-fit: cover; border: 2px solid white;
