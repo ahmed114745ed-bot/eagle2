@@ -49,13 +49,13 @@ class DeleteBdAction extends RowAction
         }
 
 
-        if ($this->agencyCount > 0) {
-            $defaultBd = Bd::where('default', 1)->where('country_id', $model->country_id)->first();
-            if (!$defaultBd)  return $this->response()->error(__('No default BD found to transfer agencies to.'))->refresh();
+        // if ($this->agencyCount > 0) {
+        //     $defaultBd = Bd::where('default', 1)->where('country_id', $model->country_id)->first();
+        //     if (!$defaultBd)  return $this->response()->error(__('No default BD found to transfer agencies to.'))->refresh();
 
 
-            Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->id]);
-        }
+        //     Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->id]);
+        // }
 
         $model->delete();
 
