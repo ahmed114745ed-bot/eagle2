@@ -698,7 +698,7 @@ class RoomController extends MainController
 
                 $name = e($user->name);
                 $id   = e($user->id);
-                $userUrl = ('areaManager/users/' . $user->id);
+                $userUrl = ('users/' . $user->id);
                 $html .= <<<HTML
                 <div class="image-wrapper" onclick="window.location.href='{$userUrl}'">
                     <img src="{$url}" title="{$name}"
