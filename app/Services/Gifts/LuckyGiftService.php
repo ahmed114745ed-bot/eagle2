@@ -445,6 +445,9 @@ class LuckyGiftService
                     isToRoom: $isToRoom
                 );
 
+                // After this hit: deduct unitPrice, add iterationWin if winner
+                $senderBalanceAfterHit = (int) ($senderBalanceBeforeHit - $unitPrice + ($iterationWin > 0 ? $iterationWin : 0));
+
                 $responseData['combo'][] = [
                     'status' => 0,
                     'data' => [
@@ -456,7 +459,7 @@ class LuckyGiftService
                     ],
                     'error_message' => '',
                     'sender_balance_before' => (int) $senderBalanceBeforeHit,
-                    'sender_balance_after' => (int) ($user->di - $unitPrice + ($iterationWin > 0 ? $iterationWin : 0)),
+                    'sender_balance_after' => $senderBalanceAfterHit,
                     'wallets_before' => $result->wallets_before ?? null,
                     'wallets_after' => $result->wallets_after ?? null,
                 ];
