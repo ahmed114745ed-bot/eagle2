@@ -23,7 +23,9 @@ use App\Services\Null\NullNewRoomBoomGiftService;
 use App\Contracts\GiftLogRepositoryContract;
 use App\Contracts\GiftRepositoryContract;
 use App\Contracts\PkRepositoryContract;
+use App\Contracts\UserDevicesHistoryRepositoryContract;
 use App\Services\Null\NullEnteranceRoomService;
+use App\Services\Null\NullUserDevicesHistoryRepository;
 use App\Services\Null\NullRoomGameService;
 use App\Services\Null\NullRoomService;
 use App\Services\Null\NullRoomRepository;
@@ -183,6 +185,14 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 CpRepositoryContract::class,
                 NullCpRepository::class
+            );
+        }
+
+        // User Devices History Repository Feature (SwitchAccount)
+        if (!$this->app->bound(UserDevicesHistoryRepositoryContract::class)) {
+            $this->app->singleton(
+                UserDevicesHistoryRepositoryContract::class,
+                NullUserDevicesHistoryRepository::class
             );
         }
     }

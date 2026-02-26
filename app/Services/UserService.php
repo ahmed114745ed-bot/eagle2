@@ -51,7 +51,7 @@ use App\Contracts\ShippingAgencyRepositoryInterface;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
-use App\Tik\Repositories\UserDevicesHistoryRepository;
+use App\Contracts\UserDevicesHistoryRepositoryContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\UserAchievementContract;
@@ -67,7 +67,7 @@ class UserService
         private readonly ?GiftLogRepositoryContract $giftLogRepository,
         private readonly UserSalaryRepository $userSalaryRepository,
         private readonly TargetRepository $targetRepository,
-        private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,
+        private readonly UserDevicesHistoryRepositoryContract $userDevicesHistoryRepository,
         private readonly UserTargetRepository $userTargetRepository,
         private readonly FamilyContract $familyService,
         private readonly AgencyRepository $agencyRepository,

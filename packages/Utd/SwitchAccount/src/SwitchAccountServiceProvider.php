@@ -2,9 +2,11 @@
 
 namespace Utd\SwitchAccount;
 
+use App\Contracts\UserDevicesHistoryRepositoryContract;
 use Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Utd\SwitchAccount\Repositories\UserDevicesHistoryRepository;
 
 class SwitchAccountServiceProvider extends ServiceProvider
 {
@@ -25,7 +27,10 @@ class SwitchAccountServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            UserDevicesHistoryRepositoryContract::class,
+            UserDevicesHistoryRepository::class
+        );
     }
 
     public function registerViews(): void
