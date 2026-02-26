@@ -55,7 +55,6 @@
         "utd/chat": "*",
         "utd/cp": "*",
         "utd/daily-prize": "*",
-        "utd/special-id": "*",
         "utd/events": "*",
         "utd/family": "*",
         "utd/gifts": "*",
@@ -68,6 +67,8 @@
         "utd/room": "*",
         "utd/room-boom": "*",
         "utd/room-cup": "*",
+        "utd/special-id": "*",
+        "utd/switch-account": "*",
         "utd/task-stream": "*",
         "utd/vip": "*"
     },
