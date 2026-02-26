@@ -29,11 +29,21 @@ class LuckyGiftV4ConcurrencyTest2 extends TestCase
         // Ensure lucky gift is enabled in settings
         settings()->set('stop_luckyGift', 0);
 
-        // Clear Redis wallet keys to ensure a clean state for each test
-        $walletTypes = [\App\Models\FairLuckWallet::TYPE_GLOBAL_VAULT, \App\Models\FairLuckWallet::TYPE_JACKPOT_WALLET, \App\Models\FairLuckWallet::TYPE_MEDIUM_WALLET];
+        // Zero out all wallet balances in Redis AND database for a clean state
+        $walletTypes = [
+            \App\Models\FairLuckWallet::TYPE_GLOBAL_VAULT,
+            \App\Models\FairLuckWallet::TYPE_JACKPOT_WALLET,
+            \App\Models\FairLuckWallet::TYPE_MEDIUM_WALLET,
+        ];
         foreach ($walletTypes as $type) {
-            \Illuminate\Support\Facades\Redis::del("fairluck:wallet:{$type}");
+            // Set Redis key to 0 (not del, because del causes fallback to DB old values)
+            \Illuminate\Support\Facades\Redis::set("fairluck:wallet:{$type}", 0);
+            // Zero out in database too
+            \App\Models\FairLuckWallet::where('wallet_type', $type)->update(['balance' => 0]);
         }
+
+        // Also clear the loss pool Redis keys
+        \Illuminate\Support\Facades\Redis::del('fairluck:loss_pool_total');
     }
 
     /**
