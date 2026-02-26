@@ -24,6 +24,8 @@ use App\Models\Setting;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
 use App\Admin\Services\FileService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class GiftController extends MainController
 {
@@ -117,12 +119,14 @@ class GiftController extends MainController
             ->with('vip')
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
-            // ->orderByDesc('enable')   // 1️⃣ enabled first
-            // ->orderBy('sort', 'asc');
+            ->orderByRaw('ISNULL(`sort`), `sort` ASC')
             ->orderBy('use_count', 'desc')
-            ->orderBy('type')
-            ->orderByRaw('ISNULL(`sort`), `sort`')
             ->orderBy('price');
+        
+        // Enable drag-drop sorting only when filtering by category
+        if ($filterType !== 'all') {
+            $grid->sortable();
+        }
 
         $grid->paginate(20);
         $grid->header(function () use ($filterType) {
@@ -132,7 +136,7 @@ class GiftController extends MainController
             $tabs = ['all' => __('All')];
 
             // هات كل الكاتيجوري وطلع الترجمة حسب اللغة الحالية
-            $categories = GiftCategory::all();
+            $categories = GiftCategory::orderBy('sort', 'asc')->get();
             foreach ($categories as $category) {
                 $title = $category->title[$locale] ?? $category->title['en'] ?? '';
                 $tabs[$category->id] = $title;
@@ -223,7 +227,198 @@ class GiftController extends MainController
             $batch->disableDelete();
             $batch->add(new MoveGroupsGifts());
         });
+        if (request('filter') && request('filter') !== 'all') {
+            $grid->tools(function ($tools) use ($filterType) {
+                $tools->append('<a href="' . admin_url('gifts/' . request('filter') . '/create') . '" class="btn btn-sm btn-default">' . __('create') . '</a>');
+                
+                // Add JavaScript for custom drag-drop handling per category
+                $tools->append('
+                <script>
+                $(document).ready(function() {
+                    console.log("🎁 Gift sortable initialized for category: ' . $filterType . '");
+                    
+                    // Clear cache before sorting starts
+                    $(".grid-sortable tbody").on("sortstart", function(event, ui) {
+                        console.log("⚡ Sort started - clearing cache...");
+                        $.ajax({
+                            url: "/admin/gifts/clear-cache",
+                            method: "POST",
+                            data: { _token: LA.token },
+                            async: false
+                        });
+                    });
+                    
+                    // Intercept save order button
+                    $(document).on("click", ".grid-save-order", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log("💾 Saving gift order...");
+                        
+                        var $btn = $(this);
+                        var sorts = [];
+                        
+                        // Collect sort data
+                        $(".grid-sortable tbody tr").each(function(index) {
+                            sorts.push({
+                                id: $(this).data("id"),
+                                sort: index + 1
+                            });
+                        });
+                        
+                        console.log("📊 Sort data:", sorts);
+                        
+                        // Send to custom endpoint
+                        $.ajax({
+                            url: "/admin/gifts/sort-update",
+                            method: "POST",
+                            data: {
+                                _token: LA.token,
+                                _sort: sorts,
+                                category_id: "' . $filterType . '"
+                            },
+                            cache: false,
+                            headers: {
+                                "Cache-Control": "no-cache, no-store, must-revalidate",
+                                "Pragma": "no-cache",
+                                "Expires": "0"
+                            },
+                            success: function(response) {
+                                console.log("✅ Sort saved:", response);
+                                toastr.success(response.message || "تم حفظ الترتيب بنجاح");
+                                
+                                // Force reload after 1 second to ensure fresh data
+                                setTimeout(function() {
+                                    console.log("🔄 Force reloading...");
+                                    location.reload(true);
+                                }, 1000);
+                            },
+                            error: function(xhr) {
+                                console.error("❌ Sort failed:", xhr);
+                                toastr.error("فشل حفظ الترتيب");
+                            }
+                        });
+                        
+                        return false;
+                    });
+                    
+                    console.log("✅ Gift sortable handlers ready");
+                });
+                </script>
+                ');
+            });
+        } elseif (request('filter')) {
+            $grid->tools(function ($tools) {
+                $tools->append('<a href="' . admin_url('gifts/' . request('filter') . '/create') . '" class="btn btn-sm btn-default">' . __('create') . '</a>');
+            });
+        }
+
+        $grid->disableCreateButton();
+
         return $grid;
+    }
+    
+    /**
+     * Clear cache for Octane (called from JavaScript before sorting)
+     */
+    public function clearCache()
+    {
+        try {
+            Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            if (function_exists('clearstatcache')) {
+                clearstatcache(true);
+            }
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'Cache cleared'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Handle sort update from grid-sortable extension
+     */
+    public function sortUpdate()
+    {
+        $sorts = request()->input('_sort');
+        $categoryId = request()->input('category_id');
+        
+        if (empty($sorts)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No sort data provided'
+            ]);
+        }
+        
+        try {
+            // Clear ALL caches before updating
+            Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            // Use DB transaction for atomicity
+            DB::beginTransaction();
+            
+            $updated = 0;
+            foreach ($sorts as $sort) {
+                // Use raw DB query to bypass Eloquent caching
+                $result = DB::table('gifts')
+                    ->where('id', $sort['id'])
+                    ->when($categoryId, fn($q) => $q->where('gift_category_id', $categoryId))
+                    ->update([
+                        'sort' => $sort['sort'],
+                        'updated_at' => now()
+                    ]);
+                $updated += $result;
+            }
+            
+            DB::commit();
+            
+            // Clear all caches after updating
+            Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            // Force PHP to clear stat cache
+            if (function_exists('clearstatcache')) {
+                clearstatcache(true);
+            }
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'تم تحديث ترتيب الهدايا بنجاح'
+            ])->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return response()->json([
+                'status' => false,
+                'message' => 'فشل تحديث الترتيب: ' . $e->getMessage()
+            ]);
+        }
     }
 
 
@@ -238,19 +433,7 @@ class GiftController extends MainController
     protected function detail($id)
     {
         $show = new Show(Gift::findOrFail($id));
-        // $show->id('ID');
-        // $show->name(__('name'));
-        // $show->e_name(__('e_name'));
-        // $show->type(__('type'));
-        // $show->vip_level(__('vip_level'));
-        // $show->hot(__('hot'));
-        // $show->is_play('is_play');
-        // $show->price(__('price'));
-        // $show->img(__('img'));
-        // $show->show_img(('show_img'));
-        // $show->show_img2('show_img2');
-        // $show->sort('sort');
-        // $show->enable('enable');
+
         $this->extendShow($show);
         return $show;
     }
@@ -262,59 +445,66 @@ class GiftController extends MainController
      */
     protected function form($id = null)
     {
+
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
-        $type = old('type', $form->model()->type ?? null);
+        $model = $id
+            ? Gift::with('luckyGift')->findOrFail($id)
+            : $form->model();
+        $type = old('type', $model?->type ?? null);
 
         $form->display(__('ID'));
         $form->text('name', __('name'));
 
 
-        // Build Gift Category options
-        $categories = GiftCategory::all();
+        $selectedCategoryId = request('type') ?? $model?->gift_category_id;
+        $categories = $selectedCategoryId
+            ? GiftCategory::query()->whereKey($selectedCategoryId)->get()
+            : collect();
         $locale = App::getLocale();
 
         $form->html(view('admin.gift_type', [
             'categories' => $categories,
             'locale' => $locale,
-            'model' => $id ? Gift::find($id) : [],
+                        'model' => $model,
         ]));
 
 
 
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
+        
+        // Calculate next sort value for new gifts
+        $nextSort = 0;
+        if (!$id && $selectedCategoryId) {
+            $maxSort = Gift::where('gift_category_id', $selectedCategoryId)->max('sort');
+            $nextSort = ($maxSort ?? 0) + 1;
+        }
+        $form->number('sort', __('Sort'))->default($nextSort)->help(__('Lower numbers appear first'));
 
-        //  $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
 
-        $form->file('img', __('img')) ->name(function ($file) {
-                // الحصول على الامتداد الحقيقي مع fallback
-                $extension = $file->getClientOriginalExtension();
-                if (empty($extension)) {
-                    $extension = $file->guessExtension();
-                }
-                return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
-            })
-            ->default('1.png');
-        // $form->file('show_img', __('show_img'))->name(function ($file) {
-        //     return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        // })->required();
+        $form->file('img', __('img'))->name(function ($file) {
+            $extension = $file->getClientOriginalExtension();
+            if (empty($extension)) {
+                $extension = $file->guessExtension();
+            }
+            return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
+        }) ->default('1.png');
+       
 
-        $form->file('show_img', __('show_img')) ->name(function ($file) {
-                // الحصول على الامتداد الحقيقي مع fallback
-                $extension = $file->getClientOriginalExtension();
-                if (empty($extension)) {
-                    $extension = $file->guessExtension();
-                }
+        $form->file('show_img', __('show_img'))->name(function ($file) {
+            $extension = $file->getClientOriginalExtension();
+            if (empty($extension)) {
+                $extension = $file->guessExtension();
+            }
 
-                // تطبيع الامتدادات
-                $extension = strtolower($extension);
-                if ($extension === 'svg') {
-                    return 'svga_' . Str::random(8) . '.svg';
-                }
+            $extension = strtolower($extension);
+            if ($extension === 'svg') {
+                return 'svga_' . Str::random(8) . '.svg';
+            }
 
-                return 'animation_' . Str::random(8) . '.' . $extension;
-            })->required();
+            return 'animation_' . Str::random(8) . '.' . $extension;
+        })->required();
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
@@ -334,7 +524,25 @@ class GiftController extends MainController
 
             if (request()->has('_edit_inline')) return;
 
+            // Handle sort shifting to avoid duplicates
+            $newSort = (int) $form->input('sort');
             $categoryId = $form->input('gift_category_id');
+            $currentId = $form->model()->id;
+            
+            if ($categoryId && $newSort > 0) {
+                // Check if sort value exists in the same category
+                $query = Gift::where('gift_category_id', $categoryId)
+                    ->where('sort', '>=', $newSort);
+                
+                // Exclude current gift if editing
+                if ($currentId) {
+                    $query->where('id', '!=', $currentId);
+                }
+                
+                // Shift all gifts with sort >= newSort
+                $query->increment('sort');
+            }
+
             $category = GiftCategory::find($categoryId);
             $type = $category?->type;
 
@@ -365,56 +573,54 @@ class GiftController extends MainController
             }
         });
 
-         $form->saving(function (Form $form) {
-                $hasShowImg = $form->show_img || $form->model()->show_img;
-                $img2 = $form->img;
-                $wareId = $form->model()->id;
+        $form->saving(function (Form $form) {
+            $hasShowImg = $form->show_img || $form->model()->show_img;
+            $img2 = $form->img;
+            $wareId = $form->model()->id;
 
-       
 
-                $hasImg2 = $img2 || $form->model()->img;
 
-                if (!$hasShowImg && !$hasImg2) {
-                    $error = new MessageBag([
-                        'title'   => 'Error',
-                        'message' => 'Please upload at least one image',
+            $hasImg2 = $img2 || $form->model()->img;
+
+            if (!$hasShowImg && !$hasImg2) {
+                $error = new MessageBag([
+                    'title'   => 'Error',
+                    'message' => 'Please upload at least one image',
+                ]);
+                return back()->with(compact('error'));
+            }
+
+            if ($form->img instanceof UploadedFile) {
+                $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+
+                // الحصول على الامتداد الحقيقي
+                $originalExt = strtolower($form->img->getClientOriginalExtension());
+                $guessedExt = strtolower($form->img->guessExtension());
+
+                // إعطاء الأولوية للامتداد الأصلي
+                $ext = !empty($originalExt) ? $originalExt : $guessedExt;
+
+
+
+                if (!in_array($ext, $allowedExtensions)) {
+                    throw ValidationException::withMessages([
+                        'img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                     ]);
-                    return back()->with(compact('error'));
                 }
 
-                // معالجة show_img
-                if ($form->img instanceof UploadedFile) {
-                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+                $form->image_type = $ext;
+            }
 
-                    // الحصول على الامتداد الحقيقي
-                    $originalExt = strtolower($form->img->getClientOriginalExtension());
-                    $guessedExt = strtolower($form->img->guessExtension());
+            // معالجة img2 - الحل الرئيسي للمشكلة
+            if ($hasShowImg instanceof UploadedFile) {
+                /** @var FileService $fileService*/
+                $fileService = app(FileService::class);
+                $ext = $fileService->getExtension($hasShowImg, $wareId, getFromService: true);
 
-                    // إعطاء الأولوية للامتداد الأصلي
-                    $ext = !empty($originalExt) ? $originalExt : $guessedExt;
-
-               
-
-                    if (!in_array($ext, $allowedExtensions)) {
-                        throw ValidationException::withMessages([
-                            'img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
-                        ]);
-                    }
-
-                    $form->image_type = $ext;
-                }
-
-                // معالجة img2 - الحل الرئيسي للمشكلة
-                if ($hasShowImg instanceof UploadedFile) {
-                    /** @var FileService $fileService*/
-                    $fileService = app( FileService::class);
-                    $ext = $fileService->getExtension($hasShowImg, $wareId, getFromService: true);
-
-                    // $form->input('detected_profile_frame_type', $ext);
-                    $form->image_type = $ext;
-                   
-                }
-            });
+                // $form->input('detected_profile_frame_type', $ext);
+                $form->image_type = $ext;
+            }
+        });
 
         // After saving, create or update LuckyGift
         $form->saved(function (Form $form) {
@@ -434,7 +640,10 @@ class GiftController extends MainController
             }
         });
 
-
+        $form->saved(function (Form $form) {
+            $url = url('admin/gifts?filter=' . $form->model()->gift_category_id);
+            return redirect()->to($url);
+        });
         return $form;
     }
 

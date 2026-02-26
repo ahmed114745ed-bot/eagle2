@@ -54,7 +54,7 @@ class LeaderCCgameController extends Controller
                 return $err;
             }
 
-            $user = User::with(['profile:id,user_id,avatar', 'gamePercentage', 'UserVip:id,user_id,level'])
+            $user = User::with(['profile:id,user_id,avatar', 'UserVip:id,user_id,level'])
                 ->select('id', 'name', 'di')
                 ->find($request->uid);
 
@@ -68,7 +68,7 @@ class LeaderCCgameController extends Controller
                 'avatar'   => getImagePath($user->profile->avatar),
                 'coin'     => $user->di,
                 'vipLevel' => $user->UserVip->level ?? 0,
-                'percentage' => (@$user->gamePercentage->percentageGame->percentage_game ?? 2) / 100,
+               
             ]);
         });
     }

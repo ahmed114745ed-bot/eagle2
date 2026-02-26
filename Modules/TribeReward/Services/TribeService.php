@@ -113,8 +113,9 @@ class TribeService
                         $dateTimestamp = Carbon::parse($AgencyReward->expire_days)->format("Y-m-d H:i:s");
                         $attributes = [
                             'user_id'       => $user->id,
-                            'custom_image' => $AgencyReward->target,
+                            'custom_achievement_id' => $AgencyReward->target,
                             'end_at' => $dateTimestamp,
+                            'receive_type' => 'tribe',
                         ];
                         UserAchievementLevel::create($attributes);
                         break;

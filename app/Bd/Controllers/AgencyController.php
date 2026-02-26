@@ -13,7 +13,6 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
-use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
@@ -23,23 +22,16 @@ use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
 use Illuminate\Http\Request as req;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Controllers\MainController;
-use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -804,6 +796,7 @@ class AgencyController extends MainController
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
+
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
                 'agency_id' => $form->model()->id,

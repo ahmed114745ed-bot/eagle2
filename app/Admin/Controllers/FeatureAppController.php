@@ -5,8 +5,6 @@ namespace App\Admin\Controllers;
 use App\Models\Setting;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use App\Models\Config;
-use App\Models\Language;
 
 class FeatureAppController extends MainController
 {
@@ -19,24 +17,10 @@ class FeatureAppController extends MainController
      */
     protected $title = 'App Feature';
 
-    // public function index(Content $content)
-    // {
-    //     $hostAgencySetting = Setting::where('key', 'host_agency')->first();
-    //     $reelSettings = Setting::where('key', 'reel_status')->first();
-    //     $youtubeSettings = Setting::where('key', 'youtube_status')->first();
-    //     $liveSettings = Setting::where('key', 'live_status')->first();
-    //     $hostAgencyStatus = ($hostAgencySetting && $hostAgencySetting->value == 1);
-    //     $reelSettings = ($reelSettings && $reelSettings->value == 1);
-    //     $youtubeSettings = ($youtubeSettings && $youtubeSettings->value == 1);
-    //     $liveSettings = ($liveSettings && $liveSettings->value == 1);
-    //     return parent::index($content
-    //         ->view('app_feature', compact(['hostAgencyStatus', 'reelSettings', 'youtubeSettings', 'liveSettings'])));
-    // }
-
 
     public function index(Content $content)
     {
-        $keys = ['host_agency', 'reel_status', 'youtube_status', 'live_status', 'share_room_with_friends', 'room_cup_setting', 'moment_status', 'host_level_enabled'];
+        $keys = ['host_agency', 'reel_status', 'youtube_status', 'live_status','audio_room', 'share_room_with_friends', 'enable_room_boom','room_cup_setting', 'moment_status', 'host_level_enabled'];
 
         $settings = Setting::whereIn('key', $keys)
             ->pluck('value', 'key')
@@ -48,10 +32,12 @@ class FeatureAppController extends MainController
                 'reelSettings'     => $settings['reel_status'] ?? 1,
                 'youtubeSettings'  => $settings['youtube_status'] ?? 1,
                 'liveSettings'     => $settings['live_status'] ?? 1,
+                'audioRoom'        => $settings['audio_room'] ?? 1,
                 'roomCupSetting'     => $settings['room_cup_setting'] ?? 0,
-                'momentStatus'     => $settings['moment_status'] ?? 0,
+                'momentStatus'     => $settings['moment_status'] ?? 1,
                 'hostLevel'       => $settings['host_level_enabled'] ?? 1,
                 'shareRoom'       => $settings['share_room_with_friends'] ?? 1,
+                'enableRoomBoom'  => $settings['enable_room_boom'] ?? 1,
             ])
         );
     }

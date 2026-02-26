@@ -2,71 +2,72 @@
 
 namespace App\Helpers;
 
-use App\Models\Pk;
-use App\Models\Ban;
-use App\Models\Pack;
-use App\Models\Role;
-use App\Models\Room;
-use App\Models\User;
-use App\Models\Ware;
+use App\Classes\Facades\Agency as FacadesAgency;
+use App\Enums\Charges\UserTypeEnum;
+use App\Facades\UserHandling;
+use App\Jobs\SendFirebaseNotificationJob;
 use App\Models\Agency;
+use App\Models\AgencyMangerPullingOut;
+use App\Models\Background;
+use App\Models\Ban;
+use App\Models\ChargeWinner;
 use App\Models\Config;
 use App\Models\Follow;
-use App\Models\Target;
-use Encore\Admin\Show;
-use GuzzleHttp\Client;
 use App\Models\GiftLog;
+use App\Models\OfficialMessage;
+use App\Models\Owner_pid_target;
+use App\Models\Pack;
 use App\Models\PackLog;
-use App\Models\Setting;
-use App\Models\Background;
+use App\Models\Pk;
+use App\Models\Role;
+use App\Models\Room;
 use App\Models\RoomVisitor;
+use App\Models\Setting;
+use App\Models\ShippingAgency;
+use App\Models\Target;
+use App\Models\User;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
-use Illuminate\Support\Str;
-use App\Models\ChargeWinner;
-use Kreait\Firebase\Factory;
-use App\Facades\UserHandling;
-use Modules\Vip\Entities\Vip;
-use App\Models\ShippingAgency;
-use Illuminate\Support\Carbon;
-use App\Models\OfficialMessage;
-use Encore\Admin\Facades\Admin;
-use App\Models\Owner_pid_target;
 use App\Models\UsersJoinedAgency;
-use Illuminate\Http\JsonResponse;
-use Modules\Vip\Entities\UserVip;
-use Illuminate\Support\Facades\DB;
-use App\Enums\Charges\UserTypeEnum;
-use Illuminate\Support\Facades\Log;
-use Modules\Events\Entities\Winner;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
-use Modules\Events\Entities\PkEvent;
-use Illuminate\Support\Facades\Cache;
-use Modules\Badge\Entities\UserBadge;
-use Modules\Events\Entities\PkWinner;
-use App\Models\AgencyMangerPullingOut;
+use App\Models\Ware;
+use App\Traits\HelperTraits\AdminTrait;
+use App\Traits\HelperTraits\AttributesTrait;
+use App\Traits\HelperTraits\CalcsTrait;
+use App\Traits\HelperTraits\FilterTrait;
 use App\Traits\HelperTraits\InfoTrait;
+use App\Traits\HelperTraits\MoneyTrait;
 use App\Traits\HelperTraits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
-use Twilio\Rest\Client as TwilioClint;
-use App\Traits\HelperTraits\AdminTrait;
-use App\Traits\HelperTraits\CalcsTrait;
-use App\Traits\HelperTraits\MoneyTrait;
-use Illuminate\Support\Facades\Storage;
-use Modules\CP\Entities\WeeklyCpWinner;
-use Modules\Events\Entities\WeeklyStar;
-use App\Traits\HelperTraits\FilterTrait;
-use App\Jobs\SendFirebaseNotificationJob;
-use Illuminate\Pagination\CursorPaginator;
-use App\Traits\HelperTraits\AttributesTrait;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Show;
+use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\AreaManager\Entities\AreaManager;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Classes\Facades\Agency as FacadesAgency;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Kreait\Firebase\Factory;
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\SubAreaManager;
+use Modules\Badge\Entities\Badge;
+use Modules\Badge\Entities\UserBadge;
 use Modules\Charizma\Http\Services\UserCharismaService;
+use Modules\CP\Entities\WeeklyCpWinner;
+use Modules\Events\Entities\PkEvent;
+use Modules\Events\Entities\PkWinner;
+use Modules\Events\Entities\WeeklyStar;
+use Modules\Events\Entities\Winner;
+use Modules\Vip\Entities\UserVip;
+use Modules\Vip\Entities\Vip;
+use Twilio\Rest\Client as TwilioClint;
 
 class Common
 {
@@ -1651,7 +1652,7 @@ class Common
     }
     public static function zegoData($key = null)
     {
-        $zegoClientId =  config('app.zego_client_id');
+        $zegoClientId =  Common::getConf('zego_key');
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
@@ -1784,17 +1785,24 @@ class Common
 
     public  static function getTargetUsd($diamonds, $percentage)
     {
+        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        $coins = Common::getSettingValue($convertDiamond) ?? 1;
+
         // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
         //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
         // });
         // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
         //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         // });
-        $zones_coins = Cache::rememberForever('zones_coins', function () {
-            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        });
-        $coins = $zones_coins;
+
+        // $zones_coins = Cache::rememberForever('zones_coins', function () {
+        //    return Setting::where('key', 'zones_coins')->value('value') ?? 1;
+        //});
+
+
+
         // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
+
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
         $usd = Common::roundToTwoDecimalPlaces($userUsd);
@@ -2090,7 +2098,7 @@ class Common
                     'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
                     'image_color' => $owner->color_image ?? null,
                     'id_image' => $owner?->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip($owner->id, 18, 'color') : null),
                 ];
 
             case 'bd':
@@ -2134,7 +2142,7 @@ class Common
                     'url' => $user ? url("admin/users/{$user->id}") : '#',
                     'image_color' => $user->color_image ?? null,
                     'id_image' => $user?->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip($user->id, 18, 'color') : null),
                 ];
 
             default:
@@ -2340,7 +2348,7 @@ class Common
                     'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
                     'image_color'          => @$resource->receiver->color_image,
                     'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') : null),
 
                 ];
             default:
@@ -2585,6 +2593,10 @@ class Common
 
     public static function userBadge($userId, $badgeId, $days, $type)
     {
+        $badge = Badge::find($badgeId);
+        if (!$badge) {
+            return;
+        }
         $badgeUser = UserBadge::where('user_id', $userId)->where('badge_id', $badgeId)->active()->first();
         if ($badgeUser && $badgeUser->expire != 0) {
             $badgeUser->expire += (($days) * 86400);

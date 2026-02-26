@@ -65,6 +65,7 @@ class VersionController extends Controller
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
         $isRoomBoomVideoUpdated = $this->isUpdated('room_boom_video_update_at', @$request->room_boom_video_update_at);
 
+        $boomThemes = $this->isUpdated('boom_themes', @$request->boom_themes_time);
 
         $images = $this->isUpdated('images_updated_at', @$request->images_time);
         $ground = $this->isUpdated('ground_updated_at', @$request->ground_time);
@@ -112,6 +113,18 @@ class VersionController extends Controller
                 && intval($settings['host_level_enabled'] ?? 0) === 1,
             "is_share_with_friends" => (bool)($settings['share_room_with_friends'] ?? true),
             'is_show_grid_view' => (bool) Common::getConf('show_room') ?? false,
+
+            "room_boom" => [
+                "enabled" => ($settings['audio_room'] ?? 0) && ($settings['room_boom'] ?? 0),
+                "cache_assets" => $boomThemes,
+            ],
+
+            "audio_room_enabled" => [
+                "enable" => (bool) ($settings['audio_room'] ?? true),
+                "metadata" => [
+                    "default_screen" => $settings['default_screen'] ?? 'audio_room',
+                ]
+            ]
 
         ];
 
@@ -214,12 +227,12 @@ class VersionController extends Controller
         if (!$settings) {
             $settings = CacheHelper::cacheSettings();
         }
-        
+
         if (!$settings) {
             return [];
         }
-        
-        return $settings->whereIn('key', ['reel_status', 'youtube_status', 'share_room_with_friends', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
+
+        return $settings->whereIn('key', ['reel_status', 'audio_room', 'default_screen', 'youtube_status', 'share_room_with_friends', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'room_boom', 'enable_room_boom', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
     }
 
 

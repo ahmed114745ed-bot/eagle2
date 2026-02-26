@@ -54,6 +54,7 @@ class SettingController extends MainController
         $languages = Language::select(['id', 'name', 'code'])->get();
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
+        $zego_key = Common::getConf('zego_key');
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
@@ -63,6 +64,7 @@ class SettingController extends MainController
                 'pusher_app_secret',
                 'chargeTabType',
                 'zego_token',
+                'zego_key',
                 'pusher_app_key',
                 'pusher_app_id',
                 'pusher_app_cluster',
@@ -108,7 +110,7 @@ class SettingController extends MainController
     {
         try {
             $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
-            
+
             foreach ($data as $key => $value) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
                 // Clear old cache first, then set new value
@@ -121,7 +123,7 @@ class SettingController extends MainController
             Cache::flush();
 
             $redirectUrl = url(config('admin.route.prefix') . '/settings');
-            
+
             if ($request->has('current_tab')) {
                 $redirectUrl .= '?tab=' . $request->current_tab;
                 if ($request->has('inner_tab_type')) {

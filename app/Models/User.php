@@ -169,7 +169,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(self::class, 'device_token', 'device_token');
     }
-
+    public function lovelyRelations()
+    {
+        return Cp::where(function ($q) {
+            $q->where('user_one_id', $this->id)
+                ->orWhere('user_two_id', $this->id);
+        })
+            ->whereIn('status', [1, 4])
+            ->whereHas('relation', function ($q) {
+                $q->where('type', 'lovely');
+            });
+    }
     public function likes()
     {
         return $this->belongsToMany(self::class, 'profile_user_likes', 'user_id', 'liked_user_id')
@@ -556,7 +566,8 @@ class User extends Authenticatable
             return;
         }
 
-        return @$this->profile()->first()->avatar ?: Common::getConf('default_img');
+        //        return @$this->profile()->first()->avatar ?: Common::getConf('default_img');
+        return @$this->profile()->first()->avatar ?: "images/businessman-icon.jpg";
     }
 
     public function profile()
@@ -1761,15 +1772,17 @@ class User extends Authenticatable
     public function userBadge()
     {
 
-        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'regular'))->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'regular'))->active()->with("badge.images")->get();
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            $url = getImagePath($badge->badge->image);
+            $badgeImage = $badge->badge?->images?->firstWhere('language', app()->getLocale())?->image
+                ?? $badge->badge?->images?->first()?->image
+                ?? $badge->badge?->image;
+            $url = getImagePath($badgeImage);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
-                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
             }
         }
 
@@ -1782,15 +1795,17 @@ class User extends Authenticatable
     public function userBadgeTop()
     {
 
-        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'top'))->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'top'))->active()->with("badge.images")->get();
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            $url = getImagePath($badge->badge->image);
+            $badgeImage = $badge->badge?->images?->firstWhere('language', app()->getLocale())?->image
+                ?? $badge->badge?->images?->first()?->image
+                ?? $badge->badge?->image;
+            $url = getImagePath($badgeImage);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
-                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
             }
         }
 
@@ -1846,7 +1861,7 @@ class User extends Authenticatable
 
     public function hasShippingAgencyV2()
     {
-        return $this->hasOne(Agency::class, 'app_owner_id');
+        return $this->hasOne(ShippingAgency::class, 'app_owner_id');
     }
 
     public function hasFamily()
@@ -2229,7 +2244,7 @@ class User extends Authenticatable
             'color'          => $color ?? '',
             'vip_gifts'      => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name'   => $hasColor ? Common::wareUserVipV2($this, 18, 'color') ?? '' : '',
+            'colored_name'   => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVipV2($this, 18, 'color') : null),
         ];
     }
 

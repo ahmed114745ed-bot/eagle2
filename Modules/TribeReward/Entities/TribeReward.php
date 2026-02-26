@@ -2,12 +2,14 @@
 
 namespace Modules\TribeReward\Entities;
 
-use App\Helpers\Common;
 use App\Models\Ware;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use App\Helpers\Common;
 use Modules\Vip\Entities\OVip;
+use Illuminate\Http\UploadedFile;
+use Modules\Badge\Entities\Badge;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Modules\Achievement\Entities\CustomAchievement;
 
 class TribeReward extends Model
 {
@@ -23,6 +25,15 @@ class TribeReward extends Model
         return $this->hasOne(OVip::class, 'id', 'target');
     }
 
+    public function badge()
+    {
+        return $this->hasOne(Badge::class, 'id', 'target');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
+    }
     protected static function boot(): void
     {
         parent::boot();
@@ -32,12 +43,7 @@ class TribeReward extends Model
             } elseif ($model->target_type == 'vip') {
                 $model->target = request('target2', $model->target);
             } elseif ($model->target_type == 'achievement') {
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -51,12 +57,7 @@ class TribeReward extends Model
             } elseif ($model->target_type == 'vip') {
                 $model->target = request('target2', $model->target);
             } elseif ($model->target_type == 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -64,5 +65,4 @@ class TribeReward extends Model
             unset($model->target4);
         });
     }
-
 }

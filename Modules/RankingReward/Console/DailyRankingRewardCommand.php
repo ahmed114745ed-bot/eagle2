@@ -328,8 +328,10 @@ class DailyRankingRewardCommand extends Command
             elseif ($reward->target_type == "achievement") {
                 UserAchievementLevel::create([
                     "user_id"     => $user->id,
-                    "custom_image" => $reward->target,
+                  //  "custom_image" => $reward->target,
+                    'custom_achievement_id' => $reward->target,
                     "end_at"      => now()->addDays($reward->expire_days),
+                    'receive_type' => 'gift-ranking',
                 ]);
             }
 

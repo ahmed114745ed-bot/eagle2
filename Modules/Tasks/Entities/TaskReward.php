@@ -2,11 +2,12 @@
 
 namespace Modules\Tasks\Entities;
 
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
+use Modules\Vip\Entities\OVip;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Achievement\Entities\CustomAchievement;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TaskReward extends Model
 {
@@ -30,6 +31,11 @@ class TaskReward extends Model
     public function ware()
     {
         return $this->belongsTo(Ware::class, 'target');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
 
     protected static function boot()

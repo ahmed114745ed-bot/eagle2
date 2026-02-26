@@ -1,61 +1,65 @@
 <?php
 
-use App\Models\Bd;
-use Carbon\Carbon;
-use App\Models\Ban;
-use App\Models\Room;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Models\CoinLog;
-use App\Models\Country;
-use App\Models\BDSallary;
-use App\Helpers\LogHelper;
 use  App\helper\TimeHelper;
-use App\Models\PaymentCoin;
-use App\Models\RoomVisitor;
-use App\Models\UserSallary;
-use App\Exports\AgencyCharge;
-use App\Models\AgencySallary;
-use App\Models\DeleteAccount;
-use App\Models\CoinGameUserAll;
-use App\Models\AdminNotification;
-use App\Facades\CustomNotification;
-use App\Enums\AdminNotificationType;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
-use Database\Seeders\FlagSyrianSeeder;
-use Modules\Vip\Entities\VipPrivilege;
-use Symfony\Component\Process\Process;
-use App\Admin\Controllers\BdController;
-use App\Jobs\UpdateUserFollowCountsJob;
-use Illuminate\Support\Facades\Artisan;
-use App\Helpers\AdminNotificationHelper;
-use App\Admin\Controllers\AuthController;
-use App\Admin\Controllers\UserController;
-use App\Enums\SuperAdminNotificationType;
-use App\Exports\AgencyChargeTransactions;
-use App\Http\Controllers\TestsController;
-use App\Admin\Controllers\EmojiController;
-use App\Http\Controllers\PayPalController;
 use App\Admin\Controllers\AgencyController;
+use App\Admin\Controllers\AuthController;
+use App\Admin\Controllers\BdController;
+use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\ExportController;
-use App\Http\Controllers\WelcomeController;
-use Modules\SuperAdmin\Entities\SuperAdmin;
-use App\Http\Controllers\SettingsController;
-use App\Helpers\SuperAdminNotificationHelper;
-use App\Http\Controllers\addTOjesonController;
-use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\NowPaymentsController;
+use App\Admin\Controllers\HomeCarouselController;
+use App\Admin\Controllers\MangerSettingController;
+use App\Admin\Controllers\UserController;
 use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\V2\SalariesController;
-use App\Admin\Controllers\HomeCarouselController;
+use App\Enums\AdminNotificationType;
+use App\Enums\SuperAdminNotificationType;
+use App\Exports\AgencyCharge;
+use App\Exports\AgencyChargeTransactions;
+use App\Facades\CustomNotification;
+use App\Helpers\AdminNotificationHelper;
+use App\Helpers\Common;
+use App\Helpers\LogHelper;
+use App\Helpers\SuperAdminNotificationHelper;
+use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\ConfigController;
-use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\BdSalaryMigrationController;
+use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Http\Controllers\TestsController;
+use App\Http\Controllers\WelcomeController;
+use App\Jobs\UpdateUserFollowCountsJob;
+use App\Models\AdminNotification;
+use App\Models\AgencySallary;
+use App\Models\Ban;
+use App\Models\Bd;
+use App\Models\BDSallary;
+use App\Models\CoinGameUserAll;
+use App\Models\CoinLog;
+use App\Models\Country;
+use App\Models\DeleteAccount;
+use App\Models\GiftLog;
+use App\Models\PaymentCoin;
+use App\Models\Room;
+use App\Models\RoomVisitor;
+use App\Models\User;
+use App\Models\UserSallary;
+use Carbon\Carbon;
+use Database\Seeders\FlagSyrianSeeder;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Route;
 use Modules\Form\Http\Controllers\FormTemplateController;
+use Modules\RoomBoom\Entities\TotalRoomGift;
+use Modules\RoomBoom\Http\Controllers\web\PercentageBoomController;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\Vip\Entities\VipPrivilege;
+use Symfony\Component\Process\Process;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -225,6 +229,35 @@ Route::get('/run-seeders', function () {
     ]);
 });
 
+Route::get('/badge-seeders', function () {
+
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'BadgeImageSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/config-badges-seeder', function () {
+    Artisan::call('db:seed', ['--class' => 'ConfigBadgesSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ ConfigBadgesSeeder executed successfully.'
+    ]);
+});
+
+Route::get('/boom-percentage-seeder', function () {
+
+    Artisan::call('db:seed', ['--class' => 'PercentageBoomSeeder']);
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ PercentageBoomSeeder executed successfully.'
+    ]);
+});
+
 Route::get('/update-flag', function () {
 
     Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
@@ -381,6 +414,7 @@ Route::group(
 
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
+        Route::post("enable-room-boom", [PercentageBoomController::class, "enableRoomBoom"]);
         Route::post("transfer-salary-reliable-shipping-agency", [AppearChargerAgencyController::class, "transferSalary"]);
 
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
@@ -612,7 +646,7 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
     //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
-
+Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
 
 Route::get('/test-games', function () {
@@ -1452,3 +1486,100 @@ Route::get('/debug/test-user-online', function () {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 });
+
+Route::get('/time-start-week', function () {
+    $date = '2026-02-15';
+
+    // room_id => sum(current_total)
+    $totalRoomGifts = TotalRoomGift::whereDate('created_at', $date)
+        ->groupBy('room_id')
+        ->pluck(DB::raw('SUM(current_total)'), 'room_id');
+
+    // room_id => sum(giftPrice)
+    $totalGiftLogs = GiftLog::whereDate('created_at', $date)
+        ->groupBy('room_id')
+        ->pluck(DB::raw('SUM(giftPrice)'), 'room_id');
+
+    dd([
+        'date' => $date,
+        'total_room_gifts' => $totalRoomGifts,
+        'total_gift_logs' => $totalGiftLogs,
+    ]);
+});
+
+Route::get('/fix-total-room-gifts', function () {
+    $tz = getTimezone();
+    $startOfWeek = Carbon::now($tz)->startOfWeek()->copy()->setTimezone('UTC');
+    $endOfWeek = Carbon::now($tz)->endOfWeek()->copy()->setTimezone('UTC');
+
+    // Get correct totals from gift_logs for each room per day
+    $correctTotals = GiftLog::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+        ->groupBy('room_id', DB::raw('DATE(created_at)'))
+        ->selectRaw('room_id, DATE(created_at) as gift_date, SUM(giftPrice) as correct_total')
+        ->get();
+
+    $updated = 0;
+    $created = 0;
+    $results = [];
+
+    foreach ($correctTotals as $row) {
+        $roomId = $row->room_id;
+        $giftDate = $row->gift_date;
+        $correctTotal = $row->correct_total;
+
+        // Find or create TotalRoomGift record for this room on this date
+        $record = TotalRoomGift::whereDate('created_at', $giftDate)
+            ->where('room_id', $roomId)
+            ->first();
+
+        if ($record) {
+            $oldValue = $record->current_total;
+            if ($oldValue != $correctTotal) {
+                $record->current_total = $correctTotal;
+                $record->save();
+                $updated++;
+
+                $results[] = [
+                    'action' => 'updated',
+                    'room_id' => $roomId,
+                    'date' => $giftDate,
+                    'old' => $oldValue,
+                    'new' => $correctTotal,
+                    'diff' => $correctTotal - $oldValue,
+                ];
+            }
+        } else {
+            // Create missing record only if correct_total > 0
+            if ($correctTotal > 0) {
+                TotalRoomGift::create([
+                    'room_id' => $roomId,
+                    'current_total' => $correctTotal,
+                    'created_at' => Carbon::parse($giftDate)->startOfDay(),
+                    'updated_at' => now(),
+                ]);
+                $created++;
+
+                $results[] = [
+                    'action' => 'created',
+                    'room_id' => $roomId,
+                    'date' => $giftDate,
+                    'old' => 0,
+                    'new' => $correctTotal,
+                    'diff' => $correctTotal,
+                ];
+            }
+        }
+    }
+
+    return response()->json([
+        'start' => $startOfWeek->toDateTimeString(),
+        'end' => $endOfWeek->toDateTimeString(),
+        'updated_count' => $updated,
+        'created_count' => $created,
+        'total_processed' => $updated + $created,
+        'results' => $results,
+    ]);
+});
+
+
+

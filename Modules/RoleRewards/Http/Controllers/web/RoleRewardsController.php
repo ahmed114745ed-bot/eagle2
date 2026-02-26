@@ -3,26 +3,27 @@
 namespace Modules\RoleRewards\Http\Controllers\web;
 
 use App\Models\Role;
-use App\Selectables\OVips;
-use Modules\Achievement\Entities\Achievement;
-use Modules\RoleRewards\Actions\DeleteRoleReward;
-use Modules\Badge\Entities\Badge;
-use Modules\RoleRewards\Entities\RoleReward;
-use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use App\Selectables\Wares;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Admin;
+use App\Selectables\OVips;
+use App\Selectables\Wares;
 use App\Selectables\Badges;
-
+use Modules\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
+use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
-use Modules\Events\Entities\ChargeTargetEvent;
+use App\Selectables\CustomAchievements;
+use App\Admin\Controllers\MainController;
+
 use Modules\Events\Entities\RewardTarget;
+use Modules\RoleRewards\Entities\RoleReward;
+use Modules\Achievement\Entities\Achievement;
+use Modules\Events\Entities\ChargeTargetEvent;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\RoleRewards\Actions\DeleteRoleReward;
+use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 
 class RoleRewardsController extends MainController
 {
@@ -94,7 +95,7 @@ class RoleRewardsController extends MainController
             } elseif ($this->type === "vip") {
                 return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "achievement") {
-                return $this->rewardable?->title ?? "-";
+                return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "badge") {
                 return $this->rewardable?->name ?? "-";
             }
@@ -107,9 +108,9 @@ class RoleRewardsController extends MainController
                 } elseif ($this->type === "vip") {
                     $path = $this->rewardable?->img;
                 } elseif ($this->type === "achievement") {
-                    $path = $this?->reward_achievement;
+                    $path = $this->rewardable?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type === "badge") {
-                    $path = $this->rewardable?->icon;
+                    $path = $this->rewardable?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -194,9 +195,10 @@ class RoleRewardsController extends MainController
         })->when("vip", function () use ($form) {
             $form->belongsTo('rewardable_id2', OVips::class, trans('vips'));
         })->when("achievement", function (Form $form) {
-            $form->image("reward_achievement", __('image'))->name(function ($file) {
-                return now()->timestamp . '.' . $file->guessExtension();
-            })->disk('gcs');
+            // $form->image("reward_achievement", __('image'))->name(function ($file) {
+            //     return now()->timestamp . '.' . $file->guessExtension();
+            // })->disk('gcs');
+            $form->belongsTo('reward_achievement', CustomAchievements::class, trans('Custom achievement'));
         })
             ->when("badge", function () use ($form) {
                 $this->addBadgeField($form);
@@ -251,9 +253,8 @@ class RoleRewardsController extends MainController
                     $form->model()->rewardable_type = \Modules\Badge\Entities\Badge::class;
                     break;
                 case 'achievement':
-                    $form->rewardable_id = 0;
-                    $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
-                    $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
+                    $form->rewardable_type = \Modules\Achievement\Entities\CustomAchievement::class;
+                    $form->model()->rewardable_type = \Modules\Achievement\Entities\CustomAchievement::class;
                     break;
             }
         });

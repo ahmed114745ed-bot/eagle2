@@ -2,16 +2,14 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Jobs\MilestoneJob;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Illuminate\Support\Facades\DB;
 use Modules\Milestones\Entities\Milestone;
-use Encore\Admin\Facades\Admin;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class MilestoneController extends MainController
 {
@@ -77,12 +75,34 @@ class MilestoneController extends MainController
         }
 
         $grid->column('sync', __('Rewards'))->display(function () {
-            $url = admin_url("milestones/{$this->id}/sync"); 
-            return "<a href='{$url}' class='btn btn-xs btn-success'>
-                        <i class='fa fa-sync'></i> " . __('Reapply Rewards') ."
-                    </a>";
+            $url = admin_url("milestones/{$this->id}/sync");
+            return "<button type='button' class='btn btn-xs btn-success sync-milestone-btn' data-url='{$url}'>
+                        <i class='fa fa-sync'></i> " . __('Reapply Rewards') . "
+                    </button>";
         });
-        
+
+        Admin::script("
+            document.querySelectorAll('.sync-milestone-btn').forEach(function(button){
+                button.addEventListener('click', function(){
+                    var url = this.dataset.url;
+                    Swal.fire({
+                        title: '" . __('Are you sure?') . "',
+                        text: '" . __('Are you sure you want to reapply rewards?') . "',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: '" . __('Yes, reapply!') . "',
+                        cancelButtonText: '" . __('Cancel') . "'
+                    }).then((result) => {
+                        if (result.value) {
+                            window.location.href = url;
+                        }
+                    });
+                });
+            });
+        ");
+
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
             $filter->equal('type', __('Type'));
@@ -143,26 +163,9 @@ class MilestoneController extends MainController
 
     public function syncMilestone($id)
     {
-        $milestone = Milestone::with('rewards')->findOrFail($id);
-        $usersQuery = match ($milestone->slug) {
-            'super-admin' => User::where('is_super_admin', 1),
-            'bd' => User::where('is_bd', 1),
-            'host-agency-owner' => User::whereHas('hasHostAgency'),
-            'charge-agency-owner' => User::whereHas('hasShippingAgencyV2'),
-            'family-owner' => User::whereHas('hasFamily'),
-            'host' => User::where('type_user', 1),
-            default => User::query(),
-        };
-    
-        DB::transaction(function () use ($usersQuery, $milestone) {
-            $usersQuery->chunk(100, function ($users) use ($milestone) {
-                foreach ($users as $user) {
-                    MilestoneHelper::removeReward($user, $milestone->slug);
-                    MilestoneHelper::grantMilestoneToUser($user, $milestone->slug);
-                }
-            });
-        });
-    
+
+        dispatch(new MilestoneJob($id))->onQueue('milestones-job');
+
         admin_success(__('milestone_rewards_synced'));
         return redirect()->back();
     }

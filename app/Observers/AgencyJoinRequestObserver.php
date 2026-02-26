@@ -2,9 +2,9 @@
 
 namespace App\Observers;
 
-use App\Models\User;
-use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
+use App\Models\User;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyJoinRequestObserver
 {
@@ -19,13 +19,12 @@ class AgencyJoinRequestObserver
                 $user->save();
                 uploadMonthlyDiamondReceive($user->id, 0);
                 $agid = $user->agency_id;
-
+                MilestoneHelper::grantMilestoneToUser($user, 'host');
                 if ($agid == '' || $agid == null || $agid == 0) {
                     $user->coins = 0;
                     $user->save();
                     uploadMonthlyDiamondReceive($user->id, 0);
                 }
-                // CustomNotification::acceptAgency($agency, $user);
             }
         }
     }
