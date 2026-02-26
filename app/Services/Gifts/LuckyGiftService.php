@@ -354,6 +354,9 @@ class LuckyGiftService
         $fairService = app(\App\Services\FairLuck\FairLuckService3::class);
         $throwNumber = 0;
 
+        $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
+        $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+
         while ($user->di >= $unitPrice && $index > 0) {
 
             foreach ($receiversIds as $receiverId) {
@@ -365,8 +368,17 @@ class LuckyGiftService
 
                 $throwNumber++;
 
+                $appFee = $unitPrice * $appFeeRate;
+                $receiverFee = $unitPrice * $receiverFeeRate;
+                $netBetAmount = $unitPrice - $appFee - $receiverFee;
+
+                $recUser = User::find($receiverId);
+                if ($recUser) {
+                    $recUser->increment('di', (int) round($receiverFee));
+                }
+
                 try {
-                    $result = $fairService->processBet($user, $gift, $unitPrice, $roomId, $receiverId);
+                    $result = $fairService->processBet($user, $gift, $netBetAmount, $roomId, $receiverId, $appFee, $receiverFee);
                 } catch (\Throwable $e) {
                     Log::error('FairLuckService3 processBet FAILED', [
                         'user_id' => $userId,
