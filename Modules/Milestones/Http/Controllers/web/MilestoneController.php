@@ -2,17 +2,14 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Jobs\MilestoneJob;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
 use App\Admin\Controllers\MainController;
 use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class MilestoneController extends MainController
 {

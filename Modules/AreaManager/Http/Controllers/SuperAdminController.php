@@ -22,11 +22,9 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\MessageBag;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
-
 
 class SuperAdminController extends MainController
 {
@@ -321,7 +319,6 @@ class SuperAdminController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_super_admin = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'super-admin');
                     }
 
                     $newUserAppId = User::find($newAppId);

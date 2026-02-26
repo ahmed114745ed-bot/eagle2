@@ -22,8 +22,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use Modules\Milestones\Helpers\MilestoneHelper;
-
 
 class AppearChargerAgencyController extends MainController
 {
@@ -204,7 +202,7 @@ class AppearChargerAgencyController extends MainController
      */
     protected function grid()
     {
-       
+
         $grid = new Grid(new ShippingAgency());
         $adminId = auth()->user()->id;
         $countriesIds = Common::areaCountries($adminId);
@@ -446,7 +444,7 @@ class AppearChargerAgencyController extends MainController
             if ($user)  $form->model()->country_id = $user->country_id;
         });
 
-        
+
 
         return $form;
     }

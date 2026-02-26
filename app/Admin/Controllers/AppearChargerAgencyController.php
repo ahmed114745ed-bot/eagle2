@@ -21,10 +21,7 @@ use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteShippingAgencyAction;
-use Modules\Milestones\Helpers\MilestoneHelper;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -259,10 +256,10 @@ class AppearChargerAgencyController extends MainController
                         ? e($this->country->name)
                         : e($this->country->e_name);
 
-                    $flagHtml = "<img src='{$flagPath}' 
-                         class='flag-image' 
-                         alt='flag Image' 
-                         title='{$flagTitle}' 
+                    $flagHtml = "<img src='{$flagPath}'
+                         class='flag-image'
+                         alt='flag Image'
+                         title='{$flagTitle}'
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
                 }
 
@@ -305,10 +302,10 @@ class AppearChargerAgencyController extends MainController
                     ? e($this->owner->country->name)
                     : e($this->owner->country->e_name);
 
-                $flagHtml = "<img src='{$flagPath}' 
-                         class='flag-image' 
-                         alt='flag Image' 
-                         title='{$flagTitle}' 
+                $flagHtml = "<img src='{$flagPath}'
+                         class='flag-image'
+                         alt='flag Image'
+                         title='{$flagTitle}'
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
             }
             return "

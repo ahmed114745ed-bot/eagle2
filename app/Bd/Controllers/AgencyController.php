@@ -32,7 +32,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {

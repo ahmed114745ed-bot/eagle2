@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Modules\AgencyApp\Entities\AdditionalInfo;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AcceptAgencyAction extends RowAction
 {
@@ -48,7 +47,6 @@ class AcceptAgencyAction extends RowAction
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
-         MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
       //  Common::createUserAdmin($appOwnerId);
         CustomNotification::acceptRequestAgency($user);
         return $this->response()->success('success')->refresh();

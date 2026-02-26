@@ -32,7 +32,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\MessageBag;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -719,7 +718,7 @@ class AgencyController extends MainController
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
-          
+
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,

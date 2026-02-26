@@ -15,7 +15,6 @@ use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyJoinRequestController extends MainController
 {
@@ -323,7 +322,7 @@ class AgencyJoinRequestController extends MainController
                 }
 
                 uploadMonthlyDiamondReceive($user_id, 0);
-                
+
             }
         });
 
