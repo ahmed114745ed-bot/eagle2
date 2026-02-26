@@ -55,6 +55,7 @@ use Illuminate\Support\Facades\Route;
 use Utd\Agency\Http\Controllers\Admin\AppearChargerAgencyController;
 use Utd\Agency\Http\Controllers\Admin\MangerSettingController;
 use Utd\Agency\Http\Controllers\Admin\PaymentGetWayController;
+use App\Admin\Controllers\SpecialIdRequestController as SpecialIdRequestCtrl;
 
 
 Admin::routes();
@@ -216,7 +217,7 @@ Route::group([
     Route::resource('agency_join_requests', 'AgencyJoinRequestController');
     Route::resource('requests-for-get-salary', 'GetSalaryRequestController');
     Route::resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
-    Route::resource('special-id-requests', 'SpecialIdRequestController');
+    Route::resource('special-id-requests', SpecialIdRequestCtrl::class)->names('special-id-requests-preview');
     Route::resource('family_levels', 'FamilyLevelController');
     Route::resource('silver', 'SilverController');
     Route::resource('coins', 'CoinController');

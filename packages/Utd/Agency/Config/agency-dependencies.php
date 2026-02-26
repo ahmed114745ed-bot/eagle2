@@ -101,8 +101,8 @@ return [
             'helper' => Modules\Milestones\Helpers\MilestoneHelper::class,
         ],
         'switch_account' => [
-            'enabled' => class_exists(Modules\SwitchAccount\Entities\UserAccount::class),
-            'entity' => Modules\SwitchAccount\Entities\UserAccount::class,
+            'enabled' => class_exists(Utd\SwitchAccount\Entities\UserAccount::class),
+            'entity' => Utd\SwitchAccount\Entities\UserAccount::class,
         ],
     ],
 

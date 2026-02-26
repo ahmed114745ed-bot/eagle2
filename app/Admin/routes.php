@@ -108,6 +108,7 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 use Utd\Agency\Http\Controllers\Admin\PackageController;
+use App\Admin\Controllers\SpecialIdRequestController as SpecialIdRequestCtrl;
 
 Route::group(
     [
@@ -427,7 +428,7 @@ Route::group(
 
         Route::resource('requests-for-get-salary', 'GetSalaryRequestController');
         Route::resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
-        Route::resource('special-id-requests', 'SpecialIdRequestController');
+        Route::resource('special-id-requests', SpecialIdRequestCtrl::class);
         Route::resource('silver', 'SilverController');
 
         Route::prefix('coins/{paymentGatwayId}')->group(function () {

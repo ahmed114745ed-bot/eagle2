@@ -7,7 +7,6 @@ use App\helper\InvitationEarningHelper;
 use App\helper\InvitationWalletHelper;
 use App\Support\PackageHelper;
 use Illuminate\Support\Facades\Log;
-use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use Utd\Vip\Entities\OVip;
 use Utd\Vip\Entities\Vip;
 use App\Models\Gift;

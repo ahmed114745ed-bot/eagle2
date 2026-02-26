@@ -29,7 +29,6 @@ use App\Admin\Actions\KickOfAgencyAction;
 use Utd\Family\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\CanPlaySwitchAction;
-use Modules\SwitchAccount\Entities\UserAccount;
 use App\Contracts\UserAchievementContract;
 
 class UserController extends MainController

@@ -54,16 +54,17 @@
         "utd/charizma": "*",
         "utd/chat": "*",
         "utd/cp": "*",
-        "utd/daily-prize": "dev-achievmentPackage",
-        "utd/special-id": "dev-achievmentPackage",
+        "utd/daily-prize": "*",
+        "utd/special-id": "*",
+        "utd/switch-account": "*",
         "utd/events": "*",
         "utd/family": "*",
         "utd/gifts": "*",
-        "utd/host-level": "dev-achievmentPackage",
+        "utd/host-level": "*",
         "utd/lucky-box": "*",
         "utd/moments": "*",
         "utd/pk": "*",
-        "utd/ranking-reward": "dev-achievmentPackage",
+        "utd/ranking-reward": "*",
         "utd/reals": "*",
         "utd/room": "*",
         "utd/room-boom": "*",
@@ -253,6 +254,10 @@
         {
             "type": "path",
             "url": "packages/Utd/SpecialId"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/SwitchAccount"
         }
     ]
 }

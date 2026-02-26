@@ -21,7 +21,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Modules\SwitchAccount\Entities\UserAccount;
 use App\Contracts\UserAchievementContract;
 use Session;
 

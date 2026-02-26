@@ -3,6 +3,7 @@
 namespace Utd\HostLevel;
 
 use Config;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class HostLevelServiceProvider extends ServiceProvider
@@ -17,6 +18,8 @@ class HostLevelServiceProvider extends ServiceProvider
      */
     protected $moduleNameLower = 'hostlevel';
 
+    protected $namespace = 'Utd\\HostLevel\\Http\\Controllers';
+
     /**
      * Boot the application events.
      *
@@ -24,6 +27,7 @@ class HostLevelServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerRoutes();
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
@@ -37,7 +41,22 @@ class HostLevelServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->register(Providers\RouteServiceProvider::class);
+        //
+    }
+
+    /**
+     * Register the package routes.
+     */
+    protected function registerRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(__DIR__.'/../routes/api.php');
+
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(__DIR__.'/../routes/web.php');
     }
 
     /**

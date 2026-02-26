@@ -1,16 +1,15 @@
 <?php
 
-namespace Utd\SpecialId;
+namespace Utd\SwitchAccount;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
-class SpecialIdServiceProvider extends ServiceProvider
+class SwitchAccountServiceProvider extends ServiceProvider
 {
-    protected string $moduleName = 'SpecialId';
-    protected string $moduleNameLower = 'specialid';
-
-    protected string $namespace = 'Utd\\SpecialId\\Http\\Controllers';
+    protected string $moduleName = 'SwitchAccount';
+    protected string $moduleNameLower = 'switchaccount';
+    protected string $namespace = 'Utd\\SwitchAccount\\Http\\Controllers';
 
     public function boot(): void
     {
@@ -18,8 +17,6 @@ class SpecialIdServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->registerUtdRoutes();
-        $this->registerDashboardRoutes();
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
@@ -28,6 +25,9 @@ class SpecialIdServiceProvider extends ServiceProvider
         //
     }
 
+    /**
+     * Register the package routes.
+     */
     protected function registerRoutes(): void
     {
         Route::prefix('api')
@@ -43,10 +43,10 @@ class SpecialIdServiceProvider extends ServiceProvider
     protected function registerConfig(): void
     {
         $this->publishes([
-            __DIR__ . '/../config/specialid.php' => config_path($this->moduleNameLower . '.php'),
+            __DIR__ . '/../config/switchaccount.php' => config_path($this->moduleNameLower . '.php'),
         ], 'config');
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/specialid.php', $this->moduleNameLower
+            __DIR__ . '/../config/switchaccount.php', $this->moduleNameLower
         );
     }
 
@@ -68,23 +68,11 @@ class SpecialIdServiceProvider extends ServiceProvider
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
+            $this->loadJsonTranslationsFrom($langPath);
         } else {
             $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', $this->moduleNameLower);
+            $this->loadJsonTranslationsFrom(__DIR__ . '/../resources/lang');
         }
-    }
-
-    protected function registerUtdRoutes(): void
-    {
-        Route::prefix('api/utd')
-            ->middleware(['api', 'localization'])
-            ->group(__DIR__ . '/../routes/utd.php');
-    }
-
-    protected function registerDashboardRoutes(): void
-    {
-        Route::prefix('api/dashboard')
-            ->middleware(['api', 'auth:sanctum', 'verified'])
-            ->group(__DIR__ . '/../routes/dashboard.php');
     }
 
     public function provides(): array

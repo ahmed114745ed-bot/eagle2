@@ -92,8 +92,8 @@ return [
             'o_vip' => Modules\Vip\Entities\OVip::class,
         ],
         'switch_account' => [
-            'enabled' => class_exists(Modules\SwitchAccount\Entities\UserAccount::class),
-            'user_account' => Modules\SwitchAccount\Entities\UserAccount::class,
+            'enabled' => class_exists(Utd\SwitchAccount\Entities\UserAccount::class),
+            'user_account' => Utd\SwitchAccount\Entities\UserAccount::class,
         ],
     ],
     'route_middlewares' => [

@@ -24,6 +24,7 @@ use Utd\RoomCup\Entities\RoomCupTarget;
 use Utd\Vip\Entities\OVip;
 use Utd\HostLevel\Entities\HostLevel;
 use Utd\SpecialId\Entities\SpecialHistory;
+use Utd\SwitchAccount\Entities\UserAccount;
 
 class PackageHelper
 {
@@ -49,6 +50,7 @@ class PackageHelper
         'rankingReward' => RankingReward::class,
         'dailyPrize' => DailyGift::class,
         'specialId' => SpecialHistory::class,
+        'switchAccount' => UserAccount::class,
     ];
 
     /**

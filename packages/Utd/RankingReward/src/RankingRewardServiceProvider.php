@@ -3,6 +3,7 @@
 namespace Utd\RankingReward;
 
 use Config;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Utd\RankingReward\Console\DailyRankingRewardCommand;
 use Utd\RankingReward\Console\MonthlyRankingCommand;
@@ -20,6 +21,8 @@ class RankingRewardServiceProvider extends ServiceProvider
      */
     protected $moduleNameLower = 'rankingreward';
 
+    protected $namespace = 'Utd\\RankingReward\\Http\\Controllers';
+
     /**
      * Boot the application events.
      *
@@ -27,6 +30,7 @@ class RankingRewardServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerRoutes();
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
@@ -47,7 +51,22 @@ class RankingRewardServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->register(Providers\RouteServiceProvider::class);
+        //
+    }
+
+    /**
+     * Register the package routes.
+     */
+    protected function registerRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(__DIR__.'/../routes/api.php');
+
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(__DIR__.'/../routes/web.php');
     }
 
     /**

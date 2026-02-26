@@ -19,13 +19,12 @@ use Illuminate\Support\Facades\Http;
 use App\Exceptions\CValidationException;
 use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
-use Modules\SwitchAccount\Traits\SwithAccountLogin;
-use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
+use App\Support\PackageHelper;
 use function request;
 
 class AuthService
 {
-    use SwithAccountLogin;
+    use \App\Traits\SwithAccountLogin;
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly CountryRepository $countryRepository,
@@ -476,7 +475,9 @@ public function loginWithApple($request, $unique_id)
         }
 
         $this->userRepository->updateDeviceToken($user, $deviceToken);
-        (new SwitchAccountServices())->saveDeviceUser($user->id, $deviceToken);
+        if (PackageHelper::isInstalled('switchAccount')) {
+            (new \Utd\SwitchAccount\Http\Services\SwitchAccountServices())->saveDeviceUser($user->id, $deviceToken);
+        }
         $this->logoutAsConfiguration($user);
         return true;
     }

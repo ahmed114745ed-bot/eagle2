@@ -17,7 +17,6 @@ use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
 use Google_Client;
-use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
 use Google\Client as GoogleClient;
 use Firebase\JWT\JWK;
 

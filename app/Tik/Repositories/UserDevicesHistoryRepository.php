@@ -2,7 +2,8 @@
 
 namespace App\Tik\Repositories;
 
-use Modules\SwitchAccount\Entities\UserDevicesHistory;
+use App\Support\PackageHelper;
+use Utd\SwitchAccount\Entities\UserDevicesHistory;
 
 
 class UserDevicesHistoryRepository extends AbstractRepository
@@ -10,7 +11,11 @@ class UserDevicesHistoryRepository extends AbstractRepository
 
     public function __construct()
     {
-        parent::__construct(new UserDevicesHistory());
+        if (PackageHelper::isInstalled('switchAccount')) {
+            parent::__construct(new UserDevicesHistory());
+        } else {
+            parent::__construct(null);
+        }
     }
 
     public function all($perPage, $Page, $deviceToken, $request)

@@ -2,15 +2,18 @@
 
 namespace Utd\DailyPrize;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class DailyPrizeServiceProvider extends ServiceProvider
 {
     protected string $moduleName = 'DailyPrize';
     protected string $moduleNameLower = 'dailyprize';
+    protected string $namespace = 'Utd\\DailyPrize\\Http\\Controllers';
 
     public function boot(): void
     {
+        $this->registerRoutes();
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
@@ -19,7 +22,19 @@ class DailyPrizeServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->app->register(Providers\RouteServiceProvider::class);
+        //
+    }
+
+    protected function registerRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(__DIR__ . '/../routes/api.php');
+
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(__DIR__ . '/../routes/web.php');
     }
 
     protected function registerConfig(): void

@@ -35,7 +35,8 @@ use App\Contracts\UserAchievementContract;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentGallery;
 use App\Support\DynamicReals;
-use Modules\SwitchAccount\Entities\UserAccount;
+use App\Support\PackageHelper;
+use Utd\SwitchAccount\Entities\UserAccount;
 use Utd\Vip\Entities\UserVip;
 
 // use Encore\Admin\Actions\Response;
@@ -310,6 +311,9 @@ class FreeUserController extends MainController
         });
 
         $grid->column('custom_button3', __('Change account'))->modal('حسابات اخري علي نفس الجهاز', function ($model) {
+            if (!PackageHelper::isInstalled('switchAccount')) {
+                return new Table([__('Name'), __('uuid'), __('phone')], []);
+            }
             $device_token  = $this->device_token;
             $users = UserAccount::where('device_token', $device_token)->get();
             $parentUserIds = $users->pluck('parent_user_id');

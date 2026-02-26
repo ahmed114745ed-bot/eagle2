@@ -60,7 +60,6 @@ use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\FixedTarget\Services\FixedTargetService;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
-use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
 use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
@@ -1073,7 +1072,10 @@ class UserController extends Controller
             return true;
         }
 
-        return !UserDevicesHistory::where('device_token', $deviceToken)
+        if (!PackageHelper::isInstalled('switchAccount')) {
+            return true;
+        }
+        return !\Utd\SwitchAccount\Entities\UserDevicesHistory::where('device_token', $deviceToken)
             ->where('user_id', '!=', $userId)
             ->exists();
     }

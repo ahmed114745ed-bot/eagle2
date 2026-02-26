@@ -7,7 +7,7 @@
     "Achievement": true,
     "SpechialId": true,
     "SpecialId": false,
-    "SwitchAccount": true,
+    "SwitchAccount": false,
     "Chat": false,
     "Public": true,
     "AgencyApp": false,
