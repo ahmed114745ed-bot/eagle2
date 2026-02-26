@@ -338,9 +338,9 @@ class UserController extends Controller
     public function superAdminUsers(Request $request)
     {
         $key = $request->q;
-
+        $selectedId = $request->selected_id;
         $page = $request->get('page', 1);
-        $users = $this->userService->superAdminUsers($key, $page);
+        $users = $this->userService->superAdminUsers($key, $page, $selectedId);
 
         return response()->json($users);
     }
@@ -368,7 +368,7 @@ class UserController extends Controller
     public function usersAreaManager(Request $request)
     {
         $key = $request->q;
-         $selectedId = $request->selected_id;
+        $selectedId = $request->selected_id;
         $page = $request->get('page', 1);
         $users = $this->userService->usersAreaManager($key, $page, $selectedId);
 

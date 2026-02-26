@@ -279,7 +279,7 @@ class AdminUserController extends EncorUsersController
 
     public function showSubSuperAdmin($id)
     {
-        $subSuperAdmin = SubAdmin::find($id);
+        $subSuperAdmin = SubAdmin::with('appUser')->find($id);
 
         if ($subSuperAdmin) {
             return response()->json([
@@ -296,10 +296,7 @@ class AdminUserController extends EncorUsersController
 
     public function updateSubSuperAdmin(Request $request,)
     {
-        $validated = $request->validate([
 
-            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-        ]);
         $subSuperAdmin = SubAdmin::find($request->id);
         $subSuperAdmin->name = $request->name;
         $subSuperAdmin->username = $request->username;
@@ -307,11 +304,24 @@ class AdminUserController extends EncorUsersController
             $image = Common::upload('images', $request->image);
             $subSuperAdmin->avatar = $image;
         }
-        if ($request->password) {
+        $plainPassword = $request->password; // input from user
+        $hash = $subSuperAdmin->password;
+        if (!Hash::check($plainPassword, $hash)) {
             $subSuperAdmin->password = Hash::make($request->password);
         }
-        if ($request->filled('password')) {
-            $subSuperAdmin->password = Hash::make($request->password);
+        if ($request->user_id != $subSuperAdmin->app_id) {
+            
+            $oldUser = User::find($subSuperAdmin->app_id);
+            if ($oldUser) {
+                $oldUser->is_sub_super_admin = 0;
+                $oldUser->save();
+            }
+            $subSuperAdmin->app_id = $request->user_id;
+            $appUser = User::find($request->user_id);
+            if ($appUser) {
+                $appUser->is_sub_super_admin = 1;
+                $appUser->save();
+            }
         }
         $subSuperAdmin->save();
         return Redirect::back();
