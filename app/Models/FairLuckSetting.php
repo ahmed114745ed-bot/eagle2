@@ -39,4 +39,19 @@ class FairLuckSetting extends Model
 
         return $value;
     }
+
+    public static function getAppFeeRate(): float
+    {
+        return (float) static::getByKey('fair_luck_app_fee_rate', 0.10);
+    }
+
+    public static function getReceiverFeeRate(): float
+    {
+        return (float) static::getByKey('fair_luck_receiver_fee_rate', 0.10);
+    }
+
+    public static function getNegativeLimit(): int
+    {
+        return (int) static::getByKey('global_vault_negative_limit', 30000);
+    }
 }

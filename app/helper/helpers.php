@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
 use Modules\UsersWallet\Entities\UserWallet;
 use Yasser\AgoraToken\RtmTokenBuilder;
-use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
+use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
+;
 
 use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
@@ -75,7 +76,7 @@ function translate($typeArray)
 {
     $arr = [];
     foreach ($typeArray as $key => $type) {
-        $arr[$key]  = __($type);
+        $arr[$key] = __($type);
     }
     return $arr;
 }
@@ -84,7 +85,7 @@ function translateCategory($typeArray)
 {
     $arr = [];
     foreach ($typeArray as $key => $type) {
-        $arr[$type]  = __($type);
+        $arr[$type] = __($type);
     }
     return $arr;
 }
@@ -130,7 +131,7 @@ if (!function_exists('convertArabicToEnglishNumbers')) {
     }
 }
 if (!function_exists('calculateUserUsd')) {
-    function calculateUserUsd($diamonds,  $value)
+    function calculateUserUsd($diamonds, $value)
     {
         $coins = Common::getMaxCoins() ?? 1;
 
@@ -149,13 +150,13 @@ if (!function_exists('decryptToArray')) {
     {
         $iv = substr($key, 0, 16);
         $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
-        
+
         if ($decrypted === false) {
             return [];
         }
-        
+
         $result = json_decode($decrypted, true);
-        
+
         return is_array($result) ? $result : [];
     }
 }
@@ -195,7 +196,7 @@ if (!function_exists('checkStoredProcedureExists')) {
 if (!function_exists('upload')) {
     function upload($file): ?string
     {
-        $extension      = $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
         $uniqueFileName = Str::random(20) . '_' . uniqid() . '.' . $extension;
         $file->storeAs('videos', $uniqueFileName, 'gcs');
         return 'videos' . DIRECTORY_SEPARATOR . $uniqueFileName;
@@ -219,7 +220,7 @@ if (!function_exists('uploadMonthlyDiamondReceive')) {
             [
                 'user_id' => $user_id,
                 'month' => $date->month,
-                'year'  => $date->year,
+                'year' => $date->year,
             ],
             [
                 'monthly_diamond_received' => $monthlyDiamondValue,
@@ -244,8 +245,8 @@ if (!function_exists('incrementMonthlyDiamond')) {
         } else {
             MonthlyDiamondReceive::create([
                 'user_id' => $user_id,
-                'month'   => $date->month,
-                'year'    => $date->year,
+                'month' => $date->month,
+                'year' => $date->year,
                 'monthly_diamond_received' => $value,
             ]);
         }
@@ -298,7 +299,7 @@ if (!function_exists('get_file_details')) {
             $connection = config('queue.default');
             $queueNames = config('queue.connections.' . $queueName . '.queue');
 
-            $minQueueSize  = null;
+            $minQueueSize = null;
             $selectedQueue = null;
 
             foreach ($queueNames as $queueName) {
@@ -306,8 +307,8 @@ if (!function_exists('get_file_details')) {
                 //            $queueSize = \DB::table('jobs')->where('queue', $queueName)->count();
                 //            $jobCount  = \DB::table('job_statistics')->where('queue', $queueName)->value('job_count');
 
-                if ($minQueueSize === null || $queueSize  < $minQueueSize) {
-                    $minQueueSize  = $queueSize;
+                if ($minQueueSize === null || $queueSize < $minQueueSize) {
+                    $minQueueSize = $queueSize;
                     $selectedQueue = $queueName;
                 }
             }
@@ -322,13 +323,13 @@ if (!function_exists('get_file_details')) {
             $connection = config('queue.default');
             $queueNames = config("queue.connections.$queueConnection.queue");
 
-            $minQueueSize  = null;
+            $minQueueSize = null;
             $selectedQueue = null;
 
             foreach ($queueNames as $queueName) {
                 $queueSize = Queue::connection($connection)->size($queueName);
                 if ($minQueueSize === null || $queueSize < $minQueueSize) {
-                    $minQueueSize  = $queueSize;
+                    $minQueueSize = $queueSize;
                     $selectedQueue = $queueName;
                 }
             }
@@ -380,10 +381,10 @@ if (!function_exists('get_file_details')) {
     if (!function_exists('httpImage')) {
         function httpImage($image)
         {
-            $response =  http::get($image);
+            $response = http::get($image);
 
             $folder = 'images/' . basename($image);
-            Storage::disk(\config('filesystems.default'))->put($folder,  $response->body());
+            Storage::disk(\config('filesystems.default'))->put($folder, $response->body());
             return $folder;
         }
     }
@@ -417,11 +418,11 @@ if (!function_exists('get_file_details')) {
                 } else {
 
                     $values = [
-                        'user_id'    => $userId,
-                        'room_id'    => $roomId,
-                        'data'       => $data,
-                        'type'       => $type,
-                        'coins'      => $coins,
+                        'user_id' => $userId,
+                        'room_id' => $roomId,
+                        'data' => $data,
+                        'type' => $type,
+                        'coins' => $coins,
                         'created_at' => now(),
                         'updated_at' => now(),
 
@@ -456,7 +457,8 @@ if (!function_exists('isSubdomain')) {
 
     function isSubdomain($host = null)
     {
-        if (!$host) $host = \request()->getHost();
+        if (!$host)
+            $host = \request()->getHost();
         $hostParts = explode('.', $host);
 
         if (count($hostParts) < 2) {
@@ -521,7 +523,7 @@ if (!function_exists('adjustColor')) {
         // Convert back to hex
         return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
     }
-    function getLighterColor($hex, $lightness  = 0.9)
+    function getLighterColor($hex, $lightness = 0.9)
     {
         list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
 
@@ -540,14 +542,19 @@ if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
         // return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 5, function () { // 5 minutes cache
-            $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
-            $configs = \App\Models\Config::whereIn('name', $keys)->pluck('value', 'name');
-            return [
-                'app_id' => $configs->get('pusher_app_id'),
-                'app_key' => $configs->get('pusher_app_key'),
-                'app_secret' => $configs->get('pusher_app_secret'),
-                'app_cluster' => $configs->get('pusher_app_cluster'),
-            ];
+        $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
+        $configs = \App\Models\Config::whereIn('name', $keys)->pluck('value', 'name');
+
+        if (!($configs instanceof \Illuminate\Support\Collection)) {
+            $configs = collect($configs);
+        }
+
+        return [
+            'app_id' => $configs->get('pusher_app_id'),
+            'app_key' => $configs->get('pusher_app_key'),
+            'app_secret' => $configs->get('pusher_app_secret'),
+            'app_cluster' => $configs->get('pusher_app_cluster'),
+        ];
         // });
     }
 }
@@ -577,7 +584,8 @@ if (!function_exists('nameRoute')) {
         if (\Str::startsWith($requestPath, 'preview')) { //admin.route.prefix,admin.auth.controller
             foreach ($separators as $s) {
                 $valuesCount = count(explode($s, $name));
-                if ($valuesCount > 1) $separator = $s;
+                if ($valuesCount > 1)
+                    $separator = $s;
             }
         }
 
@@ -941,7 +949,7 @@ if (typeof MutationObserver !== 'undefined') {
 JS
     );
 }
-if (! function_exists('checkAgencyFeature')) {
+if (!function_exists('checkAgencyFeature')) {
     function checkAgencyFeature()
     {
         $app_feature = \Cache::get('host_agency');
@@ -961,7 +969,7 @@ if (!function_exists('truncateAndTrim')) {
     }
 }
 
-if (! function_exists('clearAgencyCache')) {
+if (!function_exists('clearAgencyCache')) {
     function clearAgencyCache($agencyId)
     {
         $tabs = ['members', 'charges', 'salaries', 'requests', 'targets', 'rate', 'stars', 'heroes', 'giftlog'];
@@ -1017,7 +1025,7 @@ if (!function_exists('getCpGiftsStatus')) {
     }
 }
 
-if (! function_exists('getFavIcon')) {
+if (!function_exists('getFavIcon')) {
     function getFavIcon(): ?string
     {
         return \Cache::rememberForever('favicon', function () {
@@ -1106,7 +1114,7 @@ if (!function_exists('getToday')) {
     }
 }
 
-if (! function_exists('validateUploadedFileType')) {
+if (!function_exists('validateUploadedFileType')) {
     /**
      * @throws ValidationException
      */
@@ -1202,9 +1210,9 @@ if (!function_exists('bd_url')) {
             if ($value === null) {
                 $value = match ($key) {
                     'app_wallet_lucky_gift' => 80,
-                    'owner_lucky_gift'      => 10,
-                    'host_lucky_gift'       => 10,
-                    default                  => 0,
+                    'owner_lucky_gift' => 10,
+                    'host_lucky_gift' => 10,
+                    default => 0,
                 };
             }
 
@@ -1222,12 +1230,12 @@ if (!function_exists('getCountryIdFromLatLong')) {
         $responseEn = Http::withHeaders([
             'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
         ])->get('https://nominatim.openstreetmap.org/reverse', [
-            'lat' => $lat,
-            'lon' => $lon,
-            'format' => 'json',
-            'addressdetails' => 1,
-            'accept-language' => 'en',
-        ]);
+                    'lat' => $lat,
+                    'lon' => $lon,
+                    'format' => 'json',
+                    'addressdetails' => 1,
+                    'accept-language' => 'en',
+                ]);
 
         if (!$responseEn->ok()) {
             return null;
@@ -1249,12 +1257,12 @@ if (!function_exists('getCountryIdFromLatLong')) {
         $responseAr = Http::withHeaders([
             'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
         ])->get('https://nominatim.openstreetmap.org/reverse', [
-            'lat' => $lat,
-            'lon' => $lon,
-            'format' => 'json',
-            'addressdetails' => 1,
-            'accept-language' => 'ar',
-        ]);
+                    'lat' => $lat,
+                    'lon' => $lon,
+                    'format' => 'json',
+                    'addressdetails' => 1,
+                    'accept-language' => 'ar',
+                ]);
 
         $countryNameAr = null;
         if ($responseAr->ok()) {
@@ -1310,9 +1318,9 @@ if (!function_exists('wallet_available_by_user')) {
     {
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
 
-        $currentBalance   = $wallet->balance ?? 0;
+        $currentBalance = $wallet->balance ?? 0;
         $currentCutAmount = $wallet->cut_amount ?? 0;
-        $currentPending   = $wallet->pending_amount ?? 0;
+        $currentPending = $wallet->pending_amount ?? 0;
 
         return $currentBalance - $currentCutAmount - $currentPending;
     }
@@ -1324,10 +1332,10 @@ if (!function_exists('wallet_curant_by_user')) {
     {
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
 
-        $currentBalance   = $wallet->balance ?? 0;
-        $currentPending   = $wallet->pending_amount ?? 0;
+        $currentBalance = $wallet->balance ?? 0;
+        $currentPending = $wallet->pending_amount ?? 0;
 
-        return $currentBalance  - $currentPending;
+        return $currentBalance - $currentPending;
     }
 }
 
@@ -1338,10 +1346,10 @@ if (!function_exists('wallet_available_by_wallet')) {
             return 0;
         }
 
-        $currentBalance   = $wallet->balance ?? 0;
+        $currentBalance = $wallet->balance ?? 0;
         $currentCutAmount = $wallet->cut_amount ?? 0;
-        $currentPending   = $wallet->pending_amount ?? 0;
-        return $currentBalance -  $currentCutAmount - $currentPending;
+        $currentPending = $wallet->pending_amount ?? 0;
+        return $currentBalance - $currentCutAmount - $currentPending;
     }
 }
 
