@@ -224,7 +224,7 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function superAdminUsers($key, $page, $perPage)
+    public function superAdminUsers($key, $page, $perPage, $selectedId = null)
     {
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
             ->where(function ($query) {
@@ -244,31 +244,19 @@ class UserRepository extends Repository
                 $query->where('type', 1);
             })
             ->whereDoesntHave('shippingAgency')
-            ->where(function ($query) use ($key) {
-                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
-                    ->orWhere('id', 'like', '%' . $key . '%');
+            ->when($selectedId && $key == null, function ($q, $selectedId) {
+                $q->orWhere('id', $selectedId);
+            })
+            // Use when() instead of if for search key
+            ->when($key, function ($q, $key) {
+                $q->where(function ($q2) use ($key) {
+                    $q2->fitterByUuid($key)
+                        ->orWhere('name', 'like', '%' . $key . '%')
+                        ->orWhere('id', 'like', '%' . $key . '%');
+                });
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }
-    // public function supSuperAdminUsers($key, $page, $perPage)
-    // {
-    //     return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
-    //         ->where('is_super_admin', 0)
-    //         ->where('is_sub_super_admin', 0)
-    //         ->where(function ($query) {
-    //             $query->where('agency_id', 0)
-    //                 ->orWhereNull('agency_id');
-    //         })
-    //         ->whereDoesntHave('hostAgency', function ($query) {
-    //             $query->where('type', 1);
-    //         })
-    //         ->whereDoesntHave('shippingAgency')
-    //         ->where(function ($query) use ($key) {
-    //             $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
-    //                 ->orWhere('id', 'like', '%' . $key . '%');
-    //         })
-    //         ->paginate($perPage, ['*'], 'page', $page);
-    // }
 
     public function supSuperAdminUsers($key, $page, $perPage)
     {
@@ -339,7 +327,7 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function usersAreaManager($key, $page, $perPage)
+    public function usersAreaManager($key, $page, $perPage, $selectedId = null)
     {
         return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
             ->where(function ($query) {
@@ -361,9 +349,16 @@ class UserRepository extends Repository
                 $query->where('type', 1);
             })
             ->whereDoesntHave('shippingAgency')
-            ->where(function ($query) use ($key) {
-                $query->fitterByUuid($key)->orWhere('name', 'like', '%' . $key . '%')
-                    ->orWhere('id', 'like', '%' . $key . '%');
+            ->when($selectedId && $key == null, function ($q, $selectedId) {
+                $q->orWhere('id', $selectedId);
+            })
+            // Use when() instead of if for search key
+            ->when($key, function ($q, $key) {
+                $q->where(function ($q2) use ($key) {
+                    $q2->fitterByUuid($key)
+                        ->orWhere('name', 'like', '%' . $key . '%')
+                        ->orWhere('id', 'like', '%' . $key . '%');
+                });
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }

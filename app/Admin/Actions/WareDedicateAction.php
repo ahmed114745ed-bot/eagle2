@@ -48,6 +48,9 @@ class WareDedicateAction extends Action
         }
 
         $ware = Ware::find($request->id);
+        if (!$ware) {
+            return $this->response()->error(__('dashboard.wareNotFound'))->refresh();
+        }
         if ($ware->type == 25) {
             $special_id_check = Pack::query()->where('target_id', $ware->id)->first();
             if ($special_id_check) {

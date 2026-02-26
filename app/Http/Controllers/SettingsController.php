@@ -93,9 +93,9 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-        if (!Admin::user()->can('*')) {
-            Permission::check('edit-' . $this->permission_name);
-        }
+        // if (!Admin::user()->can('*')) {
+        //     Permission::check('edit-' . $this->permission_name);
+        // }
         $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
 
         if (
@@ -260,7 +260,7 @@ class SettingsController extends Controller
         if ($request->has('default_language')) {
             Language::query()->update(['is_default' => 0]);
 
-            Language::where('code', $request->default_language)->update(['is_default'=> 1]);
+            Language::where('code', $request->default_language)->update(['is_default' => 1]);
         }
 
         // Clear all cache including rememberForever keys
@@ -279,9 +279,15 @@ class SettingsController extends Controller
             }
         }
 
+        if ($request->has('audio_room')) {
+            admin_toastr(__('Settings updated successfully!'), 'success');
+            $url = url('admin/default-app-screen-settings');
+            return redirect()->to($url);
+        }
+
         admin_toastr(__('Settings updated successfully!'), 'success');
         return redirect()->back();
-//        return redirect($redirectUrl);
+        //        return redirect($redirectUrl);
     }
 
     public function settingGift(Request $request)

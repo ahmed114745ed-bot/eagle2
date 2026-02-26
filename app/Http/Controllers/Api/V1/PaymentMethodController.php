@@ -116,35 +116,46 @@ class PaymentMethodController extends Controller
     public function utdPayMobCallback(Request $request): JsonResponse
     {
         $webhookData = $request->all();
-        info('UTD PayMob Callback received', $webhookData);
-        \Log::info('UTD PayMob Callback received', $webhookData);
 
+        $paymob = $webhookData['paymob'] ?? [];
         $obj = $webhookData['obj'] ?? [];
         $order = $obj['order'] ?? [];
 
-        $success = $obj['success'] ?? false;
-        $transactionId = $obj['id'] ?? null;
-        $amountCents = $obj['amount_cents'] ?? 0;
+        $success = $paymob['success'] ?? $obj['success'] ?? false;
+        $transactionId = $paymob['transaction_id'] ?? $obj['id'] ?? $webhookData['paymentRefrenceNumber'] ?? null;
+        $amountCents = $paymob['amount_cents'] ?? $obj['amount_cents'] ?? ($webhookData['paymentAmount'] * 100) ?? 0;
 
-        // Get merchant_order_id - could be in order or in items name
-        $merchantOrderId = $order['merchant_order_id'] ?? null;
-
-        // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 872504210283505906")
+        $merchantOrderId = $webhookData['trx_code'] ?? null;
+        
         if (!$merchantOrderId && !empty($order['items'])) {
+            info('merchantOrderId is null, checking items', ['items' => $order['items']]);
             $itemName = $order['items'][0]['name'] ?? '';
-            if (preg_match('/- (\w+)$/', $itemName, $matches)) {
+            info('Item name extracted', ['itemName' => $itemName]);
+            
+            if (preg_match('/Charge Coin - (\d+)/', $itemName, $matches)) {
                 $merchantOrderId = $matches[1];
+                info('Regex match successful', ['matches' => $matches, 'extracted_merchantOrderId' => $merchantOrderId]);
+            } else {
+                info('Regex match failed - no match found in item name');
             }
+        } else {
+            info('merchantOrderId status', [
+                'merchantOrderId_exists' => !empty($merchantOrderId),
+                'items_empty' => empty($order['items'] ?? [])
+            ]);
         }
 
         if (!$merchantOrderId) {
             return response()->json(['status' => 'error', 'message' => 'Missing merchant order ID'], 400);
         }
 
-        // Find the coin log by trx
         $coinLog = CoinLog::where('trx', $merchantOrderId)->first();
         $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
-
+           \Log::info('Looking up records', [
+            'merchantOrderId' => $merchantOrderId,
+            'coinLog_found' => (bool) $coinLog,
+            'paymentMethod_found' => (bool) $paymentMethod,
+        ]);
         if (!$coinLog && !$paymentMethod) {
             return response()->json(['status' => 'error', 'message' => 'Payment not found'], 404);
         }

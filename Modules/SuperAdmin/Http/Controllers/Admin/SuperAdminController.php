@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
+
 use Illuminate\Http\Request;
 
 use App\Models\Bd;
@@ -10,15 +11,12 @@ use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use IntlDateFormatter;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\Permission;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
-use App\Enums\PermissionType;
 use Encore\Admin\Widgets\Box;
-use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
@@ -30,8 +28,6 @@ use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
 use Modules\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use App\Admin\Actions\DeleteSuperAdminAction;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use App\Admin\Actions\FrozenWalletSuperAdminAction;
 use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
@@ -202,19 +198,19 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('created_at', __('Created at'))->display(function ($date) {
-            static $formatter = null;
+        // $grid->column('created_at', __('Created at'))->display(function ($date) {
+        //     static $formatter = null;
 
-            if ($formatter === null) {
-                $formatter = new IntlDateFormatter(
-                    App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
-                    IntlDateFormatter::LONG,
-                    IntlDateFormatter::SHORT
-                );
-            }
+        //     if ($formatter === null) {
+        //         $formatter = new IntlDateFormatter(
+        //             App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
+        //             IntlDateFormatter::LONG,
+        //             IntlDateFormatter::SHORT
+        //         );
+        //     }
 
-            return $formatter->format(strtotime($date));
-        });
+        //     return $formatter->format(strtotime($date));
+        // });
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
@@ -483,13 +479,12 @@ class SuperAdminController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_super_admin = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'super-admin');
                     }
 
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_super_admin = 1;
                     $newUserAppId->save();
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'super-admin');
+
                     $form->app_id = $newAppId;
                 }
             }
@@ -521,7 +516,6 @@ class SuperAdminController extends MainController
             if (isset($userApp)) {
                 $userApp->is_super_admin = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
@@ -690,6 +684,8 @@ class SuperAdminController extends MainController
         $type = request()->get('type', 'vip');
         $bds = Bd::where('parent_id', $id)->with('appUser')->paginate(10, ['*'], 'bd_page');
         $prefix = dashboardName();
+
+        $subSuperAdmins = $superAdmin->subSuperAdmins()->with('appUser')->paginate(10, ['*'], 'sub_super_admin_page');
         switch ($tab) {
             case 'agencies':
                 $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
@@ -701,7 +697,7 @@ class SuperAdminController extends MainController
                 break;
         }
 
-        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds', 'subSuperAdmins'));
     }
 
     public function profilePreview()
@@ -740,6 +736,7 @@ class SuperAdminController extends MainController
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
         $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+        $subSuperAdmins = $superAdmin->subSuperAdmins()->with('appUser')->paginate(10, ['*'], 'sub_super_admin_page');
 
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
@@ -754,7 +751,7 @@ class SuperAdminController extends MainController
         }
         $prefix = dashboardName();
 
-        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds'));
+        return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds', 'subSuperAdmins'));
     }
 
     protected function detail($id)
@@ -773,44 +770,40 @@ class SuperAdminController extends MainController
         return $show;
     }
 
-    //    public function sync($days = 0)
-    //    {
-    //        $days = request()->query('days', 0);
-    //        $bds = DB::table('admin_users')
-    //            ->where('type', 'bd')
-    //            ->where('app_id', '!=', 0)
-    //            ->get();
-    //
-    //        $updated = 0;
-    //
-    //        foreach ($bds as $bd) {
-    //            $query = DB::table('agencies')
-    //                ->where('bd_id', $bd->app_id);
-    //
-    //            if ($days > 0) {
-    //                $query->where('created_at', '<=', now()->subDays($days));
-    //            }
-    //
-    //            $affected = $query->update(['bd_id' => $bd->id]);
-    //            $updated += $affected;
-    //        }
-    //
-    //        return response()->json([
-    //            'status' => 'success',
-    //            'message' => $updated
-    //        ]);
-    //    }
+
 
 
     public function searchBySuperAdmin(Request $request)
-    {   $key = $request->q;
-         $page = $request->get('page', 1);
-         $perPage = 10;
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $perPage = 10;
         return SuperAdmin::selectRaw('concat(username, " - ", id) as name, id')
             ->where(function ($query) use ($key) {
                 $query->where('username', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+
+
+
+    public function deleteSubSuperAdmin($id)
+    {
+        $oldUser = DB::table('admin_users')->where('id', $id)->first();
+        $OldUserAppId = User::find($oldUser->app_id);
+        if ($OldUserAppId) {
+            $OldUserAppId->is_sub_super_admin = 0;
+            $OldUserAppId->save();
+        }
+
+        // Delete the SubAdmin record
+        DB::table('admin_users')->where('id', $oldUser->id)->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
     }
 }

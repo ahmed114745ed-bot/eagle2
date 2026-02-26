@@ -7,16 +7,12 @@ use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Ware;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
-
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Entities\MilestoneReward;
-
 use App\Helpers\UserCommon;
 use Modules\RoleRewards\Entities\UserHistoryReward;
-use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 
 
@@ -28,20 +24,20 @@ class MilestoneHelper
     {
 
 
-        if (! $user instanceof User) {
+        if (!$user instanceof User) {
             $user = User::find($user);
-            if (! $user) {
+            if (!$user) {
                 return;
             }
         }
 
         $milestone = Milestone::where('slug', $slug)->first();
-        if (! $milestone) {
+        if (!$milestone) {
             return;
         }
 
 
-        if (! $milestone->rewards || $milestone->rewards->isEmpty()) {
+        if (!$milestone->rewards || $milestone->rewards->isEmpty()) {
             return;
         }
 
@@ -73,14 +69,14 @@ class MilestoneHelper
         }
 
         UserHistoryReward::create([
-            'user_id'         => $user->id,
-            'receive_type'    => $receiveType,
-            'sub_type'        => 'milestons',
-            'rewardable_id'   => $mr->rewardable_id,
+            'user_id' => $user->id,
+            'receive_type' => $receiveType,
+            'sub_type' => 'milestons',
+            'rewardable_id' => $mr->rewardable_id,
             'rewardable_type' => $mr->rewardable_type,
-            'extra'           => json_encode([
+            'extra' => json_encode([
                 'reward' => $mr?->reward,
-                'type'   => $mr?->type,
+                'type' => $mr?->type,
                 'expire' => $mr?->expire,
             ]),
         ]);
@@ -161,8 +157,8 @@ class MilestoneHelper
     protected static function removeRewardEffect(User $user, UserHistoryReward $historyReward): void
     {
         $extra = json_decode($historyReward->extra, true);
-        $type  = $extra['type'] ?? null;
-        $rid   = $historyReward->rewardable_id;
+        $type = $extra['type'] ?? null;
+        $rid = $historyReward->rewardable_id;
         $receiveType = $historyReward->receive_type;
 
         switch ($type) {
@@ -207,6 +203,6 @@ class MilestoneHelper
         //         'milestone_slug' => $slug,
         //         'user_id' => $user->id ?? null,
         //     ]);
-        // }   
+        // }
     }
 }

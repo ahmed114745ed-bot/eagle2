@@ -4,7 +4,6 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Events\PublicTestEvent;
 use App\Services\PayPalService;
 use App\Services\CodapayService;
 use Illuminate\Support\Facades\Route;
@@ -27,7 +26,6 @@ use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\RoomSettingController;
-use App\Http\Controllers\TestDiamondController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -37,7 +35,6 @@ use App\Http\Controllers\FirebaseAuthController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
-use App\Http\Controllers\Api\V2\WalletController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
@@ -71,9 +68,6 @@ use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
-use App\Http\Controllers\MallController as ControllersMallController;
-use Modules\Achievement\Http\Controllers\web\AchievementDedicateController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -400,7 +394,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V3'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post('/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V3'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V3'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post('/v4/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift4'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);

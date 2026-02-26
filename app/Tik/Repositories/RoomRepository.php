@@ -335,7 +335,7 @@ class RoomRepository extends AbstractRepository
 
         return $result->when($roomType != 'live', function ($q) use ($roomType) {
             $q->where('type', $roomType);
-        })->when($roomType == 'live', function ($q) use ($roomType) {
+        })->when($roomType == 'live', function ($q) {
             $q->whereIn('type', ['single_live', 'multi_live']);
         })->paginate(10);
     }
