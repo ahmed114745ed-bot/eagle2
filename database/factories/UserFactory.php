@@ -26,7 +26,10 @@ class UserFactory extends Factory
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
             'lat' => $this->faker->latitude,
-            'long' => $this->faker->longitude
+            'long' => $this->faker->longitude,
+            'di' => 0,
+            'total_diamond_send' => 0,
+            'sub_sender_level' => 0,
         ];
     }
     public function configure()

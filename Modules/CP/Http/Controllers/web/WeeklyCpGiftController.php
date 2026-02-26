@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
 use Modules\CP\Entities\WeeklyCpGift;
+use App\Selectables\CustomAchievements;
 use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -98,11 +99,10 @@ class WeeklyCpGiftController extends MainController
                 return @$this->vip->name;
             } elseif (@$this->type == "coins") {
                 return @$this->target;
-            }  elseif ($this->type == "badge") {
+            } elseif ($this->type == "badge") {
                 return @$this->badge->name ?? '';
             } elseif (@$this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         $grid->column('created_at', __('Created at'));
@@ -140,13 +140,12 @@ class WeeklyCpGiftController extends MainController
                 return @$this->ware->name;
             } elseif ($this->type == "vip") {
                 return @$this->vip->name;
-             } elseif ($this->type == "badge") {
+            } elseif ($this->type == "badge") {
                 return @$this->badge->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         $grid->column('created_at', __('Created at'));
@@ -184,13 +183,12 @@ class WeeklyCpGiftController extends MainController
                 return @$this->ware->name;
             } elseif ($this->type == "vip") {
                 return @$this->vip->name;
-            }elseif ($this->type == "badge") {
+            } elseif ($this->type == "badge") {
                 return @$this->badge->name ?? '';
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         $grid->column('created_at', __('Created at'));
@@ -335,9 +333,11 @@ class WeeklyCpGiftController extends MainController
      */
     protected function addAchievementField(Form $form)
     {
-        $form->image("target4", __('image'))->name(function ($file) {
-            return now()->timestamp . '.' . $file->guessExtension();
-        })->disk('gcs');
+        // $form->image("target4", __('image'))->name(function ($file) {
+        //     return now()->timestamp . '.' . $file->guessExtension();
+        // })->disk('gcs');
+
+        $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
     }
 
     /**

@@ -417,6 +417,12 @@ class UserCommon
             ->where('badge_id',  $id)->delete();
     }
 
+    public static function removeBadgeFromUserByReceiverType(User $user, $id = null, $receiveType)
+    {
+        UserBadge::where('receive_type', $receiveType)->where('user_id', $user->id)->delete();
+        
+    }
+
 
     public static function addWareToUser(User $user, Ware $ware, $expire, $sender = null, $receiveType = null, $sendNotification = 1)
     {
@@ -484,12 +490,21 @@ class UserCommon
     public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null, $feature = null)
     {
         $title = __('congratulations');
-        // if ($feature) {
-        //     Log::info('Adding event ware to user: ' . $user->id . ', ware: ' . $ware->id . ', feature: ' . $feature->name);
-        //     $title = $user->name . ':' . __('wareGiftNotification', ['wareName' => $ware->name, 'type' => $feature->name]);
-        // } else {
-            $body = $user->name . ':' .  __('You have received a gift: :ware', ['ware' => $ware->name]);
-       // }
+        $body = $user->name . ':' . __('You have received a gift: :ware', [
+            'ware' => $ware->name
+        ]);
+        if ($feature) {
+            $body = $user->name . ':' . __('wareGiftNotification', [
+                'wareName' => $ware->name,
+                'type'     => $feature->name
+            ]);
+
+            // Log::info('Adding event ware to user', [
+            //     'user_id' => $user->id,
+            //     'ware_id' => $ware->id,
+            //     'feature' => $feature->name,
+            // ]);
+        }
 
 
         DB::beginTransaction();

@@ -10,6 +10,7 @@ use Modules\Badge\Entities\Badge;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Modules\Achievement\Entities\CustomAchievement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RewardTarget extends Model
@@ -29,7 +30,10 @@ class RewardTarget extends Model
     {
         return $this->belongsTo(ChargeTargetEvent::class, 'charge_event_id');
     }
-
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
+    }
     public function ware()
     {
         return $this->hasOne(Ware::class, 'id', 'target');
@@ -83,12 +87,7 @@ class RewardTarget extends Model
             } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -107,12 +106,7 @@ class RewardTarget extends Model
             } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);

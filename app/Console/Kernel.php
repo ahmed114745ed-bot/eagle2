@@ -185,6 +185,11 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/weekly-ranking.log'))
             ->runInBackground();
+
+        $schedule->command('fairluck:sync-wallets')
+            ->everyMinute()
+            ->appendOutputTo(storage_path('logs/fairluck-sync-wallets.log'))
+            ->runInBackground();
     }
 
     protected function commands(): void
@@ -201,17 +206,17 @@ class Kernel extends ConsoleKernel
             return;
         }
 
-        $type     = $settings['type'] ?? 'daily';
-        $time     =  '00:00';
+        $type = $settings['type'] ?? 'daily';
+        $time = '00:00';
 
         $command = $schedule->command('roomcup:calculate-rewards')
             ->timezone(getTimezone());
 
         match ($type) {
-            'daily'   => $command->dailyAt($time),
-            'weekly'  => $command->weeklyOn(1, $time),
+            'daily' => $command->dailyAt($time),
+            'weekly' => $command->weeklyOn(1, $time),
             'monthly' => $command->monthlyOn(1, $time),
-            default   => $command->dailyAt($time),
+            default => $command->dailyAt($time),
         };
     }
 
@@ -219,10 +224,10 @@ class Kernel extends ConsoleKernel
     {
 
         $default = [
-            'enabled'          => true,
+            'enabled' => true,
             'interval_minutes' => 60,
-            'type'             => 'daily',
-            'time'             => '00:00',
+            'type' => 'daily',
+            'time' => '00:00',
         ];
 
         $settings = [];

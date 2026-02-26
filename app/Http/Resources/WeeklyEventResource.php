@@ -22,7 +22,7 @@ class WeeklyEventResource extends JsonResource
             $target = @$this->target;
         } elseif ($this->type == "achievement") {
             $value = getDriverUrl() . '/' . @$this->target;
-            $target = "<img src='$value' width='80' height='80'>";
+            $target = $this->customAchievement?->name ?? '';
         }
 
         if ($this->type == 'ware') {
@@ -30,7 +30,7 @@ class WeeklyEventResource extends JsonResource
         } elseif ($this->type == 'vip') {
             $path = $this->vip->img;
         } elseif ($this->type == 'achievement') {
-            $path = $this->target;
+            $path = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
         } else {
             $path = 'coin.png';
         }

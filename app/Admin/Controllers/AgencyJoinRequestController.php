@@ -2,26 +2,19 @@
 
 namespace App\Admin\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
+use App\Helpers\Common;
 use App\Models\Admin;
-use App\Models\Agency;
+use App\Models\AgencyJoinRequest;
+use App\Models\User;
+use App\Models\UsersJoinedAgency;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Helpers\UserCommon;
-use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
-use App\Models\UsersJoinedAgency;
-use Encore\Admin\Actions\Response;
+use Encore\Admin\Show;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
-use App\Services\AppFeatureService;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class AgencyJoinRequestController extends MainController
 {
@@ -329,6 +322,7 @@ class AgencyJoinRequestController extends MainController
                 }
 
                 uploadMonthlyDiamondReceive($user_id, 0);
+
             }
         });
 

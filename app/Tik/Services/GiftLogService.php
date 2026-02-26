@@ -151,10 +151,11 @@ class GiftLogService
             $cpIds = [];
             $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
-
+    Log::info('cpId', [ 'cpEnableAllGifts' => $cpEnableAllGifts]);
             if ($cpId != null) {
                 if ($cpEnableAllGifts || ($gift->category && $gift->category->type === 'cp')) {
                     try {
+         Log::info('cpId11111 enter', [ 'cpEnableAllGifts' => $cpEnableAllGifts]);
 
                         $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                     } catch (\Exception $e) {

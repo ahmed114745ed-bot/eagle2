@@ -18,6 +18,7 @@ return [
     "password_incorrect" => 'Şifre yanlış',
     "username_not_found" => 'Kullanıcı adı bulunamadı',
     'rejected_success' => 'Reddetme başarıyla tamamlandı ✅',
+    "searchAchievements" => "Başarıları Ara",
     'avatar'                => 'Avatar',
     'list'                  => 'Liste',
     'new'                   => 'Yeni',

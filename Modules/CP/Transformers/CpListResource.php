@@ -23,13 +23,12 @@ class CpListResource extends JsonResource
         } else {
             $user = $this->fromUser;
         }
-        
+
         $frame = UserPackHelper::getFrameImage($user);
 
         $currentLevel = CpLevel::find($this->level_id);
         $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
         $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
-
 
         $ratio = 0;
 
@@ -49,9 +48,6 @@ class CpListResource extends JsonResource
             $ratio = 100;
         }
 
-
-
-
         return [
             'id'        => $this->id,
             'level'     => $currentLevel?->level ?? 0,
@@ -62,7 +58,7 @@ class CpListResource extends JsonResource
                 "id"        => $user?->id,
                 "uid"       => $user?->uuid,
                 "name"      => $user?->name,
-                "image"     => $user?->avatar,
+                "image"     => $user->profile?->avatar,
                 "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
                 'frame' => $frame,
             ],

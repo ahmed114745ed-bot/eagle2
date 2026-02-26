@@ -251,7 +251,7 @@
 
                 <div class="form">
                     <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable Zego Feature') }}</span>
+                        <span class="toggle-label">{{ __('disable zego feature') }}</span>
                         <label class="switch">
                             <input type="checkbox" id="zego_toggle" {{ $zegoFeature ? 'checked' : '' }}
                             onchange="document.getElementById('zego_feature_value').value = this.checked ? '1' : '0';

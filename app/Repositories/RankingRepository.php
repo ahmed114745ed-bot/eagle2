@@ -189,7 +189,7 @@ class RankingRepository
         $query = GiftRanking::query();
         $this->applyDateFiltersV2($query, $type);
 
-        return  $query->whereHas('ranker')
+        return $query->whereHas('ranker')
             ->where('role', $role)
             ->when($role == 'roomId', function ($query) {
                 return $query->where('ranker_type', Room::class)->with([
@@ -201,10 +201,17 @@ class RankingRepository
             ->when($role != 'roomId', function ($query) use ($role) {
                 return $query->where('ranker_type', User::class)->with([
                     'ranker' => fn($q) => $q->with($this->rankerRelations($role))
-                        ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover'))
+                        ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover,room_name'))
                 ]);
             })
-
+            ->when($role === 'roomOwner', function ($query) {
+                return $query->whereExists(function ($sub) {
+                    $sub->selectRaw(1)
+                        ->from('rooms')
+                        ->whereColumn('rooms.uid', 'gift_rankings.ranker_id')
+                        ->where('rooms.room_status', '!=', '4');
+                });
+            })
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts')
             ->take($perPage)

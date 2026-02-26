@@ -2,15 +2,16 @@
 
 namespace Modules\RankingReward\Entities;
 
-use App\Helpers\Common;
 use App\Models\Ware;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Modules\Badge\Entities\Badge;
+use App\Helpers\Common;
 use Modules\Vip\Entities\OVip;
+use Illuminate\Http\UploadedFile;
+use Modules\Badge\Entities\Badge;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Achievement\Entities\CustomAchievement;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RankingReward extends Model
 {
@@ -35,6 +36,11 @@ class RankingReward extends Model
     public function badge(): HasOne
     {
         return $this->hasOne(Badge::class, 'id', 'target');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
 
     public function getTarget1Attribute()
@@ -76,12 +82,7 @@ class RankingReward extends Model
                 $model->target = request('target5', $model->target);
             } elseif ($model->target_type === 'achievement') {
 
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                 $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -100,12 +101,7 @@ class RankingReward extends Model
             } elseif ($model->target_type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->target_type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
+               $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);

@@ -1,133 +1,134 @@
 <?php
 
+use App\Admin\Controllers\AdminAgencyMangerController;
+use App\Admin\Controllers\AdminAreaManagerChargeController;
+use App\Admin\Controllers\AdminAuthController;
+use App\Admin\Controllers\AdminUsersController;
+use App\Admin\Controllers\AgencyController;
+use App\Admin\Controllers\AgencyControllers\HostDiamondController;
+use App\Admin\Controllers\AgencyControllers\UserController;
+use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\AgencyMangerTaregetController;
+use App\Admin\Controllers\AgencyMangerUsers;
+use App\Admin\Controllers\AgencySettingsController;
+use App\Admin\Controllers\AllGameController;
+use App\Admin\Controllers\AllStatisticController;
+use App\Admin\Controllers\AppDefaultScreenSettingsController;
+use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Admin\Controllers\AppFeatureController;
+use App\Admin\Controllers\AppSitiingCOnfigController;
+use App\Admin\Controllers\BanController;
+use App\Admin\Controllers\BannerController;
+use App\Admin\Controllers\BanRoomsController;
+use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\BdController;
+use App\Admin\Controllers\BdSelectController;
+use App\Admin\Controllers\BlackListUsersController;
+use App\Admin\Controllers\ChangeAgencyMangerController;
+use App\Admin\Controllers\ChangeCountryRequestController;
+use App\Admin\Controllers\ChangeLevelHistoryController;
+use App\Admin\Controllers\ChargeReportController;
+use App\Admin\Controllers\ChargesSettingController;
+use App\Admin\Controllers\ChargeVipController;
+use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\CoinGameUserAllController;
+use App\Admin\Controllers\CoinLogReportsController;
+use App\Admin\Controllers\ColorController;
+use App\Admin\Controllers\CoreWalletsController;
+use App\Admin\Controllers\CoreWalletTransactionController;
+use App\Admin\Controllers\CountryCategoryController;
+use App\Admin\Controllers\CountryController;
+use App\Admin\Controllers\CountryRequestActionController;
+use App\Admin\Controllers\CountryRequestHistoryController;
+use App\Admin\Controllers\CustomController;
+use App\Admin\Controllers\CustomZegoMessageController;
+use App\Admin\Controllers\DeleteAccountController;
+use App\Admin\Controllers\EmojiCategoryController;
+use App\Admin\Controllers\EmojiController;
+use App\Admin\Controllers\ExportController;
+use App\Admin\Controllers\FamilyConfigSettingController;
+use App\Admin\Controllers\FeatureAppController;
+use App\Admin\Controllers\Filter\FilterController;
+use App\Admin\Controllers\GameChargeHistoryController;
+use App\Admin\Controllers\GameSettingsController;
+use App\Admin\Controllers\GiftCategoryController;
+use App\Admin\Controllers\GiftController;
+use App\Admin\Controllers\GiftLogSummaryController;
+use App\Admin\Controllers\GiftLogTestController;
+use App\Admin\Controllers\GroupChatController;
+use App\Admin\Controllers\GroupChatSettingController;
+use App\Admin\Controllers\HomeCarouselController;
+use App\Admin\Controllers\ImageColorController;
+use App\Admin\Controllers\InterestsController;
+use App\Admin\Controllers\InvitationSettingsController;
+use App\Admin\Controllers\LanguageController;
+use App\Admin\Controllers\LinkViewController;
+use App\Admin\Controllers\MangerSettingController;
+use App\Admin\Controllers\MultiLanguageController;
+use App\Admin\Controllers\NotificationController;
+use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\OfferController;
+use App\Admin\Controllers\ParentUsersController;
+use App\Admin\Controllers\PaymentCoinController;
+use App\Admin\Controllers\PaymentGetWayController;
+use App\Admin\Controllers\PaymentMethodController;
+use App\Admin\Controllers\PercentageGameController;
+use App\Admin\Controllers\PermissionController;
+use App\Admin\Controllers\PoliceController;
+use App\Admin\Controllers\PusherStatisticsController;
+use App\Admin\Controllers\QuestionController;
+use App\Admin\Controllers\RemainingDiamondHistoryController;
+use App\Admin\Controllers\RemainingDiamondSettingController;
+use App\Admin\Controllers\ReportController;
+use App\Admin\Controllers\ReportFromUsersController;
+use App\Admin\Controllers\ReportUserController;
+use App\Admin\Controllers\ResetUserSalaryController;
+use App\Admin\Controllers\RoleControllerNew;
+use App\Admin\Controllers\RoomController;
+use App\Admin\Controllers\RoomGiftTargetController;
+use App\Admin\Controllers\RoomMicController;
+use App\Admin\Controllers\RoomSettingsController;
+use App\Admin\Controllers\RoomTargetController;
+use App\Admin\Controllers\RoomVipController;
+use App\Admin\Controllers\RouteController;
+use App\Admin\Controllers\ScaffoldController;
+use App\Admin\Controllers\ServerCountryController;
+use App\Admin\Controllers\SettingController;
+use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
+use App\Admin\Controllers\SuperAdminRewardController;
+use App\Admin\Controllers\SuperAdminRewardControllerHistory;
+use App\Admin\Controllers\SuperPackageController;
+use App\Admin\Controllers\SuperRoleController;
+use App\Admin\Controllers\TargetController;
+use App\Admin\Controllers\TerminalController;
+use App\Admin\Controllers\TestPusherController;
+use App\Admin\Controllers\TrashedUserAccountController;
+use App\Admin\Controllers\UserChargeHistoryController;
+use App\Admin\Controllers\UserChargeReportController;
+use App\Admin\Controllers\UserController as UsersAppController;
+use App\Admin\Controllers\UserLevelController;
+use App\Admin\Controllers\UserOnlineHistoryController;
+use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\UserSettingController;
+use App\Admin\Controllers\UsersJoinedAgencyController;
+use App\Admin\Controllers\UserWalletController;
+use App\Admin\Controllers\V2\SalariesController;
+use App\Admin\Controllers\VipController;
+use App\Admin\Controllers\WalletTransactionController;
+use App\Admin\Controllers\WareController;
+use App\Admin\Controllers\WareTabController;
+use App\Admin\Controllers\WareVipController;
+use App\Admin\Controllers\WithdrawController;
+use App\Admin\Controllers\ZegoFeatureController;
+use App\Admin\Controllers\FairLuckSettingsController;
+use App\Http\Controllers\AddTargetToJsonController;
+use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
-use App\Admin\Controllers\BdController;
-
-use App\Admin\Controllers\BanController;
-use App\Admin\Controllers\VipController;
-use App\Admin\Controllers\CoinController;
-use App\Admin\Controllers\GiftController;
-use App\Admin\Controllers\RoomController;
-use App\Admin\Controllers\WareController;
-use App\Admin\Controllers\ColorController;
-use App\Admin\Controllers\EmojiController;
-use App\Admin\Controllers\OfferController;
-use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
-use App\Admin\Controllers\AgencyController;
-use App\Admin\Controllers\BannerController;
-use App\Admin\Controllers\CustomController;
-use App\Admin\Controllers\ExportController;
-use App\Admin\Controllers\PoliceController;
-use App\Admin\Controllers\ReportController;
-use App\Admin\Controllers\TargetController;
-use App\Admin\Controllers\AgencyMangerUsers;
-use App\Admin\Controllers\AllGameController;
-use App\Admin\Controllers\BanTypeController;
-use App\Admin\Controllers\CountryController;
-use App\Admin\Controllers\RoleControllerNew;
-use App\Admin\Controllers\RoomMicController;
-use App\Admin\Controllers\RoomVipController;
-use App\Admin\Controllers\SettingController;
-use App\Admin\Controllers\WareTabController;
-use App\Admin\Controllers\WareVipController;
-use App\Admin\Controllers\BanRoomsController;
-use App\Admin\Controllers\BdSelectController;
-use App\Admin\Controllers\LanguageController;
-use App\Admin\Controllers\LinkViewController;
-use App\Admin\Controllers\QuestionController;
-use App\Admin\Controllers\ScaffoldController;
-use App\Admin\Controllers\TerminalController;
-use App\Admin\Controllers\WithdrawController;
-use App\Admin\Controllers\AdminAuthController;
-use App\Admin\Controllers\ChargeVipController;
-use App\Admin\Controllers\GroupChatController;
-use App\Admin\Controllers\InterestsController;
-use App\Admin\Controllers\SuperRoleController;
-use App\Admin\Controllers\UserLevelController;
-use App\Admin\Controllers\AdminUsersController;
-use App\Admin\Controllers\AppFeatureController;
-use App\Admin\Controllers\FeatureAppController;
-use App\Admin\Controllers\ImageColorController;
-use App\Admin\Controllers\PermissionController;
-use App\Admin\Controllers\ReportUserController;
-use App\Admin\Controllers\RoomTargetController;
-use App\Admin\Controllers\TestPusherController;
-use App\Admin\Controllers\UserWalletController;
-use App\Admin\Controllers\CoreWalletsController;
-use App\Admin\Controllers\GiftLogTestController;
-use App\Admin\Controllers\ParentUsersController;
-use App\Admin\Controllers\PaymentCoinController;
-use App\Admin\Controllers\UsersChargeController;
-use App\Admin\Controllers\UserSettingController;
-use App\Admin\Controllers\V2\SalariesController;
-use App\Admin\Controllers\ZegoFeatureController;
-use App\Admin\Controllers\AllStatisticController;
-use App\Admin\Controllers\ChargeReportController;
-use App\Admin\Controllers\GameSettingsController;
-use App\Admin\Controllers\GiftCategoryController;
-use App\Admin\Controllers\HomeCarouselController;
-use App\Admin\Controllers\NotificationController;
-use App\Admin\Controllers\RoomSettingsController;
-use App\Admin\Controllers\SuperPackageController;
-use App\Admin\Controllers\DeleteAccountController;
-use App\Admin\Controllers\EmojiCategoryController;
-use App\Admin\Controllers\Filter\FilterController;
-use App\Admin\Controllers\MangerSettingController;
-use App\Admin\Controllers\MultiLanguageController;
-use App\Admin\Controllers\PaymentGetWayController;
-use App\Admin\Controllers\PaymentMethodController;
-use App\Admin\Controllers\ServerCountryController;
-use App\Admin\Controllers\AgencySettingsController;
-use App\Admin\Controllers\BlackListUsersController;
-use App\Admin\Controllers\ChargesSettingController;
-use App\Admin\Controllers\CoinLogReportsController;
-use App\Admin\Controllers\GiftLogSummaryController;
-use App\Admin\Controllers\PercentageGameController;
-use App\Admin\Controllers\RoomGiftTargetController;
-use App\Http\Controllers\AddTargetToJsonController;
-use App\Admin\Controllers\chargUsersSleemController;
-use App\Admin\Controllers\CoinGameUserAllController;
-use App\Admin\Controllers\CountryCategoryController;
-use App\Admin\Controllers\ReportFromUsersController;
-use App\Admin\Controllers\ResetUserSalaryController;
-use App\Admin\Controllers\AppSitiingCOnfigController;
-use App\Admin\Controllers\GroupChatSettingController;
-use App\Admin\Controllers\PusherStatisticsController;
-use App\Admin\Controllers\SuperAdminRewardController;
-use App\Admin\Controllers\UserChargeReportController;
-use App\Admin\Controllers\AdminAgencyMangerController;
-use App\Admin\Controllers\CustomZegoMessageController;
-use App\Admin\Controllers\GameChargeHistoryController;
-use App\Admin\Controllers\UserChargeHistoryController;
-use App\Admin\Controllers\UserOnlineHistoryController;
-use App\Admin\Controllers\UsersJoinedAgencyController;
-use App\Admin\Controllers\WalletTransactionController;
-use App\Admin\Controllers\ChangeAgencyMangerController;
-use App\Admin\Controllers\ChangeLevelHistoryController;
-use App\Admin\Controllers\InvitationSettingsController;
-use App\Admin\Controllers\TrashedUserAccountController;
-use App\Admin\Controllers\AgencyMangerTaregetController;
-use App\Admin\Controllers\AppearChargerAgencyController;
-use App\Admin\Controllers\FamilyConfigSettingController;
-use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\ChangeCountryRequestController;
-use App\Admin\Controllers\CountryRequestActionController;
-use App\Admin\Controllers\CoreWalletTransactionController;
-use App\Admin\Controllers\CountryRequestHistoryController;
-use App\Admin\Controllers\AdminAreaManagerChargeController;
-use App\Admin\Controllers\AgencyControllers\UserController;
-use App\Admin\Controllers\NotificationsTemplatesController;
-use App\Admin\Controllers\RemainingDiamondHistoryController;
-use App\Admin\Controllers\RemainingDiamondSettingController;
-use App\Admin\Controllers\SuperAdminRewardControllerHistory;
-use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
-use App\Admin\Controllers\AgencyControllers\HostDiamondController;
-use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 
 
@@ -177,10 +178,10 @@ Route::group(
     ],
     function () {
         Route::get('helpers/terminal/database', [TerminalController::class, 'database']);
-        Route::post('helpers/terminal/database',   [TerminalController::class, 'runDatabase']);
-        Route::get('helpers/terminal/artisan',  [TerminalController::class, 'artisan']);
+        Route::post('helpers/terminal/database', [TerminalController::class, 'runDatabase']);
+        Route::get('helpers/terminal/artisan', [TerminalController::class, 'artisan']);
         Route::post('helpers/terminal/artisan', [TerminalController::class, 'runArtisan']);
-        Route::get('helpers/scaffold',  [ScaffoldController::class, 'index']);
+        Route::get('helpers/scaffold', [ScaffoldController::class, 'index']);
         Route::post('helpers/scaffold', [ScaffoldController::class, 'store']);
         Route::get('helpers/routes', [RouteController::class, 'index']);
     }
@@ -229,7 +230,7 @@ Route::group(
         Route::post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
         Route::resource('rooms-preview', TestController::class); //
-
+    
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -237,7 +238,7 @@ Route::group(
         Route::get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         Route::get('agency-statistic', 'AgencyStatisticController@index');
         //    Route::get('agency-settings', 'AgencySettingController@index');
-
+    
         Route::resource('test-test', 'TestTestController');
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
@@ -287,7 +288,7 @@ Route::group(
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
-
+    
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
@@ -332,6 +333,11 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+
+        Route::prefix('gifts')->group(function () {
+            Route::get('/{type}/create', [GiftController::class, 'create']);
+            Route::post('/{type}', [GiftController::class, 'store']);
+        });
         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
@@ -364,7 +370,7 @@ Route::group(
         Route::prefix('emojis')->group(function () {
             Route::get('/{filter?}', [EmojiController::class, 'index']);
         });
-        Route::resource('percentage-games', PercentageGameController::class);
+
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
@@ -540,9 +546,9 @@ Route::group(
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
         Route::get('/moments-reels', [ReportController::class, 'momentsReels'])
             ->name('admin.ajax.moments-reels');
-         Route::get('/expenses', [ReportController::class, 'expenses']);
-            Route::get('/due-salary', [ReportController::class, 'dueSalary'])
-    ->name('admin.manager.due-salary');
+        Route::get('/expenses', [ReportController::class, 'expenses']);
+        Route::get('/due-salary', [ReportController::class, 'dueSalary'])
+            ->name('admin.manager.due-salary');
         Route::resource('charges-reports', 'ChargeReportController');
         Route::get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
         Route::resource('sallaries', 'SallariesController')->name('index', 'sallaries')->middleware('web-agency-feature');
@@ -573,8 +579,8 @@ Route::group(
         Route::resource('room-vips', RoomVipController::class);
         Route::resource('room-target', RoomTargetController::class);
 
-        // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
-
+        Route::get('default-app-screen-settings', [AppDefaultScreenSettingsController::class, 'index']);
+        Route::post('default-app-screen', [AppDefaultScreenSettingsController::class, 'store']);
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
@@ -635,13 +641,6 @@ Route::group(
         Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
         Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
 
-        //    dd( Admin::menu(function ($menu) {
-        //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
-        //             ->icon('fa-file');
-        //     }));
-
-        // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
@@ -652,7 +651,6 @@ Route::group(
         Route::resource('zego-feature', ZegoFeatureController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
-        //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         Route::get('convert-is_gold', function () {
             $users = \App\Models\User::where("is_gold_id", 1)->get();
             foreach ($users as $user) {
@@ -703,9 +701,6 @@ Route::group(
         Route::post('remaining-diamond-settings/save', [RemainingDiamondSettingController::class, 'save'])->name('remaining-diamond-settings.save');
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
-            // Route::get('/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
         Route::resource('ware-management', WareTabController::class);
 
@@ -784,6 +779,8 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
+        Route::get('fairluck', [FairLuckSettingsController::class, 'index'])->name('fairluck.index');
+        Route::post('fairluck/save-settings', [FairLuckSettingsController::class, 'saveSettings'])->name('fairluck.save-settings');
     }
 );
 

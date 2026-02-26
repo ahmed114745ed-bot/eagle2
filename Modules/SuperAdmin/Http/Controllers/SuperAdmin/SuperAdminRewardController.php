@@ -43,7 +43,7 @@ class SuperAdminRewardController extends MainController
     {
         $type = request()->get('type', 'vip');
         $grid = new Grid(new SuperAdminReward());
-        $grid->model()->where('type',  $type);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where('type',  $type);
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
@@ -58,23 +58,23 @@ class SuperAdminRewardController extends MainController
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
+               
             }
         });
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } else {
                     $path = 'coin.png';
                 }

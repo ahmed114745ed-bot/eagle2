@@ -2,31 +2,29 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\Bd;
-use App\Models\User;
+use App\Admin\Controllers\MainController;
+use App\Enums\Charges\UserTypeEnum;
+use App\Helpers\Common;
 use App\Models\Agency;
+use App\Models\Bd;
 use App\Models\Charge;
+use App\Models\Country;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Country;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
-use Encore\Admin\Facades\Admin;
-
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
-use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Admin\Controllers\MainController;
+use Illuminate\Support\MessageBag;
+use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
-
 
 class SuperAdminController extends MainController
 {
@@ -208,7 +206,7 @@ class SuperAdminController extends MainController
         });
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-//            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+            //            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
             return app(\App\Admin\Services\CreatorService::class)->show($this->creator);
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
@@ -217,8 +215,11 @@ class SuperAdminController extends MainController
             $carbonDate->locale($locale);
             return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
         });
-
-        $grid->actions(function ($actions) {
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteSuperAdminsAction());
+            }
             $actions->disableDelete();
             $actions->disableEdit();
         });
@@ -254,16 +255,16 @@ class SuperAdminController extends MainController
 
             $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
 
-        if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
-            $countries = $authAdmin->countriesQuery()
-                ->doesntHave('superAdmin')
-                ->orWhere('id', $value)
-                ->get(['id', 'name', 'e_name']);
-            foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+            if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
+                $countries = $authAdmin->countriesQuery()
+                    ->doesntHave('superAdmin')
+                    ->orWhere('id', $value)
+                    ->get(['id', 'name', 'e_name']);
+                foreach ($countries as $country) {
+                    $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
+                }
+                return $ops;
             }
-            return $ops;
-        }
         })->required();
 
 
@@ -318,7 +319,6 @@ class SuperAdminController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_super_admin = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'super-admin');
                     }
 
                     $newUserAppId = User::find($newAppId);
@@ -342,7 +342,6 @@ class SuperAdminController extends MainController
             if (isset($userApp)) {
                 $userApp->is_super_admin = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();

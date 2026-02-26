@@ -1,4 +1,4 @@
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 
 
 <style>
@@ -146,29 +146,7 @@
     }
 </style>
 
-<div class="achievement-container">
-    <h3 class="text-center mb-4">{{ __('assign achievement') }}</h3>
 
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    <form method="POST" action="{{ route('admin.store-user-achievement') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
-        @csrf
-<br>
-<br>
         <div class="form-section active">
             <div class="form-group mb-3">
                 <label for="user_id" class="form-label">{{ __('admin.users') }}</label>
@@ -179,75 +157,9 @@
             </div>
         </div>
 
-        <input type="hidden" id="achievement_id" value="" name="achievement_id">
-        <br>
-        <br>
-        <div class="form-section" id="achievementLevelDiv" style="display: none;">
-            <div class="form-group mb-3">
-                <label for="achievement_level_id" class="form-label">{{ __('admin.achievementLevel') }}</label>
-                <select name="achievement_level_id" id="achievement_level_id" class="form-control">
-                    <option value="">{{ __('admin.selectAchievementLevel') }}</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-section" id="file_image">
-            <div class="form-group mb-3">
-                <label for="file_image_select" class="form-label">{{ __('admin.type_file') }}</label>
-                <select name="file_image_select" id="file_image_select" class="form-control" required>
-                    <option value="">{{ __('admin.type_file') }}</option>
-                    <option value="file">{{ __('admin.file') }}</option>
-                    <option value="image">{{ __('admin.Image') }}</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-section" id="file_input" style="display: none;">
-            <div class="form-group mb-3">
-                <label class="form-label">{{ __('admin.select_file') }}</label> 
-                <div class="file-upload-wrapper">
-                    <label for="custom_file" class="file-upload-label">
-                        <i class="fas fa-cloud-upload-alt me-2"></i>
-                        {{ __('admin.choose_file') }}
-                        <span id="file-name" class="d-block text-muted small mt-1"></span>
-                    </label>
-                    <input type="file" id="custom_file" name="custom_file" class="file-upload-input" accept="image/*,.pdf,.doc,.docx">
-                </div>
-                <!-- Add this preview container -->
-                <div id="file-preview-container" class="mt-3" style="display: none;">
-                    <div class="preview-content"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-section" id="imageDiv" style="display: none;">
-            <div class="form-group mb-3">
-                <label class="form-label">{{ __('admin.selectImage') }}</label>
-                <div class="image-scroll-container">
-                    @foreach ($achievementValidImage as $data)
-                        @if (!empty($data->file))
-                            <label class="image-option">
-                                <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
-                                <img src="{{ getImagePath($data->file) }}" 
-                                    class="uniform-image img-thumbnail">
-                            </label>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-        </div>
 
 
-    <br>
-    <br>
-        <div class="d-grid mt-4">
-            <button type="submit" class="btn btn-primary submit-btn">
-                <i class="fas fa-paper-plane me-2"></i>
-                {{ __('admin.submit') }}
-            </button>
-        </div>
-    </form>
-</div>
+   
 
 <style>
     #file-preview-container {
@@ -281,9 +193,6 @@
     }
 </style>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     $(document).ready(function() {
@@ -347,124 +256,8 @@
         }
 
 
-        $('#achievement_id').change(function() {
-            var achievementId = $(this).val();
-            $('#achievementLevelDiv, #imageDiv, #gift_achievement_div, #file_image').hide();
-            let selected = $(this).find(':selected').data('type');
-
-            if (selected == '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}') {
-                $('#gift_achievement_div').fadeIn();
-            } else if (achievementId === '') {
-                $('#file_image').show();
-                $('#gift_achievement_div').hide();
-                $('#achievementLevelDiv').hide();
-            } else if (selected !== '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}' || selected !== '') {
-                $('#gift_achievement_div').hide();
-                $('#achievementLevelDiv').show();
-            }
-
-            if (achievementId) {
-                $.ajax({
-                    url: '/admin/get-achievement-levels/' + achievementId,
-                    type: 'GET',
-                    success: function(data) {
-                        $('#achievement_level_id').empty();
-                        $('#achievement_level_id').append('<option value="">{{ __('admin.selectAchievementLevel') }}</option>');
-
-                        $.each(data, function(key, value) {
-                            $('#achievement_level_id').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            }
-        });
-
-        $('#file_image_select').change(function() {
-            var selectedValue = $(this).val();
-
-            if (selectedValue == 'file') {
-                $('#file_input').fadeIn();
-                $('#imageDiv').hide();
-            } else if (selectedValue == 'image') {
-                $('#imageDiv').show();
-                $('#file_input').hide();
-            } else {
-                $('#file_input').hide();
-                $('#imageDiv').hide();
-            }
-        });
-
-        $(document).on('change', 'input[name="custom_image"]', function() {
-            $('.image-option').removeClass('selected');
-            $(this).closest('.image-option').addClass('selected');
-        });
-
-        $('#custom_file').change(function(e) {
-            const file = e.target.files[0];
-            const previewContainer = $('#file-preview-container');
-            const previewContent = previewContainer.find('.preview-content');
-
-            $('#file-name').text(file.name);
-
-            previewContent.empty();
-
-            if (file) {
-                previewContainer.show();
-
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewContent.html(`<img src="${e.target.result}" class="img-fluid" alt="Preview">`);
-                    };
-                    reader.readAsDataURL(file);
-                } else if (file.type === 'application/pdf') {
-                    const objectUrl = URL.createObjectURL(file);
-                    previewContent.html(`
-                <iframe src="${objectUrl}" class="pdf-preview"></iframe>
-            `);
-                } else if (file.type.includes('word') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
-                    previewContent.html(`
-                <div class="doc-preview">
-                    <i class="fas fa-file-word fa-3x text-primary"></i>
-                    <p class="mt-2">${file.name}</p>
-                </div>
-            `);
-                } else {
-                    previewContent.html(`
-                <div class="doc-preview">
-                    <i class="fas fa-file fa-3x text-secondary"></i>
-                    <p class="mt-2">${file.name}</p>
-                </div>
-            `);
-                }
-            } else {
-                previewContainer.hide();
-            }
-        });
-
-        $('input[name="custom_image"]').change(function() {
-            $('.image-option').removeClass('selected');
-            const selectedOption = $(this).closest('.image-option');
-            selectedOption.addClass('selected');
-
-            selectedOption[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        });
-
-        (function() {
-            'use strict';
-            var forms = document.querySelectorAll('.needs-validation');
-
-            Array.prototype.slice.call(forms)
-                .forEach(function(form) {
-                    form.addEventListener('submit', function(event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-        })();
+       
     });
+
+
 </script>

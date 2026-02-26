@@ -7,16 +7,12 @@ use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Ware;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
-
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Entities\MilestoneReward;
-
 use App\Helpers\UserCommon;
 use Modules\RoleRewards\Entities\UserHistoryReward;
-use Illuminate\Support\Facades\Log;
 use Modules\Vip\Entities\OVip;
 
 
@@ -26,35 +22,34 @@ class MilestoneHelper
 
     public static function grantMilestoneToUser(User|int $user, string $slug): void
     {
-      
 
-        if (! $user instanceof User) {
+
+        if (!$user instanceof User) {
             $user = User::find($user);
-            if (! $user) {
+            if (!$user) {
                 return;
             }
         }
 
         $milestone = Milestone::where('slug', $slug)->first();
-        if (! $milestone) {
+        if (!$milestone) {
             return;
         }
 
 
-        if (! $milestone->rewards || $milestone->rewards->isEmpty()) {
+        if (!$milestone->rewards || $milestone->rewards->isEmpty()) {
             return;
         }
 
         foreach ($milestone->rewards as $mr) {
-           
 
-            self::giveRewardToUser($user, $mr);
+
+            self::giveRewardToUser($user, $mr, $milestone);
         }
-
     }
 
 
-    public static function giveRewardToUser(User $user, MilestoneReward $mr): void
+    public static function giveRewardToUser(User $user, MilestoneReward $mr, $milestone = null): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
 
@@ -64,36 +59,35 @@ class MilestoneHelper
             ->where('rewardable_type', $mr->rewardable_type)
             ->where('rewardable_id', $mr->rewardable_id)
             ->first();
-    
+
         if ($existing) {
             if (!$existing->trashed()) {
                 return;
             }
-    
+
             $existing->forceDelete();
         }
-    
+
         UserHistoryReward::create([
-            'user_id'         => $user->id,
-            'receive_type'    => $receiveType,
-            'sub_type'        => 'milestons',
-            'rewardable_id'   => $mr->rewardable_id,
+            'user_id' => $user->id,
+            'receive_type' => $receiveType,
+            'sub_type' => 'milestons',
+            'rewardable_id' => $mr->rewardable_id,
             'rewardable_type' => $mr->rewardable_type,
-            'extra'           => json_encode([
+            'extra' => json_encode([
                 'reward' => $mr?->reward,
-                'type'   => $mr?->type,
+                'type' => $mr?->type,
                 'expire' => $mr?->expire,
             ]),
         ]);
-    
-        self::applyRewardEffect($user, $mr);
+
+        self::applyRewardEffect($user, $mr, $milestone);
     }
 
 
-    protected static function applyRewardEffect(User $user, MilestoneReward $mr): void
+    protected static function applyRewardEffect(User $user, MilestoneReward $mr, $milestone = null): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
-        
 
         switch ($mr->type) {
             case 'coins':
@@ -117,8 +111,10 @@ class MilestoneHelper
 
             case 'ware':
                 $ware = Ware::find($mr->rewardable_id);
-                if (!$ware) { break;}
-                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature:$mr);
+                if (!$ware) {
+                    break;
+                }
+                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature: $milestone);
                 break;
 
             case 'badge':
@@ -126,10 +122,14 @@ class MilestoneHelper
                 break;
 
             case 'achievement':
+                $dateTimestamp = Carbon::parse($mr->expire)->format("Y-m-d H:i:s");
+
                 UserAchievementLevel::create([
                     'user_id' => $user->id,
-                    'custom_image' => $mr->reward,
+                    // 'custom_image' => $mr->reward,
+                    'custom_achievement_id' => $mr->rewardable_id,
                     'receive_type' => $receiveType,
+                    'end_at' => $dateTimestamp,
                 ]);
                 break;
         }
@@ -157,8 +157,8 @@ class MilestoneHelper
     protected static function removeRewardEffect(User $user, UserHistoryReward $historyReward): void
     {
         $extra = json_decode($historyReward->extra, true);
-        $type  = $extra['type'] ?? null;
-        $rid   = $historyReward->rewardable_id;
+        $type = $extra['type'] ?? null;
+        $rid = $historyReward->rewardable_id;
         $receiveType = $historyReward->receive_type;
 
         switch ($type) {
@@ -175,7 +175,7 @@ class MilestoneHelper
                 break;
 
             case 'badge':
-                UserCommon::removeBadgeFromUser($user, $rid, $receiveType);
+                UserCommon::removeBadgeFromUserByReceiverType($user, $rid, $receiveType);
                 break;
 
             case 'achievement':
@@ -193,16 +193,16 @@ class MilestoneHelper
         $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
         if ($milestone && $milestone->rewards && $milestone->rewards->count()) {
             foreach ($milestone->rewards as $reward) {
-          
-    
+
+
                 self::revokeRewardFromUser($user, $reward);
             }
-        } 
+        }
         // else {
         //     Log::warning('No rewards found for milestone', [
         //         'milestone_slug' => $slug,
         //         'user_id' => $user->id ?? null,
         //     ]);
-        // }   
-     }
+        // }
+    }
 }

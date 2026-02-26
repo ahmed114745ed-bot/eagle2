@@ -37,13 +37,18 @@ class WeeklyCpRewardsResource extends JsonResource
             case "badge":
                 $expire = $this->expire . ' days';
                 $type = $this->badge?->name ?? '';
-                $image = $this->badge?->image ?? '';
+                $badgeImage = $this->badge?->images?->firstWhere('language', app()->getLocale())?->image
+                    ?? $this->badge?->images?->first()?->image
+                    ?? $this->badge?->image;
+                $image = $badgeImage ?? '';
                 break;
 
             case "achievement":
                 $expire = $this->expire . ' days';
                 $type = "achievement";
-                $image = @$this->target[0] == '/' ? substr(@$this->target, 1) : @$this->target ?? '';
+                $achievementImage = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image
+                    ?? $this->customAchievement?->images?->first()?->image;
+                $image = $achievementImage ?? '';
                 break;
             default:
                 $expire = $this->target;

@@ -35,7 +35,7 @@ class CustomNotification
         if (!$user->is_logout) Common::send_firebase_notification($tokens_notfacion, $title, $body);
     }
 
-   
+
     public function senderLevel(int $userId)
     {
         $user = User::withoutAppends()->where('id', $userId)->first();
@@ -56,18 +56,18 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages', 1);
     }
 
-    public function RoomLevel(int $userId ,$level, $reward)
+    public function RoomLevel(int $userId, $level, $reward)
     {
 
         $user = User::withoutAppends()->where('id', $userId)->with('ownerAudioRoom.roomLevel')->first();
         if (!$user) {
             return 0;
         }
-          //  \Log::info('room level Job", ', ['user_id' => $user->id, 'level' => $level, 'reward' => $reward]);
+        //  \Log::info('room level Job", ', ['user_id' => $user->id, 'level' => $level, 'reward' => $reward]);
 
         $lang = $user->lan ?? 'en';
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
-        $body = __('api.room_level', [ 'level' => $level, 'reward' => $reward],  $lang);
+        $body = __('api.room_level', ['level' => $level, 'reward' => $reward],  $lang);
 
         $title = __('congratulation', [], $lang);
 
@@ -713,12 +713,12 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function dedicateBadges(User $user, $duration, $name, $image)
+    public function dedicateBadges(User $user, $duration, $name, $images)
     {
         $tokens_notification = $user?->notification_id;
         $lang = $user?->lan ?? 'en';
         $body            = __('api.wareVips', ['duration' => $duration, 'name' => $name], $lang);
-
+        $image = $images->firstWhere('language', $lang)?->image ?? '';
         $data['image'] = getImagePath($image);
         $icon = $data['image'];
         if (!$user->is_logout)   Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, icon: $icon, data: $data, messageType: 'ware-vip');

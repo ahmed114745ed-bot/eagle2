@@ -52,7 +52,9 @@ Route::group(
     ],
     function () {
         Route::resource('area-manager-users', AdminAreaManagerController::class);
-
+        Route::get('show-sub-area-manager/{id}', [AdminUserController::class, 'showSubSuperAdmin']);
+        Route::post('delete-sub-admin/{id}', [AdminUserController::class, 'deleteSubSuperAdmin']);
+        Route::post('update-area-manager', [AdminUserController::class, 'updateSubSuperAdmin']);
         Route::get('area-manager-users/profile', [AdminAreaManagerController::class, 'showPreview']);
         Route::get('area-manager-charges', [AreaManagerChargeController::class, 'index']);
         Route::group(['prefix' => 'area-manager-charges-report'], function () {
@@ -60,6 +62,7 @@ Route::group(
         });
     }
 );
+
 /*============================= DASHBOARD ROUTE THAT SPECIAL AREA MANGER DASH ==============================*/
 Route::group(
     [
@@ -110,8 +113,11 @@ Route::group(
         Route::get('area-manager-users/profile/{id}', [AdminAreaManagerController::class, 'showProfile']);
         Route::get('area-manager-users/{id}', [AdminAreaManagerController::class, 'showProfile']);
         Route::get('sub-area-manager-users/profile/{id}', [AdminUserController::class, 'showProfile']);
-
+        Route::get('show-sub-area-manager', [AdminUserController::class, 'showSubSuperAdmin']);
+        Route::post('update-area-manager', [AdminUserController::class, 'updateSubSuperAdmin']);
+        Route::post('delete-sub-admin/{id}', [AdminUserController::class, 'deleteSubSuperAdmin']);
         Route::resource('superadmin-users', SuperAdminController::class);
+        Route::post('delete-sub-admin/{id}', [SuperAdminController::class, 'deleteSubSuperAdmin']);
         Route::get('superadmin-users-profile/{id}', [SuperAdminController::class, 'profile']);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::resource('/bd-salaries', BdSalariesController::class);

@@ -2,13 +2,14 @@
 
 namespace Modules\Public\Entities;
 
+use App\Models\Ware;
 use App\Helpers\Common;
 use Modules\Vip\Entities\OVip;
-use App\Models\Ware;
+use Illuminate\Http\UploadedFile;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Modules\Achievement\Entities\CustomAchievement;
 
 class RewardLevelInterval extends Model
 {
@@ -40,6 +41,11 @@ class RewardLevelInterval extends Model
         return $this->target;
     }
 
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
+    }
+
     public function getTarget2Attribute()
     {
         return $this->target;
@@ -67,12 +73,7 @@ class RewardLevelInterval extends Model
                 $model->target = request('target3', $model->target);
                 $model->expire = 0;
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -89,14 +90,7 @@ class RewardLevelInterval extends Model
                 $model->target = request('target3', $model->target);
                 $model->expire = 0;
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
-                //                $model->target = request('target4', $model->target);
-
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);

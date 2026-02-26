@@ -4,12 +4,9 @@ namespace App\Admin\Actions;
 
 use App\Models\Agency;
 use App\Models\Bd;
-use App\Models\User;
-use App\Models\UserSallary;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class DeleteBdAction extends RowAction
 {
@@ -50,9 +47,6 @@ class DeleteBdAction extends RowAction
             if (!$defaultBd->app_id) return $this->response()->error(__('No default BD found to transfer agencies to.'))->refresh();
             Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->app_id]);
         }
-        $owner = User::find($model->app_id);
-
-        if ($owner)   MilestoneHelper::removeReward($owner, 'bd');
 
         $model->delete();
 

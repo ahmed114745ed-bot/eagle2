@@ -24,19 +24,18 @@ class WeeklyStarGift extends JsonResource
             case "vip":
                 $expire = $this->expire . ' days';
                 $type = $this->vip?->name;
-                $vipIcon = Ware::where('level', $this->vip?->level)->where('type', 10)->where('get_type', 1)->first();
                 $image = $this->vip?->img;
                 break;
             case "badge":
                 $expire = $this->expire . ' days';
                 $type = $this->badge?->name ?? '';
-                $image = $this->badge?->image ?? '';
+                $image = $this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 break;
 
             case "achievement":
                 $expire = $this->expire . ' days';
-                $type = "achievement";
-                $image = @$this->target[0] == '/' ? substr(@$this->target, 1) : @$this->target ?? '';
+                $type = $this->customAchievement?->name ?? '';
+                $image = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 break;
             default:
                 $expire = $this->target;

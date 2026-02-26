@@ -37,8 +37,11 @@ class BadgeDedicateAction extends Action
         try {
 
             $this->userBadge($user->id, $badge->id, $request->days, 'dedicate');
-
-            CustomNotification::dedicateBadges($user, $request->days, $badge->name, $badge->image);
+         
+                $images =   $badge->images;
+                
+       
+            CustomNotification::dedicateBadges($user, $request->days, $badge->name, $images);
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
 

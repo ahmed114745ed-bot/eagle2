@@ -2,17 +2,14 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Jobs\MilestoneJob;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
 use App\Admin\Controllers\MainController;
 use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class MilestoneController extends MainController
 {
@@ -79,10 +76,32 @@ class MilestoneController extends MainController
 
         $grid->column('sync', __('Rewards'))->display(function () {
             $url = admin_url("milestones/{$this->id}/sync");
-            return "<a href='{$url}' class='btn btn-xs btn-success'>
+            return "<button type='button' class='btn btn-xs btn-success sync-milestone-btn' data-url='{$url}'>
                         <i class='fa fa-sync'></i> " . __('Reapply Rewards') . "
-                    </a>";
+                    </button>";
         });
+
+        Admin::script("
+            document.querySelectorAll('.sync-milestone-btn').forEach(function(button){
+                button.addEventListener('click', function(){
+                    var url = this.dataset.url;
+                    Swal.fire({
+                        title: '" . __('Are you sure?') . "',
+                        text: '" . __('Are you sure you want to reapply rewards?') . "',
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: '" . __('Yes, reapply!') . "',
+                        cancelButtonText: '" . __('Cancel') . "'
+                    }).then((result) => {
+                        if (result.value) {
+                            window.location.href = url;
+                        }
+                    });
+                });
+            });
+        ");
 
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
