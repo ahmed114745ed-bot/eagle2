@@ -13,6 +13,7 @@ use Modules\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Modules\Events\Entities\RewardTarget;
 use Modules\Events\Entities\ChargeTargetEvent;
@@ -75,7 +76,7 @@ class RewardTargetController extends MainController
         $target = ChargeTargetEvent::query()->find($charge_event_id);
         $grid = new Grid(new RewardTarget());
         $grid->column('created_at')->hide();
-        $grid->model()->where("charge_event_id", $charge_event_id);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where("charge_event_id", $charge_event_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
 
@@ -90,23 +91,22 @@ class RewardTargetController extends MainController
                 } elseif ($this->type == "coins") {
                     return @$this->target;
                 } elseif ($this->type == "achievement") {
-                    $value = getDriverUrl() . '/' . @$this->target;
-                    return "<img src='$value' width='80' height='80'>";
+                    return $this->customAchievement?->name ?? '';
                 }
             });
 
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -178,9 +178,7 @@ class RewardTargetController extends MainController
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"))->rules('required');
             })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
             });
         $form->number('expire', __('expire'))->default(1);
         $form->html('</div>');

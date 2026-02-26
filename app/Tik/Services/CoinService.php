@@ -7,6 +7,7 @@ use App\Services\CodapayService;
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;
 use App\Services\GooglePayService;
+use App\Services\PaymobPaymentService;
 use App\Services\PayPalService;
 use App\Services\StripeService;
 use App\Services\ZiniPaymentService;
@@ -102,6 +103,21 @@ class CoinService
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
+            } elseif ($paymentMethod == 'utd_paymob') {
+                $Active = config('is_utd_paymob_active');
+                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                $paymobService = new PaymobPaymentService();
+
+                $paymentUrl = $paymobService->createPaymentLink(
+                    amount: $coin->usd,
+                    name: $user->name ?? 'User',
+                    description: 'Charge Coin - ' . $log->trx,
+                    email: $user->email ?? null,
+                    phone: $user->phone ?? null,
+                    trx: $log->trx
+                );
+              
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else if ($paymentMethod == 'opay') {
                 $opay = new OPayController();

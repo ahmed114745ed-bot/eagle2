@@ -37,18 +37,14 @@ use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Notification;
 use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
-use Illuminate\Validation\ValidationException;
 use Modules\Milestones\Helpers\MilestoneHelper;
 use App\Tik\Repositories\AgencySalaryRepository;
-use App\Tik\Repositories\ChargeAgencyRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Tik\Repositories\ShippingAgencyRepository;
-use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\UsersJoinedAgencyRepository;
-use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
 use App\Tik\Repositories\LeaveAgencyRequestRepository;
 use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
@@ -157,7 +153,7 @@ class AgencyService
                     'minutes' => $minutes,
                     'image_color'          => @$user->color_image,
                     'id_image'             => @$user->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip(@$user->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip(@$user->id, 18, 'color') : null),
                 ],
 
                 'target' => floor($target),

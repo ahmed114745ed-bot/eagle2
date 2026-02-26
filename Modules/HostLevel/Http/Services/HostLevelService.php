@@ -114,7 +114,7 @@ class HostLevelService
                 ];
             } elseif ($reward->type == "vip") {
                 $vip = OVip::query()->find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'charge-event');
+                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'host-level');
 
                 $notifications[] = [
                     'title' => __('congratulations'),
@@ -122,8 +122,8 @@ class HostLevelService
                 ];
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
-                if ($ware){
-                    UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
+                if ($ware) {
+                    UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'host-level');
 
                     $wareName = $ware->name ?? __('a special ware');
                     $notifications[] = [
@@ -132,9 +132,13 @@ class HostLevelService
                     ];
                 }
             } elseif ($reward->type == "achievement") {
+                $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+
                 $attributes = [
                     'user_id'       => $user->id,
-                    'custom_image' => $reward->target,
+                    'custom_achievement_id' => $reward->target,
+                    'receive_type' => 'host-level',
+                    'end_at' => $dateTimestamp,
                 ];
                 UserAchievementLevel::create($attributes);
 
@@ -143,7 +147,7 @@ class HostLevelService
                     'body'  => __('You have received a new achievement.'),
                 ];
             } elseif ($reward->type == 'badge') {
-                Common::userBadge($user->id, $reward->target, $reward->expire, 'charge-event');
+                Common::userBadge($user->id, $reward->target, $reward->expire, 'host-level');
 
                 $notifications[] = [
                     'title' => __('congratulations'),

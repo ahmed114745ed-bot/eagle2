@@ -2,56 +2,126 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
-use App\Models\User;
+use App\Helpers\Common;
 use App\Models\Admin;
 use App\Models\Agent;
-use App\Models\Agency;
-use Encore\Admin\Form;
+use App\Models\User;
 use Encore\Admin\Layout\Content;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\RoleRewards\Actions\DeleteUser;
-
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
-use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
-use App\Admin\Controllers\MainController;
-
+use Illuminate\Support\Facades\Redirect;
+use Modules\SuperAdmin\Entities\SubAdmin;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserController extends EncorUsersController
 {
-// \Encore\Admin\Controllers\UserController
+    // \Encore\Admin\Controllers\UserController
 
     protected $model;
 
     public $permission_name = 'auth-users';
 
-    public function __construct ()
+    public function __construct()
     {
         $userModel = Admin::class;
         $this->model = new $userModel;
     }
 
-    public function edit ( $id , Content $content )
+    public function edit($id, Content $content)
     {
 
-        return parent ::edit ( $id , $content );
+        return parent::edit($id, $content);
     }
 
-    public function grid ()
+    public function grid()
     {
+        \Log::info('AdminUserController grid method called - COMPLETE OVERRIDE', [
+            'controller_class' => get_class($this),
+            'request_url' => request()->url(),
+            'request_path' => request()->path()
+        ]);
 
-        $grid =  parent::grid();
+        $permission_name = $this->permission_name;
 
-        $grid->actions(function ( $actions) {
-                $actions->disableDelete();
-                $actions->add(new DeleteSubSuperAdmin());
+        $grid = new \Encore\Admin\Grid(new \App\Models\Admin());
+        $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
+
+        $grid->model()->where(function ($q) use ($authId) {
+            $q->where('parent_id', $authId);
+        })
+            ->where('is_preview', 0)
+            ->where('type', 'sub_super_admin')
+            ->whereDoesntHave('roles', function ($query) {
+                $query->where('slug', 'agency-owner');
+            });
+
+        $grid->column('id', 'ID')->sortable();
+        $grid->column('username', trans('admin.username'))->sortable();
+        $grid->column('name', trans('admin.name'))->sortable();
+        $grid->column('roles', trans('admin.roles'))->pluck('name')->label();
+
+        $grid->column('createdBy.name', __('created by'))->display(function () {
+            $user = $this->createdBy;
+            $name = $user->name ?? '';
+
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+
+            $id = $user->id ?? 'غير معروف';
+            $path = $user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("superadmin/superadmin-profile/{$user->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
         });
 
-        $grid->tools(function ($tools) {
-                $logoutUrl = route('superadmin.superadmin.logout');
-                $loginText = __('login');
-                $areaManagerUrl = url('/superadmin/login');
+        // إضافة عمود مخصص للأفعال يحتوي على جميع الأزرار
+        $grid->column('custom_actions', 'الإجراءات')->display(function () {
+            $id = $this->id;
+            $viewUrl = url("superadmin/auth-users/{$id}");
+            $editUrl = url("superadmin/auth-users/{$id}/edit");
 
-                $customButtonHTML = <<<HTML
+            return "
+            <div class='btn-group'>
+                <button type='button' class='btn btn-sm btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                    <i class='fa fa-cog'></i>&nbsp;&nbsp;<span class='caret'></span>
+                </button>
+                <ul class='dropdown-menu dropdown-menu-right'>
+                    <li><a href='{$viewUrl}'><i class='fa fa-eye'></i>&nbsp;&nbsp;عرض</a></li>
+                    <li><a href='{$editUrl}'><i class='fa fa-edit'></i>&nbsp;&nbsp;تعديل</a></li>
+                    <li><a href='javascript:void(0);' onclick='customSuperAdminDelete({$id})' style='color: red;'><i class='fa fa-trash'></i>&nbsp;&nbsp;حذف</a></li>
+                </ul>
+            </div>";
+        })->sortable(false);
+
+        // تعطيل الأفعال الافتراضية تماماً
+        $grid->disableActions();
+
+        $grid->tools(function ($tools) {
+            $logoutUrl = route('superadmin.superadmin.logout');
+            $loginText = __('login');
+            $areaManagerUrl = url('/superadmin/login');
+
+            $customButtonHTML = <<<HTML
                 <div style="display: contents; align-items: center;">
                     <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
                         <i class="fa fa-sign-in"></i> {$loginText}
@@ -61,57 +131,140 @@ class AdminUserController extends EncorUsersController
                     </button>
 
                 </div>
-                     <script>
-                    function copyAreaManagerUrl() {
-                        const url = '{$areaManagerUrl}';
-                        navigator.clipboard.writeText(url).then(() => {
-                            toastr.success('تم نسخ الرابط بنجاح');
-                        }).catch(() => {
-                            alert('تعذر نسخ الرابط');
-                        });
+                <script>
+                    if (typeof copyAreaManagerUrl === 'undefined') {
+                        function copyAreaManagerUrl() {
+                            const url = '{$areaManagerUrl}';
+                            navigator.clipboard.writeText(url).then(() => {
+                                toastr.success('تم نسخ الرابط بنجاح');
+                            }).catch(() => {
+                                alert('تعذر نسخ الرابط');
+                            });
+                        }
+                    }
+                    
+                    if (typeof customSuperAdminDelete === 'undefined') {
+                        function customSuperAdminDelete(id) {
+                            console.log('customSuperAdminDelete called with id:', id);
+                            
+                            if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                                console.log('Delete confirmed, sending AJAX to: /superadmin/auth-users/' + id);
+                                
+                                // الحصول على CSRF token بطريقة آمنة
+                                var csrfToken = '';
+                                var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                                if (csrfMeta) {
+                                    csrfToken = csrfMeta.getAttribute('content');
+                                } else if (window.Laravel && window.Laravel.csrfToken) {
+                                    csrfToken = window.Laravel.csrfToken;
+                                } else if ($('meta[name="csrf-token"]').length) {
+                                    csrfToken = $('meta[name="csrf-token"]').attr('content');
+                                }
+                                
+                                console.log('CSRF Token:', csrfToken);
+                                
+                                fetch('/superadmin/auth-users/' + id, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': csrfToken,
+                                        'Content-Type': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                })
+                                .then(response => {
+                                    console.log('Response status:', response.status);
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log('Delete response:', data);
+                                    if (data.success) {
+                                        toastr.success('تم الحذف بنجاح');
+                                        location.reload();
+                                    } else {
+                                        toastr.error(data.message || 'حدث خطأ');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Delete error:', error);
+                                    toastr.error('حدث خطأ أثناء الحذف');
+                                });
+                            }
+                        }
                     }
                 </script>
                 HTML;
 
-                $tools->append($customButtonHTML);
-            });
+            $tools->append($customButtonHTML);
+        });
 
         return $grid;
-
     }
 
-    public function update ( $id )
+    public function update($id)
     {
-        $user = Admin::query ()->findOrFail ($id);
-        if (\request ('password') != $user->password || \request ('username') != $user->username){
-            Agent::where("id",$user->id)->update([
+        $user = Admin::query()->findOrFail($id);
+        if (\request('password') != $user->password || \request('username') != $user->username) {
+            Agent::where("id", $user->id)->update([
                 "remember_token" => null
             ]);
-            DB::table ('sessions')->where ('user_id',$user->id)->delete ();
+            DB::table('sessions')->where('user_id', $user->id)->delete();
         }
-        return parent ::update ($id);
+        return parent::update($id);
     }
 
-    public function destroy ( $id )
+    public function destroy($id)
     {
+        \Log::info('AdminUserController destroy method called', [
+            'id' => $id,
+            'controller_class' => get_class($this),
+            'request_url' => request()->url(),
+            'request_method' => request()->method(),
+            'request_path' => request()->path(),
+            'current_route' => request()->route()->getName()
+        ]);
 
-        $user = $this->model->find($id);
-        if ($user){
-            if ($user->isRole('admin') || $user->isRole('developer')){
-                return response ()->json (['error'=>'','message'=>__('admin cant be deleted')]);
+        try {
+            $user = $this->model->find($id);
+            if ($user) {
+                if ($user->isRole('admin') || $user->isRole('developer')) {
+                    \Log::warning('Attempted to delete admin/developer user', ['user_id' => $id]);
+                    return response()->json(['error' => true, 'message' => __('admin cant be deleted')]);
+                }
             }
+
+            $OldUserAppId = User::find($user->app_id);
+            if ($OldUserAppId) {
+                $OldUserAppId->is_sub_super_admin = 0;
+                $OldUserAppId->save();
+
+                \Log::info('Updated user is_sub_super_admin in destroy method', [
+                    'user_id' => $OldUserAppId->id,
+                    'app_id' => $user->app_id
+                ]);
+            }
+
+            //  Agency::query ()->where ('owner_id',$id)->delete ();
+
+            // حذف المستخدم
+            $user->delete();
+
+            \Log::info('User deleted successfully in destroy method', ['user_id' => $id]);
+
+            return response()->json(['success' => true, 'message' => 'تم الحذف بنجاح']);
+        } catch (\Exception $e) {
+            \Log::error('Error in AdminUserController destroy method', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json(['error' => true, 'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
         }
-        Agency::query ()->where ('owner_id',$id)->delete ();
-
-
-        return parent ::destroy ($id);
-
     }
 
-    public function form ()
+    public function form()
     {
 
-        $form =  parent ::form ();
+        $form =  parent::form();
         $form->select('app_id', __('validation.select_user'))->options(function ($value) {
             $ops2 = [];
             foreach (User::Where('id', $value)->get() as $user) {
@@ -123,4 +276,44 @@ class AdminUserController extends EncorUsersController
     }
 
 
+
+    public function showSubSuperAdmin($id)
+    {
+        $subSuperAdmin = SubAdmin::find($id);
+
+        if ($subSuperAdmin) {
+            return response()->json([
+                'status' => 200,
+                'item' =>  $subSuperAdmin,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => trans('message.notFoundGift'),
+            ]);
+        }
+    }
+
+    public function updateSubSuperAdmin(Request $request,)
+    {
+        $validated = $request->validate([
+
+            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
+        $subSuperAdmin = SubAdmin::find($request->id);
+        $subSuperAdmin->name = $request->name;
+        $subSuperAdmin->username = $request->username;
+        if ($request->has('image')) {
+            $image = Common::upload('images', $request->image);
+            $subSuperAdmin->avatar = $image;
+        }
+        if ($request->password) {
+            $subSuperAdmin->password = Hash::make($request->password);
+        }
+        if ($request->filled('password')) {
+            $subSuperAdmin->password = Hash::make($request->password);
+        }
+        $subSuperAdmin->save();
+        return Redirect::back();
+    }
 }

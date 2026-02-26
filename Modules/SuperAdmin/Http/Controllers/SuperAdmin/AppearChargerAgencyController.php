@@ -2,29 +2,26 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Charge;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
+use App\Admin\Actions\DeleteShippingAgencyAction;
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencySallary;
+use App\Models\Charge;
 use App\Models\CoinLog;
 use App\Models\GiftLog;
-use Encore\Admin\Layout\Row;
-use Illuminate\Http\Request;
-use App\Models\AgencySallary;
-use Encore\Admin\Widgets\Box;
 use App\Models\ShippingAgency;
+use App\Models\User;
+use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
+use Encore\Admin\Show;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Controllers\MainController;
-use App\Admin\Actions\DeleteShippingAgencyAction;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -438,7 +435,6 @@ class AppearChargerAgencyController extends MainController
             setTimeout(initPhoneInput, 100);
         });
     JS);
-        // $form->hidden('Shipping_agency')->default(1);
 
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
@@ -447,10 +443,7 @@ class AppearChargerAgencyController extends MainController
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
-            // $form->model()->country_id = Admin::user()->country_id;
-            if (!$form->model()->exists) {
-                //  Common::createUserAdmin($appOwnerId);
-            }
+
 
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
                 //  Common::createUserAdmin($appOwnerId);
@@ -463,22 +456,7 @@ class AppearChargerAgencyController extends MainController
             }
         });
 
-        // $form->saved(function (Form $form) {
-        //     $checkAgencyUser = UsersJoinedAgency::where([
-        //         'user_id' => $form->model()->app_owner_id,
-        //         'agency_id' => $form->model()->id,
-        //         'type' => 1,
-        //     ])->whereNull('leave_date')->exists();
 
-        //     if (!$checkAgencyUser) {
-        //         UsersJoinedAgency::create([
-        //             'user_id' => $form->model()->app_owner_id,
-        //             'agency_id' => $form->model()->id,
-        //             'type' => 1,
-        //             'join_date' => now(),
-        //         ]);
-        //     }
-        // });
 
         return $form;
     }

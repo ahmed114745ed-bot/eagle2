@@ -37,17 +37,15 @@ class WeeklyRankingCommand extends Command
             $rankingList = $this->getRankingList($rankingType);
 
             if (!$rankingList || $rankingList->isEmpty()) {
-            //    Log:: warning('Ranking list is empty', [
-            //         'ranking_type_id' => $rankingType->id,
-            //     ]);
+                //    Log:: warning('Ranking list is empty', [
+                //         'ranking_type_id' => $rankingType->id,
+                //     ]);
                 continue;
             }
 
             // 2) Apply ranges to give rewards
             $this->applyRanges($rankingList, $rankingType);
-
         }
-
     }
 
 
@@ -56,9 +54,9 @@ class WeeklyRankingCommand extends Command
 
         switch ($rankingType->type) {
 
-             case 'wealth':
-             case 'charm':
-                 return $this->giftRanking($rankingType->type);
+            case 'wealth':
+            case 'charm':
+                return $this->giftRanking($rankingType->type);
 
             case 'charge':
                 return $this->charge();
@@ -109,7 +107,7 @@ class WeeklyRankingCommand extends Command
             ->subWeek()
             ->endOfWeek();
         //
-       //  dd($start,$end);
+        //  dd($start,$end);
 
         $query = User::query()
             // Join charges of this week
@@ -143,7 +141,7 @@ class WeeklyRankingCommand extends Command
             ->orderByDesc('total_sum');
 
         $results = $query->get()->values();
-//dd($results);
+        //dd($results);
         // Log the results count
         // Log::info("Charge results count", [
         //     'count' => $results->count()
@@ -192,7 +190,7 @@ class WeeklyRankingCommand extends Command
             $count = $max - $min + 1;
 
             $records = $rankingList->slice($startIndex, $count)->values();
-          //   dd($records );
+            //   dd($records );
             $userIdKey = $this->getUserIdKey($rankingType->type);
             $userIds = $records->pluck($userIdKey)->filter()->values();
             foreach ($records as $record) {
@@ -201,7 +199,7 @@ class WeeklyRankingCommand extends Command
                 $this->giveReward($record, $range, $rankingType->type);
             }
 
-             // dd($userIds);
+            // dd($userIds);
             $this->dispatchNotification($userIds->toArray(), $range);
         }
     }
@@ -309,8 +307,10 @@ class WeeklyRankingCommand extends Command
             elseif ($reward->target_type == "achievement") {
                 UserAchievementLevel::create([
                     "user_id"     => $user->id,
-                    "custom_image" => $reward->target,
+                    // "custom_image" => $reward->target,
+                    'custom_achievement_id' => $reward->target,
                     "end_at"      => now()->addDays($reward->expire_days),
+                    'receive_type' => 'gift-ranking',
                 ]);
             }
 

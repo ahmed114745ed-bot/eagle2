@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\SubAreaManager;
+use Modules\Achievement\Entities\CustomAchievement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SuperAdminReward extends Model
@@ -42,6 +43,11 @@ class SuperAdminReward extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'created_by');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
 
 
@@ -118,12 +124,7 @@ class SuperAdminReward extends Model
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
 
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -142,12 +143,7 @@ class SuperAdminReward extends Model
             } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);

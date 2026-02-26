@@ -9,7 +9,7 @@ use Illuminate\Http\UploadedFile;
 
 class RoleReward extends Model
 {
-    protected $appends = ['rewardable_id2', 'rewardable_id3', 'rewardable_id1'];
+    protected $appends = ['rewardable_id2', 'rewardable_id3', 'rewardable_id1', 'reward_achievement'];
     protected $fillable = [
         'role_id',
         'rewardable_id',
@@ -42,6 +42,11 @@ class RoleReward extends Model
         return $this->rewardable_id;
     }
 
+    public function getRewardAchievementAttribute()
+    {
+        return $this->rewardable_id;
+    }
+
     /**
      * العلاقة المورفية
      */
@@ -61,11 +66,14 @@ class RoleReward extends Model
                 $model->rewardable_id = request('rewardable_id2', $model->rewardable_id);
             } elseif (request('type') === "badge") {
                 $model->rewardable_id = request('rewardable_id3', $model->rewardable_id);
+            } elseif (request('type') === "achievement") {
+                $model->rewardable_id = request('reward_achievement', $model->rewardable_id);
             }
             $model->type = request('type');
             unset($model->rewardable_id2);
             unset($model->rewardable_id3);
             unset($model->rewardable_id1);
+            unset($model->reward_achievement);
         });
 
         self::updating(function ($model) {
@@ -75,6 +83,8 @@ class RoleReward extends Model
                 $model->rewardable_id = request('rewardable_id2', $model->rewardable_id);
             } elseif (request('type') === 'badge') {
                 $model->rewardable_id = request('rewardable_id3', $model->rewardable_id);
+            } elseif (request('type') === "achievement") {
+                $model->rewardable_id = request('reward_achievement', $model->rewardable_id);
             } else {
                 $model->rewardable_id = 0;
             }
@@ -82,6 +92,7 @@ class RoleReward extends Model
             unset($model->rewardable_id2);
             unset($model->rewardable_id1);
             unset($model->rewardable_id3);
+            unset($model->reward_achievement);
         });
     }
 }

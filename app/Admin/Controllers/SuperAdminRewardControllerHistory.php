@@ -16,6 +16,7 @@ use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Services\UserService;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
@@ -127,6 +128,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 'areaManager',
                 'ware',
                 'vip',
+                "customAchievement",
                 'badge',
                 'packageRewards',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
@@ -177,8 +179,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 } elseif ($this->type == "coin") {
                     return @$this->target;
                 } elseif ($this->type == "achievement") {
-                    $value = getDriverUrl() . '/' . @$this->target;
-                    return "<img src='$value' width='80' height='80'>";
+                    return $this->customAchievement?->name ?? '';
                 }
             });
             if (!request()->filled('_export_')) {
@@ -190,9 +191,9 @@ class SuperAdminRewardControllerHistory extends MainController
                         $vips = $this->vip;
                         $path = $vips->img ?? '';
                     } elseif ($this->type == 'badge') {
-                        $path = @$this->badge->image ?? '';
+                        $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                     } elseif ($this->type == 'achievement') {
-                        $path = $this->target;
+                        $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                     } else {
                         $path = 'coin.png';
                     }
@@ -330,9 +331,8 @@ class SuperAdminRewardControllerHistory extends MainController
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
             })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
+
                 $form->number('expire', __('expire'))->default(1);
             })->rules('required');
 
@@ -431,7 +431,7 @@ class SuperAdminRewardControllerHistory extends MainController
 
                     case 'badge':
                         $gifts = $memper->badge->name ?? '';
-                        $path  = $memper->badge->image ?? '';
+                        $path  = $memper->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
 
                     case 'coins':
@@ -440,8 +440,8 @@ class SuperAdminRewardControllerHistory extends MainController
                         break;
 
                     case 'achievement':
-                        $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
-                        $path  = $memper->target;
+                        $gifts = $memper->customAchievement?->name ?? '';
+                        $path  = $memper->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
                 }
 

@@ -2,40 +2,45 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Models\UserSallary;
-use Illuminate\Http\Request;
-use App\Facades\UserHandling;
-use App\Jobs\CleanGiftLogsJob;
-use App\Models\RemainingDiamond;
-use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use App\Tik\Services\GiftLogService;
-use App\Models\MonthlyDiamondReceive;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\GiftLogUtdResource;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Facades\CustomNotification;
+use App\Facades\UserHandling;
+use App\Helpers\Common;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\GiftLogResource;
+use App\Http\Resources\GiftLogUtdResource;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Jobs\CleanGiftLogsJob;
+use App\Models\GiftLog;
+use App\Models\MonthlyDiamondReceive;
+use App\Models\RemainingDiamond;
+use App\Models\User;
+use App\Models\UserSallary;
 use App\Repositories\Room\RoomTopUsersRepository;
+use App\Tik\Services\GiftLogService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
+use Modules\RoomBoom\Entities\TotalRoomGift;
+use App\Services\Gifts\LuckyGiftService;
 
 
 class GiftLogController extends Controller
 {
 
     private $roomTopUsersRepository;
+    private $luckyGiftService;
     public function __construct(
         RoomTopUsersRepository $roomTopUsersRepository,
         private GiftLogService $giftLogService,
+        LuckyGiftService $luckyGiftService,
     ) {
 
         $this->roomTopUsersRepository = $roomTopUsersRepository;
+        $this->luckyGiftService = $luckyGiftService;
     }
 
     public function updateRoomPercentageAndHost($ownerId, array $receiverIds, $totalCoins, $coinsPerUser)
@@ -241,7 +246,7 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-       $close_open_gifts = settings()->get('close_open_gifts');
+        $close_open_gifts = settings()->get('close_open_gifts');
 
         if ($close_open_gifts == 1) {
             return Common::apiResponse(0, __('Send gift stopped by admin'));
@@ -424,6 +429,36 @@ class GiftLogController extends Controller
 
         try {
             $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+        return Common::apiResponse(1, __('api_responses.success'), $data);
+    }
+
+    public function sendLuckyGift4(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+        $stopLucky = settings()->get('stop_luckyGift');
+        if ($stopLucky == 1) {
+            return Common::apiResponse(0, __('api_responses.try_again'));
+        }
+
+        $validator = Validator::make($request->all(), [
+            'id'       => 'required',
+            'owner_id' => 'nullable',
+            'toUid'    => 'required',
+            'num'      => 'required|integer|min:1',
+            'count'    => 'sometimes|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        $data = $request->all();
+        $user = $request->user();
+
+        try {
+            $data = $this->luckyGiftService->sendLuckyGift4($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
@@ -835,5 +870,42 @@ class GiftLogController extends Controller
             'year' => $year,
         ]);
         CustomNotification::remainingDiamonds($user, 'diamonds', $month, $diamonds);
+    }
+
+
+
+    public function totalRoomGift()
+    {
+        $start = Carbon::createFromFormat('d/m/Y', '09/02/2026')->startOfDay();
+        $end   = Carbon::now()->endOfDay();
+
+        GiftLog::query()
+            ->selectRaw('room_id, SUM(giftPrice) AS total')
+            ->whereBetween('created_at', [$start, $end])
+            ->groupBy('room_id')
+            ->orderBy('room_id') // required for chunk
+            ->chunk(50, function ($giftLogs) {
+
+                foreach ($giftLogs as $log) {
+                    $totalRoomGift = TotalRoomGift::where('room_id', $log->room_id)
+                        ->whereDate('created_at', now())
+                        ->first();
+
+                    if (!$totalRoomGift) {
+                        $totalRoomGift = TotalRoomGift::create([
+                            'room_id' => $log->room_id,
+                            'current_total'   => 0,
+                        ]);
+                    }
+                    $totalRoomGift->current_total += $log->total;
+                    $totalRoomGift->save();
+                }
+            });
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'done total gift from ' . $start->format('d/m/Y') . ' to ' . $end->format('d/m/Y') . '.'
+        ]);
     }
 }

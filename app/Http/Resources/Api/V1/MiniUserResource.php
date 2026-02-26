@@ -42,7 +42,7 @@ class MiniUserResource extends JsonResource
             'frame' => $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1'),
             'frame_id' => @$this->dress_1,
             'has_color_name' => $this->getPackWithTypeV2(18),
-            'colored_name' => $hasColor ? common::wareUserVipV2(@$this, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVipV2(@$this, 18, 'color') : null),
 
         ];
 

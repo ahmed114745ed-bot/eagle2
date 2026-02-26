@@ -131,7 +131,7 @@ class DailyGiftController extends Controller
 
         return $currentDay;
     }
-    public function assignGiftToUser(mixed $type, \App\Models\Admin|\Illuminate\Contracts\Auth\Authenticatable|null $user, mixed $target, mixed $expire): void
+    public function assignGiftToUser(mixed $type,  $user, mixed $target, mixed $expire): void
     {
 
         if ($type == "coins") {
@@ -157,8 +157,9 @@ class DailyGiftController extends Controller
         } elseif ($type == "achievement") {
             $attributes = [
                 'user_id'      => $user->id,
-                'custom_image' => $target,
+                'custom_achievement_id' => $target,
                 'end_at' =>  Carbon::parse($expire)->format("Y-m-d H:i:s"),
+                'receive_type' => 'daily-gifts',
             ];
             UserAchievementLevel::create($attributes);
         } elseif ($type == 'badge') {

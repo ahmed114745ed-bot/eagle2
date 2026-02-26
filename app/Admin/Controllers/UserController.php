@@ -477,10 +477,10 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'phone', 'bio']);
 
         $with = [
-            'profile:id,user_id,avatar',
+            'profile:id,user_id,avatar,gender',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
             'senderLevel:id,level,type,img',
             'receiverLevel:id,level,type,img',
@@ -1025,43 +1025,46 @@ class UserController extends MainController
 
     public function updateUsers(Request $request)
     {
-        $user = User::find($request->id);
+        $user = User::findOrFail($request->id);
+        
         $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
-            'uuid' => [
-                'sometimes',
-                Rule::unique('users', 'uuid')->ignore($user->id),
-            ],
-            'phone' => [
-                'nullable',
-                Rule::unique('users', 'phone')->ignore($user->id),
-            ],
-            'email' => ['nullable', 'email'],
+            'uuid' => ['sometimes', Rule::unique('users', 'uuid')->ignore($user->id)],
+            'phone' => ['nullable', Rule::unique('users', 'phone')->ignore($user->id)],
+            'email' => ['nullable', 'email', Rule::unique('users', 'email')->ignore($user->id)],
+            'country_id' => ['nullable', 'exists:countries,id'],
+            'bio' => ['nullable', 'string'],
+            'gender' => ['nullable', 'in:0,1'],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
-        $data = [
-            'name' => $request->name,
-            'uuid' => $request->uuid,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'bio' => $request->bio,
-        ];
-        $user->update($data);
-        $profileUser = Profile::where('user_id', $user->id)->first();
-        $dataUserProfile = [
 
-            'gender' => $request->gender,
+        // Update user fields directly from request
+        $user->name = $request->input('name', $user->name);
+        $user->uuid = $request->input('uuid', $user->uuid);
+        $user->email = $request->filled('email') ? $request->input('email') : null;
+        $user->phone = $request->filled('phone') ? $request->input('phone') : null;
+        $user->bio = $request->input('bio', $user->bio);
+        $user->country_id = $request->filled('country_id') ? $request->input('country_id') : null;        
+        $user->save();
+        
 
-        ];
+        // Update or create profile
+        $profile = $user->profile;
+        if (!$profile) {
+            $profile = new Profile();
+            $profile->user_id = $user->id;
+        }
+        
+        if ($request->has('gender')) {
+            $profile->gender = $request->input('gender');
+        }
+        
         if ($request->hasFile('image')) {
-            $dataUserProfile['avatar'] = Common::upload('images', $request->file('image'));
+            $profile->avatar = Common::upload('images', $request->file('image'));
         }
-        if ($profileUser) {
-
-            $profileUser->update($dataUserProfile);
-        } else {
-            Profile::create($dataUserProfile);
-        }
-
+        
+        $profile->save();
+        
         return Redirect::back();
     }
 

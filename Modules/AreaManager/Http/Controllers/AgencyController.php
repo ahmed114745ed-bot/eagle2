@@ -2,36 +2,36 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\Bd;
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Agency;
-use App\Models\Charge;
-use App\Models\Target;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
+use App\Admin\Actions\ChangeUsersAgencyAction;
+use App\Admin\Controllers\MainController;
+use App\AreaManager\Actions\DeleteAgencyAction;
 use App\Helpers\Common;
+use App\Models\Agency;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencySallary;
+use App\Models\Bd;
+use App\Models\Charge;
 use App\Models\Country;
 use App\Models\GiftLog;
-use App\Models\UserSallary;
-use App\Models\AgencySallary;
 use App\Models\ShippingAgency;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
+use App\Models\Target;
+use App\Models\User;
+use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Actions\Response;
-use Illuminate\Support\MessageBag;
 use App\Services\AppFeatureService;
+use Carbon\Carbon;
+use Encore\Admin\Actions\Response;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Controllers\MainController;
-use App\Admin\Actions\ChangeUsersAgencyAction;
-use App\AreaManager\Actions\DeleteAgencyAction;
-use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Support\MessageBag;
 
 class AgencyController extends MainController
 {
@@ -718,6 +718,7 @@ class AgencyController extends MainController
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,
             ]);
+
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,

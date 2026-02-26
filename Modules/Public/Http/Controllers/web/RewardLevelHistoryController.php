@@ -171,6 +171,8 @@ class RewardLevelHistoryController extends MainController
         $models = WinnerLevelInterval::with([
             'rewardLevelInterval.ware',
             'rewardLevelInterval.vip',
+            'rewardLevelInterval.customAchievement',
+            'rewardLevelInterval.customAchievement.images',
         ])
             ->where('user_id', $user_id)
             ->where('level_interval_id', $level_interval_id)
@@ -201,8 +203,8 @@ class RewardLevelHistoryController extends MainController
                     break;
 
                 case 'achievement':
-                    $gift = "<img src='" . getDriverUrl() . "/{$member->rewardLevelInterval?->target}' width='80'>";
-                    $path = $member->rewardLevelInterval?->target;
+                    $gift = $member->rewardLevelInterval?->customAchievement?->name ?? '';
+                    $path = $member->rewardLevelInterval?->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                     break;
             }
 

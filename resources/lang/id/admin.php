@@ -16,6 +16,7 @@ return [
     'avatar'                => 'Avatar',
     'list'                  => 'Daftar',
     'new'                   => 'Baru',
+    "searchAchievements" => "Cari Prestasi",
     'create'                => 'Buat',
     'not_in_same_country' => 'Tidak di negara yang sama',
     'delete'                => 'Hapus',

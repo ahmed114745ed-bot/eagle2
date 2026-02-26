@@ -8,9 +8,11 @@ use Modules\Achievement\Http\Traits\AchievementGift;
 use Modules\Moment\Entities\Moment;
 use Modules\Vip\Entities\OVip;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Gift extends Model
 {
-    use AchievementGift, TimestampsWithTimezone;
+    use AchievementGift, TimestampsWithTimezone, HasFactory;
 
 
     public $sortable = [
@@ -53,12 +55,12 @@ class Gift extends Model
     public function canPassToCp($cpEnableAllGifts)
     {
         if ($cpEnableAllGifts) {
-            return true; 
+            return true;
         }
         return $this->category && $this->category->type === 'cp';
     }
 
-        public function scopeCpAllowed($query, $cpEnableAllGifts)
+    public function scopeCpAllowed($query, $cpEnableAllGifts)
     {
         if ($cpEnableAllGifts) {
             return $query;

@@ -20,11 +20,11 @@ class DeleteSubSuperAdmin extends RowAction
     {
 
 
-        if ($model) {
-            if ($model->isRole('admin') || $model->isRole('developer')) {
-                return $this->response()->error(__('admin cant be deleted'))->refresh();
-            }
-        }
+        // if ($model) {
+        //     if ($model->isRole('admin') || $model->isRole('developer')) {
+        //         return $this->response()->error(__('admin cant be deleted'))->refresh();
+        //     }
+        // }
 
         $OldUserAppId = User::find($model->app_id);
         if ($OldUserAppId) {
