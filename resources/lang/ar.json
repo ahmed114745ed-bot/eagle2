@@ -1262,6 +1262,7 @@
     "login_from_only_one_device": "تسجيل الدخول من جهاز واحد فقط",
     "one_usd_value_in_coins": "قيمة الدولار الواحد بالعملات",
     "zego_server_secret": "سر خادم زيغو",
+    "server_secret": "سر الخادم",
     "zego_app_id": "معرف تطبيق زيغو",
     "twilio_sid": "معرف Twilio",
     "twilio_api_key": "مفتاح API لـ Twilio",
