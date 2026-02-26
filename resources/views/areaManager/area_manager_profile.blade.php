@@ -1347,6 +1347,14 @@
                                     <label class="form-label">{{ __('admin.username') }}</label>
                                     <input type="text" name="username" class="form-control" id="username">
                                 </div>
+
+                                {{-- <div class="col-lg-6 mb-3 form-group">
+                                    <label for="user_id" class="form-label">{{ __('admin.users') }}</label>
+                                    <select name="user_id" id="user_id" class="form-control select2" required>
+                                        <option value="">{{ __('admin.selectUser') }}</option>
+                                    </select>
+
+                                </div> --}}
                                 <div class="col-lg-6 mb-3 form-group">
                                     <label class="form-label">{{ __('admin.password') }}</label>
                                        <input type="password" name="password" class="form-control"  placeholder="Leave blank if not changing">
