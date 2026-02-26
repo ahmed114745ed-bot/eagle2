@@ -75,6 +75,17 @@
                                                         required>
                                                 </div>
                                             </div>
+
+                                            <div class="col-md-10">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="zego_server_secret">{{ __('utd zego Key') }}:</label>
+                                                    <input type="text" id="zego_server_secret_key"
+                                                        name="zego_key" placeholder="server_secret_key"
+                                                        value="{{ $zego_key }}" class="form-control"
+                                                        required>
+                                                </div>
+                                            </div>
                                         </div>
                                         <button type="submit"
                                             class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>

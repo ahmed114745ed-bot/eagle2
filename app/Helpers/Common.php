@@ -1652,7 +1652,7 @@ class Common
     }
     public static function zegoData($key = null)
     {
-        $zegoClientId =  config('app.zego_client_id');
+        $zegoClientId =  Common::getConf('zego_key');
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
