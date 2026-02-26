@@ -285,7 +285,7 @@ class FairLuckService3
                             } else {
 
                                 if ($globalVaultBalance > 0) {
-                                    $this->decreaseGlobalVaultBalance($globalVaultBalance, "Win payout (Global Vault {$multiplier}x)", $user->id);
+                                    $this->decreaseGlobalVaultBalance($globalVaultBalance, "Win payout (Global Vault {$multiplier}x) Partial", $user->id);
                                 }
 
                                 $remainingProfit = $profit - $globalVaultBalance;
@@ -313,7 +313,6 @@ class FairLuckService3
                 \Illuminate\Support\Facades\Redis::expire($contributionKey, 259200);
 
                 $this->lossLedger->addToGlobalPool((int) round($totalAmount));
-                $this->increaseGlobalVaultBalance((int) round($totalAmount), "Loss bet (User loss)", $user->id);
             }
 
             $profitAmount = $isWinner || $forceWin ? ($multiplier * $totalAmount) : -$totalAmount;

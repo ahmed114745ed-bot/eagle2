@@ -22,8 +22,8 @@ class FairLuckSettingsController extends AdminController
 
         $history = FairLuckWalletHistory::where('wallet_type', 'global_vault')
             ->orderBy('created_at', 'desc')
-            ->limit(50)
-            ->get();
+            ->limit(100)
+            ->get()->reverse()->values();
 
 
 
