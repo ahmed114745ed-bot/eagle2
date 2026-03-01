@@ -318,7 +318,7 @@
                         <h4 class="m-0">{{ __('admin.RTC') }}</h4>
                         <div class="d-flex align-items-center">
                             <input type="radio" id="rtcLiveRadio" class="custom-radio libraryRealTime"
-                                   name="live_library" 7
+                                   name="live_library"
                                    value="0" {{ $liveLibrary == '0' ? 'checked' : '' }}>
                             <label for="rtcLiveRadio" class="switch"></label>
                         </div>
