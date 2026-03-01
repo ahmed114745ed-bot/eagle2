@@ -184,6 +184,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
                 try {
+                    // Debug: check registered channels
+                    $broadcaster = app(\Illuminate\Broadcasting\BroadcastManager::class)->driver();
+                    $registeredChannels = $broadcaster->getChannels()->keys()->toArray();
+                    \Illuminate\Support\Facades\Log::info('🔵 Broadcasting auth DEBUG', [
+                        'user_id'             => auth()->id(),
+                        'channel_name'        => $request->input('channel_name'),
+                        'broadcaster_class'   => get_class($broadcaster),
+                        'channels_count'      => count($registeredChannels),
+                        'channels'            => $registeredChannels,
+                        'broadcaster_hash'    => spl_object_id($broadcaster),
+                    ]);
+
                     return Broadcast::auth($request);
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::error('🔴 Broadcasting auth FAILED', [
