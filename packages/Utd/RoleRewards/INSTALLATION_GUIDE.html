@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role Rewards Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #6366f1;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #4f46e5;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #6366f1;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #6366f1;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #818cf8;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #eef2ff;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #c7d2fe;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #6366f1;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #eef2ff;
+            border-left: 4px solid #6366f1;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4f46e5;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #c7d2fe;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #eef2ff;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        
+        tr:nth-child(even) {
+            background: #eef2ff;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .checkmark {
+            color: #6366f1;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>🏆 Role Rewards Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the Role Rewards package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: March 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#overview">1. Overview</a></li>
+            <li><a href="#requirements">2. Requirements</a></li>
+            <li><a href="#installation">3. Installation Steps</a></li>
+            <li><a href="#how-it-works">4. How It Works</a></li>
+            <li><a href="#routes">5. Routes</a></li>
+            <li><a href="#verification">6. Verification</a></li>
+            <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <h1 id="overview">1. Overview</h1>
+    
+    <h2>1.1 What is Role Rewards?</h2>
+    <p>Role Rewards is a package that enables administrators to assign rewards (VIP, Wares, Badges, Achievements) to admin roles. When a user is assigned a role, they automatically receive the configured rewards. When the role is removed, the rewards are revoked.</p>
+    
+    <h2>1.2 Key Features</h2>
+    <ul>
+        <li><strong>Role-based Rewards</strong> - Configure rewards per admin role</li>
+        <li><strong>Multiple Reward Types</strong> - Support for Wares, VIP, Badges, and Achievements</li>
+        <li><strong>Automatic Sync</strong> - Rewards are granted/revoked automatically on role changes</li>
+        <li><strong>Expiration Support</strong> - Time-limited rewards with configurable expiry</li>
+        <li><strong>Safe Install/Uninstall</strong> - Contract pattern with null fallback</li>
+    </ul>
+
+    <h2>1.3 How It Works</h2>
+    <ol>
+        <li>Admin navigates to <code>/admin/auth/roles</code></li>
+        <li>Clicks the "Rewards" button on any role</li>
+        <li>Adds rewards (Ware, VIP, Badge, Achievement) with optional expiry</li>
+        <li>When a user gets assigned that role, rewards are automatically granted</li>
+        <li>When the role is removed, rewards are automatically revoked</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Requirements -->
+    <h1 id="requirements">2. Requirements</h1>
+    
+    <h2>2.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel-Admin Package</td>
+            <td>Latest</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>2.2 Database Tables</h2>
+    <p>The package will create the following tables:</p>
+    <ul>
+        <li><code>role_rewards</code> - Stores reward assignments per role (type, rewardable_id, rewardable_type, expire)</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Installation -->
+    <h1 id="installation">3. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>RoleRewards</code> folder to your project:</p>
+        <pre><code>packages/Utd/RoleRewards</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/RoleRewards"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/role-rewards</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Migrations & Clear Cache</span>
+        <p>Run migrations to create database tables and clear cache:</p>
+        <pre><code>php artisan migrate; php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="note">
+        <div class="note-title">Note</div>
+        <p>The package uses the Contract/Null Object pattern. No additional configuration is needed — it works out of the box.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: How It Works -->
+    <h1 id="how-it-works">4. How It Works</h1>
+
+    <h2>4.1 Contract Pattern</h2>
+    <p>The package uses the Contract/Null Object pattern for safe install/uninstall:</p>
+    <ul>
+        <li><strong>When installed:</strong> <code>RoleRewardContract</code> resolves to <code>RoleRewardService</code> (real implementation)</li>
+        <li><strong>When uninstalled:</strong> <code>RoleRewardContract</code> resolves to <code>NullRoleRewardService</code> (does nothing)</li>
+    </ul>
+
+    <div class="note">
+        <div class="note-title">Fallback Behavior</div>
+        <p>If the Role Rewards package is not installed, the application will use <code>NullRoleRewardService</code> as a fallback, doing nothing instead of throwing errors.</p>
+    </div>
+
+    <h2>4.2 Reward Types</h2>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Dependency</th>
+        </tr>
+        <tr>
+            <td>Ware</td>
+            <td>Items from the wares/shop system</td>
+            <td>Built-in</td>
+        </tr>
+        <tr>
+            <td>VIP</td>
+            <td>VIP packages</td>
+            <td>Requires Utd/Vip package</td>
+        </tr>
+        <tr>
+            <td>Badge</td>
+            <td>Badges from the badge system</td>
+            <td>Requires Badge module</td>
+        </tr>
+        <tr>
+            <td>Achievement</td>
+            <td>Achievement rewards</td>
+            <td>Requires Utd/Achievements package</td>
+        </tr>
+    </table>
+
+    <h2>4.3 Automatic Sync</h2>
+    <p>When a role is assigned or removed from a user, the package automatically:</p>
+    <ul>
+        <li>Grants all configured rewards for that role</li>
+        <li>Revokes rewards when the role is removed</li>
+        <li>Handles expiration for time-limited rewards</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Routes -->
+    <h1 id="routes">5. Routes</h1>
+
+    <h2>5.1 Web Routes (Admin Panel)</h2>
+    <p>Base route: <code>/admin/auth/roles</code> → Click rewards button on any role</p>
+
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/admin/role-rewards/{role_id}</code></td>
+            <td>List rewards for a role</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/admin/role-rewards/{role_id}/create</code></td>
+            <td>Create reward form</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/admin/role-rewards/{role_id}</code></td>
+            <td>Store new reward</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/admin/role-rewards/{role_id}/{id}/edit</code></td>
+            <td>Edit reward form</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td><code>/admin/role-rewards/{role_id}/{id}</code></td>
+            <td>Update reward</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td><code>/admin/role-rewards/{role_id}/{id}</code></td>
+            <td>Delete reward</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Verification -->
+    <h1 id="verification">6. Verification</h1>
+
+    <h2>6.1 Verify Installation</h2>
+    <p>Run the following commands to verify the installation:</p>
+
+    <h3>Check Package Discovery</h3>
+    <pre><code>composer show utd/role-rewards</code></pre>
+
+    <h3>Check Routes</h3>
+    <pre><code>php artisan route:list | findstr role-rewards</code></pre>
+
+    <h3>Check Tables</h3>
+    <pre><code>php artisan tinker
+>>> Schema::hasTable('role_rewards')
+=> true</code></pre>
+
+    <h2>6.2 Test Access</h2>
+    <p>Open your browser and navigate to:</p>
+    <pre><code>https://your-domain.com/admin/auth/roles</code></pre>
+    <p>Click the rewards button on any role to access:</p>
+    <pre><code>https://your-domain.com/admin/role-rewards/{role_id}</code></pre>
+
+    <div class="success">
+        <strong>Success!</strong> If all checks pass, the Role Rewards package is properly installed and configured.
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Troubleshooting -->
+    <h1 id="troubleshooting">7. Troubleshooting</h1>
+
+    <h2>7.1 Common Issues</h2>
+
+    <h3>Package Not Found</h3>
+    <div class="warning">
+        <div class="warning-title">Error: Package utd/role-rewards not found</div>
+        <p>Ensure the package path is correctly added to composer.json repositories and run <code>composer update</code>.</p>
+    </div>
+
+    <h3>Route Not Found</h3>
+    <div class="warning">
+        <div class="warning-title">Error: 404 on role-rewards routes</div>
+        <p>Clear route cache: <code>php artisan route:clear</code> and verify the service provider is registered.</p>
+    </div>
+
+    <h3>Class Not Found</h3>
+    <div class="warning">
+        <div class="warning-title">Error: Class 'Utd\RoleRewards\...' not found</div>
+        <p>Run <code>composer dump-autoload</code> and clear all caches.</p>
+    </div>
+
+    <h2>7.2 Useful Commands</h2>
+    <pre><code># Clear all caches
+php artisan optimize:clear
+
+# Re-discover packages
+composer dump-autoload
+
+# Check service provider registration
+php artisan package:discover</code></pre>
+
+    <h2>7.3 Support</h2>
+    <p>For additional support, contact the development team or check the package repository for updates.</p>
+
+</body>
+</html>
