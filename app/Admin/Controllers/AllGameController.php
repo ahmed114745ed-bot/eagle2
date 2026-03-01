@@ -2,18 +2,20 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Controllers\MainController;
+use App\Models\AllGame;
+use App\Models\CoinGameUser;
+use App\Models\GameProviderSetting;
+use App\Services\AppFeatureService;
 use DB;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Models\AllGame;
-use App\Models\CoinGameUser;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
-use App\Services\AppFeatureService;
-use App\Admin\Controllers\MainController;
+use Illuminate\Http\Request;
 
 class AllGameController extends MainController
 {
@@ -197,5 +199,24 @@ class AllGameController extends MainController
         $form->text('hight', __('hight'));
 
         return $form;
+    }
+
+
+
+    public function gameSettings(Request $request)
+    {
+        $gameSetting = GameProviderSetting::where('provider_code', $request->provider_code)->first();
+        if ($gameSetting) {
+            $gameSetting->update([
+                'app_key' => $request->app_key,
+
+            ]);
+        } else {
+            GameProviderSetting::create([
+                'provider_code' => $request->provider_code,
+                'provider_name' => $request->provider_name,
+                'app_key' => $request->app_key,
+            ]);
+        }
     }
 }

@@ -321,6 +321,7 @@ Route::group(
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
+        Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');

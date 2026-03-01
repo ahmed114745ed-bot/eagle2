@@ -2,19 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use Exception;
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
+use App\Models\BrandImage;
 use App\Models\Country;
+use App\Models\GameProviderSetting;
+use App\Models\Language;
+use App\Models\PaymentCoin;
 use App\Models\Setting;
 use App\Models\Timezone;
-use App\Models\BrandImage;
-use App\Models\PaymentCoin;
+use Cache;
+use Encore\Admin\Layout\Content;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
-use App\Models\Language;
-use Cache;
 
 class SettingController extends MainController
 {
@@ -55,12 +56,17 @@ class SettingController extends MainController
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
         $zego_key = Common::getConf('zego_key');
+        $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
+        $bytesunSettings = $gameSettings->get('bytesun');
+        $quantumNexusSettings = $gameSettings->get('quantum_nexus');
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
             ->description('   ')
             ->body(view('admin.settings_new', compact([
+                'bytesunSettings',
+                'quantumNexusSettings',
                 'pusher_app_secret',
                 'chargeTabType',
                 'zego_token',

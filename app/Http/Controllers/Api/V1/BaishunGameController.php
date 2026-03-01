@@ -370,24 +370,24 @@ class BaishunGameController extends Controller
         return response()->json($data);
     }
 
-    public  function getUniqueId($signatureNonce, $timestamp, $signature)
-    {
-        if (!$signatureNonce || !$timestamp || !$signature) return null;
-        $url = config('app.baishun_server_url');
+    // public  function getUniqueId($signatureNonce, $timestamp, $signature)
+    // {
+    //     if (!$signatureNonce || !$timestamp || !$signature) return null;
+    //     $url = config('app.baishun_server_url');
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json'
-        ])->post($url, [
-            'signature_nonce' => $signatureNonce,
-            'timestamp' => $timestamp,
-            'signature' => $signature,
-        ]);
-        $data = json_decode($response->getBody(), true);
-        if ($data) {
-            return $data['unique_id'];
-        }
-        return null;
-    }
+    //     $response = Http::withHeaders([
+    //         'Content-Type' => 'application/json'
+    //     ])->post($url, [
+    //         'signature_nonce' => $signatureNonce,
+    //         'timestamp' => $timestamp,
+    //         'signature' => $signature,
+    //     ]);
+    //     $data = json_decode($response->getBody(), true);
+    //     if ($data) {
+    //         return $data['unique_id'];
+    //     }
+    //     return null;
+    // }
 
     public function getId($id)
     {
