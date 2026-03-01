@@ -15,14 +15,14 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label">{{ __('App Fee Rate (0.10 = 10%)') }}</label>
                 <div class="col-sm-8">
-                    <input type="text" name="fair_luck_app_fee_rate" class="form-control"
+                    <input type="number" name="fair_luck_app_fee_rate" class="form-control"
                         value="{{ $settings['fair_luck_app_fee_rate'] ?? '0.10' }}">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }}</label>
                 <div class="col-sm-8">
-                    <input type="text" name="fair_luck_receiver_fee_rate" class="form-control"
+                    <input type="number" name="fair_luck_receiver_fee_rate" class="form-control"
                         value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0.10' }}">
                 </div>
             </div>

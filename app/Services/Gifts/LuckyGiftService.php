@@ -304,9 +304,14 @@ class LuckyGiftService
         $giftId = $data['id'];
         $number = $data['num'];
         $count = $data['count'] ?? 1;
+        $amountBefore = $user->di;
+        $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 10;
+        $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
+        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
+        $total_cashback_percentage = 0;
 
 
-        $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
+        $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
@@ -331,7 +336,7 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
-          if (isset($ownerId)) {
+        if (isset($ownerId)) {
             $room = Room::withoutAppends()
                 ->where('uid', $ownerId)
                 ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
@@ -343,7 +348,7 @@ class LuckyGiftService
                 ->first();
             $ownerId = $room?->uid;
         }
-        
+
         if (!$room)
             throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
@@ -355,14 +360,17 @@ class LuckyGiftService
         $receiversCount = $receivedUsers->count();
         $isToRoom = $receiversCount > 1;
 
-        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
         $total_user_win = 0;
+        $max_single_win = 0;
         $total_count_win = 0;
         $unitPrice = $giftPrice * $number;
         $fairService = app(\App\Services\FairLuck\FairLuckService3::class);
         $throwNumber = 0;
+
+        $coinsForOwner = ($giftPrice * $number * $receiversCount) * $roomrPercentage;
 
         $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
         $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
@@ -371,7 +379,18 @@ class LuckyGiftService
         $totalWalletsBefore = null;
         $totalWalletsAfter = null;
 
+        $totalPriceFull = $giftPrice * $number * $receiversCount;
+
         while ($user->di >= $unitPrice && $index > 0) {
+            $balanceBeforeIteration = $user->di;
+            // Only logging the total amount once per throw batch to match V3
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($totalPriceFull),
+                $balanceBeforeIteration,
+                UserCoinLogType::LUCKY_GIFT,
+                $gift?->name,
+            );
 
             foreach ($receiversIds as $receiverId) {
 
@@ -475,6 +494,7 @@ class LuckyGiftService
                 ];
 
                 $user->di -= $unitPrice;
+                $total_cashback_percentage += $multiplier;
             }
 
             $index--;
@@ -503,15 +523,21 @@ class LuckyGiftService
             ];
         }
 
-        $room->session += (int) $gift->price * $number * $count * 0.1;
+        $room->session += $coinsForOwner * $count;
         $room->save();
 
         $responseData['session'] = $room->session_string;
         $responseData['user_coins'] = $user->di;
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
+        $responseData['cashback_percentage'] = $total_cashback_percentage;
         $responseData['total_user_win'] = $total_user_win;
-        $responseData['total_win_count'] = $total_count_win;
+        $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ?? $gift->name;
+        $responseData['summary'] = [
+            'total_win' => $total_user_win,
+            'max_single_win' => $max_single_win,
+            'total_win_count' => $total_count_win,
+        ];
 
         $responseData['balances'] = [
             'sender' => [
@@ -531,11 +557,13 @@ class LuckyGiftService
 
 
 
-        $coinsForReceiver = $number * ($giftPrice * 0.1) * $count;
+        $coinsForReceiverBase = $number * ($giftPrice * $hostPercentage);
+        $price = $coinsForReceiverBase * $receiversCount;
+        $coinsForReceiver = $coinsForReceiverBase * $count;
         $number = $number * $count;
 
         $newUserCoin = ($user->di - $userCoins);
-        $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, 0, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
+        $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
         if ($room->charizma_status && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
@@ -545,6 +573,26 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
+        // Update total_room_gifts table
+        $settings = \App\Helpers\CacheHelper::cacheSettings();
+        if (gettype($settings) !== 'array') {
+            $settings = $settings->pluck('value', 'key')->toArray();
+        }
+        $roomBoomSettings = $settings['room_boom'] ?? 1;
+        $totalHostDiamond = (int) $totalPrice * $hostPercentage;
+        if ($roomBoomSettings) {
+            (new NewRoomBoomGiftService())->sendGift($room, $totalHostDiamond, $userId);
+        } else {
+            $tz = getTimezone();
+            $todayStart = \Carbon\Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
+            $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+            $totalRoomGift->increment('current_total', $totalHostDiamond);
+        }
+
+        if ($room->type == 'audio') {
+            $serviceLevel = new UpgradeRoomLevelServices();
+            $serviceLevel->sendGift($room, $totalPrice * $count);
+        }
 
         return $responseData;
     }
