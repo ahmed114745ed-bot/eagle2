@@ -76,7 +76,7 @@ class SendGiftService
                 );
             }
             $cpId = @$cpIds[$receivedUser->id] ?? null;
-            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId , sourceType: $sourceType);
+            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId, sourceType: $sourceType);
             $info['room_boom_uuid'] = $roomBoomUuid;
             $data[] = $info;
         }
@@ -289,31 +289,6 @@ class SendGiftService
         if (!($pk instanceof Pk))
             return;
 
-        //        $m      = explode(',', $microphone);
-//        $mic_1  = @$m[1] ?? 0;
-//        $mic_2  = @$m[2] ?? 0;
-//        $mic_3  = @$m[3] ?? 0;
-//        $mic_4  = @$m[4] ?? 0;
-//        $mic_5  = @$m[5] ?? 0;
-//        $mic_6  = @$m[6] ?? 0;
-//        $mic_7  = @$m[7] ?? 0;
-//        $mic_8  = @$m[8] ?? 0;
-//        $team_1 = [$mic_1, $mic_2, $mic_5, $mic_6];
-//        $team_2 = [$mic_3, $mic_4, $mic_7, $mic_8];
-//        $t1     = implode(',', $team_1);
-//        $t2     = implode(',', $team_2);
-//
-//        foreach ($receivedIds as $toUid) {
-//            if (in_array($toUid, $team_1)) {
-//                $pk->t1_score += $giftPrice;
-//            } elseif (in_array($toUid, $team_2)) {
-//                $pk->t2_score += $giftPrice;
-//            }
-//        }
-//        $pk->team_1 = $t1;
-//        $pk->team_2 = $t2;
-//        $pk->save();
-
         $microphones = $room->microphones()
             ->orderBy('position')
             ->get()
@@ -334,17 +309,29 @@ class SendGiftService
             ->values()
             ->toArray();
 
+        $t1Add = 0;
+        $t2Add = 0;
         foreach ($receivedIds as $toUid) {
             if (in_array($toUid, $team1)) {
-                $pk->t1_score += $giftPrice;
+                $t1Add += $giftPrice;
             } elseif (in_array($toUid, $team2)) {
-                $pk->t2_score += $giftPrice;
+                $t2Add += $giftPrice;
             }
         }
 
-        $pk->team_1 = implode(',', $team1);
-        $pk->team_2 = implode(',', $team2);
-        $pk->save();
+        if ($t1Add > 0) {
+            $pk->increment('t1_score', $t1Add);
+        }
+        if ($t2Add > 0) {
+            $pk->increment('t2_score', $t2Add);
+        }
+
+        $pk->update([
+            'team_1' => implode(',', $team1),
+            'team_2' => implode(',', $team2)
+        ]);
+
+        $pk->refresh();
 
         $ms = [
             'messageContent' => [
@@ -357,6 +344,8 @@ class SendGiftService
             ]
         ];
         $json = json_encode($ms);
+
+        \Illuminate\Support\Facades\Log::info("RTM Test (updatePk) roomId: $roomId", ['data' => $ms['messageContent']]);
 
         Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
     }
@@ -410,33 +399,6 @@ class SendGiftService
     {
         if (!($pk instanceof Pk))
             return [];
-
-        //        $m = explode (',',$microphone);
-//        $mic_1 = isset($m[0])?$m[0]:0;
-//        $mic_2 = isset($m[1])?$m[1]:0;
-//        $mic_3 = isset($m[2])?$m[2]:0;
-//        $mic_4 = isset($m[3])?$m[3]:0;
-//        $mic_5 = isset($m[4])?$m[4]:0;
-//        $mic_6 = isset($m[5])?$m[5]:0;
-//        $mic_7 = isset($m[6])?$m[6]:0;
-//        $mic_8 = isset($m[7])?$m[7]:0;
-//        $mic_9 = isset($m[8])?$m[8]:0;
-//        $team_1 = [$mic_2,$mic_3,$mic_6,$mic_7];
-//        $team_2 = [$mic_4,$mic_5,$mic_8,$mic_9];
-//        $t1 = implode (',',$team_1);
-//        $t2 = implode (',',$team_2);
-//
-//        foreach ($receivedIds as $toUid) {
-//            if (in_array($toUid, $team_1)) {
-//                $pk->t1_score += $giftPrice;
-//            } elseif (in_array($toUid, $team_2)) {
-//                $pk->t2_score += $giftPrice;
-//            }
-//        }
-//        $pk->team_1 = $t1;
-//        $pk->team_2 = $t2;
-//        $pk->save();
-
         $microphones = $room->microphones()
             ->orderBy('position')
             ->get()
@@ -457,12 +419,21 @@ class SendGiftService
             ->values()
             ->toArray();
 
+        $t1Add = 0;
+        $t2Add = 0;
         foreach ($receivedIds as $toUid) {
             if (in_array($toUid, $team1)) {
-                $pk->t1_score += $giftPrice;
+                $t1Add += $giftPrice;
             } elseif (in_array($toUid, $team2)) {
-                $pk->t2_score += $giftPrice;
+                $t2Add += $giftPrice;
             }
+        }
+
+        if ($t1Add > 0) {
+            $pk->increment('t1_score', $t1Add);
+        }
+        if ($t2Add > 0) {
+            $pk->increment('t2_score', $t2Add);
         }
 
         $pk->update([
@@ -470,6 +441,7 @@ class SendGiftService
             'team_2' => implode(',', $team2),
         ]);
 
+        $pk->refresh();
         return ["end_at" => $pk->end_at, 't1_score' => $pk->t1_score, 't2_score' => $pk->t2_score];
     }
 }
