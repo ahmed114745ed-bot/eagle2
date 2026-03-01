@@ -81,11 +81,7 @@ class UpdateUserWhenSendGift
 
     public function updateUsers(int $totalCoins, array $userIds)
     {
-        // DB::table('users')->whereIn('id', $userIds)->update([
-        //     'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
-        //     'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
-        //     'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
-        // ]);
+     
         DB::transaction(function () use ($totalCoins, $userIds) {
             DB::table('users')->whereIn('id', $userIds)->update([
                 'total_diamond_received' => DB::raw("total_diamond_received + {$totalCoins}"),

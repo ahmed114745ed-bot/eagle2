@@ -48,19 +48,20 @@ class GiftLogController extends Controller
         $this->addRoomCoins($ownerId, $totalCoins);
         $this->addHostCoins($receiverIds, $coinsPerUser);
     }
-    public function addHostCoins(array $receiverIds, int  $totalCoins)
+    public function addHostCoins(array $receiverIds, int $totalCoins)
     {
         $receiverIds = UserHandling::checkIfUserHostByIds($receiverIds);
 
-        if (count($receiverIds) == 0) return;
+        if (count($receiverIds) == 0)
+            return;
 
         $coins = floor($totalCoins * 0.03);
         DB::table('users')->whereIn('id', $receiverIds)->update(values: ['di' => DB::raw(sprintf("di + %s", $coins))]);
         $data = [];
         foreach ($receiverIds as $receiverId) {
             $data[] = [
-                'user_id'    => $receiverId,
-                'coins'      => $coins,
+                'user_id' => $receiverId,
+                'coins' => $coins,
                 'from_coins' => $totalCoins,
                 'type'       => 'host_coins'
             ];
@@ -125,7 +126,7 @@ class GiftLogController extends Controller
                 $value['updated_at'] = now();
             } else break;
         }
-        if (! $isTwoDiminutionsArray) {
+        if (!$isTwoDiminutionsArray) {
             $data['created_at'] = now();
             $data['updated_at'] = now();
         }
@@ -252,13 +253,12 @@ class GiftLogController extends Controller
             return Common::apiResponse(0, __('Send gift stopped by admin'));
         }
 
-        // Update when sending the gift
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'type'     => 'nullable',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'type' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -271,18 +271,18 @@ class GiftLogController extends Controller
             return Common::apiResponse(false, $e->getMessage());
         }
 
-        settings()->set('gift_send', true);
-        $tpUsers = request()->toUid;
+        if (!settings()->get('gift_send')) {
+            settings()->set('gift_send', true);
+        }
+        $tpUsers = $request->toUid;
         $idsArray = explode(',', $tpUsers);
 
-        // Optional: convert to integers
         $idsArray = array_map('intval', $idsArray);
 
-        // Prepare API response
         $data = [
             'ids' => $idsArray
         ];
-        return Common::apiResponse(true, $message,   $data);
+        return Common::apiResponse(true, $message, $data);
     }
 
 
@@ -293,7 +293,8 @@ class GiftLogController extends Controller
         $userId = $request->user()->id;
         if ($request->user_id) {
             $user = User::where('id', $request->user_id)->exists();
-            if (!$user) return Common::apiResponse(0, 'not found', null, 404);
+            if (!$user)
+                return Common::apiResponse(0, 'not found', null, 404);
             $userId = $request->user_id;
         }
         $giftTotal = GiftLog::where(function ($q) use ($userId) {
@@ -327,8 +328,8 @@ class GiftLogController extends Controller
      */
     public function updateRoomCoinsToUser($userId, $room, $totalPrice): void
     {
-        $topUser         = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
-        $topUser->coins  += $totalPrice;
+        $topUser = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
+        $topUser->coins += $totalPrice;
         $topUser->save();
     }
 
@@ -337,8 +338,9 @@ class GiftLogController extends Controller
 
     public function is_winner($gift): bool
     {
-        if (!$gift) abort(404);
-        $win_probability = ((int)$gift->luckyGift?->win_probability ?? 70) / 100;
+        if (!$gift)
+            abort(404);
+        $win_probability = ((int) $gift->luckyGift?->win_probability ?? 70) / 100;
         $randomValue = mt_rand(0, 100) / 100;
         return $randomValue <= $win_probability;
     }
@@ -351,11 +353,11 @@ class GiftLogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -382,11 +384,11 @@ class GiftLogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -413,11 +415,11 @@ class GiftLogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -443,11 +445,11 @@ class GiftLogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -721,11 +723,11 @@ class GiftLogController extends Controller
      */
     public function getReceivedAndSanderPercentage(): array
     {
-        $keys       = ['sender_percentage', 'received_percentage'];
+        $keys = ['sender_percentage', 'received_percentage'];
         $collection = Common::getConfFromKey($keys);
         $values = [];
         foreach ($keys as $key) {
-            $config    = $collection->where('name', $key)->first();
+            $config = $collection->where('name', $key)->first();
             $values[] = $config ? $config->value : 0;
         }
         unset($collection);
@@ -739,10 +741,10 @@ class GiftLogController extends Controller
     public function getCashbackPercentage(array $probability): mixed
     {
         $luckyRandom = rand(1, 10);
-        $index       = $luckyRandom <= 5 ? 0 : (($luckyRandom <= 8) ? 1 : 2);
+        $index = $luckyRandom <= 5 ? 0 : (($luckyRandom <= 8) ? 1 : 2);
 
-        $arr                 = $probability[$index];
-        $randomIndex         = rand(0, (count($arr) - 1));
+        $arr = $probability[$index];
+        $randomIndex = rand(0, (count($arr) - 1));
         return $arr[$randomIndex];
     }
 
@@ -794,7 +796,7 @@ class GiftLogController extends Controller
             'is_finished' => 0
         ])->whereNotIn('user_id', $remainingDiamonds)
             ->chunk(100, function ($userSalaries) {   // 🔥 process only 500 rows per chunk
-
+    
                 foreach ($userSalaries as $userSalary) {
 
                     try {
@@ -844,8 +846,8 @@ class GiftLogController extends Controller
         $monthDiamondReceive = MonthlyDiamondReceive::firstOrNew(
             [
                 'user_id' => $user->id,
-                'month'   => $dt->month,
-                'year'    => $dt->year,
+                'month' => $dt->month,
+                'year' => $dt->year,
             ]
         );
 
@@ -877,7 +879,7 @@ class GiftLogController extends Controller
     public function totalRoomGift()
     {
         $start = Carbon::createFromFormat('d/m/Y', '09/02/2026')->startOfDay();
-        $end   = Carbon::now()->endOfDay();
+        $end = Carbon::now()->endOfDay();
 
         GiftLog::query()
             ->selectRaw('room_id, SUM(giftPrice) AS total')
@@ -894,7 +896,7 @@ class GiftLogController extends Controller
                     if (!$totalRoomGift) {
                         $totalRoomGift = TotalRoomGift::create([
                             'room_id' => $log->room_id,
-                            'current_total'   => 0,
+                            'current_total' => 0,
                         ]);
                     }
                     $totalRoomGift->current_total += $log->total;
