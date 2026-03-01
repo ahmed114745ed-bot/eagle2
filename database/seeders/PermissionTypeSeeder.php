@@ -652,6 +652,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'Payment-methods-for-shipping-agencies', 'except' => ['browse', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['create', 'edit', 'delete'],
                     ],],
+                    ['key' => 'salary-payment-countries', 'except' => [ 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse','create', 'edit', 'delete'],
+                    ],],
                 ],
             ],
             [
