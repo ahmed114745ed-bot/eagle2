@@ -192,11 +192,10 @@ class ConfigController extends Controller
             }
         }
 
-        Cache::forget('pusher_config');
+        Cache::forget('live_library');
         Cache::forget('all_configs');
         Cache::flush();
-        
-        
+
         if (method_exists(Cache::store('octane'), 'flush')) {
             Cache::store('octane')->flush();
         }
