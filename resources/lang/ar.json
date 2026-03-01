@@ -1095,6 +1095,7 @@
     "BD deleted successfully.": "تم حذف BD بنجاح.",
     "increment": "زيادة",
     "decrement": "إنقاص",
+    "charge country":"دولة الشحن",
     "server name": "اسم السيرفر",
     "short name": "الاختصار",
     "domain": "الدومين",
