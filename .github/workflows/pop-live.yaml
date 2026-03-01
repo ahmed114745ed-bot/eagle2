@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: print out pop-live
-      uses: appleboy/ssh-action@v1.2.1
+      uses: appleboy/ssh-action@v1.2.2
       with:
         host: "34.18.63.120"
         username: ${{ secrets.USERNAME }}
@@ -31,7 +31,7 @@ jobs:
     needs: run_pop-live_hub
     steps:
     - name: print out pop-live
-      uses: appleboy/ssh-action@v1.2.1
+      uses: appleboy/ssh-action@v1.2.2
       with:
         host: "34.18.63.120"
         username: ${{ secrets.USERNAME }}
