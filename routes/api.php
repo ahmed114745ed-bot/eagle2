@@ -215,6 +215,22 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                         ]);
                     }
 
+                    // Debug: Log registered channels on the broadcaster
+                    try {
+                        $broadcaster = app(\Illuminate\Broadcasting\BroadcastManager::class)->driver();
+                        $registeredChannels = $broadcaster->getChannels()->keys()->toArray();
+                        \Illuminate\Support\Facades\Log::info('🔵 Broadcasting registered channels', [
+                            'broadcaster_class' => get_class($broadcaster),
+                            'channels_count'    => count($registeredChannels),
+                            'channels'          => $registeredChannels,
+                            'normalized_channel' => str_replace('presence-', '', $request->input('channel_name')),
+                        ]);
+                    } catch (\Throwable $chEx) {
+                        \Illuminate\Support\Facades\Log::error('🔴 Broadcasting channels debug error', [
+                            'error' => $chEx->getMessage(),
+                        ]);
+                    }
+
                     $authResponse = Broadcast::auth($request);
 
                     \Illuminate\Support\Facades\Log::info('🟢 Broadcasting auth SUCCESS', [
