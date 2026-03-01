@@ -68,7 +68,7 @@
         "utd/room-boom": "*",
         "utd/room-cup": "*",
         "utd/special-id": "*",
-        "utd/switch-account": "*",
+        "utd/switch-account": "dev-achievmentPackage",
         "utd/task-stream": "*",
         "utd/vip": "*"
     },

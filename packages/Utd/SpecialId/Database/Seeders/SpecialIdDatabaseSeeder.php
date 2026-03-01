@@ -16,6 +16,8 @@ class SpecialIdDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call([
+            SpecialIdMenuSeeder::class,
+        ]);
     }
 }

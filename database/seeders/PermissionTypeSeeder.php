@@ -453,24 +453,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Distinguished identifier',
-                'sort' => 14,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 14],
-                ],
-                'permissions' => [
-                    ['key' => 'featured-ids', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'details-of-unique-identifiers', 'except' => ['create', 'edit', 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['delete', 'browse'],
-                    ],],
-                    ['key' => 'id-color', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'families',
                 'sort' => 16,
                 'types' => [
@@ -1308,6 +1290,27 @@ class PermissionTypeSeeder extends Seeder
 //                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
 //                        PermissionType::ADMIN->value => $defaultMethods,
 //                    ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('specialId')) {
+            $categories[] =             [
+                'name' => 'Distinguished identifier',
+                'sort' => 14,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 14],
+                ],
+                'permissions' => [
+                    ['key' => 'featured-ids', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'details-of-unique-identifiers', 'except' => ['create', 'edit', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['delete', 'browse'],
+                    ],],
+                    ['key' => 'id-color', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
                 ],
             ];
         }
