@@ -27,15 +27,4 @@ class GameProviderSetting extends Model
     {
         return $value ? Crypt::decryptString($value) : null;
     }
-    public function setAppSecretAttribute($value)
-    {
-        if ($value) {
-            $this->attributes['app_secret'] = Crypt::encryptString($value);
-        }
-    }
-
-    public function getAppSecretAttribute($value)
-    {
-        return $value ? Crypt::decryptString($value) : null;
-    }
 }

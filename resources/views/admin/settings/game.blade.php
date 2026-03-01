@@ -7,18 +7,12 @@
             <div class="col-md-6 mb-3 ms-0 me-auto">
                 <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
                     @csrf
+                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <input type="hidden" name="provider_code" value="bytesun">
-                    <input type="provider_name" name="provider_code" value="Bytesun">
+                    <input type="hidden" name="provider_name" value="Bytesun">
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="m-0">{{ __('Bytesun') }}</h4>
-
-                                    {{-- <div class="d-flex align-items-center">
-                                        <input type="radio" id="luckyFlexRadio" class="custom-radio libraryRealTime"
-                                            name="games_library"
-                                            value="0" {{ $gamesLibrary == '0' ? 'checked' : '' }}>
-                                        <label for="luckyFlexRadio" class="switch"></label>
-                                    </div> --}}
                         </div>
 
                         <div class="row">
@@ -39,14 +33,12 @@
             <div class="col-md-6 mb-3 ms-0 me-auto">
                 <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
                     @csrf
+                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <input type="hidden" name="provider_code" value="quantum_nexus">
-                    <input type="provider_name" name="provider_code" value="Quantum Nexus">
+                    <input type="hidden" name="provider_name" value="Quantum Nexus">
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="m-0">{{ __('Quantum Nexus') }}</h4>
-                            {{-- <div class="ribbon-banner-card">
-                                <span>{{ __('soon') }}</span>
-                            </div> --}}
                         </div>
                         <div class="row">
                             <div class="col-md-6">

@@ -16,6 +16,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class AllGameController extends MainController
 {
@@ -218,5 +219,18 @@ class AllGameController extends MainController
                 'app_key' => $request->app_key,
             ]);
         }
+
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        } elseif ($request->has('redirect_to')) {
+            return Redirect::to($request->redirect_to);
+        }
+
+        return redirect($redirectUrl);
     }
 }
