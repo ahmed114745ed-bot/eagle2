@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Models\GameProviderSetting;
 use App\Models\User;
@@ -20,7 +21,7 @@ class VerifyLeaderCCMiddleWare
         try {
 
             $path = ltrim(str_replace('api/', '', $request->path()), '/');
-            $gameSetting = GameProviderSetting::where('provider_code', 'quantum_nexus')->first();
+            $gameSetting =  Common::getByCode('quantum_nexus');
             $key = $gameSetting ? $gameSetting->app_key : config('games.leader_CC_game_key');
             // LogHelper::info('LeaderCC Request Timing', [
             //     'url'      => $request->fullUrl(),

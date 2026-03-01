@@ -17,6 +17,7 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Cache;
 
 class AllGameController extends MainController
 {
@@ -203,22 +204,25 @@ class AllGameController extends MainController
     }
 
 
-
     public function gameSettings(Request $request)
     {
-        $gameSetting = GameProviderSetting::where('provider_code', $request->provider_code)->first();
-        if ($gameSetting) {
-            $gameSetting->update([
-                'app_key' => $request->app_key,
-
-            ]);
-        } else {
-            GameProviderSetting::create([
-                'provider_code' => $request->provider_code,
+        $gameSetting = GameProviderSetting::updateOrCreate(
+            ['provider_code' => $request->provider_code],
+            [
                 'provider_name' => $request->provider_name,
-                'app_key' => $request->app_key,
-            ]);
-        }
+                'app_key'       => $request->app_key,
+            ]
+        );
+
+        // 🔥 Clear old cache
+        Cache::forget('game_provider_' . $request->provider_code);
+
+        // 🔥 Store fresh data in cache
+        Cache::put(
+            'game_provider_' . $request->provider_code,
+            $gameSetting,
+            now()->addHours(2) // cache for 2 hours
+        );
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
 
