@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Milestones\Http\Controllers\web;
+namespace Utd\Milestones\Http\Controllers\web;
 
 use App\Models\User;
 use Encore\Admin\Form;
@@ -9,9 +9,9 @@ use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Illuminate\Support\Facades\DB;
-use Modules\Milestones\Entities\Milestone;
+use Utd\Milestones\Entities\Milestone;
 use Encore\Admin\Facades\Admin;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 
 class MilestoneController extends MainController
 {

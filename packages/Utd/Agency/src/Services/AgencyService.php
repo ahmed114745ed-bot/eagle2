@@ -32,7 +32,7 @@ use Exception;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Log;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 use Modules\Reals\Http\Services\RealsService;
 use Utd\Agency\Contracts\AgencyServiceInterface;
 use Utd\Agency\Repositories\AdditionalInfoRepository;

@@ -22,12 +22,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Modules\AreaManager\Entities\Region;
 use App\Admin\Controllers\MainController;
-use Modules\Milestones\Entities\Milestone;
+use Utd\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\AreaManager\Entities\RegionCountry;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 use App\Admin\Actions\FrozenWalletSuperAdminAction;
 
 class AreaManagerController extends MainController

@@ -10,8 +10,8 @@ use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Entities\Milestone;
+use Utd\Milestones\Helpers\MilestoneHelper;
 
 class DeleteAgencyAction extends RowAction
 {

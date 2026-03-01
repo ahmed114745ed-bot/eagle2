@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Milestones\Entities;
+namespace Utd\Milestones\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;

@@ -104,13 +104,13 @@ class MilestonesModuleWrapper implements ExternalModuleInterface
 {
     public function isAvailable(): bool
     {
-        return class_exists(\Modules\Milestones\Helpers\MilestoneHelper::class);
+        return class_exists(\Utd\Milestones\Helpers\MilestoneHelper::class);
     }
 
     public function get($identifier = null)
     {
         if ($this->isAvailable()) {
-            return \Modules\Milestones\Helpers\MilestoneHelper::class;
+            return \Utd\Milestones\Helpers\MilestoneHelper::class;
         }
 
         return null;

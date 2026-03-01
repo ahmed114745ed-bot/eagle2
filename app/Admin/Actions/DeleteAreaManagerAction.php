@@ -11,7 +11,7 @@ use Modules\AreaManager\Entities\Region;
 use Modules\AreaManager\Entities\RegionCountry;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 use Modules\AreaManager\Entities\SubAreaManager;
 
 class DeleteAreaManagerAction extends RowAction

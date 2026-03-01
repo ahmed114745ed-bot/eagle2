@@ -81,9 +81,9 @@ return [
 
     'modules' => [
         'milestones' => [
-            'enabled' => class_exists(Modules\Milestones\Helpers\MilestoneHelper::class),
-            'helper' => Modules\Milestones\Helpers\MilestoneHelper::class,
-            'entity' => Modules\Milestones\Entities\Milestone::class,
+            'enabled' => class_exists(Utd\Milestones\Helpers\MilestoneHelper::class),
+            'helper' => Utd\Milestones\Helpers\MilestoneHelper::class,
+            'entity' => Utd\Milestones\Entities\Milestone::class,
         ],
         'vip' => [
             'enabled' => class_exists(Modules\Vip\Entities\UserVip::class),

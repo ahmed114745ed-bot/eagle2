@@ -1,7 +1,7 @@
 <?php
 
-use Modules\Milestones\Http\Controllers\web\MilestoneController;
-use Modules\Milestones\Http\Controllers\web\MilestoneRewardController;
+use Utd\Milestones\Http\Controllers\web\MilestoneController;
+use Utd\Milestones\Http\Controllers\web\MilestoneRewardController;
 
 
 /*
@@ -53,5 +53,3 @@ Route::group(
 
     }
 );
-
-

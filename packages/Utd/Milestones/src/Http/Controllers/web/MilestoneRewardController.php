@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Milestones\Http\Controllers\web;
+namespace Utd\Milestones\Http\Controllers\web;
 
 use App\Selectables\Badges;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -9,8 +9,8 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Admin;
-use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Entities\MilestoneReward;
+use Utd\Milestones\Entities\Milestone;
+use Utd\Milestones\Entities\MilestoneReward;
 use Modules\Badge\Entities\Badge;
 use App\Selectables\Wares;
 use Utd\Achievements\Entities\Achievement;

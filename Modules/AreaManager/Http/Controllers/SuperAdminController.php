@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 

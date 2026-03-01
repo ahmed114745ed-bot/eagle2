@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Milestones\Database\Seeders;
+namespace Utd\Milestones\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;

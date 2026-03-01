@@ -97,8 +97,8 @@ return [
             ],
         ],
         'milestones' => [
-            'enabled' => class_exists(Modules\Milestones\Helpers\MilestoneHelper::class),
-            'helper' => Modules\Milestones\Helpers\MilestoneHelper::class,
+            'enabled' => class_exists(Utd\Milestones\Helpers\MilestoneHelper::class),
+            'helper' => Utd\Milestones\Helpers\MilestoneHelper::class,
         ],
         'switch_account' => [
             'enabled' => class_exists(Utd\SwitchAccount\Entities\UserAccount::class),

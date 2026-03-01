@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Milestones\Entities;
+namespace Utd\Milestones\Entities;
 
 use App\Helpers\Common;
 use App\Models\User;

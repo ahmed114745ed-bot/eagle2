@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Milestones\Helpers;
+namespace Utd\Milestones\Helpers;
 
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 use Utd\Achievements\Entities\UserAchievementLevel;
-use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Entities\MilestoneReward;
+use Utd\Milestones\Entities\Milestone;
+use Utd\Milestones\Entities\MilestoneReward;
 
 use App\Helpers\UserCommon;
 use App\Models\UserHistoryReward;

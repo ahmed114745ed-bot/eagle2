@@ -23,7 +23,7 @@
     "Vip": false,
     "Badge": true,
     "RoleRewards": false,
-    "Milestones": true,
+    "Milestones": false,
     "AreaManager": true,
     "Form": true,
     "SuperAdmin": true,

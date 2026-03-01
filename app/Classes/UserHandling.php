@@ -4,7 +4,7 @@ namespace App\Classes;
 
 use Carbon\Carbon;
 use App\Models\Ban;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 use Utd\Vip\Entities\Vip;
 use App\Models\Gift;
 use Utd\Vip\Entities\OVip;

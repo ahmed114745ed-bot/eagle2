@@ -220,7 +220,7 @@ return [
         ],
         'milestones' => [
             'enabled' => true,
-            'helper' => \Modules\Milestones\Helpers\MilestoneHelper::class,
+            'helper' => \Utd\Milestones\Helpers\MilestoneHelper::class,
         ],
         'agency_app' => [
             'enabled' => true,

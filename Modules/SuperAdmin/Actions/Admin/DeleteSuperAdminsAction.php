@@ -9,7 +9,7 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 
 class DeleteSuperAdminsAction extends RowAction
 {

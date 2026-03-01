@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\BdAgencyHostSallary;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
-use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Entities\Milestone;
+use Utd\Milestones\Helpers\MilestoneHelper;
 
 class BdController extends MainController
 {

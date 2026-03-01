@@ -9,7 +9,7 @@ use App\Models\UserSallary;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Milestones\Helpers\MilestoneHelper;
 
 class DeleteBdAction extends RowAction
 {
