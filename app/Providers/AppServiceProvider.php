@@ -168,10 +168,13 @@ class AppServiceProvider extends ServiceProvider
                             'broadcasting.connections.pusher.options.cluster' => $freshConfig['app_cluster'] ?? 'mt1',
                         ]);
 
-
+                        // ⭐ FIX: Refresh Pusher credentials on existing broadcaster
+                        // instead of forgetDrivers() which creates a NEW broadcaster without channels
                         $broadcastManager = app(BroadcastManager::class);
-                        $broadcastManager->forgetDrivers();
-                        $broadcastManager->driver('pusher');
+                        $driver = $broadcastManager->driver();
+                        if ($driver instanceof \App\Broadcasting\DatabaseDrivenPusherBroadcaster) {
+                            $driver->refreshPusherCredentials();
+                        }
 
                         $lastConfigHash = $currentHash;
 

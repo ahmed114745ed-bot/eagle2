@@ -55,11 +55,6 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
-    \Illuminate\Support\Facades\Log::info('🔵 Channel Auth: room.boom.rewards', [
-        'user_id' => $user->id,
-        'room_id' => $roomId,
-        'user_exists' => !is_null($user),
-    ]);
     return [
         'id'   => $user->id,
        // 'name' => $user->name,

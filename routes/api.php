@@ -184,73 +184,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
                 try {
-                    \Illuminate\Support\Facades\Log::info('🔵 Broadcasting auth START', [
-                        'user_id'      => auth()->id(),
-                        'channel_name' => $request->input('channel_name'),
-                        'socket_id'    => $request->input('socket_id'),
-                    ]);
-
-                    // Check Pusher config
-                    $pusherConfig = [
-                        'key'     => config('broadcasting.connections.pusher.key'),
-                        'secret'  => config('broadcasting.connections.pusher.secret') ? '***SET***' : '***EMPTY***',
-                        'app_id'  => config('broadcasting.connections.pusher.app_id'),
-                        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-                        'driver'  => config('broadcasting.default'),
-                    ];
-                    \Illuminate\Support\Facades\Log::info('🔵 Broadcasting Pusher Config', $pusherConfig);
-
-                    // Check DB config
-                    try {
-                        $dbConfig = getPusherConfig();
-                        \Illuminate\Support\Facades\Log::info('🔵 Broadcasting DB Pusher Config', [
-                            'app_id'      => $dbConfig['app_id'] ?? 'NULL',
-                            'app_key'     => $dbConfig['app_key'] ?? 'NULL',
-                            'app_secret'  => !empty($dbConfig['app_secret']) ? '***SET***' : '***EMPTY***',
-                            'app_cluster' => $dbConfig['app_cluster'] ?? 'NULL',
-                        ]);
-                    } catch (\Throwable $dbEx) {
-                        \Illuminate\Support\Facades\Log::error('🔴 Broadcasting getPusherConfig() FAILED', [
-                            'error' => $dbEx->getMessage(),
-                        ]);
-                    }
-
-                    // Debug: Log registered channels on the broadcaster
-                    try {
-                        $broadcaster = app(\Illuminate\Broadcasting\BroadcastManager::class)->driver();
-                        $registeredChannels = $broadcaster->getChannels()->keys()->toArray();
-                        \Illuminate\Support\Facades\Log::info('🔵 Broadcasting registered channels', [
-                            'broadcaster_class' => get_class($broadcaster),
-                            'channels_count'    => count($registeredChannels),
-                            'channels'          => $registeredChannels,
-                            'normalized_channel' => str_replace('presence-', '', $request->input('channel_name')),
-                        ]);
-                    } catch (\Throwable $chEx) {
-                        \Illuminate\Support\Facades\Log::error('🔴 Broadcasting channels debug error', [
-                            'error' => $chEx->getMessage(),
-                        ]);
-                    }
-
-                    $authResponse = Broadcast::auth($request);
-
-                    \Illuminate\Support\Facades\Log::info('🟢 Broadcasting auth SUCCESS', [
-                        'user_id'      => auth()->id(),
-                        'channel_name' => $request->input('channel_name'),
-                        'response'     => is_object($authResponse) ? $authResponse->getContent() : $authResponse,
-                    ]);
-
-                    return $authResponse;
+                    return Broadcast::auth($request);
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::error('🔴 Broadcasting auth FAILED', [
                         'user_id'      => auth()->id() ?? 'NOT_AUTH',
                         'channel_name' => $request->input('channel_name'),
-                        'socket_id'    => $request->input('socket_id'),
                         'error'        => $e->getMessage(),
                         'error_class'  => get_class($e),
-                        'file'         => $e->getFile() . ':' . $e->getLine(),
-                        'trace'        => collect($e->getTrace())->take(5)->map(function ($t) {
-                            return ($t['file'] ?? '?') . ':' . ($t['line'] ?? '?') . ' ' . ($t['class'] ?? '') . ($t['type'] ?? '') . ($t['function'] ?? '');
-                        })->toArray(),
                     ]);
                     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
                 }

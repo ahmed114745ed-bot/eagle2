@@ -26,13 +26,6 @@ class DatabaseDrivenPusherBroadcaster extends PusherBroadcaster
         // Read fresh from database
         $config = $this->getFreshConfigFromDatabase();
         
-        Log::info('🔵 DatabaseDrivenPusherBroadcaster.__construct', [
-            'app_id'      => $config['app_id'] ?? 'NULL',
-            'app_key'     => $config['app_key'] ?? 'NULL',
-            'app_secret'  => !empty($config['app_secret']) ? '***SET(' . strlen($config['app_secret']) . ' chars)***' : '***EMPTY***',
-            'app_cluster' => $config['app_cluster'] ?? 'NULL',
-        ]);
-        
         // Create Pusher instance with DB config
         $pusher = new Pusher(
             $config['app_key'],
@@ -51,6 +44,41 @@ class DatabaseDrivenPusherBroadcaster extends PusherBroadcaster
         parent::__construct($pusher);
     }
     
+    /**
+     * Refresh only the Pusher instance (credentials) without losing registered channels.
+     * Call this instead of forgetDrivers() + driver() which creates a new broadcaster without channels.
+     */
+    public function refreshPusherCredentials(): void
+    {
+        try {
+            $freshConfig = $this->getFreshConfigFromDatabase();
+            $newHash = $this->hashConfig($freshConfig);
+            
+            if (self::$currentConfigHash !== $newHash) {
+                $this->pusher = new Pusher(
+                    $freshConfig['app_key'],
+                    $freshConfig['app_secret'],
+                    $freshConfig['app_id'],
+                    [
+                        'cluster' => $freshConfig['app_cluster'] ?? 'mt1',
+                        'useTLS' => true,
+                    ]
+                );
+                
+                self::$currentConfigHash = $newHash;
+                
+                Log::info('🔵 DatabaseDrivenPusherBroadcaster.credentials_refreshed', [
+                    'app_id' => $freshConfig['app_id'],
+                    'app_key' => $freshConfig['app_key'],
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('DatabaseDrivenPusherBroadcaster.refresh_credentials_error', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
     /**
      * Broadcast the given event - CHECKS FOR CONFIG CHANGES FIRST
      * This is the key method that runs on EVERY broadcast
