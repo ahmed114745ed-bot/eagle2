@@ -13,6 +13,7 @@ use App\Models\Ban;
 use App\Models\ChargeWinner;
 use App\Models\Config;
 use App\Models\Follow;
+use App\Models\GameProviderSetting;
 use App\Models\GiftLog;
 use App\Models\OfficialMessage;
 use App\Models\Owner_pid_target;
@@ -1810,6 +1811,17 @@ class Common
         return $usd;
     }
 
+
+    public static function getByCode($code)
+    {
+        return  Cache::remember(
+            'game_provider_' . $code,
+            now()->addHours(2),
+            function () use ($code) {
+                return GameProviderSetting::where('provider_code', $code)->first();
+            }
+        );
+    }
     public  static function getMaxCoins()
     {
         // $shipping_coins = Cache::rememberForever('shipping_coins', function () {

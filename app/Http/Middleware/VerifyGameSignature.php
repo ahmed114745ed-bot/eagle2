@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\Common;
 use App\Helpers\SignatureHelper;
 use App\Models\GameProviderSetting;
 use Carbon\Carbon;
@@ -21,7 +22,7 @@ class VerifyGameSignature
         $signature = $request->get('signature');
         $signatureNonce = $request->get('signature_nonce');
         $timestamp = $request->get('timestamp');
-        $gameSetting = GameProviderSetting::where('provider_code', 'bytesun')->first();
+        $gameSetting = Common::getByCode('bytesun');
         $appKey = $gameSetting ? $gameSetting->app_key : config('services.baishun.app_key');
         $currentTimestamp = Carbon::now()->timestamp;
 
