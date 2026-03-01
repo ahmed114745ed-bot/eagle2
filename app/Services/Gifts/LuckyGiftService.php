@@ -299,7 +299,8 @@ class LuckyGiftService
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId = $user->id;
-        $ownerId = $data['owner_id'];
+        $ownerId = @$data['owner_id'];
+        $roomId = @$data['room_id'];
         $giftId = $data['id'];
         $number = $data['num'];
         $count = $data['count'] ?? 1;
@@ -330,10 +331,19 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
-        $room = Room::withoutAppends()
-            ->where('uid', $ownerId)
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
-            ->first();
+          if (isset($ownerId)) {
+            $room = Room::withoutAppends()
+                ->where('uid', $ownerId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->first();
+        } else {
+            $room = Room::withoutAppends()
+                ->where('id', $roomId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->first();
+            $ownerId = $room?->uid;
+        }
+        
         if (!$room)
             throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
