@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\SubAreaManager;
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
+use App\Admin\Actions\DeleteSubSuperAdmin;
 use Modules\AreaManager\Http\Controllers\EncorUsersController;
 
 

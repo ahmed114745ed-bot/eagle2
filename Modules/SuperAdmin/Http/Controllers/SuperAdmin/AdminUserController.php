@@ -9,10 +9,10 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
-use Modules\RoleRewards\Actions\DeleteUser;
+use App\Admin\Actions\DeleteUserAction as DeleteUser;
 
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
-use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Admin\Actions\DeleteSubSuperAdmin;
+use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
 use App\Admin\Controllers\MainController;
 
 

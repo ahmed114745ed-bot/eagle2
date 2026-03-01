@@ -10,9 +10,9 @@ use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
-use Modules\RoleRewards\Actions\DeleteUser;
-use Modules\RoleRewards\Helpers\UserRewardHelper;
-use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Admin\Actions\DeleteUserAction as DeleteUser;
+use Utd\RoleRewards\Helpers\UserRewardHelper;
+use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
 use function Doctrine\Common\Cache\Psr6\get;
 
 class AdminUserController extends EncorUsersController

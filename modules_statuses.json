@@ -22,7 +22,7 @@
     "TribeReward": true,
     "Vip": false,
     "Badge": true,
-    "RoleRewards": true,
+    "RoleRewards": false,
     "Milestones": true,
     "AreaManager": true,
     "Form": true,

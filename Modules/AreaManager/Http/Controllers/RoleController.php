@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
-use Modules\RoleRewards\Actions\DeleteRole;
+use App\Admin\Actions\DeleteRole;
 use Encore\Admin\Auth\Permission as chPermission;
 
 class RoleController extends MainController

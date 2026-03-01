@@ -12,9 +12,9 @@ use App\Enums\PermissionType;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-use Modules\RoleRewards\Actions\DeleteRole;
+use App\Admin\Actions\DeleteRole;
 use Encore\Admin\Controllers\AdminController;
-use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
+use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission as chPermission;
 

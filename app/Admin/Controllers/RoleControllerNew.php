@@ -12,8 +12,8 @@ use Illuminate\Support\Str;
 use App\Enums\PermissionType;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Modules\RoleRewards\Actions\DeleteRole;
-use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Admin\Actions\DeleteRole;
+use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
 
 class RoleControllerNew extends MainController
 {

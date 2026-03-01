@@ -257,6 +257,10 @@
         },
         {
             "type": "path",
+            "url": "packages/Utd/RoleRewards"
+        },
+        {
+            "type": "path",
             "url": "packages/Utd/SpecialId"
         }
     ]

@@ -15,7 +15,7 @@ use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Entities\MilestoneReward;
 
 use App\Helpers\UserCommon;
-use Modules\RoleRewards\Entities\UserHistoryReward;
+use App\Models\UserHistoryReward;
 use Illuminate\Support\Facades\Log;
 use Utd\Vip\Entities\OVip;
 use App\Support\PackageHelper;
