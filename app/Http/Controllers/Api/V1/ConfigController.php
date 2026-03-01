@@ -154,7 +154,18 @@ class ConfigController extends Controller
         Artisan::call('config:cache');
         
         admin_success('Saved Successfully');
-        return Redirect::back();
+        $redirectUrl = url('admin/setting-group-char');
+        
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        } elseif ($request->has('redirect_to')) {
+            return Redirect::to($request->redirect_to);
+        }
+
+        return redirect($redirectUrl);
     }
 
     public function updateConfigAgoraZego(Request $request)
