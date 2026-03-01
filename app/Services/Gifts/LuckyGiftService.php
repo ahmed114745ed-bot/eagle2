@@ -359,8 +359,7 @@ class LuckyGiftService
         $receiverName = $receivedUsers->first()->name;
         $receiversCount = $receivedUsers->count();
         $isToRoom = $receiversCount > 1;
-
-        $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
         $total_user_win = 0;
@@ -455,7 +454,7 @@ class LuckyGiftService
                 $isPopular = $multiplier >= 5;
 
                 if ($isPopular && $iterationWin > 0) {
-                    $this->sendPopularToZego(
+                    $this->sendPopularToZegoV2(
                         $userId,
                         $user,
                         $gift,
