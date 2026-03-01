@@ -703,9 +703,11 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::SUPER_ADMIN->value => $defaultMethods,
                         PermissionType::AREA_MANAGER->value => $defaultMethods,
                     ],],
-                    ['key' => 'roles-reward', 'except' => ['show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
+                    ...(PackageHelper::isInstalled('dailyPrize') ? [
+                        ['key' => 'roles-reward', 'except' => ['show'], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],],
+                    ] : []),
                 ],
             ],
             [
