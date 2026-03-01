@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpecialId Package - Installation Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px 20px; background: #fff; }
+        .cover-page { text-align: center; padding: 100px 20px; page-break-after: always; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .cover-page h1 { font-size: 48px; color: #7c3aed; margin-bottom: 20px; }
+        .cover-page .subtitle { font-size: 24px; color: #64748b; margin-bottom: 40px; }
+        .cover-page .version { font-size: 18px; color: #94a3b8; margin-top: 60px; }
+        .cover-page .date { font-size: 14px; color: #94a3b8; margin-top: 10px; }
+        h1 { font-size: 28px; color: #5b21b6; margin: 40px 0 20px 0; padding-bottom: 10px; border-bottom: 3px solid #7c3aed; }
+        h2 { font-size: 22px; color: #6d28d9; margin: 30px 0 15px 0; }
+        h3 { font-size: 18px; color: #8b5cf6; margin: 20px 0 10px 0; }
+        p { margin: 10px 0; }
+        .toc { background: #f8fafc; padding: 30px; border-radius: 8px; margin: 30px 0; page-break-after: always; }
+        .toc h2 { margin-top: 0; text-align: center; }
+        .toc ul { list-style: none; padding: 0; }
+        .toc li { padding: 8px 0; border-bottom: 1px dotted #cbd5e1; }
+        .toc li:last-child { border-bottom: none; }
+        .toc a { color: #5b21b6; text-decoration: none; }
+        code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', 'Monaco', monospace; font-size: 14px; color: #be185d; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 15px 0; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.5; }
+        pre code { background: none; color: #e2e8f0; padding: 0; }
+        .note { background: #ede9fe; border-left: 4px solid #7c3aed; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .success { background: #d1fae5; border-left: 4px solid #10b981; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .step { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .step-number { display: inline-block; background: #7c3aed; color: white; width: 30px; height: 30px; border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold; margin-right: 10px; }
+        .step-title { font-size: 18px; font-weight: bold; color: #5b21b6; display: inline; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        th { background: #f1f5f9; font-weight: bold; color: #5b21b6; }
+        tr:nth-child(even) { background: #f8fafc; }
+        ul, ol { margin: 10px 0; padding-left: 25px; }
+        li { margin: 8px 0; }
+        .checkmark { color: #10b981; font-weight: bold; }
+        .page-break { page-break-after: always; }
+        @media print { body { padding: 20px; } pre { white-space: pre-wrap; word-wrap: break-word; } .cover-page { min-height: auto; padding: 50px 20px; } }
+    </style>
+</head>
+<body>
+    <div class="cover-page">
+        <h1>🏷️ SpecialId Package</h1>
+        <div class="subtitle">Installation &amp; Setup Guide</div>
+        <p>A comprehensive guide to install and configure the SpecialId package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: March 2026</div>
+    </div>
+
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#requirements">1. Requirements</a></li>
+            <li><a href="#installation">2. Installation Steps</a></li>
+            <li><a href="#configuration">3. Configuration</a></li>
+            <li><a href="#database">4. Database Tables</a></li>
+            <li><a href="#routes">5. Routes &amp; Middleware</a></li>
+            <li><a href="#verification">6. Verification</a></li>
+            <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+            <li><a href="#api-reference">8. API Reference</a></li>
+        </ul>
+    </div>
+
+    <h1 id="requirements">1. Requirements</h1>
+    <h2>1.1 Backend Requirements</h2>
+    <table>
+        <tr><th>Requirement</th><th>Minimum Version</th><th>Status</th></tr>
+        <tr><td>PHP</td><td>8.1 or higher</td><td><span class="checkmark">✓</span></td></tr>
+        <tr><td>Laravel Framework</td><td>10.x or 11.x</td><td><span class="checkmark">✓</span></td></tr>
+        <tr><td>Laravel-Admin Package</td><td>Latest</td><td><span class="checkmark">✓</span></td></tr>
+        <tr><td>MySQL</td><td>5.7 or higher</td><td><span class="checkmark">✓</span></td></tr>
+    </table>
+
+    <h2>1.2 Database Tables</h2>
+    <p>The package will create/modify the following tables:</p>
+    <ul>
+        <li><code>users</code> - Adds special_id column</li>
+        <li><code>wares</code> - Adds value column</li>
+        <li><code>special_id_histories</code> - Special ID purchase/usage history</li>
+        <li><code>user_wares</code> - User-ware relationships</li>
+        <li><code>special_id_frams</code> - Special ID frames</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h1 id="installation">2. Installation Steps</h1>
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>SpecialId</code> folder to your project:</p>
+        <pre><code>packages/Utd/SpecialId</code></pre>
+    </div>
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/SpecialId"
+        }
+    ]
+}</code></pre>
+    </div>
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <pre><code>composer require utd/special-id</code></pre>
+    </div>
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Setup Commands</span>
+        <p>Run migrations, seeders, and clear cache:</p>
+        <pre><code>php artisan migrate
+php artisan db:seed --class=Utd\SpecialId\Database\Seeders\SpecialIdDatabaseSeeder
+php artisan db:seed --class=PermissionTypeSeeder
+php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h1 id="configuration">3. Configuration</h1>
+    <h2>3.1 Publish Configuration</h2>
+    <pre><code>php artisan vendor:publish --tag=config</code></pre>
+    <p>The config file will be published to <code>config/specialid.php</code>.</p>
+
+    <div class="page-break"></div>
+
+    <h1 id="database">4. Database Tables Reference</h1>
+    <h2>4.1 Migrations</h2>
+    <table>
+        <tr><th>Migration</th><th>Description</th></tr>
+        <tr><td>add_special_id_to_users</td><td>Adds special_id column to users table</td></tr>
+        <tr><td>add_value_to_ware</td><td>Adds value column to wares table</td></tr>
+        <tr><td>create_special_id_history_table</td><td>Creates special_id_histories table</td></tr>
+        <tr><td>create_user_ware_table</td><td>Creates user_wares table</td></tr>
+        <tr><td>add_disable_ware_table</td><td>Adds disable column to wares table</td></tr>
+        <tr><td>create_special_id_frams_table</td><td>Creates special_id_frams table</td></tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h1 id="routes">5. Routes &amp; Middleware</h1>
+    <h2>5.1 API Routes (Mobile App)</h2>
+    <table>
+        <tr><th>Method</th><th>URI</th><th>Description</th></tr>
+        <tr><td>POST</td><td>/api/buy-special-id</td><td>Buy a special ID</td></tr>
+        <tr><td>POST</td><td>/api/use-special-id</td><td>Use a pack item</td></tr>
+        <tr><td>POST</td><td>/api/upload-special-id</td><td>Upload special ID</td></tr>
+        <tr><td>GET</td><td>/api/special-frame</td><td>Get special ID frames</td></tr>
+        <tr><td>GET</td><td>/api/special-users</td><td>Get special users</td></tr>
+    </table>
+
+    <h2>5.2 UTD Routes</h2>
+    <h3>Special ID Frames</h3>
+    <table>
+        <tr><th>Method</th><th>URI</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/utd/special-id-fram</td><td>List frames</td></tr>
+        <tr><td>GET</td><td>/api/utd/special-id-fram/{id}</td><td>Show frame</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-id-fram/create</td><td>Create frame</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-id-fram/update/{id}</td><td>Update frame</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-id-fram/delete/{id}</td><td>Delete frame</td></tr>
+    </table>
+
+    <h3>Special ID Requests</h3>
+    <table>
+        <tr><th>Method</th><th>URI</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/utd/special-id-requests</td><td>List requests</td></tr>
+        <tr><td>GET</td><td>/api/utd/special-id-requests/{id}</td><td>Show request</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-id-requests/update/{id}</td><td>Update request</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-id-requests/delete/{id}</td><td>Delete request</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-id-requests/delete-all</td><td>Delete all requests</td></tr>
+    </table>
+
+    <h3>Special Wares</h3>
+    <table>
+        <tr><th>Method</th><th>URI</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/utd/special-wares</td><td>List wares</td></tr>
+        <tr><td>GET</td><td>/api/utd/special-wares/{id}</td><td>Show ware</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-wares/create</td><td>Create ware</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-wares/update/{id}</td><td>Update ware</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-wares/update-enable/{id}</td><td>Toggle enable</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-wares/delete/{id}</td><td>Delete ware</td></tr>
+    </table>
+
+    <h3>Special Histories</h3>
+    <table>
+        <tr><th>Method</th><th>URI</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/utd/special-histories</td><td>List histories</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-histories/delete-all</td><td>Delete all</td></tr>
+        <tr><td>POST</td><td>/api/utd/special-histories/delete/{id}</td><td>Delete history</td></tr>
+    </table>
+
+    <h2>5.3 Dashboard Routes</h2>
+    <table>
+        <tr><th>Method</th><th>URI</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/dashboard/admin-special-id</td><td>List special IDs</td></tr>
+        <tr><td>GET</td><td>/api/dashboard/Sort-special-id</td><td>Sort special IDs</td></tr>
+        <tr><td>POST</td><td>/api/dashboard/Change-Sort-special-id</td><td>Change sort order</td></tr>
+        <tr><td>POST</td><td>/api/dashboard/Send-special-id</td><td>Send special ID</td></tr>
+        <tr><td>GET</td><td>/api/dashboard/enable-special-id/{ware_id}/{status}</td><td>Enable/disable</td></tr>
+        <tr><td>GET</td><td>/api/dashboard/special-id-history</td><td>View history</td></tr>
+    </table>
+
+    <h2>5.4 Admin Panel Routes</h2>
+    <table>
+        <tr><th>Method</th><th>URI</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/admin/special-wares</td><td>Featured IDs management</td></tr>
+        <tr><td>GET</td><td>/admin/special-histories</td><td>History management</td></tr>
+        <tr><td>GET</td><td>/admin/special-id-fram</td><td>Frames management</td></tr>
+    </table>
+
+    <h2>5.5 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr special</code></pre>
+
+    <div class="page-break"></div>
+
+    <h1 id="verification">6. Verification</h1>
+    <h2>6.1 Installation Checklist</h2>
+    <table>
+        <tr><th>Step</th><th>Command/Action</th><th>Expected Result</th></tr>
+        <tr><td>1. Package Installed</td><td><code>composer show utd/special-id</code></td><td>Package info displayed</td></tr>
+        <tr><td>2. Migrations Run</td><td><code>php artisan migrate:status</code></td><td>All special-id migrations "Ran"</td></tr>
+        <tr><td>3. Routes Registered</td><td><code>php artisan route:list</code></td><td>Special ID routes visible</td></tr>
+        <tr><td>4. Admin Pages Working</td><td>Visit /admin/special-wares</td><td>Page loads without errors</td></tr>
+        <tr><td>5. API Working</td><td>Test /api/special-users</td><td>Returns JSON response</td></tr>
+    </table>
+
+    <h2>6.2 Test Admin Panel</h2>
+    <pre><code>https://your-domain.com/admin/special-wares</code></pre>
+
+    <div class="success">
+        <strong>✅ Success!</strong>
+        <p>If you can access the admin panel and the API returns data, your installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h1 id="troubleshooting">7. Troubleshooting</h1>
+    <h3>Issue: Page Not Found (404)</h3>
+    <div class="step"><strong>Solution:</strong><pre><code>php artisan optimize:clear</code></pre></div>
+
+    <h3>Issue: Migration Errors</h3>
+    <div class="step"><strong>Solution:</strong><pre><code>php artisan migrate:status
+php artisan migrate</code></pre></div>
+
+    <h3>Issue: Class Not Found Errors</h3>
+    <div class="step"><strong>Solution:</strong><pre><code>composer dump-autoload
+php artisan cache:clear</code></pre></div>
+
+    <h3>Issue: Admin Menu Not Showing</h3>
+    <div class="step"><strong>Solution:</strong><pre><code>php artisan db:seed --class=Utd\SpecialId\Database\Seeders\SpecialIdDatabaseSeeder</code></pre></div>
+
+    <h2>7.1 Rollback Migrations</h2>
+    <pre><code>php artisan migrate:rollback --path=packages/Utd/SpecialId/Database/Migrations</code></pre>
+
+    <div class="page-break"></div>
+
+    <h1 id="api-reference">8. API Reference</h1>
+    <h2>8.1 Buy Special ID</h2>
+    <pre><code>POST /api/buy-special-id
+Headers: Authorization: Bearer YOUR_TOKEN
+
+Response:
+{
+    "success": true,
+    "message": "Special ID purchased successfully"
+}</code></pre>
+
+    <h2>8.2 Get Special Users</h2>
+    <pre><code>GET /api/special-users
+Headers: Authorization: Bearer YOUR_TOKEN
+
+Response:
+{
+    "data": [...],
+    "current_page": 1,
+    "total": 50
+}</code></pre>
+
+    <h2>8.3 Get Special Frames</h2>
+    <pre><code>GET /api/special-frame
+Headers: Authorization: Bearer YOUR_TOKEN
+
+Response:
+{
+    "data": [...]
+}</code></pre>
+
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">🎉 Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your SpecialId package is now ready to use.</p>
+        <div style="margin-top: 40px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+            <h3 style="color: #7c3aed;">Quick Links:</h3>
+            <ul>
+                <li>Admin Panel: <code>/admin/special-wares</code></li>
+                <li>API Base: <code>/api/special-users</code></li>
+                <li>Histories: <code>/admin/special-histories</code></li>
+            </ul>
+        </div>
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">Document Version: 1.0.0<br>Last Updated: March 2026</p>
+    </div>
+</body>
+</html>

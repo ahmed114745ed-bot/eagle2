@@ -67,7 +67,7 @@
         "utd/room": "*",
         "utd/room-boom": "*",
         "utd/room-cup": "*",
-        "utd/special-id": "*",
+        "utd/special-id": "dev-achievmentPackage",
         "utd/switch-account": "dev-achievmentPackage",
         "utd/task-stream": "*",
         "utd/vip": "*"
@@ -253,11 +253,11 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/SpecialId"
+            "url": "packages/Utd/SwitchAccount"
         },
         {
             "type": "path",
-            "url": "packages/Utd/SwitchAccount"
+            "url": "packages/Utd/SpecialId"
         }
     ]
 }
