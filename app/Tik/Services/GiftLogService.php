@@ -66,9 +66,9 @@ class GiftLogService
             $sourceType = GiftSourceType::fromType($type)->value;
 
 
-            //get the gift data from id in the parameter
-            $gift = $this->giftRepository->findById($giftId);
-            // Validation if gift return null
+            $gift = \Illuminate\Support\Facades\Cache::remember("gift_{$giftId}", 3600, function () use ($giftId) {
+                return $this->giftRepository->findById($giftId);
+            });
             if (!$gift)
                 return throw new \Exception('Gift does not exist or has been removed');
 
@@ -152,9 +152,11 @@ class GiftLogService
             $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
             if ($cpEnableAllGifts || ($gift->category && $gift->category->type === 'cp')) {
-                $hasCp = Cp::where(function ($query) use ($user) {
-                    $query->where('user_one_id', $user->id)->orWhere('user_two_id', $user->id);
-                })->whereIn('status', [1, 4])->exists();
+                $hasCp = \Illuminate\Support\Facades\Cache::remember("user_has_cp_{$user->id}", 60, function () use ($user) {
+                    return Cp::where(function ($query) use ($user) {
+                        $query->where('user_one_id', $user->id)->orWhere('user_two_id', $user->id);
+                    })->whereIn('status', [1, 4])->exists();
+                });
 
                 if ($hasCp) {
                     try {
@@ -203,13 +205,14 @@ class GiftLogService
 
             $updateUserWhenSendGift->updateUsers($price, $receiversIds);
 
-           \App\Jobs\UpdateFamilyLevelJob::dispatch($receivedUsers, $gift->price * $number)
+            \App\Jobs\UpdateFamilyLevelJob::dispatch($receivedUsers, $gift->price * $number)
                 ->afterCommit()
                 ->onQueue(getLeastBusyQueue('heavyProcessing') ?? 'default');
 
             if ($room->mode != '1' && $room->mode != '2') {
-                $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
-
+                \App\Jobs\UpdateRoomCoinsJob::dispatch($userId, $room->id, $totalPrice)
+                    ->afterCommit()
+                    ->onQueue(getLeastBusyQueue('heavyProcessing') ?? 'default');
             }
 
 
@@ -253,7 +256,9 @@ class GiftLogService
 
 
             //get the gift data from id in the parameter
-            $gift = $this->giftRepository->findById($giftId);
+            $gift = \Illuminate\Support\Facades\Cache::remember("gift_{$giftId}", 3600, function () use ($giftId) {
+                return $this->giftRepository->findById($giftId);
+            });
             // Validation if gift return null
             if (!$gift)
                 return throw new \Exception('Gift does not exist or has been removed');
@@ -366,7 +371,9 @@ class GiftLogService
             $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
 
             if ($room->mode != '1' && $room->mode != '2') {
-                $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
+                \App\Jobs\UpdateRoomCoinsJob::dispatch($userId, $room->id, $totalPrice)
+                    ->afterCommit()
+                    ->onQueue(getLeastBusyQueue('heavyProcessing') ?? 'default');
                 $topUser =
                     $this->roomTopUsersRepository->getRoomTopUser($room->id, [
                         'user' => function ($q) {
