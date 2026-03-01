@@ -245,16 +245,7 @@ class ConfigController extends Controller
     public function updateConfigAgoraZego(Request $request)
     {
         $inputValue = $request->input('live_library');
-        Log::info('Live Library - Request received', [
-            'input_value' => $inputValue,
-            'all_request' => $request->all(),
-        ]);
 
-        // Use DB query directly to bypass any model caching/observer issues
-        $beforeValue = \DB::table('configs')->where('name', 'live_library')->value('value');
-        Log::info('Live Library - Before update (raw DB)', [
-            'before_value' => $beforeValue,
-        ]);
 
         // Update directly via DB to avoid observer re-caching with stale data
         $exists = \DB::table('configs')->where('name', 'live_library')->exists();
