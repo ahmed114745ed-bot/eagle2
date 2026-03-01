@@ -359,7 +359,7 @@ class LuckyGiftService
         $receiverName = $receivedUsers->first()->name;
         $receiversCount = $receivedUsers->count();
         $isToRoom = $receiversCount > 1;
-        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
         $total_user_win = 0;
@@ -1334,6 +1334,11 @@ class LuckyGiftService
     private function getResponseData2($gift, $room, $user, $receiversIds, $receiverName)
     {
         $microphones = $room->microphones ?? collect();
+
+        \Log::info('getResponseData2 Debug', [
+            'receiversIds' => $receiversIds,
+            'microphones' => $microphones->toArray()
+        ]);
 
         $positions = $microphones
             ->filter(fn($mic) => in_array($mic->user_id, $receiversIds))
