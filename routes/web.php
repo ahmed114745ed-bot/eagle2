@@ -638,6 +638,28 @@ Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class
 Route::get('/emoji-image-type', [EmojiController::class, 'gitImage']);
 
 
+Route::get('/reset-fairluck', function () {
+    \Illuminate\Support\Facades\DB::table('fair_luck_wallets')->update(['balance' => 0, 'last_updated' => now()]);
+    \Illuminate\Support\Facades\DB::table('fair_luck_wallet_histories')->truncate();
+    \Illuminate\Support\Facades\DB::table('fair_luck_statistics')->truncate();
+
+    $keys = \Illuminate\Support\Facades\Redis::keys('fairluck:wallet:*');
+    if (!empty($keys)) {
+        foreach ($keys as $key) {
+        }
+        \Illuminate\Support\Facades\Redis::connection()->client()->del($keys);
+    }
+
+    $otherKeys = \Illuminate\Support\Facades\Redis::keys('fairluck:*');
+    if (!empty($otherKeys)) {
+        \Illuminate\Support\Facades\Redis::connection()->client()->del($otherKeys);
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'FairLuck wallets (DB & Redis), histories, and statistics have been reset to 0.'
+    ]);
+});
 
 Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
