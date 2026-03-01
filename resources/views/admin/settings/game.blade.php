@@ -12,7 +12,7 @@
                     <input type="hidden" name="provider_name" value="Bytesun">
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="m-0">{{ __('Bytesun') }}</h4>
+                            <h4 class="m-0"style="color: white;">{{ __('Bytesun') }}</h4>
                         </div>
 
                         <div class="row">
@@ -38,7 +38,7 @@
                     <input type="hidden" name="provider_name" value="Quantum Nexus">
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="m-0">{{ __('Quantum Nexus') }}</h4>
+                            <h4 class="m-0"style="color: white;">{{ __('Quantum Nexus') }}</h4>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
