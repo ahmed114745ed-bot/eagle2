@@ -6,7 +6,7 @@ use App\Models\Role;
 use Utd\RoleRewards\Actions\DeleteRoleReward;
 use Modules\Badge\Entities\Badge;
 use Utd\RoleRewards\Entities\RoleReward;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use Utd\RoleRewards\Services\RoleRewardService;
 use App\Selectables\Wares;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -287,7 +287,7 @@ class RoleRewardsController extends MainController
 
         $slug = $role->slug;
 
-        UserRoleRewardHelper::syncRewardsForRole(
+        app(RoleRewardService::class)->syncRewardsForRole(
             $roleReward->role_id,
             $slug
         );

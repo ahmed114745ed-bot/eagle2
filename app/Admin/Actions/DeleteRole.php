@@ -15,10 +15,10 @@ class DeleteRole extends RowAction
 
     public function handle(Model $model)
     {
-            \Utd\RoleRewards\Helpers\UserRoleRewardHelper::revokeRewardsFromAllUsersForRole(
-                $model->id,
-                $model->slug
-            );
+        app(\App\Contracts\RoleRewardContract::class)->revokeRewardsFromAllUsersForRole(
+            $model->id,
+            $model->slug
+        );
 
         $model->delete();
 

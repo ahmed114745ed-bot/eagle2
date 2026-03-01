@@ -39,7 +39,9 @@ use App\Services\Null\NullUserAchievementService;
 use App\Services\Null\NullRealsService;
 use App\Services\Null\NullGiftLogRepository;
 use App\Services\Null\NullGiftRepository;
+use App\Contracts\RoleRewardContract;
 use App\Services\Null\NullPkRepository;
+use App\Services\Null\NullRoleRewardService;
 use Illuminate\Support\ServiceProvider;
 
 class FeatureServiceProvider extends ServiceProvider
@@ -185,6 +187,14 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 CpRepositoryContract::class,
                 NullCpRepository::class
+            );
+        }
+
+        // Role Reward Feature
+        if (!$this->app->bound(RoleRewardContract::class)) {
+            $this->app->singleton(
+                RoleRewardContract::class,
+                NullRoleRewardService::class
             );
         }
 

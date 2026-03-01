@@ -25,7 +25,10 @@ class RoleRewardsServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            \App\Contracts\RoleRewardContract::class,
+            \Utd\RoleRewards\Services\RoleRewardService::class
+        );
     }
 
     protected function registerRoutes(): void

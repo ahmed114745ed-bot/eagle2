@@ -11,8 +11,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\DeleteUserAction as DeleteUser;
-use Utd\RoleRewards\Helpers\UserRewardHelper;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Contracts\RoleRewardContract;
 use function Doctrine\Common\Cache\Psr6\get;
 
 class AdminUserController extends EncorUsersController
@@ -116,7 +115,7 @@ class AdminUserController extends EncorUsersController
                     $oldUser = User::find($oldAppId);
                     if ($oldUser) {
                         foreach ($oldRoles as $role) {
-                            UserRoleRewardHelper::revokeRoleRewards($oldUser, $role['id'], $role['slug']);
+                            app(RoleRewardContract::class)->revokeRoleRewards($oldUser, $role['id'], $role['slug']);
                         }
                     }
                 }
@@ -127,11 +126,11 @@ class AdminUserController extends EncorUsersController
                 $user = User::find($newAppId);
                 if ($user) {
                     foreach ($rolesRemoved as $role) {
-                        UserRoleRewardHelper::revokeRoleRewards($user, $role['id'], $role['slug']);
+                        app(RoleRewardContract::class)->revokeRoleRewards($user, $role['id'], $role['slug']);
                     }
 
                     foreach ($rolesAdded as $role) {
-                        UserRoleRewardHelper::giveRoleRewards($user, $role['id'], $role['slug']);
+                        app(RoleRewardContract::class)->giveRoleRewards($user, $role['id'], $role['slug']);
                     }
                 }
             }
@@ -145,7 +144,7 @@ class AdminUserController extends EncorUsersController
 
             if ($user) {
                 foreach ($newRoles as $role) {
-                    UserRoleRewardHelper::giveRoleRewards($user, $role['id'], $role['slug']);
+                    app(RoleRewardContract::class)->giveRoleRewards($user, $role['id'], $role['slug']);
                 }
             }
         });
@@ -156,7 +155,7 @@ class AdminUserController extends EncorUsersController
 
             if ($user) {
                 foreach ($model->roles as $role) {
-                    UserRoleRewardHelper::revokeRoleRewards($user, (int)$role->id, $role->slug);
+                    app(RoleRewardContract::class)->revokeRoleRewards($user, (int)$role->id, $role->slug);
                 }
             }
         });

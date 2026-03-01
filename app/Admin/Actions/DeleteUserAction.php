@@ -6,7 +6,7 @@ use App\Models\Agency;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Encore\Admin\Facades\Admin;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Contracts\RoleRewardContract;
 
 class DeleteUserAction extends RowAction
 {
@@ -26,7 +26,7 @@ class DeleteUserAction extends RowAction
         $roles = $model->roles()->get(['id', 'slug']);
 
         foreach ($roles as $role) {
-            UserRoleRewardHelper::revokeRewardsFromAllUsersForRole($role->id, $role->slug);
+            app(RoleRewardContract::class)->revokeRewardsFromAllUsersForRole($role->id, $role->slug);
         }
 
         $model->delete();

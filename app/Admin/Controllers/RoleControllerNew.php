@@ -13,7 +13,7 @@ use App\Enums\PermissionType;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteRole;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Contracts\RoleRewardContract;
 
 class RoleControllerNew extends MainController
 {
@@ -342,7 +342,7 @@ class RoleControllerNew extends MainController
     {
         $role = Role::findOrFail($id);
 
-        UserRoleRewardHelper::revokeRewardsFromAllUsersForRole($role->id, $role->slug);
+        app(RoleRewardContract::class)->revokeRewardsFromAllUsersForRole($role->id, $role->slug);
 
         return parent::destroy($id);
     }

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\DeleteUserAction as DeleteUser;
 
 use App\Admin\Actions\DeleteSubSuperAdmin;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Contracts\RoleRewardContract;
 use App\Admin\Controllers\MainController;
 
 

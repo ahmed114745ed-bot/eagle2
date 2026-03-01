@@ -7,7 +7,7 @@ use App\Models\Agency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Contracts\RoleRewardContract;
 
 class DeleteSubSuperAdmin extends RowAction
 {

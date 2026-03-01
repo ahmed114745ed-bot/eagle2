@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\DeleteRole;
 use Encore\Admin\Controllers\AdminController;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use App\Contracts\RoleRewardContract;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission as chPermission;
 

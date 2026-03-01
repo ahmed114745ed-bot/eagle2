@@ -5,7 +5,7 @@ namespace Utd\RoleRewards\Actions;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Encore\Admin\Facades\Admin;
-use Utd\RoleRewards\Helpers\UserRoleRewardHelper;
+use Utd\RoleRewards\Services\RoleRewardService;
 
 class DeleteRoleReward extends RowAction
 {
@@ -21,7 +21,7 @@ class DeleteRoleReward extends RowAction
         if ($role) {
             $slug = $role->slug;
 
-           UserRoleRewardHelper::revokeSpecificRewardFromAllUsers(
+            app(RoleRewardService::class)->revokeSpecificRewardFromAllUsers(
                 $model->role_id,
                 $slug,
                 $model->id, 

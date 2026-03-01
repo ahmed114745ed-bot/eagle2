@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Utd\RoleRewards\Http\Controllers\web\RoleRewardsController;
 use Utd\RoleRewards\Http\Controllers\web\UserHistoryRewardController;
 
