@@ -1,6 +1,6 @@
 <?php
 
-use  App\helper\TimeHelper;
+use App\helper\TimeHelper;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -566,7 +566,7 @@ Route::get('/test-fcm/{userid}', function ($userId) {
 Route::get('/generate-token/{id}', function ($id) {
     $user = User::find($id);
 
-    if (! $user) {
+    if (!$user) {
         return response()->json(['message' => 'User not found'], 404);
     }
 
@@ -641,17 +641,19 @@ Route::get('/emoji-image-type', [EmojiController::class, 'gitImage']);
 Route::get('/reset-fairluck', function () {
     \Illuminate\Support\Facades\DB::table('fair_luck_wallets')->update(['balance' => 0, 'last_updated' => now()]);
     \Illuminate\Support\Facades\DB::table('fair_luck_wallet_histories')->truncate();
-
-    $keys = \Illuminate\Support\Facades\Redis::keys('fairluck:wallet:*');
-    if (!empty($keys)) {
-        foreach ($keys as $key) {
-        }
-        \Illuminate\Support\Facades\Redis::connection()->client()->del($keys);
+    if (\Illuminate\Support\Facades\Schema::hasTable('fair_luck_statistics')) {
+        \Illuminate\Support\Facades\DB::table('fair_luck_statistics')->truncate();
     }
 
-    $otherKeys = \Illuminate\Support\Facades\Redis::keys('fairluck:*');
-    if (!empty($otherKeys)) {
-        \Illuminate\Support\Facades\Redis::connection()->client()->del($otherKeys);
+    $redis = \Illuminate\Support\Facades\Redis::connection();
+    $prefix = config('database.redis.options.prefix', '');
+
+    $keys = $redis->keys('*fairluck*');
+    foreach ($keys as $key) {
+        if ($prefix && strpos($key, $prefix) === 0) {
+            $key = substr($key, strlen($prefix));
+        }
+        \Illuminate\Support\Facades\Redis::del($key);
     }
 
     return response()->json([
@@ -768,11 +770,11 @@ Route::get('/week-zone', function () {
 
 
     $startOfWeek = Carbon::now()->startOfWeek()->toDateTimeString();
-    $endOfWeek   = Carbon::now()->endOfWeek()->toDateTimeString();
+    $endOfWeek = Carbon::now()->endOfWeek()->toDateTimeString();
 
     return response()->json([
-        'start_of_week'  => $startOfWeek,
-        'end_of_week'    => $endOfWeek,
+        'start_of_week' => $startOfWeek,
+        'end_of_week' => $endOfWeek,
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
@@ -830,11 +832,16 @@ Route::get('/migrate-home-carousel', function () {
     foreach ($carousels as $carousel) {
 
         $displayTypes = [];
-        if ($carousel->display_home_top)     $displayTypes[] = 'home_top';
-        if ($carousel->display_home_middle)  $displayTypes[] = 'home_middle';
-        if ($carousel->display_live)         $displayTypes[] = 'live';
-        if ($carousel->display_country)      $displayTypes[] = 'country';
-        if ($carousel->display_discover)     $displayTypes[] = 'discover';
+        if ($carousel->display_home_top)
+            $displayTypes[] = 'home_top';
+        if ($carousel->display_home_middle)
+            $displayTypes[] = 'home_middle';
+        if ($carousel->display_live)
+            $displayTypes[] = 'live';
+        if ($carousel->display_country)
+            $displayTypes[] = 'country';
+        if ($carousel->display_discover)
+            $displayTypes[] = 'discover';
 
 
         $unitMap = [
@@ -849,10 +856,10 @@ Route::get('/migrate-home-carousel', function () {
         $endAt = null;
         if (!empty($carousel->input) && $carousel->input > 0) {
             $endAt = match ($unit) {
-                'hours'  => Carbon::parse($carousel->created_at)->addHours($carousel->input),
-                'days'   => Carbon::parse($carousel->created_at)->addDays($carousel->input),
+                'hours' => Carbon::parse($carousel->created_at)->addHours($carousel->input),
+                'days' => Carbon::parse($carousel->created_at)->addDays($carousel->input),
                 'months' => Carbon::parse($carousel->created_at)->addMonths($carousel->input),
-                default  => null,
+                default => null,
             };
         }
 
@@ -860,14 +867,14 @@ Route::get('/migrate-home-carousel', function () {
             DB::table('home_carousel_displays')->updateOrInsert(
                 [
                     'home_carousel_id' => $carousel->id,
-                    'display_type'     => $type,
+                    'display_type' => $type,
                 ],
                 [
-                    'end_at'        => $endAt,
-                    'duration'      => $carousel->input ?? 0,
+                    'end_at' => $endAt,
+                    'duration' => $carousel->input ?? 0,
                     'duration_unit' => $unit,
-                    'created_at'    => $carousel->created_at,
-                    'updated_at'    => $carousel->updated_at,
+                    'created_at' => $carousel->created_at,
+                    'updated_at' => $carousel->updated_at,
                 ]
             );
         }
@@ -908,24 +915,24 @@ Route::get('notifications/test2', function () {
 });
 
 Route::get('/codapay/create-payment', function () {
-    $trxId  = rand(1000, 9999);
+    $trxId = rand(1000, 9999);
     $amount = 1.00;
     $userId = 123;
 
     $payload = [
         'initRequest' => [
-            'country'    => "784",    // ✅ UAE (الإمارات)
-            'currency'   => 840,      // ✅ USD (دولار أمريكي)
-            'apiKey'     => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
-            'projectId'  => env('CODAPAY_PROJECT_ID', '289'),
-            'orderId'    => (string) $trxId,
-            'returnUrl'  => url('/codapay/success'),
-            'failUrl'    => url('/codapay/fail'),
-            'items'      => [
+            'country' => "784",    // ✅ UAE (الإمارات)
+            'currency' => 840,      // ✅ USD (دولار أمريكي)
+            'apiKey' => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
+            'projectId' => env('CODAPAY_PROJECT_ID', '289'),
+            'orderId' => (string) $trxId,
+            'returnUrl' => url('/codapay/success'),
+            'failUrl' => url('/codapay/fail'),
+            'items' => [
                 [
-                    'code'  => '1',
+                    'code' => '1',
                     'price' => (float) $amount,
-                    'name'  => "Order #{$trxId}"
+                    'name' => "Order #{$trxId}"
                 ]
             ],
             'profile' => [
@@ -953,10 +960,10 @@ Route::get('/codapay/create-payment', function () {
             // ]);
 
             return response()->json([
-                'error'   => 'Failed to connect Codapay',
-                'status'  => $response->status(),
+                'error' => 'Failed to connect Codapay',
+                'status' => $response->status(),
                 'details' => $response->body(),
-                'url'     => $url,
+                'url' => $url,
                 'payload' => $payload,
             ], 500);
         }
@@ -984,11 +991,11 @@ Route::get('/codapay/create-payment', function () {
             'message' => 'Failed to create payment',
             'error_code' => $result['initResult']['resultCode'] ?? null,
             'error_desc' => $result['initResult']['resultDesc'] ?? null,
-            'result'  => $result,
+            'result' => $result,
         ]);
     } catch (\Throwable $e) {
         return response()->json([
-            'error'   => 'Exception while connecting Codapay',
+            'error' => 'Exception while connecting Codapay',
             'details' => $e->getMessage(),
         ], 500);
     }
@@ -1104,7 +1111,7 @@ Route::get('/run-roomcup-rewards', function () {
 
     return response()->json([
         'message' => 'RoomCup rewards calculation executed successfully!',
-        'output'  => $output,
+        'output' => $output,
     ]);
 });
 
@@ -1210,8 +1217,8 @@ Route::get('/run-lucky-gift-test', function () {
     $process->run();
 
     return response()->json([
-        'exit_code'    => $process->getExitCode(),
-        'output'       => $process->getOutput(),
+        'exit_code' => $process->getExitCode(),
+        'output' => $process->getOutput(),
         'error_output' => $process->getErrorOutput(),
     ]);
 });
