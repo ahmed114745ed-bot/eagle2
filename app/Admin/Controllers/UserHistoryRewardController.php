@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\RoleRewards\Http\Controllers\web;
+namespace App\Admin\Controllers;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -10,7 +10,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
 use App\Models\UserHistoryReward;
-use Utd\RoleRewards\Entities\VUserHistoryReward;
+use App\Models\VUserHistoryReward;
 use Utd\Achievements\Entities\Achievement;
 
 

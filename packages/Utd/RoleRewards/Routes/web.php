@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Utd\RoleRewards\Http\Controllers\web\RoleRewardsController;
-use Utd\RoleRewards\Http\Controllers\web\UserHistoryRewardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +42,6 @@ Route::group(
             Route::delete('/{id}', [RoleRewardsController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
-        Route::resource('user-history-rewards', UserHistoryRewardController::class);
 
     }
 );

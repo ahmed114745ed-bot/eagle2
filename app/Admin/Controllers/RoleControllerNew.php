@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Role;
+use App\Support\PackageHelper;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -110,12 +111,15 @@ class RoleControllerNew extends MainController
             </a>';
         });
 
-        $grid->column('rewards', __('Rewards'))->display(function () {
-            $url = admin_url("role-rewards/{$this->id}");
-            return '<a href="' . $url . '" class="btn btn-sm btn-info">
+        if (PackageHelper::isInstalled('RoleReward')){
+            $grid->column('rewards', __('Rewards'))->display(function () {
+                $url = admin_url("role-rewards/{$this->id}");
+                return '<a href="' . $url . '" class="btn btn-sm btn-info">
                         <i class="fa fa-gift"></i> ' . __('rewards') . '
                     </a>';
-        });
+            });
+        }
+
         // $grid->column('permissions', trans('admin.permission'))->pluck('name')->take(7)->label();
         $grid->column('permissions', trans('admin.permission'))->display(function ($permissions) {
             return collect($permissions)->pluck('name')->take(7)->map(function ($name) {

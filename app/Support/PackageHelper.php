@@ -10,6 +10,7 @@ use Utd\Events\Entities\WeeklyStar;
 use Utd\Family\Entities\Family;
 use Utd\Gifts\Entities\GiftLog;
 use Utd\RankingReward\Entities\RankingReward;
+use Utd\RoleRewards\Entities\RoleReward;
 use Utd\Tasks\Entities\Day;
 use Utd\TaskStream\Entities\TaskStream;
 use Utd\Charizma\Entities\ExtraDataInRoom;
@@ -51,6 +52,7 @@ class PackageHelper
         'dailyPrize' => DailyGift::class,
         'specialId' => SpecialHistory::class,
         'switchAccount' => UserAccount::class,
+        'RoleReward' => RoleReward::class,
     ];
 
     /**

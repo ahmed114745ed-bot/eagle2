@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\RoleRewards\Entities;
+namespace App\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;

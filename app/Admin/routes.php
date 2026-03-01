@@ -72,6 +72,7 @@ use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\RoleControllerNew;
+use App\Admin\Controllers\UserHistoryRewardController;
 use App\Admin\Controllers\RouteController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\ServerCountryController;
@@ -242,6 +243,7 @@ Route::group(
 
 
         Route::resource('auth/roles', RoleControllerNew::class);
+        Route::resource('user-history-rewards', UserHistoryRewardController::class);
         Route::get('super-roles', [SuperRoleController::class, 'index']);
         Route::post('update-super-roles', [SuperRoleController::class, 'updatePermissionRole'])->name('admin.update-super-roles');
 

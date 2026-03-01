@@ -2,20 +2,20 @@
 
 namespace App\Admin\Actions;
 
+use App\Contracts\RoleRewardContract;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-use Encore\Admin\Facades\Admin;
 
 class DeleteRole extends RowAction
 {
     public function name(): string
     {
-        return __('Delete'); 
+        return __('Delete');
     }
 
     public function handle(Model $model)
     {
-        app(\App\Contracts\RoleRewardContract::class)->revokeRewardsFromAllUsersForRole(
+        app(RoleRewardContract::class)->revokeRewardsFromAllUsersForRole(
             $model->id,
             $model->slug
         );
