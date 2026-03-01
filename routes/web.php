@@ -641,7 +641,6 @@ Route::get('/emoji-image-type', [EmojiController::class, 'gitImage']);
 Route::get('/reset-fairluck', function () {
     \Illuminate\Support\Facades\DB::table('fair_luck_wallets')->update(['balance' => 0, 'last_updated' => now()]);
     \Illuminate\Support\Facades\DB::table('fair_luck_wallet_histories')->truncate();
-    \Illuminate\Support\Facades\DB::table('fair_luck_statistics')->truncate();
 
     $keys = \Illuminate\Support\Facades\Redis::keys('fairluck:wallet:*');
     if (!empty($keys)) {
