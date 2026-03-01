@@ -256,14 +256,16 @@ class PermissionTypeSeeder extends Seeder
                             PermissionType::ADMIN->value => ['browse', 'create', 'delete',],
                         ],
                     ],
-                    [
-                        'key' => 'special-uuid-requests',
-                        'except' => ['show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'delete', 'edit'],
+                    ...(PackageHelper::isInstalled('specialId') ? [
+                        [
+                            'key' => 'special-uuid-requests',
+                            'except' => ['show'],
+                            'additional' => [],
+                            'types' => [
+                                PermissionType::ADMIN->value => ['browse', 'create', 'delete', 'edit'],
+                            ],
                         ],
-                    ],
+                    ] : []),
                     [
                         'key' => 'edit-level',
                         'except' => ['create', 'delete', 'show'],

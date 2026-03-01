@@ -55,7 +55,7 @@ use Illuminate\Support\Facades\Route;
 use Utd\Agency\Http\Controllers\Admin\AppearChargerAgencyController;
 use Utd\Agency\Http\Controllers\Admin\MangerSettingController;
 use Utd\Agency\Http\Controllers\Admin\PaymentGetWayController;
-use App\Admin\Controllers\SpecialIdRequestController as SpecialIdRequestCtrl;
+use Utd\SpecialId\Http\Controllers\web\SpecialIdRequestController as SpecialIdRequestCtrl;
 
 
 Admin::routes();

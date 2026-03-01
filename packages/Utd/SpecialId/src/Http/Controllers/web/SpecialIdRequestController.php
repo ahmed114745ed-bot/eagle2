@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\SpecialId\Http\Controllers\web;
 
 use App\Models\Pack;
 use App\Models\User;
