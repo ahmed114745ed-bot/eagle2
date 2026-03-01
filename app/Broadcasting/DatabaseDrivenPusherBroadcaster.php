@@ -26,6 +26,13 @@ class DatabaseDrivenPusherBroadcaster extends PusherBroadcaster
         // Read fresh from database
         $config = $this->getFreshConfigFromDatabase();
         
+        Log::info('🔵 DatabaseDrivenPusherBroadcaster.__construct', [
+            'app_id'      => $config['app_id'] ?? 'NULL',
+            'app_key'     => $config['app_key'] ?? 'NULL',
+            'app_secret'  => !empty($config['app_secret']) ? '***SET(' . strlen($config['app_secret']) . ' chars)***' : '***EMPTY***',
+            'app_cluster' => $config['app_cluster'] ?? 'NULL',
+        ]);
+        
         // Create Pusher instance with DB config
         $pusher = new Pusher(
             $config['app_key'],
