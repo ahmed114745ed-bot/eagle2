@@ -250,45 +250,55 @@ class ConfigController extends Controller
             'all_request' => $request->all(),
         ]);
 
-        $beforeConfig = Config::where('name', 'live_library')->first();
-        Log::info('Live Library - Before update', [
-            'before_value' => $beforeConfig ? $beforeConfig->value : 'NOT FOUND',
-            'before_id' => $beforeConfig ? $beforeConfig->id : null,
+        // Use DB query directly to bypass any model caching/observer issues
+        $beforeValue = \DB::table('configs')->where('name', 'live_library')->value('value');
+        Log::info('Live Library - Before update (raw DB)', [
+            'before_value' => $beforeValue,
         ]);
 
-        $result = Config::updateOrCreate(
-            ['name' => 'live_library'],
-            ['value' => $inputValue]
-        );
+        // Update directly via DB to avoid observer re-caching with stale data
+        $exists = \DB::table('configs')->where('name', 'live_library')->exists();
+        if ($exists) {
+            \DB::table('configs')->where('name', 'live_library')->update([
+                'value' => $inputValue,
+                'updated_at' => now(),
+            ]);
+        } else {
+            \DB::table('configs')->insert([
+                'name' => 'live_library',
+                'value' => $inputValue,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        Log::info('Live Library - After updateOrCreate', [
-            'result_id' => $result->id,
-            'result_value' => $result->value,
-            'wasRecentlyCreated' => $result->wasRecentlyCreated,
-            'wasChanged' => $result->wasChanged(),
-            'getChanges' => $result->getChanges(),
+        // Confirm the update in DB
+        $afterValue = \DB::table('configs')->where('name', 'live_library')->value('value');
+        Log::info('Live Library - After update (raw DB)', [
+            'after_value' => $afterValue,
         ]);
 
-        // Re-read from DB to confirm
-        $afterConfig = Config::where('name', 'live_library')->first();
-        Log::info('Live Library - DB confirmation after save', [
-            'db_value' => $afterConfig ? $afterConfig->value : 'NOT FOUND',
-        ]);
-
+        // Now clear ALL caches and re-cache with fresh data
         Cache::forget('live_library');
         Cache::forget('all_configs');
 
         try {
             Cache::flush();
-            Log::info('Live Library - Cache flushed successfully');
         } catch (\Exception $e) {
             Log::error('Live Library - Cache flush failed', ['error' => $e->getMessage()]);
         }
 
+        // Re-cache all_configs with fresh data from DB
+        $freshConfigs = \DB::table('configs')->pluck('value', 'name')->toArray();
+        Cache::forever('all_configs', $freshConfigs);
+
+        Log::info('Live Library - Re-cached all_configs', [
+            'live_library_in_cache' => $freshConfigs['live_library'] ?? 'NOT SET',
+        ]);
+
         try {
             if (method_exists(Cache::store('octane'), 'flush')) {
                 Cache::store('octane')->flush();
-                Log::info('Live Library - Octane cache flushed');
             }
         } catch (\Exception $e) {
             Log::error('Live Library - Octane cache flush failed', ['error' => $e->getMessage()]);
