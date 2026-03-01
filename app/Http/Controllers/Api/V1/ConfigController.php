@@ -154,8 +154,82 @@ class ConfigController extends Controller
         Artisan::call('config:cache');
         
         admin_success('Saved Successfully');
-        $redirectUrl = url('admin/setting-group-char');
-        
+        return Redirect::back();
+    }
+
+    public function updateConfigAgoraZego(Request $request)
+    {
+        $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
+        $keys = array_diff(array_keys($request->all()), $excludeKeys);
+        $updatedKeys = [];
+        $hasPusherUpdate = false;
+
+        foreach ($keys as $key) {
+            $value = $request->input($key);
+
+            // Log if live_library is being updated via this route (should NOT happen)
+            if ($key === 'live_library') {
+                Log::warning('Live Library Config - WRONG ROUTE! live_library being updated via updateConfigAgoraZego', [
+                    'value' => $value,
+                    'all_request' => $request->all(),
+                    'url' => $request->fullUrl(),
+                    'referer' => $request->header('referer'),
+                    'is_ajax' => $request->ajax(),
+                ]);
+            }
+
+            Config::updateOrCreate(
+                ['name' => $key],
+                ['value' => $value]
+            );
+            Log::info('key config', [
+                'updated_keys' => $value,
+                'config' => Config::where('name', $key)->first(),
+            ]);
+
+            $updatedKeys[] = $key;
+            Cache::forget($key);
+
+            if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
+                $hasPusherUpdate = true;
+            }
+        }
+
+        Cache::forget('pusher_config');
+        Cache::forget('all_configs');
+        Cache::flush();
+
+
+        if (method_exists(Cache::store('octane'), 'flush')) {
+            Cache::store('octane')->flush();
+        }
+
+        if ($hasPusherUpdate) {
+            $pusherMapping = [
+                'pusher_app_key' => 'broadcasting.connections.pusher.key',
+                'pusher_app_secret' => 'broadcasting.connections.pusher.secret',
+                'pusher_app_id' => 'broadcasting.connections.pusher.app_id',
+                'pusher_app_cluster' => 'broadcasting.connections.pusher.options.cluster',
+            ];
+
+            foreach ($pusherMapping as $key => $configKey) {
+                $value = $request->input($key);
+                if ($value !== null) {
+                    if ($key === 'pusher_app_cluster') {
+                        LaravelConfig::set($configKey, $value ?? 'mt1');
+                    } else {
+                        LaravelConfig::set($configKey, $value);
+                    }
+                }
+            }
+
+            \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+        }
+
+
+
+        $redirectUrl = url('admin/settings');
+
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
             if ($request->has('inner_tab_type')) {
@@ -170,35 +244,55 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
-        $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
-        $keys = array_diff(array_keys($request->all()), $excludeKeys);
-        
-        $updatedKeys = [];
-        $hasPusherUpdate = false;
-        
-        foreach ($keys as $key) {
-            $value = $request->input($key);
-            
-            Config::updateOrCreate(
-                ['name' => $key],
-                ['value' => $value]
-            );
-            
-            $updatedKeys[] = $key;
-            Cache::forget($key);
-            
-            if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
-                $hasPusherUpdate = true;
-            }
+        $inputValue = $request->input('live_library');
+
+
+        // Update directly via DB to avoid observer re-caching with stale data
+        $exists = \DB::table('configs')->where('name', 'live_library')->exists();
+        if ($exists) {
+            \DB::table('configs')->where('name', 'live_library')->update([
+                'value' => $inputValue,
+                'updated_at' => now(),
+            ]);
+        } else {
+            \DB::table('configs')->insert([
+                'name' => 'live_library',
+                'value' => $inputValue,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        Cache::forget('pusher_config');
+        // Confirm the update in DB
+        $afterValue = \DB::table('configs')->where('name', 'live_library')->value('value');
+        Log::info('Live Library - After update (raw DB)', [
+            'after_value' => $afterValue,
+        ]);
+
+        // Now clear ALL caches and re-cache with fresh data
+        Cache::forget('live_library');
         Cache::forget('all_configs');
-        Cache::flush();
-        
-        
-        if (method_exists(Cache::store('octane'), 'flush')) {
-            Cache::store('octane')->flush();
+
+        try {
+            Cache::flush();
+        } catch (\Exception $e) {
+            Log::error('Live Library - Cache flush failed', ['error' => $e->getMessage()]);
+        }
+
+        // Re-cache all_configs with fresh data from DB
+        $freshConfigs = \DB::table('configs')->pluck('value', 'name')->toArray();
+        Cache::forever('all_configs', $freshConfigs);
+
+        Log::info('Live Library - Re-cached all_configs', [
+            'live_library_in_cache' => $freshConfigs['live_library'] ?? 'NOT SET',
+        ]);
+
+        try {
+            if (method_exists(Cache::store('octane'), 'flush')) {
+                Cache::store('octane')->flush();
+            }
+        } catch (\Exception $e) {
+            Log::error('Live Library - Octane cache flush failed', ['error' => $e->getMessage()]);
         }
         
         if ($hasPusherUpdate) {
@@ -224,19 +318,7 @@ class ConfigController extends Controller
             
         }
 
-
-
-        $redirectUrl = url(config('admin.route.prefix') . '/settings');
-        
-        if ($request->has('current_tab')) {
-            $redirectUrl .= '?tab=' . $request->current_tab;
-            if ($request->has('inner_tab_type')) {
-                $redirectUrl .= '&type=' . $request->inner_tab_type;
-            }
-        } elseif ($request->has('redirect_to')) {
-            return Redirect::to($request->redirect_to);
-        }
-
+        $redirectUrl = url('admin/settings?tab=realTimeSetting');
         return redirect($redirectUrl);
     }
 }
