@@ -203,7 +203,9 @@ class GiftLogService
 
             $updateUserWhenSendGift->updateUsers($price, $receiversIds);
 
-            $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
+           \App\Jobs\UpdateFamilyLevelJob::dispatch($receivedUsers, $gift->price * $number)
+                ->afterCommit()
+                ->onQueue(getLeastBusyQueue('heavyProcessing') ?? 'default');
 
             if ($room->mode != '1' && $room->mode != '2') {
                 $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
@@ -212,9 +214,9 @@ class GiftLogService
 
 
             if ($room->type == 'audio') {
-                $serviceLevel = new UpgradeRoomLevelServices();
-
-                $serviceLevel->sendGift($room, $totalPrice);
+                \App\Jobs\UpdateRoomLevelJob::dispatch($room->id, $totalPrice)
+                    ->afterCommit()
+                    ->onQueue(getLeastBusyQueue('heavyProcessing') ?? 'default');
             }
             $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " . __('api.to') . "{$to}";
 
