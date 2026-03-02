@@ -71,6 +71,7 @@
         "utd/special-id": "dev-achievmentPackage",
         "utd/switch-account": "dev-achievmentPackage",
         "utd/task-stream": "*",
+        "utd/badge": "*",
         "utd/vip": "*"
     },
     "require-dev": {
@@ -267,6 +268,10 @@
         {
             "type": "path",
             "url": "packages/Utd/Milestones"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Badge"
         }
     ]
 }

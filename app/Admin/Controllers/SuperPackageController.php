@@ -13,7 +13,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
 use Illuminate\Support\MessageBag;
 use Illuminate\Http\Exceptions\HttpResponseException;

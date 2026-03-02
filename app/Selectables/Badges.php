@@ -4,7 +4,7 @@ namespace App\Selectables;
 
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use Encore\Admin\Admin;
 
 class Badges extends Selectable
