@@ -11,7 +11,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Admin;
 use Utd\Milestones\Entities\Milestone;
 use Utd\Milestones\Entities\MilestoneReward;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use App\Selectables\Wares;
 use Utd\Achievements\Entities\Achievement;
 use App\Support\PackageHelper;
@@ -209,8 +209,8 @@ class MilestoneRewardController
                     break;
 
                 case 'badge':
-                    $form->rewardable_type = \Modules\Badge\Entities\Badge::class;
-                    $form->model()->rewardable_type = \Modules\Badge\Entities\Badge::class;
+                    $form->rewardable_type = \Utd\Badge\Entities\Badge::class;
+                    $form->model()->rewardable_type = \Utd\Badge\Entities\Badge::class;
                     break;
 
                 case 'achievement':

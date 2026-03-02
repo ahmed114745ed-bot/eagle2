@@ -18,7 +18,7 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\MessageBag;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use Utd\Achievements\Entities\Achievement;
 use Utd\RankingReward\Entities\RankingRange;
 use Utd\RankingReward\Entities\RankingReward;

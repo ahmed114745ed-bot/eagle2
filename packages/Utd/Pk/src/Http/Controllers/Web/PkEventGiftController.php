@@ -14,7 +14,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Pk\Entities\PkReward;
 use Utd\Vip\Entities\OVip;

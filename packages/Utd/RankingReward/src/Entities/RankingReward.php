@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use Utd\Vip\Entities\OVip;
 
 class RankingReward extends Model

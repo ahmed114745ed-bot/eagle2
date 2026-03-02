@@ -16,7 +16,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkReward;
 use Utd\Vip\Entities\OVip;

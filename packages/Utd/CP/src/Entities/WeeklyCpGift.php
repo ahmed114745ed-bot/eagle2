@@ -9,7 +9,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use Utd\Vip\Entities\OVip;
 
 class WeeklyCpGift extends Model

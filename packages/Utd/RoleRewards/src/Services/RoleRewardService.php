@@ -11,7 +11,7 @@ use Utd\Vip\Entities\OVip;
 use Utd\RoleRewards\Entities\RoleReward;
 use App\Models\UserHistoryReward;
 use Utd\Achievements\Entities\UserAchievementLevel;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use App\Support\PackageHelper;
 
 class RoleRewardService implements RoleRewardContract

@@ -9,7 +9,7 @@ use App\Helpers\Common;
 use Utd\Vip\Entities\OVip;
 use Illuminate\Http\UploadedFile;
 use App\Support\PackageHelper;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;

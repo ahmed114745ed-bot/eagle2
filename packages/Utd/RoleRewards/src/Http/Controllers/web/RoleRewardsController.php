@@ -4,7 +4,7 @@ namespace Utd\RoleRewards\Http\Controllers\web;
 
 use App\Models\Role;
 use Utd\RoleRewards\Actions\DeleteRoleReward;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use Utd\RoleRewards\Entities\RoleReward;
 use Utd\RoleRewards\Services\RoleRewardService;
 use App\Selectables\Wares;
@@ -251,8 +251,8 @@ class RoleRewardsController extends MainController
                     $form->model()->rewardable_type = OVip::class;
                     break;
                 case 'badge':
-                    $form->rewardable_type = \Modules\Badge\Entities\Badge::class;
-                    $form->model()->rewardable_type = \Modules\Badge\Entities\Badge::class;
+                    $form->rewardable_type = \Utd\Badge\Entities\Badge::class;
+                    $form->model()->rewardable_type = \Utd\Badge\Entities\Badge::class;
                     break;
                 case 'achievement':
                     if (! class_exists(Achievement::class)) {
