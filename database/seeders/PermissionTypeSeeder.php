@@ -670,21 +670,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Milestone',
-                'sort' => 32,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 32],
-
-                ],
-                'permissions' => [
-                    ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
-
-                    ],],
-
-                ],
-            ],
-            [
                 'name' => 'Employees and Permissions',
                 'sort' => 35,
                 'types' => [
@@ -1299,7 +1284,7 @@ class PermissionTypeSeeder extends Seeder
         }
 
         if (PackageHelper::isInstalled('specialId')) {
-            $categories[] =             [
+            $categories[] = [
                 'name' => 'Distinguished identifier',
                 'sort' => 14,
                 'types' => [
@@ -1315,6 +1300,24 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'id-color', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('milestone')) {
+            $categories[] = [
+                'name' => 'Milestone',
+                'sort' => 32,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 32],
+
+                ],
+                'permissions' => [
+                    ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
+
+                    ],],
+
                 ],
             ];
         }

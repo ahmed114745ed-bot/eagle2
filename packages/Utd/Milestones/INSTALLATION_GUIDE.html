@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milestones Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #6366f1;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #4f46e5;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #6366f1;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #6366f1;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #818cf8;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #eef2ff;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #c7d2fe;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #6366f1;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #eef2ff;
+            border-left: 4px solid #6366f1;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4f46e5;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #c7d2fe;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #eef2ff;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        
+        tr:nth-child(even) {
+            background: #eef2ff;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .checkmark {
+            color: #6366f1;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>🏆 Milestones Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the Milestones package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: March 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#overview">1. Overview</a></li>
+            <li><a href="#requirements">2. Requirements</a></li>
+            <li><a href="#installation">3. Installation Steps</a></li>
+            <li><a href="#configuration">4. Configuration</a></li>
+            <li><a href="#database">5. Database Tables</a></li>
+            <li><a href="#routes">6. Routes & Admin Panel</a></li>
+            <li><a href="#architecture">7. Architecture & Contracts</a></li>
+            <li><a href="#verification">8. Verification</a></li>
+            <li><a href="#troubleshooting">9. Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <h1 id="overview">1. Overview</h1>
+    
+    <h2>1.1 What is Milestones?</h2>
+    <p>The Milestones package is a reward management system that allows granting milestone-based rewards to users based on their roles and achievements. It provides an admin panel for managing milestones and their associated rewards (VIPs, badges, wares, coins, etc.).</p>
+    
+    <h2>1.2 Key Features</h2>
+    <ul>
+        <li><strong>Milestone Management</strong> - Create and manage milestones with slugs for programmatic access</li>
+        <li><strong>Reward System</strong> - Associate multiple rewards (VIP, Badge, Ware, Achievement, Coins) with each milestone</li>
+        <li><strong>Auto-Grant Rewards</strong> - Automatically grant rewards to users when they achieve a milestone</li>
+        <li><strong>Auto-Remove Rewards</strong> - Remove milestone rewards when a user loses their role/status</li>
+        <li><strong>Sync Functionality</strong> - Sync milestone rewards to all eligible users at once</li>
+        <li><strong>History Tracking</strong> - Track reward history via the <code>v_user_history_rewards</code> database view</li>
+        <li><strong>Contract-Based Architecture</strong> - Uses contracts for loose coupling; falls back to null implementation when package is not installed</li>
+    </ul>
+
+    <h2>1.3 How It Works</h2>
+    <ol>
+        <li>Admin creates a milestone (e.g., "host", "super-admin", "bd") in the admin panel</li>
+        <li>Admin assigns rewards to the milestone (VIP packages, badges, wares, etc.)</li>
+        <li>When a user achieves the milestone (e.g., becomes a host), the system calls <code>grantMilestoneToUser()</code></li>
+        <li>All rewards associated with that milestone are automatically granted to the user</li>
+        <li>When the user loses the role, <code>removeReward()</code> is called to revoke the rewards</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Requirements -->
+    <h1 id="requirements">2. Requirements</h1>
+    
+    <h2>2.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Admin (Encore)</td>
+            <td>Latest</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>2.2 Application Dependencies</h2>
+    <table>
+        <tr>
+            <th>Dependency</th>
+            <th>Purpose</th>
+            <th>Required</th>
+        </tr>
+        <tr>
+            <td>App\Contracts\MilestoneHelperContract</td>
+            <td>Contract interface (in main app)</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>App\Services\Null\NullMilestoneHelperService</td>
+            <td>Fallback when package not installed</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>App\Providers\FeatureServiceProvider</td>
+            <td>Registers null binding as default</td>
+            <td>Required</td>
+        </tr>
+    </table>
+
+    <h2>2.3 Database Tables Created</h2>
+    <ul>
+        <li><code>milestones</code> - Main milestones table</li>
+        <li><code>milestone_rewards</code> - Rewards associated with milestones</li>
+        <li><code>v_user_history_rewards</code> - Database view for reward history tracking</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Installation -->
+    <h1 id="installation">3. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>Milestones</code> folder to your project:</p>
+        <pre><code>packages/Utd/Milestones</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Milestones"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/milestones</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Migrations</span>
+        <p>Run migrations to create database tables and views:</p>
+        <pre><code>php artisan migrate</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <span class="step-title">Clear Cache</span>
+        <p>Clear the application cache:</p>
+        <pre><code>php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="note">
+        <div class="note-title">Note</div>
+        <p>The package automatically registers its service provider via Laravel's package discovery. The <code>MilestoneHelperContract</code> binding will override the null fallback registered in <code>FeatureServiceProvider</code>.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Configuration -->
+    <h1 id="configuration">4. Configuration</h1>
+
+    <h2>4.1 Publish Configuration</h2>
+    <p>Publish the configuration file:</p>
+    <pre><code>php artisan vendor:publish --tag=config</code></pre>
+    <p>This publishes to <code>config/milestones.php</code>.</p>
+
+    <h2>4.2 Configuration Options</h2>
+    <pre><code>// config/milestones.php
+return [
+    'name' => 'Milestones'
+];</code></pre>
+
+    <h2>4.3 Dependency Injection</h2>
+    <p>The package registers <code>MilestoneHelperContract</code> which can be used via the container:</p>
+    <pre><code>// Using the contract via app() helper
+app(\App\Contracts\MilestoneHelperContract::class)
+    ->grantMilestoneToUser($user, 'host');
+
+// Removing rewards
+app(\App\Contracts\MilestoneHelperContract::class)
+    ->removeReward($user, 'host');</code></pre>
+
+    <div class="note">
+        <div class="note-title">Fallback Behavior</div>
+        <p>If the Milestones package is not installed, the application uses <code>NullMilestoneHelperService</code> as a fallback. All methods return gracefully without errors — <code>grantMilestoneToUser()</code> and <code>removeReward()</code> simply do nothing.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Database -->
+    <h1 id="database">5. Database Tables Reference</h1>
+
+    <h2>5.1 milestones</h2>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>name</td>
+            <td>string</td>
+            <td>Display name of the milestone</td>
+        </tr>
+        <tr>
+            <td>slug</td>
+            <td>string</td>
+            <td>Unique slug for programmatic access (e.g., "host", "super-admin")</td>
+        </tr>
+        <tr>
+            <td>description</td>
+            <td>text (nullable)</td>
+            <td>Optional description</td>
+        </tr>
+        <tr>
+            <td>is_active</td>
+            <td>boolean</td>
+            <td>Whether the milestone is active (default: true)</td>
+        </tr>
+        <tr>
+            <td>created_at</td>
+            <td>timestamp</td>
+            <td>Creation timestamp</td>
+        </tr>
+        <tr>
+            <td>updated_at</td>
+            <td>timestamp</td>
+            <td>Last update timestamp</td>
+        </tr>
+    </table>
+
+    <h2>5.2 milestone_rewards</h2>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>milestone_id</td>
+            <td>foreignId</td>
+            <td>Reference to milestones table (cascade delete)</td>
+        </tr>
+        <tr>
+            <td>rewardable_id</td>
+            <td>unsignedBigInteger</td>
+            <td>ID of the reward item</td>
+        </tr>
+        <tr>
+            <td>rewardable_type</td>
+            <td>string</td>
+            <td>Polymorphic type (Ware, OVip, Badge, Achievement, User)</td>
+        </tr>
+        <tr>
+            <td>reward</td>
+            <td>string (nullable)</td>
+            <td>Reward value or image path</td>
+        </tr>
+        <tr>
+            <td>type</td>
+            <td>string (nullable)</td>
+            <td>Reward type category</td>
+        </tr>
+        <tr>
+            <td>expire</td>
+            <td>integer (nullable)</td>
+            <td>Expiration period in days</td>
+        </tr>
+        <tr>
+            <td>created_at</td>
+            <td>timestamp</td>
+            <td>Creation timestamp</td>
+        </tr>
+        <tr>
+            <td>updated_at</td>
+            <td>timestamp</td>
+            <td>Last update timestamp</td>
+        </tr>
+    </table>
+
+    <h2>5.3 v_user_history_rewards (Database View)</h2>
+    <p>A database view that joins <code>user_history_rewards</code> with <code>milestones</code>, <code>admin_roles</code>, <code>wares</code>, <code>o_vips</code>, and <code>badges</code> tables for comprehensive reward history tracking.</p>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Source</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>receive_category</td>
+            <td>Computed</td>
+            <td>"Role" or "Milestone"</td>
+        </tr>
+        <tr>
+            <td>receive_name</td>
+            <td>Joined</td>
+            <td>Name from admin_roles or milestones table</td>
+        </tr>
+        <tr>
+            <td>reward_name</td>
+            <td>Joined</td>
+            <td>Name from wares, o_vips, or badges table</td>
+        </tr>
+        <tr>
+            <td>reward_img</td>
+            <td>Joined</td>
+            <td>Image from the reward item</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Routes -->
+    <h1 id="routes">6. Routes & Admin Panel</h1>
+
+    <h2>6.1 Admin Panel Routes</h2>
+    <p>Base URL: <code>/{admin-prefix}/milestones</code></p>
+    <p>Middleware: <code>web, admin, adminIp, multiLanguage</code></p>
+
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/milestones</code></td>
+            <td>List all milestones</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/milestones/create</code></td>
+            <td>Create milestone form</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/milestones</code></td>
+            <td>Store new milestone</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/milestones/{id}</code></td>
+            <td>Show milestone details</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/milestones/{id}/edit</code></td>
+            <td>Edit milestone form</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td><code>/milestones/{id}</code></td>
+            <td>Update milestone</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td><code>/milestones/{id}</code></td>
+            <td>Delete milestone</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/milestones/{id}/sync</code></td>
+            <td>Sync milestone rewards to all eligible users</td>
+        </tr>
+    </table>
+
+    <h2>6.2 Milestone Rewards Routes</h2>
+    <p>Base URL: <code>/{admin-prefix}/milestone-rewards/{milestone_id}</code></p>
+
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/</code></td>
+            <td>List rewards for a milestone</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/create</code></td>
+            <td>Create reward form</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/</code></td>
+            <td>Store new reward</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/{id}/edit</code></td>
+            <td>Edit reward form</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td><code>/{id}</code></td>
+            <td>Update reward</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td><code>/{id}</code></td>
+            <td>Delete reward</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Architecture -->
+    <h1 id="architecture">7. Architecture & Contracts</h1>
+
+    <h2>7.1 Contract Pattern</h2>
+    <p>The package uses a contract-based architecture for loose coupling:</p>
+
+    <h3>Contract (in main app)</h3>
+    <pre><code>// app/Contracts/MilestoneHelperContract.php
+interface MilestoneHelperContract
+{
+    public function grantMilestoneToUser($user, string $slug): void;
+    public function removeReward($user, string $slug): void;
+}</code></pre>
+
+    <h3>Null Implementation (fallback)</h3>
+    <pre><code>// app/Services/Null/NullMilestoneHelperService.php
+class NullMilestoneHelperService implements MilestoneHelperContract
+{
+    public function grantMilestoneToUser($user, string $slug): void {}
+    public function removeReward($user, string $slug): void {}
+}</code></pre>
+
+    <h3>Real Implementation (in package)</h3>
+    <pre><code>// packages/Utd/Milestones/src/Services/MilestoneHelperService.php
+class MilestoneHelperService implements MilestoneHelperContract
+{
+    // Delegates to MilestoneHelper static methods
+}</code></pre>
+
+    <h2>7.2 Binding Order</h2>
+    <ol>
+        <li><code>FeatureServiceProvider</code> registers <code>NullMilestoneHelperService</code> as default</li>
+        <li>If package is installed, <code>MilestonesServiceProvider</code> overrides with <code>MilestoneHelperService</code></li>
+    </ol>
+
+    <h2>7.3 Usage in Code</h2>
+    <pre><code>// Always safe to call - uses null fallback if package not installed
+app(\App\Contracts\MilestoneHelperContract::class)
+    ->grantMilestoneToUser($user, 'host');
+
+app(\App\Contracts\MilestoneHelperContract::class)
+    ->removeReward($user, 'host');</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: Verification -->
+    <h1 id="verification">8. Verification</h1>
+
+    <h2>8.1 Verify Installation</h2>
+
+    <h3>Check Package Discovery</h3>
+    <pre><code>composer show utd/milestones</code></pre>
+
+    <h3>Check Routes</h3>
+    <pre><code>php artisan route:list --path=milestones</code></pre>
+
+    <h3>Check Tables</h3>
+    <pre><code>php artisan tinker
+>>> Schema::hasTable('milestones')
+=> true
+>>> Schema::hasTable('milestone_rewards')
+=> true</code></pre>
+
+    <h3>Check Contract Binding</h3>
+    <pre><code>php artisan tinker
+>>> app(\App\Contracts\MilestoneHelperContract::class)
+=> Utd\Milestones\Services\MilestoneHelperService {}</code></pre>
+
+    <div class="success">
+        <strong>Success!</strong> If all checks pass, the Milestones package is properly installed and configured.
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 9: Troubleshooting -->
+    <h1 id="troubleshooting">9. Troubleshooting</h1>
+
+    <h2>9.1 Common Issues</h2>
+
+    <h3>Package Not Found</h3>
+    <div class="warning">
+        <div class="warning-title">Error: Package utd/milestones not found</div>
+        <p>Ensure the package path is correctly added to composer.json repositories and run <code>composer update</code>.</p>
+    </div>
+
+    <h3>Migration Errors</h3>
+    <div class="warning">
+        <div class="warning-title">Error: View creation fails</div>
+        <p>The view migrations check for required tables (<code>admin_roles</code>, <code>milestones</code>, <code>user_history_rewards</code>) before creating. Ensure these tables exist.</p>
+    </div>
+
+    <h3>Contract Not Resolving</h3>
+    <div class="warning">
+        <div class="warning-title">Error: NullMilestoneHelperService is being used instead of real service</div>
+        <p>Ensure the package is properly installed and <code>MilestonesServiceProvider</code> is registered. Run <code>php artisan package:discover</code>.</p>
+    </div>
+
+    <h3>Admin Routes Not Showing</h3>
+    <div class="warning">
+        <div class="warning-title">Error: 404 on milestone admin routes</div>
+        <p>Clear route cache: <code>php artisan route:clear</code> and verify the admin prefix in your <code>config/admin.php</code>.</p>
+    </div>
+
+    <h2>9.2 Useful Commands</h2>
+    <pre><code># Clear all caches
+php artisan optimize:clear
+
+# Re-discover packages
+composer dump-autoload
+
+# Check service provider registration
+php artisan package:discover
+
+# Rollback package migrations
+php artisan migrate:rollback --path=packages/Utd/Milestones/Database/Migrations</code></pre>
+
+    <h2>9.3 Support</h2>
+    <p>For additional support, contact the development team or check the package repository for updates.</p>
+
+</body>
+</html>

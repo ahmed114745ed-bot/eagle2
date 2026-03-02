@@ -16,6 +16,8 @@ class MilestonesDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call([
+            MilestonesMenuSeeder::class,
+        ]);
     }
 }
