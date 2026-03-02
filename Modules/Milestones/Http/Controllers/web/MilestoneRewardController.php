@@ -218,14 +218,19 @@ class MilestoneRewardController
             }
         });
         Admin::script('
-                $(document).ready(function(){
-                    // Only reload once per page load
-                    if (!sessionStorage.getItem("formReloaded")) {
-                        sessionStorage.setItem("formReloaded", "1");
-                        location.reload();
-                    }
-                });
-            ');
+    $(document).ready(function(){
+        // Reload the PJAX container once
+        if (!sessionStorage.getItem("pjaxReloaded")) {
+            sessionStorage.setItem("pjaxReloaded", "1");
+            $.pjax.reload("#pjax-container");
+        }
+
+        // Trigger dynamic fields on type change
+        $("select[name=\'type\']").on("change", function(){
+            $(this).trigger("change.admin.form");
+        });
+    });
+');
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));
