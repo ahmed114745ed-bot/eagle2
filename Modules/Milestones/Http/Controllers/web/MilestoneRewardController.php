@@ -217,6 +217,15 @@ class MilestoneRewardController
                     break;
             }
         });
+        Admin::script('
+                $(document).ready(function(){
+                    // Only reload once per page load
+                    if (!sessionStorage.getItem("formReloaded")) {
+                        sessionStorage.setItem("formReloaded", "1");
+                        location.reload();
+                    }
+                });
+            ');
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));
