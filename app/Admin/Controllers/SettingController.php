@@ -59,12 +59,14 @@ class SettingController extends MainController
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
+        $zeroGamesSettings = $gameSettings->get('zero_games');
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
             ->description('   ')
             ->body(view('admin.settings_new', compact([
+                'zeroGamesSettings',
                 'bytesunSettings',
                 'quantumNexusSettings',
                 'pusher_app_secret',

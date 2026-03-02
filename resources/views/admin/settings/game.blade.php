@@ -4,7 +4,7 @@
         <label class="d-block">{{ __('Games Settings:') }}</label>
 
         <div class="row mt-4">
-            <div class="col-md-6 mb-3 ms-0 me-auto">
+            {{-- <div class="col-md-6 mb-3 ms-0 me-auto">
                 <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
@@ -108,7 +108,7 @@
 
                     </div>
                 </form>
-            </div>
+            </div> --}}
 
             <div class="col-md-6 mb-3 ms-0 me-auto">
                 <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
@@ -177,6 +177,40 @@
                                     No webhook endpoints configured.
                                 </div>
                             @endif
+
+                    </div>
+                </form>
+            </div>
+
+
+              <div class="col-md-6 mb-3 ms-0 me-auto">
+                <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
+                    @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+                    <input type="hidden" name="provider_code" value="zero_games">
+                    <input type="hidden" name="provider_name" value="Zero Games">
+
+                    <div class="card p-4 shadow-sm border-0" style="min-height: 600px; border-radius: 12px;">
+
+                        <!-- Header -->
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0"style="color: white;">{{ __('Zero Games') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                                <input type="hidden" name="active" value="0">
+                                                <input type="checkbox" id="zeroGamesRadio"
+                                                    class="custom-payment-radio libraryRealTime"
+                                                    name="active" value="1"
+                                                    {{ @$zeroGamesSettings?->is_active == 1  ? 'checked' : '' }}>
+                                                <label for="zeroGamesRadio" class="switch"></label>
+                                            </div>
+                                    </div>
+
+                        <!-- Settings Fields -->
+                        <div class="row">                    
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+
 
                     </div>
                 </form>
