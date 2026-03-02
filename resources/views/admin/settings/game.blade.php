@@ -19,7 +19,7 @@
                                     <input type="checkbox" id="bytesunRadio"
                                            class="custom-payment-radio libraryRealTime"
                                            name="active" value="1"
-                                        {{ $bytesunSettings->is_active == 1  ? 'checked' : '' }}>
+                                        {{ @$bytesunSettings?->is_active == 1  ? 'checked' : '' }}>
                                     <label for="bytesunRadio" class="switch"></label>
                                 </div>
                         </div>
@@ -54,7 +54,7 @@
                                     <input type="checkbox" id="quantumNexusRadio"
                                            class="custom-payment-radio libraryRealTime"
                                            name="active" value="1"
-                                        {{ $quantumNexusSettings->is_active == 1  ? 'checked' : '' }}>
+                                        {{ @$quantumNexusSettings?->is_active == 1  ? 'checked' : '' }}>
                                     <label for="quantumNexusRadio" class="switch"></label>
                                 </div>
                         </div>
