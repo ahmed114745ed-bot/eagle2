@@ -15,6 +15,10 @@ class GameProviderSetting extends Model
     //     'app_secret' => 'encrypted',
     // ];
 
+    protected $casts = [
+        'webhook_routes' => 'array',
+    ];
+
 
     public function setAppKeyAttribute($value)
     {
