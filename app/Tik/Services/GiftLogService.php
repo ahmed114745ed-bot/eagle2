@@ -167,19 +167,13 @@ class GiftLogService
             }
 
             if ($room->lastPk != null) {
-                Log::info("DEBUG: Dispatching UpdatePkAndSendToZigo", [
-                    'room_id' => $room->id,
-                    'user_id' => $user->id,
-                    'price' => ($gift->price * $number)
-                ]);
                 dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room))
-                    ->onQueue('updatePk');
+                    ->afterResponse();
             }
 
             if ($room->charizma_status) {
-              
                 dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
-                    ->onQueue('default');
+                    ->afterResponse();
             }
 
             $realPrice = (int) ($number * $gift->price);
