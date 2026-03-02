@@ -162,11 +162,19 @@
                                             {{ str_replace('_', ' ', $key) }}
                                         </label>
 
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-success text-white fw-bold">POST</span>
+                                        {{-- <div class="input-group">
+                                            <span class="input-group-text bg-success text-white fw-bold"> Type :=> POST</span>
                                             <input type="text" class="form-control webhook-url font-monospace bg-light" value="{{ $url }}" readonly>
                                             <button type="button" class="btn btn-success" onclick="copyWebhook(this)">
                                                 <i class="bi bi-clipboard me-1"></i>Copy
+                                            </button>
+                                        </div> --}}
+
+                                        <div class="webhook-container">
+                                            <div class="webhook-label">Type =&gt; POST</div>
+                                            <input type="text" class="form-control webhook-url" value="{{ $url }}" readonly>
+                                            <button type="button" class="btn btn-copy" onclick="copyWebhook(this)">
+                                                <i class="bi bi-clipboard"></i>Copy
                                             </button>
                                         </div>
                                     </div>
@@ -221,10 +229,33 @@
 
 
 <style>
-.btn-save {
-    display: block;
-    margin: 20px auto 0 auto; /* top margin 20px, auto left/right */
+
+    .webhook-container {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* space between input and button */
+    max-width: 500px; /* optional */
 }
+
+.webhook-container .webhook-url {
+    flex: 1; /* input takes remaining space */
+    font-size: 0.9rem;
+}
+
+.webhook-container .btn-copy {
+    background: green !important;
+    color: white;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+    .btn-save {
+        display: block;
+        margin: 20px auto 0 auto; /* top margin 20px, auto left/right */
+    }
     .btn-success {
         background: green !important;
     width: 100px;
@@ -254,8 +285,9 @@
 
 <script>
     function copyWebhook(button) {
-    // Find input inside the same input-group
-    const input = button.closest('.input-group').querySelector('.webhook-url');
+    // Find input inside the same webhook-container
+    const container = button.closest('.webhook-container');
+    const input = container.querySelector('.webhook-url');
 
     if (!input) return;
 
@@ -272,7 +304,6 @@
             button.classList.add('btn-success');
         }, 2000);
     });
-
 }
 
 </script>
