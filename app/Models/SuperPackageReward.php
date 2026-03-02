@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Support\PackageHelper;
-use Utd\Badge\Entities\Badge;
+use Modules\Badge\Entities\Badge;
 use Utd\Vip\Entities\OVip;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

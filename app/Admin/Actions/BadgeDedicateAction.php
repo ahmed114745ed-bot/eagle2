@@ -8,8 +8,8 @@ use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
-use Utd\Badge\Entities\Badge;
-use Utd\Badge\Entities\UserBadge;
+use Modules\Badge\Entities\Badge;
+use Modules\Badge\Entities\UserBadge;
 
 class BadgeDedicateAction extends Action
 {

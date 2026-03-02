@@ -14,7 +14,7 @@ use Encore\Admin\Widgets\Table;
 use App\Selectables\SuperAdmins;
 use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
-use Utd\Badge\Entities\Badge;
+use Modules\Badge\Entities\Badge;
 use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;

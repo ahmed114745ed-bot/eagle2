@@ -53,7 +53,7 @@ use App\Models\CoinTarget;
 use App\Models\UserCoinTarget;
 use App\Models\UserTargetCoin;
 use App\Facades\CustomNotification;
-use Utd\Badge\Entities\UserBadge;
+use Modules\Badge\Entities\UserBadge;
 
 class UserCommon
 {

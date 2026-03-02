@@ -38,7 +38,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
 use Illuminate\Support\Facades\Cache;
-use Utd\Badge\Entities\UserBadge;
+use Modules\Badge\Entities\UserBadge;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChargeSwitchAction;
