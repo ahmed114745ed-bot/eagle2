@@ -29,6 +29,12 @@ class VerifyLeaderCCMiddleWare
             //     'body'     => $request->all(),
             //     'path' => $path,
             // ]);
+            if (!$gameSetting->is_active) {
+                return response()->json([
+                    'errorCode' => 4005,
+                    'errorMsg'  => 'Game is not active now',
+                ], 400);
+            }
 
             if (!$key) {
                 return response()->json([

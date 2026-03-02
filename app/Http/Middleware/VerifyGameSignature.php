@@ -31,6 +31,7 @@ class VerifyGameSignature
 
         //     'is !SignatureHelper::verifySignature($signature, $signatureNonce, $appKey, $timestamp) ' . json_encode(!SignatureHelper::verifySignature($signature, $signatureNonce, $appKey, $timestamp))
         // );
+        if (!$gameSetting->is_active) return response()->json(['error' => 'Game is not active now'], 400);
 
         if (!$signature || !$signatureNonce || !$timestamp) {
             return response()->json(['error' => 'Missing signature parameters'], 400);
