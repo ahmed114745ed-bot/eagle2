@@ -187,7 +187,10 @@
 
 
 <style>
-
+.btn-save {
+    display: block;
+    margin: 20px auto 0 auto; /* top margin 20px, auto left/right */
+}
     .btn-success {
         background: green !important;
     width: 100px;
