@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Support\PackageHelper;
+
 use App\Facades\UserHandling;
 use App\Models\Bd;
 use Carbon\Carbon;
@@ -33,7 +35,6 @@ use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Utd\Milestones\Helpers\MilestoneHelper;
 
 class AgencyController extends MainController
 {
@@ -879,7 +880,7 @@ class AgencyController extends MainController
 
             $user = User::find($appOwnerId);
 
-            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
+            app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($user, 'host-agency-owner');
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
@@ -1067,7 +1068,7 @@ class AgencyController extends MainController
         }
         // add vip to user
         // UserCommon::userVip($user,'acceptJoin');
-        MilestoneHelper::grantMilestoneToUser($user, 'host');
+        app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($user, 'host');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([
@@ -1121,7 +1122,7 @@ class AgencyController extends MainController
         $user->type_user = 0;
         $user->save();
 
-        MilestoneHelper::removeReward($user, 'host');
+        app(\App\Contracts\MilestoneHelperContract::class)->removeReward($user, 'host');
 
 
         return response()->json([

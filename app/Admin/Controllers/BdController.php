@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\BdAgencyHostSallary;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use App\Support\PackageHelper;
 use Utd\Milestones\Entities\Milestone;
-use Utd\Milestones\Helpers\MilestoneHelper;
 
 class BdController extends MainController
 {
@@ -335,20 +335,23 @@ class BdController extends MainController
 
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
-                $milestoneId = Milestone::where('slug', 'bd')->first();
-                $url = $milestoneId?->id ? url('admin/milestone-rewards/' . $milestoneId->id) : '';
-                $milestone = __('milestone');   // Translates 'milestone' via your language files
+                if (PackageHelper::isInstalled('milestone')) {
+                    $milestoneId = Milestone::where('slug', 'bd')->first();
+                    if ($milestoneId) {
+                        $url = url('admin/milestone-rewards/' . $milestoneId->id);
+                        $milestone = __('milestone');
 
-                $customButtonHTML = <<<HTML
-                <div style="display: contents; align-items: center;">
-                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                         {$milestone}
-                    </a>
-                </div>
-            HTML;
+                        $customButtonHTML = <<<HTML
+                        <div style="display: contents; align-items: center;">
+                            <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                                 {$milestone}
+                            </a>
+                        </div>
+                    HTML;
 
-                // Append the custom HTML button to the grid's toolbar
-                $tools->append($customButtonHTML);
+                        $tools->append($customButtonHTML);
+                    }
+                }
             });
 
             $grid->tools(function ($tools) {
@@ -497,7 +500,7 @@ class BdController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'bd');
+                        app(\App\Contracts\MilestoneHelperContract::class)->removeReward($OldUserAppId, 'bd');
                     }
 
                     $newUserAppId = User::find($newAppId);
@@ -505,7 +508,7 @@ class BdController extends MainController
                         $newUserAppId->is_bd = 1;
                         $newUserAppId->save();
                         $form->app_id = $newAppId;
-                        MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
+                        app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($newUserAppId, 'bd');
                     }
                 }
             } else {
@@ -521,7 +524,7 @@ class BdController extends MainController
                 if (isset($userApp)) {
                     $userApp->is_bd = 1;
                     $userApp->save();
-                    MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
+                    app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($userApp, 'bd');
                 }
             }
 

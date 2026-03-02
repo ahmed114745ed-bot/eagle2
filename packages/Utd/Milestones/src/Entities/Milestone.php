@@ -2,11 +2,8 @@
 
 namespace Utd\Milestones\Entities;
 
-use App\Helpers\Common;
 use App\Models\User;
-use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 
 class Milestone extends Model
 {

@@ -25,7 +25,10 @@ class MilestonesServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            \App\Contracts\MilestoneHelperContract::class,
+            \Utd\Milestones\Services\MilestoneHelperService::class
+        );
     }
 
     protected function registerRoutes(): void

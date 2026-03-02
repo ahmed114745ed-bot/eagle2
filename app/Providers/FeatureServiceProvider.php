@@ -39,7 +39,9 @@ use App\Services\Null\NullUserAchievementService;
 use App\Services\Null\NullRealsService;
 use App\Services\Null\NullGiftLogRepository;
 use App\Services\Null\NullGiftRepository;
+use App\Contracts\MilestoneHelperContract;
 use App\Contracts\RoleRewardContract;
+use App\Services\Null\NullMilestoneHelperService;
 use App\Services\Null\NullPkRepository;
 use App\Services\Null\NullRoleRewardService;
 use Illuminate\Support\ServiceProvider;
@@ -203,6 +205,14 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 UserDevicesHistoryRepositoryContract::class,
                 NullUserDevicesHistoryRepository::class
+            );
+        }
+
+        // Milestone Helper Feature
+        if (!$this->app->bound(MilestoneHelperContract::class)) {
+            $this->app->singleton(
+                MilestoneHelperContract::class,
+                NullMilestoneHelperService::class
             );
         }
     }

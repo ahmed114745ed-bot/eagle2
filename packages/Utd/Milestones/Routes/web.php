@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Utd\Milestones\Http\Controllers\web\MilestoneController;
 use Utd\Milestones\Http\Controllers\web\MilestoneRewardController;
 

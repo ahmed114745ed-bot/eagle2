@@ -2,6 +2,8 @@
 
 namespace Modules\AreaManager\Http\Controllers\Admin;
 
+use App\Support\PackageHelper;
+
 use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -22,12 +24,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Modules\AreaManager\Entities\Region;
 use App\Admin\Controllers\MainController;
-use Utd\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\AreaManager\Entities\RegionCountry;
-use Utd\Milestones\Helpers\MilestoneHelper;
 use App\Admin\Actions\FrozenWalletSuperAdminAction;
 
 class AreaManagerController extends MainController
@@ -173,22 +173,25 @@ class AreaManagerController extends MainController
 
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
-                $milestone = Cache::remember('milestone_area_manager', now()->addHours(1), function () {
-                    return Milestone::where('slug', 'area-manager')->first();
-                });
-                $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
-                $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
+                if (PackageHelper::isInstalled('milestone')) {
+                    $milestoneModel = Cache::remember('milestone_area_manager', now()->addHours(1), function () {
+                        return \Utd\Milestones\Entities\Milestone::where('slug', 'area-manager')->first();
+                    });
+                    if ($milestoneModel) {
+                        $url = url('admin/milestone-rewards/' . $milestoneModel->id);
+                        $milestoneLabel = __('Acquisitions');
 
-                $customButtonHTML = <<<HTML
-                 <div style="display: contents; align-items: center;">
-                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                          {$milestone}
-                     </a>
-                 </div>
-             HTML;
+                        $customButtonHTML = <<<HTML
+                         <div style="display: contents; align-items: center;">
+                             <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                                  {$milestoneLabel}
+                             </a>
+                         </div>
+                     HTML;
 
-                // Append the custom HTML button to the grid's toolbar
-                $tools->append($customButtonHTML);
+                        $tools->append($customButtonHTML);
+                    }
+                }
             });
 
             $grid->tools(function ($tools) {
@@ -330,14 +333,14 @@ class AreaManagerController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_area_manager = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'area-manager');
+                        app(\App\Contracts\MilestoneHelperContract::class)->removeReward($OldUserAppId, 'area-manager');
                     }
 
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_area_manager = 1;
                     $newUserAppId->save();
                     $form->app_id = $newAppId;
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'area-manager');
+                    app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($newUserAppId->id, 'area-manager');
                 }
             }
 
@@ -353,7 +356,7 @@ class AreaManagerController extends MainController
             if (isset($userApp)) {
                 $userApp->is_area_manager = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'area-manager');
+                app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($userApp->id, 'area-manager');
             }
             $userId = $form->model()->id;
 

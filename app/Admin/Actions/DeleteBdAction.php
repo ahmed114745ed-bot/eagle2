@@ -2,6 +2,8 @@
 
 namespace App\Admin\Actions;
 
+use App\Support\PackageHelper;
+
 use App\Models\Agency;
 use App\Models\Bd;
 use App\Models\User;
@@ -9,7 +11,6 @@ use App\Models\UserSallary;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Utd\Milestones\Helpers\MilestoneHelper;
 
 class DeleteBdAction extends RowAction
 {
@@ -52,7 +53,7 @@ class DeleteBdAction extends RowAction
         }
         $owner = User::find($model->app_id);
 
-        if ($owner)   MilestoneHelper::removeReward($owner, 'bd');
+        if ($owner) { app(\App\Contracts\MilestoneHelperContract::class)->removeReward($owner, 'bd'); }
 
         $model->delete();
 

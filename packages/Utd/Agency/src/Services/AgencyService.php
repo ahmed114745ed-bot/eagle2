@@ -275,7 +275,7 @@ class AgencyService implements AgencyServiceInterface
             // add vip to user
             // UserCommon::userVip($user,'request-action-agency');
             CustomNotification::acceptAgencyApp($agency, $user);
-            MilestoneHelper::grantMilestoneToUser($user, 'host');
+            app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($user, 'host');
         }
 
         return true;
@@ -699,7 +699,7 @@ class AgencyService implements AgencyServiceInterface
         if ($joinedAgency) {
             UsersJoinedAgency::where(['agency_id' => $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
         }
-        MilestoneHelper::removeReward($user_kicked, 'host');
+        app(\App\Contracts\MilestoneHelperContract::class)->removeReward($user_kicked, 'host');
 
         return true;
     }

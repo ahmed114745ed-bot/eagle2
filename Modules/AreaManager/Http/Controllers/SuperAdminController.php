@@ -2,6 +2,8 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
+use App\Support\PackageHelper;
+
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
@@ -24,7 +26,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Utd\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 
@@ -318,7 +319,7 @@ class SuperAdminController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_super_admin = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'super-admin');
+                        app(\App\Contracts\MilestoneHelperContract::class)->removeReward($OldUserAppId, 'super-admin');
                     }
 
                     $newUserAppId = User::find($newAppId);
@@ -342,7 +343,7 @@ class SuperAdminController extends MainController
             if (isset($userApp)) {
                 $userApp->is_super_admin = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
+                app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($userApp->id, 'super-admin');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();

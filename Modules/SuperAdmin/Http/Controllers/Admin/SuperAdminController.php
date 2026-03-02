@@ -27,11 +27,10 @@ use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
+use App\Support\PackageHelper;
 use App\Admin\Controllers\MainController;
-use Utd\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Admin\Actions\DeleteSuperAdminAction;
-use Utd\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use App\Admin\Actions\FrozenWalletSuperAdminAction;
 use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
@@ -135,9 +134,12 @@ class SuperAdminController extends MainController
         ]);
 
         $milestoneCacheKey = 'milestone_super_admin';
-        $milestoneId = Cache::remember($milestoneCacheKey, 3600, function () {
-            return Milestone::where('slug', 'super-admin')->first();
-        });
+        $milestoneId = null;
+        if (PackageHelper::isInstalled('milestone')) {
+            $milestoneId = Cache::remember($milestoneCacheKey, 3600, function () {
+                return \Utd\Milestones\Entities\Milestone::where('slug', 'super-admin')->first();
+            });
+        }
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -230,17 +232,19 @@ class SuperAdminController extends MainController
 
         if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) use ($milestoneId) {
-                $url = url('admin/milestone-rewards/' . @$milestoneId->id);
-                $milestone = __('Acquisitions');
+                if (PackageHelper::isInstalled('milestone') && $milestoneId) {
+                    $url = url('admin/milestone-rewards/' . @$milestoneId->id);
+                    $milestone = __('Acquisitions');
 
-                $customButtonHTML = <<<HTML
-                <div style="display: contents; align-items: center;">
-                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                        {$milestone}
-                    </a>
-                </div>
-            HTML;
-                $tools->append($customButtonHTML);
+                    $customButtonHTML = <<<HTML
+                    <div style="display: contents; align-items: center;">
+                        <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                            {$milestone}
+                        </a>
+                    </div>
+                HTML;
+                    $tools->append($customButtonHTML);
+                }
 
                 $logoutUrl = route('admin.super.logout');
                 $loginText = __('login');
@@ -483,13 +487,15 @@ class SuperAdminController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_super_admin = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'super-admin');
+                        if (PackageHelper::isInstalled('milestone')) {
+                            app(\App\Contracts\MilestoneHelperContract::class)->removeReward($OldUserAppId, 'super-admin');
+                        }
                     }
 
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_super_admin = 1;
                     $newUserAppId->save();
-                    MilestoneHelper::grantMilestoneToUser($newUserAppId->id, 'super-admin');
+                    app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($newUserAppId->id, 'super-admin');
                     $form->app_id = $newAppId;
                 }
             }
@@ -521,7 +527,7 @@ class SuperAdminController extends MainController
             if (isset($userApp)) {
                 $userApp->is_super_admin = 1;
                 $userApp->save();
-                MilestoneHelper::grantMilestoneToUser($userApp->id, 'super-admin');
+                app(\App\Contracts\MilestoneHelperContract::class)->grantMilestoneToUser($userApp->id, 'super-admin');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'super-admin')->first();
