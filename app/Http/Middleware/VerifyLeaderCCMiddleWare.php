@@ -23,12 +23,13 @@ class VerifyLeaderCCMiddleWare
             $path = ltrim(str_replace('api/', '', $request->path()), '/');
             $gameSetting =  Common::getByCode('quantum_nexus');
             $key =  @$gameSetting->app_key ?? '';
-            // LogHelper::info('LeaderCC Request Timing', [
-            //     'url'      => $request->fullUrl(),
-            //     'method'   => $request->method(),
-            //     'body'     => $request->all(),
-            //     'path' => $path,
-            // ]);
+            LogHelper::info('LeaderCC Request Timing', [
+                'url'      => $request->fullUrl(),
+                'method'   => $request->method(),
+                'body'     => $request->all(),
+                'path' => $path,
+                'key' => $key,
+            ]);
             if (!$gameSetting->is_active) {
                 return response()->json([
                     'errorCode' => 4005,
