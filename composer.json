@@ -60,7 +60,7 @@
         "utd/gifts": "*",
         "utd/host-level": "*",
         "utd/lucky-box": "*",
-        "utd/milestones": "*",
+        "utd/milestones": "dev-achievmentPackage",
         "utd/moments": "*",
         "utd/pk": "*",
         "utd/ranking-reward": "*",
@@ -262,11 +262,11 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/Milestones"
+            "url": "packages/Utd/SpecialId"
         },
         {
             "type": "path",
-            "url": "packages/Utd/SpecialId"
+            "url": "packages/Utd/Milestones"
         }
     ]
 }
