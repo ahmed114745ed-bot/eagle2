@@ -19,7 +19,11 @@ class VerifyLeaderCCMiddleWare
         $start = microtime(true);
 
         try {
-
+  \Log::info('LeaderCC Request ', [
+             
+                'body'     => $request->all(),
+             
+            ]);
             $path = ltrim(str_replace('api/', '', $request->path()), '/');
             $gameSetting =  Common::getByCode('quantum_nexus');
             $key =  @$gameSetting->app_key ?? '';
