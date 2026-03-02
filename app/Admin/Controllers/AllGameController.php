@@ -132,10 +132,11 @@ class AllGameController extends MainController
         $grid->column('name', __('name_ar'));
         $grid->column('name_en', __('name_en'));
         $grid->column('type', __('type'))->using([
-            0 => __('joy'),
+            0 => __('Joyplay'),
             1 => __('OX'),
-            2 => __('Baishun'),
-            3 => __('Leader cc'),
+            2 => __('Bytesun'),
+            3 => __('Quantum Nexus'),
+            4 => __('Zero Games'),
         ]);
         $grid->column('url', __('Full Url'));
         $grid->column('mini_url', __('Mini Url'));
@@ -206,7 +207,7 @@ class AllGameController extends MainController
 
     public function gameSettings(Request $request)
     {
-      //  dd($request->all());
+        //  dd($request->all());
         $gameSetting = GameProviderSetting::updateOrCreate(
             ['provider_code' => $request->provider_code],
             [
