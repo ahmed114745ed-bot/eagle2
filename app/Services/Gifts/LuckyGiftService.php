@@ -323,17 +323,16 @@ class LuckyGiftService
 
         $giftPrice = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
-        $numberOfGift = $number * count($receiversIds);
+        $receiversCount = count($receiversIds);
+        $numberOfGift = $number * $receiversCount;
         $totalPrice = $giftPrice * $numberOfGift;
+        $totalPriceFull = $totalPrice * $count;
 
         $userCoins = $user->di;
         $oldUserCoin = $userCoins;
 
-
-
-        if ($userCoins < $totalPrice) {
-
-            throw new InvalidArgumentException(__('api_responses.insufficient'));
+        if ($userCoins < $totalPriceFull) {
+            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
         }
 
         if (isset($ownerId)) {
