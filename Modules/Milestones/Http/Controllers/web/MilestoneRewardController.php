@@ -34,6 +34,13 @@ class MilestoneRewardController
 
     public function create(Content $content)
     {
+        if (!request()->has('reloaded')) {
+
+            return redirect()->to(
+                request()->fullUrlWithQuery(['reloaded' => 1])
+            );
+        }
+
         return $content
             ->header(__('create'))
             // ->description(__('Add a new reward to milestone'))
@@ -218,20 +225,7 @@ class MilestoneRewardController
             }
         });
 
-        Admin::script('
-    $(document).ready(function () {
-
-        // Only reload once when visiting create page
-        if (!window.location.search.includes("reloaded=1")) {
-
-            let url = new URL(window.location.href);
-            url.searchParams.set("reloaded", "1");
-
-            window.location.href = url.toString();
-        }
-
-    });
-');
+      
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));
