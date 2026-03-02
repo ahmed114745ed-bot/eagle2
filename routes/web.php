@@ -1,6 +1,5 @@
 <?php
 
-use App\helper\TimeHelper;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -16,6 +15,7 @@ use App\Enums\SuperAdminNotificationType;
 use App\Exports\AgencyCharge;
 use App\Exports\AgencyChargeTransactions;
 use App\Facades\CustomNotification;
+use App\helper\TimeHelper;
 use App\Helpers\AdminNotificationHelper;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
@@ -49,6 +49,7 @@ use App\Models\User;
 use App\Models\UserSallary;
 use Carbon\Carbon;
 use Database\Seeders\FlagSyrianSeeder;
+use Database\Seeders\WebhookGamesSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -220,7 +221,7 @@ Route::get('/run-seeders', function () {
     Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    // Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
+     Artisan::call('db:seed', ['--class' => WebhookGamesSeeder::class]);
     // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
 
     return response()->json([
