@@ -139,8 +139,8 @@
     </div>
 
     <div class="step">
-        <span class="step-num">4</span> <strong>Run Migrations</strong>
-        <pre><code>php artisan migrate; php artisan optimize:clear</code></pre>
+        <span class="step-num">4</span> <strong>Run Migrations, Seeders & Clear Cache</strong>
+        <pre><code>php artisan migrate; php artisan db:seed --class="Utd\Milestones\Database\Seeders\MilestonesDatabaseSeeder"; php artisan db:seed --class="Database\Seeders\PermissionTypeSeeder"; php artisan optimize:clear</code></pre>
     </div>
 
     <h2>Verify Installation</h2>

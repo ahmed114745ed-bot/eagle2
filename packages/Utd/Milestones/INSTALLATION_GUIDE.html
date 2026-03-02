@@ -419,6 +419,22 @@
 
     <div class="step">
         <span class="step-number">5</span>
+        <span class="step-title">Seed Admin Menu</span>
+        <p>Run the menu seeder to create admin panel menu items:</p>
+        <pre><code>php artisan db:seed --class="Utd\Milestones\Database\Seeders\MilestonesDatabaseSeeder"</code></pre>
+        <p>Creates menu: 🏁 milestones → 📍 milestones + 🎁 user-history-rewards</p>
+    </div>
+
+    <div class="step">
+        <span class="step-number">6</span>
+        <span class="step-title">Seed Permissions</span>
+        <p>Run the PermissionTypeSeeder to register milestone permissions:</p>
+        <pre><code>php artisan db:seed --class="Database\Seeders\PermissionTypeSeeder"</code></pre>
+        <p>Registers permissions: <code>browse-milestone</code>, <code>dedicate-switch-milestone</code></p>
+    </div>
+
+    <div class="step">
+        <span class="step-number">7</span>
         <span class="step-title">Clear Cache</span>
         <p>Clear the application cache:</p>
         <pre><code>php artisan optimize:clear</code></pre>
