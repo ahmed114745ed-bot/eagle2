@@ -15,7 +15,6 @@
                             <h4 class="m-0"style="color: white;">{{ __('Bytesun') }}</h4>
                              <div class="d-flex align-items-center">
                                     <input type="hidden" name="active" value="0">
-                                   `
                                     <input type="checkbox" id="bytesunRadio"
                                            class="custom-payment-radio libraryRealTime"
                                            name="active" value="1"
@@ -50,7 +49,6 @@
                             <h4 class="m-0"style="color: white;">{{ __('Quantum Nexus') }}</h4>
                              <div class="d-flex align-items-center">
                                     <input type="hidden" name="active" value="0">
-                                   `
                                     <input type="checkbox" id="quantumNexusRadio"
                                            class="custom-payment-radio libraryRealTime"
                                            name="active" value="1"
