@@ -177,11 +177,7 @@ class GiftLogService
             }
 
             if ($room->charizma_status) {
-                Log::info("DEBUG: Dispatching UpdateSendCharismaToZigo", [
-                    'room_id' => $room->id,
-                    'userId' => $userId,
-                    'price' => ($gift->price * $number)
-                ]);
+              
                 dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
                     ->onQueue('default');
             }
