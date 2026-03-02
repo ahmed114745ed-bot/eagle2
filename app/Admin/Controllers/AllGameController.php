@@ -213,7 +213,11 @@ class AllGameController extends MainController
             [
                 'provider_name' => $request->provider_name,
                 'app_key'       => $request->app_key,
-                'is_active'             => $request->active,
+                'app_id'        => $request->app_id,
+                'channel'       => $request->channel,
+                'gsp'           => $request->gsp,
+                'is_active'     => $request->active,
+
             ]
         );
 
@@ -224,7 +228,6 @@ class AllGameController extends MainController
         Cache::put(
             'game_provider_' . $request->provider_code,
             $gameSetting,
-            now()->addHours(2) // cache for 2 hours
         );
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');

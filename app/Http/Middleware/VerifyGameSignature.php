@@ -23,7 +23,7 @@ class VerifyGameSignature
         $signatureNonce = $request->get('signature_nonce');
         $timestamp = $request->get('timestamp');
         $gameSetting = Common::getByCode('bytesun');
-        $appKey = $gameSetting ? $gameSetting->app_key : config('services.baishun.app_key');
+        $appKey =  @$gameSetting->app_key ?? '';
         $currentTimestamp = Carbon::now()->timestamp;
 
         // 'is !$signature || !$signatureNonce || !$timestamp ' . json_encode(!$signature || !$signatureNonce || !$timestamp) . PHP_EOL .
