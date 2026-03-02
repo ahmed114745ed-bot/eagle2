@@ -292,25 +292,24 @@ class FairLuckService3
 
                         if (in_array($multiplier, [5, 10, 20])) {
                             $globalVaultBalance = $this->getGlobalVaultBalance();
-                            if ($globalVaultBalance >= $profit) {
+                            $negativeLimit = FairLuckWallet::getNegativeLimit();
+                            $maxAllowedDecrease = $globalVaultBalance + $negativeLimit;
+
+                            if ($maxAllowedDecrease >= $profit) {
                                 $this->decreaseGlobalVaultBalance((int) round($profit), "Win payout (Global Vault {$multiplier}x)", $user->id);
-
                             } else {
-
-                                if ($globalVaultBalance > 0) {
-                                    $this->decreaseGlobalVaultBalance($globalVaultBalance, "Win payout (Global Vault {$multiplier}x) Partial", $user->id);
+                                // Payout as much as possible up to the negative limit
+                                if ($maxAllowedDecrease > 0) {
+                                    $this->decreaseGlobalVaultBalance((int) round($maxAllowedDecrease), "Win payout (Global Vault {$multiplier}x) Maxed to Limit", $user->id);
+                                    // Optionally, you might want to cancel the full win or do a partial win.
+                                    // Usually, for 5-20x, we want to allow it to go negative.
                                 }
 
-                                $remainingProfit = $profit - $globalVaultBalance;
-                                if ($unlockContribution > 0 && $contributionBank > -$unlockContribution && $remainingProfit > 0) {
-                                    $recoveryRatio = 0.35;
-                                    $profitOffset = min($remainingProfit, $contributionBank + $unlockContribution) * $recoveryRatio;
-                                    $updatedBank = max(-$unlockContribution, $contributionBank - $profitOffset);
-                                    \Illuminate\Support\Facades\Redis::set($contributionKey, (int) round($updatedBank));
-                                    \Illuminate\Support\Facades\Redis::expire($contributionKey, 259200);
-                                    if ($profitOffset > 0) {
-                                        $this->lossLedger->removeFromGlobalPool((int) round($profitOffset));
-                                    }
+                                // If even with negative limit we can't pay, cancel win
+                                if ($maxAllowedDecrease < ($profit * 0.5)) { // Safeguard: if we can't pay at least half, cancel.
+                                    $isWinner = false;
+                                    $forceWin = false;
+                                    $multiplier = 0;
                                 }
                             }
                         }
@@ -409,7 +408,7 @@ class FairLuckService3
             FairLuckTransaction::create([
                 'user_id' => $user->id,
                 'gift_id' => $gift->id,
-                'bet_amount' => $betAmount,
+                'bet_amount' => $betAmount + $appFee + $receiverFee,
                 'app_fee' => $appFee,
                 'receiver_fee' => $receiverFee,
                 'is_winner' => $isWinner,
