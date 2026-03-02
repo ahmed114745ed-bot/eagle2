@@ -1611,3 +1611,11 @@ Route::get('/fix-total-room-gifts', function () {
 
 
 
+Route::get('/restart-queues', function () {
+    try {
+        Artisan::call('queue:restart');
+        return "✅ Artisan queue:restart signaled successfully.";
+    } catch (\Exception $e) {
+        return "❌ Failed to signal queue:restart: " . $e->getMessage();
+    }
+});
