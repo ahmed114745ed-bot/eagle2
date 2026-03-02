@@ -219,16 +219,19 @@ class MilestoneRewardController
         });
 
         Admin::script('
-            $(document).ready(function() {
-                // Trigger Laravel Admin dynamic fields immediately on page load
-                $("select[name=\'type\']").trigger("change.admin.form");
+    $(document).ready(function () {
 
-                // Trigger when user changes type
-                $("select[name=\'type\']").on("change", function(){
-                    $(this).trigger("change.admin.form");
-                });
-            });
-        ');
+        // Only reload once when visiting create page
+        if (!window.location.search.includes("reloaded=1")) {
+
+            let url = new URL(window.location.href);
+            url.searchParams.set("reloaded", "1");
+
+            window.location.href = url.toString();
+        }
+
+    });
+');
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));
