@@ -16,17 +16,17 @@ class VerifyLeaderCCMiddleWare
 {
     public function handle(Request $request, Closure $next)
     {
+           \Log::info('LeaderCC Request ', [
+                'body'     => $request->all(),
+            ]);
         $start = microtime(true);
 
         try {
-  \Log::info('LeaderCC Request ', [
-             
-                'body'     => $request->all(),
-             
-            ]);
+         
             $path = ltrim(str_replace('api/', '', $request->path()), '/');
             $gameSetting =  Common::getByCode('quantum_nexus');
-            $key =  @$gameSetting->app_key ?? '';
+            //$key =  @$gameSetting->app_key ?? '';
+            $key =  '303';
             \Log::info('LeaderCC Request Timing', [
                 'url'      => $request->fullUrl(),
                 'method'   => $request->method(),
