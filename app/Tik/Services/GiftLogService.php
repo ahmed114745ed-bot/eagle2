@@ -165,15 +165,18 @@ class GiftLogService
                     }
                 }
             }
-
+              
             if ($room->lastPk != null) {
+
                 dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room))
-                    ->afterResponse();
+                    ->afterCommit()
+                    ->onQueue('updatePk');
             }
 
             if ($room->charizma_status) {
                 dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
-                    ->afterResponse();
+                    ->afterCommit()
+                    ->onQueue('default');
             }
 
             $realPrice = (int) ($number * $gift->price);
