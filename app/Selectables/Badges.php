@@ -2,6 +2,7 @@
 
 namespace App\Selectables;
 
+use App\Support\PackageHelper;
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
 use Utd\Badge\Entities\Badge;
@@ -14,6 +15,10 @@ class Badges extends Selectable
 
     public function make()
     {
+        if (!PackageHelper::isInstalled('badge')) {
+            return;
+        }
+
         $this->column('id', __('ID'));
         $this->column('name', __('name'));
         $this->column('image', __('image'))->display(function ($path) {

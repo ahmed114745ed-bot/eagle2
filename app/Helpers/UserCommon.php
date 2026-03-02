@@ -423,6 +423,9 @@ class UserCommon
 
     public static function removeBadgeFromUser(User $user, $id, $receiveType)
     {
+        if (!PackageHelper::isInstalled('badge')) {
+            return;
+        }
 
         UserBadge::where('receive_type', $receiveType)
             ->where('user_id', $user->id)

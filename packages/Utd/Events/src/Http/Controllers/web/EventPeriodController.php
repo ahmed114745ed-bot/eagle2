@@ -213,7 +213,7 @@ class EventPeriodController extends MainController
                 return @$vip->name ?? '';
             }
             if ($this->type === 'badge') {
-                $vip = Badge::find($target);
+                $vip = PackageHelper::isInstalled('badge') ? Badge::find($target) : null;
 
                 return $vip ? (@$vip->name ?? '') : '';
             }

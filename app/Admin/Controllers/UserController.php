@@ -623,11 +623,13 @@ class UserController extends MainController
                 break;
 
             case 'badges':
-                $badges = UserBadge::with('admin:id,name')
-                    ->where('user_id', $id)
-                    ->orderByRaw("CASE WHEN expire = 0 THEN 0 WHEN expire >= ? THEN 0 ELSE 1 END", [now()->timestamp])
-                    ->orderByDesc('expire')
-                    ->paginate(10, ['*'], 'badges_page');
+                if (PackageHelper::isInstalled('badge')) {
+                    $badges = UserBadge::with('admin:id,name')
+                        ->where('user_id', $id)
+                        ->orderByRaw("CASE WHEN expire = 0 THEN 0 WHEN expire >= ? THEN 0 ELSE 1 END", [now()->timestamp])
+                        ->orderByDesc('expire')
+                        ->paginate(10, ['*'], 'badges_page');
+                }
                 break;
 
             case 'wallet_logs':
@@ -1189,7 +1191,9 @@ class UserController extends MainController
 
     public function deleteBadge($id)
     {
-        UserBadge::where('id', $id)->delete();
+        if (PackageHelper::isInstalled('badge')) {
+            UserBadge::where('id', $id)->delete();
+        }
         return redirect()->back();
     }
 }

@@ -145,7 +145,9 @@ class RoleRewardService implements RoleRewardContract
                 ]);
             }
         } elseif ($reward->type === "badge") {
-            Common::userBadge($user->id, $reward->rewardable_id, $reward->expire, $receiveType);
+            if (PackageHelper::isInstalled('badge')) {
+                Common::userBadge($user->id, $reward->rewardable_id, $reward->expire, $receiveType);
+            }
         }
     }
 

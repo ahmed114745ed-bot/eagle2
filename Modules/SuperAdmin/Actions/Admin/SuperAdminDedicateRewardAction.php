@@ -115,7 +115,9 @@ function pu(val) {
                 UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'super_admin_dedicate');
                 break;
             case "badge":
-                Common::userBadge($user->id, $reward->target, $reward->expire, 'super_admin_dedicate');
+                if (PackageHelper::isInstalled('badge')) {
+                    Common::userBadge($user->id, $reward->target, $reward->expire, 'super_admin_dedicate');
+                }
                 break;
             case "achievement":
                 if (class_exists(UserAchievementLevel::class)) {

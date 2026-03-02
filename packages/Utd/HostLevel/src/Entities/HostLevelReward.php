@@ -39,7 +39,8 @@ class HostLevelReward extends Model
 
     public function badge()
     {
-        return $this->hasOne(Badge::class, 'id', 'target');
+        return PackageHelper::checkRelation($this, 'badge', 'hasOne') ??
+            $this->hasOne(Badge::class, 'id', 'target');
     }
 
     public function getTarget1Attribute()

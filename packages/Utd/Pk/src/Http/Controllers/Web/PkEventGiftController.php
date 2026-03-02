@@ -420,6 +420,7 @@ class PkEventGiftController extends MainController
                     if (! $id) {
                         return [];
                     }
+                    if (!PackageHelper::isInstalled('badge')) return [];
                     $ware = Badge::find($id);
 
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];

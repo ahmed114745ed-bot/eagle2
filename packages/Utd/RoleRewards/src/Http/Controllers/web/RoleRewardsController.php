@@ -217,6 +217,7 @@ class RoleRewardsController extends MainController
                 ->select('id', __('badges'))
                 ->options(function ($id) {
                     if (!$id) return [];
+                    if (!PackageHelper::isInstalled('badge')) return [];
                     $ware = Badge::find($id);
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
@@ -251,8 +252,8 @@ class RoleRewardsController extends MainController
                     $form->model()->rewardable_type = OVip::class;
                     break;
                 case 'badge':
-                    $form->rewardable_type = \Utd\Badge\Entities\Badge::class;
-                    $form->model()->rewardable_type = \Utd\Badge\Entities\Badge::class;
+                    $form->rewardable_type = Badge::class;
+                    $form->model()->rewardable_type = Badge::class;
                     break;
                 case 'achievement':
                     if (! class_exists(Achievement::class)) {

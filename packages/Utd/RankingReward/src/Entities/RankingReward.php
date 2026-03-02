@@ -37,7 +37,8 @@ class RankingReward extends Model
 
     public function badge(): HasOne
     {
-        return $this->hasOne(Badge::class, 'id', 'target');
+        return PackageHelper::checkRelation($this, 'badge', 'hasOne') ??
+            $this->hasOne(Badge::class, 'id', 'target');
     }
 
     public function getTarget1Attribute()

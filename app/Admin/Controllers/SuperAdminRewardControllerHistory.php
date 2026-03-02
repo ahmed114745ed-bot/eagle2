@@ -406,6 +406,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 ->select('id', __('badges'))
                 ->options(function ($id) {
                     if (!$id) return [];
+                    if (!PackageHelper::isInstalled('badge')) return [];
                     $ware = Badge::find($id);
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })

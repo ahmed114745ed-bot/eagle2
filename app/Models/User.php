@@ -196,9 +196,10 @@ class User extends Authenticatable
 
     public function userBadges()
     {
-        return $this->hasMany(Badge::class, 'user_id')->where(function ($q) {
-            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
-        });
+        return PackageHelper::checkRelation($this, 'badge', 'hasMany') ??
+            $this->hasMany(Badge::class, 'user_id')->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            });
     }
 
     public function latestTarget()
@@ -1840,6 +1841,9 @@ class User extends Authenticatable
 
     public function userBadge()
     {
+        if (!PackageHelper::isInstalled('badge')) {
+            return '';
+        }
 
         $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
 

@@ -231,7 +231,9 @@ class DedicateAdminPackageReward extends Action
                 if ($ware) UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'admin_dedicate');
                 break;
             case "badge":
-                Common::userBadge($user->id, $reward->target, $reward->expire, 'admin_dedicate');
+                if (PackageHelper::isInstalled('badge')) {
+                    Common::userBadge($user->id, $reward->target, $reward->expire, 'admin_dedicate');
+                }
                 break;
             case "achievement":
                 $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");

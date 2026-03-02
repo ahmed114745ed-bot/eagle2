@@ -204,7 +204,9 @@ function pu(val) {
                 UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'region_manager_dedicate');
                 break;
             case "badge":
-                Common::userBadge($user->id, $reward->target, $reward->expire, 'region_manager_dedicate');
+                if (PackageHelper::isInstalled('badge')) {
+                    Common::userBadge($user->id, $reward->target, $reward->expire, 'region_manager_dedicate');
+                }
                 break;
             case "achievement":
                 if (class_exists(UserAchievementLevel::class)) {

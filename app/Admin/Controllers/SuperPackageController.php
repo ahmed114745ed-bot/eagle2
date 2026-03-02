@@ -252,7 +252,7 @@ class SuperPackageController extends MainController
                         $name = $ware->name ?? $reward->target;
                         $url = getImagePath($ware->img2 ?? $ware->show_img ?? '');
                     } elseif ($reward->type == 'badge') {
-                        $badge = Badge::find($reward->target);
+                        $badge = PackageHelper::isInstalled('badge') ? Badge::find($reward->target) : null;
                         $name = $badge->name ?? $reward->target;
                         $url = getImagePath($badge->img ?? '');
                     } elseif ($reward->type == 'vip') {
@@ -540,6 +540,7 @@ class SuperPackageController extends MainController
                 ->select('id', __('badges'))
                 ->options(function ($id) {
                     if (!$id) return [];
+                    if (!PackageHelper::isInstalled('badge')) return [];
                     $ware = Badge::find($id);
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })

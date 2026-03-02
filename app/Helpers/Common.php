@@ -2501,6 +2501,10 @@ class Common
 
     public static function userBadge($userId, $badgeId, $days, $type)
     {
+        if (!PackageHelper::isInstalled('badge')) {
+            return;
+        }
+
         $badgeUser = UserBadge::where('user_id', $userId)->where('badge_id', $badgeId)->active()->first();
         if ($badgeUser && $badgeUser->expire != 0) {
             $badgeUser->expire += (($days) * 86400);

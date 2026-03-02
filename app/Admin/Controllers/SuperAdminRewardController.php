@@ -15,6 +15,7 @@ use Encore\Admin\Widgets\Box;
 use Illuminate\Support\HtmlString;
 use Encore\Admin\Widgets\Table;
 use App\Models\SuperPackageReward;
+use App\Support\PackageHelper;
 
 
 class SuperAdminRewardController extends MainController
@@ -84,7 +85,9 @@ class SuperAdminRewardController extends MainController
             $this->vip($grid);
         } elseif ($type == 'badge') {
             $grid = new Grid(new Badge());
-            $this->badge($grid);
+            if (PackageHelper::isInstalled('badge')) {
+                $this->badge($grid);
+            }
         } elseif ($type == 'ware') {
             $grid = new Grid(new Ware());
             $this->ware($grid);

@@ -55,8 +55,10 @@ class UserRewardsWeeklyCp
 
     public static function assignBadge($badgeId, $expire, $userOne, $userTwo)
     {
-        Common::userBadge($userOne, $badgeId, $expire, 'weekly-cp');
-        Common::userBadge($userTwo, $badgeId, $expire, 'weekly-cp');
+        if (PackageHelper::isInstalled('badge')) {
+            Common::userBadge($userOne, $badgeId, $expire, 'weekly-cp');
+            Common::userBadge($userTwo, $badgeId, $expire, 'weekly-cp');
+        }
     }
 
     public static  function assignWare($ware, $reward, $userOne, $userTwo)
