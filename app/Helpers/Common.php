@@ -1786,8 +1786,8 @@ class Common
 
     public  static function getTargetUsd($diamonds, $percentage)
     {
-        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
-        $coins = Common::getSettingValue($convertDiamond) ?? 1;
+        //$convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        //$coins = Common::getSettingValue($convertDiamond) ?? 1;
 
         // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
         //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
@@ -1796,13 +1796,11 @@ class Common
         //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         // });
 
-        // $zones_coins = Cache::rememberForever('zones_coins', function () {
-        //    return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        //});
+        $zones_coins = Cache::rememberForever('zones_coins', function () {
+            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
+        });
 
-
-
-        // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
+        $coins = $zones_coins;
 
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
