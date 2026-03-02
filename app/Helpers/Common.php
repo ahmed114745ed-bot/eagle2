@@ -41,7 +41,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Utd\Pk\Entities\PkEvent;
 use Illuminate\Support\Facades\Cache;
-use Modules\Badge\Entities\UserBadge;
+use Utd\Badge\Entities\UserBadge;
 use Utd\Pk\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
 use App\Traits\HelperTraits\InfoTrait;

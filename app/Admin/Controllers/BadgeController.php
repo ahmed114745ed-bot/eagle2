@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Badge;
+use Utd\Badge\Entities\Badge;
 use App\Models\Language;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;

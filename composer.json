@@ -61,6 +61,7 @@
         "utd/host-level": "*",
         "utd/lucky-box": "*",
         "utd/milestones": "dev-achievmentPackage",
+        "utd/badge": "*",
         "utd/moments": "*",
         "utd/pk": "*",
         "utd/ranking-reward": "*",
@@ -267,6 +268,10 @@
         {
             "type": "path",
             "url": "packages/Utd/Milestones"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Badge"
         }
     ]
 }

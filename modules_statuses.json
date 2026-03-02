@@ -21,7 +21,7 @@
     "LuckyBox": false,
     "TribeReward": true,
     "Vip": false,
-    "Badge": true,
+    "Badge": false,
     "RoleRewards": false,
     "Milestones": false,
     "AreaManager": true,

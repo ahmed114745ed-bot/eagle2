@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Helpers\Common;
 use Utd\Vip\Entities\OVip;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;

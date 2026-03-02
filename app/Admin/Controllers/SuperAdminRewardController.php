@@ -7,7 +7,7 @@ use Encore\Admin\Grid;
 use Modules\SuperAdmin\Actions\Admin\DedicateSuperAdminRewardAction;
 use Utd\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
-use Modules\Badge\Entities\Badge;
+use Utd\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Row;

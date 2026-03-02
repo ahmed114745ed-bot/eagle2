@@ -1,0 +1,22 @@
+{
+    "name": "utd/badge",
+    "description": "Badge package for Eagle",
+    "type": "library",
+    "license": "MIT",
+    "authors": [],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Utd\\Badge\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Badge\\BadgeServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
