@@ -6,6 +6,7 @@ use App\Models\FairLuckTransaction;
 use App\Models\FairLuckWallet;
 use App\Models\Gift;
 use App\Models\User;
+use App\Models\FairLuckSetting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
@@ -23,7 +24,7 @@ class FairLuckService3
         private HighMultiplierLedger $highMultiplierLedger,
         private LossLedger $lossLedger
     ) {
-        $this->houseEdgeRate = (float) config('fairluck.house_edge_rate', 0.02);
+        $this->houseEdgeRate = (float) FairLuckSetting::getByKey('house_edge_rate', 0.0);
     }
 
     public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null, $receiverId = null, float $appFee = 0, float $receiverFee = 0, float $senderBalanceBefore = 0, float $senderBalanceAfter = 0): object
@@ -135,14 +136,26 @@ class FairLuckService3
             $baseProb = ($localTargetRTP / $expectedMultiplier);
 
             $protectionMultiplier = $this->beginnerProtection->getMultiplier($profile);
-            $finalProbability = $this->probabilityEngine->calculate($baseProb, $deviation, $protectionMultiplier);
+            $finalProbability = $this->probabilityEngine->calculate($baseProb, $deviation, $protectionMultiplier, $user->di, $betAmount);
 
-            if ($consecutiveLosses >= 20) {
+            /**
+             * GRANULAR PITY SYSTEM:
+             * If the user is on a losing streak, we gradually boost the probability
+             * to 100% to ensure they hit a win and stay engaged.
+             */
+            if ($consecutiveLosses >= 5) {
+                // Boost local RTP for the base calculation
+                $localTargetRTP = max($localTargetRTP, 0.50 + ($consecutiveLosses * 0.02));
+                $baseProb = ($localTargetRTP / $expectedMultiplier);
+                $finalProbability = $this->probabilityEngine->calculate($baseProb, $deviation, $protectionMultiplier, $user->di, $betAmount);
+            }
+
+            if ($consecutiveLosses >= 15) {
+                $finalProbability = max($finalProbability, 0.80);
+            }
+
+            if ($consecutiveLosses >= 25) {
                 $finalProbability = 1.0;
-            } elseif ($consecutiveLosses >= 15) {
-                $finalProbability = max($finalProbability, 0.60);
-            } elseif ($consecutiveLosses >= 12) {
-                $finalProbability = max($finalProbability, 0.35);
             }
 
             if ($isDrainLocked) {
@@ -429,116 +442,52 @@ class FairLuckService3
     private function validateMultiplierAvailability(int $selectedMultiplier, float $betAmount): int
     {
         $requiredPayout = max(0, ($selectedMultiplier - 1) * $betAmount);
+        $limit = FairLuckWallet::getNegativeLimit();
+        $globalBalance = $this->getGlobalVaultBalance();
+        $mediumBalance = $this->getMediumWalletBalance();
+        $jackpotBalance = $this->getJackpotWalletBalance();
 
+        // 1. Small Wins (5, 10, 20) - Primary Global Vault
         if (in_array($selectedMultiplier, [5, 10, 20])) {
-            $globalBalance = $this->getGlobalVaultBalance();
-            $limit = FairLuckWallet::getNegativeLimit();
-
             if ($globalBalance + $limit >= $requiredPayout) {
                 return $selectedMultiplier;
-            } else {
-                if ($selectedMultiplier == 20) {
-                    $requiredFor10 = max(0, (10 - 1) * $betAmount);
-                    if ($globalBalance + $limit >= $requiredFor10) {
-
-                        return 10;
-                    }
-                    $requiredFor5 = max(0, (5 - 1) * $betAmount);
-                    if ($globalBalance + $limit >= $requiredFor5) {
-
-                        return 5;
-                    }
-                } elseif ($selectedMultiplier == 10) {
-                    $requiredFor5 = max(0, (5 - 1) * $betAmount);
-                    if ($globalBalance + $limit >= $requiredFor5) {
-
-                        return 5;
-                    }
-                }
-
-                $mediumBalance = $this->getMediumWalletBalance();
-                $requiredFor50 = max(0, (50 - 1) * $betAmount);
-                if ($mediumBalance >= $requiredFor50) {
-
-                    return 50;
-                }
-
-                return 0;
             }
+            // Fallback to lower multipliers in same tier
+            if ($selectedMultiplier > 5) {
+                return $this->validateMultiplierAvailability($selectedMultiplier == 20 ? 10 : 5, $betAmount);
+            }
+            return 0; // Truly insolvent
         }
 
+        // 2. Medium Wins (50, 70, 100) - Primary Medium Wallet, Fallback to Global
         if (in_array($selectedMultiplier, [50, 70, 100])) {
-            $mediumBalance = $this->getMediumWalletBalance();
-
             if ($mediumBalance >= $requiredPayout) {
                 return $selectedMultiplier;
-            } else {
-                if ($selectedMultiplier == 100) {
-                    $requiredFor70 = max(0, (70 - 1) * $betAmount);
-                    if ($mediumBalance >= $requiredFor70) {
-
-                        return 70;
-                    }
-                    $requiredFor50 = max(0, (50 - 1) * $betAmount);
-                    if ($mediumBalance >= $requiredFor50) {
-
-                        return 50;
-                    }
-                }
-                if ($selectedMultiplier == 70) {
-                    $requiredFor50 = max(0, (50 - 1) * $betAmount);
-                    if ($mediumBalance >= $requiredFor50) {
-
-                        return 50;
-                    }
-                }
-
-                $globalBalance = $this->getGlobalVaultBalance();
-                $requiredFor5 = max(0, (5 - 1) * $betAmount);
-                if ($globalBalance >= $requiredFor5) {
-
-                    return 5;
-                }
-
-                return 0;
             }
+            // Fallback: If Medium is low, check if Global can cover it (Resilience)
+            if ($globalBalance + $limit >= $requiredPayout) {
+                return $selectedMultiplier;
+            }
+            // Fallback to lower multipliers in same tier or lower tier
+            if ($selectedMultiplier > 50) {
+                return $this->validateMultiplierAvailability($selectedMultiplier == 100 ? 70 : 50, $betAmount);
+            }
+            return $this->validateMultiplierAvailability(20, $betAmount);
         }
 
+        // 3. Jackpots (250, 500, 1000) - Primary Jackpot Wallet, Fallback to Global
         if (in_array($selectedMultiplier, [250, 500, 1000])) {
-            $jackpotBalance = $this->getJackpotWalletBalance();
-
             if ($jackpotBalance >= $requiredPayout) {
                 return $selectedMultiplier;
-            } else {
-                if ($selectedMultiplier == 500) {
-                    $requiredFor250 = max(0, (250 - 1) * $betAmount);
-                    if ($jackpotBalance >= $requiredFor250) {
-
-                        return 250;
-                    }
-                }
-                if ($selectedMultiplier == 1000) {
-                    $requiredFor500 = max(0, (500 - 1) * $betAmount);
-                    if ($jackpotBalance >= $requiredFor500) {
-
-                        return 500;
-                    }
-                    $requiredFor250 = max(0, (250 - 1) * $betAmount);
-                    if ($jackpotBalance >= $requiredFor250) {
-
-                        return 250;
-                    }
-                }
-
-                $mediumBalance = $this->getMediumWalletBalance();
-                $requiredFor50 = max(0, (50 - 1) * $betAmount);
-                if ($mediumBalance >= $requiredFor50) {
-
-                    return 50;
-                }
-
-                return 0;
             }
+            if ($globalBalance >= ($requiredPayout * 2)) {
+                return $selectedMultiplier;
+            }
+
+            if ($selectedMultiplier > 250) {
+                return $this->validateMultiplierAvailability($selectedMultiplier == 1000 ? 500 : 250, $betAmount);
+            }
+            return $this->validateMultiplierAvailability(100, $betAmount);
         }
 
         return $selectedMultiplier;
@@ -1099,36 +1048,22 @@ class FairLuckService3
 
     private function distributeBetAmount(float $totalAmount, float $appFee = 0): void
     {
+        // New structure: 94% RTP, 6% Fees (App 2%, Receiver 2%, Extra 2%)
+        // The $appFee and $receiverFee passed in are already 10% each of the unitPrice in sendLuckyGift4
+        // However, FairLuckService3 handles distribution internally.
+        // Let's stick to the 94% pool allocation for Prize Wallets.
 
-        $globalVaultAmount = $totalAmount * 0.55;
-        $globalVaultAmountInt = (int) round($globalVaultAmount);
+        // $totalAmount is the net bet (e.g., 80% of price)
+        // Distribution of the net bet: 65% Global, 15% Medium, 20% Jackpot
 
-    
+        $globalVaultAmount = $totalAmount * 0.65;
+        $this->increaseGlobalVaultBalance((int) round($globalVaultAmount), "Bet contribution (65% of Net)", null);
 
-        $this->increaseGlobalVaultBalance($globalVaultAmountInt, "Bet contribution (55%)", null);
+        $jackpotWalletAmount = $totalAmount * 0.20;
+        $this->increaseJackpotWallet((int) round($jackpotWalletAmount), "Bet contribution (20% of Net)", null);
 
-        $jackpotWalletAmount = $totalAmount * 0.15;
-        $jackpotWalletAmountInt = (int) round($jackpotWalletAmount);
-
-
-        $this->increaseJackpotWallet($jackpotWalletAmountInt, "Bet contribution (15%)", null);
-
-        $mediumWalletAmount = $totalAmount * 0.10;
-        $mediumWalletAmountInt = (int) round($mediumWalletAmount);
-
-
-        $this->increaseMediumWallet($mediumWalletAmountInt, "Bet contribution (10%)", null);
-
-        // Store app fee (10%) in app_wallet (core_wallets table)
-        $appFeeInt = (int) round($appFee);
-        if ($appFeeInt > 0) {
-            \DB::table('core_wallets')
-                ->where('name', 'app_wallet')
-                ->increment('coins', $appFeeInt);
-        }
-
-    
-
+        $mediumWalletAmount = $totalAmount * 0.15;
+        $this->increaseMediumWallet((int) round($mediumWalletAmount), "Bet contribution (15% of Net)", null);
     }
 
     private function increaseJackpotWallet(int $amount, ?string $description = null, ?int $userId = null): void
