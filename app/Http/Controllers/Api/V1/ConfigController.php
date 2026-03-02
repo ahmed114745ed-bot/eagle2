@@ -242,7 +242,7 @@ class ConfigController extends Controller
         return redirect($redirectUrl);
     }
 
-    public function updateConfigAgoraZego(Request $request)
+  /*  public function updateConfigAgoraZego(Request $request)
     {
         $inputValue = $request->input('live_library');
 
@@ -320,5 +320,5 @@ class ConfigController extends Controller
 
         $redirectUrl = url('admin/settings?tab=realTimeSetting');
         return redirect($redirectUrl);
-    }
+    }*/
 }
