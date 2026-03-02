@@ -60,6 +60,7 @@
         "utd/gifts": "*",
         "utd/host-level": "*",
         "utd/lucky-box": "*",
+        "utd/milestones": "*",
         "utd/moments": "*",
         "utd/pk": "*",
         "utd/ranking-reward": "*",
@@ -70,7 +71,6 @@
         "utd/special-id": "dev-achievmentPackage",
         "utd/switch-account": "dev-achievmentPackage",
         "utd/task-stream": "*",
-        "utd/milestones": "*",
         "utd/vip": "*"
     },
     "require-dev": {
