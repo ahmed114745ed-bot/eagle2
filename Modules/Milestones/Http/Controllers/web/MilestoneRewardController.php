@@ -217,6 +217,14 @@ class MilestoneRewardController
                     break;
             }
         });
+          Admin::script('
+                $(document).ready(function(){
+                    $("select[name=\'type\']").trigger("change.admin.form");
+                    $("select[name=\'type\']").on("change", function(){
+                        $(this).trigger("change.admin.form");
+                    });
+                });
+        ');
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));
