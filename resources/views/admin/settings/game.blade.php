@@ -13,6 +13,15 @@
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="m-0"style="color: white;">{{ __('Bytesun') }}</h4>
+                             <div class="d-flex align-items-center">
+                                    <input type="hidden" name="active" value="0">
+                                   `
+                                    <input type="checkbox" id="bytesunRadio"
+                                           class="custom-payment-radio libraryRealTime"
+                                           name="active" value="1"
+                                        {{ $bytesunSettings->is_active == 1  ? 'checked' : '' }}>
+                                    <label for="bytesunRadio" class="switch"></label>
+                                </div>
                         </div>
 
                         <div class="row">
@@ -39,6 +48,15 @@
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="m-0"style="color: white;">{{ __('Quantum Nexus') }}</h4>
+                             <div class="d-flex align-items-center">
+                                    <input type="hidden" name="active" value="0">
+                                   `
+                                    <input type="checkbox" id="quantumNexusRadio"
+                                           class="custom-payment-radio libraryRealTime"
+                                           name="active" value="1"
+                                        {{ $quantumNexusSettings->is_active == 1  ? 'checked' : '' }}>
+                                    <label for="quantumNexusRadio" class="switch"></label>
+                                </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">

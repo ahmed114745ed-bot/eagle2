@@ -206,11 +206,13 @@ class AllGameController extends MainController
 
     public function gameSettings(Request $request)
     {
+      //  dd($request->all());
         $gameSetting = GameProviderSetting::updateOrCreate(
             ['provider_code' => $request->provider_code],
             [
                 'provider_name' => $request->provider_name,
                 'app_key'       => $request->app_key,
+                'is_active'             => $request->active,
             ]
         );
 
