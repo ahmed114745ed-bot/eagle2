@@ -29,28 +29,26 @@ class ProbabilityEngine
 
         /**
          * Clamping & Loss Distribution
-         * Instead of allowing 1% floor (which causes long losing streaks), 
-         * we set a 20% minimum to ensure "distributed" small wins and constant engagement.
+         * Since the minimum multiplier is now 5x, the floor must be lower than 20%
+         * to allow the house to regain balance.
          * 
-         * SMOOTH RECOVERY: If user is in profit (deviation > 0.05), we decay the floor
-         * but keep it at a reasonable level (minimum 8%) to prevent "dead zones".
+         * Recommended Floor: 10% (0.10 * 5x = 0.50 RTP during "bad" luck)
          */
-        $floor = 0.20;
+        $floor = 0.10;
 
         /**
          * LOW BALANCE PROTECTION:
-         * If the user is running low on funds (less than 10 hits available),
-         * we boost the floor to 25% to keep them in the loop.
+         * Boost to 15% to keep them in the loop without making it too profitable.
          */
         if ($userBalance > 0 && $betAmount > 0) {
             $hitsLeft = $userBalance / $betAmount;
             if ($hitsLeft < 10) {
-                $floor = 0.25;
+                $floor = 0.15;
             }
         }
 
         if ($deviation > 0.05) {
-            $floor = max(0.08, $floor - ($deviation * 1.5));
+            $floor = max(0.05, $floor - ($deviation * 1.0));
         }
 
         return max($floor, min(0.99, $finalProb));
