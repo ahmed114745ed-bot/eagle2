@@ -36,3 +36,4 @@ gcp.json
 # Reals package symlink
 public/modules/reals
 /Modules/AgencyApp/
+/storage/coverage-report/
