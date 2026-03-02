@@ -217,20 +217,18 @@ class MilestoneRewardController
                     break;
             }
         });
-        Admin::script('
-    $(document).ready(function(){
-        // Reload the PJAX container once
-        if (!sessionStorage.getItem("pjaxReloaded")) {
-            sessionStorage.setItem("pjaxReloaded", "1");
-            $.pjax.reload("#pjax-container");
-        }
 
-        // Trigger dynamic fields on type change
-        $("select[name=\'type\']").on("change", function(){
-            $(this).trigger("change.admin.form");
-        });
-    });
-');
+        Admin::script('
+            $(document).ready(function() {
+                // Trigger Laravel Admin dynamic fields immediately on page load
+                $("select[name=\'type\']").trigger("change.admin.form");
+
+                // Trigger when user changes type
+                $("select[name=\'type\']").on("change", function(){
+                    $(this).trigger("change.admin.form");
+                });
+            });
+        ');
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));
