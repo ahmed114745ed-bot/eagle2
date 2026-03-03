@@ -340,6 +340,7 @@ Route::group(
             Route::post('/{type}', [GiftController::class, 'store']);
         });
         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+        Route::post('lucky-gift-settings/version', [GiftController::class, 'saveLuckyGiftVersion'])->name('lucky-gift.version.update');
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
         Route::resource('gift-categories', GiftCategoryController::class);

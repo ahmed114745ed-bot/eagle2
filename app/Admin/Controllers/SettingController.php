@@ -231,4 +231,21 @@ class SettingController extends MainController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function updateLuckyGifts(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => 'lucky_gifts_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('lucky_gifts_action', $request->value);
+            \Artisan::call('cache:clear');
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }
