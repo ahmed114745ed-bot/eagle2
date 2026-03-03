@@ -3,7 +3,7 @@
 namespace Utd\Events\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
-use App\Models\Gift;
+use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\Ware;
 use App\Selectables\Gifts;
 use App\Services\AppFeatureService;
@@ -42,7 +42,7 @@ class EventPeriodController extends MainController
                 ->row(function (Row $row) {
 
                     //                $row->column(3, view('event_settings'));
-
+        
                     $row->column(12, function (Column $column) {
                         $column->row(view('event_taps'));
                         $column->row($this->grid2());
@@ -79,13 +79,13 @@ class EventPeriodController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->row('<h3>'.__('weekly Star').'</h3>')->row(function ($row) use ($id) {
+            ->row('<h3>' . __('weekly Star') . '</h3>')->row(function ($row) use ($id) {
                 $row->column(12, $this->weeklyStar($id));
             })
-            ->row('<h3>'.__('gifts').'</h3>')->row(function ($row) use ($id) {
+            ->row('<h3>' . __('gifts') . '</h3>')->row(function ($row) use ($id) {
                 $row->column(12, $this->giftList($id));
             })
-            ->row('<h3>'.__('Rewards').'</h3>')->row(function ($row) use ($id) {
+            ->row('<h3>' . __('Rewards') . '</h3>')->row(function ($row) use ($id) {
                 $row->column(12, $this->rewardList($id));
             }));
     }
@@ -108,18 +108,18 @@ class EventPeriodController extends MainController
         $grid->column('created_at', __('Created at'));
         $grid->column(__('procedures'))->display(function () {
             // توليد الروابط
-            $url1 = url('admin/weekly-events-gift/'.$this->id);
-            $url2 = url('admin/weekly-events-gift/'.$this->id);
-            $url3 = url('admin/weekly-events-gift/'.$this->id);
+            $url1 = url('admin/weekly-events-gift/' . $this->id);
+            $url2 = url('admin/weekly-events-gift/' . $this->id);
+            $url3 = url('admin/weekly-events-gift/' . $this->id);
 
             // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('winner first gifts').'</a>';
-            $button2 = "<a href='{$url2}' class='btn btn-sm btn-info'>".__('winner second gifts').'</a>';
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winner first gifts') . '</a>';
+            $button2 = "<a href='{$url2}' class='btn btn-sm btn-info'>" . __('winner second gifts') . '</a>';
 
-            $button3 = "<a href='{$url3}' class='btn btn-sm btn-info'>".__('winner third gifts').'</a>';
+            $button3 = "<a href='{$url3}' class='btn btn-sm btn-info'>" . __('winner third gifts') . '</a>';
 
             // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1.' '.$button2.' '.$button3;
+            return $button1 . ' ' . $button2 . ' ' . $button3;
         });
 
         $check_event_period = WeeklyStar::where('type', 'event_period')->where('start_date', '<=', date('Y-m-d'))->where('end_date', '>=', date('Y-m-d'))->first();
@@ -217,7 +217,7 @@ class EventPeriodController extends MainController
 
                 return $vip ? (@$vip->name ?? '') : '';
             }
-            $value = getDriverUrl().$target;
+            $value = getDriverUrl() . $target;
 
             return "<img src='$value' width='80' height='80'>";
 

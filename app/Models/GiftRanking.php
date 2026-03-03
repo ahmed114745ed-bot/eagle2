@@ -2,28 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class GiftRanking extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'type',
-        'role',
-        'ranker_id',
-        'ranker_type',
-        'total_gifts',
-        'last_calculated_at',
-    ];
-
-    /**
-     * Get the related model (User, Room, etc.).
-     */
-    public function ranker(): MorphTo
+/**
+ * @deprecated Use Utd\Gifts\Entities\GiftRanking instead
+ */
+if (class_exists('\Utd\Gifts\Entities\GiftRanking')) {
+    class_alias(\Utd\Gifts\Entities\GiftRanking::class, 'App\Models\GiftRanking');
+} else {
+    
+  
+    class GiftRanking extends Model
     {
-        return $this->morphTo();
+        protected $table = 'gift_rankings';
+
+        protected $fillable = [
+            'type',
+            'role',
+            'ranker_id',
+            'ranker_type',
+            'total_gifts',
+            'last_calculated_at',
+        ];
+
+        public function ranker(): MorphTo
+        {
+            return $this->morphTo();
+        }
     }
 }
