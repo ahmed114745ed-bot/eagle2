@@ -139,6 +139,7 @@ class ChangeLevelHistoryController extends MainController
 
         $grid->disableActions();
         $grid->disableCreateButton();
+        $grid->disableRowSelector();
         $grid->disableExport();
         return $grid;
     }
