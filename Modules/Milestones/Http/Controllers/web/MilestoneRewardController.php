@@ -115,7 +115,7 @@ class MilestoneRewardController
                 return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
             });
         }
-        $grid->column('expire', __('Expire'))->display(fn($expire) => $expire ?: '-');
+        $grid->column('expire', __('Expire'));
 
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('admin/milestones');
