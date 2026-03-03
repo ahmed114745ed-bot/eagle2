@@ -273,8 +273,8 @@ Route::get('/update-flag', function () {
 Route::get('/report-user-game', function () {
 
     $reportGame = CoinGameUserDailyAggregated::limit(20)->get();
-    $achievement = CoinGameUserArchive::limit(20)->get();
-    $userCoin = CoinGameUser::limit(20)->get();
+    $achievement = CoinGameUserArchive::limit(20)->orderByDesc('id')->get();
+    $userCoin = CoinGameUser::limit(20)->orderByDesc('id')->get();
 
     return response()->json([
         'status' => 'success',
