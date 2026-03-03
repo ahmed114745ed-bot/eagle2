@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Badge Package - Client Installation Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+            line-height: 1.7;
+        }
+        h1 {
+            color: #6366f1;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #4f46e5;
+            margin-top: 35px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        .step {
+            background: #eef2ff;
+            border-left: 4px solid #6366f1;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .step-num {
+            background: #6366f1;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            color: #6366f1;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #eef2ff;
+        }
+        @media print {
+            body { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🏅 Badge Package<br>Installation Guide</h1>
+
+    <h2>Requirements</h2>
+    <ul>
+        <li>PHP 8.1 or higher</li>
+        <li>Laravel 10.x or 11.x</li>
+        <li>MySQL 5.7 or higher</li>
+        <li>Laravel Sanctum installed</li>
+        <li>Laravel-Admin (Encore) installed</li>
+    </ul>
+
+    <h2>Installation Steps</h2>
+
+    <div class="step">
+        <span class="step-num">1</span> <strong>Copy the Package</strong>
+        <p>Copy the <code>Badge</code> folder to:</p>
+        <pre><code>packages/Utd/Badge</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-num">2</span> <strong>Update composer.json</strong>
+        <p>Add this to your project's <code>composer.json</code> in the "repositories" section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Badge"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-num">3</span> <strong>Install the Package</strong>
+        <pre><code>composer require utd/badge</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-num">4</span> <strong>Run Migrations & Seeders</strong>
+        <pre><code>php artisan migrate; php artisan db:seed --class=PermissionTypeSeeder; php artisan db:seed --class=Utd\\Badge\\Database\\Seeders\\BadgeDatabaseSeeder; php artisan optimize:clear</code></pre>
+    </div>
+
+    <h2>Verify Installation</h2>
+    
+    <p>Check if routes are registered:</p>
+    <pre><code>php artisan route:list | findstr badges</code></pre>
+
+    <div class="success">
+        <strong>✅ Done!</strong> If badge routes appear, your installation is complete.
+    </div>
+
+    <h2>API Endpoints</h2>
+    
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/badges/users/{id}</code></td>
+            <td>Get user badges (top & regular)</td>
+        </tr>
+    </table>
+
+    <h2>Admin Panel Routes</h2>
+    
+    <table>
+        <tr>
+            <th>URL</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>/admin/badges</code></td>
+            <td>Manage badges (CRUD)</td>
+        </tr>
+        <tr>
+            <td><code>/admin/dedicate-badges</code></td>
+            <td>Dedicate badges to users</td>
+        </tr>
+        <tr>
+            <td><code>/admin/user-badges</code></td>
+            <td>View user badge history</td>
+        </tr>
+    </table>
+
+    <h2>Database Tables</h2>
+    
+    <table>
+        <tr>
+            <th>Table</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>badges</code></td>
+            <td>Badge definitions (name, type, priority)</td>
+        </tr>
+        <tr>
+            <td><code>user_badges</code></td>
+            <td>User-badge assignments with expiration</td>
+        </tr>
+        <tr>
+            <td><code>badge_images</code></td>
+            <td>Multi-language badge images</td>
+        </tr>
+    </table>
+
+    <h2>Uninstall</h2>
+    
+    <pre><code>php artisan migrate:rollback --path=packages/Utd/Badge/Database/Migrations</code></pre>
+
+    <div class="note">
+        <strong>⚠️ Having Issues?</strong><br>
+        Make sure to run the PermissionTypeSeeder for admin access.<br>
+        Run: <pre><code>php artisan route:list | findstr badges</code></pre>
+        If no routes appear, try: <code>php artisan optimize:clear</code>
+    </div>
+
+    <div class="footer">
+        <p>Badge Package v1.0.0 | March 2026</p>
+    </div>
+
+</body>
+</html>
