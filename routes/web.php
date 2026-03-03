@@ -1652,6 +1652,7 @@ Route::get('/save-game-app-key', function (Request $request) {
             'status' => 'success',
             'message' => 'تم حفظ المفتاح بنجاح',
             'data' => $gameSetting,
+            'appKey' => $appKey,
         ]);
     } catch (\Exception $e) {
         return response()->json([
