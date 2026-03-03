@@ -1,7 +1,7 @@
 
 
 <div class="card mb-4 border-0 ">
- <form action="{{ route('admin.room-boom-percentage') }}" method="POST" enctype="multipart/form-data">
+ <form action="{{ route('admin.room-boom-settings') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     @foreach($percentages as $percentage)

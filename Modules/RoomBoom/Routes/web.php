@@ -31,7 +31,7 @@ Route::group(
         Route::resource('super-boom-rules', SuperBoomRuleController::class);
         Route::get('room_boom_winners', [RoomBoomWinnerController::class, 'index']);
         Route::get('/room-boom-settings', [PercentageBoomController::class, 'index']);
-        Route::post('/room-boom-percentage', [PercentageBoomController::class, 'save'])->name('room-boom-percentage');
+        Route::post('/room-boom-settings', [PercentageBoomController::class, 'save'])->name('room-boom-settings');
         Route::prefix('room_boom_rewards/{room_boom_level_id}')->group(function () {
             Route::get('/', [RoomBoomRewardController::class, 'index'])->name('room_boom_rewards.index');
             Route::get('/create', [RoomBoomRewardController::class, 'create'])->name('room_boom_rewards.create');
