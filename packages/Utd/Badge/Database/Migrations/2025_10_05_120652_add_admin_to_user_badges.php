@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_badges', function (Blueprint $table) {
-            $table->unsignedBigInteger('auth_id')->nullable();
+            if (!Schema::hasColumn('user_badges', 'auth_id')) {
+                $table->unsignedBigInteger('auth_id')->nullable();
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_badges', function (Blueprint $table) {
-            $table->dropColumn('auth_id');
+            if (Schema::hasColumn('user_badges', 'auth_id')) {
+                $table->dropColumn('auth_id');
+            }
         });
     }
 };
