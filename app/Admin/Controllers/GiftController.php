@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\LuckyGift;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use App\Models\GiftCategory;
@@ -110,7 +111,7 @@ class GiftController extends MainController
         $grid = new Grid(new Gift);
 
         $filterType = request('filter', 'all');
-        $category  = [];
+        $category = [];
         if (request('filter') != 'all') {
             $category = GiftCategory::find(request('filter'));
         }
@@ -122,7 +123,7 @@ class GiftController extends MainController
             ->orderByRaw('ISNULL(`sort`), `sort` ASC')
             ->orderBy('use_count', 'desc')
             ->orderBy('price');
-        
+
         // Enable drag-drop sorting only when filtering by category
         if ($filterType !== 'all') {
             $grid->sortable();
@@ -145,7 +146,7 @@ class GiftController extends MainController
             // بناء HTML
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
-                $active = $filterType === (string)$key ? 'active' : '';
+                $active = $filterType === (string) $key ? 'active' : '';
                 $url = request()->fullUrlWithQuery(['filter' => $key]);
                 $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
             }
@@ -213,11 +214,12 @@ class GiftController extends MainController
             $('.table-responsive').removeClass('table-responsive');
         }
     ");
-        $permission    = $this->permission_name;
+        $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
+            if (
+                (Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
                 && $model->category?->type != null
             ) {
                 $actions->add(new MoveGiftCategory());
@@ -230,7 +232,7 @@ class GiftController extends MainController
         if (request('filter') && request('filter') !== 'all') {
             $grid->tools(function ($tools) use ($filterType) {
                 $tools->append('<a href="' . admin_url('gifts/' . request('filter') . '/create') . '" class="btn btn-sm btn-default">' . __('create') . '</a>');
-                
+
                 // Add JavaScript for custom drag-drop handling per category
                 $tools->append('
                 <script>
@@ -317,7 +319,7 @@ class GiftController extends MainController
 
         return $grid;
     }
-    
+
     /**
      * Clear cache for Octane (called from JavaScript before sorting)
      */
@@ -326,15 +328,15 @@ class GiftController extends MainController
         try {
             Cache::flush();
             \Artisan::call('cache:clear');
-            
+
             if (function_exists('opcache_reset')) {
                 @opcache_reset();
             }
-            
+
             if (function_exists('clearstatcache')) {
                 clearstatcache(true);
             }
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'Cache cleared'
@@ -346,7 +348,7 @@ class GiftController extends MainController
             ]);
         }
     }
-    
+
     /**
      * Handle sort update from grid-sortable extension
      */
@@ -354,26 +356,26 @@ class GiftController extends MainController
     {
         $sorts = request()->input('_sort');
         $categoryId = request()->input('category_id');
-        
+
         if (empty($sorts)) {
             return response()->json([
                 'status' => false,
                 'message' => 'No sort data provided'
             ]);
         }
-        
+
         try {
             // Clear ALL caches before updating
             Cache::flush();
             \Artisan::call('cache:clear');
-            
+
             if (function_exists('opcache_reset')) {
                 @opcache_reset();
             }
-            
+
             // Use DB transaction for atomicity
             DB::beginTransaction();
-            
+
             $updated = 0;
             foreach ($sorts as $sort) {
                 // Use raw DB query to bypass Eloquent caching
@@ -386,34 +388,34 @@ class GiftController extends MainController
                     ]);
                 $updated += $result;
             }
-            
+
             DB::commit();
-            
+
             // Clear all caches after updating
             Cache::flush();
             \Artisan::call('cache:clear');
-            
+
             if (function_exists('opcache_reset')) {
                 @opcache_reset();
             }
-            
+
             // Force PHP to clear stat cache
             if (function_exists('clearstatcache')) {
                 clearstatcache(true);
             }
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'تم تحديث ترتيب الهدايا بنجاح'
             ])->withHeaders([
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                'Pragma' => 'no-cache',
-                'Expires' => '0'
-            ]);
-            
+                        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                        'Pragma' => 'no-cache',
+                        'Expires' => '0'
+                    ]);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'status' => false,
                 'message' => 'فشل تحديث الترتيب: ' . $e->getMessage()
@@ -466,14 +468,14 @@ class GiftController extends MainController
         $form->html(view('admin.gift_type', [
             'categories' => $categories,
             'locale' => $locale,
-                        'model' => $model,
+            'model' => $model,
         ]));
 
 
 
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-        
+
         // Calculate next sort value for new gifts
         $nextSort = 0;
         if (!$id && $selectedCategoryId) {
@@ -489,8 +491,8 @@ class GiftController extends MainController
                 $extension = $file->guessExtension();
             }
             return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
-        }) ->default('1.png');
-       
+        })->default('1.png');
+
 
         $form->file('show_img', __('show_img'))->name(function ($file) {
             $extension = $file->getClientOriginalExtension();
@@ -522,23 +524,24 @@ class GiftController extends MainController
         // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
 
-            if (request()->has('_edit_inline')) return;
+            if (request()->has('_edit_inline'))
+                return;
 
             // Handle sort shifting to avoid duplicates
             $newSort = (int) $form->input('sort');
             $categoryId = $form->input('gift_category_id');
             $currentId = $form->model()->id;
-            
+
             if ($categoryId && $newSort > 0) {
                 // Check if sort value exists in the same category
                 $query = Gift::where('gift_category_id', $categoryId)
                     ->where('sort', '>=', $newSort);
-                
+
                 // Exclude current gift if editing
                 if ($currentId) {
                     $query->where('id', '!=', $currentId);
                 }
-                
+
                 // Shift all gifts with sort >= newSort
                 $query->increment('sort');
             }
@@ -584,7 +587,7 @@ class GiftController extends MainController
 
             if (!$hasShowImg && !$hasImg2) {
                 $error = new MessageBag([
-                    'title'   => 'Error',
+                    'title' => 'Error',
                     'message' => 'Please upload at least one image',
                 ]);
                 return back()->with(compact('error'));
@@ -652,7 +655,57 @@ class GiftController extends MainController
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'lucky-gift-setting');
         }
-        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
-        return $content->view('lucky_gift', compact('config'));
+
+        $config = Setting::whereIn('key', [
+            'app_wallet_lucky_gift',
+            'owner_lucky_gift',
+            'lucky_gift_coins',
+            'host_lucky_gift',
+            'lucky_gift_version',
+            'lucky_gifts_action'
+        ])->pluck('value', 'key')->toArray();
+
+        // FairLuck Data
+        $fairLuckSettings = \App\Models\FairLuckSetting::pluck('value', 'key')->toArray();
+        $fairLuckHistory = \App\Models\FairLuckWalletHistory::where('wallet_type', 'global_vault')
+            ->orderBy('created_at', 'desc')
+            ->limit(100)
+            ->get()->reverse()->values();
+
+        return $content->view('lucky_gift', [
+            'config' => $config,
+            'fairLuckSettings' => $fairLuckSettings,
+            'history' => $fairLuckHistory,
+        ]);
+    }
+
+    public function saveLuckyGiftVersion(Request $request)
+    {
+        $version = $request->input('lucky_gift_version');
+        if (in_array($version, [1, 2])) {
+            Setting::updateOrCreate(['key' => 'lucky_gift_version'], ['value' => $version]);
+            Cache::forget('lucky_gift_version');
+            Cache::put('lucky_gift_version', $version);
+        }
+
+        // Handle lucky gift coins
+        if ($request->has('lucky_gift_coins')) {
+            Setting::updateOrCreate(['key' => 'lucky_gift_coins'], ['value' => $request->lucky_gift_coins]);
+            Cache::forget('lucky_gift_coins');
+            Cache::put('lucky_gift_coins', $request->lucky_gift_coins);
+        }
+
+        // Handle V1 percentages
+        $v1_keys = ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'];
+        foreach ($v1_keys as $key) {
+            if ($request->has($key)) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                Cache::forget($key);
+                Cache::put($key, $request->input($key));
+            }
+        }
+
+        admin_toastr(__('Settings updated successfully'), 'success');
+        return back();
     }
 }
