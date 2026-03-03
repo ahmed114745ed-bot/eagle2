@@ -2,7 +2,7 @@
 
 namespace Utd\Room\Entities;
 
-use App\Models\Gift;
+use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

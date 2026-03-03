@@ -16,6 +16,7 @@ use Illuminate\Routing\Controller;
 use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use Utd\Moments\Entities\Moment;
 use Utd\Moments\Entities\MomentUserGift;
+
 use Utd\Moments\Transformers\MomentGiftUserResource;
 
 class MomentUserGiftsController extends Controller
@@ -63,12 +64,12 @@ class MomentUserGiftsController extends Controller
         $number = $data['num'];
         $moment = Moment::find($moment_id);
         // Validation if moment return null
-        if (! $moment) {
+        if (!$moment) {
             return Common::apiResponse(0, 'Moment does not exist or has been removed', null, 404);
         }
 
         // validation parameter
-        if (! $data['gift_id'] || ! $data['num']) {
+        if (!$data['gift_id'] || !$data['num']) {
             return Common::apiResponse(0, __('missing params'), $data->all());
         }
 
@@ -79,7 +80,7 @@ class MomentUserGiftsController extends Controller
 
         $gift = $this->giftsService->getGift($giftId);
 
-        if (! $gift || ! $gift->enable) {
+        if (!$gift || !$gift->enable) {
             return Common::apiResponse(0, 'Gift does not exist or has been removed', null, 404);
         }
 
@@ -99,7 +100,7 @@ class MomentUserGiftsController extends Controller
         // validation if this gift vip < user vip then throw Exception
         $vip_level = @Common::ovip_center($user);
         if (@$vip_level->level < $gift->vip_level) {
-            return Common::apiResponse(0, 'vip '.$gift->vip_level.' to send this gift');
+            return Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');
         }
 
         try {
@@ -127,7 +128,7 @@ class MomentUserGiftsController extends Controller
 
         );
 
-        return Common::apiResponse(1, "  {$number} x ارسل هدية  "." قيمتها {$gift->price} "." الى {$to}");
+        return Common::apiResponse(1, "  {$number} x ارسل هدية  " . " قيمتها {$gift->price} " . " الى {$to}");
     }
 
     /**
@@ -204,7 +205,7 @@ class MomentUserGiftsController extends Controller
     public function getGifts($id)
     {
         $moment = Moment::with('gifts')->find($id);
-        if (! $moment) {
+        if (!$moment) {
             return Common::apiResponse(0, 'Moment does not exist or has been removed', null, 404);
         }
 

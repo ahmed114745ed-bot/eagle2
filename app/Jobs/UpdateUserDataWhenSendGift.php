@@ -26,7 +26,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private int $userId, private int $roomId, private array $receiversIds, private int $giftId, private int $number, private int $price, private ?int $userCoin = null,private $totalNumWin,private $totalUserWin)
+    public function __construct(private int $userId, private int $roomId, private array $receiversIds, private int $giftId, private int $number, private int $price, private ?int $userCoin = null, private $totalNumWin, private $totalUserWin)
     {
         $this->roomTopUsersRepository = app(RoomTopUsersRepositoryContract::class);
 
@@ -38,34 +38,37 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::Find($this->userId);
-        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
 
         $room =
             Room::withoutAppends()->where(['id' => $this->roomId])
                 ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone')
                 ->with([
-                           'owner' => function ($query) {
-                               $query->withoutAppends();
-                           }
-                       ])->first();
+                    'owner' => function ($query) {
+                        $query->withoutAppends();
+                    }
+                ])->first();
         $gift = Gift::query()->select([
-                                          'id', 'name', 'type', 'price'
-                                      ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();
+            'id',
+            'name',
+            'type',
+            'price'
+        ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();
 
         $numberOfGift = $this->number * count($this->receiversIds);
-        $totalPrice   = $gift->price * $numberOfGift;
+        $totalPrice = $gift->price * $numberOfGift;
         //increase room session
 //        $room->enableSaving = false;
 //        $room->session      += (int)$totalPrice * 0.1;
 //        $room->save();
-        $coins = (int)$totalPrice * $hostPercentage;
+        $coins = (int) $totalPrice * $hostPercentage;
         if ($this->userCoin != null) {
-            UserCommon::UserLuckyGift(0, $this->userId, $gift, ($this->userCoin), $this->number,$this->totalNumWin,$this->totalUserWin);
+            UserCommon::UserLuckyGift(0, $this->userId, $gift, ($this->userCoin), $this->number, $this->totalNumWin, $this->totalUserWin);
         }
-        $this->updateUserDataWhenSendGift($user, $room, $coins, $this->receiversIds, $gift, $this->number,$hostPercentage);
+        $this->updateUserDataWhenSendGift($user, $room, $coins, $this->receiversIds, $gift, $this->number, $hostPercentage);
     }
 
-    private function updateUserDataWhenSendGift( $user, $room, $coins, array $receiversIds, $gift, $number,$hostPercentage)
+    private function updateUserDataWhenSendGift($user, $room, $coins, array $receiversIds, $gift, $number, $hostPercentage)
     {
         $this->updateRoomCoinsToUser($user, $room, $coins);
         $receivedUsers = User::withoutAppends()->with(['agency', 'profile'])->whereIn('id', $receiversIds)->get();
@@ -83,7 +86,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         }
 
         $sendGiftServices = new SendGiftService();
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0 , cpIds: $cpIds);
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
     }
 
@@ -93,7 +96,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
      * @param $totalPrice
      * @return void
      */
-    public function updateRoomCoinsToUser( $user, $room, $totalPrice): void
+    public function updateRoomCoinsToUser($user, $room, $totalPrice): void
     {
         $topUser = $this->roomTopUsersRepository->findOrCreate($room->id, $user->id);
         if ($topUser) {

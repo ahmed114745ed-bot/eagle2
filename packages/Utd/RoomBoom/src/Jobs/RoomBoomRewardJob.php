@@ -2,10 +2,8 @@
 
 namespace Utd\RoomBoom\Jobs;
 
-use App\Enums\UserCoinLogType;
 use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\GiftLog;
@@ -23,18 +21,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Collection;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\RoomBoom\Entities\RoomBoom;
-use Utd\RoomBoom\Entities\RoomBoomGift;
-use Utd\RoomBoom\Entities\RoomBoomLevel;
 use Utd\RoomBoom\Entities\RoomBoomReward;
-use Utd\RoomBoom\Entities\RoomBoomTopContributor;
 use Utd\RoomBoom\Transformers\RoomBoomRewardResource;
 
-class NewRoomBoomRewardJob implements ShouldQueue
+class RoomBoomRewardJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $boomId;
-    public $userId;
     protected Collection $users;
     protected array $giftInsertData = [];
     protected array $achievementInsertData = [];
@@ -44,12 +38,9 @@ class NewRoomBoomRewardJob implements ShouldQueue
     protected array $achievementNotifications = [];
     protected array $giftNotifications = [];
     protected array $wareNotifications = [];
-    protected array $coinNotifications = [];
-
-    public function __construct($boomId, $userId)
+    public function __construct($boomId)
     {
         $this->boomId = $boomId;
-        $this->userId = $userId;
     }
 
     /**
@@ -71,11 +62,9 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
         $this->getRewardItems($rewards, $rewardItems);
 
-        $topContributors = $this->getTopContributorIds($boom->total_room_gift_id, $level->level);
+        $topContributorIds = $this->getTopContributorIds($roomId, $level->level);
 
-        $topContributorIds = $topContributors->pluck('user_id')->toArray();
-
-        $lastTriggerSenderId = $this->userId;
+        $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
 
         $room = Room::select('id')->with('roomVisitors:id,user_id,room_id')->find($roomId);
 
@@ -94,10 +83,6 @@ class NewRoomBoomRewardJob implements ShouldQueue
         $this->sendEvent($level->level, $roomId);
 
         $this->bulkInsertGiftsAchievements();
-
-        $this->storeTopContributors($topContributors, $boom);
-
-        $this->storeWinners($boom);
 
         $this->dispatchPendingNotifications();
     }
@@ -192,11 +177,6 @@ class NewRoomBoomRewardJob implements ShouldQueue
             if ($reward['target_type'] == 'gift') {
                 $this->giftRewards($reward, $userId, $expire, $token);
             }
-
-
-            if ($reward['target_type'] == 'coin') {
-                $this->coinRewards($reward['target'], $userId, $token);
-            }
         }
     }
 
@@ -237,29 +217,6 @@ class NewRoomBoomRewardJob implements ShouldQueue
         }
     }
 
-    public function coinRewards($amount, $userId, $token = null): void
-    {
-        $user = User::findOrFail($userId);
-
-        $amountBefore = $user->di ?? 0;
-    
-        UserCoinLogHelper::logByType(
-            $user->id,
-            $amount, 
-            $amountBefore,
-            UserCoinLogType::ROOM_BOOM,
-            '' 
-        );
-    
-        $user->increment('di', (int)$amount);
-
-
-        $this->coinNotifications['users'][$userId] = ($this->coinNotifications['users'][$userId] ?? 0) + (int)$amount;
-        if ($token) {
-            $this->coinNotifications['tokens'][] = $token;
-        }
-    }
-
     public function getRewardItems($rewards, &$rewardItems): void
     {
         foreach ($rewards as $reward) {
@@ -285,21 +242,23 @@ class NewRoomBoomRewardJob implements ShouldQueue
         return null;
     }
 
-    public function getTopContributorIds($totalRoomGiftId, $levelColumn)
+    public function getTopContributorIds($roomId, $levelColumn): array
     {
-        return RoomBoomGift::query()
-            ->select('user_id',
-                DB::raw('SUM(price) as total_gift'),
+        return GiftLog::query()
+            ->select('sender_id',
+                DB::raw('SUM(giftPrice) as total_gift'),
                 DB::raw('MIN(created_at) as first_contribution')
             )
-            ->where('total_room_gift_id', $totalRoomGiftId)
+            ->where('room_id', $roomId)
             ->where('room_boom_level', $levelColumn)
             ->where('start_boom_ranking', 1)
             ->where('created_at', '>=', Carbon::today())
-            ->groupBy('user_id')
+            ->groupBy('sender_id')
             ->orderByDesc('total_gift')
             ->orderBy('first_contribution', 'asc')
-            ->get();
+            ->limit(3)
+            ->pluck('sender_id')
+            ->toArray();
     }
 
     public function assignWinnerData($userId, $reward): void
@@ -342,10 +301,10 @@ class NewRoomBoomRewardJob implements ShouldQueue
     protected function dispatchPendingNotifications(): void
     {
         $this->dispatchWareNotification();
-        $this->dispatchAchievementNotification();
-        $this->dispatchGiftNotification();
-        $this->dispatchCoinNotification();
 
+        $this->dispatchAchievementNotification();
+
+        $this->dispatchGiftNotification();
     }
 
     /**
@@ -420,61 +379,6 @@ class NewRoomBoomRewardJob implements ShouldQueue
             }
         }
     }
-
-    public function dispatchCoinNotification(): void
-    {
-        if (!empty($this->coinNotifications)) {
-            $coinTitle = __('Coin Reward');
-            $coinBody  = __('You have received :coin coin.');
-
-            foreach ($this->coinNotifications['users'] as $userId => $coins) {
-                $body = str_replace(':coin', $coins, $coinBody);
-
-                if ($userId) {
-                    Common::sendOfficialMessage($userId, $coinTitle, $body);
-                }
-            }
-
-            if (!empty($this->coinNotifications['tokens'])) {
-                Common::send_firebase_notification($this->coinNotifications['tokens'], $coinTitle, $body);
-            }
-        }
-    }
-
-    protected function storeTopContributors($topContributors, $boom): void
-    {
-        $level = $boom->roomBoomLevel;
-        $totalRoomGiftId = $boom->total_room_gift_id;
-
-        $topContributorData = array_map(function ($topContributor) use ($level, $totalRoomGiftId){
-            return [
-                'room_boom_level_id' => $level->id,
-                'total_room_gift_id' => $totalRoomGiftId,
-                'user_id' => $topContributor['user_id'],
-                'price' => $topContributor['total_gift'],
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-        }, $topContributors->toArray());
-
-        DB::table('room_boom_top_contributors')->insert($topContributorData);
-    }
-
-    protected function storeWinners($boom): void
-    {
-        $winnersData = array_map(function ($reward, $userId) use ($boom) {
-            return [
-                'room_boom_reward_id' => $reward['id'],
-                'room_boom_id'        => $boom->id,
-                'user_id'             => $userId,
-                'created_at'          => now(),
-                'updated_at'          => now(),
-            ];
-        }, $this->assignments, $this->assignedUserIds);
-
-        DB::table('room_boom_winners')->insert($winnersData);
-    }
-
 }
 
 //        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)

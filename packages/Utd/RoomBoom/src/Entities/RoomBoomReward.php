@@ -3,7 +3,7 @@
 namespace Utd\RoomBoom\Entities;
 
 use App\Helpers\Common;
-use App\Models\Gift;
+use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

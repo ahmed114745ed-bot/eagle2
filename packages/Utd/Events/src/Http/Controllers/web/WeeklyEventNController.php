@@ -4,7 +4,7 @@ namespace Utd\Events\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
 use App\Helpers\UserCommon;
-use App\Models\Gift;
+use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\Ware;
 use App\Selectables\Gifts;
 use App\Services\AppFeatureService;
@@ -44,7 +44,7 @@ class WeeklyEventNController extends MainController
                 ->row(function (Row $row) {
 
                     //                $row->column(3, view('event_settings'));
-
+        
                     $row->column(12, function (Column $column) {
                         $column->row(view('event_taps'));
                         $column->row($this->grid2());
@@ -81,13 +81,13 @@ class WeeklyEventNController extends MainController
     {
         return parent::show($id, $content->title(__('weekly-events-new'))
 
-            ->row('<h3>'.__('weekly Star').'</h3>')->row(function ($row) use ($id) {
+            ->row('<h3>' . __('weekly Star') . '</h3>')->row(function ($row) use ($id) {
                 $row->column(12, $this->weeklyStar($id));
             })
-            ->row('<h3>'.__('gifts').'</h3>')->row(function ($row) use ($id) {
+            ->row('<h3>' . __('gifts') . '</h3>')->row(function ($row) use ($id) {
                 $row->column(12, $this->giftList($id));
             })
-            ->row('<h3>'.__('Rewards').'</h3>')->row(function ($row) use ($id) {
+            ->row('<h3>' . __('Rewards') . '</h3>')->row(function ($row) use ($id) {
                 $row->column(12, $this->rewardList($id));
             }));
     }
@@ -134,14 +134,14 @@ class WeeklyEventNController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        if (! request()->filled('_export_')) {
-            if (Admin::user()->can('browse-'.'weekly_star_rewards') || Admin::user()->can('*')) {
+        if (!request()->filled('_export_')) {
+            if (Admin::user()->can('browse-' . 'weekly_star_rewards') || Admin::user()->can('*')) {
                 $grid->column(__('procedures'))->display(function () {
                     // توليد الروابط
-                    $url1 = url('admin/weekly-events-gift/'.$this->id);
+                    $url1 = url('admin/weekly-events-gift/' . $this->id);
 
                     // إنشاء أزرار HTML
-                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('winners gifts').'</a>';
+                    $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . '</a>';
 
                     // دمج الأزرار في سلسلة واحدة وإرجاعها
                     return $button1;
@@ -171,8 +171,8 @@ class WeeklyEventNController extends MainController
 
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
                 if ($minStartDate) {
-                    if (! $id = $form->model()->id) {
-                        return 'required|after:'.$minStartDate;
+                    if (!$id = $form->model()->id) {
+                        return 'required|after:' . $minStartDate;
                     }
 
                     return 'required';
@@ -258,7 +258,7 @@ class WeeklyEventNController extends MainController
 
                 return $vip ? (@$vip->name ?? '') : '';
             }
-            $value = getDriverUrl().'/'.@$this->target;
+            $value = getDriverUrl() . '/' . @$this->target;
 
             return "<img src='$value' width='80' height='80'>";
 
