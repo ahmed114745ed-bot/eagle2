@@ -112,7 +112,7 @@ class MilestoneRewardController
                 }
 
                 $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
+                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
             });
         }
         $grid->column('expire', __('Expire'))->display(fn($expire) => $expire ?: '-');
