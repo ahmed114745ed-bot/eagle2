@@ -352,10 +352,11 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        $luckyStatus = settings()->get('lucky_gifts_action');
+        $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+
         \Log::info('luckyStatus', [$luckyStatus]);
         if ($luckyStatus == 1) {
-            $version = settings()->get('lucky_gift_version') ?? 1;
+            $version = Common::getSettingValue('lucky_gift_version');
             \Log::info('version', [$version]);
             if ($version == 2) {
                 return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
