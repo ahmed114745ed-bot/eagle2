@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('badges', function (Blueprint $table) {
-            $table->dropColumn('language');
-             $table->string('image')->nullable()->change();
+            if (Schema::hasColumn('badges', 'language')) {
+                $table->dropColumn('language');
+            }
+            $table->string('image')->nullable()->change();
             $table->string('image_type')->nullable()->change();
         });
     }
