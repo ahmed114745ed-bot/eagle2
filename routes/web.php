@@ -37,7 +37,9 @@ use App\Models\AgencySallary;
 use App\Models\Ban;
 use App\Models\Bd;
 use App\Models\BDSallary;
+use App\Models\CoinGameUser;
 use App\Models\CoinGameUserAll;
+use App\Models\CoinGameUserArchive;
 use App\Models\CoinGameUserDailyAggregated;
 use App\Models\CoinLog;
 use App\Models\Country;
@@ -270,12 +272,18 @@ Route::get('/update-flag', function () {
 
 Route::get('/report-user-game', function () {
 
-   $reportGame = CoinGameUserDailyAggregated::limit(20)->get();
+    $reportGame = CoinGameUserDailyAggregated::limit(20)->get();
+    $achievement = CoinGameUserArchive::limit(20)->get();
+    $userCoin = CoinGameUser::limit(20)->get();
 
     return response()->json([
         'status' => 'success',
         'message' => '✅ flag updated successfully.',
-        'data' => $reportGame
+        'data' => [
+            'reportGame' => $reportGame,
+            'achievement' => $achievement,
+            'userCoin' => $userCoin
+        ]
     ]);
 });
 Route::get('/clear_clear', function () {
