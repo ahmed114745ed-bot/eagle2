@@ -10,5 +10,9 @@ class BadgeDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
+
+        $this->call([
+            BadgeMenuSeeder::class,
+        ]);
     }
 }

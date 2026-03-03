@@ -210,22 +210,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'badge',
-                'sort' => 7,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 7],
-                ],
-                'permissions' => [
-                    ['key' => 'badges', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'dedicate-badges', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
-                    ],],
-
-                ],
-            ],
-            [
                 'name' => 'Fast orders',
                 'sort' => 8,
                 'types' => [
@@ -1316,6 +1300,25 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'milestone', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
 
+                    ],],
+
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('badge')) {
+            $categories[] = [
+                'name' => 'badge',
+                'sort' => 7,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 7],
+                ],
+                'permissions' => [
+                    ['key' => 'badges', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'dedicate-badges', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
                     ],],
 
                 ],
