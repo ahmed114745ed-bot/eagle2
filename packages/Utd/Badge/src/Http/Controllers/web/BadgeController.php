@@ -6,11 +6,14 @@ namespace Utd\Badge\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Enums\BadgeType;
 use App\Enums\ImageType;
+
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Utd\Badge\Entities\Badge;
+use Utd\Badge\Entities\BadgeImage;
 use App\Admin\Controllers\MainController;
 
 class BadgeController extends MainController
@@ -51,24 +54,25 @@ class BadgeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Badge());
-
-        $grid->model()->orderBy('priority', 'desc');
+        $grid->model()
+            ->with('images')->orderBy('priority', 'desc');
 
         $grid->column('id', __('ID'));
         $grid->column('name', __('name'));
         if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
+            $grid->column('images.image', __('image'))->display(function ($path) {
+                $path =   $this->images->firstWhere('language', app()->getLocale())?->image ?? $this->images->firstWhere('language', 'en')?->image;
                 /** @var Ware $this */
                 $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
+                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
             });
         }
         $grid->column('priority', __('Priority'))->sortable();
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            $filter->like('name', 'name');
-            $filter->equal('priority', 'Priority');
+            $filter->like('name', __('name'));
+            $filter->equal('priority', __('Priority'));
         });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -89,23 +93,91 @@ class BadgeController extends MainController
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
 
-        $form->image('show_image', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        });
-
-        $form->file('image', __('Default Image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
-        })->required();
         $form->select('type', __('Type'))
             ->options(BadgeType::options())
             ->default(BadgeType::Regular->value)
             ->rules('required|in:' . implode(',', array_keys(BadgeType::options())));
-        $form->select('image_type', __('Image Type'))
-            ->options(ImageType::options())
-            ->default(ImageType::Image->value)
-            ->rules('required|in:' . implode(',', array_keys(ImageType::options())));
-
         $form->number('priority', __('Priority'))->min(0)->default(0)->required();
+
+        $form->html(function () use ($form) {
+
+            $badgeImages = collect();
+
+            if (request()->route('badge')) {
+                $badge = Badge::with('images')->find(request()->route('badge'));
+                $badgeImages = $badge?->images->keyBy('language') ?? collect();
+            }
+
+            return view('multiBadges', compact('badgeImages'));
+        });
+
+
+        $form->saved(function (Form $form) {
+            // Get uploaded files
+            $images = request()->file('images', []);
+
+            // Get input data
+            $allData = request()->input('images', []);
+
+            // Load default badge images from DB or newly uploaded file
+            $defaultImagePath = $images['default']['image'] ?? null;
+            $defaultShowImagePath = $images['default']['default_image'] ?? null;
+
+            // If no uploaded file, use the DB value (existing default)
+            $defaultBadgeImage = BadgeImage::where('badge_id', $form->model()->id)
+                ->where('language', 'default')
+                ->first();
+
+            $defaultImage = $defaultImagePath
+                ? Common::upload('badges', $defaultImagePath)
+                : $defaultBadgeImage->image ?? null;
+
+            $defaultShowImage = $defaultShowImagePath
+                ? Common::upload('badges', $defaultShowImagePath)
+                : $defaultBadgeImage->show_image ?? null;
+
+            foreach ($allData as $lang => $dataInput) {
+
+                $badgeImage = BadgeImage::where('badge_id', $form->model()->id)
+                    ->where('language', $lang)
+                    ->first();
+
+                $data = [
+                    'badge_id'   => $form->model()->id,
+                    'language'   => $lang,
+                    'image_type' => $dataInput['image_type'] ?? ($defaultBadgeImage->image_type ?? ImageType::Image->value),
+                ];
+
+                // If the user uploaded a file in this language, use it
+                if (!empty($images[$lang]['image'])) {
+                    $data['image'] = Common::upload('badges', $images[$lang]['image']);
+                } elseif ($lang !== 'default') {
+                    // Otherwise, copy default image
+                    $data['image'] = $defaultImage;
+                } else {
+                    // default language
+                    $data['image'] = $defaultImage;
+                }
+
+                if (!empty($images[$lang]['default_image'])) {
+                    $data['show_image'] = Common::upload('badges', $images[$lang]['default_image']);
+                } elseif ($lang !== 'default') {
+                    $data['show_image'] = $defaultShowImage;
+                } else {
+                    $data['show_image'] = $defaultShowImage;
+                }
+
+                if ($badgeImage) {
+                    $badgeImage->update($data);
+                } else {
+                    BadgeImage::create($data);
+                }
+            }
+        });
+
+
+
+
 
 
         return $form;

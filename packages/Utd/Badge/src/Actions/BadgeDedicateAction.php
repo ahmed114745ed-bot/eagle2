@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Admin\Actions;
+namespace Utd\Badge\Actions;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
-use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
-use App\Helpers\Common;
-use App\Support\PackageHelper;
 use Utd\Badge\Entities\Badge;
 use Utd\Badge\Entities\UserBadge;
 
@@ -27,10 +24,6 @@ class BadgeDedicateAction extends Action
     }
     public function handle(Request $request)
     {
-        if (!PackageHelper::isInstalled('badge')) {
-            return $this->response()->error('Badge package is not installed')->refresh();
-        }
-
         $user = User::query()->searchByUuid($request->user_uuid)->first();
         if (!$user) {
             return $this->response()->error(__('dashboard.userNotFound'))->refresh();

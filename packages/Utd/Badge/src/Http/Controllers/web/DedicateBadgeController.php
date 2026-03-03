@@ -5,6 +5,7 @@ namespace Utd\Badge\Http\Controllers\web;
 
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Utd\Badge\Actions\BadgeDedicateAction;
 use Utd\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
@@ -27,16 +28,19 @@ class DedicateBadgeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Badge());
-
-        $grid->model()->orderBy('priority', 'desc');
+        $lang = app()->getLocale();
+        $grid->model()->whereHas('images', function ($query) use ($lang) {
+            $query->where('language', $lang);
+        })->with('images')->orderBy('priority', 'desc');
 
         $grid->column('id', __('ID'));
         $grid->column('name', __('name'));
         if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
+            $grid->column('images.image', __('image'))->display(function ($path) {
+                $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
                 /** @var Ware $this */
                 $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
+                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
             });
         }
 
@@ -49,7 +53,7 @@ class DedicateBadgeController extends MainController
         if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
 
-                return (new \App\Admin\Actions\BadgeDedicateAction($this->id))->render();
+                return (new BadgeDedicateAction($this->id))->render();
             });
         }
 
