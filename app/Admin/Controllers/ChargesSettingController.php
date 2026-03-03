@@ -33,6 +33,7 @@ class ChargesSettingController extends MainController
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
-        return back()->with('success', 'تم تحديث الإعدادات بنجاح!');
+        admin_success('تمت العملية', 'تم تحديث الإعدادات بنجاح!');
+        return back();
     }
 }

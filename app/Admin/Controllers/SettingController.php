@@ -139,7 +139,8 @@ class SettingController extends MainController
                 }
             }
 
-            return redirect($redirectUrl)->with('success', 'تم تحديث الإعدادات بنجاح!');
+            admin_success('تمت العملية', 'تم تحديث الإعدادات بنجاح!');
+            return redirect($redirectUrl);
         } catch (Exception $exception) {
             return back()->with('error', $exception->getMessage());
         }
