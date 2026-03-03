@@ -221,8 +221,20 @@ Route::get('/run-seeders', function () {
     Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-     Artisan::call('db:seed', ['--class' => WebhookGamesSeeder::class]);
+    Artisan::call('db:seed', ['--class' => WebhookGamesSeeder::class]);
     // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/room-boom-media', function () {
+
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'RoomBoomMediaSeeder']);
+
 
     return response()->json([
         'status' => 'success',
