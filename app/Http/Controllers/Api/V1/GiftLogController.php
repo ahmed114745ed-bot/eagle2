@@ -354,10 +354,8 @@ class GiftLogController extends Controller
     {
         $luckyStatus = Common::getSettingValue('lucky_gifts_action');
 
-        \Log::info('luckyStatus', [$luckyStatus]);
         if ($luckyStatus == 1) {
             $version = Common::getSettingValue('lucky_gift_version');
-            \Log::info('version', [$version]);
             if ($version == 2) {
                 return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
             }
@@ -430,7 +428,6 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V3(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        \Log::info('sendLuckyGift3', $request->all());
 
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
@@ -462,7 +459,6 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift4(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        \Log::info('sendLuckyGift4', $request->all());
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return Common::apiResponse(0, __('api_responses.try_again'));

@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -1630,5 +1631,33 @@ Route::get('/restart-queues', function () {
         return "✅ Artisan queue:restart signaled successfully.";
     } catch (\Exception $e) {
         return "❌ Failed to signal queue:restart: " . $e->getMessage();
+    }
+});
+
+use Illuminate\Http\Request;
+use App\Models\GameProviderSetting;
+
+
+Route::get('/save-game-app-key', function (Request $request) {
+    $providerCode = $request->provider_code ?? 'quantum_nexus';
+    $appKey = env('GAME_APP_KEY');
+    try {
+        $gameSetting = GameProviderSetting::updateOrCreate(
+            ['provider_code' => $providerCode],
+            [
+                'app_key' => $appKey,
+            ]
+        );
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم حفظ المفتاح بنجاح',
+            'data' => $gameSetting,
+            'appKey' => $appKey,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'حدث خطأ أثناء الحفظ: ' . $e->getMessage(),
+        ], 500);
     }
 });
