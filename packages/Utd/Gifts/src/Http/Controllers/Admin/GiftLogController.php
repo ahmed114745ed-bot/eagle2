@@ -54,22 +54,25 @@ class GiftLogController extends MainController
         $grid->column('giftName', __('Gift Name'));
         $grid->column('giftNum', __('Quantity'));
         $grid->column('giftPrice', __('Price'));
-        
+
         $grid->column('sender.name', __('Sender'))
-            ->display(function () {
+            ->display(function ($val) {
+                /** @var \Utd\Gifts\Entities\GiftLog $this */
                 return $this->sender ? $this->sender->name : '-';
             });
-        
+
         $grid->column('receiver.name', __('Receiver'))
-            ->display(function () {
+            ->display(function ($val) {
+                /** @var \Utd\Gifts\Entities\GiftLog $this */
                 return $this->receiver ? $this->receiver->name : '-';
             });
-        
+
         $grid->column('roomOwner.name', __('Room Owner'))
-            ->display(function () {
+            ->display(function ($val) {
+                /** @var \Utd\Gifts\Entities\GiftLog $this */
                 return $this->roomOwner ? $this->roomOwner->name : '-';
             });
-        
+
         $grid->column('created_at', __('Sent At'))->sortable();
 
         $grid->disableCreateButton();

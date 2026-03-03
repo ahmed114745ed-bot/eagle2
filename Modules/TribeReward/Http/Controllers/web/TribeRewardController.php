@@ -3,7 +3,7 @@
 namespace Modules\TribeReward\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
-use App\Models\Gift;
+use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\Ware;
 use App\Selectables\Wares;
 use Carbon\Carbon;

@@ -37,6 +37,7 @@ use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\ReportUserController;
+use Utd\Gifts\Http\Controllers\Admin\GiftController as PackageGiftController;
 use Utd\Room\Http\Controllers\Admin\RoomGiftTargetController;
 use Utd\Room\Http\Controllers\Admin\RoomSettingsController;
 use Utd\Room\Http\Controllers\Admin\RoomTargetController;
@@ -165,7 +166,7 @@ Route::group([
         Route::get('/', [BlackListUsersController::class, 'index']);
     });
     Route::resource('codes', 'CodeController');
-    Route::resource('gifts', 'GiftController', ['names' => ['index' => 'gifts']]);
+    Route::resource('gifts', PackageGiftController::class, ['names' => ['index' => 'gifts']]);
     Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
     Route::resource('test-pusher', TestPusherController::class);
     Route::resource('report_user', ReportUserController::class);

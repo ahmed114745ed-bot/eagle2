@@ -3,7 +3,7 @@
 namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Models\User;
-use App\Models\Gift;
+use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Traits\Gifts\WinLuckyGift;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

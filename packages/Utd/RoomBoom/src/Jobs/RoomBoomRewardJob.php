@@ -5,7 +5,7 @@ namespace Utd\RoomBoom\Jobs;
 use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\Gift;
+use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\GiftLog;
 use Utd\Room\Entities\Room;
 use App\Models\User;
