@@ -43,20 +43,23 @@ class ChangeLevelHistoryController extends MainController
 
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))
-        ->display(function ($name) {
-            $uid = @$this->user->uuid;
-            $path = @$this->user?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-            $this->user->id?$editUrl = url("admin/users/{$this->user->id }") :$editUrl = ''; // Using named route
+            ->display(function ($name) {
+                if (!$this->user) {
+                    return '-';
+                }
+                $uid = @$this->user->uuid;
+                $path = @$this->user?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+                @$this->user->id ? $editUrl = url("admin/users/{$this->user->id}") : $editUrl = ''; // Using named route
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            return "
+                return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 <a href='{$editUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -67,7 +70,7 @@ class ChangeLevelHistoryController extends MainController
                 </a>
             </div>
             ";
-        });
+            });
 
         $grid->column('admin.name', __('creator'))
             ->display(function ($name) {
@@ -80,7 +83,7 @@ class ChangeLevelHistoryController extends MainController
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $this->admin->id? $showUrl = url("admin/auth/users/{$this->admin->id}") : $showUrl = "";
+                $this->admin->id ? $showUrl = url("admin/auth/users/{$this->admin->id}") : $showUrl = "";
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
@@ -90,40 +93,40 @@ class ChangeLevelHistoryController extends MainController
                 </div>
             ";
             });
-            $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
-            $arrowdownIcon = asset('images/arrowdown.png'); // Path to the arrows.png image
+        $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
+        $arrowdownIcon = asset('images/arrowdown.png'); // Path to the arrows.png image
 
-            $grid->column('old_total_sender_level', __('Old Total Sender Level'))
-                ->display(function ($value) use ($arrowdownIcon) {
-                    return "<div style='display: flex; align-items: center; gap: 5px;'>
+        $grid->column('old_total_sender_level', __('Old Total Sender Level'))
+            ->display(function ($value) use ($arrowdownIcon) {
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
                                 <span>$value</span>
                                 <img src='$arrowdownIcon' style='width: 16px; height: 16px;'>
                             </div>";
-                });
+            });
 
-            $grid->column('new_total_sender_level', __('New Total Sender Level'))
-                ->display(function ($value) use ($arrowIcon) {
-                    return "<div style='display: flex; align-items: center; gap: 5px;'>
+        $grid->column('new_total_sender_level', __('New Total Sender Level'))
+            ->display(function ($value) use ($arrowIcon) {
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
                                 <span>$value</span>
                                 <img src='$arrowIcon' style='width: 16px; height: 16px;'>
                             </div>";
-                });
+            });
 
-            $grid->column('old_total_received_level', __('Old Total Received Level'))
-                ->display(function ($value) use ($arrowdownIcon) {
-                    return "<div style='display: flex; align-items: center; gap: 5px;'>
+        $grid->column('old_total_received_level', __('Old Total Received Level'))
+            ->display(function ($value) use ($arrowdownIcon) {
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
                                 <span>$value</span>
                                 <img src='$arrowdownIcon' style='width: 16px; height: 16px;'>
                             </div>";
-                });
+            });
 
-            $grid->column('new_total_received_level', __('New Total Received Level'))
-                ->display(function ($value) use ($arrowIcon) {
-                    return "<div style='display: flex; align-items: center; gap: 5px;'>
+        $grid->column('new_total_received_level', __('New Total Received Level'))
+            ->display(function ($value) use ($arrowIcon) {
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
                                 <span>$value</span>
                                 <img src='$arrowIcon' style='width: 16px; height: 16px;'>
                             </div>";
-                });
+            });
 
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             return Carbon::parse($date)->format('Y-m-d H:i:s');
@@ -133,6 +136,7 @@ class ChangeLevelHistoryController extends MainController
 
         $grid->disableActions();
         $grid->disableCreateButton();
+        $grid->disableExport();
         return $grid;
     }
 

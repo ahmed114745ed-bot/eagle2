@@ -222,6 +222,7 @@ class AreaManagerController extends MainController
         }
 
         $grid->disableRowSelector();
+        $grid->disableExport();
         $this->extendGrid($grid);
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
@@ -350,7 +351,6 @@ class AreaManagerController extends MainController
             if (isset($userApp)) {
                 $userApp->is_area_manager = 1;
                 $userApp->save();
-
             }
             $userId = $form->model()->id;
 
