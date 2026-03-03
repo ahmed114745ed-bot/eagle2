@@ -427,6 +427,8 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V3(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+        \Log::info('sendLuckyGift3', $request->all());
+
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return Common::apiResponse(0, __('api_responses.try_again'));
@@ -457,6 +459,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift4(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+        \Log::info('sendLuckyGift4', $request->all());
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return Common::apiResponse(0, __('api_responses.try_again'));
