@@ -1638,7 +1638,7 @@ use Illuminate\Http\Request;
 use App\Models\GameProviderSetting;
 
 
-Route::post('/save-game-app-key', function (Request $request) {
+Route::get('/save-game-app-key', function (Request $request) {
     $providerCode = $request->provider_code ?? 'quantum_nexus';
     $appKey = env('GAME_APP_KEY');
     try {
