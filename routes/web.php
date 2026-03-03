@@ -38,6 +38,7 @@ use App\Models\Ban;
 use App\Models\Bd;
 use App\Models\BDSallary;
 use App\Models\CoinGameUserAll;
+use App\Models\CoinGameUserDailyAggregated;
 use App\Models\CoinLog;
 use App\Models\Country;
 use App\Models\DeleteAccount;
@@ -264,6 +265,17 @@ Route::get('/update-flag', function () {
     return response()->json([
         'status' => 'success',
         'message' => '✅ flag updated successfully.'
+    ]);
+});
+
+Route::get('/report-user-game', function () {
+
+   $reportGame = CoinGameUserDailyAggregated::limit(20)->get();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ flag updated successfully.',
+        'data' => $reportGame
     ]);
 });
 Route::get('/clear_clear', function () {
