@@ -60,6 +60,6 @@ class PercentageBoomController extends MainController
         }
 
         admin_toastr(__('Saved successfully'), 'success');
-        return back();
+        return redirect()->route('admin.room-boom-settings');
     }
 }
