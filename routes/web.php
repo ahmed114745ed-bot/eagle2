@@ -692,11 +692,10 @@ Route::get('debug-user-level', function () {
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
 Route::get('stuck-users', function () {
-    $multiplier = config('exp_percentages.exp_sender_percentage', 0.2);
+    $multiplier = (float) config('exp_percentages.exp_sender_percentage', 0.2);
     $vips = \Modules\Vip\Entities\Vip::where('type', 2)->orderBy('exp', 'asc')->get();
 
     $users = \App\Models\User::where('total_diamond_send', '>', 0)
-        ->limit(500)
         ->get();
 
     $stuckUsers = [];
@@ -732,8 +731,9 @@ Route::get('stuck-users', function () {
         'count' => count($stuckUsers),
         'analysis' => [
             'reason_of_stucking' => 'Levels update only on events (Send Gift). Manual point additions or missing triggers leave the sender_level column outdated.',
-            'upgrade_logic_location' => 'Modules\Public\Http\Services\UpgradeLevelServices::checkUserLevelUpgrated',
-            'multiplier_used' => $multiplier
+            'upgrade_logic_location' => 'Modules\\Public\\Http\\Services\\UpgradeLevelServices::checkUserLevelUpgrated',
+            'multiplier_used' => $multiplier,
+            'config_raw_value' => config('exp_percentages.exp_sender_percentage')
         ],
         'stuck_users' => $stuckUsers,
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
