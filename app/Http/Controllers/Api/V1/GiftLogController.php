@@ -48,21 +48,22 @@ class GiftLogController extends Controller
         $this->addRoomCoins($ownerId, $totalCoins);
         $this->addHostCoins($receiverIds, $coinsPerUser);
     }
-    public function addHostCoins(array $receiverIds, int  $totalCoins)
+    public function addHostCoins(array $receiverIds, int $totalCoins)
     {
         $receiverIds = UserHandling::checkIfUserHostByIds($receiverIds);
 
-        if (count($receiverIds) == 0) return;
+        if (count($receiverIds) == 0)
+            return;
 
         $coins = floor($totalCoins * 0.03);
         DB::table('users')->whereIn('id', $receiverIds)->update(values: ['di' => DB::raw(sprintf("di + %s", $coins))]);
         $data = [];
         foreach ($receiverIds as $receiverId) {
             $data[] = [
-                'user_id'    => $receiverId,
-                'coins'      => $coins,
+                'user_id' => $receiverId,
+                'coins' => $coins,
                 'from_coins' => $totalCoins,
-                'type'       => 'host_coins'
+                'type' => 'host_coins'
             ];
         }
         $this->insertGiftPercentage($data);
@@ -82,9 +83,10 @@ class GiftLogController extends Controller
     }
     public function updateFamilyLevelForSender(\Illuminate\Database\Eloquent\Collection $users, $totalCoinsPerUser): bool
     {
-        $families    = $users->pluck('family')->where('id', '!=', null);
+        $families = $users->pluck('family')->where('id', '!=', null);
         $familiesIds = $families->pluck('id')->toArray();
-        if (count($familiesIds) == 0) return false;
+        if (count($familiesIds) == 0)
+            return false;
         $repeatedData = $this->getDuplication($familiesIds);
 
         foreach ($repeatedData as $data) {
@@ -123,9 +125,10 @@ class GiftLogController extends Controller
                 $isTwoDiminutionsArray = true;
                 $value['created_at'] = now();
                 $value['updated_at'] = now();
-            } else break;
+            } else
+                break;
         }
-        if (! $isTwoDiminutionsArray) {
+        if (!$isTwoDiminutionsArray) {
             $data['created_at'] = now();
             $data['updated_at'] = now();
         }
@@ -140,51 +143,51 @@ class GiftLogController extends Controller
 
         $zigoData = collect(
             [
-                'show_gift'     => $gift->show_img ?: $gift->show_img2,
-                'gift_img'      => $gift->img,
-                'gift_id'       => $gift->id,
-                'sender_id'     => (int)$user->id,
-                'receiver_id'   => (int)$to_id,
-                'num_gift'      => $totalPrice,
-                "plural"        => is_array($receiversIds) && count($receiversIds) > 1,
-                'room_session'  => $room->session_string,
-                'is_password'   => (bool)(@$room->room_pass),
-                'room_id'       => $room->id,
-                'from_name'     => $user->name,
-                'to_name'       => $toName,
-                'gift_price'    => $gift->price,
-                'owner_id'      => $ownerId,
-                'number'        => $number,
-                'coins'         => numToString($userCoins)/*$user->coins_string*/,
+                'show_gift' => $gift->show_img ?: $gift->show_img2,
+                'gift_img' => $gift->img,
+                'gift_id' => $gift->id,
+                'sender_id' => (int) $user->id,
+                'receiver_id' => (int) $to_id,
+                'num_gift' => $totalPrice,
+                "plural" => is_array($receiversIds) && count($receiversIds) > 1,
+                'room_session' => $room->session_string,
+                'is_password' => (bool) (@$room->room_pass),
+                'room_id' => $room->id,
+                'from_name' => $user->name,
+                'to_name' => $toName,
+                'gift_price' => $gift->price,
+                'owner_id' => $ownerId,
+                'number' => $number,
+                'coins' => numToString($userCoins)/*$user->coins_string*/ ,
                 'is_lucky_gift' => ($gift->type == 6),
-                'gift_image_type'            => $gift->image_type,
+                'gift_image_type' => $gift->image_type,
 
             ]
         );
 
         if ($totalPrice >= 2000) {
-            $levels         = [
+            $levels = [
                 $user->total_sender_level,
                 $user->total_received_level,
                 $firstReceiver->total_received_level,
                 $firstReceiver->total_sender_level,
             ];
-            $levels         = Common::getLevels($levels);
-            $senderLevels   = $levels->where('type', '=', 2);
+            $levels = Common::getLevels($levels);
+            $senderLevels = $levels->where('type', '=', 2);
             $receiverLevels = $levels->where('type', '=', 1);
-            $values         = [
-                's_vip_level'      => @$user->userVip->level ?? 0,
-                's_image'          => @$user->profile->avatar ?? '',
-                's_name'           => @$user->name ?? '',
-                's_sender_level'   => @$senderLevels->where('level', '=', $user->total_sender_level)->first()->img ?? '',
+            $values = [
+                's_vip_level' => @$user->userVip->level ?? 0,
+                's_image' => @$user->profile->avatar ?? '',
+                's_name' => @$user->name ?? '',
+                's_sender_level' => @$senderLevels->where('level', '=', $user->total_sender_level)->first()->img ?? '',
                 's_receiver_level' => @$receiverLevels->where('level', '=', $user->total_received_level)->first()->img ?? '',
-                'r_vip_level'      => @$firstReceiver->userVip->level ?? 0,
-                'r_name'           => @$firstReceiver->name ?? '',
-                'r_image'          => @$firstReceiver->profile->avatar ?? '',
-                'r_sender_level'   => @$senderLevels->where('level', '=', $firstReceiver->total_sender_level)->first()->img ?? '',
+                'r_vip_level' => @$firstReceiver->userVip->level ?? 0,
+                'r_name' => @$firstReceiver->name ?? '',
+                'r_image' => @$firstReceiver->profile->avatar ?? '',
+                'r_sender_level' => @$senderLevels->where('level', '=', $firstReceiver->total_sender_level)->first()->img ?? '',
                 'r_receiver_level' => @$receiverLevels->where('level', '=', $firstReceiver->total_received_level)->first()->img ?? '',
             ];
-            $zigoData       = $zigoData->merge($values);
+            $zigoData = $zigoData->merge($values);
         }
 
         //        dispatch(new SendGiftToZegoJob($zigoData, $totalPrice, ($request->to_zego == 1)))->onQueue('sendGiftToZigo');
@@ -196,42 +199,42 @@ class GiftLogController extends Controller
     {
         //        Common::sendToZego_2('SendBroadcastMessage', $zigoData['room_id'], $zigoData['sender_id'], $zigoData['from_name'], "  {$zigoData['number']} x ارسل هدية  " . " قيمتها {$zigoData['gift_price']} " . " الى {$zigoData['to_name']}");
         if ($isToZego) {
-            $d       = [
+            $d = [
                 "messageContent" => [
-                    "message"       => "showGifts",
-                    "showGift"      => $zigoData['show_gift'],
-                    'giftImg'       => $zigoData['gift_img'],
-                    'gift_id'       => $zigoData['gift_id'],
-                    'send_id'       => $zigoData['sender_id'],
-                    'receiver_id'   => $zigoData['receiver_id'],
-                    'isExpensive'   => $totalPrice >= 2000,
-                    'num_gift'      => $zigoData['number'],
-                    "plural"        => $zigoData['plural'],
-                    'gift_price'    => $totalPrice, // $zigoData['room_session'],
-                    'coins'         => @$zigoData['coins'] ?? '0',
-                    'is_lucky_gift' => (bool)$zigoData['is_lucky_gift'],
+                    "message" => "showGifts",
+                    "showGift" => $zigoData['show_gift'],
+                    'giftImg' => $zigoData['gift_img'],
+                    'gift_id' => $zigoData['gift_id'],
+                    'send_id' => $zigoData['sender_id'],
+                    'receiver_id' => $zigoData['receiver_id'],
+                    'isExpensive' => $totalPrice >= 2000,
+                    'num_gift' => $zigoData['number'],
+                    "plural" => $zigoData['plural'],
+                    'gift_price' => $totalPrice, // $zigoData['room_session'],
+                    'coins' => @$zigoData['coins'] ?? '0',
+                    'is_lucky_gift' => (bool) $zigoData['is_lucky_gift'],
                     'type' => @$zigoData['gift_image_type'] ?? 'mp4'
 
                 ]
             ];
-            $json    = json_encode($d);
+            $json = json_encode($d);
             $jsons[] = $json;
             //            Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
             if ($totalPrice >= 2000) {
-                $d    = [
+                $d = [
                     "messageContent" => [
-                        "msg"    => "SHB",
-                        'sv'     => $zigoData['s_vip_level'],
-                        'si'     => $zigoData['s_image'],
-                        'sn'     => $zigoData['s_name'],
-                        'ssl'    => $zigoData['s_sender_level'],
-                        'srl'    => $zigoData['s_receiver_level'],
-                        'rv'     => $zigoData['r_vip_level'],
-                        'rn'     => $zigoData['r_name'],
-                        'ri'     => $zigoData['r_image'],
-                        'rsl'    => $zigoData['r_sender_level'],
-                        'rrl'    => $zigoData['r_receiver_level'],
-                        'oId'    => (int)$zigoData['owner_id'],
+                        "msg" => "SHB",
+                        'sv' => $zigoData['s_vip_level'],
+                        'si' => $zigoData['s_image'],
+                        'sn' => $zigoData['s_name'],
+                        'ssl' => $zigoData['s_sender_level'],
+                        'srl' => $zigoData['s_receiver_level'],
+                        'rv' => $zigoData['r_vip_level'],
+                        'rn' => $zigoData['r_name'],
+                        'ri' => $zigoData['r_image'],
+                        'rsl' => $zigoData['r_sender_level'],
+                        'rrl' => $zigoData['r_receiver_level'],
+                        'oId' => (int) $zigoData['owner_id'],
                         'isPass' => $zigoData['is_password'],
                     ]
                 ];
@@ -252,13 +255,12 @@ class GiftLogController extends Controller
             return Common::apiResponse(0, __('Send gift stopped by admin'));
         }
 
-        // Update when sending the gift
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'type'     => 'nullable',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'type' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -271,18 +273,18 @@ class GiftLogController extends Controller
             return Common::apiResponse(false, $e->getMessage());
         }
 
-        settings()->set('gift_send', true);
-        $tpUsers = request()->toUid;
+        if (!settings()->get('gift_send')) {
+            settings()->set('gift_send', true);
+        }
+        $tpUsers = $request->toUid;
         $idsArray = explode(',', $tpUsers);
 
-        // Optional: convert to integers
         $idsArray = array_map('intval', $idsArray);
 
-        // Prepare API response
         $data = [
             'ids' => $idsArray
         ];
-        return Common::apiResponse(true, $message,   $data);
+        return Common::apiResponse(true, $message, $data);
     }
 
 
@@ -293,7 +295,8 @@ class GiftLogController extends Controller
         $userId = $request->user()->id;
         if ($request->user_id) {
             $user = User::where('id', $request->user_id)->exists();
-            if (!$user) return Common::apiResponse(0, 'not found', null, 404);
+            if (!$user)
+                return Common::apiResponse(0, 'not found', null, 404);
             $userId = $request->user_id;
         }
         $giftTotal = GiftLog::where(function ($q) use ($userId) {
@@ -327,8 +330,8 @@ class GiftLogController extends Controller
      */
     public function updateRoomCoinsToUser($userId, $room, $totalPrice): void
     {
-        $topUser         = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
-        $topUser->coins  += $totalPrice;
+        $topUser = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
+        $topUser->coins += $totalPrice;
         $topUser->save();
     }
 
@@ -337,10 +340,28 @@ class GiftLogController extends Controller
 
     public function is_winner($gift): bool
     {
-        if (!$gift) abort(404);
-        $win_probability = ((int)$gift->luckyGift?->win_probability ?? 70) / 100;
+        if (!$gift)
+            abort(404);
+        $win_probability = ((int) $gift->luckyGift?->win_probability ?? 70) / 100;
         $randomValue = mt_rand(0, 100) / 100;
         return $randomValue <= $win_probability;
+    }
+
+
+
+
+    public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+        $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+
+        if ($luckyStatus == 1) {
+            $version = Common::getSettingValue('lucky_gift_version');
+            if ($version == 2) {
+                return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
+            }
+            return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
+        }
+        return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
     }
 
     public function sendLuckyGift2(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
@@ -351,11 +372,11 @@ class GiftLogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -382,11 +403,11 @@ class GiftLogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -407,17 +428,18 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V3(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return Common::apiResponse(0, __('api_responses.try_again'));
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -443,11 +465,11 @@ class GiftLogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id'       => 'required',
+            'id' => 'required',
             'owner_id' => 'nullable',
-            'toUid'    => 'required',
-            'num'      => 'required|integer|min:1',
-            'count'    => 'sometimes|integer|min:1',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -721,11 +743,11 @@ class GiftLogController extends Controller
      */
     public function getReceivedAndSanderPercentage(): array
     {
-        $keys       = ['sender_percentage', 'received_percentage'];
+        $keys = ['sender_percentage', 'received_percentage'];
         $collection = Common::getConfFromKey($keys);
         $values = [];
         foreach ($keys as $key) {
-            $config    = $collection->where('name', $key)->first();
+            $config = $collection->where('name', $key)->first();
             $values[] = $config ? $config->value : 0;
         }
         unset($collection);
@@ -739,10 +761,10 @@ class GiftLogController extends Controller
     public function getCashbackPercentage(array $probability): mixed
     {
         $luckyRandom = rand(1, 10);
-        $index       = $luckyRandom <= 5 ? 0 : (($luckyRandom <= 8) ? 1 : 2);
+        $index = $luckyRandom <= 5 ? 0 : (($luckyRandom <= 8) ? 1 : 2);
 
-        $arr                 = $probability[$index];
-        $randomIndex         = rand(0, (count($arr) - 1));
+        $arr = $probability[$index];
+        $randomIndex = rand(0, (count($arr) - 1));
         return $arr[$randomIndex];
     }
 
@@ -794,7 +816,7 @@ class GiftLogController extends Controller
             'is_finished' => 0
         ])->whereNotIn('user_id', $remainingDiamonds)
             ->chunk(100, function ($userSalaries) {   // 🔥 process only 500 rows per chunk
-
+    
                 foreach ($userSalaries as $userSalary) {
 
                     try {
@@ -844,8 +866,8 @@ class GiftLogController extends Controller
         $monthDiamondReceive = MonthlyDiamondReceive::firstOrNew(
             [
                 'user_id' => $user->id,
-                'month'   => $dt->month,
-                'year'    => $dt->year,
+                'month' => $dt->month,
+                'year' => $dt->year,
             ]
         );
 
@@ -877,7 +899,7 @@ class GiftLogController extends Controller
     public function totalRoomGift()
     {
         $start = Carbon::createFromFormat('d/m/Y', '09/02/2026')->startOfDay();
-        $end   = Carbon::now()->endOfDay();
+        $end = Carbon::now()->endOfDay();
 
         GiftLog::query()
             ->selectRaw('room_id, SUM(giftPrice) AS total')
@@ -894,7 +916,7 @@ class GiftLogController extends Controller
                     if (!$totalRoomGift) {
                         $totalRoomGift = TotalRoomGift::create([
                             'room_id' => $log->room_id,
-                            'current_total'   => 0,
+                            'current_total' => 0,
                         ]);
                     }
                     $totalRoomGift->current_total += $log->total;

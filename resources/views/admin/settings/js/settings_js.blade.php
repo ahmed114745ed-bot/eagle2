@@ -131,7 +131,10 @@
         let inputName = $(this).attr('name');
         console.log("Selected library:", selectedLibrary);
         console.log("library Name:", inputName);
-        updateLibrary(selectedLibrary, inputName);
+        // Skip AJAX for live_library - it has its own form that submits to update-library route
+        if (inputName !== 'live_library') {
+            updateLibrary(selectedLibrary, inputName);
+        }
         updateSwitches();
     });
 

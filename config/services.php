@@ -35,11 +35,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'baishun' => [
-        'app_id' => env('BAISHUN_APP_Id',"4280702746"),
-        'app_key' => env('BAISHUN_APP_KEY',"LzfGx3f3ZKQSYxMNRqdRTOmfd0Jb59DF"),
-        'server_url' => env('BAISHUN_SERVER_URL','https://mesh-channels-test.jieyou.shop'),
-    ],
+    // 'baishun' => [
+    //     'app_id' => env('BAISHUN_APP_Id',"4280702746"),
+    //     'app_key' => env('BAISHUN_APP_KEY',"LzfGx3f3ZKQSYxMNRqdRTOmfd0Jb59DF"),
+    //     'server_url' => env('BAISHUN_SERVER_URL','https://mesh-channels-test.jieyou.shop'),
+    // ],
 
     'fawry' => [
         "fawry_secret"          => env('FAWRY_SECRET_KEY',"6ed92079-a485-4373-9453-505e20f6ef48"),

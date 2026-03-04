@@ -92,7 +92,11 @@ class CpReportRelationController extends MainController
             ->display(function ($name) {
                 $uid = @$this->fromUser->uuid;
                 $path = @$this->fromUser->profile->avatar;
-                $url = getImagePath($path);
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
                 $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
                 return "$image<br>$name <br>
             <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
@@ -101,7 +105,11 @@ class CpReportRelationController extends MainController
             ->display(function ($name) {
                 $uid = @$this->toUser->uuid;
                 $path = @$this->toUser->profile->avatar;
-                $url = getImagePath($path);
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
                 $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
                 return "$image<br>$name <br>
             <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";

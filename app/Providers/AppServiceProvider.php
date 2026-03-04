@@ -124,14 +124,18 @@ class AppServiceProvider extends ServiceProvider
 
         // Load your custom settings
         $start = Common::getSettingValue('week_start') ?? 'monday';
-        $end   = Common::getSettingValue('week_end')   ?? 'sunday';
+        $end = Common::getSettingValue('week_end') ?? 'sunday';
 
-        Carbon::setWeekStartsAt(constant('Carbon\\Carbon::' . strtoupper($start)));
         Carbon::setWeekEndsAt(constant('Carbon\\Carbon::' . strtoupper($end)));
         if (!Str::hasMacro('unescape')) {
             Str::macro('unescape', function ($value) {
                 return htmlspecialchars_decode($value, ENT_QUOTES);
             });
+        }
+
+        // Support old namespace for PkSessionJob
+        if (!class_exists('Utd\TaskStream\Jobs\PkSessionJob') && class_exists('Modules\TaskStream\Jobs\PkSessionJob')) {
+            class_alias('Modules\TaskStream\Jobs\PkSessionJob', 'Utd\TaskStream\Jobs\PkSessionJob');
         }
     }
 
@@ -314,12 +318,12 @@ class AppServiceProvider extends ServiceProvider
             ],
 
             'codapay' => [
-                'base_url'   => $settings['codapay_base_url'] ?? '',
-                'api_key'    => $settings['codapay_api_key'] ?? '',
+                'base_url' => $settings['codapay_base_url'] ?? '',
+                'api_key' => $settings['codapay_api_key'] ?? '',
                 'project_id' => $settings['codapay_project_id'] ?? '',
-                'country'    => $settings['codapay_country'] ?? '',
-                'pay_type'   => $settings['codapay_pay_type'] ?? '',
-                'currency'   => $settings['codapay_currency'] ?? '',
+                'country' => $settings['codapay_country'] ?? '',
+                'pay_type' => $settings['codapay_pay_type'] ?? '',
+                'currency' => $settings['codapay_currency'] ?? '',
             ],
 
             'googlePay' => [

@@ -1888,7 +1888,7 @@
     }
 
     .settings-menu button.active {
-        background: var(--gradient-primary) !important;
+        background: gray !important;
         color: var(--text-secondary-color) !important;
     }
 
