@@ -37,7 +37,7 @@
     background-color: var(--primary-color, gray) !important;
     color: white !important;
     border-left: 3px solid #fff;
-    box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
+    box-shadow:  10px 10px 8px rgb(148 2 2 / 15%);
 }
 
 .dark-mode .settings-menu button.active {
