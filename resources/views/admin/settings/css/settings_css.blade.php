@@ -34,8 +34,22 @@
 }
 
 .settings-menu button.active {
-    background-color:gray; /* active tab color */
-    color: white;
+    background-color: var(--primary-color, gray) !important;
+    color: white !important;
+    border-left: 3px solid #fff;
+    box-shadow:  10px 10px 8px rgb(148 2 2 / 15%);
+}
+
+.dark-mode .settings-menu button.active {
+    background-color: var(--primary-color, #ff9800) !important;
+    color: #fff !important;
+    border-left: 3px solid #fff;
+    box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
+}
+
+.rtl .settings-menu button.active {
+    border-left: none;
+    border-right: 3px solid #fff;
 }
 
     .inner-settings-menu button.active {
