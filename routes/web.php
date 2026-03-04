@@ -1,6 +1,6 @@
 <?php
 
-use  App\helper\TimeHelper;
+use App\helper\TimeHelper;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -585,7 +585,7 @@ Route::get('/test-fcm/{userid}', function ($userId) {
 Route::get('/generate-token/{id}', function ($id) {
     $user = User::find($id);
 
-    if (! $user) {
+    if (!$user) {
         return response()->json(['message' => 'User not found'], 404);
     }
 
@@ -691,7 +691,53 @@ Route::get('debug-user-level', function () {
         'user' => $user
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
+Route::get('stuck-users', function () {
+    $multiplier = config('exp_percentages.exp_sender_percentage', 0.2);
+    $vips = \Modules\Vip\Entities\Vip::where('type', 2)->orderBy('exp', 'asc')->get();
 
+    $users = \App\Models\User::where('total_diamond_send', '>', 0)
+        ->limit(500)
+        ->get();
+
+    $stuckUsers = [];
+
+    foreach ($users as $user) {
+        $actualExp = $user->total_diamond_send * $multiplier;
+
+        $rightfulLevel = 0;
+        foreach ($vips as $vip) {
+            if ($actualExp >= $vip->exp) {
+                $rightfulLevel = $vip->level;
+            } else {
+                break;
+            }
+        }
+
+        if ($rightfulLevel > $user->sender_level) {
+            $stuckUsers[] = [
+                'user_id' => $user->id,
+                'uuid' => $user->uuid,
+                'name' => $user->name,
+                'total_diamonds' => $user->total_diamond_send,
+                'effective_exp_points' => $actualExp,
+                'current_level_in_db' => $user->sender_level,
+                'should_be_level' => $rightfulLevel,
+                'gap' => $rightfulLevel - $user->sender_level
+            ];
+        }
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'count' => count($stuckUsers),
+        'analysis' => [
+            'reason_of_stucking' => 'Levels update only on events (Send Gift). Manual point additions or missing triggers leave the sender_level column outdated.',
+            'upgrade_logic_location' => 'Modules\Public\Http\Services\UpgradeLevelServices::checkUserLevelUpgrated',
+            'multiplier_used' => $multiplier
+        ],
+        'stuck_users' => $stuckUsers,
+    ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+});
 Route::get('x9b4-debug-track/{id}/{headerLog?}', function ($id, $headerLog = 'false') {
     $ids = explode(',', $id);
     settings()->set('debug_ids', $ids);
@@ -829,11 +875,11 @@ Route::get('/week-zone', function () {
 
 
     $startOfWeek = Carbon::now()->startOfWeek()->toDateTimeString();
-    $endOfWeek   = Carbon::now()->endOfWeek()->toDateTimeString();
+    $endOfWeek = Carbon::now()->endOfWeek()->toDateTimeString();
 
     return response()->json([
-        'start_of_week'  => $startOfWeek,
-        'end_of_week'    => $endOfWeek,
+        'start_of_week' => $startOfWeek,
+        'end_of_week' => $endOfWeek,
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
@@ -891,11 +937,16 @@ Route::get('/migrate-home-carousel', function () {
     foreach ($carousels as $carousel) {
 
         $displayTypes = [];
-        if ($carousel->display_home_top)     $displayTypes[] = 'home_top';
-        if ($carousel->display_home_middle)  $displayTypes[] = 'home_middle';
-        if ($carousel->display_live)         $displayTypes[] = 'live';
-        if ($carousel->display_country)      $displayTypes[] = 'country';
-        if ($carousel->display_discover)     $displayTypes[] = 'discover';
+        if ($carousel->display_home_top)
+            $displayTypes[] = 'home_top';
+        if ($carousel->display_home_middle)
+            $displayTypes[] = 'home_middle';
+        if ($carousel->display_live)
+            $displayTypes[] = 'live';
+        if ($carousel->display_country)
+            $displayTypes[] = 'country';
+        if ($carousel->display_discover)
+            $displayTypes[] = 'discover';
 
 
         $unitMap = [
@@ -910,10 +961,10 @@ Route::get('/migrate-home-carousel', function () {
         $endAt = null;
         if (!empty($carousel->input) && $carousel->input > 0) {
             $endAt = match ($unit) {
-                'hours'  => Carbon::parse($carousel->created_at)->addHours($carousel->input),
-                'days'   => Carbon::parse($carousel->created_at)->addDays($carousel->input),
+                'hours' => Carbon::parse($carousel->created_at)->addHours($carousel->input),
+                'days' => Carbon::parse($carousel->created_at)->addDays($carousel->input),
                 'months' => Carbon::parse($carousel->created_at)->addMonths($carousel->input),
-                default  => null,
+                default => null,
             };
         }
 
@@ -921,14 +972,14 @@ Route::get('/migrate-home-carousel', function () {
             DB::table('home_carousel_displays')->updateOrInsert(
                 [
                     'home_carousel_id' => $carousel->id,
-                    'display_type'     => $type,
+                    'display_type' => $type,
                 ],
                 [
-                    'end_at'        => $endAt,
-                    'duration'      => $carousel->input ?? 0,
+                    'end_at' => $endAt,
+                    'duration' => $carousel->input ?? 0,
                     'duration_unit' => $unit,
-                    'created_at'    => $carousel->created_at,
-                    'updated_at'    => $carousel->updated_at,
+                    'created_at' => $carousel->created_at,
+                    'updated_at' => $carousel->updated_at,
                 ]
             );
         }
@@ -969,24 +1020,24 @@ Route::get('notifications/test2', function () {
 });
 
 Route::get('/codapay/create-payment', function () {
-    $trxId  = rand(1000, 9999);
+    $trxId = rand(1000, 9999);
     $amount = 1.00;
     $userId = 123;
 
     $payload = [
         'initRequest' => [
-            'country'    => "784",    // ✅ UAE (الإمارات)
-            'currency'   => 840,      // ✅ USD (دولار أمريكي)
-            'apiKey'     => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
-            'projectId'  => env('CODAPAY_PROJECT_ID', '289'),
-            'orderId'    => (string) $trxId,
-            'returnUrl'  => url('/codapay/success'),
-            'failUrl'    => url('/codapay/fail'),
-            'items'      => [
+            'country' => "784",    // ✅ UAE (الإمارات)
+            'currency' => 840,      // ✅ USD (دولار أمريكي)
+            'apiKey' => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
+            'projectId' => env('CODAPAY_PROJECT_ID', '289'),
+            'orderId' => (string) $trxId,
+            'returnUrl' => url('/codapay/success'),
+            'failUrl' => url('/codapay/fail'),
+            'items' => [
                 [
-                    'code'  => '1',
+                    'code' => '1',
                     'price' => (float) $amount,
-                    'name'  => "Order #{$trxId}"
+                    'name' => "Order #{$trxId}"
                 ]
             ],
             'profile' => [
@@ -1014,10 +1065,10 @@ Route::get('/codapay/create-payment', function () {
             // ]);
 
             return response()->json([
-                'error'   => 'Failed to connect Codapay',
-                'status'  => $response->status(),
+                'error' => 'Failed to connect Codapay',
+                'status' => $response->status(),
                 'details' => $response->body(),
-                'url'     => $url,
+                'url' => $url,
                 'payload' => $payload,
             ], 500);
         }
@@ -1045,11 +1096,11 @@ Route::get('/codapay/create-payment', function () {
             'message' => 'Failed to create payment',
             'error_code' => $result['initResult']['resultCode'] ?? null,
             'error_desc' => $result['initResult']['resultDesc'] ?? null,
-            'result'  => $result,
+            'result' => $result,
         ]);
     } catch (\Throwable $e) {
         return response()->json([
-            'error'   => 'Exception while connecting Codapay',
+            'error' => 'Exception while connecting Codapay',
             'details' => $e->getMessage(),
         ], 500);
     }
@@ -1165,7 +1216,7 @@ Route::get('/run-roomcup-rewards', function () {
 
     return response()->json([
         'message' => 'RoomCup rewards calculation executed successfully!',
-        'output'  => $output,
+        'output' => $output,
     ]);
 });
 
@@ -1271,8 +1322,8 @@ Route::get('/run-lucky-gift-test', function () {
     $process->run();
 
     return response()->json([
-        'exit_code'    => $process->getExitCode(),
-        'output'       => $process->getOutput(),
+        'exit_code' => $process->getExitCode(),
+        'output' => $process->getOutput(),
         'error_output' => $process->getErrorOutput(),
     ]);
 });
