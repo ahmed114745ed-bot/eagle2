@@ -692,11 +692,10 @@ Route::get('debug-user-level', function () {
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
 Route::get('stuck-users', function () {
-    $multiplier = (float) config('exp_percentages.exp_sender_percentage', 0.2);
+    $multiplier = (float) request('multiplier', config('exp_percentages.exp_sender_percentage', 0.2));
     $vips = \Modules\Vip\Entities\Vip::where('type', 2)->orderBy('exp', 'asc')->get();
 
-    $users = \App\Models\User::where('total_diamond_send', '>', 0)
-        ->get();
+    $users = \App\Models\User::where('total_diamond_send', '>', 0)->get();
 
     $stuckUsers = [];
 
@@ -718,7 +717,7 @@ Route::get('stuck-users', function () {
                 'uuid' => $user->uuid,
                 'name' => $user->name,
                 'total_diamonds' => $user->total_diamond_send,
-                'effective_exp_points' => $actualExp,
+                'effective_exp_points' => (int) $actualExp,
                 'current_level_in_db' => $user->sender_level,
                 'should_be_level' => $rightfulLevel,
                 'gap' => $rightfulLevel - $user->sender_level
@@ -731,9 +730,13 @@ Route::get('stuck-users', function () {
         'count' => count($stuckUsers),
         'analysis' => [
             'reason_of_stucking' => 'Levels update only on events (Send Gift). Manual point additions or missing triggers leave the sender_level column outdated.',
-            'upgrade_logic_location' => 'Modules\\Public\\Http\\Services\\UpgradeLevelServices::checkUserLevelUpgrated',
-            'multiplier_used' => $multiplier,
-            'config_raw_value' => config('exp_percentages.exp_sender_percentage')
+            'multiplier_source' => [
+                'request_param' => request('multiplier') ? 'provided' : 'not provided',
+                'config_helper' => config('exp_percentages.exp_sender_percentage'),
+                'db_raw' => \DB::table('configs')->where('name', 'exp_sender_percentage')->value('value'),
+                'final_multiplier_used' => $multiplier
+            ],
+            'tip' => 'To test with a different multiplier, use ?multiplier=0.2 in the URL'
         ],
         'stuck_users' => $stuckUsers,
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
