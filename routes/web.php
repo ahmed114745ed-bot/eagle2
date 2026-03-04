@@ -651,16 +651,19 @@ Route::get('debug-user-level', function () {
     }
 
     $currentLevel = $user->senderLevel;
-    $expLevel = $user->total_diamond_send; // news: column name is total_diamond_send
+    $expLevel = $user->total_diamond_send;
+
+    $multiplier = config('exp_percentages.exp_sender_percentage', 0.2);
+    $currentExp = $expLevel * $multiplier;
 
     $secondLevel = \Modules\Vip\Entities\Vip::where('type', 2)
         ->where('level', '>', $user->sender_level)
         ->orderBy('level')
         ->first();
 
-    $remaining = ($secondLevel?->exp ?? 0) - $expLevel;
-    $progressCurrent = $expLevel - ($currentLevel?->exp ?? 0);
-    $progressNext = ($secondLevel?->exp ?? 0) - ($currentLevel?->exp ?? 0);
+    $remaining = max(0, ($secondLevel?->exp ?? 0) - $currentExp);
+    $progressCurrent = max(0, $currentExp - ($currentLevel?->exp ?? 0));
+    $progressNext = max(1, ($secondLevel?->exp ?? 0) - ($currentLevel?->exp ?? 0));
 
     return response()->json([
         'status' => 'success',
@@ -682,6 +685,8 @@ Route::get('debug-user-level', function () {
             'exp' => $secondLevel->exp,
         ] : 'NULL (Max level or level data missing)',
         'diagnostic_calculations' => [
+            'multiplier_used' => $multiplier,
+            'earned_xp' => $currentExp,
             'remaining_to_next_level' => $remaining,
             'progress_current' => $progressCurrent,
             'progress_next' => $progressNext,
