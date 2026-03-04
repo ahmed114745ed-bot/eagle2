@@ -1,3 +1,4 @@
+
 <div id="timeSettings" class="settings-section">
     <h3>{{ __('Timing settings') }}</h3>
     <form action="{{ route('admin.app.settings.update') }}" method="POST" class="settings-form">
@@ -85,9 +86,3 @@
 </div>
 
 
-<style>
-    select.form-control {
-        height: 45px;
-        line-height: 45px;
-    }
-</style>
