@@ -34,13 +34,13 @@
 }
 
 .settings-menu button.active {
-    background-color:var(--primary-color); /* active tab color */
+    background-color:gray; /* active tab color */
     color: white;
 }
 
     .inner-settings-menu button.active {
-        background: var(--primary-color);
-        color: black;
+        background: ;
+        color: white;
     }
 
     .settings-section {
