@@ -629,6 +629,69 @@ Route::get('/charge-agency-export-report', [
 ])->name('charge-agency-export-report');
 
 
+Route::get('debug-user-level', function () {
+    $uuid = request('uuid', '7477526');
+    $user = \App\Models\User::withTrashed()
+        ->where('uuid', $uuid)
+        ->orWhere('id', $uuid)
+        ->orWhere('special_id', $uuid)
+        ->first();
+
+    if (!$user) {
+        $closest = \App\Models\User::where('uuid', 'like', "%$uuid%")->orWhere('name', 'like', "%$uuid%")->limit(5)->get(['id', 'uuid', 'name']);
+        return response()->json([
+            'status' => 'error',
+            'message' => "User with UUID/ID $uuid not found in users table.",
+            'search_db_info' => [
+                'total_users' => \App\Models\User::withTrashed()->count(),
+                'database' => config('database.connections.mysql.database'),
+            ],
+            'closest_matches_found' => $closest
+        ]);
+    }
+
+    $currentLevel = $user->senderLevel;
+    $expLevel = $user->total_diamond_send; // news: column name is total_diamond_send
+
+    $secondLevel = \Modules\Vip\Entities\Vip::where('type', 2)
+        ->where('level', '>', $user->sender_level)
+        ->orderBy('level')
+        ->first();
+
+    $remaining = ($secondLevel?->exp ?? 0) - $expLevel;
+    $progressCurrent = $expLevel - ($currentLevel?->exp ?? 0);
+    $progressNext = ($secondLevel?->exp ?? 0) - ($currentLevel?->exp ?? 0);
+
+    return response()->json([
+        'status' => 'success',
+        'user_data' => [
+            'id' => $user->id,
+            'uuid' => $user->uuid,
+            'special_id' => $user->special_id,
+            'name' => $user->name,
+            'sender_level_column' => $user->sender_level,
+            'total_diamond_send' => $user->total_diamond_send,
+            'deleted_at' => $user->deleted_at,
+        ],
+        'current_level_model' => $currentLevel ? [
+            'level' => $currentLevel->level,
+            'exp' => $currentLevel->exp,
+        ] : 'NULL (The user is likely at level 0 or level not in vips table)',
+        'next_level_model' => $secondLevel ? [
+            'level' => $secondLevel->level,
+            'exp' => $secondLevel->exp,
+        ] : 'NULL (Max level or level data missing)',
+        'diagnostic_calculations' => [
+            'remaining_to_next_level' => $remaining,
+            'progress_current' => $progressCurrent,
+            'progress_next' => $progressNext,
+            'ratio' => $progressNext > 0 ? ($progressCurrent / $progressNext) : 0,
+        ],
+        'vips_type_2_reference' => \Modules\Vip\Entities\Vip::where('type', 2)->orderBy('level')->get(['level', 'exp']),
+        'user' => $user
+    ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+});
+
 Route::get('x9b4-debug-track/{id}/{headerLog?}', function ($id, $headerLog = 'false') {
     $ids = explode(',', $id);
     settings()->set('debug_ids', $ids);
