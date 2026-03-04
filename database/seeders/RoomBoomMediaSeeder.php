@@ -67,7 +67,7 @@ class RoomBoomMediaSeeder extends Seeder
                             'image_type_boom' => 'svga',
                             'updated_at' => now(),
                         ]);
-                    if ($level == 1) {
+                    if ($level == 1 || $level == 3 || $level == 4 || $level == 5) {
                         $fileName2 = "bomb_background.jpeg";
                         $newPath2 = $this->uploadIfExists($localPath, $fileName2);
                         DB::table('room_boom_levels')
