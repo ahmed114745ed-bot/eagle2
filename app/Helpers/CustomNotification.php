@@ -987,31 +987,14 @@ class CustomNotification
         if ($type === 'bd_form') {
             $body = __('api.agencyOwner', [
                 'userName' => $details['username'] ?? '',
-                'Password' => $details['password'] ?? ''
             ], $lang);
-            // Log BD form approval details (excluding password for security)
-            Log::info('Form request approved (BD form)', [
-                'user_id' => $user->id,
-                'type' => $type,
-                'username' => $details['username'] ?? null,
-                // Password intentionally omitted from logs for security
-            ]);
+        
         } else {
             $body = __("api.acceptYourAgency", [], $lang);
-            Log::info('Form request approved', [
-                'user_id' => $user->id,
-                'type' => $type,
-                'message' => $body
-            ]);
+          
         }
 
         if (!$user->is_logout) {
-            // Log before sending Firebase notification
-            Log::info('Sending Firebase notification for approved form request', [
-                'user_id' => $user->id,
-                'type' => $type,
-                'notification_token' => $tokens_notification
-            ]);
             Common::send_firebase_notification(
                 $tokens_notification,
                 $this->appName($user->lan),
@@ -1036,12 +1019,6 @@ class CustomNotification
         ]);
 
         if (!$user->is_logout) {
-            // Log before sending Firebase notification for rejection
-            Log::info('Sending Firebase notification for rejected form request', [
-                'user_id' => $user->id,
-                'type' => $type,
-                'notification_token' => $tokens_notification
-            ]);
             Common::send_firebase_notification(
                 $tokens_notification,
                 $this->appName($user->lan),
