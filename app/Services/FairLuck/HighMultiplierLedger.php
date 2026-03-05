@@ -260,20 +260,14 @@ class HighMultiplierLedger
 
         if ($pool <= $floor) {
             if (!$alerted) {
-                Log::warning('FairLuck high multiplier pool dropped below floor', [
-                    'pool' => $pool,
-                    'floor' => $floor,
-                ]);
+              
                 Redis::setex(self::POOL_ALERT_KEY, $alertTtl, 1);
             }
             return;
         }
 
         if ($alerted) {
-            Log::info('FairLuck high multiplier pool recovered above floor', [
-                'pool' => $pool,
-                'floor' => $floor,
-            ]);
+          
         }
         Redis::del(self::POOL_ALERT_KEY);
     }

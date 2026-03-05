@@ -2,18 +2,22 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Controllers\MainController;
+use App\Models\AllGame;
+use App\Models\CoinGameUser;
+use App\Models\GameProviderSetting;
+use App\Services\AppFeatureService;
 use DB;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Models\AllGame;
-use App\Models\CoinGameUser;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
-use App\Services\AppFeatureService;
-use App\Admin\Controllers\MainController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Cache;
 
 class AllGameController extends MainController
 {
@@ -128,10 +132,11 @@ class AllGameController extends MainController
         $grid->column('name', __('name_ar'));
         $grid->column('name_en', __('name_en'));
         $grid->column('type', __('type'))->using([
-            0 => __('joy'),
+            0 => __('Joyplay'),
             1 => __('OX'),
-            2 => __('Baishun'),
-            3 => __('Leader cc'),
+            2 => __('Bytesun'),
+            3 => __('Quantum Nexus'),
+            4 => __('Zero Games'),
         ]);
         $grid->column('url', __('Full Url'));
         $grid->column('mini_url', __('Mini Url'));
@@ -197,5 +202,45 @@ class AllGameController extends MainController
         $form->text('hight', __('hight'));
 
         return $form;
+    }
+
+
+    public function gameSettings(Request $request)
+    {
+        //  dd($request->all());
+        $gameSetting = GameProviderSetting::updateOrCreate(
+            ['provider_code' => $request->provider_code],
+            [
+                'provider_name' => $request->provider_name,
+                'app_key'       => $request->app_key,
+                'app_id'        => $request->app_id,
+                'channel'       => $request->channel,
+                'gsp'           => $request->gsp,
+                'is_active'     => $request->active,
+
+            ]
+        );
+
+        // 🔥 Clear old cache
+        Cache::forget('game_provider_' . $request->provider_code);
+
+        // 🔥 Store fresh data in cache
+        Cache::put(
+            'game_provider_' . $request->provider_code,
+            $gameSetting,
+        );
+
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        } elseif ($request->has('redirect_to')) {
+            return Redirect::to($request->redirect_to);
+        }
+
+        return redirect($redirectUrl);
     }
 }

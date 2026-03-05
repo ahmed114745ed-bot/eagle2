@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\Common;
 use App\Helpers\LogHelper;
+use App\Models\GameProviderSetting;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
@@ -14,113 +16,123 @@ class VerifyLeaderCCMiddleWare
 {
     public function handle(Request $request, Closure $next)
     {
+           \Log::info('LeaderCC Request ', [
+                'body'     => $request->all(),
+            ]);
         $start = microtime(true);
 
         try {
-    
-        $path = ltrim(str_replace('api/', '', $request->path()), '/');
-        $key = config('games.leader_CC_game_key');
-        // LogHelper::info('LeaderCC Request Timing', [
-        //     'url'      => $request->fullUrl(),
-        //     'method'   => $request->method(),
-        //     'body'     => $request->all(),
-        //     'path' => $path,
-        // ]);
-     
-        if (!$key) {
-            return response()->json([
-                'errorCode' => 4005,
-                'errorMsg'  => 'Missing or invalid parameters key',
-            ], 400);
-        }
-
-        if ($request->has('orderId')) {
-            $orderId = $request->orderId;
-            if (Cache::has("order_$orderId")) {
+         
+            $path = ltrim(str_replace('api/', '', $request->path()), '/');
+            $gameSetting =  Common::getByCode('quantum_nexus');
+            $key =  @$gameSetting->app_key ?? '';
+            \Log::info('LeaderCC Request Timing', [
+                'url'      => $request->fullUrl(),
+                'method'   => $request->method(),
+                'body'     => $request->all(),
+                'path' => $path,
+                'key' => $key,
+            ]);
+            if (!$gameSetting->is_active) {
                 return response()->json([
-                    'errorCode' => 10003,
-                    'errorMsg'  => 'Order already exists'
+                    'errorCode' => 4005,
+                    'errorMsg'  => 'Game is not active now',
                 ], 400);
             }
-        }
-        if ($request->has('token')) {
-            $token = $request->token;
-            $userId = $this->findUserByToken($token);
-            if (!$userId) {
+
+            if (!$key) {
                 return response()->json([
-                    'errorCode' => 10003,
-                    'errorMsg'  => 'user not found'
+                    'errorCode' => 4005,
+                    'errorMsg'  => 'Missing or invalid parameters key',
                 ], 400);
             }
-        }
 
-
-        switch ($path) {
-            case 'leader-cc-game/change-balance':
-                $requiredParams = ['orderId','gameId','roundId','uid','coin','type','rewardType','token','sign'];
-                foreach ($requiredParams as $p) {
-                    if (!$request->has($p)) {
-                        return response()->json([
-                            'errorCode' => 4005,
-                            'errorMsg' => 'Missing signature parameters'
-                        ], 400);
-                    }
+            if ($request->has('orderId')) {
+                $orderId = $request->orderId;
+                if (Cache::has("order_$orderId")) {
+                    return response()->json([
+                        'errorCode' => 10003,
+                        'errorMsg'  => 'Order already exists'
+                    ], 400);
                 }
-                $rawString = 
-                    $request->orderId .
-                    $request->gameId .
-                    $request->roundId .
-                    $request->uid .
-                    $request->coin .
-                    $request->type .
-                    $request->rewardType .
-                    $request->token .
-                    $request->input('winId', "") .
-                    $request->roomId .
-                    $key;
-                break;
-
-            case 'leader-cc-game/get-user-info':
-            case 'leader-cc-game/make-up-orders':
-                $requiredParams = ['gameId','uid','token','roomId','sign'];
-                foreach ($requiredParams as $p) {
-                    if (!$request->has($p)) {
-                        return response()->json([
-                            'errorCode' => 4005,
-                            'errorMsg' => 'Missing signature parameters'
-                        ], 400);
-                    }
+            }
+            if ($request->has('token')) {
+                $token = $request->token;
+                $userId = $this->findUserByToken($token);
+                if (!$userId) {
+                    return response()->json([
+                        'errorCode' => 10003,
+                        'errorMsg'  => 'user not found'
+                    ], 400);
                 }
-                $rawString =
-                    $request->gameId .
-                    $request->uid .
-                    $request->token .
-                    $request->roomId .
-                    $key;
-                break;
+            }
 
-            default:
+
+            switch ($path) {
+                case 'leader-cc-game/change-balance':
+                    $requiredParams = ['orderId', 'gameId', 'roundId', 'uid', 'coin', 'type', 'rewardType', 'token', 'sign'];
+                    foreach ($requiredParams as $p) {
+                        if (!$request->has($p)) {
+                            return response()->json([
+                                'errorCode' => 4005,
+                                'errorMsg' => 'Missing signature parameters'
+                            ], 400);
+                        }
+                    }
+                    $rawString =
+                        $request->orderId .
+                        $request->gameId .
+                        $request->roundId .
+                        $request->uid .
+                        $request->coin .
+                        $request->type .
+                        $request->rewardType .
+                        $request->token .
+                        $request->input('winId', "") .
+                        $request->roomId .
+                        $key;
+                    break;
+
+                case 'leader-cc-game/get-user-info':
+                case 'leader-cc-game/make-up-orders':
+                    $requiredParams = ['gameId', 'uid', 'token', 'roomId', 'sign'];
+                    foreach ($requiredParams as $p) {
+                        if (!$request->has($p)) {
+                            return response()->json([
+                                'errorCode' => 4005,
+                                'errorMsg' => 'Missing signature parameters'
+                            ], 400);
+                        }
+                    }
+                    $rawString =
+                        $request->gameId .
+                        $request->uid .
+                        $request->token .
+                        $request->roomId .
+                        $key;
+                    break;
+
+                default:
+                    return response()->json([
+                        'errorCode' => 4006,
+                        'errorMsg' => 'Endpoint not allowed for this middleware'
+                    ], 400);
+            }
+
+            $expectedSign = md5($rawString);
+
+            if (!hash_equals(strtolower($expectedSign), strtolower($request->input('sign')))) {
                 return response()->json([
-                    'errorCode' => 4006,
-                    'errorMsg' => 'Endpoint not allowed for this middleware'
+                    'errorCode' => 10004,
+                    'errorMsg' => 'Verify signature fail'
                 ], 400);
-        }
+            }
 
-        $expectedSign = md5($rawString);
 
-        if (!hash_equals(strtolower($expectedSign), strtolower($request->input('sign')))) {
-            return response()->json([
-                'errorCode' => 10004,
-                'errorMsg' => 'Verify signature fail'
-            ], 400);
-        }
 
-      
-    
             $response = $next($request);
-    
         } catch (\Throwable $e) {
-    
+
             $duration = microtime(true) - $start;
             return response()->json([
                 'errorCode' => 5000,
@@ -128,10 +140,10 @@ class VerifyLeaderCCMiddleWare
                 'details'   => $e->getMessage(),
             ], 500);
         }
-    
+
         $duration = microtime(true) - $start;
-    
-    
+
+
         return $response;
     }
 
@@ -146,9 +158,7 @@ class VerifyLeaderCCMiddleWare
         $personalToken = PersonalAccessToken::findToken($plainToken);
         if (!$personalToken) {
             return null;
-        } 
+        }
         return $personalToken->tokenable_id;
     }
-    
 }
-

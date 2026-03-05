@@ -98,7 +98,7 @@ class TargetController extends MainController
         $grid->model()->orderBy('diamonds', 'asc');
 
         // $coins = Common::getMaxCoins();
-        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        $convertDiamond = 'zones_coins';
         $coins = Common::getSettingValue($convertDiamond) ?? 1;
 
         $this->addLevelColumn($grid);
@@ -558,7 +558,7 @@ class TargetController extends MainController
             ->rules('min:0')
             ->default(100)
             ->disable();
-        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        $convertDiamond = 'zones_coins';
         $coins = Common::getSettingValue($convertDiamond) ?? 1;
         $form->html('
         <script>

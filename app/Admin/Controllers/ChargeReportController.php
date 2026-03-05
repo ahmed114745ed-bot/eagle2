@@ -178,7 +178,7 @@ class ChargeReportController extends MainController
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
 
             $sender = Common::getChargerInfoII($this);
-                        if (empty($sender['name']) && empty($sender['uuid'])) {
+            if (empty($sender['name']) && empty($sender['uuid'])) {
                 $label = $this->charger_type === 'agency' ? 'Deleted Shipping Agency' : ($this->charger_type === 'user' ? 'Deleted user' : 'Deleted admin');
 
                 return "
@@ -261,7 +261,7 @@ class ChargeReportController extends MainController
         ";
         });
 
-    $grid->column('user_type', __('receiver type'));
+        $grid->column('user_type', __('receiver type'));
 
         if (request("name") == "dash") {
             $grid->column('agency_id', __('Agency'))->display(function () {
@@ -560,6 +560,12 @@ class ChargeReportController extends MainController
             $start = now()->startOfMonth();
             $end   = $end   = now()->endOfMonth();
             $query->whereBetween('created_at', [$start, $end]);
+        })->when(request('from_date'), function ($query,) {
+
+            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+           // dd(request('from_date'), request('to_date'),$start, $end);
+            $query->whereBetween('created_at', [$start, $end]);
         })->with([
             'user',
             'user.profile',
@@ -713,9 +719,10 @@ class ChargeReportController extends MainController
 
         $grid->column('coin.usd', __('dollar'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg');
+            $coin = $coin ?? $this->paid_usd;
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>
             ";

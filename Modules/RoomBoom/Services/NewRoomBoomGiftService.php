@@ -52,7 +52,8 @@ class NewRoomBoomGiftService
         });
     }
 
-    public function getOrCreateTotalRoomGift($roomId, $todayStart){
+    public function getOrCreateTotalRoomGift($roomId, $todayStart)
+    {
         $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
             ->where('created_at', '>=', $todayStart)
             ->lockForUpdate()
@@ -75,7 +76,7 @@ class NewRoomBoomGiftService
             ->latest()
             ->get();
 
-        foreach ($openBooms as $openBoom){
+        foreach ($openBooms as $openBoom) {
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
 
             if ($boomLevel && $newTotal >= $boomLevel->target) {
@@ -102,18 +103,19 @@ class NewRoomBoomGiftService
                     'total_room_gift_id' => $totalRoomGift->id,
                     'room_boom_level_id' => $nextLevel->id,
                 ], [
-                    'started_at'        => now(),
+                    'started_at' => now(),
                     'total_gifts_value' => $newTotal,
                 ]);
 
-                $d = [
-                    "messageContent" => [
-                        "message" => "roomBoomStarted",
-                        "roomBoomLevel" => $nextLevel->id,
-                    ]
-                ];
-
-                Common::sendToZego('SendCustomCommand', $room->id, $room->uid, json_encode($d));
+                \Illuminate\Support\Facades\DB::afterCommit(function () use ($room, $nextLevel) {
+                    $d = [
+                        "messageContent" => [
+                            "message" => "roomBoomStarted",
+                            "roomBoomLevel" => $nextLevel->id,
+                        ]
+                    ];
+                    Common::sendToZego('SendCustomCommand', $room->id, $room->uid, json_encode($d));
+                });
             }
         }
     }
@@ -121,109 +123,146 @@ class NewRoomBoomGiftService
     public function oldLevels($totalPrice, $totalRoomGiftId, $userId, &$currentTotal): void
     {
         $remaining = $totalPrice;
-        $levels = RoomBoomLevel::orderBy('level', 'asc')->get();
+        $levels = \Illuminate\Support\Facades\Cache::remember('room_boom_levels', 3600, function () {
+            return RoomBoomLevel::orderBy('level', 'asc')->get();
+        });
+
+        $giftsToInsert = [];
+        $now = Carbon::now();
 
         foreach ($levels as $level) {
-            if ($remaining <= 0) break;
+            if ($remaining <= 0)
+                break;
 
             if ($currentTotal >= $level->target) {
                 continue;
             }
 
             $neededForLevel = $level->target - $currentTotal;
-            $levelAmount  = min($remaining, $neededForLevel);
+            $levelAmount = min($remaining, $neededForLevel);
             $neededToMin = max(0, $level->min_target - $currentTotal);
 
             if ($currentTotal < $level->min_target) {
-                if ($levelAmount  >= $neededToMin && $neededToMin > 0) {
-                    RoomBoomGift::create([
+                if ($levelAmount >= $neededToMin && $neededToMin > 0) {
+                    $giftsToInsert[] = [
                         'total_room_gift_id' => $totalRoomGiftId,
                         'user_id' => $userId,
                         'price' => $neededToMin,
                         'room_boom_level' => $level->level,
                         'start_boom_ranking' => 0,
-                    ]);
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
 
                     $remainingPart = $levelAmount - $neededToMin;
                     if ($remainingPart > 0) {
-                        RoomBoomGift::create([
+                        $giftsToInsert[] = [
                             'total_room_gift_id' => $totalRoomGiftId,
                             'user_id' => $userId,
                             'price' => $remainingPart,
                             'room_boom_level' => $level->level,
                             'start_boom_ranking' => 1,
-                        ]);
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
                     }
                 } else {
-                    RoomBoomGift::create([
+                    $giftsToInsert[] = [
                         'total_room_gift_id' => $totalRoomGiftId,
                         'user_id' => $userId,
-                        'price' => $levelAmount ,
+                        'price' => $levelAmount,
                         'room_boom_level' => $level->level,
                         'start_boom_ranking' => 0,
-                    ]);
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
                 }
             } else {
-                RoomBoomGift::create([
+                $giftsToInsert[] = [
                     'total_room_gift_id' => $totalRoomGiftId,
                     'user_id' => $userId,
-                    'price' => $levelAmount ,
+                    'price' => $levelAmount,
                     'room_boom_level' => $level->level,
                     'start_boom_ranking' => 1,
-                ]);
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
 
-            $currentTotal += $levelAmount ;
-            $remaining -= $levelAmount ;
+            $currentTotal += $levelAmount;
+            $remaining -= $levelAmount;
+        }
+
+        if (!empty($giftsToInsert)) {
+            RoomBoomGift::insert($giftsToInsert);
         }
     }
 
     private function activateLevels($totalRoomGift, $newTotal): void
     {
-        $levelsToActivate = RoomBoomLevel::where('min_target', '<=', $newTotal)
-            ->where('target', '<=', $newTotal)
-            ->orderBy('level', 'asc')
-            ->get();
+        $levelsToActivate = \Illuminate\Support\Facades\Cache::remember('room_boom_levels', 3600, function () {
+            return RoomBoomLevel::orderBy('level', 'asc')->get();
+        })->where('min_target', '<=', $newTotal)->where('target', '>=', $newTotal);
+
+        if ($levelsToActivate->isEmpty())
+            return;
+
+        $existingLevelIds = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
+            ->whereIn('room_boom_level_id', $levelsToActivate->pluck('id'))
+            ->pluck('room_boom_level_id')
+            ->toArray();
+
+        $boomsToInsert = [];
+        $now = Carbon::now();
 
         foreach ($levelsToActivate as $level) {
-            $exists = RoomBoom::where('room_boom_level_id', $level->id)
-                ->where('total_room_gift_id', $totalRoomGift->id)
-                ->first();
-
-            if (!$exists) {
-                $this->safeCreateBoom($totalRoomGift->id, $level->id, $newTotal);
+            if (!in_array($level->id, $existingLevelIds)) {
+                $boomsToInsert[] = [
+                    'total_room_gift_id' => $totalRoomGift->id,
+                    'room_boom_level_id' => $level->id,
+                    'started_at' => $now,
+                    'total_gifts_value' => $newTotal,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
+        }
+
+        if (!empty($boomsToInsert)) {
+            RoomBoom::insert($boomsToInsert);
         }
     }
 
     private function handleCurrentLevel($totalRoomGift, $newTotal, $roomId, $roomUid): void
     {
-        $currentLevel = RoomBoomLevel::where('min_target', '<=', $newTotal)
-            ->where('target', '>=', $newTotal)
-            ->orderBy('level')
-            ->first();
+        $currentLevel = \Illuminate\Support\Facades\Cache::remember('room_boom_levels', 3600, function () {
+            return RoomBoomLevel::orderBy('level', 'asc')->get();
+        })->where('min_target', '<=', $newTotal)->where('target', '>=', $newTotal)->first();
 
-        if (!$currentLevel) return;
+        if (!$currentLevel)
+            return;
 
         $existingBoom = RoomBoom::where('room_boom_level_id', $currentLevel->id)
             ->where('total_room_gift_id', $totalRoomGift->id)
-            ->lockForUpdate()
-            ->first();
+            ->first(); // Avoided lockForUpdate to prevent deadlocks on high concurrency
 
         if (!$existingBoom) {
-            $existingBoom = $this->safeCreateBoom($totalRoomGift->id, $currentLevel->id, $newTotal);
+            $this->safeCreateBoom($totalRoomGift->id, $currentLevel->id, $newTotal);
 
-            $d = [
-                "messageContent" => [
-                    "message"       => "roomBoomStarted",
-                    'roomBoomLevel' => $currentLevel->id,
-                ]
-            ];
-            Common::sendToZego('SendCustomCommand', $roomId, $roomUid, json_encode($d));
+            // Defer the Zego HTTP request to run after the DB transaction ends
+            DB::afterCommit(function () use ($roomId, $roomUid, $currentLevel) {
+                $d = [
+                    "messageContent" => [
+                        "message" => "roomBoomStarted",
+                        'roomBoomLevel' => $currentLevel->id,
+                    ]
+                ];
+                Common::sendToZego('SendCustomCommand', $roomId, $roomUid, json_encode($d));
+            });
+        } elseif ($existingBoom->total_gifts_value != $newTotal) {
+            $existingBoom->total_gifts_value = $newTotal;
+            $existingBoom->save();
         }
-
-        $existingBoom->total_gifts_value = $newTotal;
-        $existingBoom->save();
     }
 
     private function safeCreateBoom($totalRoomGiftId, $levelId, $newTotal)

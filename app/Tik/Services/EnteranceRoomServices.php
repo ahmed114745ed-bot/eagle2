@@ -583,7 +583,7 @@ class EnteranceRoomServices
 
     public function deleteOldRoomMic($user, $room)
     {
-        RoomMicrophone::where('user_id', $user->id)->delete();
+        RoomMicrophone::where('user_id', $user->id)->where('room_id','!=', $room->id)->delete();
         $partner = $user->lovelyRelations()
             ->with(['userOne', 'userTwo'])
             ->first()?->partner;

@@ -25,10 +25,11 @@ use Str;
 class SendGiftService
 {
 
-    public function sendGift($number, Room $room, Gift $gift, User $senderUser, User $receivedUser, $isPlay = 0, $isPK = 0, $totalPrice = null, $platformObtain = null,)
+    public function sendGift($number, Room $room, Gift $gift, User $senderUser, User $receivedUser, $isPlay = 0, $isPK = 0, $totalPrice = null, $platformObtain = null, )
     {
 
-        if ($totalPrice == null) $totalPrice = $gift->price * $number;
+        if ($totalPrice == null)
+            $totalPrice = $gift->price * $number;
 
         $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPK);
         GiftLog::query()->create($info);
@@ -39,7 +40,8 @@ class SendGiftService
 
     public function sendGift2($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, $cpId = null)
     {
-        if ($totalPrice == null) $totalPrice = $gift->price * $number;
+        if ($totalPrice == null)
+            $totalPrice = $gift->price * $number;
         $data = [];
         foreach ($receivedUsers as $receivedUser) {
             $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId);
@@ -48,11 +50,15 @@ class SendGiftService
         DB::table('gift_logs')->insert($data);
     }
 
-    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null , $sourceType = null,$type = null)
+    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null, $sourceType = null, $type = null)
     {
-        if ($totalPrice == null) $totalPrice = $gift->price * $number;
+        if ($totalPrice == null)
+            $totalPrice = $gift->price * $number;
         $roomBoomUuid = (string) Str::uuid();
         $data = [];
+        $diamondLogs = [];
+        $now = now();
+
         foreach ($receivedUsers as $receivedUser) {
             if ($type !== 'bag') {
                 $featureType = $room->type === 'audio'
@@ -70,7 +76,7 @@ class SendGiftService
                 );
             }
             $cpId = @$cpIds[$receivedUser->id] ?? null;
-            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId , sourceType: $sourceType);
+            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId, sourceType: $sourceType);
             $info['room_boom_uuid'] = $roomBoomUuid;
             $data[] = $info;
         }
@@ -88,12 +94,12 @@ class SendGiftService
         $room_scale = Common::getConfig('platform_share');
         $room_scale = $room_scale ? $room_scale : 0;//Platform share
         if (!$room_user->is_sign) {                                                                         //non-contract homeowner
-            $data['uid']      =
+            $data['uid'] =
                 0;                                                                                          //Room running water
-            $data['toUid']    =
+            $data['toUid'] =
                 $total * ((100 - $room_scale) / 100);                                                       //recipient
             $data['platform'] = $total * ($room_scale / 100);                                               //Platform flow
-            $data['uid_yj']   = 0;                                                                          //homeowner
+            $data['uid_yj'] = 0;                                                                          //homeowner
         } else {
             //Room running water
             $stream = $total * $room_user->scale / 100;
@@ -107,13 +113,13 @@ class SendGiftService
             }
             //recipient
             $room_scale_sign = (100 - $room_scale) / 100;
-            $get_gift        = $total * ($room_scale_sign * $scale / 100);
-            $uid_yj          = $total * ($room_scale_sign * (100 - $scale) / 100);
+            $get_gift = $total * ($room_scale_sign * $scale / 100);
+            $uid_yj = $total * ($room_scale_sign * (100 - $scale) / 100);
 
-            $data['uid']      = $stream;  //Room running water
-            $data['toUid']    = $get_gift;//recipient
+            $data['uid'] = $stream;  //Room running water
+            $data['toUid'] = $get_gift;//recipient
             $data['platform'] = $platform;//Platform flow
-            $data['uid_yj']   = $uid_yj;  //homeowner
+            $data['uid_yj'] = $uid_yj;  //homeowner
         }
         $data = array_map(function ($val) {
             //            $gvic = Common::getConf ('gift_value_in_coins')?:0.1;
@@ -126,11 +132,11 @@ class SendGiftService
 
     }
     public function updateFamilyLevel(Family &$family, $totalCoins)
-{
-    //get total giftlogs
-    $this->updateFamilyModel($totalCoins, $family);
+    {
+        //get total giftlogs
+        $this->updateFamilyModel($totalCoins, $family);
 
-}
+    }
 
     /**
      * @param $totalCoinsPerUser
@@ -140,7 +146,7 @@ class SendGiftService
     public function updateFamilyModel($totalCoinsPerUser, Family $family): void
     {
         $family->total_diamond += $totalCoinsPerUser;
-        $familyId              = $family->id;
+        $familyId = $family->id;
         $this->updateOrCreateFamilyRank($familyId, $totalCoinsPerUser);
 
         $level =
@@ -160,12 +166,13 @@ class SendGiftService
      */
     public function updateOrCreateFamilyRank(mixed $familyId, $totalCoinsPerUser, ?Carbon $day = null): void
     {
-        if ($day == null) $day = now();
+        if ($day == null)
+            $day = now();
         $familyRank = FamilyRank::query()->where('family_id', $familyId)
-                                ->where('day', $day->day)
-                                ->where('month', $day->month)
-                                ->where('year', $day->year)
-                                ->first();
+            ->where('day', $day->day)
+            ->where('month', $day->month)
+            ->where('year', $day->year)
+            ->first();
 
         if ($familyRank) {
             $familyRank->coins += $totalCoinsPerUser;
@@ -183,19 +190,20 @@ class SendGiftService
     public function createFamilyRank(mixed $familyId, $totalCoinsPerUser): void
     {
         FamilyRank::query()->create([
-                                        'family_id' => $familyId,
-                                        'day'       => now()->day,
-                                        'month'     => now()->month,
-                                        'year'      => now()->year,
-                                        'coins'     => $totalCoinsPerUser
-                                    ]);
+            'family_id' => $familyId,
+            'day' => now()->day,
+            'month' => now()->month,
+            'year' => now()->year,
+            'coins' => $totalCoinsPerUser
+        ]);
     }
 
     public function updateFamilyLevelForReceiver(Collection $users, $totalCoinsPerUser): bool
     {
-        $families    = $users->pluck('family')->where('id', '!=', null);
+        $families = $users->pluck('family')->where('id', '!=', null);
         $familiesIds = $families->pluck('id')->toArray();
-        if (count($familiesIds) == 0) return false;
+        if (count($familiesIds) == 0)
+            return false;
         $repeatedData = $this->getDuplication($familiesIds);
 
         foreach ($repeatedData as $data) {
@@ -218,7 +226,7 @@ class SendGiftService
             $isFound = false;
             foreach ($repeatedData as $index => $data) {
                 if ($data['id'] == $familiesId) {
-                    $isFound                       = true;
+                    $isFound = true;
                     $repeatedData[$index]['count'] += 1;
                     break;
                 }
@@ -234,21 +242,22 @@ class SendGiftService
 
     public function updatePkScoresAndSendToZego($pk, $userId, $roomId, $receivedIds, $giftPrice, $microphone)
     {
-        if (!($pk instanceof Pk)) return;
+        if (!($pk instanceof Pk))
+            return;
 
-        $m      = explode(',', $microphone);
-        $mic_1  = isset($m[1]) ? $m[1] : 0;
-        $mic_2  = isset($m[2]) ? $m[2] : 0;
-        $mic_3  = isset($m[3]) ? $m[3] : 0;
-        $mic_4  = isset($m[4]) ? $m[4] : 0;
-        $mic_5  = isset($m[5]) ? $m[5] : 0;
-        $mic_6  = isset($m[6]) ? $m[6] : 0;
-        $mic_7  = isset($m[7]) ? $m[7] : 0;
-        $mic_8  = isset($m[8]) ? $m[8] : 0;
+        $m = explode(',', $microphone);
+        $mic_1 = isset($m[1]) ? $m[1] : 0;
+        $mic_2 = isset($m[2]) ? $m[2] : 0;
+        $mic_3 = isset($m[3]) ? $m[3] : 0;
+        $mic_4 = isset($m[4]) ? $m[4] : 0;
+        $mic_5 = isset($m[5]) ? $m[5] : 0;
+        $mic_6 = isset($m[6]) ? $m[6] : 0;
+        $mic_7 = isset($m[7]) ? $m[7] : 0;
+        $mic_8 = isset($m[8]) ? $m[8] : 0;
         $team_1 = [$mic_1, $mic_2, $mic_5, $mic_6];
         $team_2 = [$mic_3, $mic_4, $mic_7, $mic_8];
-        $t1     = implode(',', $team_1);
-        $t2     = implode(',', $team_2);
+        $t1 = implode(',', $team_1);
+        $t2 = implode(',', $team_2);
 
         foreach ($receivedIds as $toUid) {
             if (in_array($toUid, $team_1)) {
@@ -263,10 +272,10 @@ class SendGiftService
 
         $ms = [
             'messageContent' => [
-                "message"            => "updatePk",
-                "PkTime"             => Carbon::parse($pk->end_at)->diffInMinutes(now()),
-                "scoreTeam1"         => $pk->t1_score,
-                "scoreTeam2"         => $pk->t2_score,
+                "message" => "updatePk",
+                "PkTime" => Carbon::parse($pk->end_at)->diffInMinutes(now()),
+                "scoreTeam1" => $pk->t1_score,
+                "scoreTeam2" => $pk->t2_score,
                 "percentagepk_team1" => $pk->t1_per,
                 "percentagepk_team2" => $pk->t2_per
             ]
@@ -277,32 +286,8 @@ class SendGiftService
 
     public function updatePkScoresAndSendToZegoJob($pk, $userId, $roomId, $receivedIds, $giftPrice, $room)
     {
-        if (!($pk instanceof Pk)) return;
-
-//        $m      = explode(',', $microphone);
-//        $mic_1  = @$m[1] ?? 0;
-//        $mic_2  = @$m[2] ?? 0;
-//        $mic_3  = @$m[3] ?? 0;
-//        $mic_4  = @$m[4] ?? 0;
-//        $mic_5  = @$m[5] ?? 0;
-//        $mic_6  = @$m[6] ?? 0;
-//        $mic_7  = @$m[7] ?? 0;
-//        $mic_8  = @$m[8] ?? 0;
-//        $team_1 = [$mic_1, $mic_2, $mic_5, $mic_6];
-//        $team_2 = [$mic_3, $mic_4, $mic_7, $mic_8];
-//        $t1     = implode(',', $team_1);
-//        $t2     = implode(',', $team_2);
-//
-//        foreach ($receivedIds as $toUid) {
-//            if (in_array($toUid, $team_1)) {
-//                $pk->t1_score += $giftPrice;
-//            } elseif (in_array($toUid, $team_2)) {
-//                $pk->t2_score += $giftPrice;
-//            }
-//        }
-//        $pk->team_1 = $t1;
-//        $pk->team_2 = $t2;
-//        $pk->save();
+        if (!($pk instanceof Pk))
+            return;
 
         $microphones = $room->microphones()
             ->orderBy('position')
@@ -324,29 +309,43 @@ class SendGiftService
             ->values()
             ->toArray();
 
+        $t1Add = 0;
+        $t2Add = 0;
         foreach ($receivedIds as $toUid) {
             if (in_array($toUid, $team1)) {
-                $pk->t1_score += $giftPrice;
+                $t1Add += $giftPrice;
             } elseif (in_array($toUid, $team2)) {
-                $pk->t2_score += $giftPrice;
+                $t2Add += $giftPrice;
             }
         }
 
-        $pk->team_1 = implode(',', $team1);
-        $pk->team_2 = implode(',', $team2);
-        $pk->save();
+        if ($t1Add > 0) {
+            $pk->increment('t1_score', $t1Add);
+        }
+        if ($t2Add > 0) {
+            $pk->increment('t2_score', $t2Add);
+        }
 
-        $ms   = [
+        $pk->update([
+            'team_1' => implode(',', $team1),
+            'team_2' => implode(',', $team2)
+        ]);
+
+        $pk->refresh();
+
+        $ms = [
             'messageContent' => [
-                "message"            => "updatePk",
-                "PkTime"             => Carbon::parse($pk->end_at)->diffInMinutes(now()),
-                "scoreTeam1"         => $pk->t1_score,
-                "scoreTeam2"         => $pk->t2_score,
+                "message" => "updatePk",
+                "PkTime" => Carbon::parse($pk->end_at)->diffInMinutes(now()),
+                "scoreTeam1" => $pk->t1_score,
+                "scoreTeam2" => $pk->t2_score,
                 "percentagepk_team1" => $pk->t1_per,
                 "percentagepk_team2" => $pk->t2_per
             ]
         ];
         $json = json_encode($ms);
+
+        \Illuminate\Support\Facades\Log::info("RTM Test (updatePk) roomId: $roomId", ['data' => $ms['messageContent']]);
 
         Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
     }
@@ -362,33 +361,33 @@ class SendGiftService
      * @param mixed $isPlay
      * @return array
      */
-    public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null ,$sourceType = null): array
+    public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null, $sourceType = null): array
     {
         $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
-        $info['giftId']       = $gift->id;
+        $info['giftId'] = $gift->id;
         $info['roomowner_id'] = $room->uid;
-        $info['giftNum']      = $number;
-        $info['giftName']     = $gift->name ?: '_';
-        $info['giftPrice']    = $totalPrice;
-        $info['app_profit_coins']    = $totalPrice;
-        $info['sender_id']    = $senderUser->id;
-        $info['receiver_id']  = $receivedUser->id;
-        $info['is_play']      = $isPlay ? 2 : 1;
-        $info['type']         = 2;
-        $info['created_at']   = $info['updated_at'] = date('Y-m-d H:i:s', time());
+        $info['giftNum'] = $number;
+        $info['giftName'] = $gift->name ?: '_';
+        $info['giftPrice'] = $totalPrice;
+        $info['app_profit_coins'] = $totalPrice;
+        $info['sender_id'] = $senderUser->id;
+        $info['receiver_id'] = $receivedUser->id;
+        $info['is_play'] = $isPlay ? 2 : 1;
+        $info['type'] = 2;
+        $info['created_at'] = $info['updated_at'] = date('Y-m-d H:i:s', time());
 
-        $info['platform_obtain']  = 0.0;                          //platform
-        $info['receiver_obtain']  = $totalPrice;                  //recipient
+        $info['platform_obtain'] = 0.0;                          //platform
+        $info['receiver_obtain'] = $totalPrice;                  //recipient
         $info['roomowner_obtain'] = floor($totalPrice * 0.03);    //homeowner
 
-        $info['agency_id']          = $receivedUser->agency_id;//homeowner
+        $info['agency_id'] = $receivedUser->agency_id;//homeowner
         $info['receiver_family_id'] = @$receivedUser->family_id;         //homeowner
-        $info['sender_family_id']   = @$senderUser->family_id;
-        $info['pk']   = @$isPk ?? false;
-        $info['cp_id']   = $cpId;
-        $info['room_id']   = $room->id;
+        $info['sender_family_id'] = @$senderUser->family_id;
+        $info['pk'] = @$isPk ?? false;
+        $info['cp_id'] = $cpId;
+        $info['room_id'] = $room->id;
         $info['room_gift_status'] = $appFeatureStatus ?? false;
-        $info['source_type']  = $sourceType;
+        $info['source_type'] = $sourceType;
 
 
 
@@ -396,36 +395,10 @@ class SendGiftService
         return $info;
     }
 
-    public function updatePkScoresAndSendToZegoJob2($pk, $receivedIds, $giftPrice, $room) :  array
+    public function updatePkScoresAndSendToZegoJob2($pk, $receivedIds, $giftPrice, $room): array
     {
-        if(!($pk instanceof Pk)) return [];
-
-//        $m = explode (',',$microphone);
-//        $mic_1 = isset($m[0])?$m[0]:0;
-//        $mic_2 = isset($m[1])?$m[1]:0;
-//        $mic_3 = isset($m[2])?$m[2]:0;
-//        $mic_4 = isset($m[3])?$m[3]:0;
-//        $mic_5 = isset($m[4])?$m[4]:0;
-//        $mic_6 = isset($m[5])?$m[5]:0;
-//        $mic_7 = isset($m[6])?$m[6]:0;
-//        $mic_8 = isset($m[7])?$m[7]:0;
-//        $mic_9 = isset($m[8])?$m[8]:0;
-//        $team_1 = [$mic_2,$mic_3,$mic_6,$mic_7];
-//        $team_2 = [$mic_4,$mic_5,$mic_8,$mic_9];
-//        $t1 = implode (',',$team_1);
-//        $t2 = implode (',',$team_2);
-//
-//        foreach ($receivedIds as $toUid) {
-//            if (in_array($toUid, $team_1)) {
-//                $pk->t1_score += $giftPrice;
-//            } elseif (in_array($toUid, $team_2)) {
-//                $pk->t2_score += $giftPrice;
-//            }
-//        }
-//        $pk->team_1 = $t1;
-//        $pk->team_2 = $t2;
-//        $pk->save();
-
+        if (!($pk instanceof Pk))
+            return [];
         $microphones = $room->microphones()
             ->orderBy('position')
             ->get()
@@ -446,12 +419,21 @@ class SendGiftService
             ->values()
             ->toArray();
 
+        $t1Add = 0;
+        $t2Add = 0;
         foreach ($receivedIds as $toUid) {
             if (in_array($toUid, $team1)) {
-                $pk->t1_score += $giftPrice;
+                $t1Add += $giftPrice;
             } elseif (in_array($toUid, $team2)) {
-                $pk->t2_score += $giftPrice;
+                $t2Add += $giftPrice;
             }
+        }
+
+        if ($t1Add > 0) {
+            $pk->increment('t1_score', $t1Add);
+        }
+        if ($t2Add > 0) {
+            $pk->increment('t2_score', $t2Add);
         }
 
         $pk->update([
@@ -459,6 +441,7 @@ class SendGiftService
             'team_2' => implode(',', $team2),
         ]);
 
+        $pk->refresh();
         return ["end_at" => $pk->end_at, 't1_score' => $pk->t1_score, 't2_score' => $pk->t2_score];
     }
 }

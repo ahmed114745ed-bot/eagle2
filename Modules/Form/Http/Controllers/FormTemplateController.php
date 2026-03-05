@@ -344,7 +344,7 @@ class FormTemplateController extends Controller
         $data = $request->except('_token');
 
         $existingRequest = FormRequest::where('form_template_id', $template->id)
-            ->where('submitted_by', $request->user_id)->where('status', '!=', 'rejected')
+            ->where('submitted_by', $request->user_id)->where('status', '=', 'pending')
             ->first();
         if ($existingRequest) {
             return redirect()->route('forms.show.reqs', [

@@ -22,13 +22,13 @@ class Badges extends Selectable
             $path =   $this->images->firstWhere('language', app()->getLocale())?->image ?? $this->images->firstWhere('language', 'en')?->image;
             /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithSvga($this->id, $url, 60, 60);
+            return handleShowImageWithSvga($this->id, $url, 100, 100, 4, 'contain');
         });
 
         $this->column('show_image', __('show image'))->display(function ($path) {
             $path =   $this->images->firstWhere('language', app()->getLocale())?->show_image ?? $this->images->firstWhere('language', 'en')?->show_image;
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
+            return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
         });
 
         $this->column('priority', __('Priority'))->sortable();

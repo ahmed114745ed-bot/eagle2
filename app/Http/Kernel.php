@@ -102,7 +102,6 @@ class Kernel extends HttpKernel
         'octane.pusher.config2' => \App\Http\Middleware\OctanePusherConfigv2::class,
         'verify.game.signature' => \App\Http\Middleware\VerifyLeaderCCMiddleWare::class,
 
-        // 'verify.game.signature' => \App\Http\Middleware\VerifyGameLeaderCCMiddleWare::class,
         //        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
