@@ -287,11 +287,13 @@ window.showSection = function(sectionId) {
     });
     const section = document.getElementById(sectionId);
     if (section) section.classList.add('active');
-
+    const hashValue = window.location.hash.substring(1);
     // Update all forms with current tab information
     document.querySelectorAll('input[name="current_tab"]').forEach(input => {
         input.value = sectionId;
     });
+
+    
 
     // Add current_tab as hidden input to all forms in settings (including both settings-form and no-background-form)
     document.querySelectorAll('.settings-form, .no-background-form, form[action*="admin"]').forEach(form => {
