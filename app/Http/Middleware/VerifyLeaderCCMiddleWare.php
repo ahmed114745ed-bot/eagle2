@@ -25,8 +25,7 @@ class VerifyLeaderCCMiddleWare
          
             $path = ltrim(str_replace('api/', '', $request->path()), '/');
             $gameSetting =  Common::getByCode('quantum_nexus');
-            //$key =  @$gameSetting->app_key ?? '';
-            $key =  '303';
+            $key =  @$gameSetting->app_key ?? '';
             \Log::info('LeaderCC Request Timing', [
                 'url'      => $request->fullUrl(),
                 'method'   => $request->method(),
