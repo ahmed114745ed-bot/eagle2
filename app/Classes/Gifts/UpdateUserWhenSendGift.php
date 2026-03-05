@@ -88,9 +88,7 @@ class UpdateUserWhenSendGift
                 ->get();
 
             foreach ($users as $user) {
-                if (!$user || !isset($user->id)) {
-                    continue;
-                    
+             
                 $user->increment('total_diamond_received', $totalCoins);
 
                 if ($user->agency_id == 0) {
