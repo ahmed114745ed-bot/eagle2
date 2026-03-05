@@ -1661,3 +1661,10 @@ Route::get('/save-game-app-key', function (Request $request) {
         ], 500);
     }
 });
+
+Route::get('make-webhook-url', function () {
+    $seeder = new \Database\Seeders\WebhookGamesSeeder();
+    $seeder->run();
+
+    return 'WebhookGamesSeeder has been executed successfully!';
+});
