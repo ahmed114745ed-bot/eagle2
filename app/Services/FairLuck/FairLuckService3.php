@@ -357,19 +357,7 @@ class FairLuckService3
                 'medium_wallet' => $this->getMediumWalletBalance(),
             ];
 
-            \Illuminate\Support\Facades\Log::info('FairLuckService3 AFTER DISTRIBUTION', [
-                'user_id' => $user->id,
-                'bet_amount' => $betAmount,
-                'global_vault_after' => $walletsAfter['global_vault'],
-                'jackpot_wallet_after' => $walletsAfter['jackpot_wallet'],
-                'medium_wallet_after' => $walletsAfter['medium_wallet'],
-                'global_vault_increase' => $walletsAfter['global_vault'] - $walletsBefore['global_vault'],
-                'jackpot_wallet_increase' => $walletsAfter['jackpot_wallet'] - $walletsBefore['jackpot_wallet'],
-                'medium_wallet_increase' => $walletsAfter['medium_wallet'] - $walletsBefore['medium_wallet'],
-                'expected_55_percent' => round($totalAmount * 0.55),
-                'expected_15_percent' => round($totalAmount * 0.15),
-                'expected_10_percent' => round($totalAmount * 0.10),
-            ]);
+          
 
             $houseEdgeCut = $totalAmount * 0.20; // 20% total fee/house cut
 
