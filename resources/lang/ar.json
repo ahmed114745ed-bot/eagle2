@@ -5301,5 +5301,11 @@
     "App Fee": "رسوم التطبيق",
     "Receiver Fee": "عمولة المستلم",
     "Net Bet (to FairLuck)": "صافي الرهان (إلى FairLuck)",
-    "Winner?": "فائز؟"
+    "Winner?": "فائز؟",
+    "App Settings": "إعدادات التطبيق",
+    "Bottom Nav Active Color": "لون شريط التنقل النشط",
+    "Bottom Nav Inactive Color": "لون شريط التنقل غير النشط",
+    "Text Header Color": "لون نص الرأس",
+    "Button Text Color": "لون نص الزر",
+    "New Theme Enabled": "تفعيل المظهر الجديد"
 }

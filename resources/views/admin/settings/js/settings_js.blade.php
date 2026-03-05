@@ -644,4 +644,32 @@ window.updateBackgroundValue = async function() {
             }, 5000);
         });
     });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const exchangeRateInput = document.getElementById('coin_exp');
+    const diamondInput = document.querySelector('.user_coin_input');
+    const exchangeRateHidden = document.querySelector('.exchange_rate');
+    const resultSpan = document.querySelector('.exp_result');
+
+    function calculateExchange() {
+        const rate = parseFloat(exchangeRateInput.value) || 0;
+        const diamonds = parseFloat(diamondInput.value) || 0;
+
+        exchangeRateHidden.value = rate;
+
+        if (rate > 0 && diamonds > 0) {
+            const result = (diamonds * rate).toFixed(2);
+            resultSpan.textContent = result + ' coins';
+            resultSpan.style.display = 'inline-block';
+        } else {
+            resultSpan.textContent = '';
+            resultSpan.style.display = 'none';
+        }
+    }
+
+    exchangeRateInput.addEventListener('input', calculateExchange);
+    diamondInput.addEventListener('input', calculateExchange);
+
+    calculateExchange();
+});
 </script>

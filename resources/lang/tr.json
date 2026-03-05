@@ -4419,5 +4419,12 @@
     "payment.processing_error": "Ödeme işlemi hatası oluştu",
     "payment.invalid_link_type": "Geçersiz bağlantı türü",
     "payment.paymob_error": "PayMob işleminde hata oluştu",
-    "payment.paymob_success": "PayMob ödeme bağlantısı başarıyla oluşturuldu"
+    "payment.paymob_success": "PayMob ödeme bağlantısı başarıyla oluşturuldu",
+    "App Settings": "Uygulama Ayarları",
+    "Bottom Nav Active Color": "Alt Gezinti Aktif Rengi",
+    "Bottom Nav Inactive Color": "Alt Gezinti Pasif Rengi",
+    "Text Header Color": "Metin Başlığı Rengi",
+    "Button Text Color": "Düğme Metin Rengi",
+    "New Theme Enabled": "Yeni Tema Etkinleştirildi"
+
 }

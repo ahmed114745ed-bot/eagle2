@@ -961,7 +961,8 @@
     }
 
     .real-time-card-height {
-        height: 255px;
+       /* height: 255px;*/
+       min-height: 332px !important;
     }
 
     @media (max-width: 576px) {
@@ -983,7 +984,7 @@
         }
 
         .real-time-card-height {
-            height: auto;
+          /*  height: auto;*/
         }
 
         .rtl .theme-settings form,
@@ -1128,4 +1129,28 @@
             right: 75px;
         }
     }
+
+    .color-white{
+        color: white !important;
+    }
+    .p-9-px {
+        padding: 9px !important;
+    }
+    .btn0bottom{
+            bottom: 22px;
+            position: absolute;
+            margin: auto;
+    }
+
+    .pusher-settings-form{
+        height: 560px;
+    }
+    .pusher-btn0bottom {
+        position: absolute;
+        margin: 17px;
+        bottom: 0;
+    }
+
 </style>
+
+

@@ -4016,5 +4016,12 @@
     "payment.processing_error": "भुगतान प्रोसेसिंग त्रुटि हुई",
     "payment.invalid_link_type": "गलत लिंक प्रकार",
     "payment.paymob_error": "पेमोब प्रोसेसिंग में त्रुटि हुई",
-    "payment.paymob_success": "पेमोब पेमेंट लिंक सफलतापूर्वक बनाया गया"
+    "payment.paymob_success": "पेमोब पेमेंट लिंक सफलतापूर्वक बनाया गया",
+    "App Settings": "ऐप सेटिंग्स",
+    "Bottom Nav Active Color": "निचली नेविगेशन सक्रिय रंग",
+    "Bottom Nav Inactive Color": "निचली नेविगेशन निष्क्रिय रंग",
+    "Text Header Color": "टेक्स्ट हेडर रंग",
+    "Button Text Color": "बटन टेक्स्ट रंग",
+    "New Theme Enabled": "नई थीम सक्षम"
+
 }
