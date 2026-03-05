@@ -1658,4 +1658,5 @@ Route::get('make-seeders-for-new-update', function () {
     $seeder->run();
 
     return 'seeders have been executed successfully!';
+    return 'seeders have been executed successfully!';
 });
