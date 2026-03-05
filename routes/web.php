@@ -231,18 +231,6 @@ Route::get('/run-seeders', function () {
     ]);
 });
 
-Route::get('/room-boom-media', function () {
-
-    // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'RoomBoomMediaSeeder']);
-
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
 Route::get('/badge-seeders', function () {
 
     // Run multiple seeders one by one
@@ -1662,9 +1650,12 @@ Route::get('/save-game-app-key', function (Request $request) {
     }
 });
 
-Route::get('make-webhook-url', function () {
+Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
 
-    return 'WebhookGamesSeeder has been executed successfully!';
+     $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder->run();
+
+    return 'seeders have been executed successfully!';
 });
