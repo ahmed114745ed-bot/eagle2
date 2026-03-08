@@ -38,6 +38,7 @@ use App\Models\AgencySallary;
 use App\Models\Ban;
 use App\Models\Bd;
 use App\Models\BDSallary;
+use App\Models\Coin;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinLog;
 use App\Models\Country;
@@ -1662,6 +1663,28 @@ Route::get('/save-game-app-key', function (Request $request) {
     }
 });
 
+Route::get('/fix-paid-usd', function () {
+    $logs = CoinLog::whereNull('paid_usd')
+        ->orWhere('paid_usd', 0)
+        ->get();
+
+    $updated = 0;
+    $skipped = 0;
+
+    foreach ($logs as $log) {
+        $coin = Coin::find($log->product_id); 
+
+        if ($coin) {
+            $log->paid_usd = $coin->usd;
+            $log->save();
+            $updated++;
+        } else {
+            $skipped++; 
+        }
+    }
+
+    return "Updated: {$updated} | Skipped (no product_id): {$skipped}";
+});
 Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
@@ -1671,3 +1694,7 @@ Route::get('make-seeders-for-new-update', function () {
 
     return 'seeders have been executed successfully!';
 });
+
+
+
+
