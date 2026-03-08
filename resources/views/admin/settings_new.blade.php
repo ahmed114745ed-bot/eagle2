@@ -31,9 +31,6 @@
         <button onclick="showSection('paymentCredentialSettings')">{{ __('Payment') }}</button>
         <button onclick="showSection('gamesSettings')" class="position-relative">
             {{ __('Games') }}
-            <div class="ribbon-banner">
-                <span>{{ __('soon') }}</span>
-            </div>
         </button>
         <button onclick="showSection('notificationSettings')" class="position-relative">
             {{ __('Notifications') }}

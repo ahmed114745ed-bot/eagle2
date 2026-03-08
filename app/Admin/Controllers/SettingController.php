@@ -2,19 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use Exception;
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
+use App\Models\BrandImage;
 use App\Models\Country;
+use App\Models\GameProviderSetting;
+use App\Models\Language;
+use App\Models\PaymentCoin;
 use App\Models\Setting;
 use App\Models\Timezone;
-use App\Models\BrandImage;
-use App\Models\PaymentCoin;
+use Cache;
+use Encore\Admin\Layout\Content;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
-use App\Models\Language;
-use Cache;
 
 class SettingController extends MainController
 {
@@ -54,15 +55,24 @@ class SettingController extends MainController
         $languages = Language::select(['id', 'name', 'code'])->get();
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
+        $zego_key = Common::getConf('zego_key');
+        $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
+        $bytesunSettings = $gameSettings->get('bytesun');
+        $quantumNexusSettings = $gameSettings->get('quantum_nexus');
+        $zeroGamesSettings = $gameSettings->get('zero_games');
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
             ->description('   ')
             ->body(view('admin.settings_new', compact([
+                'zeroGamesSettings',
+                'bytesunSettings',
+                'quantumNexusSettings',
                 'pusher_app_secret',
                 'chargeTabType',
                 'zego_token',
+                'zego_key',
                 'pusher_app_key',
                 'pusher_app_id',
                 'pusher_app_cluster',
@@ -108,7 +118,7 @@ class SettingController extends MainController
     {
         try {
             $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
-            
+
             foreach ($data as $key => $value) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
                 // Clear old cache first, then set new value
@@ -121,7 +131,7 @@ class SettingController extends MainController
             Cache::flush();
 
             $redirectUrl = url(config('admin.route.prefix') . '/settings');
-            
+
             if ($request->has('current_tab')) {
                 $redirectUrl .= '?tab=' . $request->current_tab;
                 if ($request->has('inner_tab_type')) {
@@ -129,7 +139,8 @@ class SettingController extends MainController
                 }
             }
 
-            return redirect($redirectUrl)->with('success', 'تم تحديث الإعدادات بنجاح!');
+            admin_success('تمت العملية', 'تم تحديث الإعدادات بنجاح!');
+            return redirect($redirectUrl);
         } catch (Exception $exception) {
             return back()->with('error', $exception->getMessage());
         }
@@ -214,6 +225,23 @@ class SettingController extends MainController
             );
 
             Cache::forever('pk_live_action', $request->value);
+            \Artisan::call('cache:clear');
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function updateLuckyGifts(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => 'lucky_gifts_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('lucky_gifts_action', $request->value);
             \Artisan::call('cache:clear');
 
             return Common::apiResponse(true, 'created successfully');

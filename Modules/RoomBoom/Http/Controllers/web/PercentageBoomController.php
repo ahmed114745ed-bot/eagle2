@@ -20,7 +20,7 @@ class PercentageBoomController extends MainController
         $percentages = BoomPercentage::get();
         return parent::index($content
             ->title(__('settings'))
-            ->body(view('percentageBoom', compact(['percentages']))));
+            ->body(view('percentageBoom', compact(['percentages',]))));
     }
 
 
@@ -60,6 +60,6 @@ class PercentageBoomController extends MainController
         }
 
         admin_toastr(__('Saved successfully'), 'success');
-        return back();
+        return redirect()->route('admin.room-boom-settings');
     }
 }

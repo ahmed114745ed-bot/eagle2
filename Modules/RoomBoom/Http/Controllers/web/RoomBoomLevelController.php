@@ -170,7 +170,7 @@ class RoomBoomLevelController extends MainController
         $this->disableFormTools($form);
 
         // Background image upload
-        $form->image('background_image', trans('background image'))->name(function ($file) {
+        $form->file('background_image', trans('background image'))->name(function ($file) {
             $extension = $file->getClientOriginalExtension();
             if (empty($extension)) {
                 $extension = $file->guessExtension();
@@ -188,7 +188,7 @@ class RoomBoomLevelController extends MainController
             ]
         )->required();
 
-        $form->image('boom_image', trans('boom image'))->name(function ($file) {
+        $form->file('boom_image', trans('boom image'))->name(function ($file) {
             $extension = $file->getClientOriginalExtension();
             if (empty($extension)) {
                 $extension = $file->guessExtension();

@@ -9,7 +9,6 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class DeleteSuperAdminsAction extends RowAction
 {
@@ -35,11 +34,10 @@ class DeleteSuperAdminsAction extends RowAction
 
         if ($model->default == 1) $this->response()->error(__('can not delete default super admin'))->refresh();
         $user = User::find($model->app_id);
-       
+
         if ($user) {
             $user->is_super_admin = 0;
             $user->save();
-            MilestoneHelper::removeReward($user, 'super-admin');
         }
         $defaultSuperAdmin = SuperAdmin::where('default', 1)->first();
         if ($defaultSuperAdmin) Bd::where('parent_id', $model->id)->update(['parent_id' => $defaultSuperAdmin->id]);

@@ -2,7 +2,6 @@
 
 namespace App\Admin\Actions;
 
-
 use App\Models\User;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
@@ -11,7 +10,6 @@ use Modules\AreaManager\Entities\Region;
 use Modules\AreaManager\Entities\RegionCountry;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
-use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\AreaManager\Entities\SubAreaManager;
 
 class DeleteAreaManagerAction extends RowAction
@@ -38,7 +36,6 @@ class DeleteAreaManagerAction extends RowAction
         if ($user) {
             $user->is_area_manager = 0;
             $user->save();
-            MilestoneHelper::removeReward($user, 'area-manager');
         }
         $default = AreaManager::where('default', 1)->first();
         $this->transferCountriesToDefaultManager($model,$default);
@@ -58,7 +55,7 @@ class DeleteAreaManagerAction extends RowAction
     protected function transferCountriesToDefaultManager(AreaManager $manager,AreaManager $defaultManager): void
     {
         if (!$defaultManager) {
-            return; 
+            return;
         }
         $defaultRegion = Region::firstOrCreate(
             ['manager_id' => $defaultManager->id],

@@ -27,26 +27,138 @@ class PaymobPaymentService
 
     public function makePayment($trx, $amount, $exterData)
     {
-        PaymentMethodHistory::create([
-            "amount" => $amount,
-            "type" => 'game_type',
-            "utd_code" => $trx
-        ]);
+        $utdUrl = config("services.utd_paymob.utd_url");
+        $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
+        $secret = config("services.utd_paymob.utd_paymob_secret");
 
-        $data = $this->getBodyForPaymob($trx, $amount);
-        $data['paymentSubType'] = $exterData['type'];
-        $data['paymentType'] = $exterData['paymentType'];
-        $data['payment_method'] = $exterData['payment_method'] ?? 'card';
+        
+        $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
+        $secret = config("services.utd_paymob.utd_paymob_secret");
+        $returnUrl = url(config("services.utd_paymob.utd_paymob_return_url"));
+        $orderId = 'ORDER-' . $trx . '-' . time();
+        $price = number_format($amount, 2, '.', '');
+
+        $syn = $merchantCode . $orderId . "" . $returnUrl . $orderId . "1" . $price . $secret;
+        $signature = hash('sha256', $syn);
+
+        $data = [
+            'returnUrl' => $returnUrl,
+            'merchantCode' => $merchantCode,
+            'chargeItems' => [
+                [
+                    'itemId' => $orderId,
+                    'price' => (float) $amount,
+                ]
+            ],
+            'signature' => $signature,
+            'special_reference' => $orderId,
+            'amount' => (float) $amount,
+            'description' => 'Payment via makePayment - ' . $trx,
+            'paymentSubType' => $exterData['type'] ?? 'game_type',
+            'paymentType' => $exterData['paymentType'] ?? 'revenue',
+            'payment_method' => $exterData['payment_method'] ?? 'card',
+        ];
 
         if (isset($exterData['wallet_phone'])) {
             $data['wallet_phone'] = $exterData['wallet_phone'];
         }
 
         $utdUrl = config("services.utd_paymob.utd_url");
-        $response = Http::post($utdUrl, $data);
+        
+        if (empty($utdUrl)) {
+            $utdUrl = config("services.utd_paymob.utd_paymob_url");
+            Log::info('Trying alternative URL config:', ['alternative_url' => $utdUrl]);
+        }
+        
+        if (empty($utdUrl)) {
+            return [
+                'status' => 0,
+                'message' => 'Payment gateway configuration error: Missing URL',
+                'data' => null
+            ];
+        }
+        
+        $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-intention', $utdUrl);
+        
+        if ($baseUrl === $utdUrl && !str_contains($utdUrl, '/api/paymob-intention')) {
+            $baseUrl = rtrim($utdUrl, '/') . '/api/paymob-intention';
+        }
+        
+        if (empty($baseUrl) || !filter_var($baseUrl, FILTER_VALIDATE_URL)) {
+        
+            return [
+                'status' => 0,
+                'message' => 'Payment gateway configuration error: Invalid URL',
+                'data' => null
+            ];
+        }
+        
+    
+        
+        try {
+            $response = Http::timeout(30)->post($baseUrl, $data);
+        
+        } catch (\Exception $e) {
+           
+            return [
+                'status' => 0,
+                'message' => 'Connection error: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
 
-        info($response);
-        return json_decode($response);
+        $responseData = $response->json();
+        
+        if (!$response->successful()) {
+            return [
+                'status' => 0,
+                'message' => $responseData['message'] ?? 'Payment request failed',
+                'data' => $responseData
+            ];
+        }
+        
+        // Check if responseData is directly a URL string
+        if (is_string($responseData) && filter_var($responseData, FILTER_VALIDATE_URL)) {
+            return [
+                'status' => 1,
+                'payment_url' => $responseData,
+                'message' => 'Payment link created successfully',
+                'data' => ['url' => $responseData]
+            ];
+        }
+        
+        // Check for payment URL in different possible fields (for object responses)
+        $paymentUrl = null;
+        if (is_array($responseData) || is_object($responseData)) {
+            $responseArray = (array) $responseData;
+            if (isset($responseArray['payment_url'])) {
+                $paymentUrl = $responseArray['payment_url'];
+            } elseif (isset($responseArray['redirectionUrl'])) {
+                $paymentUrl = $responseArray['redirectionUrl'];
+            } elseif (isset($responseArray['url'])) {
+                $paymentUrl = $responseArray['url'];
+            } elseif (isset($responseArray['checkout_url'])) {
+                $paymentUrl = $responseArray['checkout_url'];
+            } elseif (isset($responseArray['payment_link'])) {
+                $paymentUrl = $responseArray['payment_link'];
+            }
+        }
+        
+        if ($paymentUrl && filter_var($paymentUrl, FILTER_VALIDATE_URL)) {
+            return [
+                'status' => 1,
+                'payment_url' => $paymentUrl,
+                'message' => 'Payment link created successfully',
+                'data' => $responseData
+            ];
+        }
+        
+        return [
+            'status' => 1,
+            'payment_url' => $responseData,
+            'message' => 'Payment processed but no URL found',
+            'data' => $responseData
+        ];
     }
 
     public function getBodyForPaymob($trx, $amount)
@@ -77,10 +189,16 @@ class PaymobPaymentService
         return $data;
     }
 
-    public function createPaymentLink($amount, $name, $description = '', $email = null, $phone = null, $expiresAt = null, $isLive = false)
+    public function createPaymentLink($amount, $name, $description = '', $email = null, $phone = null, $trx = null, $expiresAt = null, $isLive = false )
     {
+        PaymentMethodHistory::create([
+            "amount" => $amount,
+            "payment_method" => 'paymob',
+            "type" => 'game_type',
+            "utd_code" => $trx
+        ]);
+
         $utdUrl = config("services.utd_paymob.utd_url");
-        // Use paymob-intention endpoint
         $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-intention', $utdUrl);
 
         $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
@@ -118,8 +236,35 @@ class PaymobPaymentService
             ],
         ];
 
-        $response = Http::post($baseUrl, $data);
+     
 
-        return json_decode($response, true);
+        try {
+            $response = Http::timeout(30)->post($baseUrl, $data);
+
+        
+        } catch (\Exception $e) {
+         
+            return [
+                'status' => 0,
+                'message' => 'Connection error: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
+
+        $responseData = $response->json();
+        
+        if (!$response->successful()) {
+            return [
+                'status' => 0,
+                'message' => $responseData['message'] ?? 'Failed to create payment link',
+                'data' => $responseData
+            ];
+        }
+        
+        if (is_string($responseData) && filter_var($responseData, FILTER_VALIDATE_URL)) {
+            return $responseData;     
+        }
+        
+
     }
 }

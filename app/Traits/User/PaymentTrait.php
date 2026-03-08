@@ -55,6 +55,7 @@ trait PaymentTrait
                 'donor_type'     => 0,
                 'status'         => 1,
                 'trx'            => $orderId,
+                'paid_usd'       => $coins?->usd ?? 0,
             ]);
         }
 

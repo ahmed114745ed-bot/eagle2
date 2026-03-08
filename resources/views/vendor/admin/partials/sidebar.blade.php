@@ -203,7 +203,7 @@
                             </li>
                         @endif
                     @else
-                        @if(hasPermission($link['permission'] ?? null))
+                        {{-- @if(hasPermission($link['permission'] ?? null))
                             <li class="crs-item">
                                 <a href="{{ superadmin_url($link['uri']) }}" class="crs-link crs-leaf">
                                     @if(str_contains($link['icon'] ?? '', 'fa-'))
@@ -212,6 +212,30 @@
                                         <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
                                     @endif
                                     <span class="crs-title">{{ $link['title'] }}</span>
+                                </a>
+                            </li>
+                        @endif --}}
+
+                        @if(hasPermission($link['permission'] ?? null))
+                            @php
+                                $icon = is_array($link['icon'] ?? null)
+                                    ? ($link['icon'][0] ?? '')
+                                    : ($link['icon'] ?? '');
+
+                                $title = is_array($link['title'] ?? null)
+                                    ? ($link['title'][app()->getLocale()] ?? '')
+                                    : ($link['title'] ?? '');
+                            @endphp
+
+                            <li class="crs-item">
+                                <a href="{{ superadmin_url($link['uri'] ?? '#') }}" class="crs-link crs-leaf">
+                                    @if(str_contains($icon, 'fa-'))
+                                        <i class="fa {{ $icon }} crs-icon"></i>
+                                    @else
+                                        <span class="crs-icon emoji-icon">{{ $icon }}</span>
+                                    @endif
+
+                                    <span class="crs-title">{{ $title }}</span>
                                 </a>
                             </li>
                         @endif

@@ -154,51 +154,119 @@ class HomeCarouselController extends MainController
         }
 
 
+        // Admin::script("
+        //     if (typeof axios === 'undefined') {
+        //         var script = document.createElement('script');
+        //         script.src = 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js';
+        //         document.head.appendChild(script);
+        //     }
+
+        //     function bindDisplaySwitch() {
+        //         document.querySelectorAll('.display-switch').forEach(function(el) {
+
+        //             el.onchange = null;
+
+        //             el.addEventListener('change', function() {
+        //                 let checkbox = this;
+
+        //                 let payload = {
+        //                     home_carousel_id: checkbox.dataset.homeCarouselId,
+        //                     display_type: checkbox.dataset.displayType,
+        //                     status: checkbox.checked ? 1 : 0
+        //                 };
+
+        //                 axios.post('/admin/home-carousel-display-toggle', payload)
+        //                     .then(res => {
+        //                         if (!res.data.success) {
+        //                             checkbox.checked = !payload.status;
+        //                             return;
+        //                         }
+
+        //                         checkbox.dataset.id = res.data.display_id ?? 0;
+        //                          $.pjax.reload('#pjax-container');
+        //                          toastr.success('Done');
+
+        //                         let durationEl = checkbox.closest('div').querySelector('.duration-text');
+        //                         durationEl.textContent = res.data.duration || '';
+        //                     })
+        //                     .catch(() => {
+        //                         checkbox.checked = !payload.status;
+        //                     });
+        //             });
+        //         });
+        //     }
+
+        //     bindDisplaySwitch();
+        //     $(document).on('pjax:complete', bindDisplaySwitch);
+        // ");
+
         Admin::script("
-            if (typeof axios === 'undefined') {
-                var script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js';
-                document.head.appendChild(script);
-            }
+    if (typeof axios === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js';
+        document.head.appendChild(script);
+    }
 
-            function bindDisplaySwitch() {
-                document.querySelectorAll('.display-switch').forEach(function(el) {
+    function bindDisplaySwitch() {
 
-                    el.onchange = null;
+        document.querySelectorAll('.display-switch').forEach(function(el) {
 
-                    el.addEventListener('change', function() {
-                        let checkbox = this;
+            el.onchange = null;
 
-                        let payload = {
-                            home_carousel_id: checkbox.dataset.homeCarouselId,
-                            display_type: checkbox.dataset.displayType,
-                            status: checkbox.checked ? 1 : 0
-                        };
+            el.addEventListener('change', function() {
 
-                        axios.post('/admin/home-carousel-display-toggle', payload)
-                            .then(res => {
-                                if (!res.data.success) {
-                                    checkbox.checked = !payload.status;
-                                    return;
-                                }
+                let checkbox = this;
 
-                                checkbox.dataset.id = res.data.display_id ?? 0;
-                                 $.pjax.reload('#pjax-container');
-                                 toastr.success('Done');
+                let payload = {
+                    home_carousel_id: checkbox.dataset.homeCarouselId,
+                    display_type: checkbox.dataset.displayType,
+                    status: checkbox.checked ? 1 : 0
+                };
 
-                                let durationEl = checkbox.closest('div').querySelector('.duration-text');
-                                durationEl.textContent = res.data.duration || '';
-                            })
-                            .catch(() => {
-                                checkbox.checked = !payload.status;
-                            });
+                axios.post('/admin/home-carousel-display-toggle', payload)
+                    .then(function(res) {
+
+                        if (!res.data.success) {
+                            checkbox.checked = !payload.status;
+                            toastr.error(res.data.message);
+                            return;
+                        }
+
+                        checkbox.dataset.id = res.data.display_id ?? 0;
+
+                        toastr.success(res.data.message);
+
+                        $.pjax.reload('#pjax-container');
+
+                    })
+                    .catch(function(error) {
+
+                        checkbox.checked = !payload.status;
+
+                        if (error.response && error.response.data) {
+
+                            let message = error.response.data.message || 'Validation error';
+
+                            if (error.response.data.errors) {
+                                message = Object.values(error.response.data.errors)
+                                    .flat()
+                                    .join('<br>');
+                            }
+
+                            toastr.error(message);
+
+                        } else {
+                            toastr.error('Something went wrong');
+                        }
+
                     });
-                });
-            }
+            });
+        });
+    }
 
-            bindDisplaySwitch();
-            $(document).on('pjax:complete', bindDisplaySwitch);
-        ");
+    bindDisplaySwitch();
+    $(document).on('pjax:complete', bindDisplaySwitch);
+");
 
 
         $grid->column('enable', __('enable'))->switch();
@@ -254,27 +322,7 @@ class HomeCarouselController extends MainController
             transform: translateX(26px);
             }
         ');
-        //        Admin::style('
-        //            .table-responsive {
-        //                max-height: calc(100vh - 250px);
-        //                overflow-y: auto;
-        //            }
-        //            .grid-table thead th {
-        //                position: sticky;
-        //                top: 0;
-        //                background-color: #f5f5f5;
-        //                z-index: 10;
-        //                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-        //            }
-        //            .grid-table thead th::after {
-        //                content: "";
-        //                position: absolute;
-        //                left: 0;
-        //                bottom: 0;
-        //                width: 100%;
-        //                border-bottom: 1px solid #ddd;
-        //            }
-        //        ');
+        
 
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -284,80 +332,7 @@ class HomeCarouselController extends MainController
         return $grid;
     }
 
-    // public function toggleStatus(Request $request)
-    // {
-    //     // dd($request->all());
-    //     $request->validate([
-    //         'home_carousel_id' => 'required|exists:home_carousels,id',
-    //         'display_type'     => 'required|string',
-    //         'status'           => 'required|boolean',
-    //     ]);
-
-    //     $display = HomeCarouselDisplay::where('home_carousel_id', $request->home_carousel_id)
-    //         ->where('display_type', $request->display_type)
-    //         ->first();
-
-    //     $homeCarousel = HomeCarousel::find($request->home_carousel_id);
-    //     $formForm = $homeCarousel->form;
-    //     switch ($formForm) {
-    //         case 1:
-    //             $duration_unit = 'hours';
-    //             break;
-    //         case 2:
-    //             $duration_unit = 'days';
-    //             break;
-    //         case 3:
-    //             $duration_unit = 'months';
-    //             break;
-    //         default:
-    //             $duration_unit = 'hours';
-    //     }
-
-    //     $duration = $homeCarousel->input ?? 1;
-
-    //     $endAt = match ($duration_unit) {
-    //         'hours' => now()->addHours($duration),
-    //         'days'  => now()->addDays($duration),
-    //         'months' => now()->addMonths($duration),
-    //         default => now()->addHours($duration),
-    //     };
-
-    //     if ($request->status) {
-    //         if ($display && Carbon::parse($display->end_at)->isFuture()) {
-
-    //             $display->status = 1;
-    //             $display->save();
-    //             // already active
-    //         } elseif ($display && Carbon::parse($display->end_at)->isPast()) {
-
-
-    //             $display->status = 1;
-    //             $display->end_at = $endAt;
-    //             $display->save();
-    //         } elseif (!$display) {
-    //             HomeCarouselDisplay::create([
-    //                 'home_carousel_id' => $request->home_carousel_id,
-    //                 'display_type'     => $request->display_type,
-    //                 'status'           => 1,
-    //                 'end_at'           => $endAt,
-    //                 'duration'        => $duration_unit,
-    //             ]);
-    //         }
-    //     } else {
-    //         $display->status = 0;
-    //         $display->save();
-    //     }
-
-
-    //     return response()->json([
-    //         'success'    => true,
-    //         'message'    => __('Submission status updated successfully!'),
-    //         'display_id' => $display->id ?? 0,
-    //     ]);
-
-
-    //     return back()->with('success', __('Submission status updated successfully!'));
-    // }
+    
 
 
     public function toggleStatus(Request $request)
@@ -385,6 +360,15 @@ class HomeCarouselController extends MainController
             'lifetime' => now(),
             default => now()->addHours($duration),
         };
+
+        $maxTimestamp = Carbon::create(2038, 1, 19, 3, 14, 7);
+
+        if ($endAt->greaterThan($maxTimestamp)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Duration is too large. Maximum allowed date is 19-01-2038.')
+            ], 422);
+        }
 
         $display = HomeCarouselDisplay::firstOrNew([
             'home_carousel_id' => $data['home_carousel_id'],
@@ -454,6 +438,7 @@ class HomeCarouselController extends MainController
         $this->addContentType($form);
         $this->addDisplayLocations($form);
 
+
         $this->syncDisplaysBeforeSave($form);
         $this->syncCountriesAfterSave($form);
 
@@ -482,16 +467,14 @@ class HomeCarouselController extends MainController
             4 => __('lifetime')
         ])->when('1', function (Form $form) {
 
-            $form->text('input', trans('input'))
-                ->rules('required|regex:/^\d+$/');
+            $form->text('input', trans('input'));
         })->when('2', function (Form $form) {
-            $form->text('input', trans('input'))
-                ->rules('required|regex:/^\d+$/');
+            $form->text('input', trans('input'));
         })->when('3', function (Form $form) {
             $form->text('input', trans('input'))
-                ->rules('required|regex:/^\d+$/');
+                ->rules('integer|min:1|max:99');
         })->when('4', function (Form $form) {
-            $form->hidden('input', trans('input'))->default(0);
+             \Log::info('Adding input field for lifetime duration');
         });
     }
 
@@ -586,19 +569,23 @@ class HomeCarouselController extends MainController
         $form->ignore(['duration']);
 
 
+     
         $form->saving(function (Form $form) {
+        try {
+        if (request()->hasFile('img')) {
 
-            if (request()->hasFile('img')) {
+                        $path = WebPHelper::uploadWebp(
+                            request()->file('img'),
+                            'images',
+                            'splash',
 
-                $path = WebPHelper::uploadWebp(
-                    request()->file('img'),
-                    'images',
-                    'splash',
+                        );
 
-                );
-
-                $form->image_url = $path;
-            }
+                        $form->image_url = $path;
+                    }        } catch (\Exception $e) {
+                    dd($e->getMessage()); 
+                }
+            
         });
         // dd($form->display_at , $form->model()->display_at ,request('display_at'));
 

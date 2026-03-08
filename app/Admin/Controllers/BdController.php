@@ -21,7 +21,6 @@ use App\Models\BdAgencyHostSallary;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class BdController extends MainController
 {
@@ -497,7 +496,6 @@ class BdController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
-                        MilestoneHelper::removeReward($OldUserAppId, 'bd');
                     }
 
                     $newUserAppId = User::find($newAppId);
@@ -505,7 +503,6 @@ class BdController extends MainController
                         $newUserAppId->is_bd = 1;
                         $newUserAppId->save();
                         $form->app_id = $newAppId;
-                        MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
                     }
                 }
             } else {
@@ -521,7 +518,6 @@ class BdController extends MainController
                 if (isset($userApp)) {
                     $userApp->is_bd = 1;
                     $userApp->save();
-                    MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
                 }
             }
 

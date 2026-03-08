@@ -13,6 +13,7 @@ use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminChargeReportController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdminCountryController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdminNotificationController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AdminUserController;
 
 
 /*
@@ -61,13 +62,15 @@ Route::group(
         });
 
         Route::resource('superadmin-users', SuperAdminController::class);
+        Route::post('delete-sub-admin/{id}', [SuperAdminController::class, 'deleteSubSuperAdmin']);
         Route::resource('restore-super-admins', RestoreSuperAdminController::class);
         Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
         Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
-       
+       Route::get('show-sub-super-admin/{id}', [AdminUserController::class,'showSubSuperAdmin']);
+        Route::post('update-sub-super-admin', [AdminUserController::class,'updateSubSuperAdmin']);
 
 
         Route::post('/set-preview-superadmin', function () {
@@ -86,7 +89,8 @@ Route::group(
         Route::group(['prefix' => 'superadmin-charges-report'], function () {
             Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
         });
-    });
+    }
+);
 
 
 /*
@@ -96,7 +100,7 @@ Route::group(
 |
 */
 
-use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AdminUserController;
+
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AgencyController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AgencyUserController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AppearChargerAgencyController;
@@ -104,6 +108,7 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AuthController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\BdController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\BdSalariesController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\ChargeController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HandleController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeCarouselController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\LiveRoomController;
@@ -122,7 +127,6 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdmin\WalletController;
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-
 });
 
 
@@ -169,6 +173,8 @@ Route::group(
         'as' => 'superadmin.',
     ],
     function () {
+        Route::post('_handle_action_', [HandleController::class, 'handleAction'])->name('handle-action');
+        
         Route::get('setting', [AuthController::class, 'getSetting']);
         Route::get('auth/setting', [AuthController::class, 'getSetting']);
         Route::put('update-setting', [AuthController::class, 'putSetting']);
@@ -203,7 +209,9 @@ Route::group(
             ]
         ]);
 
+
         Route::get('superadmin-profile/{id}', [SuperAdminController::class, 'profile']);
+        Route::post('delete-sub-admin/{id}', [SuperAdminController::class, 'deleteSubSuperAdmin']);
 
         Route::resource('rooms', RoomController::class);
         Route::get('home-carousel/history', [SuperadminBannerHistory::class, 'index'])->name('home-carousel.history');
@@ -246,7 +254,8 @@ Route::group(
         });
         Route::resource('roles', RoleController::class);
         Route::resource('auth-users', AdminUserController::class);
-
+        Route::get('show-sub-super-admin', [AdminUserController::class,'showSubSuperAdmin']);
+        Route::post('update-sub-super-admin', [AdminUserController::class,'updateSubSuperAdmin']);
         Route::prefix('statistics')->name('statistics.')->group(function () {
             Route::get('top-users-data', [HomeController::class, 'topUsersData']);
             Route::get('comparison-user-signup', [HomeController::class, 'comparisonUserSignUp']);
@@ -280,4 +289,3 @@ Route::group(
         Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
     }
 );
-

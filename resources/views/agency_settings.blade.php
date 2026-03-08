@@ -676,7 +676,7 @@
                 @if ($remaining_diamonds_action)
                     <button onclick="showSection('remaining_diamonds')">{{ __('remaining diamonds') }}</button>
                 @endif
-                <button onclick="showSection('convert_diamonds')">{{ __('convert diamonds') }}</button>
+                {{-- <button onclick="showSection('convert_diamonds')">{{ __('convert diamonds') }}</button> --}}
 
             </div>
         </div>
@@ -781,7 +781,7 @@
 
                 @endif
 
-
+{{-- 
                  <div id="convert_diamonds" class="settings-section p-4 shadow-sm rounded bg-white">
 
                         <form method="POST" action="{{ route('admin.app.settings.update') }}">
@@ -806,14 +806,6 @@
                                     </option>
                                 </select>
                             </div>
-
-                            {{-- <!-- Context Text -->
-                            <div class="alert alert-info mt-3">
-                                <i class="fa fa-info-circle me-1"></i>
-                                {{ __('Remaining diamonds from last month that the host user can convert to coins, keep as diamonds, or leave unchanged.') }}
-                            </div> --}}
-
-                            <!-- Save Button -->
                             <div class="d-flex justify-content-end mt-4">
                                 <button type="submit" class="btn btn-success btn-lg px-4 fw-bold shadow">
                                     <i class="fa fa-check-circle me-1"></i> {{ __('Save') }}
@@ -821,7 +813,7 @@
                             </div>
 
                         </form>
-                    </div>
+                    </div> --}}
 
 
 

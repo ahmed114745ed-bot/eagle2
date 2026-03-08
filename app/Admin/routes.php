@@ -13,6 +13,7 @@ use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\AllStatisticController;
+use App\Admin\Controllers\AppDefaultScreenSettingsController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AppFeatureController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
@@ -120,6 +121,7 @@ use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
 use App\Admin\Controllers\WithdrawController;
 use App\Admin\Controllers\ZegoFeatureController;
+use App\Admin\Controllers\FairLuckSettingsController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 use App\Models\Room;
@@ -176,10 +178,10 @@ Route::group(
     ],
     function () {
         Route::get('helpers/terminal/database', [TerminalController::class, 'database']);
-        Route::post('helpers/terminal/database',   [TerminalController::class, 'runDatabase']);
-        Route::get('helpers/terminal/artisan',  [TerminalController::class, 'artisan']);
+        Route::post('helpers/terminal/database', [TerminalController::class, 'runDatabase']);
+        Route::get('helpers/terminal/artisan', [TerminalController::class, 'artisan']);
         Route::post('helpers/terminal/artisan', [TerminalController::class, 'runArtisan']);
-        Route::get('helpers/scaffold',  [ScaffoldController::class, 'index']);
+        Route::get('helpers/scaffold', [ScaffoldController::class, 'index']);
         Route::post('helpers/scaffold', [ScaffoldController::class, 'store']);
         Route::get('helpers/routes', [RouteController::class, 'index']);
     }
@@ -228,7 +230,7 @@ Route::group(
         Route::post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
         Route::resource('rooms-preview', TestController::class); //
-
+    
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -236,7 +238,7 @@ Route::group(
         Route::get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         Route::get('agency-statistic', 'AgencyStatisticController@index');
         //    Route::get('agency-settings', 'AgencySettingController@index');
-
+    
         Route::resource('test-test', 'TestTestController');
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
@@ -286,7 +288,7 @@ Route::group(
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
-
+    
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
@@ -319,6 +321,7 @@ Route::group(
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::resource('all-games', AllGameController::class);
+        Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
@@ -332,11 +335,12 @@ Route::group(
             ]
         ]);
 
-         Route::prefix('gifts')->group(function () {
+        Route::prefix('gifts')->group(function () {
             Route::get('/{type}/create', [GiftController::class, 'create']);
             Route::post('/{type}', [GiftController::class, 'store']);
         });
         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+        Route::post('lucky-gift-settings/version', [GiftController::class, 'saveLuckyGiftVersion'])->name('lucky-gift.version.update');
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
         Route::resource('gift-categories', GiftCategoryController::class);
@@ -368,7 +372,7 @@ Route::group(
         Route::prefix('emojis')->group(function () {
             Route::get('/{filter?}', [EmojiController::class, 'index']);
         });
-       
+
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
@@ -544,9 +548,9 @@ Route::group(
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
         Route::get('/moments-reels', [ReportController::class, 'momentsReels'])
             ->name('admin.ajax.moments-reels');
-         Route::get('/expenses', [ReportController::class, 'expenses']);
-            Route::get('/due-salary', [ReportController::class, 'dueSalary'])
-    ->name('admin.manager.due-salary');
+        Route::get('/expenses', [ReportController::class, 'expenses']);
+        Route::get('/due-salary', [ReportController::class, 'dueSalary'])
+            ->name('admin.manager.due-salary');
         Route::resource('charges-reports', 'ChargeReportController');
         Route::get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
         Route::resource('sallaries', 'SallariesController')->name('index', 'sallaries')->middleware('web-agency-feature');
@@ -577,8 +581,8 @@ Route::group(
         Route::resource('room-vips', RoomVipController::class);
         Route::resource('room-target', RoomTargetController::class);
 
-        // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
-
+        Route::get('default-app-screen-settings', [AppDefaultScreenSettingsController::class, 'index']);
+        Route::post('default-app-screen', [AppDefaultScreenSettingsController::class, 'store']);
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
@@ -639,13 +643,6 @@ Route::group(
         Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
         Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
 
-        //    dd( Admin::menu(function ($menu) {
-        //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
-        //             ->icon('fa-file');
-        //     }));
-
-        // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
@@ -656,7 +653,6 @@ Route::group(
         Route::resource('zego-feature', ZegoFeatureController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
-        //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         Route::get('convert-is_gold', function () {
             $users = \App\Models\User::where("is_gold_id", 1)->get();
             foreach ($users as $user) {
@@ -707,9 +703,6 @@ Route::group(
         Route::post('remaining-diamond-settings/save', [RemainingDiamondSettingController::class, 'save'])->name('remaining-diamond-settings.save');
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
-            // Route::get('/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
         Route::resource('ware-management', WareTabController::class);
 
@@ -788,6 +781,8 @@ Route::group(
             $user->save();
             return response()->json(['status' => 'success']);
         });
+        Route::get('fairluck', [FairLuckSettingsController::class, 'index'])->name('fairluck.index');
+        Route::post('fairluck/save-settings', [FairLuckSettingsController::class, 'saveSettings'])->name('fairluck.save-settings');
     }
 );
 

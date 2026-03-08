@@ -156,6 +156,7 @@ class FormTemplateController extends Controller
 
     public function update(Request $request, FormTemplate $formTemplate)
     {
+
         $validated = $request->validate([
             'title' => 'required|array',
             'title.*' => 'required|string',
@@ -284,6 +285,8 @@ class FormTemplateController extends Controller
         return redirect(admin_url('form-templates'));
     }
 
+   
+
 
     public function destroy(FormTemplate $formTemplate)
     {
@@ -341,7 +344,7 @@ class FormTemplateController extends Controller
         $data = $request->except('_token');
 
         $existingRequest = FormRequest::where('form_template_id', $template->id)
-            ->where('submitted_by', $request->user_id)->where('status', '!=', 'rejected')
+            ->where('submitted_by', $request->user_id)->where('status', '=', 'pending')
             ->first();
         if ($existingRequest) {
             return redirect()->route('forms.show.reqs', [

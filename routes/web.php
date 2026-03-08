@@ -1,6 +1,5 @@
 <?php
 
-use App\helper\TimeHelper;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -16,6 +15,7 @@ use App\Enums\SuperAdminNotificationType;
 use App\Exports\AgencyCharge;
 use App\Exports\AgencyChargeTransactions;
 use App\Facades\CustomNotification;
+use App\helper\TimeHelper;
 use App\Helpers\AdminNotificationHelper;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
@@ -38,6 +38,7 @@ use App\Models\Ban;
 use App\Models\Bd;
 use App\Models\BDSallary;
 use App\Models\CoinGameUser;
+use App\Models\Coin;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserArchive;
 use App\Models\CoinGameUserDailyAggregated;
@@ -52,6 +53,7 @@ use App\Models\User;
 use App\Models\UserSallary;
 use Carbon\Carbon;
 use Database\Seeders\FlagSyrianSeeder;
+use Database\Seeders\WebhookGamesSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -222,7 +224,7 @@ Route::get('/run-seeders', function () {
     Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    // Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
+    Artisan::call('db:seed', ['--class' => WebhookGamesSeeder::class]);
     // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
 
     return response()->json([
@@ -230,6 +232,18 @@ Route::get('/run-seeders', function () {
         'message' => '✅ All seeders executed successfully.'
     ]);
 });
+
+Route::get('/run-permission', function () {
+
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+
 
 Route::get('/badge-seeders', function () {
 
@@ -774,6 +788,29 @@ Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class
 Route::get('/emoji-image-type', [EmojiController::class, 'gitImage']);
 
 
+Route::get('/reset-fairluck', function () {
+    \Illuminate\Support\Facades\DB::table('fair_luck_wallets')->update(['balance' => 0, 'last_updated' => now()]);
+    \Illuminate\Support\Facades\DB::table('fair_luck_wallet_histories')->truncate();
+    if (\Illuminate\Support\Facades\Schema::hasTable('fair_luck_statistics')) {
+        \Illuminate\Support\Facades\DB::table('fair_luck_statistics')->truncate();
+    }
+
+    $redis = \Illuminate\Support\Facades\Redis::connection();
+    $prefix = config('database.redis.options.prefix', '');
+
+    $keys = $redis->keys('*fairluck*');
+    foreach ($keys as $key) {
+        if ($prefix && strpos($key, $prefix) === 0) {
+            $key = substr($key, strlen($prefix));
+        }
+        \Illuminate\Support\Facades\Redis::del($key);
+    }
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'FairLuck wallets (DB & Redis), histories, and statistics have been reset to 0.'
+    ]);
+});
 
 Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:10,1'
     Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
@@ -1721,3 +1758,78 @@ Route::get('/fix-total-room-gifts', function () {
         'results' => $results,
     ]);
 });
+
+
+
+Route::get('/restart-queues', function () {
+    try {
+        Artisan::call('queue:restart');
+        return "✅ Artisan queue:restart signaled successfully.";
+    } catch (\Exception $e) {
+        return "❌ Failed to signal queue:restart: " . $e->getMessage();
+    }
+});
+
+use Illuminate\Http\Request;
+use App\Models\GameProviderSetting;
+
+
+Route::get('/save-game-app-key', function (Request $request) {
+    $providerCode = $request->provider_code ?? 'quantum_nexus';
+    $appKey = env('GAME_APP_KEY');
+    try {
+        $gameSetting = GameProviderSetting::updateOrCreate(
+            ['provider_code' => $providerCode],
+            [
+                'app_key' => $appKey,
+            ]
+        );
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم حفظ المفتاح بنجاح',
+            'data' => $gameSetting,
+            'appKey' => $appKey,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'حدث خطأ أثناء الحفظ: ' . $e->getMessage(),
+        ], 500);
+    }
+});
+
+Route::get('/fix-paid-usd', function () {
+    $logs = CoinLog::whereNull('paid_usd')
+        ->orWhere('paid_usd', 0)
+        ->get();
+
+    $updated = 0;
+    $skipped = 0;
+
+    foreach ($logs as $log) {
+        $coin = Coin::find($log->product_id); 
+
+        if ($coin) {
+            $log->paid_usd = $coin->usd;
+            $log->save();
+            $updated++;
+        } else {
+            $skipped++; 
+        }
+    }
+
+    return "Updated: {$updated} | Skipped (no product_id): {$skipped}";
+});
+Route::get('make-seeders-for-new-update', function () {
+    $seeder = new \Database\Seeders\WebhookGamesSeeder();
+    $seeder->run();
+
+     $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder->run();
+
+    return 'seeders have been executed successfully!';
+});
+
+
+
+

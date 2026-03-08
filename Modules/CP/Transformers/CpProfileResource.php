@@ -60,7 +60,7 @@ class CpProfileResource extends JsonResource
                 "id"        => $user?->id,
                 "uid"       => $user?->uuid,
                 "name"      => $user?->name,
-                "image"     => $user?->avatar,
+                "image"     => $user?->profile?->avatar,
                 "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
                 'frame' => $frame,
             ],

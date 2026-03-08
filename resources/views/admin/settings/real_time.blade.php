@@ -13,9 +13,9 @@
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow real-time-card-height">
+                        <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                <h4 class="m-0 color-white">{{ __('admin.Tencent') }}</h4>
                                 <div class="ribbon-banner-card">
                                     <span>{{ __('soon') }}</span>
                                 </div>
@@ -48,7 +48,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                         </div>
                     </div>
                 </form>
@@ -59,25 +59,36 @@
                               <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                                 <!-- Zego Fields -->
                                 <div class="col-md-6 mb-3 ms-0 me-auto">
-                                    <div class="card p-3 shadow" style="height: 300px;">
+                                    <div class="card p-9-px shadow real-time-card-height"  >
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4 class="m-0">{{ __('utd zego token') }}</h4>
+                                            <h4 class="m-0 color-white">{{ __('UTD VOICE') }}</h4>
                                         </div>
                                         <br>
                                         <div class="row">
                                             <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
-                                                        for="zego_server_secret">{{ __('utd zego token') }}:</label>
+                                                        for="zego_server_secret">{{ __('UTD VOICE') }}:</label>
                                                     <input type="text" id="zego_server_secret"
-                                                        name="zego_token" placeholder="server_secret"
+                                                        name="zego_token" placeholder="{{ __('server_secret') }}"
                                                         value="{{ $zego_token }}" class="form-control"
+                                                        required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-10">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="zego_server_secret">{{ __('UTD VOICE Key') }}:</label>
+                                                    <input type="text" id="zego_server_secret_key"
+                                                        name="zego_key" placeholder="{{ __('server_secret_key') }}"
+                                                        value="{{ $zego_key }}" class="form-control"
                                                         required>
                                                 </div>
                                             </div>
                                         </div>
                                         <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                            class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                                     </div>
                                 </div>
                             </form>
@@ -86,9 +97,9 @@
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow real-time-card-height">
+                        <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                <h4 class="m-0 color-white">{{ __('admin.Zego') }}</h4>
                             </div>
 
                             <div class="row">
@@ -139,7 +150,7 @@
                                 </script>
                             </div>
 
-                            <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                         </div>
                     </div>
                 </form>
@@ -148,9 +159,9 @@
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow real-time-card-height">
+                        <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                <h4 class="m-0 color-white">{{ __('admin.Agora') }}</h4>
                             </div>
                             <br>
                             <div class="row">
@@ -172,7 +183,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                         </div>
                     </div>
                 </form>
@@ -307,7 +318,7 @@
                         <h4 class="m-0">{{ __('admin.RTC') }}</h4>
                         <div class="d-flex align-items-center">
                             <input type="radio" id="rtcLiveRadio" class="custom-radio libraryRealTime"
-                                   name="live_library" 7
+                                   name="live_library"
                                    value="0" {{ $liveLibrary == '0' ? 'checked' : '' }}>
                             <label for="rtcLiveRadio" class="switch"></label>
                         </div>

@@ -224,7 +224,7 @@ class AchievementDedicateController extends MainController
             $actions->disableEdit();
         });
         $this->extendGrid($grid);
-
+        $grid->disableExport();
 
         return $grid;
     }

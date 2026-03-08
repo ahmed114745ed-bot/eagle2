@@ -338,9 +338,9 @@ class UserController extends Controller
     public function superAdminUsers(Request $request)
     {
         $key = $request->q;
-
+        $selectedId = $request->selected_id;
         $page = $request->get('page', 1);
-        $users = $this->userService->superAdminUsers($key, $page);
+        $users = $this->userService->superAdminUsers($key, $page, $selectedId);
 
         return response()->json($users);
     }
@@ -368,9 +368,9 @@ class UserController extends Controller
     public function usersAreaManager(Request $request)
     {
         $key = $request->q;
-
+        $selectedId = $request->selected_id;
         $page = $request->get('page', 1);
-        $users = $this->userService->usersAreaManager($key, $page);
+        $users = $this->userService->usersAreaManager($key, $page, $selectedId);
 
         return response()->json($users);
     }
@@ -1513,14 +1513,12 @@ class UserController extends Controller
         });
     }
 
-   public function userLevelDetails(Request $request)
+      public function userLevelDetails(Request $request)
     {
-        $user = $request->user()->fresh();  // Refresh to get latest data from DB
+        $user = $request->user()->fresh();
 
         $currentLevel = $user->senderLevel;
-
         $expLevel = $user->total_sender_diamonds;
-
 
         if ($currentLevel) {
             $secondLevel = Vip::where('type', 2)
@@ -1531,9 +1529,10 @@ class UserController extends Controller
             $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
         }
 
+        $expPercentages = \Illuminate\Support\Facades\Config::get('exp_percentages') ?? [1, 1];
+        $multiplier = $expPercentages['exp_sender_percentage'] ?? 0.2;
 
         if ($secondLevel != null && $currentLevel != null) {
-            $multiplier = config('exp_percentages.exp_sender_percentage', 0.2);
             $currentExp = $expLevel * $multiplier;
 
             $remaining = max(0, ($secondLevel?->exp ?? 0) - $currentExp);
