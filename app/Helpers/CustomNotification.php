@@ -910,11 +910,14 @@ class CustomNotification
         $translatedTitle = $this->multiLang($title);
         $translatedBody = $this->multiLang($body, $replace);
 
-        if (!$user->is_logout)
-            Common::send_firebase_notification($notificationToken, $translatedTitle[$currentLang], $translatedBody[$currentLang]);
-
         Common::sendOfficialMessage($user->id, content: $translatedBody[$currentLang], title: $translatedTitle['en'], titleAr: $translatedTitle['ar']);
         (new UserCounterServices)->eventUser($user, 'official-messages');
+
+        if (!$user->is_logout) {
+            dispatch(function () use ($notificationToken, $translatedTitle, $translatedBody, $currentLang) {
+                Common::send_firebase_notification($notificationToken, $translatedTitle[$currentLang], $translatedBody[$currentLang]);
+            })->afterResponse();
+        }
     }
 
 
