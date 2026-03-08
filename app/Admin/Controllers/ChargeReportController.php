@@ -10,7 +10,7 @@ use App\Helpers\Common;
 use App\Models\CoinLog;
 use Encore\Admin\Admin;
 use App\Helpers\UserCommon;
-use Utd\UsersWallet\Entities\ExchangeLog;
+use App\Models\ExchangeLog;
 use App\Models\PaymentCoin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
