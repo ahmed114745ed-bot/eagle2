@@ -29,8 +29,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
-use Modules\Wallet\Services\CheckSystemConfigs;
-use Modules\Wallet\Services\CheckUserExistence;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
@@ -338,7 +336,7 @@ class WalletController extends MainController
         $receiverId = $data['target_id'] ?? null;
 
 
-        if (settings()->get("bd_stop_charge", 0)) {
+        if (settings()->get("bd_stop_charge") ?? 0) {
 
             throw new \Exception(__('api_responses.freez_charge'));
         }
@@ -374,7 +372,7 @@ class WalletController extends MainController
         try {
 
 
-            $amountBefore =  Common::getCurrentBalance($receiver->id);
+            $amountBefore = Common::getCurrentBalance($receiver->id);
             UserCoinLogHelper::logByType(
                 $receiver->id,
                 $coins,
@@ -383,7 +381,7 @@ class WalletController extends MainController
             );
             $sender->incrementCutAmountInBdSallary($amount);
             $receiver->increment('di', $coins);
-            $descriptionData = ['receiver_id'  => $receiver->id];
+            $descriptionData = ['receiver_id' => $receiver->id];
 
             // Deduct from BD's linked user wallet
             $bdUserId = $sender->app_id ?? $sender->id;
@@ -407,14 +405,14 @@ class WalletController extends MainController
                 'user_type' => $receiverType,
                 'amount' => $coins,
                 'amount_type' => 2,
-                "usd" =>  $amount ?? 0,
+                "usd" => $amount ?? 0,
                 'is_used_transferred' => 1,
                 'user_charger_type' => 'bd'
             ];
 
-            $charge =  Charge::create($data);
+            $charge = Charge::create($data);
 
-            UserCommon::UserEarnedInvitation($receiver->id, $coins ,$charge->id);
+            UserCommon::UserEarnedInvitation($receiver->id, $coins, $charge->id);
 
             DB::commit();
             return true;
@@ -431,13 +429,13 @@ class WalletController extends MainController
         $usd = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
-        if (settings()->get("stop_charge", 0)) {
+        if (settings()->get("stop_charge") ?? 0) {
 
             throw new \Exception(__('api_responses.freez_charge'));
         }
 
 
-        if (settings()->get("bd_stop_charge", 0)) {
+        if (settings()->get("bd_stop_charge") ?? 0) {
 
             throw new \Exception(__('api_responses.freez_charge'));
         }

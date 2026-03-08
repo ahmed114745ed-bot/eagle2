@@ -7,12 +7,14 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Modules\UsersWallet\Services\ExchangeService;
+use Utd\UsersWallet\Services\ExchangeService;
 
 class ExchangeController extends Controller
 {
 
-    public function __construct(private ExchangeService $exchangeService) {}
+    public function __construct(private ExchangeService $exchangeService)
+    {
+    }
 
     public function all(Request $request)
     {
@@ -79,5 +81,5 @@ class ExchangeController extends Controller
         }
     }
 
-   
+
 }

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Modules\UsersWallet\Helpers\WalletHelper;
+use Utd\UsersWallet\Helpers\WalletHelper;
 
 class UpdateUserWalletBalances implements ShouldQueue
 {
@@ -18,19 +18,19 @@ class UpdateUserWalletBalances implements ShouldQueue
     protected array $oldData;
     protected ?int $agencyId;
     protected string $type;
-    protected   $target_id;
+    protected $target_id;
 
 
     /**
      * Create a new job instance.
      */
-    public function __construct(int $userId, array $newData, array $oldData, ?int $agencyId = null, string $type = 'system' , $target_id = null)
+    public function __construct(int $userId, array $newData, array $oldData, ?int $agencyId = null, string $type = 'system', $target_id = null)
     {
-        $this->userId   = $userId;
-        $this->newData  = $newData;
-        $this->oldData  = $oldData;
+        $this->userId = $userId;
+        $this->newData = $newData;
+        $this->oldData = $oldData;
         $this->agencyId = $agencyId;
-        $this->type     = $type;
+        $this->type = $type;
         $this->target_id = $target_id;
 
     }
@@ -40,7 +40,11 @@ class UpdateUserWalletBalances implements ShouldQueue
      */
     public function handle(): void
     {
-        WalletHelper::addAllBalancesByDiffs(
+        if (!\App\Support\PackageHelper::isInstalled('usersWallet')) {
+            return;
+        }
+
+        \Utd\UsersWallet\Helpers\WalletHelper::addAllBalancesByDiffs(
             $this->userId,
             $this->newData,
             $this->oldData,

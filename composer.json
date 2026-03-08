@@ -71,6 +71,7 @@
         "utd/special-id": "*",
         "utd/switch-account": "*",
         "utd/task-stream": "*",
+        "utd/userswallet": "*",
         "utd/vip": "*"
     },
     "require-dev": {
@@ -87,14 +88,17 @@
             "Database\\Seeders\\": "database/seeders/",
             "Utd\\CP\\Database\\Seeders\\": "vendor/utd/cp/Database/Seeders/",
             "Utd\\LuckyBox\\Database\\Seeders\\": "vendor/utd/lucky-box/Database/Seeders/",
-            "Utd\\Family\\": "packages/Utd/Family/src/"
+            "Utd\\Family\\": "packages/Utd/Family/src/",
+            "Utd\\UsersWallet\\": "packages/Utd/UsersWallet/src/",
+            "Utd\\UsersWallet\\Database\\": "packages/Utd/UsersWallet/Database/"
         },
         "files": [
             "app/helpers.php",
             "app/helper/helpers.php",
             "app/helper/helperType.php",
             "app/Helpers/UserCoinLogHelper.php",
-            "packages/Utd/Family/src/Support/helpers.php"
+            "packages/Utd/Family/src/Support/helpers.php",
+            "packages/Utd/UsersWallet/src/helpers.php"
         ]
     },
     "autoload-dev": {
@@ -240,7 +244,6 @@
             "url": "packages/Utd/Tasks"
         },
         {
-
             "type": "path",
             "url": "packages/Utd/HostLevel"
         },
@@ -267,6 +270,13 @@
         {
             "type": "path",
             "url": "packages/Utd/Milestones"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/UsersWallet",
+            "options": {
+                "symlink": true
+            }
         },
         {
             "type": "path",

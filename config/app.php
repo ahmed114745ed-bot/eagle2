@@ -19,12 +19,12 @@ return [
     'baishun_app_id' => env('BAISHUN_APP_Id', "4280702746"),
     'baishun_app_key' => env('BAISHUN_APP_KEY', "LzfGx3f3ZKQSYxMNRqdRTOmfd0Jb59DF"),
     'baishun_server_url' => env('BAISHUN_SERVER_URL', 'https://mesh-channels-test.jieyou.shop'),
-    'baishun_channel'      => env('BAISHUN_CHANNEL', ''),
-    'baishun_gsp'      => env('BAISHUN_GSP', '201'),
+    'baishun_channel' => env('BAISHUN_CHANNEL', ''),
+    'baishun_gsp' => env('BAISHUN_GSP', '201'),
 
-    'balance_user_name'     => env('BALANCE_USER_NAME', 'superAdmin'),
-    'balance_password'      => env('BALANCE_PASSWORD', '12345678'),
-    'one_coins'             => env('ONE_COINS'),
+    'balance_user_name' => env('BALANCE_USER_NAME', 'superAdmin'),
+    'balance_password' => env('BALANCE_PASSWORD', '12345678'),
+    'one_coins' => env('ONE_COINS'),
 
     'appLogo' => env('APP_LOGO', 'https://demo.24hourworx.com/assets/images/BG2.jpg'),
 
@@ -236,10 +236,11 @@ return [
         Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
         App\Providers\FeatureServiceProvider::class,
 
-      
+
         App\Providers\RealsPackageServiceProvider::class,
         App\Providers\GiftsMenuServiceProvider::class,
         \Utd\Family\FamilyServiceProvider::class,
+        \Utd\UsersWallet\UsersWalletServiceProvider::class,
     ],
 
     /*

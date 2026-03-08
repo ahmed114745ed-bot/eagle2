@@ -28,7 +28,7 @@ use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-use Modules\UsersWallet\Entities\WalletLog;
+use Utd\UsersWallet\Entities\WalletLog;
 use Utd\Vip\Entities\UserVip;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
@@ -155,7 +155,7 @@ class UserController extends MainController
 
     protected function grid()
     {
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = empty((array) session('filter_country_id')) ? Common::areaCountries() : (array) session('filter_country_id');
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
@@ -404,7 +404,8 @@ class UserController extends MainController
                 $actions->disableView();
             }
         });
-        if (config('app.env') == 'production') $grid->disableCreateButton();
+        if (config('app.env') == 'production')
+            $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableRowSelector();
 
@@ -459,16 +460,16 @@ class UserController extends MainController
 
     public function show($id, Content $content)
     {
-        $timezone   = Common::timeZone();
-        $month      = request('month');
-        $year       = request('year');
-        $start      = request('start_at');
-        $end        = request('end_at');
-        $joinDate   = request('join_date');
-        $type       = request('type', 4);
-        $agencyId   = request('agency_id');
+        $timezone = Common::timeZone();
+        $month = request('month');
+        $year = request('year');
+        $start = request('start_at');
+        $end = request('end_at');
+        $joinDate = request('join_date');
+        $type = request('type', 4);
+        $agencyId = request('agency_id');
         $chargeTabType = request('type', 'receiver');
-        $giftType   = request('gift_type', 'receiver');
+        $giftType = request('gift_type', 'receiver');
         $packs = null;
         $types = collect();
         $currentType = null;
@@ -509,7 +510,7 @@ class UserController extends MainController
         $user = $userQuery->with($with)->findOrFail($id);
 
         // Avoid duplicate wallet calls
-        $availableBalance = $curantBalance = wallet_available_by_user($id);
+        $availableBalance = $curantBalance = \App\Support\PackageHelper::isInstalled('usersWallet') ? wallet_available_by_user($id) : 0;
         /* =========================
         | USER IMAGE
         ========================= */
@@ -633,6 +634,10 @@ class UserController extends MainController
                 break;
 
             case 'wallet_logs':
+                if (!\App\Support\PackageHelper::isInstalled('usersWallet')) {
+                    $walletLogs = collect([]);
+                    break;
+                }
                 $year = request('year');
                 $month = request('month');
                 $walletLogs = WalletLog::where('user_id', $id)

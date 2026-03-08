@@ -30,7 +30,7 @@ use Modules\AreaManager\Entities\AreaManager;
 use App\Support\PackageHelper;
 use App\Models\CoinGameUserDailyAggregated;
 use Carbon\CarbonPeriod;
-use Modules\UsersWallet\Entities\WalletLog;
+use Utd\UsersWallet\Entities\WalletLog;
 
 class AllStatisticController extends MainController
 {
@@ -45,7 +45,7 @@ class AllStatisticController extends MainController
     {
         $filterCountryId = session('filter_country_id');
         if (!empty($filterCountryId)) {
-            return [(int)$filterCountryId];
+            return [(int) $filterCountryId];
         }
 
         $adminId = session('area_manager_id') ?? auth()->id();
@@ -62,7 +62,7 @@ class AllStatisticController extends MainController
 
         $sessionCountryId = session('area_manager_country_id');
         if (!empty($sessionCountryId)) {
-            return (array)$sessionCountryId;
+            return (array) $sessionCountryId;
         }
 
         if (method_exists($authAdmin, 'countriesQuery')) {
@@ -267,10 +267,12 @@ class AllStatisticController extends MainController
     public function topUsersVisits(Request $request)
     {
         $topUsers = User::select('id', 'name')
-            ->withCount(['liveTimes as total_hours' => function ($q) {
-                $q->select(DB::raw("SUM(hours)"))
-                    ->where('start_time', '>=', now()->subMonth());
-            }])
+            ->withCount([
+                'liveTimes as total_hours' => function ($q) {
+                    $q->select(DB::raw("SUM(hours)"))
+                        ->where('start_time', '>=', now()->subMonth());
+                }
+            ])
             ->having('total_hours', '>', 0)
             ->orderByDesc('total_hours')
             ->take(10)
@@ -848,30 +850,34 @@ class AllStatisticController extends MainController
                 'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
             ]);
 
-        $withdrawals = WalletLog::with('user.profile')->where('operation', 'subtract')
-            ->latest()
-            ->take(8)
-            ->get()
-            ->map(function ($w) {
-                $defaultImage = asset('images/businessman-icon.jpg');
-                $path = $w->user->profile?->avatar ?? null;
-                $url = $path ? getImagePath($path) : $defaultImage;
+        $withdrawals = collect([]);
+        if (\App\Support\PackageHelper::isInstalled('usersWallet')) {
+            $withdrawals = WalletLog::with('user.profile')->where('operation', 'subtract')
+                ->latest()
+                ->take(8)
+                ->get();
+        }
 
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
+        $withdrawals = $withdrawals->map(function ($w) {
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $path = $w->user->profile?->avatar ?? null;
+            $url = $path ? getImagePath($path) : $defaultImage;
 
-                return [
-                    'id' => $w->id,
-                    'user_name' => $w->user->name ?? '',
-                    'uuid' => $w->user->uuid ?? '',
-                    'user_id' => $w->user_id,
-                    'img' => $url,
-                    'amount' => $w->amount,
-                    'type' => $w->type,
-                    'date' => $w->created_at->format('Y-m-d')
-                ];
-            });
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return [
+                'id' => $w->id,
+                'user_name' => $w->user->name ?? '',
+                'uuid' => $w->user->uuid ?? '',
+                'user_id' => $w->user_id,
+                'img' => $url,
+                'amount' => $w->amount,
+                'type' => $w->type,
+                'date' => $w->created_at->format('Y-m-d')
+            ];
+        });
 
         $topUsers = \DB::table('charges')
             ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
@@ -910,7 +916,7 @@ class AllStatisticController extends MainController
 
     public function financeChartIndex(Request $request)
     {
-        $days = (int)$request->query('days', 7);
+        $days = (int) $request->query('days', 7);
 
         $to = $request->filled('to')
             ? Carbon::parse($request->query('to'))->endOfDay()
@@ -935,7 +941,7 @@ class AllStatisticController extends MainController
             ->toArray();
 
         foreach ($charges as $date => $total) {
-            $values[$date] = (float)$total;
+            $values[$date] = (float) $total;
         }
 
         $labels = array_map(
@@ -952,11 +958,14 @@ class AllStatisticController extends MainController
     public function ajaxWalletLogs(Request $request)
     {
 
-        $logs = WalletLog::with('user.profile')
-            ->whereIn('operation', ['add', 'cut'])
-            ->orderBy('created_at', 'desc')
-            ->take(8)
-            ->get();
+        $logs = collect([]);
+        if (\App\Support\PackageHelper::isInstalled('usersWallet')) {
+            $logs = WalletLog::with('user.profile')
+                ->whereIn('operation', ['add', 'cut'])
+                ->orderBy('created_at', 'desc')
+                ->take(8)
+                ->get();
+        }
 
         return response()->json([
             'data' => $logs->map(function ($log) {

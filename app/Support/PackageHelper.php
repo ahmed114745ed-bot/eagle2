@@ -28,6 +28,7 @@ use Utd\Badge\Entities\Badge;
 use Utd\Milestones\Entities\Milestone;
 use Utd\SpecialId\Entities\SpecialHistory;
 use Utd\SwitchAccount\Entities\UserAccount;
+use Utd\UsersWallet\Entities\UserWallet;
 
 class PackageHelper
 {
@@ -57,6 +58,7 @@ class PackageHelper
         'RoleReward' => RoleReward::class,
         'milestone' => Milestone::class,
         'badge' => Badge::class,
+        'usersWallet' => UserWallet::class,
     ];
 
     /**

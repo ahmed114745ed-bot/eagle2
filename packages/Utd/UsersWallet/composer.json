@@ -1,0 +1,28 @@
+{
+    "name": "utd/userswallet",
+    "description": "Users Wallet Professional Package",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "UTD Team",
+            "email": "dev@utd.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Utd\\UsersWallet\\": "src/",
+            "Utd\\UsersWallet\\Database\\": "Database/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\UsersWallet\\UsersWalletServiceProvider"
+            ]
+        }
+    }
+}

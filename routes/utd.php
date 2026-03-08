@@ -68,7 +68,7 @@ use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\utd\TicketController;
 use App\Http\Controllers\utd\WithdrawController;
 use Illuminate\Support\Facades\Route;
-use Modules\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
+use Utd\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
 use Utd\Events\Http\Controllers\Utd\EventPeriodController;
 use Utd\Events\Http\Controllers\Utd\RoleEventController;
 use Utd\Events\Http\Controllers\Utd\TargetEventController;
@@ -498,7 +498,7 @@ Route::middleware([])->group(function () {
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
 
-    Route::post('roles/preview',  [RoleController::class, 'preview']);
+    Route::post('roles/preview', [RoleController::class, 'preview']);
 
 
     // game report
@@ -562,7 +562,9 @@ Route::middleware([])->group(function () {
         Route::get('coins/{id}', [ChargesController::class, 'userCharge']);
         Route::get('salary/{id}', [UserController::class, 'userSalaryWithHisAgency']);
         Route::get('report/{id}', [Report_userController::class, 'userReport']);
-        Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
+        if (\App\Support\PackageHelper::isInstalled('usersWallet')) {
+            Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
+        }
         Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
         Route::get('vip/{id}', [UserController::class, 'userVip']);

@@ -38,7 +38,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use App\Traits\SpecialId;
-use Modules\UsersWallet\Entities\UserWallet;
+use Utd\UsersWallet\Entities\UserWallet;
 use Utd\Vip\Entities\OVip;
 use Utd\Vip\Entities\UserVip;
 use Utd\Vip\Entities\Vip;
@@ -53,7 +53,7 @@ use Utd\Room\Entities\RoomVisitor;
  */
 class User extends Authenticatable
 {
-    use DynamicAchievementTrait,DynamicRealsTrait, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel, \App\Traits\SafeRelationLoading;
+    use DynamicAchievementTrait, DynamicRealsTrait, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel, \App\Traits\SafeRelationLoading;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -250,7 +250,7 @@ class User extends Authenticatable
     {
         return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
             $this->hasOne(Vip::class, 'level', 'total_received_level')
-            ->where('type', 1);
+                ->where('type', 1);
     }
 
     public function monthlyDiamondReceive()
@@ -273,7 +273,7 @@ class User extends Authenticatable
     public function getMonthlyDiamondReceived($month = null, $year = null)
     {
         $month = $month ?? now(getTimezone())->month;
-        $year  = $year ?? now(getTimezone())->year;
+        $year = $year ?? now(getTimezone())->year;
 
         return $this->monthlyDiamondReceive()
             ->where('month', $month)
@@ -288,7 +288,7 @@ class User extends Authenticatable
         $record = $this->monthlyDiamondReceive()
             ->firstOrNew([
                 'month' => $date->month,
-                'year'  => $date->year,
+                'year' => $date->year,
             ]);
 
         $record->monthly_diamond_received = ($record->monthly_diamond_received ?? 0) + $value;
@@ -319,10 +319,10 @@ class User extends Authenticatable
     {
         $month = @request()->month;
         $year = @request()->year;
-        if (! $month) {
+        if (!$month) {
             $month = now()->month;
         }
-        if (! $year) {
+        if (!$year) {
             $year = now()->year;
         }
         $hours_days = \Cache::get('hours_days') ?? 2;
@@ -341,10 +341,10 @@ class User extends Authenticatable
     {
         $month = @request()->month;
         $year = @request()->year;
-        if (! $month) {
+        if (!$month) {
             $month = now()->month;
         }
-        if (! $year) {
+        if (!$year) {
             $year = now()->year;
         }
 
@@ -394,10 +394,10 @@ class User extends Authenticatable
     {
         $month = (int) @request()->month;
         $year = (int) @request()->year;
-        if (! $month) {
+        if (!$month) {
             $month = now()->month;
         }
-        if (! $year) {
+        if (!$year) {
             $year = now()->year;
         }
 
@@ -889,23 +889,23 @@ class User extends Authenticatable
     {
         return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
             $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
-        })->with('OVip')->orderByDesc('level');
+                $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            })->with('OVip')->orderByDesc('level');
     }
 
     public function userHaveVip()
     {
         return PackageHelper::checkRelation($this, 'vip', 'hasMany') ??
             $this->hasMany(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
-        })->with('OVip')->orderByDesc('level');
+                $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            })->with('OVip')->orderByDesc('level');
     }
 
     public function Ovip()
     {
         return PackageHelper::checkRelation($this, 'vip', 'hasOneThrough') ??
             $this->hasOneThrough(OVip::class, UserVip::class, 'user_id', 'id', 'id', 'vip_id')
-            ->with('privilegs');
+                ->with('privilegs');
     }
 
     public function haveVip()
@@ -975,7 +975,7 @@ class User extends Authenticatable
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
-        if (PackageHelper::isInstalled('room')){
+        if (PackageHelper::isInstalled('room')) {
             $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
                 $q->where('uid', $this->id);
             })
@@ -1113,10 +1113,10 @@ class User extends Authenticatable
 
     public function target($month = null, $year = null)
     {
-        if (! $month) {
+        if (!$month) {
             $month = date('m');
         }
-        if (! $year) {
+        if (!$year) {
             $year = date('Y');
         }
 
@@ -1154,7 +1154,7 @@ class User extends Authenticatable
         $lastHistory = $this->history()->latest()->first();
 
         // Compare with the last history record to avoid duplications
-        if (! $lastHistory || $lastDiamondReceived !== $lastHistory->diamond) {
+        if (!$lastHistory || $lastDiamondReceived !== $lastHistory->diamond) {
             $this->history()->create([
                 'user_id' => $this->id,
                 'agency_id' => $this->agency_id,
@@ -1334,7 +1334,7 @@ class User extends Authenticatable
 
     public function moments()
     {
-        if (! class_exists(Moment::class)){
+        if (!class_exists(Moment::class)) {
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         return $this->hasMany(Moment::class, 'user_id');
@@ -1342,7 +1342,7 @@ class User extends Authenticatable
 
     public function moment_comments()
     {
-        if (! class_exists(\Modules\Moment\Entities\MomentCommint::class)){
+        if (!class_exists(\Modules\Moment\Entities\MomentCommint::class)) {
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         return $this->hasMany(\Modules\Moment\Entities\MomentCommint::class, 'user_id');
@@ -1350,7 +1350,7 @@ class User extends Authenticatable
 
     public function moment_likes()
     {
-        if (! class_exists(\Modules\Moment\Entities\MomentLikes::class)){
+        if (!class_exists(\Modules\Moment\Entities\MomentLikes::class)) {
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         return $this->hasMany(\Modules\Moment\Entities\MomentLikes::class, 'user_id');
@@ -1635,8 +1635,8 @@ class User extends Authenticatable
         $pack = $this->packs->first(
             fn($pack) =>
             $pack->type === 25 &&
-                $pack->is_used &&
-                optional($pack->ware)->value == $this->special_id
+            $pack->is_used &&
+            optional($pack->ware)->value == $this->special_id
         );
 
         return ($this->special_id && $pack)
@@ -1865,7 +1865,8 @@ class User extends Authenticatable
 
     public function wallet()
     {
-        return $this->hasOne(UserWallet::class);
+        return PackageHelper::checkRelation($this, 'usersWallet', 'hasOne') ??
+            $this->hasOne(UserWallet::class);
     }
 
     public function momentUserGift()
@@ -2051,7 +2052,7 @@ class User extends Authenticatable
         }
 
         $start = $join->join_date;
-        $end =  now();
+        $end = now();
 
         $userSalary = UserSallary::query()
             ->where('user_id', $this->id)
@@ -2234,7 +2235,7 @@ class User extends Authenticatable
         return $this->hasMany(BlackList::class, 'from_uid');
     }
 
-    public function getProfileFrame(): Ware | null
+    public function getProfileFrame(): Ware|null
     {
         return $this->packs?->where('type', 28)->where('is_used', 1)->first()?->ware;
     }
@@ -2281,17 +2282,17 @@ class User extends Authenticatable
     {
         return PackageHelper::checkRelation($this, 'chat', 'hasOne') ??
             $this->hasOne(ChatSetting::class, 'user_id')
-            ->withDefault([
-                'chat_with_friends' => 1,
-                'chat_with_all' => 0,
-            ]);
+                ->withDefault([
+                    'chat_with_friends' => 1,
+                    'chat_with_all' => 0,
+                ]);
     }
 
     public function userDataSetting()
     {
         return $this->hasOne(\App\Models\UserSetting::class, 'user_id')
             ->withDefault([
-                'show_git'   => 1,
+                'show_git' => 1,
                 'show_intro' => 1,
                 'show_banner' => 1,
             ]);
@@ -2308,26 +2309,26 @@ class User extends Authenticatable
 
         $vipIcon = $vip->wareIcon;
         $hasColor = Common::hasInPackV2($this->packs, 18, true);
-        $color    = Common::hasColorInPackV2($this->packs, 21, true);
+        $color = Common::hasColorInPackV2($this->packs, 21, true);
 
         $vip_gifts = $vip->privilegs->contains(fn($priv) => $priv->type == 14);
         $vip_upload_gif = $vip->privilegs->contains(fn($priv) => $priv->type == 22);
 
         return [
-            'id'             => 1,
-            'level'          => $vip->level ?? 0,
-            'name'           => $vip->name ?? '',
-            'price'          => $vip->price ?? 0,
-            'img_old'        => $vip->img ?? '',
-            'img'            => $vipIcon->show_img ?? '',
-            'image'          => $vip->image ?? '',
+            'id' => 1,
+            'level' => $vip->level ?? 0,
+            'name' => $vip->name ?? '',
+            'price' => $vip->price ?? 0,
+            'img_old' => $vip->img ?? '',
+            'img' => $vipIcon->show_img ?? '',
+            'image' => $vip->image ?? '',
             'image_from_wares' => $vipIcon->show_img ?? '',
-            'expire'         => $vip->expire ?? 0,
-            'ware_id'        => $vipIcon?->id ?? 0,
-            'color'          => $color ?? '',
-            'vip_gifts'      => $vip_gifts ?? 0,
+            'expire' => $vip->expire ?? 0,
+            'ware_id' => $vipIcon?->id ?? 0,
+            'color' => $color ?? '',
+            'vip_gifts' => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name'   => $hasColor ? Common::wareUserVipV2($this, 18, 'color') ?? '' : '',
+            'colored_name' => $hasColor ? Common::wareUserVipV2($this, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -2338,16 +2339,16 @@ class User extends Authenticatable
 
     public function getLevelDataAttribute()
     {
-        $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
+        $expPercentages = Config::get('exp_percentages') ?? [0, 0];
 
         $diamondReceived = $this->total_received_diamonds ?? 0;
-        $diamondSend     = $this->total_sender_diamonds ?? 0;
+        $diamondSend = $this->total_sender_diamonds ?? 0;
 
         $receivedNum = floor($diamondReceived * ($expPercentages['exp_received_percentage'] ?? 1));
-        $senderNum   = floor($diamondSend * ($expPercentages['exp_sender_percentage'] ?? 1));
+        $senderNum = floor($diamondSend * ($expPercentages['exp_sender_percentage'] ?? 1));
 
-        $star_level  = $this->total_received_level ?? 0;
-        $gold_level  = $this->total_sender_level ?? 0;
+        $star_level = $this->total_received_level ?? 0;
+        $gold_level = $this->total_sender_level ?? 0;
 
         $vipsData = \Cache::rememberForever(
             'vips_data',
@@ -2367,32 +2368,32 @@ class User extends Authenticatable
         $nextStarData = $this->getNextLevelDataFromCache(1, $star_level, $vipsData);
         $nextGoldData = $this->getNextLevelDataFromCache(2, $gold_level, $vipsData);
 
-        $next_star_num    = $nextStarData['next_exp'];
-        $next_star_level  = $nextStarData['next_level'];
-        $next_gold_num    = $nextGoldData['next_exp'];
-        $next_gold_level  = $nextGoldData['next_level'];
+        $next_star_num = $nextStarData['next_exp'];
+        $next_star_level = $nextStarData['next_level'];
+        $next_gold_num = $nextGoldData['next_exp'];
+        $next_gold_level = $nextGoldData['next_level'];
 
         return [
-            'receiver_num'        => $receivedNum,
-            'receiver_img'        => $star_level_img,
-            'sender_num'          => $senderNum,
-            'sender_rem'          => max(0, $next_gold_num - $senderNum),
-            'receiver_rem'        => max(0, $next_star_num - $receivedNum),
-            'sender_img'          => $gold_level_img,
-            'receiver_level'      => $star_level,
-            'next_receiver_num'   => $next_star_num ?: 0,
+            'receiver_num' => $receivedNum,
+            'receiver_img' => $star_level_img,
+            'sender_num' => $senderNum,
+            'sender_rem' => max(0, $next_gold_num - $senderNum),
+            'receiver_rem' => max(0, $next_star_num - $receivedNum),
+            'sender_img' => $gold_level_img,
+            'receiver_level' => $star_level,
+            'next_receiver_num' => $next_star_num ?: 0,
             'next_receiver_level' => $next_star_level ?: 0,
-            'sender_level'        => $gold_level,
-            'next_sender_num'     => $next_gold_num ?: 0,
-            'next_sender_level'   => $next_gold_level ?: 0,
-            'prev_receiver_num'   => $current_star_num ?: 0,
-            'prev_sender_num'     => $current_gold_num ?: 0,
+            'sender_level' => $gold_level,
+            'next_sender_num' => $next_gold_num ?: 0,
+            'next_sender_level' => $next_gold_level ?: 0,
+            'prev_receiver_num' => $current_star_num ?: 0,
+            'prev_sender_num' => $current_gold_num ?: 0,
             'current_receiver_num' => $current_star_num,
-            'current_sender_num'  => $current_gold_num,
-            'exp-sender'          => $expPercentages['exp_sender_percentage'] ?? 1,
-            'exp-receiver'        => $expPercentages['exp_received_percentage'] ?? 1,
-            'receiver_per'        => $this->calcPercentage($receivedNum, $current_star_num, $next_star_num),
-            'sender_per'          => $this->calcPercentage($senderNum, $current_gold_num, $next_gold_num),
+            'current_sender_num' => $current_gold_num,
+            'exp-sender' => $expPercentages['exp_sender_percentage'] ?? 1,
+            'exp-receiver' => $expPercentages['exp_received_percentage'] ?? 1,
+            'receiver_per' => $this->calcPercentage($receivedNum, $current_star_num, $next_star_num),
+            'sender_per' => $this->calcPercentage($senderNum, $current_gold_num, $next_gold_num),
         ];
     }
 
@@ -2400,23 +2401,26 @@ class User extends Authenticatable
     {
         $range = $next - $prev;
         $progress = $current - $prev;
-        if ($range <= 0) return 0.0;
+        if ($range <= 0)
+            return 0.0;
         $percentage = $progress / $range;
         return $percentage < 0 ? 0.0 : ($percentage > 1 ? 1.0 : round($percentage, 2));
     }
 
-    private  function getCurrentLevelFromCache($type = null, $level = 0, $field = null, $vipsData = [])
+    private function getCurrentLevelFromCache($type = null, $level = 0, $field = null, $vipsData = [])
     {
-        if (!$type || !$field || !isset($vipsData[$type])) return 0;
+        if (!$type || !$field || !isset($vipsData[$type]))
+            return 0;
 
         $levelData = $vipsData[$type]->where('level', '=', $level)->first();
 
         return $levelData ? $levelData->$field : 0;
     }
 
-    private  function getNextLevelDataFromCache($type, $currentLevel, $vipsData)
+    private function getNextLevelDataFromCache($type, $currentLevel, $vipsData)
     {
-        if (!isset($vipsData[$type])) return ['next_exp' => 0, 'next_level' => 0];
+        if (!isset($vipsData[$type]))
+            return ['next_exp' => 0, 'next_level' => 0];
 
         $data = $vipsData[$type];
         $nextData = ['next_exp' => 0, 'next_level' => 0];
@@ -2521,6 +2525,7 @@ class User extends Authenticatable
 
     public function userWallet()
     {
-        return $this->hasOne(UserWallet::class);
+        return PackageHelper::checkRelation($this, 'usersWallet', 'hasOne') ??
+            $this->hasOne(UserWallet::class);
     }
 }

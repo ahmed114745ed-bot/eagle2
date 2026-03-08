@@ -3,7 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Http\Resources\AudioGiftsListResource;
-use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
+use Utd\UsersWallet\Repositories\Eloquent\UserLogRepository;
 use Utd\Moments\Entities\MomentUserGift;
 use Utd\Moments\Transformers\MomentGiftResource;
 use App\Contracts\GiftLogRepositoryContract;
@@ -14,7 +14,8 @@ class WalletStatisticService
     public function __construct(
         private readonly ?GiftLogRepositoryContract $giftLogRepository,
         private readonly UserLogRepository $userCoinLogRepository
-    ) {}
+    ) {
+    }
 
 
     public function diamondsStatistic($userId, $type, $startDate, $endDate, $perPage, $page)
@@ -47,7 +48,7 @@ class WalletStatisticService
                 break;
         }
 
-            $resource = $resourceClass::collection($list);
+        $resource = $resourceClass::collection($list);
 
         return [
             'total_diamonds' => $list->sum('total'),

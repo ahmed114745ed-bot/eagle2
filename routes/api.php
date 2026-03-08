@@ -54,7 +54,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
-use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
+use Utd\UsersWallet\Http\Controllers\Api\ExchangeController;
 use Utd\Achievements\Http\Controllers\AchievementController;
 use Utd\Family\Http\Controllers\Api\FamilyController;
 use Utd\Room\Entities\Room;
@@ -68,16 +68,16 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('test-game-rtm', function () {
 
         $user = User::find(524);
-        $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
+        $room = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
 
-        $d    = [
+        $d = [
             "messageContent" => [
                 "message" => "SBG",
-                'uImage'  => $user->profile?->avatar ?? 0,
-                'uName'   => $user->name ?? '',
-                'uId'     => $user->id ?? 0,
-                'coins'   => 50000,
-                "gImage"  => @$user->nowGame?->image
+                'uImage' => $user->profile?->avatar ?? 0,
+                'uName' => $user->name ?? '',
+                'uId' => $user->id ?? 0,
+                'coins' => 50000,
+                "gImage" => @$user->nowGame?->image
             ]
         ];
         $json = json_encode($d);
@@ -170,7 +170,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     $authResponse = Broadcast::auth($request);
                     return $authResponse;
                 } catch (\Exception $e) {
-//                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                    //                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
                     return response()->json([
                         'success' => false,
                         'type' => get_class($e),
@@ -281,7 +281,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('change-request', [CountryController::class, 'changeRequest']);
             });
             // user controller
-
+    
             Route::prefix('user_info')->group(function () {
 
                 Route::get('my_pack', [PackController::class, 'my_pack']);
@@ -294,13 +294,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::post('send_pack', [UserController::class, 'sendPack']);
 
-            Route::prefix('exchange')->group(function () {
-                Route::get('/list', [ExchangeController::class, 'exchangeList']);
-                Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
-                Route::post('/make', [ExchangeController::class, 'exchangeSave']);
-                Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
-                Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
-            });
+            if (\App\Support\PackageHelper::isInstalled('usersWallet')) {
+                Route::prefix('exchange')->group(function () {
+                    Route::get('/list', [ExchangeController::class, 'exchangeList']);
+                    Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
+                    Route::post('/make', [ExchangeController::class, 'exchangeSave']);
+                    Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
+                    Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
+                });
+            }
 
             Route::get('trxs', [ChargeController::class, 'trxLog']);
             Route::get('images', [HomeController::class, 'getImages']);
@@ -346,7 +348,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('report_user', [ReportUserController::class, 'ReportUser']);
             });
             // end user api
-
+    
             //start rankin
             Route::prefix('ranking')->group(function () {
                 Route::post('/', [RankingController::class, 'ranking2']);
@@ -364,11 +366,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/v2/one-room', [Ranking2Controller::class, 'oneRoomRanking']);
             });
             // end ranking
-
+    
             // start vips
             Route::get('profile-frame-wares', [\App\Http\Controllers\Api\V1\WareController::class, 'profile_frame_wares']);
             // end vips
-
+    
 
 
             Route::prefix('emojis')->group(function () {
@@ -403,12 +405,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('update-game', [AllGameController::class, 'updateGame']);
             });
             // end games
-
+    
             // questions
             Route::get('questions', [QuestionController::class, 'questions']);
             Route::post('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
             // end questions
-
+    
 
             Route::get('/charge-level', [ChargeLevelController::class, 'chargeLevel']);
 
@@ -439,7 +441,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //     $data = Common::level_center(@$id);
             //     return $data;
             // });
-
+    
             Route::post('test-google-id', [AuthController::class, 'verifyGoogleToken']);
 
             // Music Store
@@ -467,7 +469,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::get('/public-test/{ids}', function ($ids) {
                 $title = 'System‑wide Test';
-                $body  = 'This is only a test.';
+                $body = 'This is only a test.';
 
                 $idArray = explode(',', $ids);
 
@@ -502,7 +504,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->values()
                     ->toArray();
                 // $result = Common::unsubscribeFromTopic($tokens, $topic);
-
+    
                 // return response()->json($result);
             });
         }
@@ -523,13 +525,13 @@ Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController
 
 
 Route::get('/public-official-test/{ids}', function ($ids) {
-    $title    = 'System‑wide Test';
-    $body_en  = 'This is only a test.';
-    $body_ar  = 'هذا مجرد اختبار.';
-    $image    = null; // مثال: 'https://example.com/image.jpg'
-    $data     = null; // يجب أن يكون string|null
-    $subType  = null;
-    $type     = 2;
+    $title = 'System‑wide Test';
+    $body_en = 'This is only a test.';
+    $body_ar = 'هذا مجرد اختبار.';
+    $image = null; // مثال: 'https://example.com/image.jpg'
+    $data = null; // يجب أن يكون string|null
+    $subType = null;
+    $type = 2;
     $fromUser = null;
 
     $idArray = explode(',', $ids);
@@ -563,8 +565,8 @@ Route::get('gifts-by-id', function (Request $request) {
         ?? ($gift->show_img ? Storage::url($gift->show_img) : null);
 
     return response()->json([
-        'id'    => $gift->id,
-        'name'  => $gift->name,
+        'id' => $gift->id,
+        'name' => $gift->name,
         'image' => $imageUrl,
     ]);
 });
