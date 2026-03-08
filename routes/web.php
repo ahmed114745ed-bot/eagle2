@@ -1663,28 +1663,83 @@ Route::get('/save-game-app-key', function (Request $request) {
     }
 });
 
+use Illuminate\Support\Facades\Log;
+
 Route::get('/fix-paid-usd', function () {
+
+    Log::info('Fix paid_usd process started');
+
     $logs = CoinLog::whereNull('paid_usd')
         ->orWhere('paid_usd', 0)
         ->get();
 
+    Log::info('Total logs fetched', ['count' => $logs->count()]);
+
     $updated = 0;
     $skipped = 0;
+    $errors = 0;
 
     foreach ($logs as $log) {
 
-        $coin = Coin::where('coin',$log->obtained_coins) ->first(); 
+        try {
 
-        if ($coin) {
-            $log->paid_usd = $coin->usd;
-            $log->save();
-            $updated++;
-        } else {
-            $skipped++; 
+            Log::info('Processing log', [
+                'log_id' => $log->id,
+                'obtained_coins' => $log->obtained_coins,
+                'current_paid_usd' => $log->paid_usd
+            ]);
+
+            $coin = Coin::where('coin', $log->obtained_coins)->first();
+
+            if ($coin) {
+
+                $oldValue = $log->paid_usd;
+
+                $log->paid_usd = $coin->usd;
+                $saved = $log->save();
+
+                if ($saved) {
+                    Log::info('Log updated successfully', [
+                        'log_id' => $log->id,
+                        'old_paid_usd' => $oldValue,
+                        'new_paid_usd' => $coin->usd
+                    ]);
+                } else {
+                    Log::warning('Log save returned false', [
+                        'log_id' => $log->id
+                    ]);
+                }
+
+                $updated++;
+
+            } else {
+
+                Log::warning('Coin not found for obtained_coins', [
+                    'log_id' => $log->id,
+                    'obtained_coins' => $log->obtained_coins
+                ]);
+
+                $skipped++;
+            }
+
+        } catch (\Exception $e) {
+
+            Log::error('Error while processing log', [
+                'log_id' => $log->id,
+                'error' => $e->getMessage()
+            ]);
+
+            $errors++;
         }
     }
 
-    return "Updated: {$updated} | Skipped (no product_id): {$skipped}";
+    Log::info('Fix paid_usd process finished', [
+        'updated' => $updated,
+        'skipped' => $skipped,
+        'errors' => $errors
+    ]);
+
+    return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
 });
 Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
