@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\CoreWallet;
+use Utd\UsersWallet\Entities\CoreWallet;
 use Illuminate\Database\Seeder;
 
 class CoreWalletTableSeeder extends Seeder

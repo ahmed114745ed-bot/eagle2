@@ -129,9 +129,11 @@ class UserController extends Controller
     }
     public function image_intro($id)
     {
-        if (!$id) return Common::apiResponse(false, 'messing user id parameter', 400);
+        if (!$id)
+            return Common::apiResponse(false, 'messing user id parameter', 400);
         $user = User::find($id);
-        if (! $user) return Common::apiResponse(false, 'user not found', 400);
+        if (!$user)
+            return Common::apiResponse(false, 'user not found', 400);
         $dr = '';
         $pack = self::checkPack($user->id, 6, $user->dress_3);
         $pack = $pack->pluck('target_id');
@@ -141,7 +143,8 @@ class UserController extends Controller
             ->whereIn('id', $pack)
             ->where('type', 6)
             ->get();
-        if (! $ware) return Common::apiResponse(false, ' not found', 400);
+        if (!$ware)
+            return Common::apiResponse(false, ' not found', 400);
         if (!$ware->isEmpty()) {
             $dr = $ware->map(function ($w) {
                 return [
@@ -193,7 +196,7 @@ class UserController extends Controller
                 ($targetService)->calculateTarget();
             }
         }
-        $data = $this->userService->userStatic($user,  $month, $year);
+        $data = $this->userService->userStatic($user, $month, $year);
         return Common::apiResponse(true, '', $data, 200);
     }
 
@@ -219,7 +222,7 @@ class UserController extends Controller
 
         $filterCharges = (new FilterChargeService($perPage, $currentPage))->result($type, $key);
 
-        if (! $filterCharges) {
+        if (!$filterCharges) {
             return response()->json(['message' => 'Invalid type'], 400);
         }
 
@@ -443,7 +446,7 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-//     public function userFamily(Request $request)
+    //     public function userFamily(Request $request)
 //     {
 //         $key = $request->q;
 //         $page = $request->get('page', 1);
@@ -523,6 +526,9 @@ class UserController extends Controller
 
     public function my_store_all(Request $request)
     {
+        if (!\App\Support\PackageHelper::isInstalled('usersWallet')) {
+            return Common::apiResponse(false, 'wallet package is not installed', null, 404);
+        }
         $user = $request->user();
         $user = $this->userService->myStore($user, $request);
         $data = new MyStoreResource($user);
@@ -531,7 +537,7 @@ class UserController extends Controller
 
     public function ranking_room(Request $request)
     {
-        $toArray =  $this->userService->roomRanking($request);
+        $toArray = $this->userService->roomRanking($request);
         return Common::apiResponse(1, '', $toArray);
     }
 
@@ -561,17 +567,21 @@ class UserController extends Controller
         $user = User::with([
             'chatRoomsAsUser' => function ($q) use ($authUserId) {
                 $q->where('user_id2', $authUserId)
-                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-                        $query->where('user_id', '<>', $authUserId)
-                            ->where('status', '<>', 'seen');
-                    }]);
+                    ->withCount([
+                        'messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }
+                    ]);
             },
             'chatRoomsAsUser2' => function ($q) use ($authUserId) {
                 $q->where('user_id', $authUserId)
-                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-                        $query->where('user_id', '<>', $authUserId)
-                            ->where('status', '<>', 'seen');
-                    }]);
+                    ->withCount([
+                        'messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }
+                    ]);
             },
         ])->find($id);
 
@@ -590,7 +600,7 @@ class UserController extends Controller
     public function showUsersDetails(Request $request)
     {
 
-        $users_ids =  explode(',', $request->users_ids);
+        $users_ids = explode(',', $request->users_ids);
 
         $user = $this->userService->showUsers($users_ids);
         $response = (UserResource::collection($user))->toArray(request());
@@ -601,7 +611,7 @@ class UserController extends Controller
     public function vTwoshow(Request $request, $id)
     {
         $isVisit = @$request->is_visit == 'true' ? true : false;
-        $auth   = $request->user();
+        $auth = $request->user();
         try {
             $user = $this->userService->vTwoshowUser($id, $auth, $request, $isVisit);
         } catch (Exception $e) {
@@ -613,7 +623,8 @@ class UserController extends Controller
     public function changePhoneWhatsapp(Request $request, WhatsappWebhook $whatsappWebhook)
     {
         $phone = $request->phone;
-        if (!$phone) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$phone)
+            return Common::apiResponse(0, 'missing params', null, 422);
         $user = $request->user();
         $rules = [
             'phone' => [
@@ -621,7 +632,8 @@ class UserController extends Controller
                 Rule::unique('users', 'phone')->withoutTrashed()->ignore($user->id),
             ],
         ];
-        if ($user->phone == $phone) return Common::apiResponse(0, 'Old phone is wrong', null, 404);
+        if ($user->phone == $phone)
+            return Common::apiResponse(0, 'Old phone is wrong', null, 404);
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return Common::apiResponse(0, 'Validation failed', $validator->errors(), 422);
@@ -641,11 +653,13 @@ class UserController extends Controller
     public function resetWhatsapp(Request $request, WhatsappWebhook $whatsappWebhook)
     {
         $phone = $request->phone;
-        if (!$phone || !$request->password) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$phone || !$request->password)
+            return Common::apiResponse(0, 'missing params', null, 422);
         $user = $request->user();
 
 
-        if ($user->phone != $phone) return Common::apiResponse(0, 'phone number not register with your account', null, 404);
+        if ($user->phone != $phone)
+            return Common::apiResponse(0, 'phone number not register with your account', null, 404);
 
         $rules = [
             'phone' => [
@@ -671,7 +685,9 @@ class UserController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function userInfoWithRole(Request $request) {}
+    public function userInfoWithRole(Request $request)
+    {
+    }
 
 
     public function logout(Request $request)
@@ -685,12 +701,13 @@ class UserController extends Controller
 
     public function user_agency_information()
     {
-        $user   =   Auth::user();
-        $month  =   \request('month');
-        $year  =   \request('year');
+        $user = Auth::user();
+        $month = \request('month');
+        $year = \request('year');
 
         $agency = Agency::query()->with('owner')->where('app_owner_id', $user->id)->withCount('joinRequests')->first();
-        if (!$agency) return Common::apiResponse(0, __("api_responses.u_not_owner_agncy"), []);
+        if (!$agency)
+            return Common::apiResponse(0, __("api_responses.u_not_owner_agncy"), []);
         $total_host_target = UserSallary::where('user_agency_id', $agency->id);
 
         if ($month != null && $year != null) {
@@ -698,17 +715,17 @@ class UserController extends Controller
                 ->where('year', $year);
         }
         $total_host_target = $total_host_target->sum('sallary');
-        $owner =       $agency->owner;
+        $owner = $agency->owner;
         $owner->avatar = $agency->owner->avatar;
         $data = [
-            'id'                => $agency->id,
-            'name'              => $agency->name,
-            'image'             => $agency->img,
-            'pio'               => $agency->contents,
-            'num_of_hosts'      => $agency->mempers->count(),
-            'total_salary'      => $total_host_target,
-            'agency_target'     => $agency->getSalary($month, $year),
-            'number_request'              => $agency->joinRequests->count(),
+            'id' => $agency->id,
+            'name' => $agency->name,
+            'image' => $agency->img,
+            'pio' => $agency->contents,
+            'num_of_hosts' => $agency->mempers->count(),
+            'total_salary' => $total_host_target,
+            'agency_target' => $agency->getSalary($month, $year),
+            'number_request' => $agency->joinRequests->count(),
             'owner' => $owner
         ];
         return Common::apiResponse(1, '', $data);
@@ -716,7 +733,8 @@ class UserController extends Controller
 
     public function changePhone(Request $request)
     {
-        if (!$request->phone  || !$request->current_phone || !$request->old_code || !$request->new_code) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$request->phone || !$request->current_phone || !$request->old_code || !$request->new_code)
+            return Common::apiResponse(0, 'missing params', null, 422);
         $user = $request->user();
         $rules = [
             'phone' => [
@@ -724,15 +742,16 @@ class UserController extends Controller
                 Rule::unique('users', 'phone')->ignore($user->id),
             ],
         ];
-        if ($user->phone != $request->current_phone) return Common::apiResponse(0, 'Old phone is wronge', null, 404);
+        if ($user->phone != $request->current_phone)
+            return Common::apiResponse(0, 'Old phone is wronge', null, 404);
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return Common::apiResponse(0, 'Validation failed', $validator->errors(), 422);
         }
         $whatsappOtpService = new WhatsappOtp();
-        $phone              = $request->phone;
-        $isValidOld            = $whatsappOtpService->isValidate($request->current_phone, $request->old_code);
-        $isValidNew            = $whatsappOtpService->isValidate($phone, $request->new_code);
+        $phone = $request->phone;
+        $isValidOld = $whatsappOtpService->isValidate($request->current_phone, $request->old_code);
+        $isValidNew = $whatsappOtpService->isValidate($phone, $request->new_code);
         if (!$isValidOld) {
             return Common::apiResponse(false, __('api_responses.invalid_old_code'));
         }
@@ -776,13 +795,13 @@ class UserController extends Controller
                 ?: Common::getUserDress($senderId, $dressId, 4, 'img1', true);
 
             return [
-                'id'        => $sender->id,
-                'uuid'      => $sender->uuid,
-                'name'      => $sender->name,
-                'image'     => $image,
-                'gender'    => $sender->gender,
-                'country'   => [
-                    'id'   => $sender->country->id ?? 0,
+                'id' => $sender->id,
+                'uuid' => $sender->uuid,
+                'name' => $sender->name,
+                'image' => $image,
+                'gender' => $sender->gender,
+                'country' => [
+                    'id' => $sender->country->id ?? 0,
                     'name' => $sender->country->name ?? '',
                     'flag' => $sender->country->flag ?? '',
                 ],
@@ -791,17 +810,17 @@ class UserController extends Controller
                         $achievementService->getUserAchievement($sender)
                     )
                     : $achievementService->getUserAchievement($sender),
-                'total'      => numToString($currentTotal),
+                'total' => numToString($currentTotal),
                 'total_diff' => $totalDiff,
-                'frame'      => $frame,
-                'frame_id'   => $frame ? $dressId : 0,
-                'colored_name'   => UserPackHelper::getColorName($sender),
+                'frame' => $frame,
+                'frame_id' => $frame ? $dressId : 0,
+                'colored_name' => UserPackHelper::getColorName($sender),
             ];
         })->filter()->values()->all(); // filter to remove nulls
 
         $count = count($data);
         $arr = [
-            'top'   => $count < 4 ? $data : array_slice($data, 0, 3),
+            'top' => $count < 4 ? $data : array_slice($data, 0, 3),
             'other' => $count < 4 ? [] : array_slice($data, 3),
             'count' => $count,
         ];
@@ -904,9 +923,9 @@ class UserController extends Controller
             true,
             __('api_responses.logged'),
             [
-                'id'            => $user->id,
-                'is_first'      => @(bool)$user->is_points_first,
-                'auth_token'    => $user->auth_token
+                'id' => $user->id,
+                'is_first' => @(bool) $user->is_points_first,
+                'auth_token' => $user->auth_token
             ]
         );
         return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
@@ -937,15 +956,15 @@ class UserController extends Controller
 
     public function UserEarnFromInvitationStatistics()
     {
-        $userId             = Auth::id();
-        $parentInvitations  = UserEarnInvitation::where("parent_id", $userId);
+        $userId = Auth::id();
+        $parentInvitations = UserEarnInvitation::where("parent_id", $userId);
         $UserCodeInvitation = UserCodeInvitation::where("user_id", $userId);
         if ($parentInvitations != null) {
             $data = [
-                "totalEarned"  => $parentInvitations->sum("parent_percentage"),
-                "earnedDay"    => $parentInvitations->whereDate("created_at", date("Y-m-d"))->sum("parent_percentage"),
+                "totalEarned" => $parentInvitations->sum("parent_percentage"),
+                "earnedDay" => $parentInvitations->whereDate("created_at", date("Y-m-d"))->sum("parent_percentage"),
                 "TotalInvited" => $UserCodeInvitation->count(),
-                "invitedDay"   => $UserCodeInvitation->whereDate("created_at", date("Y-m-d"))->count(),
+                "invitedDay" => $UserCodeInvitation->whereDate("created_at", date("Y-m-d"))->count(),
             ];
             return Common::apiResponse(true, '', $data, 200);
         }
@@ -955,14 +974,14 @@ class UserController extends Controller
     public function parentUser()
     {
         $userId = Auth::id();
-        $data   = UserCodeInvitation::with("user")->where("invited_id", $userId)->first();
-        $lang   = app()->getLocale();
+        $data = UserCodeInvitation::with("user")->where("invited_id", $userId)->first();
+        $lang = app()->getLocale();
         if ($lang == 'ar') {
             $mes_user_not_found = 'لم يتم العثور علي المستخدم';
-            $success_mes        = 'لا يوجد بيانات';
+            $success_mes = 'لا يوجد بيانات';
         } else {
             $mes_user_not_found = 'It was not found on the user';
-            $success_mes        = 'not found data';
+            $success_mes = 'not found data';
         }
 
         if ($data) {
@@ -977,7 +996,7 @@ class UserController extends Controller
     public function UserEarnFromInvitation()
     {
         $userId = Auth::id();
-        $data   = UserEarnInvitation::with("user:id,name,uuid")->select("id", "user_id", "parent_id", "updated_at", "user_charge", "parent_percentage")->where("parent_id", $userId)->orderByDesc('created_at')->get();
+        $data = UserEarnInvitation::with("user:id,name,uuid")->select("id", "user_id", "parent_id", "updated_at", "user_charge", "parent_percentage")->where("parent_id", $userId)->orderByDesc('created_at')->get();
         return Common::apiResponse(true, '', $data, 200);
     }
 
@@ -987,10 +1006,10 @@ class UserController extends Controller
             return Common::apiResponse(false, __('invitation.stopped'), null, 403);
         }
 
-        $userId     = Auth::id();
+        $userId = Auth::id();
         $userParent = $this->getUserByCode($request->code);
-        $existing   = UserCommon::CheckUserParent($userId);
-        $isNew      = UserCommon::CheckUserNew($userId);
+        $existing = UserCommon::CheckUserParent($userId);
+        $isNew = UserCommon::CheckUserNew($userId);
 
         if (!$this->isDeviceUniqueForUser($userId, Auth::user()->device_token)) {
             return Common::apiResponse(false, __('invitation.device_in_use'), null, 403);
@@ -1057,7 +1076,7 @@ class UserController extends Controller
         );
 
         return UserCodeInvitation::create([
-            "user_id"    => $parentId,
+            "user_id" => $parentId,
             "invited_id" => $invitedId,
         ]);
     }
@@ -1082,7 +1101,7 @@ class UserController extends Controller
 
     private function rewardUser(User $user, int $reward, string $type, array $meta = []): void
     {
-        $amountBefore =  Common::getCurrentBalance($user->id);
+        $amountBefore = Common::getCurrentBalance($user->id);
 
         if ($reward > 0) {
             $user->increment('di', $reward);
@@ -1098,15 +1117,15 @@ class UserController extends Controller
 
     public function CreateCodeInvitation()
     {
-        $user_id       = Auth::id();
+        $user_id = Auth::id();
         $generatedCode = random_int(1, 100000);
-        $existingCode  = UserCodeInvitation::where('code', $user_id . $generatedCode)->exists();
+        $existingCode = UserCodeInvitation::where('code', $user_id . $generatedCode)->exists();
         if ($existingCode) {
             $generatedCode = random_int(1, 100000);
         }
         $data = UserCodeInvitation::create([
             "user_id" => $user_id,
-            "code"    => $user_id . $generatedCode,
+            "code" => $user_id . $generatedCode,
         ]);
         return Common::apiResponse(true, 'تم انشاء الكود', $data->code, 200);
     }
@@ -1120,8 +1139,8 @@ class UserController extends Controller
     public function updateUserLevel($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'total_sender_level'         => 'required|numeric',
-            'total_received_level'         => 'required|numeric',
+            'total_sender_level' => 'required|numeric',
+            'total_received_level' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -1177,7 +1196,7 @@ class UserController extends Controller
         }
     }
 
-//     public function kickFamily($id)
+    //     public function kickFamily($id)
 //     {
 //         try {
 //             $this->userService->kickFamily($id);
@@ -1190,8 +1209,8 @@ class UserController extends Controller
     public function changeAgency(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'user_id'         => 'required|integer|exists:users,id',
-            'agency_id'         => 'required|integer|exists:agencies,id',
+            'user_id' => 'required|integer|exists:users,id',
+            'agency_id' => 'required|integer|exists:agencies,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -1210,7 +1229,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer|exists:users,id',
             'key' => 'required|string|in:charge_status,transfer_salary,can_play',
-            'value'   => [
+            'value' => [
                 'required',
                 function ($attribute, $value, $fail) use ($request) {
                     if (in_array($request->key, ['charge_status', 'transfer_salary']) && !in_array($value, [0, 1])) {
@@ -1240,7 +1259,7 @@ class UserController extends Controller
     public function updateUserSetting(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'user_id'         => 'required|integer|exists:users,id',
+            'user_id' => 'required|integer|exists:users,id',
             'key' => 'required|string|in:hide_chat,show_invite_code',
             'value' => 'required|boolean',
         ]);
@@ -1261,14 +1280,14 @@ class UserController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'uuid'         => 'required',
-            'name'         => 'required|string',
-            'nickname'         => 'nullable|string',
-            'charge_status'         => 'required|boolean',
-            'transfer_salary'         => 'required|boolean',
-            'can_play'         => 'required|integer|in:0,2,3',
-            'country_id'         => 'nullable|integer|exists:countries,id',
-            'di'    => 'nullable|integer',
+            'uuid' => 'required',
+            'name' => 'required|string',
+            'nickname' => 'nullable|string',
+            'charge_status' => 'required|boolean',
+            'transfer_salary' => 'required|boolean',
+            'can_play' => 'required|integer|in:0,2,3',
+            'country_id' => 'nullable|integer|exists:countries,id',
+            'di' => 'nullable|integer',
             'user_diamond' => 'nullable|integer',
             'total_sender_level' => 'nullable|integer',
             'total_received_level' => 'nullable|integer',
@@ -1284,8 +1303,8 @@ class UserController extends Controller
             'avatar' => 'nullable',
             'image_id' => 'nullable',
             'gender' => 'nullable',
-            'show_invite_code'         => 'required|boolean',
-            'hide_chat'         => 'required|boolean',
+            'show_invite_code' => 'required|boolean',
+            'hide_chat' => 'required|boolean',
 
         ]);
         if ($validator->fails()) {
@@ -1305,7 +1324,7 @@ class UserController extends Controller
     {
 
         try {
-            $user  = $this->userService->showDataUser($id);
+            $user = $this->userService->showDataUser($id);
             return Common::apiResponse(true, 'done', new ShowUserResource($user));
         } catch (Exception $exception) {
 
@@ -1316,16 +1335,16 @@ class UserController extends Controller
     public function updateDataUser($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'uuid'         => [
+            'uuid' => [
                 'required',
                 'exists:users,uuid',
                 Rule::unique('users', 'uuid')->ignore($id),
             ],
-            'name'         => 'required|string',
-            'charge_status'         => 'required|boolean',
-            'transfer_salary'         => 'required|boolean',
-            'can_play'         => 'required|integer|in:0,2,3',
-            'country_id'         => 'nullable|integer|exists:countries,id',
+            'name' => 'required|string',
+            'charge_status' => 'required|boolean',
+            'transfer_salary' => 'required|boolean',
+            'can_play' => 'required|integer|in:0,2,3',
+            'country_id' => 'nullable|integer|exists:countries,id',
             'user_diamond' => 'nullable|integer',
             'total_sender_level' => 'nullable|integer',
             'total_received_level' => 'nullable|integer',
@@ -1337,8 +1356,8 @@ class UserController extends Controller
             'avatar' => 'nullable',
             'image_id' => 'nullable',
             'gender' => 'nullable',
-            'show_invite_code'         => 'required|boolean',
-            'hide_chat'         => 'required|boolean',
+            'show_invite_code' => 'required|boolean',
+            'hide_chat' => 'required|boolean',
 
         ]);
         if ($validator->fails()) {
@@ -1372,7 +1391,7 @@ class UserController extends Controller
     public function myData($id)
     {
         try {
-            $user  = $this->userService->showDataUser($id);
+            $user = $this->userService->showDataUser($id);
 
             return Common::apiResponse(true, 'done', new MyDataUtdResource($user));
         } catch (Exception $exception) {
@@ -1385,7 +1404,7 @@ class UserController extends Controller
     {
         try {
             $data = $this->userService->userSalary($id, $request->month, $request->year);
-            return Common::apiResponse(true, 'done',  $data);
+            return Common::apiResponse(true, 'done', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -1407,7 +1426,7 @@ class UserController extends Controller
     {
         try {
             $data = $this->userService->userPacks($request->type, $id, $request->per_page, $request->page);
-            return Common::apiResponse(true, 'done',  UserPackUtdResource::collection($data));
+            return Common::apiResponse(true, 'done', UserPackUtdResource::collection($data));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -1484,7 +1503,7 @@ class UserController extends Controller
 
     public function userLevels(Request $request)
     {
-        $user         = $request->user();
+        $user = $request->user();
         $data = $this->userService->userChargeLevel($user);
         return Common::apiResponse(true, 'success', $data);
     }
@@ -1506,7 +1525,8 @@ class UserController extends Controller
     public function dataUser(Request $request)
     {
         $id = $request->id;
-        if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
+        if (!$id)
+            return Common::apiResponse(0, __('api_responses.validation_error'), 400);
 
         return Cache::remember("data_user_{$id}", 600, function () use ($id) {
             $data = $this->userService->dataUser($id);

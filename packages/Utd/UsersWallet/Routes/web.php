@@ -19,7 +19,9 @@
 use Utd\UsersWallet\Http\Controllers\Web\UserWithdrawalController;
 use Utd\UsersWallet\Http\Controllers\Web\WalletFieldController;
 use Utd\UsersWallet\Http\Controllers\Web\WalletTemplateController;
-
+use Utd\UsersWallet\Http\Controllers\Web\WithdrawController;
+use Utd\UsersWallet\Http\Controllers\Api\CoreWalletsController;
+use Utd\UsersWallet\Http\Controllers\Web\ExchangeController;
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -40,6 +42,31 @@ Route::group(
 
 
         Route::resource('wallet-templates', WalletTemplateController::class);
+
+        Route::prefix('withdraw-types')->group(function () {
+            Route::get('/', [WithdrawController::class, 'index']);
+            Route::post('/create', [WithdrawController::class, 'store']);
+            Route::post('/update/{id}', [WithdrawController::class, 'update']);
+            Route::post('/delete/{id}', [WithdrawController::class, 'delete']);
+            Route::post('/delete-all', [WithdrawController::class, 'delete_all']);
+            Route::get('/{id}', [WithdrawController::class, 'show']);
+        });
+
+        Route::prefix('core-wallets')->group(function () {
+            Route::get('/all', [CoreWalletsController::class, 'index']);
+            Route::post('/create', [CoreWalletsController::class, 'store']);
+            Route::post('/update', [CoreWalletsController::class, 'update']);
+            Route::post('/show/{id}', [CoreWalletsController::class, 'show']);
+            Route::delete('delete/{id}', [CoreWalletsController::class, 'delete']);
+        });
+
+        Route::prefix('exchanges')->group(function () {
+            Route::get('/', [ExchangeController::class, 'all']);
+            Route::get('/show/{id}', [ExchangeController::class, 'show']);
+            Route::post('/create', [ExchangeController::class, 'create']);
+            Route::post('/update/{id}', [ExchangeController::class, 'update']);
+            Route::delete('/delete/{id}', [ExchangeController::class, 'destroy']);
+        });
 
         Route::prefix('wallet-fields/{wallet_template_id}')->group(function () {
             Route::get('/', [WalletFieldController::class, 'index'])->name('wallet-fields.index');

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Dashboard\Wallet;
 
 use App\Http\Controllers\Controller;
-use App\Models\CoreWallet;
+use Utd\UsersWallet\Entities\CoreWallet;
 use Illuminate\Http\Request;
 
 class AdminCoreWalletController extends Controller

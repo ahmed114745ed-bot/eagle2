@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tik\Services;
+namespace Utd\UsersWallet\Services;
 
 use App\Helpers\Common;
 use App\Tik\Repositories\CoreWalletsRepository;

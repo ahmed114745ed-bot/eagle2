@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace Utd\UsersWallet\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class WalletTransactionBackup extends Model
+class WalletTransaction extends Model
 {
     use TimestampsWithTimezone;
 
@@ -16,11 +16,17 @@ class WalletTransactionBackup extends Model
         'value',
         'description',
         'description_data',
-        'original_created_at',
+        'transactions_type',
+        'message',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function wallet(): BelongsTo
+    {
+        return $this->belongsTo(UserWallet::class, 'user_id', 'user_id');
     }
 }

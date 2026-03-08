@@ -11,7 +11,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
 use App\Jobs\LogUserCumulativeCoinProfit;
-use App\Models\CoreWallet;
+use Utd\UsersWallet\Entities\CoreWallet;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;

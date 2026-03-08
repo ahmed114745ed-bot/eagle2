@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace Utd\UsersWallet\Http\Controllers\Api;
 
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
-use App\Tik\Services\CoreWalletsService;
+use Utd\UsersWallet\Services\CoreWalletsService;
 use Illuminate\Support\Facades\Validator;
 
 

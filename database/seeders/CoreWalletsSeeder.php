@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\CoreWallets;
+use Utd\UsersWallet\Entities\CoreWallets;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 

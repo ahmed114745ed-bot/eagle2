@@ -75,13 +75,11 @@ class UsersWalletServiceProvider extends ServiceProvider
     {
         // Web Routes
         Route::middleware('web')
-            ->namespace($this->namespace)
             ->group(__DIR__ . '/../Routes/web.php');
 
         // API Routes
         Route::prefix('api')
             ->middleware('api')
-            ->namespace($this->namespace)
             ->group(__DIR__ . '/../Routes/api.php');
     }
 

@@ -3,7 +3,7 @@
 namespace Utd\UsersWallet\Repositories\Eloquent;
 
 
-use App\Models\Exchange;
+use Utd\UsersWallet\Entities\Exchange;
 use App\Tik\Repositories\AbstractRepository;
 
 class ExchangeRepository extends AbstractRepository

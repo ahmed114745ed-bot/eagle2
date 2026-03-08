@@ -9,7 +9,7 @@ use App\Models\Agency;
 
 use App\Models\GiftLog;
 use Utd\Vip\Entities\UserVip;
-use App\Models\ExchangeLog;
+use Utd\UsersWallet\Entities\ExchangeLog;
 use App\Models\AgencySallary;
 use App\Support\PackageHelper;
 use Illuminate\Database\Seeder;

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Dashboard\Charing;
 
 use App\Http\Controllers\Controller;
-use App\Models\Exchange;
+use Utd\UsersWallet\Entities\Exchange;
 use Illuminate\Http\Request;
 
 class AdminCharingExchangesController extends Controller

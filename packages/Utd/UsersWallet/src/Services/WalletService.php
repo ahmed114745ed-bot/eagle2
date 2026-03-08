@@ -2,7 +2,7 @@
 
 namespace Utd\UsersWallet\Services;
 
-use App\Models\WalletTransaction;
+use Utd\UsersWallet\Entities\WalletTransaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Exception;

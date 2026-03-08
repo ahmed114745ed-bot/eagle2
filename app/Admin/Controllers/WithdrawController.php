@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\PaymentWithdrawType;
+use Utd\UsersWallet\Entities\PaymentWithdrawType;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

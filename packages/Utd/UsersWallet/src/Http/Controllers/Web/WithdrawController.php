@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\UsersWallet\Http\Controllers\Web;
 
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Models\PaymentWithdrawType;
+use Utd\UsersWallet\Entities\PaymentWithdrawType;
 use App\Http\Controllers\Controller;
-use App\Models\PaymentWithdrawField;
+use Utd\UsersWallet\Entities\PaymentWithdrawField;
 
 class WithdrawController extends Controller
 {

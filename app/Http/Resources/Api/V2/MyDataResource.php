@@ -47,16 +47,16 @@ class MyDataResource extends JsonResource
 
             if ($cur_level) {
                 $lev = [
-                    'level_exp' => (int)($cur_level->exp ?? 0),
+                    'level_exp' => (int) ($cur_level->exp ?? 0),
                     'level_name' => $cur_level->name ?? '',
                     'level_img' => $cur_level->img ?? '',
-                    'family_exp' => (int)$giftLogs,
-                    'over_current_level_exp' => (int)$over,
-                    'next_exp' => (int)($next_level->exp ?? 0),
+                    'family_exp' => (int) $giftLogs,
+                    'over_current_level_exp' => (int) $over,
+                    'next_exp' => (int) ($next_level->exp ?? 0),
                     'next_name' => $next_level->name ?? null,
                     'next_img' => $next_level->img ?? null,
-                    'per' => $diff == 0 ? 0 : (double)($over / $diff),
-                    'rem' => (int)($diff - $over)
+                    'per' => $diff == 0 ? 0 : (double) ($over / $diff),
+                    'rem' => (int) ($diff - $over)
                 ];
             }
 
@@ -129,10 +129,10 @@ class MyDataResource extends JsonResource
         $show_user_setting = $this->userSetting;
         if ($show_user_setting == null) {
             $show_user_setting = UserSetting::firstOrCreate(['user_id' => $this->id], [
-                    'show_git' => 1,
-                    'show_intro' => 1,
-                    'show_banner' => 1,
-                ]);
+                'show_git' => 1,
+                'show_intro' => 1,
+                'show_banner' => 1,
+            ]);
         }
 
         $achievement_images = [];
@@ -148,7 +148,7 @@ class MyDataResource extends JsonResource
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
             'name' => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid,
-            'phone' => (string)@$this->phone ?: '',
+            'phone' => (string) @$this->phone ?: '',
             'frame' => $frame,
             'intro' => $intro,
             'intro_type' => @$TypeIntro?->image_type ?? '',
@@ -156,11 +156,11 @@ class MyDataResource extends JsonResource
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
             'frame_id' => $frame ? @$this->dress_1 : 0,
             'intro_id' => $intro ? @$this->dress_3 : 0,
-            'is_first' => (bool)$this->is_points_first,
-            'is_agency_request' => AgencyPackageHelper::isAgencyInstalled() ? (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count() : false,
+            'is_first' => (bool) $this->is_points_first,
+            'is_agency_request' => AgencyPackageHelper::isAgencyInstalled() ? (bool) $this->agencyJoinRequest->where('status', '!=', 2)->count() : false,
             'has_room' => $this->hasRoom(),
-            'google_bind' => (bool)@$this->google_id,
-            'phone_bind' => (bool)@$this->phone,
+            'google_bind' => (bool) @$this->google_id,
+            'phone_bind' => (bool) @$this->phone,
             'vip' => Common::ovip_center($this),
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
@@ -172,14 +172,16 @@ class MyDataResource extends JsonResource
             'profile' => new ProfileResource(@$this->profile),
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
-            'game_Available' => (bool)UserHandling::chickLevelToPlay($this->resource),
-            'my_store' => [
-                'id' => $this->id,
-                'coins' => (int)$this->di,
-                'diamonds' => $this->monthly_diamond_received,
-                'silver_coins' => $this->gold,
-                'usd' => (double)$this->sallary,
-            ],
+            'game_Available' => (bool) UserHandling::chickLevelToPlay($this->resource),
+            $this->mergeWhen(\App\Support\PackageHelper::isInstalled('usersWallet'), [
+                'my_store' => [
+                    'id' => $this->id,
+                    'coins' => (int) $this->di,
+                    'diamonds' => $this->monthly_diamond_received,
+                    'silver_coins' => $this->gold,
+                    'usd' => (double) $this->sallary,
+                ]
+            ]),
             'family_data' => $f,
             'agency' => $agency_joined,
             'Last_seen' => @$time_log->time ?? 0,

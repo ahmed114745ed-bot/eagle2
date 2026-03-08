@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\UserWallet;
+use Utd\UsersWallet\Entities\UserWallet;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;

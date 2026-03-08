@@ -16,7 +16,7 @@ use App\Http\Resources\Api\V1\RecevingReportResource;
 use App\Http\Resources\Api\V1\RechargeCoinsReportResource;
 use App\Models\Charge;
 use App\Models\CoinLog;
-use App\Models\ExchangeLog;
+use Utd\UsersWallet\Entities\ExchangeLog;
 use Utd\DailyPrize\Entities\DailyUserGift;
 use Utd\Events\Entities\WinnerReward;
 use App\Support\PackageHelper;

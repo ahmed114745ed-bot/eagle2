@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Utd\UsersWallet\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;

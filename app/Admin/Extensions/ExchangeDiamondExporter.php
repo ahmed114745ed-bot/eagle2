@@ -4,7 +4,7 @@ namespace App\Admin\Extensions;
 
 use Carbon\Carbon;
 
-use App\Models\ExchangeLog;
+use Utd\UsersWallet\Entities\ExchangeLog;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 

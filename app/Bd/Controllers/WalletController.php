@@ -16,12 +16,12 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\BDSallary;
-use App\Models\UserWallet;
+use Utd\UsersWallet\Entities\UserWallet;
 use Illuminate\Http\Request;
 use Utd\Agency\Entities\ShippingAgency;
 use App\Services\WalletService;
 use Encore\Admin\Layout\Content;
-use App\Models\WalletTransaction;
+use Utd\UsersWallet\Entities\WalletTransaction;
 use App\Services\BDChargeService;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
@@ -77,7 +77,7 @@ class WalletController extends MainController
      */
     protected function grid()
     {
-        $grid = new Grid(new \App\Models\WalletTransaction());
+        $grid = new Grid(new \Utd\UsersWallet\Entities\WalletTransaction());
 
         $currentUserId = \Auth::user()->id;
         $grid->model()->where('user_id', $currentUserId);

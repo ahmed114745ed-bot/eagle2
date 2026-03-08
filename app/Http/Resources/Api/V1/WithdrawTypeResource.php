@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Models\UserPaymentWithdraw;
+use Utd\UsersWallet\Entities\UserPaymentWithdraw;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 

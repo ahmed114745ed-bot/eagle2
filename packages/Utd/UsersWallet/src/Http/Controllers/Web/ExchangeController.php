@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\UsersWallet\Http\Controllers\Web;
 
 use Exception;
 use App\Helpers\Common;

@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Helpers\AgencyPackageHelper;
-use App\Models\WalletTransaction;
+use Utd\UsersWallet\Entities\WalletTransaction;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;

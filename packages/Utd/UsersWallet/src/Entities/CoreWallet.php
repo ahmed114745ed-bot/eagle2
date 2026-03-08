@@ -1,19 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace Utd\UsersWallet\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ExchangeLog extends Model
+class CoreWallet extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $guarded = [];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+    protected $fillable = [
+        'coins',
+    ];
 }

@@ -7,9 +7,9 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\AdminUser;
-use App\Models\CoreWallets;
+use Utd\UsersWallet\Entities\CoreWallets;
 use Encore\Admin\Layout\Content;
-use App\Models\CoreWalletTransaction;
+use Utd\UsersWallet\Entities\CoreWalletTransaction;
 use Encore\Admin\Controllers\AdminController;
 
 class CoreWalletTransactionController extends MainController

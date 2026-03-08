@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\CoreWallets;
+use Utd\UsersWallet\Entities\CoreWallets;
 
 class CoreWalletsRepository extends AbstractRepository
 {

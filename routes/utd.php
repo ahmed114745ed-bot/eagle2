@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\ConfigController;
-use App\Http\Controllers\Api\V1\CoreWalletsController;
+
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\GiftLogController;
@@ -42,7 +42,7 @@ use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\EmojiController;
-use App\Http\Controllers\utd\ExchangeController;
+use Utd\UsersWallet\Http\Controllers\Web\ExchangeController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\ImageController;
@@ -66,9 +66,9 @@ use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\utd\SallariesHistoryController;
 use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\utd\TicketController;
-use App\Http\Controllers\utd\WithdrawController;
+
 use Illuminate\Support\Facades\Route;
-use Utd\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
+
 use Utd\Events\Http\Controllers\Utd\EventPeriodController;
 use Utd\Events\Http\Controllers\Utd\RoleEventController;
 use Utd\Events\Http\Controllers\Utd\TargetEventController;
@@ -247,16 +247,6 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [PaymentGateWayController::class, 'delete']);
         Route::post('/delete-all', [PaymentGateWayController::class, 'delete_all']);
         Route::get('/{id}', [PaymentGateWayController::class, 'show']);
-    });
-
-
-    Route::prefix('withdraw-types')->group(function () {
-        Route::get('/', [WithdrawController::class, 'index']);
-        Route::post('/create', [WithdrawController::class, 'store']);
-        Route::post('/update/{id}', [WithdrawController::class, 'update']);
-        Route::post('/delete/{id}', [WithdrawController::class, 'delete']);
-        Route::post('/delete-all', [WithdrawController::class, 'delete_all']);
-        Route::get('/{id}', [WithdrawController::class, 'show']);
     });
 
     Route::prefix('agency-country')->group(function () {
@@ -475,14 +465,6 @@ Route::middleware([])->group(function () {
         Route::post('/create', [addTOjesonController::class, 'create']);
         Route::get('/show', [addTOjesonController::class, 'show']);
     });
-    //CoreWallets
-    Route::prefix('core-wallets')->group(function () {
-        Route::get('/all', [CoreWalletsController::class, 'index']);
-        Route::post('/create', [CoreWalletsController::class, 'store']);
-        Route::post('/update', [CoreWalletsController::class, 'update']);
-        Route::post('/show/{id}', [CoreWalletsController::class, 'show']);
-        Route::delete('delete/{id}', [CoreWalletsController::class, 'delete']);
-    });
 
     //coin
     Route::prefix('coins')->group(function () {
@@ -615,14 +597,6 @@ Route::middleware([])->group(function () {
         Route::post('/create', [SilverController::class, 'create']);
         Route::post('/update/{id}', [SilverController::class, 'update']);
         Route::delete('/delete/{id}', [SilverController::class, 'destroy']);
-    });
-
-    Route::prefix('exchanges')->group(function () {
-        Route::get('/', [ExchangeController::class, 'all']);
-        Route::get('/show/{id}', [ExchangeController::class, 'show']);
-        Route::post('/create', [ExchangeController::class, 'create']);
-        Route::post('/update/{id}', [ExchangeController::class, 'update']);
-        Route::delete('/delete/{id}', [ExchangeController::class, 'destroy']);
     });
     Route::get('codes', [UserController::class, 'allCodes']);
 

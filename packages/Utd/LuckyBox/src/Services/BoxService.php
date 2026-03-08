@@ -7,7 +7,7 @@ use App\Events\SuperLuckyBox;
 use App\Facades\RedisService;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use App\Models\CoreWallet;
+use Utd\UsersWallet\Entities\CoreWallet;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;

@@ -15,7 +15,11 @@ use Illuminate\Support\Str;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 use Utd\Gifts\Entities\LuckyGift;
-use Utd\Gifts\Support\ClassResolver;
+use App\Models\Setting;
+use App\Helpers\Common;
+use Utd\Gifts\Actions\MoveGiftCategory;
+use Utd\Gifts\Actions\MoveGroupsGifts;
+use App\Admin\Forms\TabsFrom;
 
 /**
  * GiftController
@@ -73,11 +77,10 @@ class GiftController
 
     public function luckyGiftSettings(Content $content)
     {
-        if (! Admin::user()->can('*')) {
+        if (!Admin::user()->can('*')) {
             Permission::check('browse-lucky-gift-setting');
         }
-        $SettingModel = ClassResolver::model('setting');
-        $config = $SettingModel::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
 
         return $content->view('lucky_gift', compact('config'));
     }
@@ -108,7 +111,7 @@ class GiftController
         $grid->model()
             ->with('vip')
             ->where('type', '!=', 8)
-            ->when($filterType !== 'all', fn ($q) => $q->where('gift_category_id', $filterType))
+            ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
             ->orderBy('use_count', 'desc')
             ->orderBy('type')
             ->orderByRaw('ISNULL(`sort`), `sort`')
@@ -156,9 +159,8 @@ class GiftController
         }
 
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
-            $CommonHelperClass = ClassResolver::helper('common');
-            if ($CommonHelperClass) {
-                $grid->column('enable', trans('enable'))->switch($CommonHelperClass::getSwitchStates());
+            if (class_exists(Common::class)) {
+                $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
             }
         }
 
@@ -167,7 +169,7 @@ class GiftController
 
             return "
             <div style='display: flex; align-items: center; gap: 5px;'>
-                <span>".number_format($coin)."</span>
+                <span>" . number_format($coin) . "</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>
         ";
@@ -176,7 +178,7 @@ class GiftController
         $grid->column('img', trans('image'))->display(function ($path) {
             $imgPath = getImagePath($path) ?: asset('images/image.png');
             $musicIcon = $this->music_gift === 1
-                ? "<img src='".asset('images/music.jpg')."'
+                ? "<img src='" . asset('images/music.jpg') . "'
                 style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
                 background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>"
                 : '';
@@ -206,20 +208,19 @@ class GiftController
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if ((Admin::user()->can('move-switch-'.$permission) || Admin::user()->can('*'))
+            if (
+                (Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
                 && $model->category?->type !== null
             ) {
-                $MoveGiftCategoryAction = ClassResolver::action('move_gift_category');
-                if ($MoveGiftCategoryAction && class_exists($MoveGiftCategoryAction)) {
-                    $actions->add(new $MoveGiftCategoryAction());
+                if (class_exists(MoveGiftCategory::class)) {
+                    $actions->add(new MoveGiftCategory());
                 }
             }
         });
         $grid->batchActions(function ($batch) {
             $batch->disableDelete();
-            $MoveGroupsGiftsAction = ClassResolver::action('move_groups_gifts');
-            if ($MoveGroupsGiftsAction && class_exists($MoveGroupsGiftsAction)) {
-                $batch->add(new $MoveGroupsGiftsAction());
+            if (class_exists(MoveGroupsGifts::class)) {
+                $batch->add(new MoveGroupsGifts());
             }
         });
 
@@ -242,8 +243,7 @@ class GiftController
      */
     protected function form($id = null)
     {
-        $TabsFromClass = ClassResolver::form('tabs_from');
-        $form = new $TabsFromClass(new Gift);
+        $form = new TabsFrom(new Gift);
 
         // Disable default form tools
         $form->tools(function ($tools) {
@@ -267,14 +267,13 @@ class GiftController
         ]));
 
         $form->currency('price', __('price'))->symbol('💎');
-        $CommonHelperClass = ClassResolver::helper('common');
-        if ($CommonHelperClass) {
-            $form->switch('enable', __('enable'))->states($CommonHelperClass::getSwitchStates());
+        if (class_exists(Common::class)) {
+            $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
         }
 
         $form->file('img', __('img'));
         $form->file('show_img', __('show_img'))->name(function ($file) {
-            return 'svga_'.Str::random(6).'.'.$file->getClientOriginalExtension();
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         })->required();
         $form->select('image_type', __('image_type'))->options(
             [
@@ -285,9 +284,8 @@ class GiftController
             ]
         )->required();
 
-        $CommonHelperClass = ClassResolver::helper('common');
-        if ($CommonHelperClass) {
-            $form->switch('music_gift', trans('music_gift'))->states($CommonHelperClass::getSwitchStatesGiftMucic());
+        if (class_exists(Common::class)) {
+            $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
         }
 
         // Before saving, handle validations and model fields

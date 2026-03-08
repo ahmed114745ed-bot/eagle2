@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Models;
+namespace Utd\UsersWallet\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PaymentWithdrawField extends Model
+class UserPaymentWithdraw extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
     protected $guarded = [];
 
-    public function withdrawType()
+    public function payment_withdraw_type()
     {
-        return $this->belongsTo(PaymentWithdrawType::class, 'payment_withdraw_type_id');
+        return $this->belongsTo(PaymentWithdrawType::class)->with('userWithdrawFields');
     }
 }

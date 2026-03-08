@@ -2,8 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\CoreWallets;
-use App\Models\CoreWalletTransaction;
+use Utd\UsersWallet\Entities\CoreWallets;
+use Utd\UsersWallet\Entities\CoreWalletTransaction;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;

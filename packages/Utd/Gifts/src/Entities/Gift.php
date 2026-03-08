@@ -4,7 +4,6 @@ namespace Utd\Gifts\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Utd\Gifts\Support\ModelResolver;
 
 class Gift extends Model
 {
@@ -26,13 +25,11 @@ class Gift extends Model
 
     public function moments()
     {
-        $momentModel = ModelResolver::getMomentModel();
-
-        if (! $momentModel) {
-            return ModelResolver::emptyRelation($this);
+        if (!\App\Support\PackageHelper::isInstalled('moments')) {
+            return $this->belongsTo(static::class, 'id', 'id')->whereRaw('1 = 0');
         }
 
-        return $this->belongsToMany($momentModel, 'moment_user_gifts')
+        return $this->belongsToMany(\Utd\Moments\Entities\Moment::class, 'moment_user_gifts')
             ->withPivot('num', 'created_at', 'updated_at')
             ->withTimestamps();
     }
@@ -44,24 +41,16 @@ class Gift extends Model
 
     public function vip()
     {
-        $vipModel = ModelResolver::getVipModel();
-
-        if (! $vipModel) {
-            return ModelResolver::emptyRelation($this);
+        if (!\App\Support\PackageHelper::isInstalled('vip')) {
+            return $this->belongsTo(static::class, 'id', 'id')->whereRaw('1 = 0');
         }
 
-        return $this->hasOne($vipModel, 'id', 'vip_level');
+        return $this->hasOne(\Utd\Vip\Entities\OVip::class, 'id', 'vip_level');
     }
 
     public function users()
     {
-        $userModel = ModelResolver::getUserModel();
-
-        if (! $userModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsToMany($userModel, 'user_gifts')
+        return $this->belongsToMany(\App\Models\User::class, 'user_gifts')
             ->withPivot('quantity', 'expire')
             ->withTimestamps();
     }
@@ -104,8 +93,7 @@ class Gift extends Model
     {
         parent::boot();
 
-        $achievementTrait = ModelResolver::getTrait('achievement_gift');
-        if ($achievementTrait) {
+        if (trait_exists(\App\Traits\AchievementGift::class)) {
             static::addGlobalScope(function ($builder) {});
         }
     }
