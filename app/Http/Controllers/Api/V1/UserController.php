@@ -1529,7 +1529,7 @@ class UserController extends Controller
             $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
         }
 
-        $expPercentages = Config::get('exp_percentages') ?? [1, 1];
+        $expPercentages = \Illuminate\Support\Facades\Config::get('exp_percentages') ?? [1, 1];
         $multiplier = $expPercentages['exp_sender_percentage'] ?? 0.2;
 
         if ($secondLevel != null && $currentLevel != null) {

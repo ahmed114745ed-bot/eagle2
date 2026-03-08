@@ -138,8 +138,6 @@ class ChargeController extends Controller
 
             DB::commit();
 
-            $notificationToken[] = DB::table('users')->where('id', $to->id)->value('notification_id');
-
             $title = 'Coins Received';
             $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
 
@@ -149,8 +147,6 @@ class ChargeController extends Controller
                 $body,
                 ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
             );
-
-            Common::send_firebase_notification($notificationToken, $title, $body);
 
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
@@ -336,8 +332,6 @@ class ChargeController extends Controller
             UserCommon::addChargeLevel($receiver->id, $amount);
             $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
 
-            $notificationToken[] = DB::table('users')->where('id', $receiver->id)->value('notification_id');
-
             $title = 'Balance Recharged';
             $body = 'Your balance has been recharged with :usd coins by :name.';
 
@@ -347,8 +341,6 @@ class ChargeController extends Controller
                 $body,
                 ['usd' => $amount, 'name' => $user->name,]
             );
-
-            Common::send_firebase_notification($notificationToken, $title, $body);
 
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
