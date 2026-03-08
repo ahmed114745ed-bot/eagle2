@@ -10,7 +10,7 @@ use App\Helpers\Common;
 use App\Models\CoinLog;
 use Encore\Admin\Admin;
 use App\Helpers\UserCommon;
-use App\Models\ExchangeLog;
+use  App\Models\ExchangeLog;
 use App\Models\PaymentCoin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
@@ -711,9 +711,10 @@ class ChargeReportController extends MainController
 
         $grid->column('coin.usd', __('dollar'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg');
+            $coin = $coin ?? $this->paid_usd;
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" .$coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>
             ";
