@@ -1672,7 +1672,8 @@ Route::get('/fix-paid-usd', function () {
     $skipped = 0;
 
     foreach ($logs as $log) {
-        $coin = Coin::find($log->product_id); 
+
+        $coin = Coin::where('coin',$log->obtained_coins) ->first(); 
 
         if ($coin) {
             $log->paid_usd = $coin->usd;
