@@ -6,6 +6,7 @@ use App\Contracts\MomentContract;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Utd\Moments\Helpers\CustomNotification;
 use Utd\Moments\Services\MomentService;
 
 class MomentsServiceProvider extends ServiceProvider
@@ -20,6 +21,8 @@ class MomentsServiceProvider extends ServiceProvider
         //        $this->mergeConfigFrom(__DIR__ . '/../Config/moments.php', 'moments');
 
         $this->app->singleton(MomentContract::class, MomentService::class);
+
+        $this->app->bind('MomentCustomNotification', fn ($app) => new CustomNotification());
     }
 
     /**

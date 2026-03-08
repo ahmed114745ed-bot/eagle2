@@ -2,7 +2,7 @@
 
 namespace Utd\Moments\Http\Controllers;
 
-use App\Facades\CustomNotification;
+use Utd\Moments\Facades\CustomNotification;
 use App\Helpers\Common;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;

@@ -5,7 +5,7 @@ namespace Utd\Moments\Http\Controllers;
 use App\Contracts\GiftsContract;
 use App\Enums\UserDiamondLogType;
 use App\Exceptions\NotInfMoneyException;
-use App\Facades\CustomNotification;
+use Utd\Moments\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Helpers\UserDiamondLogHelper;
 use App\Models\User;
