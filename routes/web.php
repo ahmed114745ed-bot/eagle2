@@ -231,6 +231,18 @@ Route::get('/run-seeders', function () {
     ]);
 });
 
+Route::get('/run-permission', function () {
+
+    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+
+
 Route::get('/badge-seeders', function () {
 
     // Run multiple seeders one by one
