@@ -14,6 +14,8 @@
     "Operation log": "Operation Log",
     "App": "Application",
     "Email": "Email",
+      "Super Roles":"Roles",
+    "Browse super roles":"Browse Roles",
     "server_secret_key": "server secret key",
     "server_secret": "server secret",
     "Browse change country request": "Browse country request",
