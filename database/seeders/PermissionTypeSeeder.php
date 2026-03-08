@@ -201,12 +201,12 @@ class PermissionTypeSeeder extends Seeder
 
                         ],
                     ],
-                     [
-                        'key' => 'roles',
+                    [ 
+                        'key' => 'super-roles',
                         'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => ['super-roles'],
+                        'additional' => [],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse',],
+                            PermissionType::ADMIN->value => ['browse'],
                         ],
                     ],
                 ],
@@ -278,7 +278,7 @@ class PermissionTypeSeeder extends Seeder
 
                 ],
             ],
-           
+
 
             [
                 'name' => 'Wallet',
@@ -584,7 +584,7 @@ class PermissionTypeSeeder extends Seeder
 
                 ],
             ],
-             [
+            [
                 'name' => 'host level',
                 'sort' => 22,
                 'types' => [
@@ -661,8 +661,8 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'Payment-methods-for-shipping-agencies', 'except' => ['browse', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['create', 'edit', 'delete'],
                     ],],
-                    ['key' => 'salary-payment-countries', 'except' => [ 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse','create', 'edit', 'delete'],
+                    ['key' => 'salary-payment-countries', 'except' => ['show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
                     ],],
                 ],
             ],
