@@ -201,6 +201,14 @@ class PermissionTypeSeeder extends Seeder
 
                         ],
                     ],
+                     [
+                        'key' => 'roles',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['super-roles'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse',],
+                        ],
+                    ],
                 ],
             ],
             [
