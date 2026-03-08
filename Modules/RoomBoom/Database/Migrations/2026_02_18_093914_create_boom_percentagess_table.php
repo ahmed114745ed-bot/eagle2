@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('boom_percentages', function (Blueprint $table) {
-            $table->id();
-            $table->integer('percentage');
-            $table->string('image')->nullable();
-            $table->string('image_type')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('boom_percentages')) {
+            Schema::create('boom_percentages', function (Blueprint $table) {
+                $table->id();
+                $table->integer('percentage');
+                $table->string('image')->nullable();
+                $table->string('image_type')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
