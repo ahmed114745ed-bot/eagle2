@@ -122,6 +122,7 @@ class WeeklyCpGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        $grid->disableExport();
         return $grid;
     }
 
@@ -164,6 +165,7 @@ class WeeklyCpGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        $grid->disableExport();
 
         return $grid;
     }
@@ -207,7 +209,7 @@ class WeeklyCpGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
-
+        $grid->disableExport();
         return $grid;
     }
 

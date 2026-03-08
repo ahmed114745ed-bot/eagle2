@@ -36,6 +36,7 @@ use App\Admin\Actions\ChangeUsersAgencyAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
 use Encore\Admin\Controllers\HasResourceActions;
 
+
 class AgencyController extends MainController
 {
     use HasResourceActions;
@@ -837,7 +838,7 @@ class AgencyController extends MainController
                 if ($defaultBd) {
                     $form->bd_id = $defaultBd->id;
                 } else {
-                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                    throw new \Exception(__('dashboard.no_default_bd_to_transfer_agencies'));
                 }
             }
             $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
@@ -889,7 +890,7 @@ class AgencyController extends MainController
 
             $user = User::find($appOwnerId);
 
-            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
+
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
@@ -1077,7 +1078,6 @@ class AgencyController extends MainController
         }
         // add vip to user
         // UserCommon::userVip($user,'acceptJoin');
-        MilestoneHelper::grantMilestoneToUser($user, 'host');
         CustomNotification::acceptAgencyApp($agency, $user);
 
         return  response()->json([
@@ -1133,14 +1133,11 @@ class AgencyController extends MainController
 
         MilestoneHelper::removeReward($user, 'host');
 
-
         return response()->json([
             'status' => true,
             'message' => __('done')
         ]);
     }
-
-
 
     public function rejectJoin($id)
     {

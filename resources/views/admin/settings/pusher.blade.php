@@ -6,9 +6,9 @@
             <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4 settings-form">
                 @csrf
                 <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                <div class="card p-3 shadow" style="height: 450px;">
+                <div class="card p-3 shadow pusher-settings-form" style="">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="m-0">{{ __('pusher') }}</h4>
+                        <h4 class="m-0 color-white">{{ __('pusher') }}</h4>
                         <div class="d-flex align-items-center">
                             <input type="radio" id="pusherRadio" class="custom-radio pusherLib"
                                    name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
@@ -47,7 +47,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-5 btn-save">
+                    <button type="submit" class="btn btn-primary mt-5 pusher-btn0bottom">
                         <i class="fas fa-save"></i> {{ __('save') }}
                     </button>
                 </div>
@@ -58,9 +58,9 @@
             <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4 settings-form">
                 @csrf
                 <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                <div class="card p-3 shadow" style="height: 450px;">
+                <div class="card p-3 shadow pusher-settings-form" style="">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="m-0">{{ __('firebase') }}</h4>
+                        <h4 class="m-0 color-white">{{ __('firebase') }}</h4>
                         <div class="ribbon-banner-card">
                             <span>{{ __('soon') }}</span>
                         </div>
@@ -96,7 +96,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-5 btn-save">
+                    <button type="submit" class="btn btn-primary mt-5 pusher-btn0bottom">
                         <i class="fas fa-save"></i> {{ __('save') }}
                     </button>
                 </div>
@@ -107,9 +107,9 @@
             <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="settings-form">
                 @csrf
                 <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                <div class="card p-3 shadow" style="height: 450px;">
+                <div class="card p-3 shadow pusher-settings-form" style="">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="m-0">{{ __('supabase') }}</h4>
+                        <h4 class="m-0 color-white">{{ __('supabase') }}</h4>
                         <div class="ribbon-banner-card">
                             <span>{{ __('soon') }}</span>
                         </div>
@@ -145,7 +145,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-5 btn-save">
+                    <button type="submit" class="btn btn-primary mt-5 pusher-btn0bottom">
                         <i class="fas fa-save"></i> {{ __('save') }}
                     </button>
                 </div>

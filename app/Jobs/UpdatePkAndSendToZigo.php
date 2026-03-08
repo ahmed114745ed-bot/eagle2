@@ -11,8 +11,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-
-
 class UpdatePkAndSendToZigo implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -35,10 +33,10 @@ class UpdatePkAndSendToZigo implements ShouldQueue
     {
 
         $this->receivedIds = $receivedIds;
-        $this->totalPrice  = $totalPrice;
-        $this->room        = $room;
-        $this->userId      = $userId;
-        $this->roomId      = $roomId;
+        $this->totalPrice = $totalPrice;
+        $this->room = $room;
+        $this->userId = $userId;
+        $this->roomId = $roomId;
     }
 
 
@@ -49,11 +47,12 @@ class UpdatePkAndSendToZigo implements ShouldQueue
      */
     public function handle()
     {
-
-        /*$lastPk =
-            Pk::query()->where('room_id', $this->roomId)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first();*/
-
+        \Log::info("DEBUG: UpdatePkAndSendToZigo handle started", ['room_id' => $this->roomId]);
         $lastPk = Room::select(['id'])->where('id', $this->roomId)->first()?->lastPk;
+        if (!$lastPk) {
+            \Log::info("DEBUG: UpdatePkAndSendToZigo - lastPk is null, skipping", ['room_id' => $this->roomId]);
+            return;
+        }
         (new SendGiftService())->updatePkScoresAndSendToZegoJob($lastPk, $this->userId, $this->roomId, $this->receivedIds, $this->totalPrice, $this->room);
     }
 

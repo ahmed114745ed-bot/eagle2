@@ -2,19 +2,22 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Admin;
-use App\Models\Agent;
-use App\Models\Agency;
-use App\Models\Charge;
-use App\Helpers\Common;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
-use Modules\SuperAdmin\Entities\SuperAdmin;
+use App\Helpers\Common;
+use App\Models\Admin;
+use App\Models\Agency;
+use App\Models\Agent;
+use App\Models\Charge;
+use App\Models\User;
+use Encore\Admin\Layout\Content;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Modules\AreaManager\Entities\SubAreaManager;
-use Modules\RoleRewards\Actions\DeleteSubSuperAdmin;
 use Modules\AreaManager\Http\Controllers\EncorUsersController;
+use Modules\RoleRewards\Actions\DeleteSubAreaManager;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 
 
@@ -45,7 +48,7 @@ class AdminUserController extends EncorUsersController
 
         $grid->actions(function ($actions) {
             $actions->disableDelete();
-            $actions->add(new DeleteSubSuperAdmin());
+            $actions->add(new DeleteSubAreaManager());
         });
         $grid->disableExport();
         $grid->tools(function ($tools) {
@@ -128,8 +131,65 @@ class AdminUserController extends EncorUsersController
             ->title(__($this->title))
             ->body($this->profile($id));
     }
+    public function showSubSuperAdmin($id)
+    {
+        $subSuperAdmin = SubAreaManager::with('appUser')->find($id);
 
+        if (!$subSuperAdmin) {
+            return response()->json([
+                'status' => 404,
+                'message' => trans('message.notFoundGift'),
+            ]);
+        }
 
+        // Build a payload that includes the linked app user display name
+        $item = $subSuperAdmin->toArray();
+        $item['app_user_name'] = null;
+        if ($subSuperAdmin->appUser) {
+            $appUser = $subSuperAdmin->appUser;
+            $display = trim(($appUser->name ?? '') . ' - ' . ($appUser->uuid ?? ''));
+            $item['app_user_name'] = $display;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'item' => $item,
+        ]);
+    }
+
+    public function updateSubSuperAdmin(Request $request,)
+    {
+
+        $subSuperAdmin = SubAreaManager::find($request->id);
+        $subSuperAdmin->name = $request->name;
+        $subSuperAdmin->username = $request->username;
+        if ($request->has('image')) {
+            $image = Common::upload('images', $request->image);
+            $subSuperAdmin->avatar = $image;
+        }
+        $plainPassword = $request->password; // input from user
+        $hash = $subSuperAdmin->password;
+        if (Hash::check($plainPassword, $hash)) {
+            $subSuperAdmin->password = Hash::make($request->password);
+        }
+
+        if ($request->user_id != $subSuperAdmin->app_id) {
+           // dd($request->user_id, $subSuperAdmin->app_id, $request->password);
+            $oldUser = User::find($subSuperAdmin->app_id);
+            if ($oldUser) {
+                $oldUser->sub_area_manger = 0;
+                $oldUser->save();
+            }
+            $subSuperAdmin->app_id = $request->user_id;
+            $appUser = User::find($request->user_id);
+            if ($appUser) {
+                $appUser->sub_area_manger = 1;
+                $appUser->save();
+            }
+        }
+        $subSuperAdmin->save();
+        return Redirect::back();
+    }
 
     public function profile($id)
     {
@@ -186,5 +246,23 @@ class AdminUserController extends EncorUsersController
         }
 
         return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'charges'));
+    }
+
+    public function deleteSubSuperAdmin($id)
+    {
+        $oldUser = DB::table('admin_users')->where('id', $id)->first();
+        $OldUserAppId = User::find($oldUser->app_id);
+        if ($OldUserAppId) {
+            $OldUserAppId->sub_area_manger = 0;
+            $OldUserAppId->save();
+        }
+
+        // Delete the SubAdmin record
+        DB::table('admin_users')->where('id', $oldUser->id)->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
     }
 }

@@ -121,7 +121,7 @@
                 </div>
             </div>
 
-            @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio']))
+            @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio','Tiko Live']))
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>
@@ -134,12 +134,14 @@
         </div>
 
         <div class="col-12 d-flex gap-3 mt-4">
-            <button type="submit" class="btn btn-primary btn-save">
-                <i class="fas fa-save"></i> {{ __('Save') }}
-            </button>
+         
             <button type="button" id="resetAppColorsSettings" class="btn btn-info">
                 <i class="fas fa-undo"></i> {{ __('Reset Colors') }}
             </button>
+            <button type="submit" class="btn btn-primary btn-save" style="margin: 0px 20px !important ;     display: inline !important;">
+                <i class="fas fa-save"></i> {{ __('Save') }}
+            </button>
+
         </div>
     </form>
 </div>

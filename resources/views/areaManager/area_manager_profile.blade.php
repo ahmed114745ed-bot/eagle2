@@ -862,6 +862,8 @@
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
         <a href="?tab=superAdmin" class="tab-btn {{ $activeTab == 'superAdmin' ? 'active' : '' }}"
            data-target="superAdmin-tab">{{ __('country manager') }}</a>
+        <a href="?tab=users" class="tab-btn {{ $activeTab === 'users' ? 'active' : '' }}">{{ __('Employees Country Manager') }}</a>
+
 
 
     </div>
@@ -1183,13 +1185,213 @@
         </div>
     @endif
 
+
+
+      @if($activeTab === 'users')
+        <div class="tab-content active" id="users-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ __('Employees Country Manager') }}</h3>
+                    <span class="badge count-badge">{{ optional($subAreaManagers)->total() ?? 0 }}</span>
+                </div>
+                @if($subAreaManagers && $subAreaManagers->count())
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('user') }}</th>
+                                <th>{{ __('Role') }}</th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($subAreaManagers as $index => $subSuperAdmin)
+                                <tr>
+                                    <td>{{ $index + 1 + (($subAreaManagers->currentPage() - 1) * $subAreaManagers->perPage()) }}</td>
+
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+
+                                            <!-- Avatar -->
+                                            <div class="user-avatar">
+                                                <a href="{{ url($prefix.'/auth-users/' .$subSuperAdmin->id) }}">
+                                                    <img
+                                                        src="{{ $subSuperAdmin->avatar ? getImagePath($subSuperAdmin->avatar) : $defaultImage }}"
+                                                        alt="{{ $subSuperAdmin->username ?? '' }}"
+                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                </a>
+                                            </div>
+
+                                            <!-- Name + ID -->
+                                            <div class="user-info" style="line-height: 1.2;">
+                                                <strong>
+                                                    <a href="{{ url($prefix.'/auth-users/' .$subSuperAdmin->id) }}"
+                                                       style="display: block;">
+                                                        {{ $subSuperAdmin->username ?? '' }}
+                                                    </a>
+                                                </strong>
+
+                                                <small style="color: #555;">
+                                                    ID: {{ $subSuperAdmin->id }}
+                                                </small>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+
+                                            <!-- Avatar -->
+                                            <div class="user-avatar">
+                                                <a href="{{ url($prefix.'/users/' . ($subSuperAdmin->appUser?->id ?? 0)) }}">
+                                                    <img
+                                                        src="{{ $subSuperAdmin->appUser?->profile?->avatar ? getImagePath($subSuperAdmin->appUser->profile->avatar) : $defaultImage }}"
+                                                        alt="{{ $subSuperAdmin->appUser?->name ?? '' }}"
+                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                </a>
+                                            </div>
+
+                                            <!-- Name + ID -->
+                                            <div class="user-info" style="line-height: 1.2;">
+                                                <strong style="display: flex; align-items: center; gap: 6px;">
+                                                    <a href="{{ url($prefix.'/users/' . ($subSuperAdmin->appUser?->id ?? 0)) }}"
+                                                       style="display: flex; align-items: center; gap: 6px;">
+
+                                                        {{-- Country Flag --}}
+                                                        @if(@$subSuperAdmin->appUser->country->flag)
+                                                            <img src="{{ getImagePath($subSuperAdmin->appUser->country->flag) }}"
+                                                                 alt="flag"
+                                                                 style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
+                                                        @endif
+
+                                                        {{-- User Name --}}
+                                                        {{ $subSuperAdmin->appUser?->name ?? '' }}
+                                                    </a>
+                                                </strong>
+
+                                                <small style="color: #555;">
+                                                    ID: {{ $subSuperAdmin->appUser?->uuid ?? 'N/A' }}
+                                                </small>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+                                      <td>
+                                                
+                                                    @if (\Encore\Admin\Facades\Admin::user()->can('delete-' . 'auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                        <button class="btn btn-info kick-member-btn" data-id="{{ $subSuperAdmin->id }}">
+                                                            {{ __('delete') }}
+                                                        </button>
+                                                    @endif
+
+                                                     @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                                                <button type="submit" class="btn btn-info edit_user_item_model_btn" data-id="{{ $subSuperAdmin->id }}">
+                                                                    {{ __('edit') }}
+                                                                </button>
+                                                            @endif
+                                               
+                                            </td>
+
+
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-wrapper">
+                        {{ $subAreaManagers->appends(['tab' => 'sub-super-admin',
+                        'sub_super_admin_page' => $subAreaManagers?->currentPage(),])->links('vendor.pagination.default') }}
+                    </div>
+                @else
+                    <div class="empty-table">
+                        <i class="fas fa-users-slash"></i>
+                        <p>{{ __('No users admins found') }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
+</div>
+
+<div class="updateProjectModal modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg mt-6" role="document">
+        <div class="modal-content border-0">
+            <div class="modal-content position-relative">
+                <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
+                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form action="{{  url(request()->segment(1) . '/update-area-manager')}}" id="country_update_form" method="POST"
+                      enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-0">
+
+                        <div class="p-4">
+                            <div class="row flex-evenly">
+                                <input type="hidden" name=id class="item_id">
+
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.name') }}</label>
+                                    <input type="text" name="name" class="form-control"
+                                           id="name">
+                                </div>
+
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.username') }}</label>
+                                    <input type="text" name="username" class="form-control" id="username">
+                                </div>
+
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label for="user_id" class="form-label">{{ __('admin.users') }}</label>
+                                    <select class="form-control" id="user_id" name="user_id">
+                                        <option value="">{{ __('admin.selectUser') }}</option>
+                                    </select>
+
+                                </div>
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('admin.password') }}</label>
+                                       <input type="password" name="password" class="form-control"  placeholder="Leave blank if not changing">
+
+                                </div>
+
+                                <div class="col-lg-6 form-group mb-3">
+                                    <label class="form-label">{{ __('image') }}</label>
+                                    <input class="form-control" name="image" accept="image/*" type="file"/>
+                                    <div class="mt-2">
+                                       <img src="" class="w-40 " style="width: 100px" id="img_edit"
+                                                alt="">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary cancel_user_item_model_btn" type="button"
+                                data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
-
+<script>
+    const DASHBOARD_PREFIX = "{{ request()->segment(1) }}";
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -1247,6 +1449,138 @@
 
 
     $(document).ready(function () {
+
+
+                
+
+              $('#user_id').select2({
+                    dropdownParent: $('#item_modal_update'),
+                    width: '100%',
+                    placeholder: 'Select user',
+                    allowClear: true,
+                    minimumInputLength: 1,
+                    ajax: {
+                        url: '/api/search/users-area-manager',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term || '',
+                                page: params.page || 1,
+                                selected_id: $('#user_id').val() || null
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data.data.map(item => ({
+                                    id: item.id,
+                                    text: item.name
+                                })),
+                                pagination: {
+                                    more: data.current_page < data.last_page
+                                }
+                            };
+                        }
+                    }
+                });
+
+                // Safe pre-select when the page provides data attributes
+                // Example: <select id="user_id" data-selected-id="..." data-selected-text="...">
+                (function () {
+                    var preId = $('#user_id').data('selected-id');
+                    var preText = $('#user_id').data('selected-text');
+                    if (preId) {
+                        $('#user_id').val(null).trigger('change');
+                        var selectedUser = new Option(preText || preId, preId, true, true);
+                        $('#user_id').append(selectedUser).trigger('change');
+                    }
+                })();
+
+          $(document).on('click', '.edit_user_item_model_btn', function () {
+            $('#item_modal_update').modal('show');
+             const id = $(this).data('id');
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: 'get',
+                    dataType: 'json',
+                    url: '/'+ DASHBOARD_PREFIX + "/show-sub-area-manager/" + id ,
+                    success: function(response) {
+                        if (response.status == 404) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Sorry',
+                                text: response.message,
+                            })
+                        } else {
+                           
+                            const image =  "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
+                            $('#name').val(response.item.name);
+                            $('#username').val(response.item.username);
+                            $('#password').val(response.item.password);
+                            if (response.item.app_id) {
+                                // Clear any previous selection
+                                $('#user_id').val(null).trigger('change');
+
+                                // Prefer server-provided formatted name, then try nested appUser, then fall back
+                                var displayText = response.item.app_user_name || null;
+                                if (!displayText && response.item.appUser) {
+                                    var au = response.item.appUser;
+                                    displayText = (au.name ? au.name : '') + ' - ' + (au.uuid ? au.uuid : '');
+                                }
+                                if (!displayText) displayText = response.item.name || response.item.app_id;
+
+                                var selectedUser = new Option(
+                                    displayText,
+                                    response.item.app_id,
+                                    true,
+                                    true
+                                );
+
+                                $('#user_id').append(selectedUser).trigger('change');
+                            }
+                           
+                            $('#img_edit').attr('src', image);
+                            $('.item_id').val(response.item.id);
+                            $('#item_modal_update').modal('show');
+                        }
+                        }
+                })
+        });
+
+        $(document).on('click', '.cancel_user_item_model_btn', function () {
+            $('#item_modal_update').modal('hide');
+        });
+
+     
+
+
+                    $('.kick-member-btn').click(function () {
+                        const id = $(this).data('id');
+                        console.log("Make admin clicked, ID:", id);
+                        confirmAction('{{ __("are_you_sure_delete") }}', () => {
+                            showLoader();
+                            $.post('/' + DASHBOARD_PREFIX + '/delete-sub-admin/' + id, {
+                                _token: '{{ csrf_token() }}'
+                            }, function (response) {
+                                Swal.close();
+                                console.log("Make admin response:", response);
+                                if (response.status) {
+                                    showSuccess(response.message, () => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    showError(response.message);
+                                }
+                            }).fail(function (xhr) {
+                                Swal.close();
+                                console.error("Make admin failed", xhr);
+                                const res = xhr.responseJSON;
+                                showError(res?.message ?? '{{ __("failed_make_admin") }}');
+                            });
+                        });
+                    });
         console.log("Document ready");
 
         function showLoader() {

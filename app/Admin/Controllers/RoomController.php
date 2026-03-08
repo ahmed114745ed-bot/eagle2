@@ -70,13 +70,7 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
-        \Log::info('[RoomController@show] Viewing room profile', [
-            'room_id' => $id,
-            'admin_user' => auth()->id(),
-            'timestamp' => now()->toDateTimeString()
-        ]);
-
-        $room = Room::with(['owner.profile', 'roomLevel','roomCategory', 'microphones.user.profile'])
+        $room = Room::with(['owner.profile', 'roomLevel', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -586,7 +580,7 @@ class RoomController extends MainController
         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
-        $grid->model()->with('microphones')->collection(function (Collection $collection) {
+        $grid->model()->with('microphones')->collection(function ($collection) {
             // collect all microphone user IDs from the current page rows
             $allIds = $collection->flatMap(function ($row) {
                 return array_filter(explode(',', (string) $row->microphone));
@@ -622,9 +616,20 @@ class RoomController extends MainController
 
         $grid->id(__('ID'));
 
+
         $grid->column('room_name', __('room'))->display(function ($name) {
-            $path = @$this->room_cover;
-            $id = @$this->id;
+
+            $name = mb_convert_encoding($name, 'UTF-8', 'UTF-8');
+
+            if (mb_strlen($name) > 50) {
+                $name = mb_substr($name, 0, 50) . ' ...';
+            }
+
+            $name = e($name);
+
+            $path = $this->room_cover;
+            $id = $this->id;
+
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -632,10 +637,13 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
+            if (strlen($name) > 50) {
+                $name = substr($name, 0, 50) . ' ...';
+            }
+
             $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $name);
             $encodedName = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-            //dd( $this->roomLevel);
             $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
             $levelImageHtml = '';
 
@@ -646,7 +654,10 @@ class RoomController extends MainController
                     </div>
                 ";
             }
+
+            $roomUrl = url("admin/rooms/{$id}");
             return "
+                <a href='$roomUrl' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
                         <div>
@@ -655,7 +666,7 @@ class RoomController extends MainController
                              {$levelImageHtml}
                         </div>
                     </div>
-                ";
+               ";
         });
 
         $grid->column('owner_id', __('room owner'))->display(function ($name) {
@@ -698,9 +709,9 @@ class RoomController extends MainController
 
                 $name = e($user->name);
                 $id   = e($user->id);
-
+                $userUrl = admin_url('users/' . $user->id);
                 $html .= <<<HTML
-                <div class="image-wrapper" onclick="window.location.href='{$id}'">
+                <div class="image-wrapper" onclick="window.location.href='{$userUrl}'">
                     <img src="{$url}" title="{$name}"
                     style="width: 40px; height: 40px; border-radius: 50%;
                             object-fit: cover; border: 2px solid white;

@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\Common;
 use App\Helpers\SignatureHelper;
+use App\Models\GameProviderSetting;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -20,7 +22,8 @@ class VerifyGameSignature
         $signature = $request->get('signature');
         $signatureNonce = $request->get('signature_nonce');
         $timestamp = $request->get('timestamp');
-        $appKey = config('services.baishun.app_key');
+        $gameSetting = Common::getByCode('bytesun');
+        $appKey =  @$gameSetting->app_key ?? '';
         $currentTimestamp = Carbon::now()->timestamp;
 
         // 'is !$signature || !$signatureNonce || !$timestamp ' . json_encode(!$signature || !$signatureNonce || !$timestamp) . PHP_EOL .
@@ -28,6 +31,7 @@ class VerifyGameSignature
 
         //     'is !SignatureHelper::verifySignature($signature, $signatureNonce, $appKey, $timestamp) ' . json_encode(!SignatureHelper::verifySignature($signature, $signatureNonce, $appKey, $timestamp))
         // );
+        if (!$gameSetting->is_active) return response()->json(['error' => 'Game is not active now'], 400);
 
         if (!$signature || !$signatureNonce || !$timestamp) {
             return response()->json(['error' => 'Missing signature parameters'], 400);

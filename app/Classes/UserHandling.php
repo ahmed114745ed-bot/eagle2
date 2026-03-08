@@ -6,21 +6,16 @@ use Carbon\Carbon;
 use App\Models\Ban;
 use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\Vip\Entities\Vip;
-use App\Models\Gift;
-use Modules\Vip\Entities\OVip;
 use App\Models\User;
-use App\Models\Config;
 use App\Helpers\Common;
 use App\Models\BanType;
 use App\Models\GiftLog;
-use Modules\Vip\Entities\UserVip;
 use App\Models\LiveTime;
 use App\Models\RealtimeProject;
 use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Modules\AgencyApp\Entities\AgencyUserJob;
-use Modules\Vip\Helpers\VipCommon;
 
 class UserHandling
 {
@@ -113,12 +108,12 @@ class UserHandling
 
     private function handleUserSalaries(User $user)
     {
-   
+
             $agencyId = $user->agency_id;
             $timezone = getTimezone();
             $currentMonth = now( $timezone)->month;
             $currentYear = now( $timezone)->year;
-    
+
             $userSalaries = UserSallary::query()
                 ->where('user_id', $user->id)
                 ->where('user_agency_id', $agencyId)
@@ -126,14 +121,14 @@ class UserHandling
                 ->where('year', $currentYear)
                 ->where('is_finished', 0)
                 ->first();
-             
+
             if (!$userSalaries) return;
-           
+
             if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
-              
+
                 $userSalaries->update(['is_finished' => 1]);
             }
-        
+
     }
 
     private function clearUserAgencyLogs(User $user)
@@ -168,25 +163,25 @@ class UserHandling
     public function kickOfAllUsersFromAgency(\App\Models\Agency $agency)
     {
         $agencyId = $agency->id;
-    
+
         $users = User::where('agency_id', $agencyId)
             ->get();
-    
+
         if ($users->isEmpty()) {
-            return; 
+            return;
         }
-    
+
         DB::transaction(function () use ($users, $agencyId) {
-    
+
             foreach ($users as $user) {
                 self::kickUserFromAgency($user, 0);
             }
 
-    
+
             DB::table('agency_sallaries')->where('agency_id', $agencyId)->delete();
         });
     }
-    
+
 
 
     public static function checkIfUserOwnerOfAgency(User $user): bool
@@ -316,7 +311,7 @@ class UserHandling
             ->selectRaw('CAST(SUM(giftNum * giftPrice) AS DECIMAL(10, 2)) AS total')
             ->where('receiver_id', $userId)
             ->groupBy('sender_id')
-            ->orderByDesc('total')  
+            ->orderByDesc('total')
             ->take(3)
             ->get();
 

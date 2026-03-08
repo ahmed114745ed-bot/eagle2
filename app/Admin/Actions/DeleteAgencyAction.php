@@ -4,14 +4,11 @@ namespace App\Admin\Actions;
 
 use App\Models\User;
 use App\Models\Admin;
-use App\Models\Agency;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class DeleteAgencyAction extends RowAction
 {
@@ -44,7 +41,6 @@ class DeleteAgencyAction extends RowAction
             // ]);
             $user = User::find($model->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
-            MilestoneHelper::removeReward($user, 'host-agency-owner');
             $model->delete();
             DB::commit();
             return $this->response()->success(__('dashboard.successful'))->refresh();
