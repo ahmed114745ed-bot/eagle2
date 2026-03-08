@@ -10,7 +10,7 @@ use App\Helpers\Common;
 use App\Models\CoinLog;
 use Encore\Admin\Admin;
 use App\Helpers\UserCommon;
-use App\Models\ExchangeLog;
+use Utd\UsersWallet\Entities\ExchangeLog;
 use App\Models\PaymentCoin;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
@@ -672,10 +672,10 @@ class ChargeReportController extends MainController
             //     $q->where('status', request('status'))
             // );
 
-            $total = $query->where('status', 1)->sum('paid_usd');
-            return view('admin.grid.common.report.charge-summary', [
-                'total' => $total,
-            ])->render();
+$total = $query->where('status', 1)->sum('usd');
+return view('admin.grid.common.report.charge-summary', [
+    'total' => $total,
+])->render();
         });
 
         $grid->column('id', __('transaction id'));
