@@ -1650,8 +1650,8 @@ Route::get('/save-game-app-key', function (Request $request) {
 });
 
 Route::get('make-seeders-for-new-update', function () {
-    $seeder = new \Database\Seeders\WebhookGamesSeeder();
-    $seeder->run();
+    // $seeder = new \Database\Seeders\WebhookGamesSeeder();
+    // $seeder->run();
 
      $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
     $seeder->run();
