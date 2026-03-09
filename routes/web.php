@@ -1640,7 +1640,7 @@ use App\Models\GameProviderSetting;
 
 Route::get('/save-game-app-key', function (Request $request) {
     $providerCode = $request->provider_code ?? 'quantum_nexus';
-    $appKey = env('GAME_APP_KEY');
+    $appKey = env('LEADER_CC_GAME_SECRET_KEY');
     try {
         $gameSetting = GameProviderSetting::updateOrCreate(
             ['provider_code' => $providerCode],
