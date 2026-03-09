@@ -640,7 +640,13 @@ class ChargeReportController extends MainController
 
         $grid->header(function () {
             $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/ ;
-
+       
+            $query->when(!request('from_date'), function ($query) {
+                $start = now()->startOfMonth();
+                $end = now()->endOfMonth();
+                $query->whereBetween('created_at', [$start, $end]);
+            });
+            
             $query->when(
                 request('user.uuid'),
                 fn($q, $uuid) =>
