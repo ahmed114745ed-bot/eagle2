@@ -2,14 +2,15 @@
 
 namespace Modules\Public\Entities;
 
-use App\Models\Ware;
 use App\Helpers\Common;
-use Modules\Vip\Entities\OVip;
-use Illuminate\Http\UploadedFile;
+use App\Models\Ware;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\Achievement\Entities\CustomAchievement;
+use Modules\Badge\Entities\Badge;
+use Modules\Vip\Entities\OVip;
 
 class RewardLevelInterval extends Model
 {
@@ -29,6 +30,11 @@ class RewardLevelInterval extends Model
     public function ware()
     {
         return $this->hasOne(Ware::class, 'id', 'target');
+    }
+
+      public function badge()
+    {
+        return $this->hasOne(Badge::class, 'id', 'target');
     }
 
     public function vip()
@@ -61,6 +67,11 @@ class RewardLevelInterval extends Model
         return $this->target;
     }
 
+    public function getTarget5Attribute()
+    {
+        return $this->target;
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -74,11 +85,14 @@ class RewardLevelInterval extends Model
                 $model->expire = 0;
             } elseif ($model->type === 'achievement') {
                 $model->target = request('target4', $model->target);
+            } elseif ($model->type === 'badge') {
+                $model->target = request('target5', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
             unset($model->target3);
             unset($model->target4);
+            unset($model->target5);
         });
 
         self::updating(function ($model) {
@@ -91,11 +105,14 @@ class RewardLevelInterval extends Model
                 $model->expire = 0;
             } elseif ($model->type === 'achievement') {
                 $model->target = request('target4', $model->target);
+            } elseif ($model->type === 'badge') {
+                $model->target = request('target5', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
             unset($model->target3);
             unset($model->target4);
+            unset($model->target5);
         });
     }
 }
