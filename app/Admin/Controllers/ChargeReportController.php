@@ -623,7 +623,7 @@ class ChargeReportController extends MainController
                 border: 1px solid rgba(0,0,0,0.15) !important;
                 padding: 10px !important;
                 display: block !important;
-                 background: #fff ;
+                background: #fff !important;
 
             }
            .dark-mode .bootstrap-datetimepicker-widget {
@@ -663,7 +663,7 @@ class ChargeReportController extends MainController
             $query->when(
                 request('user.uuid'),
                 fn($q, $uuid) =>
-                $q->whereHas('user', fn($u) => $u->where('uuid', $uuid))
+                $q->whereHas('user', fn($u,$uuid) => $u->where('uuid', $uuid))
             );
 
             $query->when(
