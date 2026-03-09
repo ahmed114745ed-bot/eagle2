@@ -23,7 +23,7 @@ class PjaxOverride extends BasePjax
             return $response;
         };
 
-        $result = (new static())->handle(Request::capture(), $next);
+        $result = (new static())->handle(app('request'), $next);
 
         // Throw HttpResponseException instead of exit()
         // Laravel will catch this and send the response properly
