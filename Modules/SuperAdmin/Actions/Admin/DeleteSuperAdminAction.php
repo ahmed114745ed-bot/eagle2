@@ -56,4 +56,8 @@ class DeleteSuperAdminAction extends RowAction
             $this->confirm(__('dashboard.chickDelete'),'',[]);
         }
 
+        public function getHandleRoute()
+        {
+            return url(request()->segment(1) . '/_handle_action_');
+        }
 }
