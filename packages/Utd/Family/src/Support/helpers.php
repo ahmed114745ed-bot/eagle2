@@ -133,7 +133,3 @@ if (! function_exists('family_contract_or_fail')) {
         return $class;
     }
 }
-
-if (! interface_exists(App\Contracts\FamilyContract::class) && interface_exists(Utd\Family\Contracts\FamilyServiceContract::class)) {
-    class_alias(Utd\Family\Contracts\FamilyServiceContract::class, App\Contracts\FamilyContract::class);
-}

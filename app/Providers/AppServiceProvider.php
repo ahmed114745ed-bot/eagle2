@@ -70,7 +70,6 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bindIf(\App\Contracts\FamilyContract::class, \App\Services\Family\NullFamilyService::class);
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }

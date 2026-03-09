@@ -39,8 +39,10 @@ use App\Services\Null\NullUserAchievementService;
 use App\Services\Null\NullRealsService;
 use App\Services\Null\NullGiftLogRepository;
 use App\Services\Null\NullGiftRepository;
+use App\Contracts\FamilyContract;
 use App\Contracts\MilestoneHelperContract;
 use App\Contracts\RoleRewardContract;
+use App\Services\Family\NullFamilyService;
 use App\Services\Null\NullMilestoneHelperService;
 use App\Services\Null\NullPkRepository;
 use App\Services\Null\NullRoleRewardService;
@@ -213,6 +215,14 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 MilestoneHelperContract::class,
                 NullMilestoneHelperService::class
+            );
+        }
+
+        // Family Feature
+        if (!$this->app->bound(FamilyContract::class)) {
+            $this->app->singleton(
+                FamilyContract::class,
+                NullFamilyService::class
             );
         }
     }

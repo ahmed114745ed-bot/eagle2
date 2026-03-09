@@ -6,13 +6,12 @@ use App\Contracts\FamilyContract;
 use Carbon\CarbonInterface;
 use Exception;
 use Utd\Agency\Repositories\UserRepository;
-use Utd\Family\Contracts\FamilyServiceContract;
 use Utd\Family\Http\Resources\V2\FamilyResource;
 use Utd\Family\Repositories\FamilyRankRepository;
 use Utd\Family\Repositories\FamilyRepository;
 use Utd\Family\Repositories\FamilyUserRepository;
 
-class FamilyService implements FamilyContract, FamilyServiceContract
+class FamilyService implements FamilyContract
 {
     public function __construct(
         private readonly FamilyRepository $familyRepository,

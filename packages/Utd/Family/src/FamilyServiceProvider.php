@@ -2,6 +2,7 @@
 
 namespace Utd\Family;
 
+use App\Contracts\FamilyContract;
 use Illuminate\Support\ServiceProvider;
 
 class FamilyServiceProvider extends ServiceProvider
@@ -15,14 +16,14 @@ class FamilyServiceProvider extends ServiceProvider
             __DIR__.'/../config/family.php', 'family'
         );
 
-        $this->registerNullBindings();
-
         if (! $this->isEnabled()) {
             return;
         }
 
         $this->registerAliases();
-        $this->registerFamilyServices();
+
+        // Clean contract binding — like Moments pattern
+        $this->app->singleton(FamilyContract::class, Services\FamilyService::class);
 
         $this->app->singleton(Repositories\FamilyRepository::class);
         $this->app->singleton(Repositories\FamilyUserRepository::class);
@@ -106,31 +107,6 @@ class FamilyServiceProvider extends ServiceProvider
                 class_alias($dashboardTrait, 'Utd\\Family\\Traits\\DashBoardTrait');
             }
         }
-    }
-
-    protected function registerFamilyServices(): void
-    {
-        $familyService = Services\FamilyService::class;
-        $contractInterface = config('family.contracts.family_service', Contracts\FamilyServiceContract::class);
-
-        $this->app->singleton($familyService);
-
-        $this->app->singleton(Contracts\FamilyServiceContract::class, function ($app) use ($familyService) {
-            return $app->make($familyService);
-        });
-
-        if ($contractInterface && interface_exists($contractInterface)) {
-            $this->app->singleton($contractInterface, function ($app) use ($familyService) {
-                return $app->make($familyService);
-            });
-        }
-    }
-
-    protected function registerNullBindings(): void
-    {
-        $nullFamilyService = Services\NullFamilyService::class;
-        $this->app->singleton($nullFamilyService);
-        $this->app->alias($nullFamilyService, 'family.null_service');
     }
 
     protected function isEnabled(): bool
