@@ -1513,14 +1513,12 @@ class UserController extends Controller
         });
     }
 
-   public function userLevelDetails(Request $request)
+      public function userLevelDetails(Request $request)
     {
-        $user = $request->user()->fresh();  // Refresh to get latest data from DB
+        $user = $request->user()->fresh();
 
         $currentLevel = $user->senderLevel;
-
         $expLevel = $user->total_sender_diamonds;
-
 
         if ($currentLevel) {
             $secondLevel = Vip::where('type', 2)
@@ -1531,9 +1529,10 @@ class UserController extends Controller
             $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
         }
 
+        $expPercentages = \Illuminate\Support\Facades\Config::get('exp_percentages') ?? [1, 1];
+        $multiplier = $expPercentages['exp_sender_percentage'] ?? 0.2;
 
         if ($secondLevel != null && $currentLevel != null) {
-            $multiplier = config('exp_percentages.exp_sender_percentage', 0.2);
             $currentExp = $expLevel * $multiplier;
 
             $remaining = max(0, ($secondLevel?->exp ?? 0) - $currentExp);

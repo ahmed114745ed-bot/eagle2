@@ -8,6 +8,7 @@ use App\Helpers\Common;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -15,7 +16,7 @@ class RoomBoomMediaSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command->info('Starting Boom Images Seeder...');
+        $this->log('Starting Boom Images Seeder...');
 
         $localPath = public_path('images/room boom');
 
@@ -23,7 +24,7 @@ class RoomBoomMediaSeeder extends Seeder
 
             for ($level = 0; $level <= 101; $level++) {
 
-                $this->command->info("Processing Level: {$level}");
+                $this->log("Processing Level: {$level}");
 
                 /*
                 |--------------------------------------------------------------------------
@@ -46,7 +47,7 @@ class RoomBoomMediaSeeder extends Seeder
                         ]
                     );
 
-                    $this->command->info("✔ Saved {$fileName1}");
+                    $this->log("✔ Saved {$fileName1}");
                 }
 
                 /*
@@ -67,7 +68,7 @@ class RoomBoomMediaSeeder extends Seeder
                             'image_type_boom' => 'svga',
                             'updated_at' => now(),
                         ]);
-                    if ($level == 1) {
+                    if ($level == 1 || $level == 3 || $level == 4 || $level == 5) {
                         $fileName2 = "bomb_background.jpeg";
                         $newPath2 = $this->uploadIfExists($localPath, $fileName2);
                         DB::table('room_boom_levels')
@@ -89,12 +90,36 @@ class RoomBoomMediaSeeder extends Seeder
                             ]);
                     }
 
-                    $this->command->info("✔ Saved {$fileName2}");
+                    $this->log("✔ Saved {$fileName2}");
                 }
             }
         });
 
-        $this->command->info('Boom Images Seeder Completed Successfully 🚀');
+        $this->log('Boom Images Seeder Completed Successfully 🚀');
+    }
+
+    /**
+     * Log message to command output or Laravel log
+     */
+    private function log(string $message): void
+    {
+        if ($this->command) {
+            $this->command->info($message);
+        } else {
+            Log::info($message);
+        }
+    }
+
+    /**
+     * Log warning message
+     */
+    private function warn(string $message): void
+    {
+        if ($this->command) {
+            $this->command->warn($message);
+        } else {
+            Log::warning($message);
+        }
     }
 
     /**
@@ -105,7 +130,7 @@ class RoomBoomMediaSeeder extends Seeder
         $fullPath = $localPath . DIRECTORY_SEPARATOR . $fileName;
 
         if (!file_exists($fullPath)) {
-            $this->command->warn("⚠ File not found: {$fileName}");
+            $this->warn("⚠ File not found: {$fileName}");
             return null;
         }
 

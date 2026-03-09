@@ -17,6 +17,7 @@ use Encore\Admin\Show;
 use Modules\Form\Entities\FormRequest;
 use Modules\Form\Services\FormRenderService;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use App\Facades\CustomNotification;
 
 class FormRequestController extends MainController
 {
@@ -424,6 +425,7 @@ class FormRequestController extends MainController
         $owner->type_user = 2;
         $owner->save();
         MilestoneHelper::grantMilestoneToUser($owner, 'host-agency-owner');
+        CustomNotification::formRequestApproved($owner, 'host_agency');
         // return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
         return response()->json([
             'success' => true,
@@ -463,6 +465,11 @@ class FormRequestController extends MainController
         ]);
         MilestoneHelper::grantMilestoneToUser($phoneUser, 'bd');
         $request->update(['status' => 'approved']);
+
+        CustomNotification::formRequestApproved($phoneUser, 'bd_form', [
+            'username' => $request->name,
+            'password' => $data['password'] ?? 123456789
+        ]);
 
         //  return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
         return response()->json([
@@ -509,6 +516,7 @@ class FormRequestController extends MainController
 
         MilestoneHelper::grantMilestoneToUser($owner, 'charge-agency-owner');
         $request->update(['status' => 'approved']);
+        CustomNotification::formRequestApproved($owner, 'shipping_agency');
         return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
     }
 
@@ -543,6 +551,11 @@ class FormRequestController extends MainController
         $request = FormRequest::findOrFail($id);
         $request->status = 'rejected';
         $request->save();
+
+        if ($user = User::find($request->submitted_by)) {
+            CustomNotification::formRequestRejected($user, $request->form_template_type);
+        }
+
         return response()->json([
             'success' => true,
             'message' => __('admin.rejected_success'),

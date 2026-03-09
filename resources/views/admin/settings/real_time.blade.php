@@ -13,9 +13,9 @@
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow real-time-card-height">
+                        <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                <h4 class="m-0 color-white">{{ __('admin.Tencent') }}</h4>
                                 <div class="ribbon-banner-card">
                                     <span>{{ __('soon') }}</span>
                                 </div>
@@ -48,7 +48,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                         </div>
                     </div>
                 </form>
@@ -59,9 +59,9 @@
                               <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                                 <!-- Zego Fields -->
                                 <div class="col-md-6 mb-3 ms-0 me-auto">
-                                    <div class="card p-3 shadow" style="height: 300px;">
+                                    <div class="card p-9-px shadow real-time-card-height"  >
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4 class="m-0">{{ __('UTD VOICE') }}</h4>
+                                            <h4 class="m-0 color-white">{{ __('UTD VOICE') }}</h4>
                                         </div>
                                         <br>
                                         <div class="row">
@@ -88,7 +88,7 @@
                                             </div>
                                         </div>
                                         <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                            class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                                     </div>
                                 </div>
                             </form>
@@ -97,9 +97,9 @@
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow real-time-card-height">
+                        <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                <h4 class="m-0 color-white">{{ __('admin.Zego') }}</h4>
                             </div>
 
                             <div class="row">
@@ -150,7 +150,7 @@
                                 </script>
                             </div>
 
-                            <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                         </div>
                     </div>
                 </form>
@@ -159,9 +159,9 @@
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow real-time-card-height">
+                        <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                <h4 class="m-0 color-white">{{ __('admin.Agora') }}</h4>
                             </div>
                             <br>
                             <div class="row">
@@ -183,7 +183,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                         </div>
                     </div>
                 </form>

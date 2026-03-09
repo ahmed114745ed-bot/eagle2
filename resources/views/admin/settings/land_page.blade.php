@@ -21,6 +21,7 @@
                   id="landingSettingsForm" class="settings-form">
                 @csrf
                 <input type="hidden" name="current_tab" value="">
+                <input type="hidden" name="inner_tab_type_hash" value="">
                 <div class="tab-pane show active" id="general" role="tabpanel" aria-labelledby="general-tab">
                     <h5>{{ __('General Settings') }}</h5>
                     <hr>
@@ -108,3 +109,33 @@
         </div>
     </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+
+    if (type) {
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.delete('type');
+        newUrl.hash = type;
+        window.location.href = newUrl.toString();
+    }
+
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target').substring(1);
+            document.querySelector('input[name="inner_tab_type_hash"]').value = targetId;
+        });
+    });
+
+    const activeButton = document.querySelector('.tab-btn.active');
+    if (activeButton) {
+        const targetId = activeButton.getAttribute('data-target').substring(1);
+        document.querySelector('input[name="inner_tab_type_hash"]').value = targetId;
+    }
+});
+</script>

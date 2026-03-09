@@ -1334,10 +1334,7 @@ class LuckyGiftService
     {
         $microphones = $room->microphones ?? collect();
 
-        \Log::info('getResponseData2 Debug', [
-            'receiversIds' => $receiversIds,
-            'microphones' => $microphones->toArray()
-        ]);
+     
 
         $positions = $microphones
             ->filter(fn($mic) => in_array($mic->user_id, $receiversIds))

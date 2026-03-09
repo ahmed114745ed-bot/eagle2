@@ -78,30 +78,30 @@ class UpdateUserWhenSendGift
         }*/
     }
 
-
     public function updateUsers(int $totalCoins, array $userIds)
     {
-     
+        sort($userIds);
         DB::transaction(function () use ($totalCoins, $userIds) {
            $users = User::whereIn('id', $userIds)
+                ->orderBy('id') 
                 ->lockForUpdate()
                 ->get();
 
             foreach ($users as $user) {
-                
-                if (!$user || !isset($user->id)) {
-                    continue;
+             
+                $user->increment('total_diamond_received', $totalCoins);
+
+                if ($user->agency_id == 0) {
+                    $user->increment('exchange_diamonds', $totalCoins);
                 }
-                DB::table('users')->where('id', $user->id)->update([
-                    'total_diamond_received'   => $user->total_diamond_received + $totalCoins,
-                    'exchange_diamonds'        => $user->agency_id == 0
-                        ? $user->exchange_diamonds + $totalCoins
-                        : $user->exchange_diamonds,
-                ]);
-                $monthlyDiamond = $user->monthly_diamond_received + $totalCoins;
-                uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
+
+                uploadMonthlyDiamondReceive(
+                    $user->id,
+                    $user->monthly_diamond_received + $totalCoins
+                );
             }
-        });
+
+        }, 5); 
     }
     public function updateReceivedLevels(User $receivedUser)
     {

@@ -14,6 +14,8 @@
     "Operation log": "Operation Log",
     "App": "Application",
     "Email": "Email",
+      "Super Roles":"Roles",
+    "Browse super roles":"Browse Roles",
     "server_secret_key": "server secret key",
     "server_secret": "server secret",
     "Browse change country request": "Browse country request",
@@ -1701,5 +1703,12 @@
     "App Fee": "App Fee",
     "Receiver Fee": "Receiver Fee",
     "Net Bet (to FairLuck)": "Net Bet (to FairLuck)",
-    "Winner?": "Winner?"
+    "Winner?": "Winner?",
+    "App Settings": "App Settings",
+    "Bottom Nav Active Color": "Bottom Nav Active Color",
+    "Bottom Nav Inactive Color": "Bottom Nav Inactive Color",
+    "Text Header Color": "Text Header Color",
+    "Button Text Color": "Button Text Color",
+    "New Theme Enabled": "New Theme Enabled"
+
 }

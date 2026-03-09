@@ -34,8 +34,22 @@
 }
 
 .settings-menu button.active {
-    background-color:gray; /* active tab color */
-    color: white;
+    background-color: var(--primary-color, gray) !important;
+    color: white !important;
+    border-left: 3px solid #fff;
+    box-shadow:  10px 10px 8px rgb(148 2 2 / 15%);
+}
+
+.dark-mode .settings-menu button.active {
+    background-color: var(--primary-color, #ff9800) !important;
+    color: #fff !important;
+    border-left: 3px solid #fff;
+    box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
+}
+
+.rtl .settings-menu button.active {
+    border-left: none;
+    border-right: 3px solid #fff;
 }
 
     .inner-settings-menu button.active {
@@ -947,7 +961,8 @@
     }
 
     .real-time-card-height {
-        height: 255px;
+       /* height: 255px;*/
+       min-height: 332px !important;
     }
 
     @media (max-width: 576px) {
@@ -969,7 +984,7 @@
         }
 
         .real-time-card-height {
-            height: auto;
+          /*  height: auto;*/
         }
 
         .rtl .theme-settings form,
@@ -1114,4 +1129,28 @@
             right: 75px;
         }
     }
+
+    .color-white{
+        color: white !important;
+    }
+    .p-9-px {
+        padding: 9px !important;
+    }
+    .btn0bottom{
+            bottom: 22px;
+            position: absolute;
+            margin: auto;
+    }
+
+    .pusher-settings-form{
+        height: 560px;
+    }
+    .pusher-btn0bottom {
+        position: absolute;
+        margin: 17px;
+        bottom: 0;
+    }
+
 </style>
+
+
