@@ -486,7 +486,7 @@ class ChargeReportController extends MainController
 
         $grid->model()->when(!request('from_date'), function ($query, ) {
             
-            $start =  = now()->startOfMonth();
+            $start =   now()->startOfMonth();
 
             $end = $end = now()->endOfMonth();
             $query->where('created_at', '>=',$start);
