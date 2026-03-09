@@ -623,6 +623,19 @@ class ChargeReportController extends MainController
                 border: 1px solid rgba(0,0,0,0.15) !important;
                 padding: 10px !important;
                 display: block !important;
+                 background: #fff ;
+
+            }
+           .dark-mode .bootstrap-datetimepicker-widget {
+                z-index: 999999999999999 !important;
+                max-width: 300px !important;
+                border-radius: 12px !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                padding: 10px !important;
+                display: block !important;
+                background: #000000 !important;
+
             }
             /* Force parent containers to show the calendar */
             .filter-container, .filter-container .row, .filter-container .box-body, .box, .box-body {
@@ -646,7 +659,7 @@ class ChargeReportController extends MainController
                 $end = now()->endOfMonth();
                 $query->whereBetween('created_at', [$start, $end]);
             });
-            
+
             $query->when(
                 request('user.uuid'),
                 fn($q, $uuid) =>
