@@ -112,6 +112,7 @@ class AppServiceProvider extends ServiceProvider
         // Override admin.pjax middleware for Swoole/Octane compatibility
         $this->overridePjaxMiddleware();
 
+
         $this->dashboardAdminConfig();
         $this->setupAppSettings();
         $this->setupLanguages();
@@ -194,34 +195,20 @@ class AppServiceProvider extends ServiceProvider
 
     public function dashboardAdminConfig(): void
     {
-        // Register all admin route groups at boot time for Octane worker safety
-        // This avoids "sticky" configuration when workers handle different prefixes
-        
+        $prefix = request()->segment(1);
+
         $originalConfig = config('admin.route');
 
-        // 1. Default Admin
-        \Encore\Admin\Facades\Admin::routes();
-
-        // 2. Super Admin
-        if (config('admin.superadmin_route')) {
+        if ($prefix === 'superadmin') {
             config(['admin.route' => config('admin.superadmin_route')]);
-            \Encore\Admin\Facades\Admin::routes();
-        }
-
-        // 3. Area Manager
-        if (config('admin.area_manager_route')) {
+            Admin::routes();
+        } elseif ($prefix === 'areaManager') {
             config(['admin.route' => config('admin.area_manager_route')]);
-            \Encore\Admin\Facades\Admin::routes();
+            Admin::routes();
+        } elseif ($prefix === 'admin') {
+            // Admin::routes();
+            config(['admin.route' => $originalConfig]);
         }
-
-        // 4. Agency
-        if (config('admin.agency_route')) {
-            config(['admin.route' => config('admin.agency_route')]);
-            \Encore\Admin\Facades\Admin::routes();
-        }
-
-        // Restore original config for the rest of the boot process
-        config(['admin.route' => $originalConfig]);
     }
 
     protected function defineCarbonMacros(): void
