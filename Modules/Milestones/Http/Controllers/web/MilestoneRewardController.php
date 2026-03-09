@@ -34,8 +34,7 @@ class MilestoneRewardController
 
     public function create(Content $content)
     {
-
-    if (!request()->has('reloaded')) {
+        if (!request()->has('reloaded')) {
 
             return redirect()->to(
                 request()->fullUrlWithQuery(['reloaded' => 1])
@@ -224,6 +223,8 @@ class MilestoneRewardController
                     break;
             }
         });
+
+      
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));

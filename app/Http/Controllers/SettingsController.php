@@ -277,6 +277,11 @@ class SettingsController extends Controller
             if ($request->has('inner_tab_type')) {
                 $redirectUrl .= '&type=' . $request->inner_tab_type;
             }
+             if ($request->has('inner_tab_type_hash')) {
+                $redirectUrl .= '#' . $request->inner_tab_type_hash;
+            }
+            admin_toastr(__('Settings updated successfully!'), 'success');
+            return redirect($redirectUrl);
         }
 
         if ($request->has('audio_room')) {

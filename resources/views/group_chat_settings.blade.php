@@ -458,6 +458,7 @@
                         </div>;
                     @endif
                    <div class="form">
+                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                         <label>{{ __('admin.price') }}</label>
                         <input type="number" name="group_chat" value="{{ $groupChat }}" class="form-control">
 

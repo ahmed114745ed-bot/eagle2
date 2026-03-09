@@ -93,37 +93,37 @@ class ChargeReportController extends MainController
         $grid->disableRowSelector();
         $grid->model()
             ->when($countryID, fn($q) =>
-            $q->where(function ($q) use ($countryID) {
-                $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
-                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
-            }))
+                $q->where(function ($q) use ($countryID) {
+                    $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
+                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+                }))
             ->orderByDesc('created_at')->with([
-                // 'sender',
-                // 'sender.profile:id,user_id,avatar',
-                'receiver',
-                'receiver.profile:id,user_id,avatar',
-                // 'sender.packs' => function ($q) {
-                //     $q->whereIn('type', [25])
-                //         ->where('is_used', true)
-                //         ->with('ware:id,value');
-                // },
-                'receiver.packs' => function ($q) {
-                    $q->whereIn('type', [25])
-                        ->where('is_used', true)
-                        ->with('ware:id,value');
-                },
-                'admin',
-                'admin.agency',
-                'senderUser',
-                'senderUser.profile:id,user_id,avatar',
-                'senderUser.packs' => function ($q) {
-                    $q->whereIn('type', [25])
-                        ->where('is_used', true)
-                        ->with('ware:id,value');
-                },
-                'receiveragency',
+                    // 'sender',
+                    // 'sender.profile:id,user_id,avatar',
+                    'receiver',
+                    'receiver.profile:id,user_id,avatar',
+                    // 'sender.packs' => function ($q) {
+                    //     $q->whereIn('type', [25])
+                    //         ->where('is_used', true)
+                    //         ->with('ware:id,value');
+                    // },
+                    'receiver.packs' => function ($q) {
+                        $q->whereIn('type', [25])
+                            ->where('is_used', true)
+                            ->with('ware:id,value');
+                    },
+                    'admin',
+                    'admin.agency',
+                    'senderUser',
+                    'senderUser.profile:id,user_id,avatar',
+                    'senderUser.packs' => function ($q) {
+                        $q->whereIn('type', [25])
+                            ->where('is_used', true)
+                            ->with('ware:id,value');
+                    },
+                    'receiveragency',
 
-            ]);
+                ]);
 
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash");
@@ -163,29 +163,29 @@ class ChargeReportController extends MainController
         if ($charger_type != "shipping-agency-activity") {
             $this->filterChargeDash($grid);
         }
-        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query, ) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
-            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $end = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
             $query->whereBetween('created_at', [$start, $end]);
-        })->when(!request('from_date'), function ($query,) {
+        })->when(!request('from_date'), function ($query, ) {
 
             $start = now()->startOfMonth();
-            $end   = $end   = now()->endOfMonth();
+            $end = $end = now()->endOfMonth();
             $query->whereBetween('created_at', [$start, $end]);
         });
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
 
             $sender = Common::getChargerInfoII($this);
-                        if (empty($sender['name']) && empty($sender['uuid'])) {
-                $label = $this->charger_type === 'agency' ? 'Deleted Shipping Agency' : ($this->charger_type === 'user' ? 'Deleted user' : 'Deleted admin');
-
+            if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        <span style='cursor: pointer;'>{$label}</span>
-                    </div>
-                ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+
+                            <span style=' cursor: pointer;'>Unknown </span>
+
+                </div>
+            ";
             }
 
             $name = $sender['name'];
@@ -218,18 +218,18 @@ class ChargeReportController extends MainController
                 </div>
             ";
         });
-        $grid->column('user_id', __('receiver'))->display(function ($recever) {
+        $grid->column('user_id', __('recipient'))->display(function ($recever) {
 
 
             $sender = Common::getReceiverInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
-                $label = $this->user_type === 'agency' ? 'Deleted Shipping Agency' : ($this->user_type === 'user' ? 'Deleted user' : 'Deleted admin');
-
                 return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        <span style='cursor: pointer;'>{$label}</span>
-                    </div>
-                ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+
+                            <span style=' cursor: pointer;'>Unknown </span>
+
+                </div>
+            ";
             }
             $name = $sender['name'];
             $uid = $sender['uuid'];
@@ -260,8 +260,6 @@ class ChargeReportController extends MainController
             </div>
         ";
         });
-
-    $grid->column('user_type', __('receiver type'));
 
         if (request("name") == "dash") {
             $grid->column('agency_id', __('Agency'))->display(function () {
@@ -310,7 +308,7 @@ class ChargeReportController extends MainController
         $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
             ->display(function ($coin) {
                 $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
-
+    
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <span>{$coin}</span>
                         <img src='{$image}' alt='USD' width='20' height='20'>
@@ -360,14 +358,14 @@ class ChargeReportController extends MainController
             $filter->column(1 / 4, function ($filter) {
                 $filter->where(function () {}, __('Type'), 'filter_type')
                     ->select([
-                        'user'     => 'User',
+                        'user' => 'User',
                         'shipping' => 'Shipping Agency',
                     ])->default('shipping');
             });
 
             $filter->column(3 / 4, function ($filter) {
                 $filter->where(function ($query) {
-                    $type  = request('filter_type');
+                    $type = request('filter_type');
                     $value = trim($this->input);
 
                     if ($type === 'user') {
@@ -383,14 +381,14 @@ class ChargeReportController extends MainController
             $filter->column(1 / 4, function ($filter) {
                 $filter->where(function () {}, __('sender type'), 'sender_type')
                     ->select([
-                        'user'     => 'User',
+                        'user' => 'User',
                         'shipping' => 'Shipping Agency',
                     ])->default('shipping');
             });
 
             $filter->column(3 / 4, function ($filter) {
                 $filter->where(function ($query) {
-                    $type  = request('sender_type');
+                    $type = request('sender_type');
                     $value = trim($this->input);
 
                     if ($type === 'user') {
@@ -404,14 +402,14 @@ class ChargeReportController extends MainController
             $filter->column(1 / 4, function ($filter) {
                 $filter->where(function () {}, __('receiver type'), 'receiver_type')
                     ->select([
-                        'user'     => 'User',
+                        'user' => 'User',
                         'shipping' => 'Shipping Agency',
                     ])->default('shipping');
             });
 
             $filter->column(3 / 4, function ($filter) {
                 $filter->where(function ($query) {
-                    $type  = request('receiver_type');
+                    $type = request('receiver_type');
                     $value = trim($this->input);
 
                     if ($type === 'user') {
@@ -444,7 +442,7 @@ class ChargeReportController extends MainController
             $filter->column(1 / 4, function ($filter) {
                 $filter->where(function () {}, __('Type'), 'filter_type')
                     ->select([
-                        'user'     => 'User',
+                        'user' => 'User',
                         'shipping' => 'Shipping Agency',
                     ])->default('shipping');
             });
@@ -452,7 +450,7 @@ class ChargeReportController extends MainController
             $filter->column(3 / 4, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
-                    $type  = request('filter_type');
+                    $type = request('filter_type');
                     if ($type == 'user') {
                         $query->whereHas('receiverUser', function ($q) use ($input) {
                             $q->where('uuid', $input)
@@ -486,89 +484,22 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        Admin::style("
-            /* Force date picker inputs to be smaller - very specific selectors */
-            input[type='date'],
-            input[type='date'].form-control,
-            .form-control[type='date'],
-            .filter-container input[type='date'],
-            .filter-item input[type='date'],
-            .col-md-6 input[type='date'],
-            .col-md-2 input[type='date'],
-            .col-md-3 input[type='date'],
-            .col-md-4 input[type='date'],
-            .col-md-5 input[type='date'],
-            .col-md-8 input[type='date'] {
-                max-width: 100px !important;
-                width: 100px !important;
-                font-size: 0.75rem !important;
-                padding: 0.15rem 0.3rem !important;
-                height: 26px !important;
-                line-height: 1.1 !important;
-                box-sizing: border-box !important;
-            }
-
-            /* Target date picker containers specifically */
-            .input-group:has(input[type='date']),
-            .input-group:has(.form-control[type='date']) {
-                max-width: 110px !important;
-                width: 110px !important;
-            }
-
-            /* Reduce spacing for filter columns */
-            .filter-item,
-            .filter-item-date,
-            .col-md-6,
-            .col-md-2,
-            .col-md-3,
-            .col-md-4,
-            .col-md-5,
-            .col-md-8 {
-                margin-bottom: 5px !important;
-                padding-left: 5px !important;
-                padding-right: 5px !important;
-            }
-
-            /* Make buttons in input groups smaller */
-            .input-group .btn,
-            .input-group-append .btn,
-            .input-group-btn .btn {
-                padding: 0.15rem 0.3rem !important;
-                font-size: 0.75rem !important;
-                height: 26px !important;
-                line-height: 1.1 !important;
-            }
-
-            /* Override any existing date picker styles */
-            .daterangepicker,
-            .bootstrap-datepicker,
-            .datepicker {
-                font-size: 0.75rem !important;
-                width: 180px !important;
-                max-width: 180px !important;
-            }
-
-            .daterangepicker .calendar-table,
-            .bootstrap-datepicker .datepicker-days,
-            .datepicker table {
-                font-size: 0.7rem !important;
-            }
-        ");
-
-        $grid->model()->when(!request('from_date'), function ($query,) {
-
-            $start = now()->startOfMonth();
-            $end   = $end   = now()->endOfMonth();
-            $query->whereBetween('created_at', [$start, $end]);
+        $grid->model()->when(!request('from_date'), function ($query, ) {
+             $from = request('from_date')
+                        ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
+                        : now()->startOfMonth();
+            $start = $from->startOfDay();
+            $end = $end = now()->endOfMonth();
+            $query->where('created_at', '>=',$start);
         })->with([
-            'user',
-            'user.profile',
-            'user.packs' => function ($q) {
-                $q->whereIn('type', [25])
-                    ->where('is_used', true)
-                    ->with('ware:id,value');
-            },
-        ])
+                    'user',
+                    'user.profile',
+                    'user.packs' => function ($q) {
+                        $q->whereIn('type', [25])
+                            ->where('is_used', true)
+                            ->with('ware:id,value');
+                    },
+                ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at');
 
@@ -584,50 +515,133 @@ class ChargeReportController extends MainController
                         $query->where('method', $this->input);
                     }
                 }, __('Select type'), 'method')->select(
-                    ['' => __('All')] + PaymentCoin::orderBy('type')->pluck('title', 'type')->toArray()
-                );
+                        ['' => __('All')] + PaymentCoin::orderBy('type')->pluck('title', 'type')->toArray()
+                    );
 
                 $filter->equal('status', __('Status'))->select([
                     '' => __('All'),
-                    1  => __('success'),
-                    0  => __('failed'),
+                    1 => __('success'),
+                    0 => __('failed'),
                 ]);
             });
 
             $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     if ($from = request('from_date')) {
-                //         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
-                //         $query->whereDate('created_at', '>=', $start);
-                //     }
-                // }, __('From Date'), 'from_date')->date();
-
                 $filter->where(function ($query) {
-
                     $from = request('from_date')
                         ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
                         : now()->startOfMonth();
-
-                    $query->where(
-                        'created_at',
-                        '>=',
-                        $from->startOfMonth()
-                    );
-                }, __('From Date'), 'from_date')
-                    ->date()
-                    ->default(now()->startOfMonth()->toDateString());
+                    $query->where('created_at', '>=', $from->startOfDay());
+                }, __('From Date'), 'from_date')->date();
 
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
                         $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
-                        $query->whereDate('created_at', '<=', $end);
+                        $query->where('created_at', '<=', $end);
                     }
                 }, __('To Date'), 'to_date')->date();
             });
         });
 
+        Admin::script("
+            function fixDateFilters() {
+                $('.utd-custom-date').each(function() {
+                    $(this).find('.input-group').css('width', '100%');
+                    $(this).find('input').css('width', '100%');
+                });
+                
+                // Stacking fix: elevate the active container
+                $('.utd-custom-date input').on('focus click', function() {
+                    $('.utd-custom-date').removeClass('active-date-container');
+                    $(this).closest('.utd-custom-date').addClass('active-date-container');
+                });
+            }
+            $('[name=from_date], [name=to_date]').closest('.form-group').addClass('utd-custom-date');
+            fixDateFilters();
+            $(document).on('pjax:complete', fixDateFilters);
+        ");
+
+        Admin::style("
+            .utd-custom-date {
+                display: block !important;
+                margin-bottom: 20px !important;
+                backdrop-filter: blur(5px) !important;
+                padding: 15px !important;
+                transition: all 0.3s ease !important;
+                position: relative !important;
+                overflow: visible !important;
+            }
+            .utd-custom-date:hover {
+                background: rgba(255, 255, 255, 0.08) !important;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+                transform: translateY(-2px) !important;
+            }
+            .utd-custom-date label {
+                display: block !important;
+                width: 100% !important;
+                text-align: left !important;
+                padding: 0 0 8px 0 !important;
+                margin: 0 !important;
+                white-space: nowrap !important;
+                float: none !important;
+                font-weight: 600 !important;
+                color: #555 !important;
+                font-size: 11px !important;
+                letter-spacing: 0.2px !important;
+                text-transform: uppercase !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+            }
+            .utd-custom-date .col-sm-8,
+            .utd-custom-date .col-sm-2 {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: 0 0 100% !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .utd-custom-date .input-group.date {
+                width: 100% !important;
+                border-radius: 8px !important;
+                overflow: visible !important;
+                border: 1px solid #ddd !important;
+            }
+            .utd-custom-date .input-group.date input {
+                border: none !important;
+                height: 36px !important;
+                padding: 8px 10px !important;
+                font-size: 13px !important;
+            }
+            .utd-custom-date .input-group-addon {
+                border: none !important;
+                color: #777 !important;
+                padding: 0 8px !important;
+            }
+            .bootstrap-datetimepicker-widget {
+                z-index: 999999999999999 !important;
+                max-width: 300px !important;
+                border-radius: 12px !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                padding: 10px !important;
+                background: #fff !important;
+                display: block !important;
+            }
+            /* Force parent containers to show the calendar */
+            .filter-container, .filter-container .row, .filter-container .box-body, .box, .box-body {
+                overflow: visible !important;
+            }
+            .utd-custom-date {
+                z-index: 100 !important;
+            }
+            .utd-custom-date.active-date-container {
+                z-index: 9999 !important;
+            }
+        ");
+
+
+
         $grid->header(function () {
-            $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/;
+            $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/ ;
 
             $query->when(
                 request('user.uuid'),
@@ -653,16 +667,7 @@ class ChargeReportController extends MainController
                 $q->whereDate('created_at', '>=', Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay())
             );
 
-            $query->when(
-                !request('from_date'),
 
-                fn($q) =>
-                $q->where(
-                    'created_at',
-                    '>=',
-                    now()->startOfMonth()
-                )
-            );
 
             $query->when(
                 request('to_date'),
@@ -685,11 +690,11 @@ class ChargeReportController extends MainController
         $grid->column('user_id', __('charger'))->display(function () {
             $user = $this->user;
             if (!$user) {
-                return "<div style='display: flex; align-items: center; gap: 10px;'><span style='cursor: pointer;'>Deleted user</span></div>";
+                return "<div style='display: flex; align-items: center; gap: 10px;'><span style='cursor: pointer;'>Unknown</span></div>";
             }
 
             $name = $user->name ?? '';
-            $uid  = $user->uuid ?? 0;
+            $uid = $user->uuid ?? 0;
             $path = $user->profile->avatar ?? null;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -713,9 +718,10 @@ class ChargeReportController extends MainController
 
         $grid->column('coin.usd', __('dollar'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg');
+            $coin = $coin ?? $this->paid_usd;
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>" . $coin . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>
             ";
@@ -775,83 +781,15 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        Admin::style("
-            /* Force date picker inputs to be smaller - very specific selectors */
-            input[type='date'],
-            input[type='date'].form-control,
-            .form-control[type='date'],
-            .filter-container input[type='date'],
-            .filter-item input[type='date'],
-            .col-md-6 input[type='date'],
-            .col-md-2 input[type='date'],
-            .col-md-3 input[type='date'],
-            .col-md-4 input[type='date'],
-            .col-md-5 input[type='date'],
-            .col-md-8 input[type='date'] {
-                max-width: 100px !important;
-                width: 100px !important;
-                font-size: 0.75rem !important;
-                padding: 0.15rem 0.3rem !important;
-                height: 26px !important;
-                line-height: 1.1 !important;
-                box-sizing: border-box !important;
-            }
-
-            /* Target date picker containers specifically */
-            .input-group:has(input[type='date']),
-            .input-group:has(.form-control[type='date']) {
-                max-width: 110px !important;
-                width: 110px !important;
-            }
-
-            /* Reduce spacing for filter columns */
-            .filter-item,
-            .filter-item-date,
-            .col-md-6,
-            .col-md-2,
-            .col-md-3,
-            .col-md-4,
-            .col-md-5,
-            .col-md-8 {
-                margin-bottom: 5px !important;
-                padding-left: 5px !important;
-                padding-right: 5px !important;
-            }
-
-            /* Make buttons in input groups smaller */
-            .input-group .btn,
-            .input-group-append .btn,
-            .input-group-btn .btn {
-                padding: 0.15rem 0.3rem !important;
-                font-size: 0.75rem !important;
-                height: 26px !important;
-                line-height: 1.1 !important;
-            }
-
-            /* Override any existing date picker styles */
-            .daterangepicker,
-            .bootstrap-datepicker,
-            .datepicker {
-                font-size: 0.75rem !important;
-                width: 180px !important;
-                max-width: 180px !important;
-            }
-
-            .daterangepicker .calendar-table,
-            .bootstrap-datepicker .datepicker-days,
-            .datepicker table {
-                font-size: 0.7rem !important;
-            }
-        ");
-        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query, ) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
-            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $end = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
             $query->whereBetween('created_at', [$start, $end]);
-        })->when(!request('from_date'), function ($query,) {
+        })->when(!request('from_date'), function ($query, ) {
 
             $start = now()->startOfMonth();
-            $end   = $end   = now()->endOfMonth();
+            $end = $end = now()->endOfMonth();
             $query->whereBetween('created_at', [$start, $end]);
         })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at')->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
@@ -861,16 +799,8 @@ class ChargeReportController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
             });
-            $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     if ($from = request('from_date')) {
-                //         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
-                //         $query->whereDate('created_at', '>=', $start);
-                //     }
-                // }, __('From Date'), 'from_date')->date();
-
+            $filter->column(1 / 6, function ($filter) {
                 $filter->where(function ($query) {
-
                     $from = request('from_date')
                         ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
                         : now()->startOfMonth();
@@ -885,7 +815,6 @@ class ChargeReportController extends MainController
 
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
-
                         $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
                         $query->whereDate('created_at', '<=', $end);
                     }
@@ -897,11 +826,11 @@ class ChargeReportController extends MainController
                     $query->where('method', $this->input);
                 }
             }, __('Select type'), 'name_for_url_shortcut')->radio([
-                '' => __('All'),
-                'huawei_pay' => __('huawei pay'),
-                'google_pay' => __('google pay'),
-                'apple_pay' => __('apple pay'),
-            ]);
+                        '' => __('All'),
+                        'huawei_pay' => __('huawei pay'),
+                        'google_pay' => __('google pay'),
+                        'apple_pay' => __('apple pay'),
+                    ]);
         });
 
         $grid->quickSearch();
@@ -911,12 +840,12 @@ class ChargeReportController extends MainController
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
 
-                            <span style=' cursor: pointer;'>Deleted user </span>
+                            <span style=' cursor: pointer;'>Unknown </span>
 
                 </div>
             ";
             }
-            $name =  $this->user->name ?? '';
+            $name = $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -994,31 +923,28 @@ class ChargeReportController extends MainController
                     ->with('ware:id,value');
             },
         ])
-            ->when(request('from_date') && request('to_date'), function ($query,) {
+            ->when(request('from_date') && request('to_date'), function ($query, ) {
 
                 $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
-                $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+                $end = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
                 $query->whereBetween('created_at', [$start, $end]);
-            })->when(!request('from_date'), function ($query,) {
+            })->when(!request('from_date'), function ($query, ) {
 
                 $start = now()->startOfMonth();
-                $end   = $end   = now()->endOfMonth();
+                $end = $end = now()->endOfMonth();
                 $query->whereBetween('created_at', [$start, $end]);
             })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at')->where('status', 1);
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
+
             $filter->column(1 / 2, function ($filter) {
-                // $filter->where(function ($query) {
-                //     if ($from = request('from_date')) {
-                //         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
-                //         $query->whereDate('created_at', '>=', $start);
-                //     }
-                // }, __('From Date'), 'from_date')->date();
+                $filter->equal('user.uuid', __('charger'));
+            });
 
+            $filter->column(1 / 6, function ($filter) {
                 $filter->where(function ($query) {
-
                     $from = request('from_date')
                         ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
                         : now()->startOfMonth();
@@ -1033,7 +959,6 @@ class ChargeReportController extends MainController
 
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
-
                         $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
                         $query->whereDate('created_at', '<=', $end);
                     }
@@ -1041,15 +966,109 @@ class ChargeReportController extends MainController
             });
         });
 
+        Admin::script("
+            function fixInAppDateFilters() {
+                $('.utd-custom-date').each(function() {
+                    $(this).find('.input-group').css('width', '100%');
+                    $(this).find('input').css('width', '100%');
+                });
+                
+                // Stacking fix: elevate the active container
+                $('.utd-custom-date input').on('focus click', function() {
+                    $('.utd-custom-date').removeClass('active-date-container');
+                    $(this).closest('.utd-custom-date').addClass('active-date-container');
+                });
+            }
+            $('[name=from_date], [name=to_date]').closest('.form-group').addClass('utd-custom-date');
+            fixInAppDateFilters();
+            $(document).on('pjax:complete', fixInAppDateFilters);
+        ");
 
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('user.uuid', __('charger'));
-            });
-
-            $filter->disableIdFilter();
-        });
+        Admin::style("
+            .utd-custom-date {
+                display: block !important;
+                margin-bottom: 20px !important;
+                background: rgba(255, 255, 255, 0.05) !important;
+                backdrop-filter: blur(5px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 12px !important;
+                padding: 15px !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+                transition: all 0.3s ease !important;
+                position: relative !important;
+                overflow: visible !important;
+                width: 100% !important;
+            }
+            .utd-custom-date:hover {
+                background: rgba(255, 255, 255, 0.08) !important;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+                transform: translateY(-2px) !important;
+            }
+            .utd-custom-date label {
+                display: block !important;
+                width: 100% !important;
+                text-align: left !important;
+                padding: 0 0 8px 0 !important;
+                margin: 0 !important;
+                white-space: nowrap !important;
+                float: none !important;
+                font-weight: 600 !important;
+                color: #555 !important;
+                font-size: 11px !important;
+                letter-spacing: 0.2px !important;
+                text-transform: uppercase !important;
+                overflow: visible !important;
+                text-overflow: clip !important;
+            }
+            .utd-custom-date .col-sm-8,
+            .utd-custom-date .col-sm-2 {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: 0 0 100% !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .utd-custom-date .input-group.date {
+                width: 100% !important;
+                border-radius: 8px !important;
+                overflow: visible !important;
+                border: 1px solid #ddd !important;
+                background: #fff !important;
+            }
+            .utd-custom-date .input-group.date input {
+                border: none !important;
+                height: 36px !important;
+                padding: 8px 10px !important;
+                font-size: 13px !important;
+            }
+            .utd-custom-date .input-group-addon {
+                background: #f8f9fa !important;
+                border: none !important;
+                color: #777 !important;
+                padding: 0 8px !important;
+            }
+            .bootstrap-datetimepicker-widget {
+                z-index: 9999999999 !important;
+                max-width: 300px !important;
+                border-radius: 12px !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                padding: 10px !important;
+                background: #fff !important;
+                display: block !important;
+            }
+                
+            /* Force parent containers to show the calendar */
+            .filter-container, .filter-container .row, .filter-container .box-body, .box, .box-body {
+                overflow: visible !important;
+            }
+            .utd-custom-date {
+                z-index: 100 !important;
+            }
+            .utd-custom-date.active-date-container {
+                z-index: 9999 !important;
+            }
+        ");
 
         $grid->quickSearch();
         $grid->column('id', __('id'));
@@ -1058,12 +1077,12 @@ class ChargeReportController extends MainController
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
 
-                            <span style=' cursor: pointer;'>Deleted user </span>
+                            <span style=' cursor: pointer;'>Unknown </span>
 
                 </div>
             ";
             }
-            $name =  $this->user->name ?? '';
+            $name = $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -1221,7 +1240,7 @@ class ChargeReportController extends MainController
             $grid->column('admin.name', __('created by'))->display(function () {
                 $name = $this->admin->name ?? '';
                 $path = $this->admin->avatar ?? null;
-                $id =  $this->admin->id ?? 0;
+                $id = $this->admin->id ?? 0;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
@@ -1388,7 +1407,7 @@ class ChargeReportController extends MainController
         if ($scope === 'not_dash') {
             // dd(123);
             $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {
-                return $this->user_id == $agency_id  ?  __('increment') : __('decrement');
+                return $this->user_id == $agency_id ? __('increment') : __('decrement');
             });
         } else {
             $grid->column('amount_type', __('status'))->display(function () {

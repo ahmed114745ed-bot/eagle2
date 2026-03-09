@@ -1,336 +1,273 @@
+@php
+    $luckyStatus = $config['lucky_gifts_action'] ?? 0;
+    $currentVersion = $config['lucky_gift_version'] ?? 1;
+@endphp
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
+    .nav-tabs-custom>.nav-tabs>li.active {
+        border-top-color: #3c8dbc;
     }
 
-    /* القائمة الجانبية */
-    .settings-menu button {
-        display: block;
-        width: 100%;
-        text-align: right;
-        padding: 15px;
-        color: black;
-        background: white;
-        border: none;
-        margin-bottom: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    /* RTL Support for Horizontal Form Labels */
+    body.rtl .form-horizontal .control-label,
+    [dir="rtl"] .form-horizontal .control-label {
+        text-align: left !important;
     }
 
-    .settings-menu button:hover {
-        background: var(--primary-color);
-        color: var(--text-secondary-color);
+    body:not(.rtl):not([dir="rtl"]) .form-horizontal .control-label {
+        text-align: right !important;
     }
 
-    .settings-menu button {
-        display: block;
-        width: 100%;
-        text-align: right;
-        padding: 15px;
-        background: #333;
-        color: white;
-        border: none;
-        margin-bottom: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .settings-menu button:hover {
-        background: #ff9800;
-    }
-
-    /* محتوى الصفحة */
-    .settings-content {
-        flex-grow: 1;
-        padding: 20px;
-    }
-
-    .settings-section {
-        display: none;
-    }
-
-    .active {
-        display: block;
-    }
-
-    label {
-        display: block;
-        margin: 10px 0 5px;
-    }
-
-    input,
-    select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        background: #333;
-        border: 1px solid #444;
-        color: white;
-    }
-
-    button {
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .all-page {
-        display: inline-flex;
-    }
-
-    .wrapper {
-        width: 100%;
-
-    }
-
-    .settings-content {
-        width: 869px;
-
-    }
-
-    .form {
-        width: 400px;
-        margin: auto;
-    }
-
-    /* تصميم النافذة */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        padding-top: 50px;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-    }
-
-    /* الصورة داخل النافذة */
-    .modal-content {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-    }
-
-    /* زر الإغلاق */
-    .close {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: white;
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    img {
-        width: 201px;
-        display: block;
-        height: 99px;
-        margin-bottom: 20px;
-    }
-
-    button {
-        width: 200px;
-
+    /* Ensure vertical alignment is consistent */
+    .form-horizontal .control-label {
+        padding-top: 7px;
+        margin-bottom: 0;
     }
 </style>
-</head>
 
-<body>
-    <div class="all-page">
-        <div class="settings-sidebar">
-            <h2>{{ __('Settings') }}</h2>
-            <div class="settings-menu">
-                <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Luck gift Settings') }}</button>
-                <button onclick="showSection('number_comment')">{{ __('lucky gift coins') }}</button>
-            </div>
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab_1" data-toggle="tab">{{ __('Luck gift Settings') }}</a></li>
+        <li><a href="#tab_2" data-toggle="tab">{{ __('lucky gift coins') }}</a></li>
+    </ul>
+    <div class="tab-content">
+        {{-- Tab 1: Luck gift Settings --}}
+        <div class="tab-pane active" id="tab_1">
+
+            @if($luckyStatus == 1)
+                <div class="box box-solid box-default" style="border: 1px solid #eee; margin-bottom: 20px;">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-refresh"></i> {{ __('Choose Lucky Gift Version') }}</h3>
+                    </div>
+                    <div class="box-body">
+                        <form action="{{ route('admin.lucky-gift.version.update') }}" method="POST" class="form-inline">
+                            @csrf
+                            <div class="radio-group" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                <label
+                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 1 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
+                                    <input type="radio" name="lucky_gift_version" value="1" {{ $currentVersion == 1 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
+                                    <strong>{{ __('Version 1 (Standard)') }}</strong>
+                                </label>
+                                <label
+                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 2 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
+                                    <input type="radio" name="lucky_gift_version" value="2" {{ $currentVersion == 2 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
+                                    <strong>{{ __('Version 2 (FairLuck)') }}</strong>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Version 1 Content --}}
+            @if($currentVersion == 1 || $luckyStatus == 0)
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ __('Luck gift Settings (V1)') }}</h3>
+                    </div>
+                    <form action="{{ route('admin.lucky-gift.version.update') }}" method="POST" class="form-horizontal">
+                        @csrf
+                        <div class="box-body">
+                            @if($errors->any())
+                                <div class="alert alert-danger alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                    <h4><i class="icon fa fa-ban"></i> {{ __('Error!') }}</h4>
+                                    <ul>
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('application wallet percentage') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="app_wallet_lucky_gift" class="form-control"
+                                        value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" required>
+                                    <span class="help-block">{{ __('App owner profit') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('owner percentage') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="owner_lucky_gift" class="form-control"
+                                        value="{{ $config['owner_lucky_gift'] ?? 0 }}" required>
+                                    <span class="help-block">{{ __('owner gift') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('host percentage') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="host_lucky_gift" class="form-control"
+                                        value="{{ $config['host_lucky_gift'] ?? 0 }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">{{ __('Save V1 Settings') }}</button>
+                        </div>
+                    </form>
+                </div>
+            @else
+                {{-- Version 2 Content (Matched with fairluck/dashboard.blade.php) --}}
+                @php $settings = $fairLuckSettings; @endphp
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ __('FairLuck Settings') }}</h3>
+                    </div>
+                    <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
+                        @csrf
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="global_vault_negative_limit" class="form-control"
+                                        value="{{ $settings['global_vault_negative_limit'] ?? 30000 }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_app_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0.10' }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_receiver_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0.10' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-primary pull-right">{{ __('Save') }}</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">{{ __('Global Vault Balance History') }}</h3>
+                            </div>
+                            <div class="box-body">
+                                <canvas id="vaultChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
-        <div class="settings-content">
-            <div id="VipSettings" class="settings-section active">
-                <h3>{{ __('Luck gift Settings') }}</h3>
-
-                <form action="{{ route('admin.lucky.gift.settings.update') }}" class="new-form" method="POST" enctype="multipart/form-data">
+        {{-- Tab 2: lucky gift coins --}}
+        <div class="tab-pane" id="tab_2">
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">{{ __('lucky gift coins') }}</h3>
+                </div>
+                <form action="{{ route('admin.lucky-gift.version.update') }}" method="POST" class="form-horizontal">
                     @csrf
-
-                    {{-- Show global errors --}}
-                    @if($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    {{-- Show specific error
-                    @error('gift_percentage')
-                        <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror --}}
-                    <div class="form">
-                        <!-- Wallet Lucky Box -->
+                    <div class="box-body">
                         <div class="form-group">
-                            <label for="app_wallet_lucky_gift">{{ __('application wallet percentage from the lucky gift') }}</label>
-                            <input type="number"
-                                id="app_wallet_lucky_gift"
-                                name="app_wallet_lucky_gift"
-                                min="1"
-                                value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}"
-                                class="form-control"
-                                placeholder="{{ __('Enter the wallet lucky gift value') }}" required />
-                                 <small class="form-text text-muted">{{ __('App owner profit') }}</small>
-
+                            <label class="col-sm-3 control-label">{{ __('lucky gift coins') }}</label>
+                            <div class="col-sm-8">
+                                <input type="number" name="lucky_gift_coins" class="form-control"
+                                    value="{{ (isset($config['lucky_gift_coins']) && $config['lucky_gift_coins'] != 0) ? $config['lucky_gift_coins'] : 2000 }}"
+                                    required>
+                                <span
+                                    class="help-block">{{ __('Play coin sound inside the room when the win amount is greater than or equal to the added value.') }}</span>
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="owner_lucky_gift">{{ __('owner percentage from the lucky gift') }}</label>
-                            <input type="number"
-                                id="owner_lucky_gift"
-                                name="owner_lucky_gift"
-                                min="1"
-                                value="{{ $config['owner_lucky_gift'] ?? 0 }}"
-                                class="form-control"
-                                placeholder="{{ __('Enter  value') }}"  required/>
-                                <small class="form-text text-muted">{{ __('owner gift') }}</small>
-                        </div>
-
-
-                        <div class="form-group">
-                            <label for="host_lucky_gift">{{ __('host percentage from the lucky gift') }}</label>
-                            <input type="number"
-                                id="host_lucky_gift"
-                                name="host_lucky_gift"
-                                min="1"
-                                value="{{ $config['host_lucky_gift'] ?? 0 }}"
-                                class="form-control"
-                                placeholder="{{ __('Enter  value') }}" required />
-                        </div>
-
-
-                        <!-- Submit Button -->
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-warning pull-right">{{ __('Save') }}</button>
                     </div>
                 </form>
             </div>
-
-
-             <div id="number_comment" class="settings-section active">
-
-
-                <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-
-                    {{-- Show global errors --}}
-                    @if($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    {{-- Show specific error
-                    @error('gift_percentage')
-                        <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror --}}
-                    <div class="form">
-                        <!-- Wallet Lucky Box -->
-                        <div class="form-group">
-                            <label for="number_comments">{{ __('lucky gift coins') }}</label>
-                            <input type="number"
-                                id="lucky_gift_coins"
-                                name="lucky_gift_coins"
-                                min="1"
-                                value="{{ (isset($config['lucky_gift_coins']) && $config['lucky_gift_coins'] != 0) ? $config['lucky_gift_coins'] : 2000 }}"
-                                class="form-control"
-                                placeholder="{{ __('Enter the lucky gift coins value') }}" required />
-                                 <small class="form-text text-muted">{{ __('Play coin sound inside the room when the win amount is greater than or equal to the added value.') }}</small>
-
-
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
         </div>
-
-        <div id="imageModal" class="modal" onclick="closeFullScreen()">
-            <span class="close">&times;</span>
-            <img class="modal-content" id="fullImage">
-        </div>
-        <!-- كود JavaScript -->
-        <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Function to get query parameter by name
-    function getQueryParam(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
-
-    // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-    const activeTab = getQueryParam("firsttab") || "VipSettings";
-
-    // Show the selected tab
-    showSection(activeTab);
-});
-
-function showSection(sectionId) {
-    // Remove active class from all sections
-    document.querySelectorAll('.settings-section').forEach(section => {
-        section.classList.remove('active');
-    });
-
-    // Add active class to the selected section
-    document.getElementById(sectionId).classList.add('active');
-
-    // Reset button styles
-    document.querySelectorAll('.settings-menu button').forEach(button => {
-        button.style.backgroundColor = '';
-        button.style.color = '';
-    });
-
-    // Highlight the active button
-    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-    if (activeButton) {
-        activeButton.style.backgroundColor = 'var(--primary-color)';
-        activeButton.style.color = 'var(--text-secondary-color)';
-    }
-
-    // Update the URL with the selected tab without reloading
-    const url = new URL(window.location);
-    url.searchParams.set("firsttab", sectionId);
-    window.history.pushState({}, "", url);
-}
-
-
-            function openFullScreen(imgElement) {
-                var modal = document.getElementById("imageModal");
-                var modalImg = document.getElementById("fullImage");
-
-                modal.style.display = "block";
-                modalImg.src = imgElement.src;
-            }
-
-            function closeFullScreen() {
-                document.getElementById("imageModal").style.display = "none";
-            }
-        </script>
     </div>
-</body>
+</div>
+
+@if($luckyStatus == 1 && $currentVersion == 2 && isset($history))
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(function () {
+            var historyData = {!! json_encode($history->map(function ($h) {
+            return [
+                'date' => $h->created_at ? $h->created_at->format('m-d H:i:s') : '',
+                'before' => (int) $h->balance_before,
+                'change' => (int) $h->amount,
+                'after' => (int) $h->balance_after,
+                'desc' => $h->description ?? __('Transaction')
+            ];
+        })->toArray()) !!};
+
+            var labels = historyData.map(function (d) { return d.date; });
+            var dataPoints = historyData.map(function (d) { return d.after; });
+
+            var ctx = document.getElementById('vaultChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "{{ __('Global Vault Balance') }}",
+                        data: dataPoints,
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        backgroundColor: 'rgba(60,141,188,0.2)',
+                        fill: true,
+                        tension: 0.1,
+                        pointBackgroundColor: function (context) {
+                            var val = dataPoints[context.dataIndex] || 0;
+                            return val < 0 ? 'rgba(255,99,132,1)' : 'rgba(60,141,188,1)';
+                        },
+                        pointBorderColor: '#fff',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false,
+                    },
+                    plugins: {
+                        tooltip: {
+                            padding: 10,
+                            callbacks: {
+                                label: function (context) {
+                                    var data = historyData[context.dataIndex];
+                                    var lines = [];
+                                    lines.push("{{ __('🎯 Balance After:  ') }}" + data.after.toLocaleString());
+                                    lines.push("{{ __('💰 Change Amt:  ') }}" + (data.change > 0 ? '+' : '') + data.change.toLocaleString());
+                                    lines.push("{{ __('⏳ Balance Before: ') }}" + data.before.toLocaleString());
+
+                                    var desc = data.desc;
+                                    desc = desc.replace('Win payout', "{{ __('🏆 Win') }}")
+                                        .replace('Loss bet', "{{ __('💔 Loss') }}")
+                                        .replace('Bet contribution', "{{ __('💸 Bet') }}");
+
+                                    lines.push("{{ __('📝 Info: ') }}" + desc);
+
+                                    if (data.after < 0) {
+                                        lines.push("{{ __('⚠️ Status: Wallet is Negative!') }}");
+                                    }
+                                    return lines;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: false }
+                    }
+                }
+            });
+        });
+    </script>
+@endif

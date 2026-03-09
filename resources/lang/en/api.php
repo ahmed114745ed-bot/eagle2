@@ -157,7 +157,8 @@ return [
     'reject_agency' => 'Your request to join the agency :name has been rejected.',
     'closeNormalBox' => 'Your normal luck box has expired.',
     'closeSuperBox' => 'Your super luck box has expired.',
-    'acceptYourAgency' => 'Your agency has been accepted',
-    'rejectYourAgency' => 'Your agency has been refused',
+
+    'acceptYourAgency' => 'Your agency creation request has been accepted',
+    'rejectYourAgency' => 'Your agency creation request has been rejected',
 
 ];

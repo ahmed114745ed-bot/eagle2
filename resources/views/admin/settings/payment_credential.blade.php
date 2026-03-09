@@ -11,7 +11,7 @@
                         <input type="hidden" name="current_tab" value="">
                         <div class="card payment-card p-3 shadow">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h4 class="m-0">{{ __('admin.' . $coin->title) }}</h4>
+                                <h4 class="m-0 color-white">{{ __('admin.' . $coin->title) }}</h4>
                                 <div class="d-flex align-items-center">
                                     <input type="hidden" name="is_{{ $coin->type }}_active" value="0">
                                     <input type="hidden" name="payment_getaway_id" value={{ $coin->id }}>
