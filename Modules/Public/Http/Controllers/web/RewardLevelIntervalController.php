@@ -141,6 +141,11 @@ class RewardLevelIntervalController extends MainController
             $tools->append($button);
         });
         $this->extendGrid($grid);
+        Admin::script("
+        if (window.innerWidth >= 1024) {
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
 
         return $grid;
     }
