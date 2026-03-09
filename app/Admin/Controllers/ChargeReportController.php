@@ -485,10 +485,9 @@ class ChargeReportController extends MainController
         $grid->disableRowSelector();
 
         $grid->model()->when(!request('from_date'), function ($query, ) {
-             $from = request('from_date')
-                        ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
-                        : now()->startOfMonth();
-            $start = $from->startOfDay();
+            
+            $start =  = now()->startOfMonth();
+
             $end = $end = now()->endOfMonth();
             $query->where('created_at', '>=',$start);
         })->with([
@@ -623,7 +622,6 @@ class ChargeReportController extends MainController
                 box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
                 border: 1px solid rgba(0,0,0,0.15) !important;
                 padding: 10px !important;
-                background: #fff !important;
                 display: block !important;
             }
             /* Force parent containers to show the calendar */
