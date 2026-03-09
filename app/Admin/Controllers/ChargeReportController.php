@@ -485,10 +485,12 @@ class ChargeReportController extends MainController
         $grid->disableRowSelector();
 
         $grid->model()->when(!request('from_date'), function ($query, ) {
-
-            $start = now()->startOfMonth();
+             $from = request('from_date')
+                        ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
+                        : now()->startOfMonth();
+            $start = $from->startOfDay();
             $end = $end = now()->endOfMonth();
-            $query->whereBetween('created_at', [$start, $end]);
+            $query->where('created_at', '>=',$start);
         })->with([
                     'user',
                     'user.profile',
@@ -562,10 +564,7 @@ class ChargeReportController extends MainController
             .utd-custom-date {
                 display: block !important;
                 margin-bottom: 20px !important;
-                background: rgba(255, 255, 255, 0.05) !important;
                 backdrop-filter: blur(5px) !important;
-                border: 1px solid rgba(255, 255, 255, 0.1) !important;
-                border-radius: 12px !important;
                 padding: 15px !important;
                 transition: all 0.3s ease !important;
                 position: relative !important;
@@ -605,7 +604,6 @@ class ChargeReportController extends MainController
                 border-radius: 8px !important;
                 overflow: visible !important;
                 border: 1px solid #ddd !important;
-                background: #fff !important;
             }
             .utd-custom-date .input-group.date input {
                 border: none !important;
@@ -614,7 +612,6 @@ class ChargeReportController extends MainController
                 font-size: 13px !important;
             }
             .utd-custom-date .input-group-addon {
-                background: #f8f9fa !important;
                 border: none !important;
                 color: #777 !important;
                 padding: 0 8px !important;
