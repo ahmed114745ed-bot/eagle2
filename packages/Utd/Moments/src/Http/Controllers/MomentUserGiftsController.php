@@ -217,7 +217,7 @@ class MomentUserGiftsController extends Controller
         }
 
         $data = $moment->gifts()
-            ->select("{$giftsTable}.img", DB::raw('CAST(sum(moment_user_gifts.num) AS INT) as num_gift'))
+            ->select("{$giftsTable}.img", DB::raw('CAST(sum(moment_user_gifts.num) AS UNSIGNED) as num_gift'))
             ->groupBy("{$giftsTable}.id", "{$giftsTable}.img", 'moment_user_gifts.moment_id', 'moment_user_gifts.gift_id')
             ->orderByDesc('num_gift')
             ->get();
