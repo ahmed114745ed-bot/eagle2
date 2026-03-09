@@ -1753,3 +1753,71 @@ Route::get('make-seeders-for-new-update', function () {
 
 
 
+Route::get('/show-coins-and-logs', function () {
+
+    $coins = Coin::all();
+
+    $logs = CoinLog::whereNull('paid_usd')
+        ->orWhere('paid_usd', 0)
+        ->get();
+
+    $html = "<h2>Coins Table</h2>";
+    $html .= "<table border='1' cellpadding='6' cellspacing='0'>";
+    $html .= "<tr>
+                <th>ID</th>
+                <th>USD</th>
+                <th>Coin</th>
+                <th>First Charge Coin</th>
+                <th>Status</th>
+                <th>Discount Code</th>
+                <th>Extra Value</th>
+                <th>Created At</th>
+            </tr>";
+
+    foreach ($coins as $coin) {
+        $html .= "<tr>
+                    <td>{$coin->id}</td>
+                    <td>{$coin->usd}</td>
+                    <td>{$coin->coin}</td>
+                    <td>{$coin->first_charge_coin}</td>
+                    <td>{$coin->status}</td>
+                    <td>{$coin->discount_code}</td>
+                    <td>{$coin->extra_value}</td>
+                    <td>{$coin->created_at}</td>
+                </tr>";
+    }
+
+    $html .= "</table>";
+
+    $html .= "<br><hr><br>";
+
+    $html .= "<h2>Coin Logs (paid_usd = null or 0)</h2>";
+    $html .= "<table border='1' cellpadding='6' cellspacing='0'>";
+    $html .= "<tr>
+                <th>ID</th>
+                <th>Paid USD</th>
+                <th>Obtained Coins</th>
+                <th>User ID</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Coin ID</th>
+                <th>Created At</th>
+            </tr>";
+
+    foreach ($logs as $log) {
+        $html .= "<tr>
+                    <td>{$log->id}</td>
+                    <td>{$log->paid_usd}</td>
+                    <td>{$log->obtained_coins}</td>
+                    <td>{$log->user_id}</td>
+                    <td>{$log->method}</td>
+                    <td>{$log->status}</td>
+                    <td>{$log->coin_id}</td>
+                    <td>{$log->created_at}</td>
+                </tr>";
+    }
+
+    $html .= "</table>";
+
+    return $html;
+});
