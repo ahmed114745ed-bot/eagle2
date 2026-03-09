@@ -225,4 +225,9 @@ class SuperAdminChargeAction extends Action
 
         return $html;
     }
+
+    public function getHandleRoute()
+    {
+        return url(request()->segment(1) . '/_handle_action_');
+    }
 }
