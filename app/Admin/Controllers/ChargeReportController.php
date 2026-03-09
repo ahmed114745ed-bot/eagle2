@@ -530,7 +530,7 @@ class ChargeReportController extends MainController
                         ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
                         : now()->startOfMonth();
                     $query->where('created_at', '>=', $from->startOfDay());
-                }, __('From Date'), 'from_date')->date();
+                }, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
 
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
