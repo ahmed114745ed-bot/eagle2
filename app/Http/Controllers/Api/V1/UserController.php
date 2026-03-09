@@ -1513,14 +1513,12 @@ class UserController extends Controller
         });
     }
 
-    public function userLevelDetails(Request $request)
+      public function userLevelDetails(Request $request)
     {
-        $user = $request->user()->fresh();  // Refresh to get latest data from DB
+        $user = $request->user()->fresh();
 
         $currentLevel = $user->senderLevel;
-
-        $expLevel             = $user->total_sender_diamonds;
-
+        $expLevel = $user->total_sender_diamonds;
 
         if ($currentLevel) {
             $secondLevel = Vip::where('type', 2)
@@ -1531,12 +1529,16 @@ class UserController extends Controller
             $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
         }
 
+        $expPercentages = \Illuminate\Support\Facades\Config::get('exp_percentages') ?? [1, 1];
+        $multiplier = $expPercentages['exp_sender_percentage'] ?? 0.2;
 
         if ($secondLevel != null && $currentLevel != null) {
-            $remaining       = $secondLevel?->exp - $expLevel;
-            $exactlyValue    = @$secondLevel?->exp;
-            $progressCurrent = $expLevel - $currentLevel->exp;
-            $progressNext    = $secondLevel->exp - $currentLevel->exp;
+            $currentExp = $expLevel * $multiplier;
+
+            $remaining = max(0, ($secondLevel?->exp ?? 0) - $currentExp);
+            $exactlyValue = @$secondLevel?->exp;
+            $progressCurrent = max(0, $currentExp - ($currentLevel->exp ?? 0));
+            $progressNext = max(1, ($secondLevel->exp ?? 0) - ($currentLevel->exp ?? 0));
 
             $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
 
@@ -1547,14 +1549,14 @@ class UserController extends Controller
             }
             $progress = $exactlyValue == 0 ? 1 : $bar;
         } elseif ($currentLevel != null) {
-            $exactlyValue    = $secondLevel?->exp ?? 0;
+            $exactlyValue = $secondLevel?->exp ?? 0;
             $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
-            $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
+            $progressNext = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
 
-            $progress  = 1;
+            $progress = 1;
             $remaining = 0;
         } else {
-            $progress  = 1;
+            $progress = 1;
             $remaining = 0;
         }
         $vipsData = DB::table('vips')->get()->groupBy('type');
@@ -1568,7 +1570,7 @@ class UserController extends Controller
         $data = [
             'receiver_img' => $user->receiverLevel?->img ?? '',
             'exp_receiver' => $user->receiverLevel?->exp ?? 0,
-            'sender_img'   => $user->senderLevel?->img ?? '',
+            'sender_img' => $user->senderLevel?->img ?? '',
             'sender_level' => intval($user->senderLevel?->level),
             'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
             'remaining_to_next_level' => $remaining ?? 0,
@@ -1576,6 +1578,7 @@ class UserController extends Controller
         ];
         return Common::apiResponse(true, 'success', $data);
     }
+
 
 
 

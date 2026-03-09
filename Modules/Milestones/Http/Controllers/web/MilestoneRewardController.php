@@ -34,6 +34,13 @@ class MilestoneRewardController
 
     public function create(Content $content)
     {
+        if (!request()->has('reloaded')) {
+
+            return redirect()->to(
+                request()->fullUrlWithQuery(['reloaded' => 1])
+            );
+        }
+
         return $content
             ->header(__('create'))
             // ->description(__('Add a new reward to milestone'))
@@ -105,7 +112,7 @@ class MilestoneRewardController
                 }
 
                 $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
+                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
             });
         }
         $grid->column('expire', __('Expire'))->display(fn($expire) => $expire ?: '-');
@@ -217,6 +224,8 @@ class MilestoneRewardController
                     break;
             }
         });
+
+      
         $form->saved(function (Form $form) {
 
             $route = url('admin/milestone-rewards/' . request('milestone_id'));

@@ -1,7 +1,7 @@
 
 
 <div class="card mb-4 border-0 ">
- <form action="{{ url('admin/room-boom/save') }}" method="POST" enctype="multipart/form-data">
+ <form action="{{ route('admin.room-boom-settings') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     @foreach($percentages as $percentage)
@@ -80,7 +80,6 @@
 
         <div class="box-footer">
 
-            <input type="hidden" name="_token" value="za1Uk8aVRuzBBWojNUrfhSq7FaKjMHAzFi4xwh0y" autocomplete="off">
 
             <div class="col-md-2">
             </div>

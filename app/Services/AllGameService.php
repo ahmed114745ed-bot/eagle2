@@ -32,11 +32,12 @@ class AllGameService
         $miniGames = $this->allGameRepository->getAllEnabledMiniGames();
         \request()->type = 1;
         $miniGames = AllGameResource::collection($miniGames)->toArray(request());
+        $gameSetting = Common::getByCode('bytesun');
 
         $key = [
-            "baishun_channel" => config('app.baishun_channel') ?? '',
-            "baishun_app_id" => config('app.baishun_app_id') ?? '',
-            "baishun_gsp" => (int)(config('app.baishun_gsp') ?? 201),
+            "baishun_channel" => $gameSetting->channel ?? '',
+            "baishun_app_id" => $gameSetting->app_id ?? '',
+            "baishun_gsp" => (int)($gameSetting->gsp ?? 201),
         ];
         return [
             'full' => $fullGames,
@@ -54,9 +55,9 @@ class AllGameService
 
 
         $key = [
-            "baishun_channel" => config('app.baishun_channel') ?? '',
-            "baishun_app_id" => config('app.baishun_app_id') ?? '',
-            "baishun_gsp" => (int)(config('app.baishun_gsp') ?? 201),
+            "baishun_channel" => $gameSetting->channel ?? '',
+            "baishun_app_id" => $gameSetting->app_id ?? '',
+            "baishun_gsp" => (int)($gameSetting->gsp ?? 201),
         ];
         return [
             'full' => $fullGames,

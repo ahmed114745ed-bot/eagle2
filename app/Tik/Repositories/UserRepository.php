@@ -23,7 +23,7 @@ class UserRepository extends AbstractRepository
 
     public function create(array $data): mixed
     {
-        return  $this->model->create($data);
+        return $this->model->create($data);
     }
 
 
@@ -122,13 +122,19 @@ class UserRepository extends AbstractRepository
 
     public function getUsers($ids)
     {
-        return $this->model->query()->with(['agency', 'profile', 'family'])
+        return $this->model->query()
+            ->with([
+                'agency:id,owner_id,name,type',
+                'profile:id,user_id,avatar',
+                'family:id,user_id,name,total_diamond,current_level_id'
+            ])
             ->whereIn('id', $ids)->get();
     }
 
     public function getAdmins($ids)
     {
-        if (empty($ids)) return collect();
+        if (empty($ids))
+            return collect();
 
         //        $vipsData = DB::table('vips')->get()->groupBy('type');
         //        $expPercentages = config('exp_percentages', [
@@ -146,17 +152,17 @@ class UserRepository extends AbstractRepository
             'sender_level',
             'received_level'
         ])->with([
-            //            'agency.owner',
-            //            'agency.mempers',
-            'profile:id,user_id,avatar',
-            //            'family',
-            'packs:id,user_id,is_used,type,target_id',
-            'eligiblePacks',
-            //            'ownAgency',
-            //            'userSetting',
-            //            'activePack20'
-            'specialId.ware',
-        ])->whereIn('id', $ids)->get();
+                    //            'agency.owner',
+                    //            'agency.mempers',
+                    'profile:id,user_id,avatar',
+                    //            'family',
+                    'packs:id,user_id,is_used,type,target_id',
+                    'eligiblePacks',
+                    //            'ownAgency',
+                    //            'userSetting',
+                    //            'activePack20'
+                    'specialId.ware',
+                ])->whereIn('id', $ids)->get();
 
         $admins->each(function ($user) {
             $user->user_types2 = $this->computeUserTypes($user);
@@ -170,10 +176,14 @@ class UserRepository extends AbstractRepository
     private function computeUserTypes($user): array
     {
         $types = [];
-        if ($user->type_user >= 1) $types[] = 1;
-        if ($user->type_user >= 2) $types[] = 2;
-        if ($user->agency?->type === 'shipping') $types[] = 3;
-        if ($user->is_bd) $types[] = 4;
+        if ($user->type_user >= 1)
+            $types[] = 1;
+        if ($user->type_user >= 2)
+            $types[] = 2;
+        if ($user->agency?->type === 'shipping')
+            $types[] = 3;
+        if ($user->is_bd)
+            $types[] = 4;
 
         return empty($types) ? [0] : array_unique($types);
     }
@@ -241,22 +251,22 @@ class UserRepository extends AbstractRepository
                      where (users_vips.expire >= UNIX_TIMESTAMP()) and users_vips.user_id = users.id order by level  desc limit 1) as max_level
                      ')
         ])->with([
-            'packs' => function ($query) {
-                return $query->whereIn('type', [4, 18, 5, 17]);
-            },
-            'profile',
-            'UserVip',
-            'dress1',
-        ])->where(function ($query) {
-            $query->whereDoesntHave('packs')->orWhereHas('packs', function ($q) {
-                $q->where("type", '!=', 17)->orWhere(fn($q) => $q->where('type', 17)->where("is_used", 0));
-            });
-        })->whereIn('users.id', $roomAdminActive)->orderByDesc(DB::raw('max_level'));
+                    'packs' => function ($query) {
+                        return $query->whereIn('type', [4, 18, 5, 17]);
+                    },
+                    'profile',
+                    'UserVip',
+                    'dress1',
+                ])->where(function ($query) {
+                    $query->whereDoesntHave('packs')->orWhereHas('packs', function ($q) {
+                        $q->where("type", '!=', 17)->orWhere(fn($q) => $q->where('type', 17)->where("is_used", 0));
+                    });
+                })->whereIn('users.id', $roomAdminActive)->orderByDesc(DB::raw('max_level'));
     }
 
     public function anotherUserRoom($roomVisitorArray, $limit, $offset)
     {
-        return  $this->usersRoom($roomVisitorArray)->limit($limit)->offset($offset)->get();
+        return $this->usersRoom($roomVisitorArray)->limit($limit)->offset($offset)->get();
     }
 
     public function updateFamilyId($user, $familyId)
@@ -305,11 +315,12 @@ class UserRepository extends AbstractRepository
     // }
     public function updateIsLogout($user, $isLogout, $is_new = false)
     {
-        if (!$user) return;
+        if (!$user)
+            return;
 
         $user->lan = app()->getLocale() ?? 'en';
-        $user->is_logout = (bool)$isLogout;
-        $user->is_points_first = (bool)$is_new;
+        $user->is_logout = (bool) $isLogout;
+        $user->is_points_first = (bool) $is_new;
 
         $notification_id = request()->input('notification_id');
         if ($notification_id) {
@@ -385,17 +396,21 @@ class UserRepository extends AbstractRepository
 
     public function findUsersByAgencyId($agencyId, $perPage, $page)
     {
-        return $this->model->where('agency_id', $agencyId)->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
-            $q->where('month', now()->month)
-                ->where('year', now()->year);
-        }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
+        return $this->model->where('agency_id', $agencyId)->withSum([
+            'monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
+                $q->where('month', now()->month)
+                    ->where('year', now()->year);
+            }
+        ], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
     }
     public function findUsersByAgencyIdI($agencyId)
     {
-        return $this->model->where('agency_id', $agencyId)->withSum(['monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
-            $q->where('month', now()->month)
-                ->where('year', now()->year);
-        }], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc');
+        return $this->model->where('agency_id', $agencyId)->withSum([
+            'monthlyDiamondReceive as monthly_diamond_received' => function ($q) {
+                $q->where('month', now()->month)
+                    ->where('year', now()->year);
+            }
+        ], 'monthly_diamond_received')->orderBy('monthly_diamond_received', 'desc');
     }
 
     public function getIdsByAgencyId($agencyId)
@@ -539,11 +554,13 @@ class UserRepository extends AbstractRepository
             $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
                 $query->where('month', $month)->where('year', $year);
             });
-        })->with(['userSallary' => function ($query) use ($month, $year) {
-            $query->when(isset($month) && isset($year), function ($query) use ($month, $year) {
-                $query->where('month', $month)->where('year', $year);
-            });
-        }])->with('agency')
+        })->with([
+                    'userSallary' => function ($query) use ($month, $year) {
+                        $query->when(isset($month) && isset($year), function ($query) use ($month, $year) {
+                            $query->where('month', $month)->where('year', $year);
+                        });
+                    }
+                ])->with('agency')
             ->paginate($perPage, ['*'], 'page', $page)
             ->through(function ($user) use ($month, $year) {
                 $user->total_diamonds = $user->getTotalDiamond($month, $year);
@@ -565,7 +582,7 @@ class UserRepository extends AbstractRepository
 
         return $user->friends()
             ->where('online', 1)
-            ->whereHas('ownerRoom', function ($query) use ($tasks){
+            ->whereHas('ownerRoom', function ($query) use ($tasks) {
                 $query->where('type', 'live')
                     ->where('is_live', 1)
                     ->when(!empty($tasks), function ($q) use ($tasks) {
@@ -578,8 +595,8 @@ class UserRepository extends AbstractRepository
                 'UserVip',
                 'packs',
                 'ownerRoom' => function ($query) {
-                $query->where('type', 'live')->where('is_live', 1);
-            }
+                    $query->where('type', 'live')->where('is_live', 1);
+                }
             ])
             ->paginate(request('per_page'));
     }
@@ -594,17 +611,21 @@ class UserRepository extends AbstractRepository
             ->with([
                 'chatRoomsAsUser' => function ($q) use ($authUserId) {
                     $q->where('user_id2', $authUserId)
-                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-                            $query->where('user_id', '<>', $authUserId)
-                                ->where('status', '<>', 'seen');
-                        }]);
+                        ->withCount([
+                            'messages as unread_messages_count' => function ($query) use ($authUserId) {
+                                $query->where('user_id', '<>', $authUserId)
+                                    ->where('status', '<>', 'seen');
+                            }
+                        ]);
                 },
                 'chatRoomsAsUser2' => function ($q) use ($authUserId) {
                     $q->where('user_id', $authUserId)
-                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
-                            $query->where('user_id', '<>', $authUserId)
-                                ->where('status', '<>', 'seen');
-                        }]);
+                        ->withCount([
+                            'messages as unread_messages_count' => function ($query) use ($authUserId) {
+                                $query->where('user_id', '<>', $authUserId)
+                                    ->where('status', '<>', 'seen');
+                            }
+                        ]);
                 },
             ])
             ->paginate(request('per_page', 10));
@@ -615,9 +636,11 @@ class UserRepository extends AbstractRepository
 
     public function agencyUsers($agencyId, $month, $year, $perPage, $page)
     {
-        return $this->model->where('agency_id', $agencyId)->with(['targets' => function ($query) use ($agencyId, $month, $year) {
-            $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
-        }])->paginate($perPage, ['*'], 'page', $page);
+        return $this->model->where('agency_id', $agencyId)->with([
+            'targets' => function ($query) use ($agencyId, $month, $year) {
+                $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
+            }
+        ])->paginate($perPage, ['*'], 'page', $page);
     }
 
 
