@@ -14,5 +14,9 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'update-room-count',
         '__debugbar/screen',
+        'admin/_handle_action_',
+        'superadmin/_handle_action_',
+        'areaManager/_handle_action_',
+        'agency/_handle_action_',
     ];
 }

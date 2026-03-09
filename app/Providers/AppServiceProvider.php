@@ -190,20 +190,34 @@ class AppServiceProvider extends ServiceProvider
 
     public function dashboardAdminConfig(): void
     {
-        $prefix = request()->segment(1);
-
+        // Register all admin route groups at boot time for Octane worker safety
+        // This avoids "sticky" configuration when workers handle different prefixes
+        
         $originalConfig = config('admin.route');
 
-        if ($prefix === 'superadmin') {
+        // 1. Default Admin
+        \Encore\Admin\Facades\Admin::routes();
+
+        // 2. Super Admin
+        if (config('admin.superadmin_route')) {
             config(['admin.route' => config('admin.superadmin_route')]);
-            Admin::routes();
-        } elseif ($prefix === 'areaManager') {
-            config(['admin.route' => config('admin.area_manager_route')]);
-            Admin::routes();
-        } elseif ($prefix === 'admin') {
-            // Admin::routes();
-            config(['admin.route' => $originalConfig]);
+            \Encore\Admin\Facades\Admin::routes();
         }
+
+        // 3. Area Manager
+        if (config('admin.area_manager_route')) {
+            config(['admin.route' => config('admin.area_manager_route')]);
+            \Encore\Admin\Facades\Admin::routes();
+        }
+
+        // 4. Agency
+        if (config('admin.agency_route')) {
+            config(['admin.route' => config('admin.agency_route')]);
+            \Encore\Admin\Facades\Admin::routes();
+        }
+
+        // Restore original config for the rest of the boot process
+        config(['admin.route' => $originalConfig]);
     }
 
     protected function defineCarbonMacros(): void
