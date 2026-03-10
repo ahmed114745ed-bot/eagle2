@@ -1773,6 +1773,10 @@
     "Login": "تسجيل الدخول",
     "login": "الدخول",
     "Logs": "السجلات",
+    "Zego Settings": "إعدادات زيغو",
+    "Encrypted Zego Token": "رمز زيغو المشفّر",
+    "zego client Id": "معرّف عميل زيغو",
+
     "show achievement": "عرض الاوسمة",
     "show achievement_level": "عرض مستوى الإنجاز",
     "show admin users": "عرض المستخدمين الإداريين",
