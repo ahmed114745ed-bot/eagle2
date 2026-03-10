@@ -56,12 +56,15 @@ class SettingController extends MainController
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
         $zego_key = Common::getConf('zego_key');
+        $appCoinRate = data_get($settings, 'app_coin_rate');
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
+        $userTransferRateEnabled = data_get($settings, 'user_transfer_rate_enabled');
+        $userTransferCoinRate = data_get($settings, 'user_transfer_coin_rate');
         return parent::index($content
             ->header(__('Settings'))
             ->description('   ')
@@ -101,7 +104,10 @@ class SettingController extends MainController
                 'agora_app_certificate',
                 'zego_filter_enabled',
                 'is_auto_preview',
-                'countries'
+                'countries',
+                'appCoinRate',
+                'userTransferRateEnabled',
+                'userTransferCoinRate'
             ]))));
     }
 

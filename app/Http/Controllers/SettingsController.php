@@ -101,14 +101,12 @@ class SettingsController extends Controller
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
             ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
-            ($request->has('zones_coins') && !is_null($request->zones_coins) && $request->zones_coins != cache()->get('zones_coins')) ||
             ($request->has('user_coins') && !is_null($request->user_coins) && $request->user_coins != cache()->get('user_coins'))
         ) {
 
-            $zoneSetting = Setting::where('key', 'zones_coins')->first();
             $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
             $shippingSetting = Setting::where('key', 'shipping_coins')->first();
-            if ($zoneSetting && $superAdminSetting && $shippingSetting) {
+            if ($superAdminSetting && $shippingSetting) {
 
                 $userSalary = UserSallary::select('sallary', 'cut_amount')->first();
 

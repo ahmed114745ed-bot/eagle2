@@ -24,6 +24,7 @@ use Modules\AreaManager\Http\Controllers\DedicateRewardHistoryController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
+use Modules\AreaManager\Http\Controllers\CoinRateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -155,6 +156,8 @@ Route::group(
         Route::get('users/{id}/same-device-users-table', [UserController::class, 'ajaxSameDeviceUsersTable']);
         //
         Route::get('/charges', [ChargeController::class, 'index']);
+        Route::get('coin-rate-settings', [CoinRateController::class, 'index'])->name('coin-rate-settings.index');
+        Route::post('coin-rate-settings', [CoinRateController::class, 'store'])->name('coin-rate-settings.store');
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
 
         Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('admin.rooms-activity');

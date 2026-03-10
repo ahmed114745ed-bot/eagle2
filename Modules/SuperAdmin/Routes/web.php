@@ -123,6 +123,7 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdmin\SuperadminBannerHistoryContro
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\SuperAdminRewardController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\UserController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\WalletController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\CoinRateController;
 
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
@@ -182,6 +183,8 @@ Route::group(
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::resource('/salaries', BdSalariesController::class);
         Route::resource('/charges', ChargeController::class);
+        Route::get('coin-rate-settings', [CoinRateController::class, 'index'])->name('coin-rate-settings.index');
+        Route::post('coin-rate-settings', [CoinRateController::class, 'store'])->name('coin-rate-settings.store');
         // Route::resource('/wallet', 'WalletController');
         Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
         Route::post('/locale', MultiLanguageController::class . '@locale');

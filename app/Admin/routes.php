@@ -158,7 +158,7 @@ Route::group([
     ],
 ], function () {
 
-    Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
+    Route::get('change-password-view', [App\Admin\Controllers\AuthController::class, 'changePasswordView'])
         ->name('admin.change-password-view');
 });
 
@@ -688,8 +688,9 @@ Route::group(
         Route::resource('helper-links', LinkViewController::class);
 
         Route::resource('room-settings', RoomSettingsController::class);
-        Route::resource('charges-settings', ChargesSettingController::class);
+
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
+        Route::post('save-settings', [SettingController::class, 'saveSettings'])->name('saveSettings');
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
 
