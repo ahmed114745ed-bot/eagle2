@@ -2,7 +2,6 @@
 
 namespace Utd\Reals\Services;
 
-use App\Facades\CustomNotification;
 use App\Models\User;
 use Utd\Reals\Entities\Real;
 use Utd\Reals\Entities\RealUserLike;
@@ -34,7 +33,7 @@ class RealLikesService extends BaseModelService
             $real->likes()->create([
                 'user_id' => $userId,
             ]);
-            CustomNotification::likeReal($real, $user);
+            (new RealsNotification())->likeReal($real, $user);
         }
 
         return true;

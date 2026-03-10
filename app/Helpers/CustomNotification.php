@@ -107,25 +107,6 @@ class CustomNotification
 
 
 
-    public function likeReal(Real $real, User $userLike)
-    {
-        $reelUser                = $real->user;
-        $lang = $reelUser->lan ?? 'en';
-        $body             = __('api.like_your_real', ['name' => $userLike->name], $lang);
-        $title = __('api.likeReal', [], $lang);
-        $data['real_id'] = @$real->id;
-        $this->sendNotificationWithImage($reelUser, $body, $body, $userLike, $title, 'like-real', $data);
-    }
-
-    public function CommentReal(Real $real, User $user)
-    {
-        $reelUser               = $real->user;
-        $lang = $reelUser->lan ?? 'en';
-        $body           = __('api.comment_real', ['name' => $user->name], $lang);
-        $title = __('api.realComment', [], $lang);
-        $data['real_id'] = @$real->id;
-        $this->sendNotificationWithImage($reelUser, $body, $body, $user, $title, 'real-comment', $data);
-    }
 
 
     public function acceptAgency(Agency $agency, User $user)

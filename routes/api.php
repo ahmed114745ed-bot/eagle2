@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\CommunityController;
+use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\EmojiController;
 use App\Http\Controllers\Api\V1\GiftCategoryController;
@@ -200,7 +201,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('config')->group(function () {
                 Route::get('settings', [VersionController::class, 'settings']);
-                Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
+                Route::post('keys-values', [ConfigController::class, 'getConfigValues']);
                 //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
             });
             Route::get('user-app-setting', [UserController::class, 'appSetting']);

@@ -2,8 +2,8 @@
 
 namespace Utd\Reals\Http\Controllers;
 
-use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use Utd\Reals\Services\RealsNotification;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -70,7 +70,7 @@ class RealsUserCommentController extends Controller
         }
         $this->realCommentsService->add($request->validated(), $real, $user);
 
-        CustomNotification::CommentReal($real, $user);
+        (new RealsNotification())->CommentReal($real, $user);
 
         return Common::apiResponse(1, 'success', [], 200);
     }
