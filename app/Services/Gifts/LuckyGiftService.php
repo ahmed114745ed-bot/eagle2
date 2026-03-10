@@ -278,6 +278,7 @@ class LuckyGiftService
         //     'total_diamond' => $room->total_diamond,
         //     'totalPrice' => $totalPrice,
         // ]);
+        $responseData['total_pk'] = $coinsForReceiver;
 
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
@@ -586,6 +587,7 @@ class LuckyGiftService
             $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
             $totalRoomGift->increment('current_total', $totalHostDiamond);
         }
+        $responseData['total_pk'] = $coinsForReceiver;
 
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();

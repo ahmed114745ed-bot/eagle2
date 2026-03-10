@@ -519,20 +519,20 @@ class EnteranceRoomServices
             $is_black = explode(',', $roomBlack);
             foreach ($is_black as $k => &$v) {
                 $arr = explode("#", $v);
-                $sjc = time() - $arr[1];
-                $rt = $arr[2] - $sjc;
+                $sjc = time() - (int)$arr[1];
+                $rt = (int)$arr[2] - $sjc;
                 $h = floor($rt / 3600);
                 $r = $rt % 3600;
                 $m = floor($r / 60);
                 $s = $r % 60;
-                if ($sjc < $arr[2] && $arr[0] == $user->id) {
+                if ($sjc < (int)$arr[2] && $arr[0] == $user->id) {
                     $messageBlack = __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room');
                     $remainingTime = ['remaining_time' => "$h:$m:$s"];
 
                     return Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'));
                 }
 
-                if ($sjc >= $arr[2]) {
+                if ($sjc >= (int)$arr[2]) {
                     unset($is_black[$k]);
                 }
             }
@@ -783,11 +783,11 @@ class EnteranceRoomServices
         $isBlack = explode(',', $room->room_black);
         foreach ($isBlack as $k => &$v) {
             $arr = explode("#", $v);
-            $sjc = time() - $arr[1];
-            if ($sjc < $arr[2] && $arr[0] == $userId) {
+            $sjc = time() - (int)$arr[1];
+            if ($sjc < (int)$arr[2] && $arr[0] == $userId) {
                 return true;
             }
-            if ($sjc >= $arr[2]) {
+            if ($sjc >= (int)$arr[2]) {
                 unset($isBlack[$k]);
             }
         }

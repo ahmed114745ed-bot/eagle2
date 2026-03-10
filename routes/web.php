@@ -38,6 +38,7 @@ use App\Models\AgencySallary;
 use App\Models\Ban;
 use App\Models\Bd;
 use App\Models\BDSallary;
+use App\Models\Coin;
 use App\Models\CoinGameUserAll;
 use App\Models\CoinLog;
 use App\Models\Country;
@@ -1640,7 +1641,7 @@ use App\Models\GameProviderSetting;
 
 Route::get('/save-game-app-key', function (Request $request) {
     $providerCode = $request->provider_code ?? 'quantum_nexus';
-    $appKey = env('GAME_APP_KEY');
+    $appKey = env('LEADER_CC_GAME_SECRET_KEY');
     try {
         $gameSetting = GameProviderSetting::updateOrCreate(
             ['provider_code' => $providerCode],
@@ -1662,6 +1663,84 @@ Route::get('/save-game-app-key', function (Request $request) {
     }
 });
 
+use Illuminate\Support\Facades\Log;
+
+Route::get('/fix-paid-usd', function () {
+
+    Log::info('Fix paid_usd process started');
+
+    $logs = CoinLog::whereNull('paid_usd')
+        ->orWhere('paid_usd', 0)
+        ->get();
+
+    Log::info('Total logs fetched', ['count' => $logs->count()]);
+
+    $updated = 0;
+    $skipped = 0;
+    $errors = 0;
+
+    foreach ($logs as $log) {
+
+        try {
+
+            Log::info('Processing log', [
+                'log_id' => $log->id,
+                'obtained_coins' => $log->obtained_coins,
+                'current_paid_usd' => $log->paid_usd
+            ]);
+
+            $coin = Coin::where('coin', $log->obtained_coins)->first();
+
+            if ($coin) {
+
+                $oldValue = $log->paid_usd;
+
+                $log->paid_usd = $coin->usd;
+                $saved = $log->save();
+
+                if ($saved) {
+                    Log::info('Log updated successfully', [
+                        'log_id' => $log->id,
+                        'old_paid_usd' => $oldValue,
+                        'new_paid_usd' => $coin->usd
+                    ]);
+                } else {
+                    Log::warning('Log save returned false', [
+                        'log_id' => $log->id
+                    ]);
+                }
+
+                $updated++;
+
+            } else {
+
+                Log::warning('Coin not found for obtained_coins', [
+                    'log_id' => $log->id,
+                    'obtained_coins' => $log->obtained_coins
+                ]);
+
+                $skipped++;
+            }
+
+        } catch (\Exception $e) {
+
+            Log::error('Error while processing log', [
+                'log_id' => $log->id,
+                'error' => $e->getMessage()
+            ]);
+
+            $errors++;
+        }
+    }
+
+    Log::info('Fix paid_usd process finished', [
+        'updated' => $updated,
+        'skipped' => $skipped,
+        'errors' => $errors
+    ]);
+
+    return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
+});
 Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
@@ -1672,3 +1751,12 @@ Route::get('make-seeders-for-new-update', function () {
     return 'seeders have been executed successfully!';
     return 'seeders have been executed successfully!';
 });
+
+Route::get('make-seeders-for-permission', function () {
+    $seeder = new \Database\Seeders\PermissionTypeSeeder();
+    $seeder->run();
+
+    return 'seeders have been executed successfully!';
+});
+
+

@@ -705,7 +705,7 @@ class GiftController extends MainController
             }
         }
 
-        admin_toastr(__('Settings updated successfully'), 'success');
+        admin_toastr(__('Settings updated successfully.'), 'success');
         return back();
     }
 }

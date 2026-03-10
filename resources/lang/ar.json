@@ -1773,6 +1773,10 @@
     "Login": "تسجيل الدخول",
     "login": "الدخول",
     "Logs": "السجلات",
+    "Settings": "إعدادات ",
+    "Encrypted Token": "رمز  المشفّر",
+    "client Id": "معرّف عميل ",
+
     "show achievement": "عرض الاوسمة",
     "show achievement_level": "عرض مستوى الإنجاز",
     "show admin users": "عرض المستخدمين الإداريين",
@@ -3097,6 +3101,7 @@
     "select_default_superadmin": "اختر مدير دوله ليكون الافتراضي",
     "set_as_default": "تعيين كـ BD افتراضي",
     "Updated": "تم التحديث",
+    "Default area manager not found. Please set a default area manager before deleting.": "لم يتم العثور على مدير منطقة افتراضي. يرجى تعيين مدير منطقة افتراضي قبل الحذف.",
     "dodo": "     ",
     "Default Super Admin has been set successfully": "تم تعيين مدير دوله الافتراضي بنجاح",
     "set_superadmin_as_default": "تعيين كمدير دوله افتراضي",

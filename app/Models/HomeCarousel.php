@@ -59,12 +59,15 @@ class HomeCarousel extends Model
         parent::boot();
 
         self::creating(function ($model) {
+             $newDuration = Carbon::now();
             if ($model->form !== null) {
+
                 $newDuration = Carbon::now();
                 $duration = match ($model->form) {
                     '1' => $model->input > 1 ? $newDuration->addHours($model->input) : $newDuration->addMinute($model->input * 60),
                     '2' => $newDuration->addDays($model->input),
                     '3' => $newDuration->addMonths($model->input),
+                    '4' => 0,
                     default => null
                 };
                 // $model->duration = $duration->timestamp;
@@ -73,12 +76,15 @@ class HomeCarousel extends Model
 
         self::saving(function ($model) {
             $newDuration = Carbon::now();
+
             if ($model->form !== null) {
                 if ($model->isDirty('input') || $model->isDirty('form')) {
                     $duration = match ($model->form) {
                         '1' => $model->input > 1 ? $newDuration->addHours($model->input) : $newDuration->addMinute($model->input * 60),
                         '2' => $newDuration->addDays($model->input),
                         '3' => $newDuration->addMonths($model->input),
+                        '4' => 0,
+
                         default => null
                     };
                     // $model->duration = $duration->timestamp;
@@ -94,6 +100,7 @@ class HomeCarousel extends Model
                         '1' => $model->input > 1 ? $newDuration->addHours($model->input) : $newDuration->addMinute($model->input * 60),
                         '2' => $newDuration->addDays($model->input),
                         '3' => $newDuration->addMonths($model->input),
+                        '4' => 0,
                         default => null
                     };
                     // $model->duration = $duration->timestamp;

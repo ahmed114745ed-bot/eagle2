@@ -4404,6 +4404,7 @@
     "share_room_message": "Merhaba, gel ve benimle bu odaya katıl, gerçekten çok eğlenceli",
     "payment.amount": "Tutar",
     "payment.type": "Tip",
+    "Default area manager not found. Please set a default area manager before deleting.": "Varsayılan bölge yöneticisi bulunamadı. Silmeden önce lütfen bir varsayılan bölge yöneticisi ayarlayın.",
     "payment.game_type": "Oyun Tipi",
     "payment.link_type": "Bağlantı Tipi",
     "payment.select_link_type": "Bağlantı Tipi Seçin",
@@ -4461,6 +4462,10 @@
     "coins": "Paralar",
     "wealth": "Servet",
     "attraction": "Çekicilik",
-    "cp": "CP"
+    "Encrypted Token": "Şifrelenmiş Token",
+    "client Id": "İstemci Kimliği",
+    "cp": "CP",
+        "Reel Settings": "Reel Ayarları",
+      "chat":"Chat"
 
 }

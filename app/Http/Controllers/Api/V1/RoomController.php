@@ -1928,46 +1928,55 @@ class RoomController extends Controller
     }
     protected function removeBlock(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'room_id'        => 'required|integer|exists:rooms,id',
-            'user_id'        => 'required|integer|exists:users,id',
+         $validator = Validator::make($request->all(), [
+                'room_id' => 'required|integer|exists:rooms,id',
+                'user_id' => 'required|integer|exists:users,id',
+            ]);
 
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        try {
-            $userId = $request->user()->id;
-            $room = Room::findOrFail($request->room_id);
-            if ($room->uid != $userId) return   Common::apiResponse(0, 'you do not have permission', 400);
-            $ids = explode(',', $room->room_black);
-            $updatedIds = [];
-            $userToRemove = $request->user_id;
-
-            // foreach ($ids as $entry) {
-            //     $parts = explode('#', $entry);
-            //     $id = $parts[0] ?? null;
-
-            //     if ($id != $userToRemove)   return   Common::apiResponse(0, 'this user not in black list', 400);
-            // }
-
-            $ids = array_filter(explode(',', $room->room_black));
-            $userToRemove = (string) $request->user_id;
-
-            if (!in_array($userToRemove, $ids)) {
-                return Common::apiResponse(0, 'this user not in black list', 400);
+            if ($validator->fails()) {
+                return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
             }
-            $ids = array_values(array_filter($ids, fn($id) => $id != $userToRemove));
 
+            try {
 
-            $room->room_black = implode(',', $ids);
-            $room->save();
-            return   Common::apiResponse(true, 'block removed', 200);
-        } catch (Exception $e) {
-            return Common::apiResponse(0, $e->getMessage(), 422);
-        }
+                $userId = $request->user()->id;
+                $room = Room::findOrFail($request->room_id);
+
+                if ($room->uid != $userId) {
+                    return Common::apiResponse(0, 'you do not have permission', 400);
+                }
+
+                $ids = array_filter(explode(',', $room->room_black));
+                $userToRemove = $request->user_id;
+
+                $found = false;
+
+                $ids = array_values(array_filter($ids, function ($entry) use ($userToRemove, &$found) {
+
+                    $parts = explode('#', $entry);
+                    $id = $parts[0] ?? null;
+
+                    if ($id == $userToRemove) {
+                        $found = true;
+                        return false;
+                    }
+
+                    return true;
+                }));
+
+                if (!$found) {
+                    return Common::apiResponse(0, 'this user not in black list', 400);
+                }
+
+                $room->room_black = implode(',', $ids);
+                $room->save();
+
+                return Common::apiResponse(true, 'block removed', 200);
+
+            } catch (Exception $e) {
+                return Common::apiResponse(0, $e->getMessage(), 422);
+            }
     }
-
     public function roomUserDetails($id)
     {
         try {

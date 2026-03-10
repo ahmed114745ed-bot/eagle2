@@ -753,20 +753,21 @@ class Common
     }
     private static function getGoogleAccessToken()
     {
-        $credentialsFilePath = base_path(config("app.fileName"));
+        return \Cache::remember('firebase_google_access_token', 3500, function () {
+            $credentialsFilePath = base_path(config("app.fileName"));
 
-        // التحقق من وجود الملف
-        if (!file_exists($credentialsFilePath)) {
-            return;
-        }
+            if (!file_exists($credentialsFilePath)) {
+                return null;
+            }
 
-        $client = new \Google_Client();
-        $client->setAuthConfig($credentialsFilePath);
-        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
-        $client->refreshTokenWithAssertion();
-        $token = $client->getAccessToken();
+            $client = new \Google_Client();
+            $client->setAuthConfig($credentialsFilePath);
+            $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+            $client->refreshTokenWithAssertion();
+            $token = $client->getAccessToken();
 
-        return $token['access_token'];
+            return $token['access_token'];
+        });
     }
     private static function getUnsubscribeGoogleAccessToken(): ?string
     {
