@@ -4462,9 +4462,8 @@
     "coins": "Paralar",
     "wealth": "Servet",
     "attraction": "Çekicilik",
-    "Zego Settings": "Zego Ayarları",
-    "Encrypted Zego Token": "Şifrelenmiş Zego Token",
-    "zego client Id": "Zego İstemci Kimliği",
+    "Encrypted Token": "Şifrelenmiş Token",
+    "client Id": "İstemci Kimliği",
     "cp": "CP",
         "Reel Settings": "Reel Ayarları",
       "chat":"Chat"

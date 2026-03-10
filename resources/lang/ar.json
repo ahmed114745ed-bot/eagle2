@@ -1773,9 +1773,9 @@
     "Login": "تسجيل الدخول",
     "login": "الدخول",
     "Logs": "السجلات",
-    "Zego Settings": "إعدادات زيغو",
-    "Encrypted Zego Token": "رمز زيغو المشفّر",
-    "zego client Id": "معرّف عميل زيغو",
+    "Settings": "إعدادات ",
+    "Encrypted Token": "رمز  المشفّر",
+    "client Id": "معرّف عميل ",
 
     "show achievement": "عرض الاوسمة",
     "show achievement_level": "عرض مستوى الإنجاز",

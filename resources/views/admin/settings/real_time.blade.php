@@ -61,14 +61,14 @@
                                 <div class="col-md-6 mb-3 ms-0 me-auto">
                                     <div class="card p-9-px shadow real-time-card-height"  >
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4 class="m-0 color-white">{{ __('Zego Settings') }}</h4>
+                                            <h4 class="m-0 color-white">{{ __('settings') }}</h4>
                                         </div>
                                         <br>
                                         <div class="row">
                                             <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
-                                                        for="zego_server_secret">{{ __('Encrypted Zego Token') }}:</label>
+                                                        for="zego_server_secret">{{ __('Encrypted Token') }}:</label>
                                                     <input type="text" id="zego_server_secret"
                                                         name="zego_token" placeholder="{{ __('server_secret') }}"
                                                         value="{{ $zego_token }}" class="form-control"
@@ -79,7 +79,7 @@
                                             <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
-                                                        for="zego_server_secret">{{ __('zego client Id') }}:</label>
+                                                        for="zego_server_secret">{{ __('client Id') }}:</label>
                                                     <input type="text" id="zego_server_secret_key"
                                                         name="zego_key" placeholder="{{ __('server_secret_key') }}"
                                                         value="{{ $zego_key }}" class="form-control"
