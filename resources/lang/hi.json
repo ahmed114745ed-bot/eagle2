@@ -3502,6 +3502,7 @@
     "dashboard.login.cancel": "रद्द करें",
     "dashboard.login.confirm": "पुष्टि करें",
     "dashboard.login.success": "सफलता",
+    "login": "लॉगिन",
     "dashboard.login.error.enter_username_first": "कृपया पहले उपयोगकर्ता नाम दर्ज करें",
     "login.error.enter_type": "कृपया पहले प्रकार दर्ज करें",
     "dashboard.login.loading.prepare": "तैयार किया जा रहा है...",
