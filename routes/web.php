@@ -1751,6 +1751,11 @@ Route::get('make-seeders-for-new-update', function () {
     return 'seeders have been executed successfully!';
 });
 
+Route::get('make-seeders-for-permission', function () {
+    $seeder = new \Database\Seeders\PermissionTypeSeeder();
+    $seeder->run();
 
+    return 'seeders have been executed successfully!';
+});
 
 
