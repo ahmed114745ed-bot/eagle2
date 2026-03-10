@@ -13,7 +13,7 @@ class MultiplierSelector
     public function select(float $deviation): int
     {
         $availableMultipliers = FairLuckSetting::getByKey('available_multipliers', [5, 10, 20, 50, 100, 250, 500, 1000]);
-        
+
         // Dynamic weights based on deviation
         $weights = $this->calculateWeights($availableMultipliers, $deviation);
 
@@ -23,7 +23,7 @@ class MultiplierSelector
     private function calculateWeights(array $multipliers, float $deviation): array
     {
         $weights = [];
-        
+
         foreach ($multipliers as $m) {
             if ($deviation < -0.15) { // User in significant deficit (Lost > 15% more than target)
                 // Reward user: favor high multipliers but be less aggressive with jackpots
@@ -46,7 +46,7 @@ class MultiplierSelector
                 // In normal state, only allow up to 100x.
                 // 250x, 500x and 1000x are reserved ONLY for users in significant deficit.
                 if ($m >= 250) {
-                    $weights[] = 0; 
+                    $weights[] = 0;
                 } else {
                     $weights[] = $weight;
                 }
@@ -58,17 +58,17 @@ class MultiplierSelector
 
     private function getNormalWeight(int $multiplier): int
     {
-        // Extreme weights for small multipliers to maximize playtime (Super Low Volatility)
+        // High frequency for small multipliers to maximize playtime (Low Volatility)
         return match ($multiplier) {
-            5 => 2000,  // Was 800 - Heavily favor the lowest win to keep balance stable
-            10 => 800,  // Was 400
-            20 => 200,  // Was 150
-            50 => 20,   // Was 40
-            100 => 5,   // Was 10
-            250 => 1,   // Was 5
-            500 => 0,   // Reserved for deficit only
-            1000 => 0,  // Reserved for deficit only
-            default => 1,
+            5 => 2000,
+            10 => 800,
+            20 => 200,
+            50 => 20,
+            100 => 5,
+            250 => 1,
+            500 => 0,
+            1000 => 0,
+            default => 0,
         };
     }
 

@@ -438,6 +438,7 @@ class HomeCarouselController extends MainController
         $this->addContentType($form);
         $this->addDisplayLocations($form);
 
+
         $this->syncDisplaysBeforeSave($form);
         $this->syncCountriesAfterSave($form);
 
@@ -471,9 +472,9 @@ class HomeCarouselController extends MainController
             $form->text('input', trans('input'));
         })->when('3', function (Form $form) {
             $form->text('input', trans('input'))
-                ->rules('required|integer|min:1|max:99');
+                ->rules('integer|min:1|max:99');
         })->when('4', function (Form $form) {
-            $form->hidden('input', trans('input'))->default(0);
+             \Log::info('Adding input field for lifetime duration');
         });
     }
 
@@ -568,19 +569,23 @@ class HomeCarouselController extends MainController
         $form->ignore(['duration']);
 
 
+     
         $form->saving(function (Form $form) {
+        try {
+        if (request()->hasFile('img')) {
 
-            if (request()->hasFile('img')) {
+                        $path = WebPHelper::uploadWebp(
+                            request()->file('img'),
+                            'images',
+                            'splash',
 
-                $path = WebPHelper::uploadWebp(
-                    request()->file('img'),
-                    'images',
-                    'splash',
+                        );
 
-                );
-
-                $form->image_url = $path;
-            }
+                        $form->image_url = $path;
+                    }        } catch (\Exception $e) {
+                    dd($e->getMessage()); 
+                }
+            
         });
         // dd($form->display_at , $form->model()->display_at ,request('display_at'));
 

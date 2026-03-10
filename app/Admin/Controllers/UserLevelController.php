@@ -138,6 +138,7 @@ class UserLevelController extends MainController
         });
 
         $grid->disableCreateButton();
+        $grid->disableExport();
 
         $grid->tools(function (Grid\Tools $tools) {
             $url = '/admin/change-level-histories';

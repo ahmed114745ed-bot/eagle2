@@ -16,7 +16,9 @@ class UserCharismaService
 
     private Collection $userCharismaLevels;
 
-    public function __construct() { }
+    public function __construct()
+    {
+    }
 
     public function roomCharisma($room_id)
     {
@@ -25,8 +27,8 @@ class UserCharismaService
             return [];
         }
 
-//        $microphones = $room->microphone;
-        $users       = $this->getUserIdWithPosition2($room);
+        //        $microphones = $room->microphone;
+        $users = $this->getUserIdWithPosition2($room);
         $user_ids = $users->pluck('user_id')->toArray();
 
         $charisma = ExtraDataInRoom::whereIn('user_id', $user_ids)->where('room_id', $room->id)->get()->map(function ($item) use ($users) {
@@ -39,7 +41,7 @@ class UserCharismaService
 
 
 
-    public function RemoveUserRoomWhenLeaveMic($userId,$roomId)
+    public function RemoveUserRoomWhenLeaveMic($userId, $roomId)
     {
         $user = User::find($userId);
         $room = Room::find($roomId);
@@ -65,17 +67,17 @@ class UserCharismaService
         // info('addTotalEarnedCoinsInUserRoom');
         $roomId = $room->id;
 
-        if ( !$room) {
+        if (!$room) {
             return false;
         }
 
 
-//        $users = $this->getUserIdWithPosition2($room);
+        //        $users = $this->getUserIdWithPosition2($room);
         $users = $room->microphones()
             ->get(['user_id', 'position'])
             ->map(fn($m) => [
-                'user_id'  => (int)$m->user_id,
-                'position' => (int)$m->position,
+                'user_id' => (int) $m->user_id,
+                'position' => (int) $m->position,
             ])
             ->values();
 
@@ -83,17 +85,19 @@ class UserCharismaService
 
         foreach ($userIds as $userId) {
 
-            if ($earnedCoins) {                                                                                                                                                                                                                            // Find or create the ExtraDataInRoom record
-                $extraDataInRoom          = ExtraDataInRoom::firstOrNew([
-                                                                            'user_id' => $userId, 'room_id' => $roomId
-                                                                        ]);                                                                                                                                                                               // Update the total earned coins
-                $extraDataInRoom->total   += $earnedCoins;
-                $extraDataInRoom->room_id = $roomId;
-                $extraDataInRoom->save();
+            if ($earnedCoins) {
+                // Find or create the ExtraDataInRoom record
+                $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
+                    'user_id' => $userId,
+                    'room_id' => $roomId
+                ], ['total' => 0]);
+
+                // Update the total earned coins using atomic increment
+                $extraDataInRoom->increment('total', $earnedCoins);
             }
 
             $user = $users->where('user_id', $userId)->first();
-            if ($user){
+            if ($user) {
                 $user['total'] = @$extraDataInRoom?->total ?? 0;
                 $allDataChanges[] = $user;
             }
@@ -107,7 +111,7 @@ class UserCharismaService
     {
         $roomId = $room->id;
 
-        if ( !$room) {
+        if (!$room) {
             return false;
         }
 
@@ -117,17 +121,19 @@ class UserCharismaService
 
         foreach ($userIds as $userId) {
 
-            if ($earnedCoins) {                                                                                                                                                                                                                            // Find or create the ExtraDataInRoom record
-                $extraDataInRoom = ExtraDataInRoom::firstOrNew([
-                    'user_id' => $userId, 'room_id' => $roomId
-                ]);                                                                                                                                                                               // Update the total earned coins
-                $extraDataInRoom->total   += $earnedCoins;
-                $extraDataInRoom->room_id = $roomId;
-                $extraDataInRoom->save();
+            if ($earnedCoins) {
+                // Find or create the ExtraDataInRoom record
+                $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
+                    'user_id' => $userId,
+                    'room_id' => $roomId
+                ], ['total' => 0]);
+
+                // Update the total earned coins using atomic increment
+                $extraDataInRoom->increment('total', $earnedCoins);
             }
 
             $user = $users->where('user_id', $userId)->first();
-            if ($user){
+            if ($user) {
                 $user['total'] = @$extraDataInRoom?->total ?? 0;
                 $allDataChanges[] = $user;
             }
@@ -171,12 +177,12 @@ class UserCharismaService
 
     public function getUserResetData($microphones, array $userIds)
     {
-        $users       = $this->getUserIdWithPosition($microphones);
+        $users = $this->getUserIdWithPosition($microphones);
         $allDataChanges = [];
         foreach ($userIds as $userId) {
             $user = $users->where('user_id', $userId)->first();
-            if ($user){
-                $user['total'] =  0;
+            if ($user) {
+                $user['total'] = 0;
                 $allDataChanges[] = $user;
             }
         }
@@ -185,12 +191,12 @@ class UserCharismaService
 
     public function getUserResetData2($room, array $userIds)
     {
-        $users       = $this->getUserIdWithPosition2($room);
+        $users = $this->getUserIdWithPosition2($room);
         $allDataChanges = [];
         foreach ($userIds as $userId) {
             $user = $users->where('user_id', $userId)->first();
-            if ($user){
-                $user['total'] =  0;
+            if ($user) {
+                $user['total'] = 0;
                 $allDataChanges[] = $user;
             }
         }

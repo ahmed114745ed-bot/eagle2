@@ -131,7 +131,10 @@
         let inputName = $(this).attr('name');
         console.log("Selected library:", selectedLibrary);
         console.log("library Name:", inputName);
-        updateLibrary(selectedLibrary, inputName);
+        // Skip AJAX for live_library - it has its own form that submits to update-library route
+        if (inputName !== 'live_library') {
+            updateLibrary(selectedLibrary, inputName);
+        }
         updateSwitches();
     });
 
@@ -284,11 +287,13 @@ window.showSection = function(sectionId) {
     });
     const section = document.getElementById(sectionId);
     if (section) section.classList.add('active');
-
+    const hashValue = window.location.hash.substring(1);
     // Update all forms with current tab information
     document.querySelectorAll('input[name="current_tab"]').forEach(input => {
         input.value = sectionId;
     });
+
+    
 
     // Add current_tab as hidden input to all forms in settings (including both settings-form and no-background-form)
     document.querySelectorAll('.settings-form, .no-background-form, form[action*="admin"]').forEach(form => {
@@ -639,4 +644,32 @@ window.updateBackgroundValue = async function() {
             }, 5000);
         });
     });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const exchangeRateInput = document.getElementById('coin_exp');
+    const diamondInput = document.querySelector('.user_coin_input');
+    const exchangeRateHidden = document.querySelector('.exchange_rate');
+    const resultSpan = document.querySelector('.exp_result');
+
+    function calculateExchange() {
+        const rate = parseFloat(exchangeRateInput.value) || 0;
+        const diamonds = parseFloat(diamondInput.value) || 0;
+
+        exchangeRateHidden.value = rate;
+
+        if (rate > 0 && diamonds > 0) {
+            const result = (diamonds * rate).toFixed(2);
+            resultSpan.textContent = result + ' coins';
+            resultSpan.style.display = 'inline-block';
+        } else {
+            resultSpan.textContent = '';
+            resultSpan.style.display = 'none';
+        }
+    }
+
+    exchangeRateInput.addEventListener('input', calculateExchange);
+    diamondInput.addEventListener('input', calculateExchange);
+
+    calculateExchange();
+});
 </script>

@@ -45,6 +45,12 @@ class FairLuckSettingsController extends AdminController
 
     public function saveSettings(Request $request)
     {
+        $request->validate([
+            'global_vault_negative_limit' => 'required|numeric',
+            'fair_luck_app_fee_rate' => 'required|numeric|between:0,1',
+            'fair_luck_receiver_fee_rate' => 'required|numeric|between:0,1',
+        ]);
+
         $data = $request->only([
             'global_vault_negative_limit',
             'fair_luck_app_fee_rate',
@@ -55,6 +61,7 @@ class FairLuckSettingsController extends AdminController
             FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
-        return back()->with('success', 'Settings updated successfully.');
+        admin_success(__('Updated'), __('Settings updated successfully.'));
+        return back();
     }
 }

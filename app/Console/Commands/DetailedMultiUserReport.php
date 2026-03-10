@@ -139,7 +139,6 @@ class DetailedMultiUserReport extends Command
                     // تنفيذ الرهان
                     $result = $fairLuckService->processBet($userData['user'], $gift, $betAmount);
                     
-                    // تحديث رصيد المستخدم يدوياً (لأن FairLuckService3 لا يفعل ذلك)
                     $userBalanceBefore = $userData['user']->di;
                     $actualProfit = $result->isWinner ? $result->profitAmount : -$betAmount;
                     $newBalance = $userBalanceBefore + $actualProfit;
