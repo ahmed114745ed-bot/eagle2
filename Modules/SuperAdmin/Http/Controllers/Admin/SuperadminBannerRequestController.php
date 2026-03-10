@@ -71,9 +71,9 @@ class SuperadminBannerRequestController extends AdminController
                 return $name;
             }
 
-            $id = $this->superAdmin->id ?? '-';
-            $name = $this->superAdmin->username ?? 'غير معروف';
-            $path = $this->superAdmin->avatar;
+            $id = @$this->superAdmin->id ?? '-';
+            $name = @$this->superAdmin->username ?? 'غير معروف';
+            $path = @$this->superAdmin->avatar ?? '';
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
