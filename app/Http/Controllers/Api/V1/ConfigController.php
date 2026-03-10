@@ -200,8 +200,10 @@ class ConfigController extends Controller
         Cache::flush();
 
 
-        if (method_exists(Cache::store('octane'), 'flush')) {
+        try {
             Cache::store('octane')->flush();
+        } catch (\Exception $e) {
+            // Octane cache driver not available
         }
 
         if ($hasPusherUpdate) {
