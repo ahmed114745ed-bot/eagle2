@@ -712,12 +712,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'room-background', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'emoji', 'except' => [], 'additional' => ['move-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
-                    ],],
-                    ['key' => 'emoji-categories', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
+                    
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit'],
                     ],],
@@ -767,11 +762,28 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                 ],
             ],
-            [
-                'name' => 'Cp',
+
+             [
+                'name' => 'emojis',
                 'sort' => 28,
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 28],
+                ],
+                'permissions' => [
+
+                    ['key' => 'emoji', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'emoji-categories', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                ],
+            ],
+            [
+                'name' => 'Cp',
+                'sort' => 29,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 29],
                 ],
                 'permissions' => [
 
@@ -791,9 +803,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Custom achievement',
-                'sort' => 29,
+                'sort' => 30,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 29],
+                    PermissionType::ADMIN->value => ['sort' => 30],
                 ],
                 'permissions' => [
 
@@ -805,9 +817,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Achievements',
-                'sort' => 30,
+                'sort' => 31,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 30],
+                    PermissionType::ADMIN->value => ['sort' => 31],
                 ],
                 'permissions' => [
                     ['key' => 'achievement', 'except' => ['create', 'delete'], 'additional' => [], 'types' => [
@@ -823,9 +835,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Group chat',
-                'sort' => 31,
+                'sort' => 32,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 31],
+                    PermissionType::ADMIN->value => ['sort' => 32],
                 ],
                 'permissions' => [
                     ['key' => 'group-chat', 'except' => [], 'additional' => [], 'types' => [
@@ -838,9 +850,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Lucky box',
-                'sort' => 32,
+                'sort' => 33,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 32],
+                    PermissionType::ADMIN->value => ['sort' => 33],
                 ],
                 'permissions' => [
                     ['key' => 'boxes', 'except' => [], 'additional' => [], 'types' => [
@@ -856,9 +868,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Events',
-                'sort' => 33,
+                'sort' => 34,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 33],
+                    PermissionType::ADMIN->value => ['sort' => 34],
                 ],
                 'permissions' => [
                     ['key' => 'event-period', 'except' => [], 'additional' => [], 'types' => [
@@ -892,9 +904,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Milestone',
-                'sort' => 34,
+                'sort' => 35,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 34],
+                    PermissionType::ADMIN->value => ['sort' => 35],
 
                 ],
                 'permissions' => [
@@ -907,9 +919,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Reels',
-                'sort' => 35,
+                'sort' => 36,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 35],
+                    PermissionType::ADMIN->value => ['sort' => 36],
                 ],
                 'permissions' => [
                     ['key' => 'Real', 'except' => [], 'additional' => [], 'types' => [
@@ -922,9 +934,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Moment',
-                'sort' => 36,
+                'sort' => 37,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 36],
+                    PermissionType::ADMIN->value => ['sort' => 37],
                 ],
                 'permissions' => [
                     ['key' => 'Moment', 'except' => [], 'additional' => [], 'types' => [
@@ -937,9 +949,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Employees and Permissions',
-                'sort' => 37,
+                'sort' => 38,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 37],
+                    PermissionType::ADMIN->value => ['sort' => 38],
                     PermissionType::SUPER_ADMIN->value => ['sort' => 9],
                     PermissionType::AREA_MANAGER->value => ['sort' => 9],
                 ],
@@ -961,9 +973,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Work Settings',
-                'sort' => 38,
+                'sort' => 39,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 38],
+                    PermissionType::ADMIN->value => ['sort' => 39],
                 ],
                 'permissions' => [
                     ['key' => 'delete-account-details', 'except' => [], 'additional' => [], 'types' => [
@@ -994,9 +1006,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Sensitive Settings',
-                'sort' => 39,
+                'sort' => 40,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 39],
+                    PermissionType::ADMIN->value => ['sort' => 40],
                 ],
                 'permissions' => [
                     ['key' => 'updates', 'except' => [], 'additional' => [], 'types' => [
@@ -1012,9 +1024,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'System Settings',
-                'sort' => 40,
+                'sort' => 41,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 40],
+                    PermissionType::ADMIN->value => ['sort' => 41],
                 ],
                 'permissions' => [
                     ['key' => 'settings', 'except' => [], 'additional' => [], 'types' => [
@@ -1033,9 +1045,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Level',
-                'sort' => 41,
+                'sort' => 42,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 41],
+                    PermissionType::ADMIN->value => ['sort' => 42],
                 ],
                 'permissions' => [
                     ['key' => 'level', 'except' => [], 'additional' => [], 'types' => [
@@ -1052,9 +1064,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'user parent',
-                'sort' => 42,
+                'sort' => 43,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 42],
+                    PermissionType::ADMIN->value => ['sort' => 43],
                 ],
                 'permissions' => [
                     ['key' => 'user-parent', 'except' => ['edit', 'delete', 'show'], 'additional' => [], 'types' => [
@@ -1064,9 +1076,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'tribe events',
-                'sort' => 43,
+                'sort' => 44,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 43],
+                    PermissionType::ADMIN->value => ['sort' => 44],
                 ],
                 'permissions' => [
                     ['key' => 'tribe-periods', 'except' => [], 'additional' => [], 'types' => [
@@ -1082,9 +1094,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Room Boom',
-                'sort' => 44,
+                'sort' => 45,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 44],
+                    PermissionType::ADMIN->value => ['sort' => 45],
                 ],
                 'permissions' => [
                     ['key' => 'room-boom-levels', 'except' => [], 'additional' => [], 'types' => [
@@ -1116,9 +1128,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'reward',
-                'sort' => 45,
+                'sort' => 46,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 45],
+                    PermissionType::ADMIN->value => ['sort' => 46],
                 ],
                 'permissions' => [
                     [
@@ -1224,9 +1236,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'wallet fields',
-                'sort' => 46,
+                'sort' => 47,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 46],
+                    PermissionType::ADMIN->value => ['sort' => 47],
                 ],
                 'permissions' => [
                     ['key' => 'wallet-template', 'except' => [], 'additional' => [], 'types' => [
@@ -1239,9 +1251,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'ranking rewards',
-                'sort' => 47,
+                'sort' => 48,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 47],
+                    PermissionType::ADMIN->value => ['sort' => 48],
                 ],
                 'permissions' => [
                     ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
@@ -1252,9 +1264,9 @@ class PermissionTypeSeeder extends Seeder
 
             [
                 'name' => 'addons',
-                'sort' => 48,
+                'sort' => 49,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 48],
+                    PermissionType::ADMIN->value => ['sort' => 49],
                 ],
                 'permissions' => [
                     ['key' => 'app-feature', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
@@ -1264,9 +1276,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Default App Screen Settings',
-                'sort' => 49,
+                'sort' => 50,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 49],
+                    PermissionType::ADMIN->value => ['sort' => 50],
                 ],
                 'permissions' => [
                     ['key' => 'default-screen-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [

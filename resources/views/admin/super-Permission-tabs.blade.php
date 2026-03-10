@@ -60,6 +60,11 @@
         background-color: var(--primary-color);
         color: white;
     }
+    .nav-link {
+       
+        color: white;
+    }
+ 
     .permissions-section {
         display: none;
     }
@@ -1155,7 +1160,7 @@
         }
 
         .card-title {
-            color: #333;
+            color: #ffffff;
             font-weight: 500;
         }
         .table tbody tr:nth-child(even) {

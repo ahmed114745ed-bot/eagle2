@@ -19,6 +19,7 @@
     "Theme": "थीम",
       "Reel Settings": "रील सेटिंग्स",
       "chat":"चैट",
+      "Default area manager not found. Please set a default area manager before deleting.": "डिफ़ॉल्ट एरिया मैनेजर नहीं मिला। कृपया हटाने से पहले एक डिफ़ॉल्ट एरिया मैनेजर सेट करें।",
 
     "Super Roles": "भूमिकाएँ",
 "Browse super roles": "भूमिकाएँ ब्राउज़ करें",
@@ -438,6 +439,7 @@
     "This operation has already been done before!": "यह प्रक्रिया पहले ही की जा चुकी है!",
     "There was a problem, please try again!": "कोई समस्या हुई, कृपया फिर से प्रयास करें!",
     "Link": "लिंक",
+    "default":"डिफ़ॉल्ट",
     "Copy": "कॉपी",
     "helper links": "सहायक लिंक",
     "roomTarget": "रूम कप टारगेट: गिफ्ट और विज़िटर्स मिलकर टारगेट पूरा करते हैं। पूरा होने पर, रूम ओनर और एडमिन्स को कॉइन प्रॉफिट मिलता है।",
@@ -3500,6 +3502,7 @@
     "dashboard.login.cancel": "रद्द करें",
     "dashboard.login.confirm": "पुष्टि करें",
     "dashboard.login.success": "सफलता",
+    "login": "लॉगिन",
     "dashboard.login.error.enter_username_first": "कृपया पहले उपयोगकर्ता नाम दर्ज करें",
     "login.error.enter_type": "कृपया पहले प्रकार दर्ज करें",
     "dashboard.login.loading.prepare": "तैयार किया जा रहा है...",
