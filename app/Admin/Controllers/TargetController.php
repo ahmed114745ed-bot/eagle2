@@ -183,13 +183,15 @@ class TargetController extends MainController
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
+                $diamonds = $this->diamonds;
 
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['usd'] ?? $value;
+                    $diamonds = $this->edit->data['diamonds'] ?? $diamonds;
                 }
 
-                $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+                $endFormatted = $coins > 0 ? ($diamonds / $coins) : 0;
+                $userUsd = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
 
                 $display = $this->displayOldNewValue($old, $new, '', true);
 
@@ -208,13 +210,15 @@ class TargetController extends MainController
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
+                $diamonds = $this->diamonds;
 
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['agency_share'] ?? $value;
+                    $diamonds = $this->edit->data['diamonds'] ?? $diamonds;
                 }
 
-                $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+                $endFormatted = $coins > 0 ? ($diamonds / $coins) : 0;
+                $userUsd = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
 
                 $display = $this->displayOldNewValue($old, $new, '', true);
 
@@ -233,13 +237,15 @@ class TargetController extends MainController
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
+                $diamonds = $this->diamonds;
 
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['db_percentage'] ?? $value;
+                    $diamonds = $this->edit->data['diamonds'] ?? $diamonds;
                 }
 
-                $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+                $endFormatted = $coins > 0 ? ($diamonds / $coins) : 0;
+                $userUsd = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
 
                 $display = $this->displayOldNewValue($old, $new, '', true);
 
@@ -258,13 +264,15 @@ class TargetController extends MainController
             ->display(function ($value) use ($coins) {
                 $old = $value;
                 $new = $value;
+                $diamonds = $this->diamonds;
 
                 if ($this->under_edit && $this->edit) {
                     $new = $this->edit->data['app_profit_percentage'] ?? $value;
+                    $diamonds = $this->edit->data['diamonds'] ?? $diamonds;
                 }
 
-                $endFormatted = $this->diamonds / $coins;
-                $userUsd = common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
+                $endFormatted = $coins > 0 ? ($diamonds / $coins) : 0;
+                $userUsd = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted * $new / 100);
 
                 $display = $this->displayOldNewValue($old, $new, '', true);
 

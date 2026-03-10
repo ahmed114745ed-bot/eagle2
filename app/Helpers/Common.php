@@ -1787,25 +1787,11 @@ class Common
 
     public  static function getTargetUsd($diamonds, $percentage)
     {
-        //$convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
-        //$coins = Common::getSettingValue($convertDiamond) ?? 1;
+        $coins = \App\Services\CoinRateService::getAppBaseRate();
 
-        // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
-        //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        // });
-        // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
-        //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
-        // });
-
-        $zones_coins = Cache::rememberForever('zones_coins', function () {
-            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        });
-
-        $coins = $zones_coins;
-
-        $usd = $diamonds / $coins;
-        $userUsd = $usd *  $percentage  / 100;
-        $usd = Common::roundToTwoDecimalPlaces($userUsd);
+        $endFormatted = $coins > 0 ? ($diamonds / $coins) : 0;
+        $userUsd = $endFormatted * $percentage / 100;
+        $usd = \App\Helpers\Common::roundToTwoDecimalPlaces($userUsd);
 
         return $usd;
     }
@@ -1823,21 +1809,7 @@ class Common
     }
     public  static function getMaxCoins()
     {
-        // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
-        //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        // });
-        // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
-        //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
-        // });
-        $zones_coins = Cache::rememberForever('zones_coins', function () {
-            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        });
-
-        // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
-
-        $coins = $zones_coins;
-
-        return $coins;
+        return \App\Services\CoinRateService::getAppBaseRate();
     }
 
     public  static function getCoinsValue($key)
