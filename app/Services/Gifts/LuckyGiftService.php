@@ -278,6 +278,7 @@ class LuckyGiftService
         //     'total_diamond' => $room->total_diamond,
         //     'totalPrice' => $totalPrice,
         // ]);
+        $responseData['total_pk'] = $coinsForReceiver;
 
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
