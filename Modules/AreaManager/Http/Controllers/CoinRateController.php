@@ -28,8 +28,11 @@ class CoinRateController extends Controller
 
     public function store(Request $request)
     {
+        $appRate = CoinRateService::getAppBaseRate();
         $request->validate([
-            'rate' => 'required|numeric|min:0'
+            'rate' => 'required|numeric|min:1|max:' . $appRate
+        ], [
+            'rate.max' => __('The rate cannot be higher than the app base rate (:rate)', ['rate' => $appRate])
         ]);
 
         AdminCoinRate::updateOrCreate(

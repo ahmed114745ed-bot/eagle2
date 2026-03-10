@@ -42,6 +42,11 @@ class CoinRateService
 
     public static function getEffectiveRate($admin = null)
     {
+        // Auto-detect authenticated admin if none passed
+        if (!$admin) {
+            $admin = auth('admin')->user();
+        }
+
         if (!$admin) {
             return self::getAppBaseRate();
         }

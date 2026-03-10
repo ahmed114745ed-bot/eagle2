@@ -4073,5 +4073,12 @@
     "Equivalent:": "समतुल्य:",
     "Total sent:": "कुल भेजा गया:",
     "Base": "आधार",
-    "Extra": "अतिरिक्त"
+    "Extra": "अतिरिक्त",
+    "Coin Rate Settings": "कॉइन दर सेटिंग्स",
+    "Set your own coin rate for charging": "चार्जिंग के लिए अपनी कॉइन दर निर्धारित करें",
+    "Custom Coin Rate": "कस्टम कॉइन दर",
+    "Default App Rate: 1 USD = :rate Coins": "डिफ़ॉल्ट ऐप दर: 1 USD = :rate कॉइन",
+    "1 USD = :rate Coins": "1 USD = :rate कॉइन",
+    "The rate cannot be higher than the app base rate (:rate)": "दर ऐप की आधार दर (:rate) से अधिक नहीं हो सकती",
+    "Settings updated successfully": "सेटिंग्स सफलतापूर्वक अपडेट की गईं"
 }

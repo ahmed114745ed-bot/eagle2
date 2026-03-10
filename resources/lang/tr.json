@@ -4463,5 +4463,12 @@
     "Equivalent:": "Eşdeğeri:",
     "Total sent:": "Gönderilen Toplam:",
     "Base": "Temel",
-    "Extra": "Ekstra"
+    "Extra": "Ekstra",
+    "Coin Rate Settings": "Coin Kur Ayarları",
+    "Set your own coin rate for charging": "Kendi coin kurunuzu belirleyin",
+    "Custom Coin Rate": "Özel Coin Kuru",
+    "Default App Rate: 1 USD = :rate Coins": "Varsayılan Uygulama Kuru: 1 USD = :rate Coin",
+    "1 USD = :rate Coins": "1 USD = :rate Coin",
+    "The rate cannot be higher than the app base rate (:rate)": "Kur, uygulamanın taban kurundan (:rate) yüksek olamaz",
+    "Settings updated successfully": "Ayarlar başarıyla güncellendi"
 }

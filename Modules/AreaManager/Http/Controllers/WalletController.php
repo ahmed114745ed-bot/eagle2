@@ -13,6 +13,7 @@ use App\Models\UserWallet;
 use Illuminate\Http\Request;
 use App\Models\ShippingAgency;
 use App\Services\WalletService;
+use App\Services\CoinRateService;
 use Encore\Admin\Layout\Content;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
@@ -355,8 +356,8 @@ class WalletController extends MainController
             throw new \Exception(__('not_verified_agency'));
         }
 
-        $rate = Common::getCoinsValue('shipping_coins');
-        if (!$rate) {
+        $effectiveRate = CoinRateService::getEffectiveRate();
+        if (!$effectiveRate) {
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
         }
 
@@ -364,10 +365,10 @@ class WalletController extends MainController
 
         if ($chargeType === 'dollar') {
             $usdAmount = $amount;
-            $coinAmount = $amount * $rate;
+            $coinAmount = $amount * $effectiveRate;
         } else {
             $coinAmount = $amount;
-            $usdAmount = $amount / $rate;
+            $usdAmount = $amount / $effectiveRate;
         }
 
         $totalSalary = $from->di;
@@ -435,9 +436,7 @@ class WalletController extends MainController
             throw new \Exception(__('This sub admin not found under your account.'));
         }
 
-        $userCoins = \Cache::rememberForever('zones_coins', function () {
-            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        });
+        $userCoins = CoinRateService::getEffectiveRate();
 
         $chargeType = $data['charge_type'];
 
@@ -480,9 +479,7 @@ class WalletController extends MainController
             throw new \Exception(__('Super Admin not found.'));
         }
 
-        $userCoins = \Cache::rememberForever('super_admin_coins', function () {
-            return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
-        });
+        $userCoins = CoinRateService::getEffectiveRate();
 
         $chargeType = $data['charge_type'];
 
