@@ -1,0 +1,69 @@
+name: SSh-fun-chat-pipline
+on:
+  push:
+    branches: ["fun-chat"]
+jobs:
+  run_fun_chat_hub:
+    runs-on: [self-hosted]
+    steps:
+    - name: pull latest code
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.134.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 3m
+        script: |
+          cd /var/www/fun-chat
+          source /home/${{ secrets.USERNAME }}/hub.sh
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_fun_chat_app:
+    runs-on: [self-hosted]
+    needs: run_fun_chat_hub
+    steps:
+    - name: build and deploy fun-chat app
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.134.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/fun-chat
+          pwd
+          docker build -t fun-chat-octa:${{ github.sha }} -f Dockerfile-octana .
+          docker service update --image fun-chat-octa:${{ github.sha }} fun-chat-octa
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_fun_chat_job:
+    runs-on: [self-hosted]
+    needs: run_fun_chat_hub
+    steps:
+    - name: build and deploy fun-chat job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.134.3"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/fun-chat
+          pwd
+          docker build -t fun-chat-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image fun-chat-job:${{ github.sha }} fun-chat-job
