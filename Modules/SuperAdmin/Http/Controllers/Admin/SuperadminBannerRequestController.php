@@ -61,9 +61,40 @@ class SuperadminBannerRequestController extends AdminController
 
         $userService = $this->userService;
 
-        // Super Admin
-        $grid->column('user_id', __('Super Admin'))->display(function () use ($userService) {
-            return $userService->adminUserAvatar($this->superAdmin ?? null, withoutLevels: true);
+        // // Super Admin
+        // $grid->column('user_id', __('Super Admin'))->display(function () use ($userService) {
+        //     return $userService->adminUserAvatar($this->superAdmin ?? null, withoutLevels: true);
+        // });
+
+        $grid->column('username', __('Super Admin'))->display(function ($name) {
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+
+            $id = $this->superAdmin->id ?? '-';
+            $name = $this->superAdmin->username ?? 'غير معروف';
+            $path = $this->superAdmin->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->superAdmin->id, $url, 40, 40);
+            $showUrl = url("admin/superadmin-users/{$this->superAdmin->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
         });
 
         // Banner Image
