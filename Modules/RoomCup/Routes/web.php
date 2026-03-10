@@ -56,6 +56,225 @@ Route::get('/roomcup/calculate-rewards', function () {
     ]);
 });
 
+Route::get('/roomcup/compensate-missed', function () {
+    $roomIds = request()->query('room_ids');
+    if (!$roomIds) {
+        return response()->json(['error' => 'room_ids query parameter required (comma-separated)'], 400);
+    }
+
+    $roomIds = array_map('intval', explode(',', $roomIds));
+    $dryRun = request()->query('dry_run', '1') === '1';
+    $tz = getTimezone();
+
+    // Get settings to determine period type
+    $typeSetting = \App\Models\Setting::where('key', 'roomcup_type')->first();
+    $type = $typeSetting ? $typeSetting->value : 'daily';
+
+    // Calculate the gift period (last completed period)
+    switch ($type) {
+        case 'weekly':
+            $start = \Carbon\Carbon::now($tz)->subWeek()->startOfWeek();
+            $end = \Carbon\Carbon::now($tz)->subWeek()->endOfWeek();
+            break;
+        case 'monthly':
+            $start = \Carbon\Carbon::now($tz)->subMonth()->startOfMonth();
+            $end = \Carbon\Carbon::now($tz)->subMonth()->endOfMonth();
+            break;
+        default:
+            $start = \Carbon\Carbon::yesterday($tz)->startOfDay();
+            $end = \Carbon\Carbon::yesterday($tz)->endOfDay();
+            break;
+    }
+
+    $results = [];
+
+    foreach ($roomIds as $roomId) {
+        $room = \App\Models\Room::find($roomId);
+        if (!$room) {
+            $results[] = ['room_id' => $roomId, 'status' => 'error', 'reason' => 'Room not found'];
+            continue;
+        }
+
+        // Check if reward already exists for this room in the period
+        $existingReward = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $roomId)
+            ->whereBetween('created_at', [$start, $end])
+            ->exists();
+
+        // Also check current period (where the command writes rewards)
+        switch ($type) {
+            case 'weekly':
+                $rewardStart = \Carbon\Carbon::now($tz)->startOfWeek();
+                $rewardEnd = \Carbon\Carbon::now($tz)->endOfWeek();
+                break;
+            case 'monthly':
+                $rewardStart = \Carbon\Carbon::now($tz)->startOfMonth();
+                $rewardEnd = \Carbon\Carbon::now($tz)->endOfMonth();
+                break;
+            default:
+                $rewardStart = \Carbon\Carbon::now($tz)->startOfDay();
+                $rewardEnd = \Carbon\Carbon::now($tz)->endOfDay();
+                break;
+        }
+
+        $existingRewardCurrent = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $roomId)
+            ->whereBetween('created_at', [$rewardStart, $rewardEnd])
+            ->exists();
+
+        if ($existingReward || $existingRewardCurrent) {
+            $results[] = ['room_id' => $roomId, 'room_name' => $room->room_name ?? $room->name, 'status' => 'skipped', 'reason' => 'Reward already exists for this period'];
+            continue;
+        }
+
+        // Get aggregated gifts for this room
+        $gift = \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$start, $end])
+            ->where('room_id', $roomId)
+            ->select(
+                'room_id',
+                \DB::raw('SUM(current_total) as current_total'),
+                \DB::raw('SUM(number_of_visitors) as number_of_visitors'),
+                \DB::raw('MAX(id) as id')
+            )
+            ->groupBy('room_id')
+            ->first();
+
+        if (!$gift) {
+            $results[] = ['room_id' => $roomId, 'room_name' => $room->room_name ?? $room->name, 'status' => 'error', 'reason' => 'No gift records found in period'];
+            continue;
+        }
+
+        // Find matching target
+        $target = \Modules\RoomCup\Entities\RoomCupTarget::where('total', '<=', $gift->current_total)
+            ->where('number_of_visitors', '<=', $gift->number_of_visitors)
+            ->orderByDesc('total')
+            ->first();
+
+        if (!$target) {
+            $results[] = [
+                'room_id' => $roomId,
+                'room_name' => $room->room_name ?? $room->name,
+                'status' => 'error',
+                'reason' => "No target matched (total: {$gift->current_total}, visitors: {$gift->number_of_visitors})",
+            ];
+            continue;
+        }
+
+        $admins = $room->admins_v2();
+        $adminsCount = $admins->count();
+        $ownerProfit = $target->owner_profit;
+        $adminProfit = $target->admin_profit;
+        $adminShare = ($adminsCount > 0 && $adminProfit > 0) ? $adminProfit / $adminsCount : 0;
+
+        $rewardsToCreate = [];
+
+        // Owner reward
+        if ($ownerProfit > 0) {
+            $rewardsToCreate[] = [
+                'room_id' => $room->id,
+                'total_room_gift_id' => $gift->id,
+                'target_id' => $target->id,
+                'user_id' => $room->uid,
+                'type' => 'owner',
+                'amount' => $ownerProfit,
+                'user_name' => \App\Models\User::find($room->uid)?->name ?? 'N/A',
+            ];
+        }
+
+        // Admin rewards
+        if ($adminsCount > 0 && $adminProfit > 0) {
+            foreach ($admins as $admin) {
+                $rewardsToCreate[] = [
+                    'room_id' => $room->id,
+                    'total_room_gift_id' => $gift->id,
+                    'target_id' => $target->id,
+                    'user_id' => $admin->id,
+                    'type' => 'admin',
+                    'amount' => $adminShare,
+                    'user_name' => $admin->name ?? 'N/A',
+                ];
+            }
+        }
+
+        if ($dryRun) {
+            $results[] = [
+                'room_id' => $roomId,
+                'room_name' => $room->room_name ?? $room->name,
+                'status' => 'dry_run',
+                'target_matched' => $target->id,
+                'total_gifts' => $gift->current_total,
+                'visitors' => $gift->number_of_visitors,
+                'owner_profit' => $ownerProfit,
+                'admin_profit' => $adminProfit,
+                'admin_count' => $adminsCount,
+                'admin_share_each' => $adminShare,
+                'rewards_preview' => $rewardsToCreate,
+            ];
+            continue;
+        }
+
+        // Actually distribute rewards
+        try {
+            \DB::transaction(function () use ($rewardsToCreate, $room, $target) {
+                // Adjust admins
+                $room->additional_admin = 0;
+                $room->save();
+
+                $currentTotal = (int) $room->max_admin + (int) $room->additional_admin;
+                $targetTotal = (int) $target->number_of_admins;
+                $difference = $targetTotal - $currentTotal;
+                if ($difference > 0) {
+                    $room->additional_admin += $difference;
+                    $room->save();
+                }
+
+                foreach ($rewardsToCreate as $reward) {
+                    $rewardData = $reward;
+                    unset($rewardData['user_name']);
+                    $rewardData['created_at'] = now();
+                    $rewardData['updated_at'] = now();
+
+                    \Modules\RoomCup\Entities\RoomCupReward::create($rewardData);
+
+                    $amountBefore = \App\Helpers\Common::getCurrentBalance($reward['user_id']);
+
+                    \App\Helpers\UserCoinLogHelper::logByType(
+                        $reward['user_id'],
+                        $reward['amount'],
+                        $amountBefore,
+                        \App\Enums\UserCoinLogType::ROOM_CUP,
+                    );
+
+                    \App\Models\User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
+                    \Modules\RoomCup\Helpers\RoomCupHelper::updateRoomCupWallet($reward['amount']);
+                }
+            });
+
+            $results[] = [
+                'room_id' => $roomId,
+                'room_name' => $room->room_name ?? $room->name,
+                'status' => 'compensated',
+                'target_matched' => $target->id,
+                'rewards_distributed' => count($rewardsToCreate),
+                'total_amount' => array_sum(array_column($rewardsToCreate, 'amount')),
+                'rewards' => $rewardsToCreate,
+            ];
+        } catch (\Throwable $e) {
+            $results[] = [
+                'room_id' => $roomId,
+                'room_name' => $room->room_name ?? $room->name,
+                'status' => 'error',
+                'reason' => $e->getMessage(),
+            ];
+        }
+    }
+
+    return response()->json([
+        'period' => ['type' => $type, 'start' => $start->toDateTimeString(), 'end' => $end->toDateTimeString()],
+        'dry_run' => $dryRun,
+        'note' => $dryRun ? 'This is a preview. To execute, add &dry_run=0 to the URL' : 'Rewards have been distributed',
+        'results' => $results,
+    ]);
+});
+
 Route::get('/roomcup/diagnostic', function () {
     $settings = [];
     $default = [
