@@ -2,8 +2,8 @@
 
 namespace Utd\Moments\Http\Controllers;
 
-use Utd\Moments\Facades\CustomNotification;
 use App\Helpers\Common;
+use Utd\Moments\Services\MomentsNotification;
 use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
@@ -82,7 +82,7 @@ class MomentUserCommentController extends Controller
 
             return Common::apiResponse(0, 'try_again');
         }
-        CustomNotification::momentComment($moment, $user);
+        (new MomentsNotification())->momentComment($moment, $user);
 
         return Common::apiResponse(1, 'success');
 

@@ -2,8 +2,8 @@
 
 namespace Utd\Moments\Http\Controllers;
 
-use Utd\Moments\Facades\CustomNotification;
 use App\Helpers\Common;
+use Utd\Moments\Services\MomentsNotification;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -99,7 +99,7 @@ class MomentUserLikesController extends Controller
         }
         if ($add === 'Like') {
 
-            CustomNotification::likeMoment($moment, $user);
+            (new MomentsNotification())->likeMoment($moment, $user);
 
             return Common::apiResponse(1, 'success', [], 200);
         }

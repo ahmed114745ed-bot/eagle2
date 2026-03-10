@@ -5,7 +5,7 @@ namespace Utd\Moments\Http\Controllers;
 use App\Contracts\GiftsContract;
 use App\Enums\UserDiamondLogType;
 use App\Exceptions\NotInfMoneyException;
-use Utd\Moments\Facades\CustomNotification;
+use Utd\Moments\Services\MomentsNotification;
 use App\Helpers\Common;
 use App\Helpers\UserDiamondLogHelper;
 use App\Models\User;
@@ -199,7 +199,7 @@ class MomentUserGiftsController extends Controller
 
         $this->giftsService->createGiftLog($info);
 
-        CustomNotification::sendMomentGift($senderUser, $gift, $receivedUser, $momentId);
+        (new MomentsNotification())->sendMomentGift($senderUser, $gift, $receivedUser, $momentId);
     }
 
     public function getGifts($id)
