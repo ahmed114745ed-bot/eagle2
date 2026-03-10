@@ -1253,7 +1253,9 @@ Route::get('/run-lucky-gift-unit-test', function () {
 });
 
 Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
-    Debugbar::info('Viewport:', $request->all());
+    if (class_exists(\Barryvdh\Debugbar\Facades\Debugbar::class)) {
+        \Barryvdh\Debugbar\Facades\Debugbar::info('Viewport:', $request->all());
+    }
     return response()->json(['ok' => true]);
 });
 
