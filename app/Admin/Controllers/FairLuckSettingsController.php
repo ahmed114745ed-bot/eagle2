@@ -61,7 +61,7 @@ class FairLuckSettingsController extends AdminController
             FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
-        admin_success('Updated', 'Settings updated successfully.');
+        admin_success(__('Updated'), __('Settings updated successfully.'));
         return back();
     }
 }
