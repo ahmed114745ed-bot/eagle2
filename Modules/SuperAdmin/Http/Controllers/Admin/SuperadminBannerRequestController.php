@@ -35,8 +35,9 @@ class SuperadminBannerRequestController extends AdminController
 
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(__('SuperadminBannerRequest'))
+        return parent::index(
+            $content
+                ->title(__('SuperadminBannerRequest'))
             // ->body($this->grid())
         );
     }
@@ -52,8 +53,8 @@ class SuperadminBannerRequestController extends AdminController
         $grid->model()->when($itemNotification, function ($query, $itemNotification) {
             $query->where('id', $itemNotification);
         });
-        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img'])->latest();
-        $countryID =session('filter_country_id');
+        $grid->model()->with(['superAdmin', 'homeCarousel:home_carousel_id.img'])->latest();
+        $countryID = session('filter_country_id');
         $grid->model()
             ->when($countryID, fn($q) => $q->whereHas('superAdmin', fn($q) => $q->where('country_id', $countryID)))
             ->with(['superAdmin', 'homeCarousel:home_carousel_id.img'])->latest();
@@ -67,6 +68,9 @@ class SuperadminBannerRequestController extends AdminController
         // });
 
         $grid->column('username', __('Super Admin'))->display(function ($name) {
+            if (!$this->superAdmin) {
+                return __('Unknown');
+            }
             if (request()->filled('_export_')) {
                 return $name;
             }
@@ -104,10 +108,14 @@ class SuperadminBannerRequestController extends AdminController
         $grid->column('coins_deducted', __('Coins Deducted'));
         $grid->column('status', __('Status'))->display(function ($status) {
             switch ($status) {
-                case 'pending': return '<span class="text-warning">'. __('Pending') .'</span>';
-                case 'approved': return '<span class="text-success">'. __('Approved') .'</span>';
-                case 'rejected': return '<span class="text-danger">'. __('Rejected') .'</span>';
-                default: return $status;
+                case 'pending':
+                    return '<span class="text-warning">' . __('Pending') . '</span>';
+                case 'approved':
+                    return '<span class="text-success">' . __('Approved') . '</span>';
+                case 'rejected':
+                    return '<span class="text-danger">' . __('Rejected') . '</span>';
+                default:
+                    return $status;
             }
         });
 
@@ -122,18 +130,15 @@ class SuperadminBannerRequestController extends AdminController
                 return __('Display Live');
             } elseif ($value === 'display_room') {
                 return __('Display Room');
-            }
-
-
-            else {
+            } else {
                 return $value;
             }
         });
         $grid->column('hours', __('hours'));
         $grid->column('created_at', __('Created At'))
-        ->display(function ($createdAt) {
-            return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
-        });
+            ->display(function ($createdAt) {
+                return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
+            });
 
         // Actions
         if (Admin::user()->can('reject-switch-' . $this->permission_name) || Admin::user()->can('approve-switch-' . $this->permission_name) || Admin::user()->can('*')) {
@@ -245,8 +250,8 @@ class SuperadminBannerRequestController extends AdminController
                     document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
                     });
     ");
-    $grid->disableActions();
-    $grid->disableCreation();
+        $grid->disableActions();
+        $grid->disableCreation();
         return $grid;
     }
 
@@ -365,8 +370,8 @@ class SuperadminBannerRequestController extends AdminController
                     'coins' => $request->coins_deducted,
                 ]
 
-                ],
-                superAdminId:$request->user_id
+            ],
+            superAdminId: $request->user_id
 
         );
 
@@ -418,12 +423,11 @@ class SuperadminBannerRequestController extends AdminController
                     'coins' => $request->coins_deducted,
                 ]
 
-                ],
-                superAdminId:$request->user_id
+            ],
+            superAdminId: $request->user_id
 
         );
 
         return response()->json(['success' => true, 'message' => __('Banner rejected successfully')]);
     }
-
 }
