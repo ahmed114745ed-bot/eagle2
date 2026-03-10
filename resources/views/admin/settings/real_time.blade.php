@@ -61,7 +61,7 @@
                                 <div class="col-md-6 mb-3 ms-0 me-auto">
                                     <div class="card p-9-px shadow real-time-card-height"  >
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4 class="m-0 color-white">{{ __('settings') }}</h4>
+                                            <h4 class="m-0 color-white">{{ __('UTD VOICE') }}</h4>
                                         </div>
                                         <br>
                                         <div class="row">
@@ -237,7 +237,7 @@
 
                 <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <h4 class="m-0">{{ __('UTD VOICE') }}</h4>
                         <div class="d-flex align-items-center">
                             <input type="radio" id="utdZegoSoundRadio" class="custom-radio libraryRealTime"
                                    name="sound_library"
@@ -294,7 +294,7 @@
 
                 <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <h4 class="m-0">{{ __('UTD VOICE') }}</h4>
                         <div class="d-flex align-items-center">
                             <input type="radio" id="utdZegoVideoRadio" class="custom-radio libraryRealTime"
                                    name="video_library"
