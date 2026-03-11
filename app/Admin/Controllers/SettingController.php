@@ -261,8 +261,9 @@ class SettingController extends MainController
         $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
         $superAdminCoins = Setting::where('key', 'super_admin_coins')->value('value') ?? $appBaseRate;
         $areaManagerCoins = Setting::where('key', 'area_manager_coins')->value('value') ?? Setting::where('key', 'zones_coins')->value('value') ?? $appBaseRate;
+        $userCoinsConfig = \App\Models\Config::where('name', 'user_coins')->first();
+        $userRate = $userCoinsConfig ? (float) $userCoinsConfig->value : $appBaseRate;
 
-        // Init Super Admins
         $superAdmins = \App\Models\AdminUser::where('type', 'superadmin')->get();
         foreach ($superAdmins as $admin) {
             \App\Models\AdminCoinRate::updateOrCreate(
@@ -271,7 +272,6 @@ class SettingController extends MainController
             );
         }
 
-        // Init Area Managers
         $areaManagers = \App\Models\AdminUser::where('type', 'area-manager')->get();
         foreach ($areaManagers as $manager) {
             \App\Models\AdminCoinRate::updateOrCreate(
@@ -280,7 +280,30 @@ class SettingController extends MainController
             );
         }
 
-        admin_success('تمت العملية', 'تم تعيين القيم الافتراضية بنجاح!');
-        return redirect(config('admin.route.prefix') . '/charges-settings?firsttab=chargesSettings');
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'user_transfer_coin_rate'],
+            ['value' => $userRate]
+        );
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'user_transfer_rate_enabled'],
+            ['value' => 1]
+        );
+
+        return 'done';
+    }
+
+    public function backfillCharges()
+    {
+        set_time_limit(300);
+        $exitCode = \Artisan::call('charges:backfill', ['--chunk' => 500]);
+
+        $output = \Artisan::output();
+
+        if ($exitCode === 0) {
+           return  'تمت العملية تم تعبئة بيانات الشحنات القديمة بنجاح!';
+        } else {
+            return 'خطأ حدث خطأ أثناء تعبئة البيانات. راجع السجلات.';
+        }
+
     }
 }
