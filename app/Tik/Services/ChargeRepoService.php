@@ -60,51 +60,59 @@ class ChargeRepoService
         if ($salary < $amount) {
             throw new Exception('Low Balance');
         }
+
         try {
-            \DB::beginTransaction();
-            // Increment 'di' column for the user
-            $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
-            $coins = $coinPrise * $amount;
+            DB::beginTransaction();
+            
+            $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+            $effectiveRate = \App\Services\CoinRateService::getEffectiveRate();
+            
+            $calc = \App\Services\ChargeCalculationService::calculate(
+                (float) $amount, 
+                'usd', 
+                $effectiveRate, 
+                $appBaseRate
+            );
+            
+            $coins = $calc['total_coins'];
             $userType = $userResve->user_type;
 
-            $baseRate = \App\Services\CoinRateService::getAppBaseRate();
-            $totalCoins = $coins;
-            $usdAmount = floatval($amount);
-            $sentCoins = $usdAmount * $baseRate;
-            $extraCoins = $totalCoins - $sentCoins;
-
             $data = [
-                'userId' => $userId,
-                'chargeType' => 'host_agency',
-                'receiverId' => $user_id,
-                'type' => $userType,
-                'amount' => $coins,
-                'amountType' => 2,
-                'isTransferred' => true,
-                'total_coins' => $totalCoins,
-                'transaction_type' => 'admin_to_user',
-                'rate_source' => 'app',
-                'applied_coin_rate' => $baseRate,
-                'base_usd' => $usdAmount,
-                'base_coins' => $sentCoins,
-                'bonus_coins' => $extraCoins,
-                'profit_usd' => $usdAmount,
-                'profit_coins' => $sentCoins,
+                'userId'            => $userId,
+                'chargeType'        => 'host_agency',
+                'receiverId'        => $user_id,
+                'type'              => $userType,
+                'amount'            => $coins,
+                'amount_type'       => 2,
+                'isTransferred'     => true,
+                'total_coins'       => $calc['total_coins'],
+                'transaction_type'  => 'admin_to_user',
+                'rate_source'       => 'admin',
+                'applied_coin_rate' => $calc['applied_coin_rate'],
+                'base_usd'          => $calc['base_usd'],
+                'base_coins'        => $calc['base_coins'],
+                'bonus_coins'       => $calc['bonus_coins'],
+                'profit_usd'        => $calc['profit_usd'],
+                'profit_coins'      => $calc['profit_coins'],
             ];
 
-            $this->create($data);
+            $charge = $this->create($data);
             $this->roomSalaryRepo->incrementCutAmount($room->id, $amount);
             $this->userRepository->incrementCoins($toUserUuId, $coins);
 
-            \DB::commit();
-            (new UserAchievementService())->insertCharging($userResve, $coins);
-            UserCommon::UserEarnedInvitation($userResve->id, $coins,$data->id);
+            DB::commit();
 
-            return true; //
+            // Notify achievements
+            $achievementService = new UserAchievementService();
+            $achievementService->insertCharging($userResve, $coins);
+
+            // Handle invitations
+            UserCommon::UserEarnedInvitation($userResve->id, $coins, $charge->id);
+
+            return true;
         } catch (Exception $e) {
-            \DB::rollBack();
-            throw new Exception('An error occurred, please try again later');
-        }
+            DB::rollBack();
+            throw new Exception('An error occurred, please try again later: ' . $e->getMessage());     }
     }
 
     public function chargeTo(User $fromUser, User $toUser, $coins, $isRoomTarget, $usd)
@@ -318,7 +326,7 @@ class ChargeRepoService
 
         $unit = $usd !== null ? 'usd' : 'coins';
         $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
-        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate, $appBaseRate);
         
         $totalCoins = $calc['total_coins'];
         $baseUsd = $calc['base_usd'];
@@ -390,7 +398,7 @@ class ChargeRepoService
 
         $unit = $usd !== null ? 'usd' : 'coins';
         $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
-        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate, $appBaseRate);
 
         $totalCoins = $calc['total_coins'];
         $baseUsd = $calc['base_usd'];
@@ -444,7 +452,7 @@ class ChargeRepoService
         
         $unit = $usd !== null ? 'usd' : 'coins';
         $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
-        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate, $appBaseRate);
 
         $totalCoins = $calc['total_coins'];
         $baseUsd = $calc['base_usd'];
@@ -573,7 +581,7 @@ class ChargeRepoService
         
         $unit = $usd !== null ? 'usd' : 'coins';
         $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
-        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate, $appBaseRate);
 
         $totalCoins = $calc['total_coins'];
         $baseUsd = $calc['base_usd'];

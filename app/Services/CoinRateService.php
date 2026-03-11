@@ -17,9 +17,15 @@ class CoinRateService
 
     protected static function getSetting(string $key, $default = 10000): float
     {
-        return (float) Cache::rememberForever("setting_{$key}", function () use ($key, $default) {
+        $value = (float) Cache::rememberForever("setting_{$key}", function () use ($key, $default) {
             return Setting::where('key', $key)->value('value') ?? $default;
         });
+
+        if ($value <= 0) {
+            throw new \Exception(__("Invalid rate for ':key'. Rate must be greater than zero.", ['key' => $key]));
+        }
+
+        return $value;
     }
 
 
