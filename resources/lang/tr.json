@@ -4471,5 +4471,18 @@
     "The rate cannot be higher than the app base rate (:rate)": "Kur, uygulamanın taban kurundan (:rate) yüksek olamaz",
     "Settings updated successfully": "Ayarlar başarıyla güncellendi",
     "Total Profit (profit_coins)": "Toplam Kar (Jeton)",
-    "Total Cashback (bonus_coins)": "Toplam Geri Ödeme (Jeton)"
+    "Total Cashback (bonus_coins)": "Toplam Geri Ödeme (Jeton)",
+    "System Mode": "Sistem Modu",
+    "Unified System (Modern)": "Birleşik Sistem (Modern)",
+    "Legacy System (Old)": "Eski Sistem (Eski)",
+    "Unified": "Birleşik",
+    "Uses Base Rate + Admin Custom Overrides.": "Temel Oran + Yönetici Özel Ayarları kullanılır.",
+    "Legacy": "Eski",
+    "Uses individual settings (Super Admin, Zones, etc.) below.": "Aşağıdaki bireysel ayarları (Süper Yönetici, Bölgeler, vb.) kullanır.",
+    "Init User Rates": "Kullanıcı Oranlarını Başlat",
+    "Init Admin Rates": "Yönetici Oranlarını Başlat",
+    "Backfill Old Data": "Eski Verileri Geri Doldur",
+    "Are you sure you want to initialize user rates from old config?": "Kullanıcı oranlarını eski yapılandırmadan başlatmak istediğinizden emin misiniz?",
+    "Are you sure you want to initialize admin rates from current settings?": "Yönetici oranlarını mevcut ayarlardan başlatmak istediğinizden emin misiniz?",
+    "This will process ALL old charges to calculate profit\/bonus. Are you sure?": "Bu, kâr\/bonus hesaplamak için TÜM eski yüklemeleri işleyecektir. Emin misiniz?"
 }

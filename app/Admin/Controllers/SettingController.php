@@ -261,9 +261,8 @@ class SettingController extends MainController
         $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
         $superAdminCoins = Setting::where('key', 'super_admin_coins')->value('value') ?? $appBaseRate;
         $areaManagerCoins = Setting::where('key', 'area_manager_coins')->value('value') ?? Setting::where('key', 'zones_coins')->value('value') ?? $appBaseRate;
-        $userCoinsConfig = \App\Models\Config::where('name', 'user_coins')->first();
-        $userRate = $userCoinsConfig ? (float) $userCoinsConfig->value : $appBaseRate;
 
+        // Super Admins
         $superAdmins = \App\Models\AdminUser::where('type', 'superadmin')->get();
         foreach ($superAdmins as $admin) {
             \App\Models\AdminCoinRate::updateOrCreate(
@@ -272,6 +271,7 @@ class SettingController extends MainController
             );
         }
 
+        // Area Managers
         $areaManagers = \App\Models\AdminUser::where('type', 'area-manager')->get();
         foreach ($areaManagers as $manager) {
             \App\Models\AdminCoinRate::updateOrCreate(
@@ -279,6 +279,15 @@ class SettingController extends MainController
                 ['rate' => $areaManagerCoins]
             );
         }
+
+        return 'تمت تهيئة قيم المشرفين بنجاح (Init Admin Rates Done)';
+    }
+
+    public function initUserCoinRates()
+    {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $userCoinsConfig = \App\Models\Config::where('name', 'user_coins')->first();
+        $userRate = $userCoinsConfig ? (float) $userCoinsConfig->value : $appBaseRate;
 
         \App\Models\Setting::updateOrCreate(
             ['key' => 'user_transfer_coin_rate'],
@@ -289,7 +298,12 @@ class SettingController extends MainController
             ['value' => 1]
         );
 
-        return 'done';
+        \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_coin_rate');
+        \Illuminate\Support\Facades\Cache::forget('user_transfer_coin_rate');
+        \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_rate_enabled');
+        \Illuminate\Support\Facades\Cache::forget('user_transfer_rate_enabled');
+
+        return 'تمت تهيئة قيم المستخدمين بنجاح (Init User Rates Done)';
     }
 
     public function backfillCharges()

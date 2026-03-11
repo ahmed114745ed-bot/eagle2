@@ -1168,7 +1168,10 @@ class ChargeReportController extends MainController
 
     private function tabsComponent()
     {
-        return view('admin.grid.common.report.charge')->render();
+        $mode = \App\Services\CoinRateService::getSystemMode();
+        $view = ($mode === 'unified') ? 'admin.grid.common.report.unified_charge' : 'admin.grid.common.report.charge';
+        
+        return view($view)->render();
     }
 
 

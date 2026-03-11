@@ -4997,5 +4997,18 @@
     "The rate cannot be higher than the app base rate (:rate)": "لا يمكن أن يكون السعر أعلى من السعر الأساسي للتطبيق (:rate)",
     "Settings updated successfully": "تم تحديث الإعدادات بنجاح",
     "Total Profit (profit_coins)": "إجمالي الأرباح (الكوينز)",
-    "Total Cashback (bonus_coins)": "إجمالي الكاش باك (الكوينز)"
+    "Total Cashback (bonus_coins)": "إجمالي الكاش باك (الكوينز)",
+    "System Mode": "وضع النظام",
+    "Unified System (Modern)": "النظام الموحد (حديث)",
+    "Legacy System (Old)": "النظام القديم",
+    "Unified": "موحد",
+    "Uses Base Rate + Admin Custom Overrides.": "يستخدم التقييم الأساسي + تعديلات الأدمن الخاصة.",
+    "Legacy": "قديم",
+    "Uses individual settings (Super Admin, Zones, etc.) below.": "يستخدم الإعدادات الفردية (سوبر أدمن، المناطق، إلخ) الموضحة أدناه.",
+    "Init User Rates": "تهيئة تقييمات المستخدمين",
+    "Init Admin Rates": "تهيئة تقييمات المديرين",
+    "Backfill Old Data": "تعبئة البيانات القديمة",
+    "Are you sure you want to initialize user rates from old config?": "هل أنت متأكد من تهيئة تقييمات المستخدمين من الإعدادات القديمة؟",
+    "Are you sure you want to initialize admin rates from current settings?": "هل أنت متأكد من تهيئة تقييمات المديرين من الإعدادات الحالية؟",
+    "This will process ALL old charges to calculate profit\/bonus. Are you sure?": "سيؤدي هذا لمعالجة كافة الشحنات القديمة لحساب الأرباح والمكافآت. هل أنت متأكد؟"
 }

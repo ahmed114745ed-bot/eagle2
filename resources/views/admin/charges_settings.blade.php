@@ -500,6 +500,28 @@
                 <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" id="targetSettingsForm">
             @csrf
             <div class="form row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label style="color: #ff9800; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 15px; display: block;">
+                            <i class="fa fa-cogs"></i> {{ __('System Mode') }}
+                        </label>
+                        <div class="radio-options-container">
+                            <div class="radio-option">
+                                <input type="radio" name="coin_rate_system_mode" value="unified" id="mode_unified" class="radio-input" {{ ($settings['coin_rate_system_mode'] ?? 'unified') == 'unified' ? 'checked' : '' }}>
+                                <label for="mode_unified" class="radio-label">{{ __('Unified System (Modern)') }}</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="coin_rate_system_mode" value="legacy" id="mode_legacy" class="radio-input" {{ ($settings['coin_rate_system_mode'] ?? '') == 'legacy' ? 'checked' : '' }}>
+                                <label for="mode_legacy" class="radio-label">{{ __('Legacy System (Old)') }}</label>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted mb-4">
+                            <strong>{{ __('Unified') }}:</strong> {{ __('Uses Base Rate + Admin Custom Overrides.') }}<br>
+                            <strong>{{ __('Legacy') }}:</strong> {{ __('Uses individual settings (Super Admin, Zones, etc.) below.') }}
+                        </small>
+                    </div>
+                </div>
+
                 <div class="col-md-6">
                     <div class="form-group ">
                         <label>{{ __('Zones') }}</label>
@@ -549,7 +571,17 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
+                <div class="col-md-12 mt-4">
+                    <hr style="border-color: #444;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <button type="button" class="btn btn-primary" onclick="showConfirmationModal()">{{ __('save') }}</button>
+                        </div>
+                        <div class="d-flex gap-2">
+                           
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
             </div>

@@ -4081,5 +4081,18 @@
     "The rate cannot be higher than the app base rate (:rate)": "दर ऐप की आधार दर (:rate) से अधिक नहीं हो सकती",
     "Settings updated successfully": "सेटिंग्स सफलतापूर्वक अपडेट की गईं",
     "Total Profit (profit_coins)": "कुल लाभ (सिक्के)",
-    "Total Cashback (bonus_coins)": "कुल कैशबैक (सिक्के)"
+    "Total Cashback (bonus_coins)": "कुल कैशबैक (सिक्के)",
+    "System Mode": "सिस्टम मोड",
+    "Unified System (Modern)": "एकीकृत प्रणाली (आधुनिक)",
+    "Legacy System (Old)": "लीगेसी सिस्टम (पुराना)",
+    "Unified": "एकीकृत",
+    "Uses Base Rate + Admin Custom Overrides.": "बेस रेट + एडमिन कस्टम ओवरराइड का उपयोग करता है।",
+    "Legacy": "लीगेसी",
+    "Uses individual settings (Super Admin, Zones, etc.) below.": "नीचे दिए गए अलग-अलग सेटिंग्स (सुपर एडमिन, ज़ोन, आदि) का उपयोग करता है।",
+    "Init User Rates": "यूजर रेट्स शुरू करें",
+    "Init Admin Rates": "एडमिन रेट्स शुरू करें",
+    "Backfill Old Data": "पुराना डेटा बैकफिल करें",
+    "Are you sure you want to initialize user rates from old config?": "क्या आप वाकई पुरानी कॉन्फ़िगरेशन से यूजर रेट शुरू करना चाहते हैं?",
+    "Are you sure you want to initialize admin rates from current settings?": "क्या आप वाकई वर्तमान सेटिंग्स से एडमिन रेट शुरू करना चाहते हैं?",
+    "This will process ALL old charges to calculate profit\/bonus. Are you sure?": "यह लाभ\/बोनस की गणना करने के लिए सभी पुराने शुल्कों को संसाधित करेगा। क्या आप सुनिश्चित हैं?"
 }
