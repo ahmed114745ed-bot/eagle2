@@ -111,7 +111,6 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdmin\ChargeController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HandleController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeCarouselController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeController;
-use Modules\SuperAdmin\Http\Controllers\SuperAdmin\LiveRoomController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\MultiLanguageController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\NotificationController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\OfficialMessengerSuperAdminController;
@@ -198,7 +197,6 @@ Route::group(
             Route::resource('users', AgencyUserController::class);
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
-        Route::resource('live-rooms', LiveRoomController::class);
         Route::resource('official-message', OfficialMessengerSuperAdminController::class);
 
         //users

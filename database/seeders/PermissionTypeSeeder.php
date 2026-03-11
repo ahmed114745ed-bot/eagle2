@@ -698,11 +698,7 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
                         PermissionType::AREA_MANAGER->value => ['browse', 'show'],
                     ],],
-                    ['key' => 'live-rooms', 'except' => ['create'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'show', 'edit', 'delete',],
-                        PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
-                        PermissionType::AREA_MANAGER->value => ['browse', 'show'],
-                    ],],
+                    
                     ['key' => 'categories', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
@@ -903,21 +899,6 @@ class PermissionTypeSeeder extends Seeder
 
                     ],],
 
-                ],
-            ],
-            [
-                'name' => 'Reels',
-                'sort' => 35,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 35],
-                ],
-                'permissions' => [
-                    ['key' => 'Real', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'report-real', 'except' => ['create', 'edit', 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'delete'],
-                    ],],
                 ],
             ],
             [

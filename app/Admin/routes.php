@@ -30,7 +30,6 @@ use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ChargeVipController;
-use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
@@ -38,8 +37,6 @@ use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\CountryCategoryController;
-use App\Admin\Controllers\CountryController;
-use App\Admin\Controllers\CountryRequestActionController;
 use App\Admin\Controllers\CountryRequestHistoryController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\CustomZegoMessageController;
@@ -73,7 +70,6 @@ use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
-use App\Admin\Controllers\PercentageGameController;
 use App\Admin\Controllers\PermissionController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\PusherStatisticsController;
@@ -309,7 +305,6 @@ Route::group(
         ]);
         Route::get('rooms/microphones', [RoomController::class, 'getRoomsMicrophones']);
         Route::get('rooms/{room}/microphones', [RoomController::class, 'getRoomMicrophones']);
-        Route::resource('live-rooms', 'LiveRoomController');
 
 
         Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');

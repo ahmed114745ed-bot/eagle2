@@ -11,7 +11,6 @@ use Modules\AreaManager\Http\Controllers\UserController;
 use Modules\AreaManager\Http\Controllers\AgencyController;
 use Modules\AreaManager\Http\Controllers\ChargeController;
 use Modules\AreaManager\Http\Controllers\WalletController;
-use Modules\AreaManager\Http\Controllers\LiveRoomController;
 use Modules\AreaManager\Http\Controllers\AdminUserController;
 use Modules\AreaManager\Http\Controllers\AgencyUserController;
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
@@ -135,7 +134,7 @@ Route::group(
             Route::resource('users', AgencyUserController::class);
             Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
         });
-        Route::resource('live-rooms', LiveRoomController::class);
+       
         Route::resource('official-message', OfficialMessageController::class);
 
         //        //users
