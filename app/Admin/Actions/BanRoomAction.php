@@ -63,8 +63,6 @@ class BanRoomAction extends Action
                     'staff_id' => Auth::id(),
                 ]
             );
-
-
         }
 
 
@@ -95,7 +93,7 @@ class BanRoomAction extends Action
     {
         $this->text('uuid', __('uuid'));
         $this->integer('duration', __('duration(hours)'))->rules('required|max:6');
-        $this->select('type', __('type'))->options(['audio' => __('audio'), 'live' => __('live')])->default('audio');
+        $this->hidden('type', __('type'))->value('audio');
     }
 
     public function html()
