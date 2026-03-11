@@ -37,83 +37,129 @@
     <div class="col">
         <h4 class="details-title">{{ __('Details') }}</h4>
 
-        <!-- Stats Cards Container (loaded via AJAX) -->
-        <div class="stats-cards-container" id="ajax-stats-container" style="min-height: 100px;">
-            <div style="text-align: center; width: 100%; padding: 20px; color: var(--text-secondary-color, #333);">
-                <i class="fa fa-spinner fa-spin fa-2x"></i> <span style="margin-right: 10px;">{{ __('Loading stats...') }}</span>
-            </div>
+        @php
+            $isDashboard = request()->name == 'dash' || request()->name == null;
+            $isApp = request()->name == 'shipping-agency-activity';
+            $isStripe = request()->name == 'stripe';
+            $isStripeNew = request()->name == 'stripenew';
+            $isInApp = request()->name == 'in-app-purchas';
+            $isExchange = request()->name == 'exchange';
+            $isHost = request()->name == 'host';
+
+            $getUserByUuid = function ($uuid) {
+                // Avoid running queries for empty or default '0' UUIDs
+                if (empty($uuid) || $uuid === '0') {
+                    return null;
+                }
+                return \App\Models\User::where('uuid', $uuid)->first() ?? \App\Models\ShippingAgency::where('id', $uuid)->first();
+            };
+
+            $calculateReceiverValue = function ($user, $request) use ($isDashboard, $isApp, $isStripe, $isStripeNew, $isInApp) {
+                if ($isDashboard || $isApp) {
+                    $query = \App\Models\Charge::query();
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('amount');
+                } elseif ($isStripe) {
+                    $query = \App\Models\CoinLog::whereNotIn('method', ['huawei_pay', 'google_pay', 'strip', 'apple_pay']);
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('obtained_coins');
+                } elseif ($isStripeNew) {
+                    $query = \App\Models\CoinLog::where('method', 'strip');
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('obtained_coins');
+                } elseif ($isInApp) {
+                    if ($request->name_for_url_shortcut) {
+                        $query = \App\Models\CoinLog::where('method', $request->name_for_url_shortcut);
+                    } else {
+                        $query = \App\Models\CoinLog::whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
+                    }
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('obtained_coins');
+                }
+                return 0;
+            };
+
+            if($isDashboard || $isStripe || $isHost) {
+                $fields = [
+                    'dollar' => ['label' => __('total transfer dollars'), 'icon' => 'fa-dollar-sign', 'color' => 'success'],
+                    'coins' => ['label' => __('total transfer coins'), 'icon' => 'fa-coins', 'color' => 'warning']
+                ];
+            } elseif ($isExchange) {
+                $fields = [
+                    'diamonds' => ['label' => __('total diamonds'), 'icon' => 'fa-gem', 'color' => 'info'],
+                    'coins' => ['label' => __('total coins'), 'icon' => 'fa-coins', 'color' => 'warning']
+                ];
+            } else {
+                $fields = [
+                    'receiver' => ['label' => __('Total recharge to recharge agencies'), 'icon' => 'fa-arrow-down', 'color' => 'primary'],
+                    'sender' => ['label' => __('Total recharge from recharge agencies'), 'icon' => 'fa-arrow-up', 'color' => 'danger']
+                ];
+            }
+        @endphp
+
+            <!-- Stats Cards -->
+        <div class="stats-cards-container">
+            @foreach ($fields as $name => $field)
+                @php
+                    $uuid = data_get(request($name), 'uuid') ?: null;
+                    $user = $getUserByUuid($uuid);
+                    $value = 0;
+
+                    if ($name === 'receiver') {
+                        if($isApp) {
+                            $value = \App\Models\Charge::where('user_type', 'agency')->sum('amount');
+                        } else {
+                            $value = $calculateReceiverValue($user, request());
+                        }
+                    } elseif ($name === 'sender') {
+                        if($isApp) {
+                            $value = \App\Models\Charge::where('charger_type', 'agency')->sum('amount');
+                        } else {
+                            $value = $user ? \App\Models\Charge::where('charger_id', $user->id)->sum('amount') : \App\Models\Charge::sum('amount');
+                        }
+                    } elseif ($name === 'dollar') {
+                        if($isDashboard) {
+                            $value = \App\Models\Charge::where('charger_type', 'dash')->sum('usd');
+                        } elseif ($isHost) {
+                            $value = \App\Models\Charge::where('charger_type', 'host_agency')->sum('usd');
+                        } else {
+                            $value = DB::table('coin_logs')->join('coins', 'coin_logs.coin_id', '=', 'coins.id')->sum('coins.usd');
+                        }
+                    } elseif ($name === 'coins') {
+                        if($isDashboard) {
+                            $value = \App\Models\Charge::where('charger_type', 'dash')->sum('amount');
+                        } elseif ($isExchange) {
+                            $value = \App\Models\ExchangeLog::sum('value');
+                        } elseif ($isHost) {
+                            $value = \App\Models\Charge::where('charger_type', 'host_agency')->sum('amount');
+                        } else {
+                            $value = \App\Models\CoinLog::where('status', 1)->sum('obtained_coins');
+                        }
+                    } elseif ($name === 'diamonds') {
+                        $value = \App\Models\ExchangeLog::sum('diamonds');
+                    }
+                @endphp
+
+                <div class="stat-card stat-card-{{ $field['color'] }}">
+                    <div class="stat-card-icon">
+                        <i class="fa {{ $field['icon'] }}"></i>
+                    </div>
+                    <div class="stat-card-content">
+                        <span class="stat-card-label">{{ $field['label'] }}</span>
+                        <span class="stat-card-value">{{ number_format($value, 2) }}</span>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
-
-<script>
-    function loadChargeStats(queryString) {
-        var url = "{{ url(config('admin.route.prefix') . '/charges-reports-stats') }}" + (queryString || window.location.search);
-        var container = document.getElementById('ajax-stats-container');
-        container.innerHTML = '<div style="text-align:center;width:100%;padding:20px;"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
-            credentials: 'same-origin'
-        })
-        .then(function(response) {
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            return response.json();
-        })
-        .then(function(data) {
-            container.innerHTML = '';
-            if (data && data.stats && data.stats.length) {
-                data.stats.forEach(function(stat) {
-                    var subValueHtml = stat.sub_value
-                        ? '<div style="font-size:.9rem;font-weight:600;opacity:.85;border-top:1px solid rgba(255,255,255,.2);margin-top:5px;padding-top:5px;"><i class="fa fa-dollar-sign" style="font-size:.8rem;"></i> ' + stat.sub_value + '</div>'
-                        : '';
-                    container.insertAdjacentHTML('beforeend',
-                        '<div class="stat-card stat-card-' + stat.color + '">' +
-                            '<div class="stat-card-icon"><i class="fa ' + stat.icon + '"></i></div>' +
-                            '<div class="stat-card-content">' +
-                                '<span class="stat-card-label">' + stat.label + '</span>' +
-                                '<span class="stat-card-value">' + stat.value + '</span>' +
-                                subValueHtml +
-                            '</div>' +
-                        '</div>'
-                    );
-                });
-            } else {
-                container.innerHTML = '<div style="padding:15px;opacity:.6;">{{ __("No data available") }}</div>';
-            }
-        })
-        .catch(function(err) {
-            console.error('Stats error:', err);
-            container.innerHTML = '<div style="color:red;padding:15px;">{{ __("Error loading stats. Please reload.") }}</div>';
-        });
-    }
-
-    // Load on page ready
-    document.addEventListener("DOMContentLoaded", function() {
-        loadChargeStats();
-
-        // Reload stats when a tab is clicked (tab links use ?name= param)
-        document.querySelectorAll('.charge_action').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var href = this.getAttribute('href');
-                // Update URL without page reload via pushState
-                window.history.pushState({}, '', location.pathname + href);
-                loadChargeStats('?' + href.replace(/^\?/, ''));
-                // Also trigger the grid pjax reload
-                var pjaxContainer = document.querySelector('[data-pjax-container]');
-                if (pjaxContainer && typeof $.pjax !== 'undefined') {
-                    $.pjax.reload({container: '#pjax-container', url: location.pathname + href});
-                } else {
-                    window.location.href = location.pathname + href;
-                }
-            });
-        });
-    });
-</script>
 </div>
 
 <style>
