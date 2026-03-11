@@ -255,4 +255,32 @@ class SettingController extends MainController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function initCoinRates()
+    {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $superAdminCoins = Setting::where('key', 'super_admin_coins')->value('value') ?? $appBaseRate;
+        $areaManagerCoins = Setting::where('key', 'area_manager_coins')->value('value') ?? Setting::where('key', 'zones_coins')->value('value') ?? $appBaseRate;
+
+        // Init Super Admins
+        $superAdmins = \App\Models\AdminUser::where('type', 'superadmin')->get();
+        foreach ($superAdmins as $admin) {
+            \App\Models\AdminCoinRate::updateOrCreate(
+                ['admin_id' => $admin->id],
+                ['rate' => $superAdminCoins]
+            );
+        }
+
+        // Init Area Managers
+        $areaManagers = \App\Models\AdminUser::where('type', 'area-manager')->get();
+        foreach ($areaManagers as $manager) {
+            \App\Models\AdminCoinRate::updateOrCreate(
+                ['admin_id' => $manager->id],
+                ['rate' => $areaManagerCoins]
+            );
+        }
+
+        admin_success('تمت العملية', 'تم تعيين القيم الافتراضية بنجاح!');
+        return redirect(config('admin.route.prefix') . '/charges-settings?firsttab=chargesSettings');
+    }
 }

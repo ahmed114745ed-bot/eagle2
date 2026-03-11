@@ -399,6 +399,17 @@ class WalletController extends MainController
 
         );
 
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate();
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($usd, 'usd', $effectiveRate);
+        
+        $totalCoins = $calc['total_coins'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $totalCoins - $baseCoins;
+        $profitUsd = $calc['profit_usd'];
+
         $data = [
             'charger_id' => $fromUser->id,
             'charger_type' => $type,
@@ -409,7 +420,16 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => $type
+            'user_charger_type' => $type,
+            'total_coins' => $totalCoins,
+            'transaction_type' => 'area_manager_to_agency',
+            'rate_source' => 'admin',
+            'applied_coin_rate' => $effectiveRate,
+            'base_usd' => $usd,
+            'base_coins' => $baseCoins,
+            'bonus_coins' => $bonusCoins,
+            'profit_usd' => $profitUsd,
+            'profit_coins' => $profitCoins,
         ];
 
         Charge::create($data);
@@ -510,6 +530,17 @@ class WalletController extends MainController
     {
         $type = auth()->user()->type == 'area-manager' ? UserTypeEnum::AREA_MANAGER : UserTypeEnum::SUB_AREA_MANAGER;
 
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate();
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
+        
+        $totalCoins = $calc['total_coins'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $totalCoins - $baseCoins;
+        $profitUsd = $calc['profit_usd'];
+
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $type;
@@ -519,6 +550,16 @@ class WalletController extends MainController
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before =  $receiver->di  - $coins;
+        $charge->total_coins = $totalCoins;
+        $charge->transaction_type = 'area_manager_to_' . strtolower(str_replace(' ', '_', $receiverType));
+        
+        $charge->rate_source = 'admin';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $usdAmount;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $bonusCoins;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
         $charge->save();
 
         return true;

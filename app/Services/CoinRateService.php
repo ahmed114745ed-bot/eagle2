@@ -33,29 +33,31 @@ class CoinRateService
     public static function getAdminCustomRate($adminId)
     {
         $customRate = AdminCoinRate::where('admin_id', $adminId)->first();
+        
         if ($customRate) {
             return $customRate->rate;
         }
-
-        return self::getAppBaseRate();
+        $baseRate = self::getAppBaseRate();
+        return $baseRate;
     }
 
     public static function getEffectiveRate($admin = null)
     {
-        // Auto-detect authenticated admin if none passed
         if (!$admin) {
             $admin = auth('admin')->user();
+        }
+        
+        if (!$admin && class_exists('\Encore\Admin\Facades\Admin')) {
+            $admin = \Encore\Admin\Facades\Admin::user();
         }
 
         if (!$admin) {
             return self::getAppBaseRate();
         }
 
-        // Check if admin is one of the types that can have a custom rate
-        // Usually, we check the role. For now, we'll check if a custom rate exists in the table.
         $customRate = AdminCoinRate::where('admin_id', $admin->id)->first();
         if ($customRate) {
-            return $customRate->rate;
+            return (float) $customRate->rate;
         }
 
         return self::getAppBaseRate();

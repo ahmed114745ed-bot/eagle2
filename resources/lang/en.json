@@ -197,7 +197,7 @@
     "Coupons": "Coupons",
     "image": "Image",
     "img": "Image",
-    "enable": "Enable/Disable",
+    "enable": "Enable\/Disable",
     "phone": "Phone",
     "code": "Code",
     "aid": "Admin ID",
@@ -1357,7 +1357,7 @@
     "This Month": "This Month",
     "count_sessions": "Number of Users",
     "Followers Count": "Followers Count",
-    "title_user": "📊 User Statistics (Online / Offline)",
+    "title_user": "📊 User Statistics (Online \/ Offline)",
     "online_users": "Online Users",
     "offline_users": "Offline Users",
     "Top Users Visits": "Most interactive",
@@ -1728,12 +1728,12 @@
     "Total sent:": "Total sent:",
     "Base": "Base",
     "Extra": "Extra",
-    "Coin Rate Settings": "Coin Rate Settings",
     "Set your own coin rate for charging": "Set your own coin rate for charging",
     "Custom Coin Rate": "Custom Coin Rate",
-    "Coins": "Coins",
     "Default App Rate: 1 USD = :rate Coins": "Default App Rate: 1 USD = :rate Coins",
     "1 USD = :rate Coins": "1 USD = :rate Coins",
     "The rate cannot be higher than the app base rate (:rate)": "The rate cannot exceed the app base rate (:rate)",
-    "Settings updated successfully": "Settings updated successfully"
+    "Settings updated successfully": "Settings updated successfully",
+    "Total Profit (profit_coins)": "Total Profit (Coins)",
+    "Total Cashback (bonus_coins)": "Total Cashback (Coins)"
 }

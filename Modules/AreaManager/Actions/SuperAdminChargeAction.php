@@ -126,15 +126,32 @@ class SuperAdminChargeAction extends Action
         $charge->user_id = $superAdmin->id;
         $charge->agency_id = null;
         $charge->user_type = UserTypeEnum::SUPER_ADMIN;
-        $charge->base_coin_rate = \App\Services\CoinRateService::getEffectiveRate(Auth::user());
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate(Auth::user());
+        
         $charge->amount = $request->charge_type == 'increment' ? $totalCoins : -$coins;
-        $charge->usd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / $charge->base_coin_rate;
+        
+        $baseUsd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / $effectiveRate;
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($baseUsd, 'usd', $effectiveRate);
+        
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $profitUsd = $calc['profit_usd'];
+
+        $charge->usd = $baseUsd;
         $charge->balance_before = $superAdmin->di - ($request->charge_type == 'increment' ? $totalCoins : -$coins);
 
-        $charge->sent_coins = $request->charge_type == 'increment' ? $coins : -$coins;
-        $charge->extra_coins = $request->charge_type == 'increment' ? $extraCoins : 0;
         $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
         $charge->transaction_type = 'super_admin_charge';
+        
+        $charge->rate_source = 'admin';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $baseUsd;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $request->charge_type == 'increment' ? $extraCoins : 0;
+        $charge->profit_usd = (float) $profitUsd;
+        $charge->profit_coins = (float) $profitCoins;
 
         $charge->save();
 

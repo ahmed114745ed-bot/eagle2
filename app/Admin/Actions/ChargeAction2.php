@@ -91,6 +91,17 @@ class ChargeAction2 extends Action
     private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount, $shippingCoins)
     {
 
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = $appBaseRate;
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
+        
+        $totalCoins = $calc['total_coins'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $totalCoins - $baseCoins;
+        $profitUsd = $calc['profit_usd'];
+
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
@@ -100,6 +111,16 @@ class ChargeAction2 extends Action
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before =  $agency->coins  - ($amount * $shippingCoins);
+        $charge->total_coins = $totalCoins;
+        $charge->transaction_type = 'admin_to_agency';
+        
+        $charge->rate_source = 'app';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $usdAmount;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $bonusCoins;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
 
         $charge->save();
         if ($request->hasFile('invoice')) {

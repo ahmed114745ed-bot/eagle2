@@ -34,13 +34,28 @@ class AdminUserCharingController extends Controller
         ]);
         $sender = $request->user();
         $reciver  = User::find($request->id);
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $totalCoins = $request->coins;
+        $baseUsd = $appBaseRate > 0 ? $totalCoins / $appBaseRate : 0;
+
         $data = new Charge();
         $data->charger_id = $sender->id;
         $data->charger_type =  'dash';
         $data->user_id =  $request->id;
         $data->user_type =  'app';
-        $data->amount =  $request->coins ;
+        $data->amount =  $totalCoins ;
         $data->balance_before =  $reciver ->coins;
+        
+        $data->applied_coin_rate = $appBaseRate;
+        $data->total_coins = $totalCoins;
+        $data->transaction_type = 'admin_to_user';
+        $data->rate_source = 'app';
+        $data->base_usd = $baseUsd;
+        $data->base_coins = $totalCoins;
+        $data->bonus_coins = 0;
+        $data->profit_usd = $baseUsd;
+        $data->profit_coins = $totalCoins;
+        
         $data->save();
 
 

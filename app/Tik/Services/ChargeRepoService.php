@@ -67,6 +67,12 @@ class ChargeRepoService
             $coins = $coinPrise * $amount;
             $userType = $userResve->user_type;
 
+            $baseRate = \App\Services\CoinRateService::getAppBaseRate();
+            $totalCoins = $coins;
+            $usdAmount = floatval($amount);
+            $sentCoins = $usdAmount * $baseRate;
+            $extraCoins = $totalCoins - $sentCoins;
+
             $data = [
                 'userId' => $userId,
                 'chargeType' => 'host_agency',
@@ -75,6 +81,15 @@ class ChargeRepoService
                 'amount' => $coins,
                 'amountType' => 2,
                 'isTransferred' => true,
+                'total_coins' => $totalCoins,
+                'transaction_type' => 'admin_to_user',
+                'rate_source' => 'app',
+                'applied_coin_rate' => $baseRate,
+                'base_usd' => $usdAmount,
+                'base_coins' => $sentCoins,
+                'bonus_coins' => $extraCoins,
+                'profit_usd' => $usdAmount,
+                'profit_coins' => $sentCoins,
             ];
 
             $this->create($data);
@@ -104,7 +119,7 @@ class ChargeRepoService
             } else {
                 $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
             }
-            $this->charge($fromUser, $toUser, $chargeType, $coins, $usd);
+            $this->charge($fromUser, $toUser, $chargeType, $coins, $usd, false, 'user_to_user');
 
             if ($toUser instanceof User) {
                 (new UserAchievementService())->insertCharging($toUser, $coins);
@@ -133,7 +148,7 @@ class ChargeRepoService
                 $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
             }
 
-            $this->chargeAgencyNew($fromUser, $toAgency, $chargeType, $coins, $usd);
+            $this->chargeAgencyNew($fromUser, $toAgency, $chargeType, $coins, $usd, false, 'user_to_agency');
 
             return true;
         } catch (Exception $e) {
@@ -165,7 +180,7 @@ class ChargeRepoService
         $percentage = Common::getCoinsValue('user_coins');
 
         $usd = $count / $percentage;
-        $this->charge($sender, $userReceiver, 'agency', $count, $usd);
+        $this->charge($sender, $userReceiver, 'agency', $count, $usd, false, 'agency_to_user');
 
         return $userReceiver;
     }
@@ -223,7 +238,7 @@ class ChargeRepoService
 
             $coinPrise = Common::getCoinsValue('user_coins');
             $numDi = $coinPrise * $count;
-            $this->charge(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true);
+            $this->charge(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true, transactionType: 'agency_to_user');
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
 
             return [$receiver, $numDi, $salary];
@@ -275,7 +290,7 @@ class ChargeRepoService
 
             $coinPrise = Common::getCoinsValue('shipping_coins');
             $numDi = $coinPrise * $count;
-            $this->chargeAgency(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true);
+            $this->chargeAgency(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true, transactionType: 'agency_to_agency');
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
 
             return [$receiver, $numDi, $salary];
@@ -285,8 +300,32 @@ class ChargeRepoService
         }
     }
 
-    public function charge($sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function charge($sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false, $transactionType = null)
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        
+        $rateSource = 'app';
+        if ($transactionType === 'user_to_user' || $transactionType === 'agency_to_user') {
+            $effectiveRate = \App\Services\CoinRateService::getUserTransferRate();
+            $rateSource = 'user_transfer';
+        } elseif ($chargeType === 'host_agency' || $chargeType === 'agency') {
+            $effectiveRate = \App\Services\CoinRateService::getEffectiveRate($sender instanceof User ? $sender : null);
+            $rateSource = 'admin';
+        } else {
+            $effectiveRate = $appBaseRate;
+            $rateSource = 'app';
+        }
+
+        $unit = $usd !== null ? 'usd' : 'coins';
+        $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+        
+        $totalCoins = $calc['total_coins'];
+        $baseUsd = $calc['base_usd'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $calc['bonus_coins'];
+        $profitUsd = $calc['profit_usd'];
 
         if ($chargeType === 'user') {
             WalletService::storeTransaction(
@@ -308,7 +347,6 @@ class ChargeRepoService
             UserCoinLogType::APP_CHARGE,
         );
     
-        // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
             'charger_id' => $sender->id,
@@ -317,9 +355,18 @@ class ChargeRepoService
             'user_type' => 'user',
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $usd !== null ? $usd : $amount,
+            'usd' => $baseUsd,
             'is_used_transferred' => $transferred,
-            'action_user_id' => auth()->user()->id,
+            'action_user_id' => auth()->user()->id() ?? (isset($sender->id) ? $sender->id : null),
+            'total_coins' => $totalCoins,
+            'transaction_type' => $transactionType,
+            'rate_source' => $rateSource,
+            'applied_coin_rate' => $effectiveRate,
+            'base_usd' => $baseUsd,
+            'base_coins' => $baseCoins,
+            'bonus_coins' => $bonusCoins,
+            'profit_usd' => $profitUsd,
+            'profit_coins' => $profitCoins,
         ];
         $this->create($data);
     }
@@ -328,9 +375,30 @@ class ChargeRepoService
     {
         return $this->coinLogRepository->getCoinsByUserId($userId, $searchKey);
     }
-
-    public function chargeAgencyNew(User $sender, ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function chargeAgencyNew($sender, ShippingAgency|Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false, $transactionType = null)
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        
+        $rateSource = 'app';
+        if ($transactionType === 'user_to_agency') {
+            $effectiveRate = \App\Services\CoinRateService::getUserTransferRate();
+            $rateSource = 'user_transfer';
+        } else {
+            $effectiveRate = \App\Services\CoinRateService::getEffectiveRate($sender);
+            $rateSource = 'admin';
+        }
+
+        $unit = $usd !== null ? 'usd' : 'coins';
+        $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+
+        $totalCoins = $calc['total_coins'];
+        $baseUsd = $calc['base_usd'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $calc['bonus_coins'];
+        $profitUsd = $calc['profit_usd'];
+
         $type = $receiver->owner?->user_type ?? '';
 
         $receiver->increment('coins', $amount);
@@ -353,15 +421,37 @@ class ChargeRepoService
             'user_type' => 'agency',
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $usd ?? 0,
+            'usd' => $baseUsd,
             'is_used_transferred' => $transferred,
+            'total_coins' => $totalCoins,
+            'transaction_type' => $transactionType,
+            'rate_source' => $rateSource,
+            'applied_coin_rate' => $effectiveRate,
+            'base_usd' => $baseUsd,
+            'base_coins' => $baseCoins,
+            'bonus_coins' => $bonusCoins,
+            'profit_usd' => $profitUsd,
+            'profit_coins' => $profitCoins,
         ];
 
         $this->create($data);
     }
 
-    public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false, $transactionType = null)
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate($sender instanceof User ? $sender : null);
+        
+        $unit = $usd !== null ? 'usd' : 'coins';
+        $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+
+        $totalCoins = $calc['total_coins'];
+        $baseUsd = $calc['base_usd'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $calc['bonus_coins'];
+        $profitUsd = $calc['profit_usd'];
    
 
         $receiver->increment('coins', $amount);
@@ -374,9 +464,18 @@ class ChargeRepoService
             'user_type' => 'agency',
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $usd !== null ? $usd : $amount,
+            'usd' => $baseUsd,
             'is_used_transferred' => $transferred,
-            'action_user_id' => auth()->user()->id,
+            'action_user_id' => auth()->user()->id() ?? (isset($sender->id) ? $sender->id : null),
+            'total_coins' => $totalCoins,
+            'transaction_type' => $transactionType,
+            'rate_source' => 'admin',
+            'applied_coin_rate' => $effectiveRate,
+            'base_usd' => $baseUsd,
+            'base_coins' => $baseCoins,
+            'bonus_coins' => $bonusCoins,
+            'profit_usd' => $profitUsd,
+            'profit_coins' => $profitCoins,
 
         ];
 
@@ -467,8 +566,22 @@ class ChargeRepoService
         }
     }
 
-    public function agencyCharge($chargerId, $userId, $amount, $type, $usd, $chargeType, $transferred = false, $agencyId = null)
+    public function agencyCharge($chargerId, $userId, $amount, $type, $usd, $chargeType, $transferred = false, $agencyId = null, $transactionType = null)
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate();
+        
+        $unit = $usd !== null ? 'usd' : 'coins';
+        $inputAmount = $usd !== null ? floatval($usd) : floatval($amount);
+        $calc = \App\Services\ChargeCalculationService::calculate($inputAmount, $unit, $effectiveRate);
+
+        $totalCoins = $calc['total_coins'];
+        $baseUsd = $calc['base_usd'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $calc['bonus_coins'];
+        $profitUsd = $calc['profit_usd'];
+
         $data = [
             'charger_id' => $chargerId,
             'charger_type' => $chargeType,
@@ -476,9 +589,18 @@ class ChargeRepoService
             'user_type' => $type,
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $usd !== null ? $usd : $amount,
+            'usd' => $baseUsd,
             'is_used_transferred' => $transferred,
             'agency_id' => $agencyId,
+            'total_coins' => $totalCoins,
+            'transaction_type' => $transactionType,
+            'rate_source' => 'admin',
+            'applied_coin_rate' => $effectiveRate,
+            'base_usd' => $baseUsd,
+            'base_coins' => $baseCoins,
+            'bonus_coins' => $bonusCoins,
+            'profit_usd' => $profitUsd,
+            'profit_coins' => $profitCoins,
         ];
         $this->create($data);
     }

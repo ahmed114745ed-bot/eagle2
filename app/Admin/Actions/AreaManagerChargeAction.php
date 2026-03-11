@@ -109,6 +109,18 @@ class AreaManagerChargeAction extends Action
 
     private function createChargeRecord(Request $request, AreaManager $areaManager, $amount, $coins, $extraCoins, $totalCoins, $usdAmount): void
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = $appBaseRate;
+        
+        $baseUsd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / $appBaseRate;
+        $totalCoins = $coins;
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($baseUsd, 'usd', $effectiveRate);
+        
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $profitUsd = $calc['profit_usd'];
+
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
@@ -116,13 +128,19 @@ class AreaManagerChargeAction extends Action
         $charge->agency_id =   null;
         $charge->user_type = UserTypeEnum::AREA_MANAGER;
         $charge->amount = $request->charge_type == 'increment' ? $totalCoins : -$coins;
-        $charge->usd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / \App\Services\CoinRateService::getAppBaseRate();
+        $charge->usd = $baseUsd;
         $charge->balance_before =  $areaManager->di  - ($request->charge_type == 'increment' ? $totalCoins : -$coins);
         
-        $charge->sent_coins = $request->charge_type == 'increment' ? $coins : -$coins;
-        $charge->extra_coins = $request->charge_type == 'increment' ? $extraCoins : 0;
         $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
         $charge->transaction_type = 'area_manager_charge';
+        
+        $charge->rate_source = 'app';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $baseUsd;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $extraCoins;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
         
         $charge->save();
 

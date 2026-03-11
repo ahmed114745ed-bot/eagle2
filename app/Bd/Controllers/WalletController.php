@@ -399,6 +399,18 @@ class WalletController extends MainController
 
 
 
+            $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+            $effectiveRate = $appBaseRate;
+            
+            $calc = \App\Services\ChargeCalculationService::calculate($amount, 'usd', $effectiveRate);
+            
+            $baseUsd = $calc['base_usd'];
+            $baseCoins = $calc['base_coins'];
+            $totalCoins = $calc['total_coins']; // This might differ from $coins input, but BD controller seems to use $amount (USD)
+            $profitCoins = $calc['profit_coins'];
+            $profitUsd = $calc['profit_usd'];
+            $appliedRate = $effectiveRate;
+
             $data = [
                 'charger_id' => $sender->id,
                 'charger_type' => 'bd',
@@ -409,7 +421,16 @@ class WalletController extends MainController
                 'amount_type' => 2,
                 "usd" =>  $amount ?? 0,
                 'is_used_transferred' => 1,
-                'user_charger_type' => 'bd'
+                'user_charger_type' => 'bd',
+                'applied_coin_rate' => $appliedRate,
+                'total_coins' => $totalCoins,
+                'transaction_type' => 'bd_to_user',
+                'rate_source' => 'admin',
+                'base_usd' => $baseUsd,
+                'base_coins' => $baseCoins,
+                'bonus_coins' => 0,
+                'profit_usd' => $profitUsd,
+                'profit_coins' => $profitCoins,
             ];
 
             $charge =  Charge::create($data);
@@ -500,6 +521,14 @@ class WalletController extends MainController
             'charge'
         );
 
+        $effectiveRate = \App\Services\CoinRateService::getAppliedRate($fromUser);
+        
+        $baseUsd = (float) $usd;
+        $totalCoins = (float) $coins;
+        $baseCoins = $baseUsd * $effectiveRate;
+        $profitCoins = $baseCoins;
+        $profitUsd = $baseUsd;
+
         $data = [
             'charger_id' => $fromUser->id,
             'charger_type' => 'bd',
@@ -510,8 +539,16 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => 'bd'
-
+            'user_charger_type' => 'bd',
+            'applied_coin_rate' => $effectiveRate,
+            'total_coins' => $totalCoins,
+            'transaction_type' => 'bd_to_agency',
+            'rate_source' => 'admin',
+            'base_usd' => $baseUsd,
+            'base_coins' => $baseCoins,
+            'bonus_coins' => $totalCoins - $baseCoins,
+            'profit_usd' => $profitUsd,
+            'profit_coins' => $profitCoins,
         ];
 
         Charge::create($data);

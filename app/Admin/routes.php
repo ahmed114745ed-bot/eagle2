@@ -640,6 +640,8 @@ Route::group(
         Route::get('admin-rewards-histories', [SuperAdminRewardControllerHistory::class, 'index']);
         Route::get('admin-rewards-histories/{id}', [SuperAdminRewardControllerHistory::class, 'getRewards']);
 
+        Route::get('charges-reports-stats', [ChargeReportController::class, 'getStats'])->name('charge-reports.stats');
+
         Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
         Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
 
@@ -793,4 +795,5 @@ Route::group([
     'middleware' => ['web', 'admin'],
 ], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
+    Route::get('init-coin-rates', [\App\Admin\Controllers\SettingController::class, 'initCoinRates']);
 });

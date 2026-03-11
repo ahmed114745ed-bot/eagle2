@@ -40,6 +40,7 @@ class CoinRateController extends Controller
             ['rate' => $request->rate]
         );
 
-        return back()->with('success', __('Settings updated successfully'));
+        admin_toastr(__('Settings updated successfully'));
+        return back();
     }
 }
