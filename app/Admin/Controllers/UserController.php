@@ -394,7 +394,7 @@ class UserController extends MainController
                 $actions->disableView();
             }
         });
-        if (config('app.env') == 'production') $grid->disableCreateButton();
+       // if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableRowSelector();
 
