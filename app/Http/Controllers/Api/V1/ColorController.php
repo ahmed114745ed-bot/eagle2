@@ -70,12 +70,18 @@ class ColorController extends Controller
                 return Setting::where('key', 'text_header_color')->value('value');
             }),
             "button_text_color" => Cache::remember('button_text_color', 3600, function () {
-                return Setting::where('key', 'button_text_color')->value('value');
+                return Setting::where('key', 'button_text_color')->value('value') ?? '';
             }),
+
+            'body_color' => [
+                "dark_mode_color" => Cache::remember('dark_mode_color', 3600, function () {
+                    return Setting::where('key', 'dark_mode_color')->value('value');
+                }),
+                "light_mode_color" => Cache::remember('light_mode_color', 3600, function () {
+                    return Setting::where('key', 'light_mode_color')->value('value') ?? '';
+                }),
+            ],
         ];
-
-
-
 
         return Common::apiResponse(true, '', $data, 200);
     }

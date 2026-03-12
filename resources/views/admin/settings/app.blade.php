@@ -107,6 +107,7 @@
                     </div>
                 </div>
             </div>
+          
 
             <div class="col-md-6">
                 <div class="form-group">
@@ -120,7 +121,32 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="app_primary_color">{{ __('Dark Mode Color') }}</label>
+                    <div class="input-group colorpicker-element">
+                        <span class="input-group-addon">
+                            <i style="background-color: {{ data_get($settings, 'dark_mode_color', '') }};"></i>
+                        </span>
+                        <input type="text" name="dark_mode_color" id="dark_mode_color" class="form-control"
+                               value="{{ data_get($settings, 'dark_mode_color', '') }}" placeholder="اختر لون" required>
+                    </div>
+                </div>
+            </div>
 
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="light_mode_color">{{ __('Light Mode Color') }}</label>
+                    <div class="input-group colorpicker-element">
+                        <span class="input-group-addon">
+                            <i style="background-color: {{ data_get($settings, 'light_mode_color', '') }};"></i>
+                        </span>
+                        <input type="text" name="light_mode_color" id="light_mode_color" class="form-control"
+                               value="{{ data_get($settings, 'light_mode_color', '') }}" placeholder="اختر لون" required>
+                    </div>
+                </div>
+            </div>
+        
             @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio','Tiko Live']))
                 <div class="col-md-6">
                     <div class="form-group">
@@ -131,7 +157,9 @@
                     </div>
                 </div>
             @endif
-        </div>
+
+             
+            </div>
 
         <div class="col-12 d-flex gap-3 mt-4">
          
