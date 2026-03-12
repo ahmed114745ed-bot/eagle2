@@ -1366,3 +1366,12 @@ function formatLargeNumber($number): string
     }
     return number_format($number);
 }
+
+
+if (! function_exists('getFairLuckSetting')) {
+    function getFairLuckSetting(string $key, $default = null)
+    {
+        $setting = \App\Models\FairLuckSetting::where('key', $key)->first();
+        return $setting ? $setting->value : $default;
+    }
+}

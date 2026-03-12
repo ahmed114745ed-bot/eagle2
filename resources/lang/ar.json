@@ -5316,5 +5316,7 @@
     "Bottom Nav Inactive Color": "لون شريط التنقل غير النشط",
     "Text Header Color": "لون نص الرأس",
     "Button Text Color": "لون نص الزر",
-    "New Theme Enabled": "تفعيل المظهر الجديد"
+    "New Theme Enabled": "تفعيل المظهر الجديد",
+    "Owner Fee Rate (0.10 = 10%)": "النسبة  للغرفة (0.10 = 10%)" 
+
 }

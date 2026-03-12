@@ -306,9 +306,11 @@ class LuckyGiftService
         $number = $data['num'];
         $count = $data['count'] ?? 1;
         $amountBefore = $user->di;
-        $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 10;
-        $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
-        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
+
+        $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
+        $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+        $roomrPercentage = \App\Models\FairLuckSetting::getOwnerFeeRate();
+        $hostPercentage = $receiverFeeRate;
         $total_cashback_percentage = 0;
 
 
@@ -371,8 +373,7 @@ class LuckyGiftService
 
         $coinsForOwner = ($giftPrice * $number * $receiversCount) * $roomrPercentage;
 
-        $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
-        $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+     
 
         $senderBalanceBefore = $user->di;
         $totalWalletsBefore = null;
@@ -404,7 +405,7 @@ class LuckyGiftService
 
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
-                $netBetAmount = $unitPrice - $appFee - $receiverFee;
+                $netBetAmount = $unitPrice - $appFee - $receiverFee - $coinsForOwner;
 
                 $recUser = User::find($receiverId);
                 if ($recUser) {
@@ -565,7 +566,10 @@ class LuckyGiftService
         $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
         if ($room->charizma_status && $coinsForReceiver > 1) {
-            dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
+            dispatch(new UpdateSendCharismaToZigo($room->id, $receiversIds, $coinsForReceiver, $userId))
+                    ->afterCommit()
+                    ->onQueue('default');
+          //  dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
         } elseif ($room->lastPk && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds, "pk");
         }
