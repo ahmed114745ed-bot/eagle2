@@ -133,6 +133,7 @@ class WeeklyEventNController extends MainController
 
     protected function form()
     {
+        dd(123);
         $form = new Form(new WeeklyStar);
         $this->disableFormTools($form);
 
