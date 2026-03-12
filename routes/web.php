@@ -1759,6 +1759,7 @@ Route::get('make-seeders-for-permission', function () {
     $seeder->run();
 
     return 'seeders have been executed successfully!';
+    return 'seeders have been executed successfully!';
 });
 
 
