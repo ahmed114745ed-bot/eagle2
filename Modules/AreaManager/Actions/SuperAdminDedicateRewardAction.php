@@ -41,15 +41,20 @@ class SuperAdminDedicateRewardAction extends Action
 
         $reward = SuperAdminReward::find($request->id);
         $noReward = $request->input('no_reward') ?? 1;
-        $rewardNom = $noReward -  $reward->gave_reward_no;
+        $remainingRewards = $reward->no_reward - $reward->gave_reward_no;
         try {
-            if ($rewardNom == 0) {
+            if ($remainingRewards <= 0) {
                 return $this->response()->error(__('your reward finished'));
+            }
+            if ($noReward > $remainingRewards) {
+                return $this->response()->error(__('not enough rewards, remaining: ') . $remainingRewards);
             }
             if ($request->user_type == 'user') {
                 $user = User::query()->searchByUuid($request->user_uuid)->first();
                 if (!$user)   return $this->response()->error(__('dashboard.userNotFound'))->refresh();
-                $this->assignRewards($reward, $user);
+                for ($i = 0; $i < $noReward; $i++) {
+                    $this->assignRewards($reward, $user);
+                }
             } else {
                 $user = SuperAdmin::find($request->super_admin_id);
                 if (!$user) return $this->response()->error(__('dashboard.userNotFound'))->refresh();
@@ -85,7 +90,7 @@ class SuperAdminDedicateRewardAction extends Action
             ->options(self::getSuperAdmins())
             // ->ajax('/areaManager/search/super-admin', 'id', 'name')
             ->attribute(['id' => 'super-admin-select']);
-        $this->integer('no_reward', __('No reward'))->default(1)->attribute(['id' => 'no-reward-input']);
+        $this->integer('no_reward', __('No reward'))->default(1);
 
         Admin::script(<<<'SCRIPT'
             function toggleUserTypeFields() {
@@ -94,10 +99,9 @@ class SuperAdminDedicateRewardAction extends Action
                 if (selected === 'user') {
                     $('#user-select').closest('.form-group').show();
                     $('#super-admin-select').closest('.form-group').hide();
-                     $('#no-reward-input').closest('.form-group').hide();
+                    
                 } else if (selected === 'super_admin') {
                     $('#super-admin-select').closest('.form-group').show();
-                     $('#no-reward-input').closest('.form-group').show();
                     $('#user-select').closest('.form-group').hide();
                 }
             }
