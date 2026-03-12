@@ -69,7 +69,7 @@ class SuperAdminDedicateRewardAction extends Action
 
             SuperAdminReward::where('id', $request->id)
                 ->increment('gave_reward_no', $noReward);
-            return $this->response()->success(__('dashboard.successful'));
+            return $this->response()->success(__('dashboard.successful'))->refresh();
         } catch (\Exception $exception) {
             return $this->response()->error('some thing went wrong')->refresh();
         }
