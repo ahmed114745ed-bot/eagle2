@@ -890,12 +890,12 @@ class LuckyGiftService
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
                 ->where('uid', $ownerId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
         } else {
             $room = Room::withoutAppends()
                 ->where('id', $roomId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
             $ownerId = $room?->uid;
         }
