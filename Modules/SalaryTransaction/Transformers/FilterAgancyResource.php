@@ -36,7 +36,7 @@ class FilterAgancyResource extends JsonResource
             $type = 'shipping';
         }
 
-        $giftLog = $this->giftLogs->groupBy('receiver_id')
+        $giftLog = $this->giftLogs->filter(fn($log) => $log->receiver)->groupBy('receiver_id')
             ->map(function ($logs) {
                 return [
                     'receiver' => $logs->first()->receiver,
