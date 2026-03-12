@@ -83,7 +83,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('application wallet percentage') }}</label>
                                 <div class="col-sm-8">
-                                    <input type="number" name="app_wallet_lucky_gift" class="form-control"
+                                    <input type="number" step="any" name="app_wallet_lucky_gift" class="form-control"
                                         value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" required>
                                     <span class="help-block">{{ __('App owner profit') }}</span>
                                 </div>
@@ -92,7 +92,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('owner percentage') }}</label>
                                 <div class="col-sm-8">
-                                    <input type="number" name="owner_lucky_gift" class="form-control"
+                                    <input type="number" step="any" name="owner_lucky_gift" class="form-control"
                                         value="{{ $config['owner_lucky_gift'] ?? 0 }}" required>
                                     <span class="help-block">{{ __('owner gift') }}</span>
                                 </div>
@@ -101,7 +101,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('host percentage') }}</label>
                                 <div class="col-sm-8">
-                                    <input type="number" name="host_lucky_gift" class="form-control"
+                                    <input type="number" step="any" name="host_lucky_gift" class="form-control"
                                         value="{{ $config['host_lucky_gift'] ?? 0 }}" required>
                                 </div>
                             </div>

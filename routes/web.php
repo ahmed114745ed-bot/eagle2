@@ -1759,3 +1759,19 @@ Route::get('make-seeders-for-permission', function () {
 });
 
 
+
+
+Route::get('/queue-control/{queue}', function ($queue) {
+
+    $check = shell_exec("ps aux | grep 'queue:work --queue=$queue' | grep -v grep");
+
+    if ($check) {
+        Artisan::call('queue:restart');
+        return "Queue $queue restarted";
+    } else {
+        shell_exec("php artisan queue:work --queue=$queue > /dev/null 2>&1 &");
+        return "Queue $queue started";
+    }
+
+});
+
