@@ -132,14 +132,21 @@
                                 <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="fair_luck_app_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0.10' }}">
+                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0' }}">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="fair_luck_receiver_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0.10' }}">
+                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_owner_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0' }}">
                                 </div>
                             </div>
                         </div>
