@@ -763,6 +763,9 @@ Route::group(
             Route::get('/agencies-test', [GiftLogTestController::class, 'showAgencies']);
             Route::post('/agencies-test', [GiftLogTestController::class, 'agencies']);
 
+            Route::get('/gift-test', [GiftLogTestController::class, 'showSendGift']);
+            Route::post('/gift-test', [GiftLogTestController::class, 'sendGift']);
+
             Route::get('/pusher-test/{id}', function ($id) {
                 $user = \App\Models\User::findOrFail($id);
                 $token = $user->createToken('broadcast')->plainTextToken;

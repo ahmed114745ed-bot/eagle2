@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Transformers\FilterAgancyResource;
@@ -52,7 +53,7 @@ class GiftLogTestController extends Controller
         return view('test.gifts-test');
     }
 
-    public function gift_queue_cp_view(\Illuminate\Http\Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function gift_queue_cp_view(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $close_open_gifts = settings()->get('close_open_gifts');
 
@@ -342,6 +343,53 @@ class GiftLogTestController extends Controller
             'success' => true,
             'message' => '',
             'data' => $data,
+        ]);
+    }
+
+    public function showSendGift()
+    {
+        return view('test.gift');
+    }
+
+    public function sendGift(UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+
+        $request = Request::create('/', 'POST', [
+            'owner_id' => '1206',
+            'id' => '374',
+            'toUid' => '1206',
+            'num' => '20',
+        ]);
+
+        $close_open_gifts = settings()->get('close_open_gifts');
+        if ($close_open_gifts == 1) {
+            return view('test.gift', [
+                'success' => false,
+                'message' => 'Send gift stopped by admin',
+                'data' => null
+            ]);
+        }
+
+        try {
+            $message = $this->giftLogService->sendTestGift($request, $updateUserWhenSendGift);
+        } catch (\Exception $e) {
+            return view('test.gift', [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => null
+            ]);
+        }
+
+        // معالجة النتائج
+        $tpUsers = $request->toUid;
+        $idsArray = array_map('intval', explode(',', $tpUsers));
+
+        return view('test.gift', [
+            'success' => true,
+            'message' => $message,
+            'data' => [
+                'ids' => $idsArray
+            ]
         ]);
     }
 
