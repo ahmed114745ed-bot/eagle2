@@ -27,6 +27,7 @@ use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Carbon\Carbon;
 use App\Helpers\CacheHelper;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
+use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 
 class LuckyGiftService
 {
@@ -566,10 +567,7 @@ class LuckyGiftService
         $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
 
         if ($room->charizma_status && $coinsForReceiver > 1) {
-            dispatch(new UpdateSendCharismaToZigo($room->id, $receiversIds, $coinsForReceiver, $userId))
-                    ->afterCommit()
-                    ->onQueue('default');
-          //  dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
+            dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
         } elseif ($room->lastPk && $coinsForReceiver > 1) {
             dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds, "pk");
         }
