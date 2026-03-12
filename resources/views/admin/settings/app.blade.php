@@ -123,7 +123,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="app_primary_color">{{ __('Dark Mode Color') }}</label>
+                    <label for="app_primary_color">{{ __('Dark Body Color') }}</label>
                     <div class="input-group colorpicker-element">
                         <span class="input-group-addon">
                             <i style="background-color: {{ data_get($settings, 'dark_mode_color', '') }};"></i>
@@ -136,7 +136,7 @@
 
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="light_mode_color">{{ __('Light Mode Color') }}</label>
+                    <label for="light_mode_color">{{ __('Light Body Color') }}</label>
                     <div class="input-group colorpicker-element">
                         <span class="input-group-addon">
                             <i style="background-color: {{ data_get($settings, 'light_mode_color', '') }};"></i>
