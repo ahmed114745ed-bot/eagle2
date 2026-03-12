@@ -88,17 +88,6 @@ class UpdateUserWhenSendGift
                 ->get();
 
             foreach ($users as $user) {
-
-                $user->increment('total_diamond_received', $totalCoins);
-
-                if ($user->agency_id == 0) {
-                    $user->increment('exchange_diamonds', $totalCoins);
-                }
-
-                uploadMonthlyDiamondReceive(
-                    $user->id,
-                    $user->monthly_diamond_received + $totalCoins
-                );
                 $lastReceivedLevel = $user->total_received_level;
                 try {
                     (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
@@ -113,9 +102,19 @@ class UpdateUserWhenSendGift
                         'path' => storage_path('logs/diamond_upgrade.log'),
                     ])->error("Error in checkUserLevelUpgrated for user {$user->id}: " . $e->getMessage());
                 }
+                $user->increment('total_diamond_received', $totalCoins);
+
+                if ($user->agency_id == 0) {
+                    $user->increment('exchange_diamonds', $totalCoins);
+                }
+
+                uploadMonthlyDiamondReceive(
+                    $user->id,
+                    $user->monthly_diamond_received + $totalCoins
+                );
+
 
                 $user->save();
-
             }
         }, 5);
     }
