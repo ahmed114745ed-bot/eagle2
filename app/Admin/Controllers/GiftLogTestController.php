@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Repositories\Community\SearchRepository;
 use App\Services\ProfileService;
 use App\Services\UserService;
+use App\Tik\Services\AgencyService;
 use App\Tik\Services\GiftLogService;
 use App\Tik\Services\RoomRepoService;
 use Exception;
@@ -30,15 +31,18 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
+use Modules\SalaryTransaction\Transformers\FilterAgancyResource;
+use Modules\SalaryTransaction\Transformers\FilterAgencyMangerResource;
 
 class GiftLogTestController extends Controller
 {
 
     public function __construct(
-        private readonly GiftLogService $giftLogService,
-        private readonly UserService $userService,
-        private readonly ProfileService $profileService,
+        private readonly GiftLogService  $giftLogService,
+        private readonly UserService     $userService,
+        private readonly ProfileService  $profileService,
         private readonly RoomRepoService $roomService,
+        private readonly AgencyService $agencyService,
     )
     {
     }
@@ -136,7 +140,7 @@ class GiftLogTestController extends Controller
         return view('test.relations', [
             'success' => $original['success'] ?? false,
             'message' => $original['message'] ?? '',
-            'data'    => $original['data'] ?? [],
+            'data' => $original['data'] ?? [],
         ]);
     }
 
@@ -162,7 +166,7 @@ class GiftLogTestController extends Controller
         return view('test.visitors', [
             'success' => true,
             'message' => '',
-            'data'    => $original['data'] ?? [],
+            'data' => $original['data'] ?? [],
         ]);
     }
 
@@ -180,7 +184,7 @@ class GiftLogTestController extends Controller
         return view('test.room_admins', [
             'success' => true,
             'message' => '',
-            'data'    => $data,
+            'data' => $data,
         ]);
     }
 
@@ -199,7 +203,7 @@ class GiftLogTestController extends Controller
         return view('test.rooms', [
             'success' => true,
             'message' => '',
-            'data'    => $data,
+            'data' => $data,
         ]);
     }
 
@@ -227,12 +231,12 @@ class GiftLogTestController extends Controller
         $result = [
             'user' => UserResourceSearchV2::collection($this->userSearchHand($user_id, $keywords, $blockedUserIds)),
             'rooms' => RoomSearchResource::collection($this->searchRooms($user_id, $keywords, $blockedUserIds)),
-            ];
+        ];
 
         return view('test.search', [
             'success' => true,
             'message' => '',
-            'data'    => $result,
+            'data' => $result,
         ]);
     }
 
@@ -257,7 +261,7 @@ class GiftLogTestController extends Controller
         return view('test.notifications', [
             'success' => true,
             'message' => '',
-            'data'    => $data,
+            'data' => $data,
         ]);
     }
 
@@ -289,12 +293,12 @@ class GiftLogTestController extends Controller
 
         $data = [
             'version' => [
-                'android_version'   => settings()->get('android_current_version'),
-                'ios_version'       => settings()->get('ios_current_version'),
-                'huawei_version'    => settings()->get('huawei_current_version'),
+                'android_version' => settings()->get('android_current_version'),
+                'ios_version' => settings()->get('ios_current_version'),
+                'huawei_version' => settings()->get('huawei_current_version'),
             ],
-            'hide_invite'       => $invite_code,
-            'show_chat'         => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
+            'hide_invite' => $invite_code,
+            'show_chat' => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
             'shared_key' => Common::getConfig('shared') ?? '1234',
             'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
             'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
@@ -304,7 +308,40 @@ class GiftLogTestController extends Controller
         return view('test.app_settings', [
             'success' => true,
             'message' => '',
-            'data'    => $data,
+            'data' => $data,
+        ]);
+    }
+
+    public function showAgencies()
+    {
+        return view('test.agencies');
+    }
+
+    public function agencies()
+    {
+        $app_feature = Cache::get('host_agency');
+
+        if (!$app_feature) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Agency Feature is Disabled, Contact the administration'),
+                'data'    => null,
+            ]);
+        }
+
+        $keyword = null;
+
+        [$agencies, $agencyManger] = $this->agencyService->filter($keyword);
+
+        $data = [
+            'agencies' => FilterAgancyResource::collection($agencies),
+            'agency_masters' => FilterAgencyMangerResource::collection($agencyManger),
+        ];
+
+        return view('test.agencies', [
+            'success' => true,
+            'message' => '',
+            'data' => $data,
         ]);
     }
 
@@ -384,7 +421,7 @@ class GiftLogTestController extends Controller
             ->whereHas('owner', function ($query) {
                 $query->where('status', 1);
             })
-            ->where('uid', 'like',  $keywords . '%')
+            ->where('uid', 'like', $keywords . '%')
             ->whereNotIn('uid', $blockedUserIds)
             ->orderBy('hot', 'desc')
             ->take(2)
