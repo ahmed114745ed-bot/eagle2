@@ -2560,7 +2560,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" target="_blank"
+                                    <a href="{{ url('admin/gifts/' .  @$giftSLog->gift->id) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
                                              width="30" height="30"
