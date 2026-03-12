@@ -1496,6 +1496,7 @@ class Common
 
         return $ch->isNotEmpty();
     }
+
     public static function hasProfileFramePack($user_id, $type, $use_status = false)
     {
         $ch =  self::checkPack($user_id, $type);
