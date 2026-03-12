@@ -61,18 +61,22 @@ class UsersChargeAction extends Action
         if ($amount < 0 && $user->di < abs($amount)) {
             return $this->response()->error(__('Insufficient user balance'))->refresh();
         }
-        $userCoins = \Cache::rememberForever('user_coins', function () {
+      /*  $userCoins = \Cache::rememberForever('user_coins', function () {
             $setting =   Setting::where('key', 'user_coins')->first();
             return $setting?->value;
-        });
+        });*/
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRateOrUserCoins();
+        $effectiveRate = $appBaseRate;
         
-        $coins = $amount * $userCoins;
+        $calc = \App\Services\ChargeCalculationService::calculate($request->amount, 'usd', $effectiveRate);
         
-        if (! $userCoins || $userCoins == 0) {
+        $coins = $calc['total_coins'];
+        
+        if (!$coins || $coins == 0) {
             return $this->response()->error(__('please set user coins in configs'))->refresh();
         }
         
-        DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
+        DB::transaction(function () use ($request, $user, $amount, $coins, $typeCharge , $calc , $effectiveRate) {
             
             $amountBefore =  Common::getCurrentBalance($user->id);
 
@@ -91,7 +95,7 @@ class UsersChargeAction extends Action
             }
             $user->save();
 
-            $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount);
+            $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount , $calc , $effectiveRate);
 
             if ($typeCharge == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -114,13 +118,9 @@ class UsersChargeAction extends Action
 
 
 
-    private function createChargeRecord(Request $request, User $user, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, User $user, $amount, $coins = 0, $usdAmount , $calc , $effectiveRate)
     {
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
-        $effectiveRate = $appBaseRate;
-        
-        $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
-        
+       
         $totalCoins = $calc['total_coins'];
         $baseCoins = $calc['base_coins'];
         $profitCoins = $calc['profit_coins'];

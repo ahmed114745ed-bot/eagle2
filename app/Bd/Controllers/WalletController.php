@@ -358,17 +358,23 @@ class WalletController extends MainController
         if ($totalSalary < $amount) {
             throw new \Exception(__('balance not enough'));
         }
-        $rate = Common::getCoinsValue('user_coins');
+
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRateOrUserCoins();
+        $effectiveRate = $appBaseRate;
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($amount, 'usd', $effectiveRate);
+            
+            
         if (!$rate) {
             throw new \Exception(__('please set usd_value_in_coins in configs'));
         }
 
-        $coins = $amount * $rate;
+        $coins = $calc['total_coins']; 
 
-        return $this->startTransaction($receiver, $sender, $amount, $coins, 'user');
+        return $this->startTransaction($receiver, $sender, $amount, $coins, 'user',$calc,$effectiveRate);
     }
 
-    public function startTransaction(User $receiver, Bd $sender, int $amount, int $coins, string $receiverType)
+    public function startTransaction(User $receiver, Bd $sender, int $amount, int $coins, string $receiverType,$calc,$effectiveRate)
     {
         DB::beginTransaction();
         try {
@@ -399,11 +405,7 @@ class WalletController extends MainController
 
 
 
-            $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
-            $effectiveRate = $appBaseRate;
-            
-            $calc = \App\Services\ChargeCalculationService::calculate($amount, 'usd', $effectiveRate);
-            
+        
             $baseUsd = $calc['base_usd'];
             $baseCoins = $calc['base_coins'];
             $totalCoins = $calc['total_coins']; // This might differ from $coins input, but BD controller seems to use $amount (USD)
@@ -482,7 +484,7 @@ class WalletController extends MainController
 
         }
 
-        $rate = Common::getCoinsValue('shipping_coins');
+        $rate = \App\Services\CoinRateService::getAppBaseRate2();
         if (!$rate) {
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
         }

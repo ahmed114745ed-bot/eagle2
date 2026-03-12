@@ -785,7 +785,7 @@ class HomeController extends  MainController
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
             ->sum(\DB::raw('giftPrice * giftNum'));
 
-        $rate = Common::getCoinsValue('user_coins');
+        $rate = \App\Services\CoinRateService::getUserTransferRate();
         $totalGiftsUsd = $rate > 0 ? $totalGiftsValue / $rate : 0;
 
         return response()->json([

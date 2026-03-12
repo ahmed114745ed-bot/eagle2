@@ -15,7 +15,7 @@ class CoinRateController extends Controller
     {
         $adminId = Auth::id();
         $customRate = AdminCoinRate::where('admin_id', $adminId)->first();
-        $appRate = CoinRateService::getAppBaseRate();
+        $appRate = \App\Services\CoinRateService::getAppBaseRate();
 
         return $content
             ->header(__('Coin Rate Settings'))
@@ -28,7 +28,7 @@ class CoinRateController extends Controller
 
     public function store(Request $request)
     {
-        $appRate = CoinRateService::getAppBaseRate();
+        $appRate = \App\Services\CoinRateService::getAppBaseRate();
         $request->validate([
             'rate' => 'required|numeric|min:1|max:' . $appRate
         ], [

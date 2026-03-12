@@ -261,7 +261,7 @@ class SettingController extends MainController
         $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
         $superAdminCoins = Setting::where('key', 'super_admin_coins')->value('value') ?? $appBaseRate;
         $areaManagerCoins = Setting::where('key', 'area_manager_coins')->value('value') ?? Setting::where('key', 'zones_coins')->value('value') ?? $appBaseRate;
-
+        $zones_coins =Setting::where('key', 'zones_coins')->value('value') ;
         // Super Admins
         $superAdmins = \App\Models\AdminUser::where('type', 'superadmin')->get();
         foreach ($superAdmins as $admin) {
@@ -280,14 +280,8 @@ class SettingController extends MainController
             );
         }
 
-        return 'تمت تهيئة قيم المشرفين بنجاح (Init Admin Rates Done)';
-    }
-
-    public function initUserCoinRates()
-    {
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
-        $userCoinsConfig = \App\Models\Config::where('name', 'user_coins')->first();
-        $userRate = $userCoinsConfig ? (float) $userCoinsConfig->value : $appBaseRate;
+        $userCoinsConfig = \App\Models\Setting::where('key', 'user_coins')->first();
+        $userRate = (float) $userCoinsConfig->value ;
 
         \App\Models\Setting::updateOrCreate(
             ['key' => 'user_transfer_coin_rate'],
@@ -298,11 +292,21 @@ class SettingController extends MainController
             ['value' => 1]
         );
 
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'app_coin_rate'],
+            ['value' => $zones_coins]
+        );
         \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_coin_rate');
         \Illuminate\Support\Facades\Cache::forget('user_transfer_coin_rate');
         \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_rate_enabled');
         \Illuminate\Support\Facades\Cache::forget('user_transfer_rate_enabled');
 
+        return 'تمت تهيئة قيم المشرفين بنجاح (Init Admin Rates Done)';
+    }
+
+    public function initUserCoinRates()
+    {
+ 
         return 'تمت تهيئة قيم المستخدمين بنجاح (Init User Rates Done)';
     }
 

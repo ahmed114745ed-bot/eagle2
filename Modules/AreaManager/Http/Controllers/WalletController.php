@@ -356,7 +356,7 @@ class WalletController extends MainController
             throw new \Exception(__('not_verified_agency'));
         }
 
-        $effectiveRate = CoinRateService::getEffectiveRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate();
         if (!$effectiveRate) {
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
         }
@@ -456,7 +456,7 @@ class WalletController extends MainController
             throw new \Exception(__('This sub admin not found under your account.'));
         }
 
-        $userCoins = CoinRateService::getEffectiveRate();
+        $userCoins =\App\Services\CoinRateService::getEffectiveRate();
 
         $chargeType = $data['charge_type'];
 
@@ -499,7 +499,7 @@ class WalletController extends MainController
             throw new \Exception(__('Super Admin not found.'));
         }
 
-        $userCoins = CoinRateService::getEffectiveRate();
+        $userCoins = \App\Services\CoinRateService::getEffectiveRate();
 
         $chargeType = $data['charge_type'];
 

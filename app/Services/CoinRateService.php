@@ -32,10 +32,28 @@ class CoinRateService
     public static function getAppBaseRate(): float
     {
         if (self::getSystemMode() === 'legacy') {
+            return self::getSetting('shipping_coins');
+        }
+
+        return self::getSetting('app_coin_rate');
+    }
+
+        public static function getAppBaseRate2(): float
+    {
+        if (self::getSystemMode() === 'legacy') {
             return self::getSetting('zones_coins');
         }
 
         return self::getSetting('app_coin_rate');
+    }
+
+    public static function getAppBaseRateOrUserCoins(): float
+    {
+        if (self::getSystemMode() === 'legacy') {
+            return self::getSetting('user_coins');
+        }
+
+        return self::getUserTransferRate();
     }
 
   

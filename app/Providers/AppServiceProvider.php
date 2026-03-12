@@ -230,7 +230,11 @@ class AppServiceProvider extends ServiceProvider
         $key = $locale === 'ar' ? 'app_title_ar' : 'app_title_en';
 
         $appName = Cache::rememberForever("settings.{$key}", function () use ($key) {
-            return Setting::where('key', $key)->value('value') ?? 'Default';
+            try {
+                return Setting::where('key', $key)->value('value') ?? 'Default';
+            } catch (\Exception $e) {
+                return 'Default';
+            }
         });
 
         config(['app.name' => $appName]);
@@ -351,9 +355,13 @@ class AppServiceProvider extends ServiceProvider
     protected function setupLanguages(): void
     {
         $enabledLanguages = Cache::rememberForever('languages', function () {
-            return Language::where('is_enabled', true)
-                ->pluck('name', 'code')
-                ->toArray();
+            try {
+                return Language::where('is_enabled', true)
+                    ->pluck('name', 'code')
+                    ->toArray();
+            } catch (\Exception $e) {
+                return [];
+            }
         });
 
         Config::set('admin.extensions.multi-language.languages', $enabledLanguages);

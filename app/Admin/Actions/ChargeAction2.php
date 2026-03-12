@@ -56,17 +56,20 @@ class ChargeAction2 extends Action
         if ($amount < 0 && $agency->coins < abs($amount)) {
             return $this->response()->error(__('Insufficient agency balance'))->refresh();
         }
-        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
+      /*  $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
             $setting =   Setting::where('key', 'shipping_coins')->first();
             return $setting?->value;
         });
         if (! $shippingCoins || $shippingCoins == 0) {
             return $this->response()->error(__('please set agency coins in configs'))->refresh();
-        }
+        }*/
 
         DB::transaction(function () use ($request, $agency,  $amount, $shippingCoins) {
-            $coins = $amount * $shippingCoins;
-
+          //  $coins = $amount * $shippingCoins;
+            $appBaseRate = \App\Services\CoinRateService::getAppBaseRate2();
+            $effectiveRate = $appBaseRate;
+            $calc = \App\Services\ChargeCalculationService::calculate($request->amount, 'usd', $effectiveRate);
+            $coins = $calc['total_coins'];
             $agency->coins += $coins;
             if ($agency->coins < 0) {
                 throw ValidationException::withMessages([
@@ -75,7 +78,7 @@ class ChargeAction2 extends Action
             }
             $agency->save();
 
-            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount, $shippingCoins);
+            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount, $shippingCoins,$calc , $effectiveRate);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -88,13 +91,10 @@ class ChargeAction2 extends Action
 
 
 
-    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount, $shippingCoins)
+    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount, $shippingCoins,$calc,$effectiveRate)
     {
 
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
-        $effectiveRate = $appBaseRate;
-        
-        $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
+      
         
         $totalCoins = $calc['total_coins'];
         $baseCoins = $calc['base_coins'];

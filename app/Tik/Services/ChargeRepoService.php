@@ -185,7 +185,10 @@ class ChargeRepoService
 
         $this->userRepository->decrementUserCoins($sender, $count);
         // $percentage = Common::getConf("one_usd_value_in_coins") ?? 1;4
-        $percentage = Common::getCoinsValue('user_coins');
+        $percentage = \App\Services\CoinRateService::getUserTransferRate();
+        
+        
+            
 
         $usd = $count / $percentage;
         $this->charge($sender, $userReceiver, 'agency', $count, $usd, false, 'agency_to_user');
@@ -244,7 +247,8 @@ class ChargeRepoService
                 throw new Exception('Low Balance');
             }
 
-            $coinPrise = Common::getCoinsValue('user_coins');
+          //  $coinPrise = Common::getCoinsValue('user_coins');
+            $coinPrise = \App\Services\CoinRateService::getUserTransferRate();
             $numDi = $coinPrise * $count;
             $this->charge(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true, transactionType: 'agency_to_user');
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
@@ -699,7 +703,7 @@ class ChargeRepoService
 
         $authAgency->decrement('coins', $amount);
         $receiver->increment('di', $amount);
-        $usdRate = $amount / Common::getCoinsValue('user_coins');
+        $usdRate = $amount / \App\Services\CoinRateService::getUserTransferRate();
 
         $this->agencyCharge(
             chargerId: $authAgency->id,

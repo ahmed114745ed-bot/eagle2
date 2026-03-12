@@ -93,10 +93,7 @@ class ChargeAction extends Action
         //            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
         //        }
 
-        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
-            $setting =   Setting::where('key', 'shipping_coins')->first();
-            return $setting?->value;
-        });
+        $shippingCoins = \App\Services\CoinRateService::getAppBaseRate2();
         if (! $shippingCoins || $shippingCoins == 0) {
             return $this->response()->error(__('please set agency coins in configs'))->refresh();
         }
@@ -124,10 +121,7 @@ class ChargeAction extends Action
         //        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
         //        $usdAmount = $request->amount / $percentage;
 
-        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
-            $setting =   Setting::where('key', 'shipping_coins')->first();
-            return $setting?->value;
-        });
+        $shippingCoins = \App\Services\CoinRateService::getAppBaseRate2();
         //        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
         $usdAmount = $request->amount * $shippingCoins;
 
@@ -154,7 +148,7 @@ class ChargeAction extends Action
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount)
     {
 
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate2();
         $effectiveRate = $appBaseRate;
 
         $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
