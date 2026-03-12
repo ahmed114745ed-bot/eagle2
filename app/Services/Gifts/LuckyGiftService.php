@@ -27,6 +27,7 @@ use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Carbon\Carbon;
 use App\Helpers\CacheHelper;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
+use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 
 class LuckyGiftService
 {
@@ -306,9 +307,11 @@ class LuckyGiftService
         $number = $data['num'];
         $count = $data['count'] ?? 1;
         $amountBefore = $user->di;
-        $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 10;
-        $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
-        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
+
+        $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
+        $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+        $roomrPercentage = \App\Models\FairLuckSetting::getOwnerFeeRate();
+        $hostPercentage = $receiverFeeRate;
         $total_cashback_percentage = 0;
 
 
@@ -371,8 +374,7 @@ class LuckyGiftService
 
         $coinsForOwner = ($giftPrice * $number * $receiversCount) * $roomrPercentage;
 
-        $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
-        $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+     
 
         $senderBalanceBefore = $user->di;
         $totalWalletsBefore = null;
@@ -404,7 +406,7 @@ class LuckyGiftService
 
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
-                $netBetAmount = $unitPrice - $appFee - $receiverFee;
+                $netBetAmount = $unitPrice - $appFee - $receiverFee - $coinsForOwner;
 
                 $recUser = User::find($receiverId);
                 if ($recUser) {

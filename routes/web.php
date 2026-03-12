@@ -1760,18 +1760,40 @@ Route::get('make-seeders-for-permission', function () {
 
 
 
-
 Route::get('/queue-control/{queue}', function ($queue) {
 
     $check = shell_exec("ps aux | grep 'queue:work --queue=$queue' | grep -v grep");
 
     if ($check) {
-        Artisan::call('queue:restart');
-        return "Queue $queue restarted";
+        $output = [];
+        $returnVar = 0;
+        exec("php artisan queue:restart 2>&1", $output, $returnVar);
+        return response()->json([
+            'action' => 'restarted',
+            'queue' => $queue,
+            'return_code' => $returnVar,
+            'output' => $output
+        ]);
     } else {
-        shell_exec("php artisan queue:work --queue=$queue > /dev/null 2>&1 &");
-        return "Queue $queue started";
+        $output = [];
+        $returnVar = 0;
+        exec("php artisan queue:work --queue=$queue --tries=1 2>&1 &", $output, $returnVar);
+
+        return response()->json([
+            'action' => 'started',
+            'queue' => $queue,
+            'return_code' => $returnVar,
+            'output' => $output
+        ]);
     }
 
 });
 
+
+Route::get('/get-gift-percentages', function () {
+$negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
+$appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
+$receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
+
+dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+}); 

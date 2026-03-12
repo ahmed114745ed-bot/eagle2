@@ -696,7 +696,7 @@ class GiftController extends MainController
         }
 
         // Handle V1 percentages
-        $v1_keys = ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'];
+        $v1_keys = ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift','fair_luck_app_fee_rate','fair_luck_owner_fee_rate','fair_luck_receiver_fee_rate'];
         foreach ($v1_keys as $key) {
             if ($request->has($key)) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);

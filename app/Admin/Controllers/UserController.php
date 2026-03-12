@@ -584,8 +584,8 @@ class UserController extends MainController
                         // },
                         // 'receiver.profile',
                         // 'sender.profile',
-                        'gift:id,name,price',
-                        'room:id,room_name',
+                        'gift:id,name,price,e_name,img,type',
+                        'room:id,room_name,room_cover',
                         'agency:id,name',
                     ])
                     ->orderByDesc('id')

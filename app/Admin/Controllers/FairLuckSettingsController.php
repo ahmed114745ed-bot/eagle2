@@ -49,14 +49,15 @@ class FairLuckSettingsController extends AdminController
             'global_vault_negative_limit' => 'required|numeric',
             'fair_luck_app_fee_rate' => 'required|numeric|between:0,1',
             'fair_luck_receiver_fee_rate' => 'required|numeric|between:0,1',
+            'fair_luck_owner_fee_rate' => 'required|numeric|between:0,1',
         ]);
-
         $data = $request->only([
             'global_vault_negative_limit',
             'fair_luck_app_fee_rate',
-            'fair_luck_receiver_fee_rate'
+            'fair_luck_receiver_fee_rate',
+            'fair_luck_owner_fee_rate'
         ]);
-
+        
         foreach ($data as $key => $value) {
             FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
