@@ -420,7 +420,9 @@ class UserRepository extends AbstractRepository
 
     public function getAgencyMangerByFilter($keyword)
     {
-        return $this->model->query()->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keyword}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])->has('ownAgency')->where(function ($q) use ($keyword) {
+        return $this->model->query()
+            ->with(['profile', 'ownAgency.mempers.profile'])
+            ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keyword}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])->has('ownAgency')->where(function ($q) use ($keyword) {
             $q->where('uuid', 'like', '%' . $keyword . '%')
                 ->orWhereHas('ownAgency', function ($query) use ($keyword) {
                     $query->where('id', 'like', '%' . $keyword . '%');

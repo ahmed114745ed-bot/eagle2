@@ -8,6 +8,7 @@ use App\Models\AgencyUserJob;
 use App\Models\Scopes\HostAgencyScope;
 use App\Models\ShippingAgency;
 use App\Models\UsersJoinedAgency;
+use Carbon\Carbon;
 
 class AgencyRepository extends AbstractRepository
 {
@@ -202,8 +203,15 @@ class AgencyRepository extends AbstractRepository
 
     public function getAgencyByFilter($keyword)
     {
+        $year = request('year') ?? Carbon::now()->year;
+        $month = request('month') ?? Carbon::now()->month;
+
         return  $this->model
-            ->with('owner')
+            ->with(['giftLogs' => function ($q) use ($year, $month){
+                $q->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->with('receiver');
+            }, 'owner.profile', 'mempers.profile', 'admins.user.profile', 'admins.user.packs', 'admins.user.specialId.ware', 'joinRequests'])
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%');
             })->get();
