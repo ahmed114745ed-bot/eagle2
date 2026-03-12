@@ -24,7 +24,7 @@ trait AttributesTrait
     public static function checkPackV2($userPacks, $type, $dress = null)
     {
         $userPacks = collect($userPacks);
-        
+
         return $userPacks->filter(function ($item) use ($type, $dress) {
             if ($item->type !== $type) return false;
             if ($dress !== null && $item->target_id !== $dress) return false;

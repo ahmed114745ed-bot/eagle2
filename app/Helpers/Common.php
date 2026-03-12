@@ -182,6 +182,13 @@ class Common
             $user = $user_id;
         }
 
+        if (!$user) {
+            return [
+                'receiver_img' => '',
+                'sender_img' => ''
+            ];
+        }
+
         $star_level = $user->received_level + $user->sub_receiver_level;
         $firstVip = Vip::collectionBuilder()->where('level', $star_level)->where('type', 1)->first();
         $data['receiver_img'] = !is_null($firstVip) ? $firstVip->img : '';
