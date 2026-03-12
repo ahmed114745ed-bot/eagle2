@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\UserCommon;
+use App\Helpers\Common;
 use App\Models\Cp;
 use App\Models\Gift;
 use App\Models\Room;
@@ -38,7 +39,16 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::Find($this->userId);
-        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+        
+        $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+        $hostPercentage = 0;
+        if ($luckyStatus == 1) {
+            $version = Common::getSettingValue('lucky_gift_version');
+            if ($version == 2) {
+               $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+            }
+           $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+        }
 
         $room =
             Room::withoutAppends()->where(['id' => $this->roomId])
