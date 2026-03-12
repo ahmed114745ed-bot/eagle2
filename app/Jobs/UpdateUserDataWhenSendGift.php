@@ -39,7 +39,6 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::Find($this->userId);
-        
         $luckyStatus = Common::getSettingValue('lucky_gifts_action');
         $hostPercentage = 0;
         if ($luckyStatus == 1) {
