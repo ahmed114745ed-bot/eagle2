@@ -111,6 +111,17 @@ class SuperAdminDedicateRewardAction extends Action
 
             // run on page load
             toggleUserTypeFields();
+
+            // Fix Select2 search input not working inside Bootstrap modal
+            $(document).on('shown.bs.modal', '.modal', function() {
+                $(this).removeAttr('tabindex');
+            });
+            $(document).on('select2:open', '#super-admin-select', function() {
+                setTimeout(function() {
+                    var searchField = document.querySelector('.select2-container--open .select2-search__field');
+                    if (searchField) searchField.focus();
+                }, 100);
+            });
             SCRIPT);
     }
 
