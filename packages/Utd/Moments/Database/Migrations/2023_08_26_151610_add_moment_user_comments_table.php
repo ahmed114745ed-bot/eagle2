@@ -4,14 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddMomentUserCommentsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasTable('moment_user_comments')) {
             Schema::create('moment_user_comments', function (Blueprint $table) {
@@ -26,11 +24,9 @@ class AddMomentUserCommentsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('real_user_comments');
+        Schema::dropIfExists('moment_user_comments');
     }
-}
+};

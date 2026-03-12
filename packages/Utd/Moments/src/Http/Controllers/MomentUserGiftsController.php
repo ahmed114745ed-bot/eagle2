@@ -5,6 +5,7 @@ namespace Utd\Moments\Http\Controllers;
 use App\Contracts\GiftsContract;
 use App\Enums\UserDiamondLogType;
 use App\Exceptions\NotInfMoneyException;
+use App\Support\PackageHelper;
 use Utd\Moments\Services\MomentsNotification;
 use App\Helpers\Common;
 use App\Helpers\UserDiamondLogHelper;
@@ -227,6 +228,10 @@ class MomentUserGiftsController extends Controller
 
     public function userGift($id)
     {
+        if (! PackageHelper::isInstalled('gift')) {
+            return Common::apiResponse(0, 'Gift package is not installed', null, 404);
+        }
+
         $momentsGift = MomentUserGift::selectRaw('user_id, moment_id, SUM(num) as num')
             ->where('moment_id', $id)
             ->groupBy('user_id', 'moment_id')

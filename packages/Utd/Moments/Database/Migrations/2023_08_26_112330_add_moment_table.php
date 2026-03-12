@@ -4,22 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddMomentTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasTable('moment')) {
             Schema::create('moment', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->string('description')->default('');
+                $table->text('description')->nullable();
                 $table->integer('comment_num')->default(0);
                 $table->integer('like_num')->default(0);
+                $table->string('img')->nullable();
                 $table->timestamps();
             });
         }
@@ -27,11 +26,9 @@ class AddMomentTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('reals');
+        Schema::dropIfExists('moment');
     }
-}
+};

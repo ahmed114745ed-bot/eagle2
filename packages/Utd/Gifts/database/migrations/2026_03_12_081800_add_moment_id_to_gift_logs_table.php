@@ -13,7 +13,6 @@ return new class extends Migration
     {
         if (Schema::hasTable('gift_logs') && ! Schema::hasColumn('gift_logs', 'moent_id')) {
             Schema::table('gift_logs', function (Blueprint $table) {
-                // $table->unsignedInteger('moent_id')->nullable();
                 $table->foreignId('moent_id')->nullable()->constrained('moment')->onDelete('cascade');
             });
         }

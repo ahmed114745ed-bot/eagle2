@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('gifts') && ! Schema::hasTable('moment_user_gifts')) {
+        if (Schema::hasTable('gifts') && Schema::hasTable('moment') && ! Schema::hasTable('moment_user_gifts')) {
             Schema::create('moment_user_gifts', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');

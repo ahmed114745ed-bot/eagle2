@@ -4,18 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddMomentUserLikesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasTable('moment_user_likes')) {
             Schema::create('moment_user_likes', function (Blueprint $table) {
-
                 $table->id();
                 $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -26,11 +23,9 @@ class AddMomentUserLikesTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('real_user_likes');
+        Schema::dropIfExists('moment_user_likes');
     }
-}
+};
