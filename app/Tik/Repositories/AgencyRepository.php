@@ -212,8 +212,8 @@ class AgencyRepository extends AbstractRepository
                     ->whereMonth('created_at', $month)
                     ->with('receiver');
             }, 'owner.profile', 'mempers.profile', 'admins.user.profile', 'admins.user.packs',
-                'admins.user.specialId.ware', 'joinRequests', 'receiver.packs', 'receiver.profile',
-                'receiver.specialId.ware'])
+                'admins.user.specialId.ware', 'joinRequests', 'giftLogs.receiver.packs', 'giftLogs.receiver.profile',
+                'giftLogs.receiver.specialId.ware'])
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%');
             })->get();
