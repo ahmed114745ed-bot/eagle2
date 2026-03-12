@@ -142,6 +142,9 @@ class WeeklyEventNController extends MainController
         $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_star')->max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
+        if ($minStartDate && $minStartDate < date("Y-m-d")) {
+            $minStartDate = date("Y-m-d");
+        }
         $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
             ->rules(function ($form) {
 
