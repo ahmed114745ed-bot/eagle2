@@ -355,8 +355,8 @@ class LuckyGiftService
         $roomId = $room->id;
 
 
-        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
-        $receiverName = $receivedUsers->first()->name;
+        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
+        $receiverName = $receivedUsers->first()?->name;
         $receiversCount = $receivedUsers->count();
         $isToRoom = $receiversCount > 1;
         $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
@@ -380,9 +380,8 @@ class LuckyGiftService
 
         $totalPriceFull = $giftPrice * $number * $receiversCount;
 
-        while ($user->di >= $unitPrice && $index > 0) {
+        while ($user->di >= $totalPriceFull && $index > 0) {
             $balanceBeforeIteration = $user->di;
-            // Only logging the total amount once per throw batch to match V3
             UserCoinLogHelper::logByType(
                 $user->id,
                 -abs($totalPriceFull),
