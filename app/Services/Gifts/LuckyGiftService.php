@@ -408,11 +408,6 @@ class LuckyGiftService
                 $receiverFee = $unitPrice * $receiverFeeRate;
                 $netBetAmount = $unitPrice - $appFee - $receiverFee - $coinsForOwner;
 
-                $recUser = User::find($receiverId);
-                if ($recUser) {
-                    $recUser->increment('di', (int) round($receiverFee));
-                }
-
                 try {
                     $result = $fairService->processBet($user, $gift, $netBetAmount, $roomId, $receiverId, $appFee, $receiverFee, $senderBalanceBeforeHit, $user->di - $unitPrice);
                 } catch (\Throwable $e) {
