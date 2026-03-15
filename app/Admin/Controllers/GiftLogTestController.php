@@ -372,7 +372,7 @@ class GiftLogTestController extends Controller
         }
 
         try {
-            $message = $this->giftLogService->sendTestGift($request, $updateUserWhenSendGift);
+            $message = $this->giftLogService->sendThestGift($request, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return view('test.gift', [
                 'success' => false,

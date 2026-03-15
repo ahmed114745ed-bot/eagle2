@@ -11,8 +11,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('fair_luck_transactions', function (Blueprint $table) {
-            $table->decimal('app_fee', 12, 2)->default(0)->after('bet_amount');
-            $table->decimal('receiver_fee', 12, 2)->default(0)->after('app_fee');
+            if (!Schema::hasColumn('fair_luck_transactions', 'app_fee')) {
+                $table->decimal('app_fee', 12, 2)->default(0)->after('bet_amount');
+            }
+            if (!Schema::hasColumn('fair_luck_transactions', 'receiver_fee')) {
+                $table->decimal('receiver_fee', 12, 2)->default(0)->after('app_fee');
+            }
         });
     }
 
