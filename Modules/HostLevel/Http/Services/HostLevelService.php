@@ -179,7 +179,7 @@ class HostLevelService
 
         return  GiftLog::where('receiver_id', $userId)
             ->filterByEventType($eventType)
-            ->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total_diamond')->groupBy("receiver_id")
+            ->selectRaw('receiver_id, SUM(giftPrice) AS total_diamond')->groupBy("receiver_id")
             ->value('total_diamond');
-    }
+    } 
 }
