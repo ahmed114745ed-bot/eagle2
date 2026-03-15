@@ -1256,52 +1256,57 @@ class UserService
         if ($currentLevel) {
             $secondLevel = $this->vipRepository->nextLevel($currentLevel->level, 5);
         } else {
+            // If user has no current level (Level 0), find the very first level of type 5
             $secondLevel = $this->vipRepository->findByType(5);
         }
 
+        $remaining    = 0;
+        $progress     = 0;
+        $exactlyValue = 0;
 
-        if ($secondLevel != null && $currentLevel != null) {
-            $remaining       = $secondLevel?->exp - $user->total_charge_coins;
-            $exactlyValue    = @$secondLevel?->exp;
-            $progressCurrent = $expLevel - $currentLevel->exp;
-            $progressNext    = $secondLevel->exp - $currentLevel->exp;
+        if ($secondLevel) {
+            $exactlyValue    = $secondLevel->exp;
+            $remaining       = max(0, $exactlyValue - $expLevel);
+            
+            // Calculate progress based on thresholds between levels
+            $currentThreshold = $currentLevel ? $currentLevel->exp : 0;
+            $nextThreshold    = $secondLevel->exp;
+            
+            $progressNext     = $nextThreshold - $currentThreshold;
+            $progressCurrent  = $expLevel - $currentThreshold;
 
-            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
-
-            if ($prog >= 1) {
-                $bar = 1;
+            if ($progressNext > 0) {
+                $prog = $progressCurrent / $progressNext;
+                $progress = (int) (clamp($prog, 0, 1) * 100);
             } else {
-                $bar = round($prog, 1);
+                $progress = 100;
             }
-            $progress = $exactlyValue == 0 ? 1 : $bar;
-        } elseif ($currentLevel != null) {
-            $exactlyValue    = $secondLevel?->exp ?? 0;
-            $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
-            $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
-
-            $progress  = 1;
+        } elseif ($currentLevel) {
+            // Max level reached
+            $progress  = 100;
             $remaining = 0;
-        } else {
-            $progress  = 1;
-            $remaining = 0;
+            $exactlyValue = $currentLevel->exp;
         }
-        $expPercentages  = Config::get('exp_percentages') ??  cache('exp_percentages');;
+
+        $expPercentages = Config::get('exp_percentages') ?? cache('exp_percentages');
+        
         $chargeLevel = [
             'current_level' => $currentLevel->level ?? 0,
-            'current_exp'   => $currentLevel->exp ?? 0,
+            'current_exp'   => $currentLevel->exp ?? 0, // Threshold for current level
             'current_img'   => $currentLevel->img ?? '',
-            'next_level'    => @$secondLevel ? @$secondLevel->level : ($currentLevel->level ?? 0),
-            'next_exp'      => @$secondLevel ?  @$secondLevel->exp ?? 0 : ($currentLevel->exp ?? 0),
-            'next_img'      => @$secondLevel ? @$secondLevel->img ?? '' : $currentLevel->img ?? '',
-            'remaining'     => @$remaining ?? 0,
-            'progress'      => (int)(@$progress ?? 0),
-            'exp_charge' =>  $expPercentages['exp_charge_percentage'] ?? 1,
+            'next_level'    => $secondLevel ? $secondLevel->level : ($currentLevel->level ?? 0),
+            'next_exp'      => $secondLevel ? $secondLevel->exp : ($currentLevel->exp ?? 0),
+            'next_img'      => $secondLevel ? $secondLevel->img ?? '' : ($currentLevel->img ?? ''),
+            'remaining'     => (int) $remaining,
+            'progress'      => (int) $progress,
+            'exp_charge'    => $expPercentages['exp_charge_percentage'] ?? 1,
+            'total_exp'     => $expLevel, // Added for clarity/debugging if needed
         ];
 
-        return  [
-            'gift_level' => Common::level_center($user->id),
+        return [
+            'gift_level'   => Common::level_center($user->id),
             'charge_level' => $chargeLevel,
-            'room_level' =>  $this->roomLevel($user),
+            'room_level'   => $this->roomLevel($user),
         ];
     }
 
