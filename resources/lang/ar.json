@@ -1293,6 +1293,7 @@
     "zego_server_secret": "سر خادم زيغو",
     "server_secret": "سر الخادم",
     "zego_app_id": "معرف تطبيق زيغو",
+    "zego": "زيغو",
     "twilio_sid": "معرف Twilio",
     "twilio_api_key": "مفتاح API لـ Twilio",
     "twilio_from ": "من Twilio",
@@ -5317,6 +5318,24 @@
     "Text Header Color": "لون نص الرأس",
     "Button Text Color": "لون نص الزر",
     "New Theme Enabled": "تفعيل المظهر الجديد",
-    "Owner Fee Rate (0.10 = 10%)": "النسبة  للغرفة (0.10 = 10%)" 
+    "Owner Fee Rate (0.10 = 10%)": "النسبة  للغرفة (0.10 = 10%)" ,
+    "UTD API Key": "مفتاح API الخاص بوحدة UTD",
+     "UTD API Secret": "سر API الخاص بوحدة UTD",
+     "Save Settings": "حفظ الإعدادات",
+     "Saving...": "جاري الحفظ...",
+     "Settings saved successfully!": "تم حفظ الإعدادات بنجاح!",
+     "Failed to save settings. Please try again.": "فشل في حفظ الإعدادات. يرجى المحاولة مرة أخرى.",
+     "Invalid input. Please check your entries and try again.": "إدخال غير صالح. يرجى التحقق من إدخالاتك والمحاولة مرة أخرى.",
+     "App fee rate must be a decimal between 0 and 1.": "يجب أن تكون نسبة رسوم التطبيق عددًا عشريًا بين 0 و 1.",
+     "UTD API Key and Secret are required when New Theme is enabled.": "مفتاح API وسر وحدة UTD مطلوبان عند تفعيل المظهر الجديد.",
+     "App Settings Updated": "تم تحديث إعدادات التطبيق",
+     "The app settings have been updated successfully.": "تم تحديث إعدادات التطبيق بنجاح!",
+     "Error Updating App Settings": "خطأ في تحديث إعدادات التطبيق",
+     "There was an error updating the app settings. Please try again.": "حدث خطأ أثناء تحديث إعدادات التطبيق. يرجى المحاولة مرة أخرى.",
+     "Invalid App Fee Rate": "نسبة رسوم التطبيق غير صالحة",
+     "The app fee rate must be a decimal value between 0 and 1.": "يجب أن تكون نسبة رسوم التطبيق قيمة عشرية بين 0 و 1.",
+     "UTD API Credentials Required": "مطلوب بيانات اعتماد API لوحدة UTD",
+     "UTD API Key and Secret are required when New Theme is enabled.": "مفتاح API وسر وحدة UTD مطلوبان عند تفعيل المظهر الجديد.",
+     "App Settings Validation Error": "خطأ في التحقق من إعدادات التطبيق"
 
 }

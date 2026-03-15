@@ -243,13 +243,13 @@ class EnteranceController extends Controller
     public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
         $user = $request->user();
-        $zego_feature = \Cache::rememberForever('zego_feature', function () {
-            return \DB::table('settings')->where('key', 'zego_feature')->value('value');
-        });
+        // $zego_feature = \Cache::rememberForever('zego_feature', function () {
+        //     return \DB::table('settings')->where('key', 'zego_feature')->value('value');
+        // });
 
-        if ($zego_feature && $zego_feature == 1) {
-            throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
-        }
+        // if ($zego_feature && $zego_feature == 1) {
+        //     throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
+        // }
         $user     = $request->user();
         $roomId   = (int)$request->input('room_id');
         $roomPass = $request->input('room_pass');
@@ -372,15 +372,15 @@ class EnteranceController extends Controller
         $user->save();
         $this->calcTime($user_id);
         if ($isToZegoCharisma && isset($userDataWithCharisma)) {
-         /*   $ms = [
+           $ms = [
                 'messageContent' => [
                     "message" => "updateCharisma",
                     'data' => $userDataWithCharisma
                 ]
             ];
             $json = json_encode($ms);
-        **/
-          //  Common::sendToZego('SendCustomCommand', $room->id, $request->owner_id, $json);
+        
+           Common::sendToZego('SendCustomCommand', $room->id, $request->owner_id, $json);
         }
 
         $this->handleLeaveCp($user, $room);
@@ -474,9 +474,9 @@ class EnteranceController extends Controller
             if ($b) {
                 $n = $b->name ?: 'nan';
             }
-           // Common::sendToZego_4('SendCustomCommand', $room_id, $uid, $black_id, $json);
+            Common::sendToZego_4('SendCustomCommand', $room_id, $uid, $black_id, $json);
             $this->calcTime($black_id);
-          //  Common::sendToZego_2('SendBroadcastMessage', $room_id, $uid, 'room', " تم طرد $n");
+            Common::sendToZego_2('SendBroadcastMessage', $room_id, $uid, 'room', " تم طرد $n");
             return Common::apiResponse(1, 'success');
         } else {
             return Common::apiResponse(0, 'fail', null, 400);

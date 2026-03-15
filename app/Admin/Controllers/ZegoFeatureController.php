@@ -38,7 +38,7 @@ class ZegoFeatureController extends MainController
 
     public function zegoKey(Request $request)
     {
-        $keys = 'zego_feature';
+      /*  $keys = 'zego_feature';
 
         $setting = Setting::where('key', $keys)->first();
         if ($setting) {
@@ -57,6 +57,6 @@ class ZegoFeatureController extends MainController
                 'value' => $request->is_active,
             ]);
         }
-        Cache::put('zego_feature', $request->is_active);
+        Cache::put('zego_feature', $request->is_active);*/
     }
 }

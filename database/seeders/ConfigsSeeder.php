@@ -29,7 +29,9 @@ class ConfigsSeeder extends Seeder
 //            array('name' => 'union_share','value' => '10','desc' => NULL,'created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
 //            array('name' => 'no_family_ratio','value' => '10','desc' => NULL,'created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
 //            array('name' => '$is_family_ratio','value' => '20','desc' => NULL,'created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09')
-        );
+            array('name' => 'utd_app_id','value' => env('UTD_APP_ID'),'desc' => '','created_at' => now(),'updated_at' => now()),
+             array('name' => 'utd_api_key','value' => env('UTD_API_KEY'),'desc' => '','created_at' => now(),'updated_at' => now()),
+);
         DB::table ('configs')->insert ($configs);
     }
 }

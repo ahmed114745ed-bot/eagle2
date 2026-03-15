@@ -54,6 +54,8 @@ class SettingController extends MainController
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
         $zego_key = Common::getConf('zego_key');
+        $utd_api_key = Common::getConf('utd_api_key');
+        $utd_app_id = Common::getConf('utd_app_id');
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
@@ -95,7 +97,9 @@ class SettingController extends MainController
                 'gamesLibrary',
                 'zego_filter_enabled',
                 'is_auto_preview',
-                'countries'
+                'countries' ,
+                'utd_api_key',
+                'utd_app_id'
             ]))));
     }
 
