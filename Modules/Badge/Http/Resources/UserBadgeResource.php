@@ -16,6 +16,7 @@ class UserBadgeResource extends JsonResource
     public function toArray($request)
     {
         $user = request()->user();
+        info($user);
         $userLang = $user->lan ?? 'en';
 
         info($userLang);
@@ -24,6 +25,7 @@ class UserBadgeResource extends JsonResource
         $badgeImage = $this->badge?->images?->firstWhere('language', $userLang)
             ?? $this->badge?->images?->first();
 
+        info($this->badge?->images?->first());
         return [
             'image' => $badgeImage?->image ?? $this->badge?->image ?? '',
             'image_type' => $badgeImage?->image_type ?? $this->badge?->image_type ?? '',
