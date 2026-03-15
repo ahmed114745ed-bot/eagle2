@@ -358,8 +358,8 @@ class LuckyGiftService
         $roomId = $room->id;
 
 
-        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
-        $receiverName = $receivedUsers->first()->name;
+        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
+        $receiverName = $receivedUsers->first()?->name;
         $receiversCount = $receivedUsers->count();
         $isToRoom = $receiversCount > 1;
         $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
@@ -382,9 +382,8 @@ class LuckyGiftService
 
         $totalPriceFull = $giftPrice * $number * $receiversCount;
 
-        while ($user->di >= $unitPrice && $index > 0) {
+        while ($user->di >= $totalPriceFull && $index > 0) {
             $balanceBeforeIteration = $user->di;
-            // Only logging the total amount once per throw batch to match V3
             UserCoinLogHelper::logByType(
                 $user->id,
                 -abs($totalPriceFull),
@@ -407,11 +406,6 @@ class LuckyGiftService
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
                 $netBetAmount = $unitPrice - $appFee - $receiverFee - $coinsForOwner;
-
-                $recUser = User::find($receiverId);
-                if ($recUser) {
-                    $recUser->increment('di', (int) round($receiverFee));
-                }
 
                 try {
                     $result = $fairService->processBet($user, $gift, $netBetAmount, $roomId, $receiverId, $appFee, $receiverFee, $senderBalanceBeforeHit, $user->di - $unitPrice);
@@ -890,12 +884,12 @@ class LuckyGiftService
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
                 ->where('uid', $ownerId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
         } else {
             $room = Room::withoutAppends()
                 ->where('id', $roomId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
             $ownerId = $room?->uid;
         }

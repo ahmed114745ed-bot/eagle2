@@ -184,7 +184,7 @@
                             <label class="col-sm-3 control-label">{{ __('lucky gift coins') }}</label>
                             <div class="col-sm-8">
                                 <input type="number" name="lucky_gift_coins" class="form-control"
-                                    value="{{ (isset($config['lucky_gift_coins']) && $config['lucky_gift_coins'] != 0) ? $config['lucky_gift_coins'] : 2000 }}"
+                                         value="{{ $config['lucky_gift_coins'] ?? 0 }}"
                                     required>
                                 <span
                                     class="help-block">{{ __('Play coin sound inside the room when the win amount is greater than or equal to the added value.') }}</span>
