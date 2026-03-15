@@ -9,8 +9,6 @@ return [
     // Deploy webhook secret
     'deploy_secret' => env('DEPLOY_SECRET', 'change-this-secret-token'),
 
-    'agora_app_id' => env('AGORA_APP_ID'),
-    'agora_certificate' => env('AGORA_APP_CERTIFICATE'),
     'payment_url' => env('PAYMENT_URL'),
     'node_server_name' => env('NODE_SERVER_NAME'),
 

@@ -208,7 +208,6 @@ return [
     "opay" => 'ओपे',
     "public_key" => 'सार्वजनिक कुंजी',
     "country_code" => 'देश कोड',
-    "Tencent" => 'Tencent',
     "lucky_flex" => "लकी फ्लेक्स",
     "chess" => "शतरंज",
 

@@ -10,10 +10,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\Redis;
-use App\Services\AgoraRtmTokenBuilder;
 use Modules\UsersWallet\Entities\UserWallet;
-use Yasser\AgoraToken\RtmTokenBuilder;
-use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 ;
 
 use Illuminate\Validation\ValidationException;
@@ -29,46 +26,9 @@ const GAME_COINS_PLAY = 'game_coins_play_#';
 
 
 
-function generateRtcToken($channelName, $uid, $expiresInSeconds = 86400)
-{
-    $appID = Common::getConfig('app_id');
-    $appCertificate = Common::getConfig('agora_app_certificate');
-    $role = RtcTokenBuilder2::ROLE_PUBLISHER;
-
-    $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
-
-    return $token;
-}
-
-function generateAgoraRtmToken($channelName, $rtmUid)
-{
-
-    if (!$rtmUid) {
-        return null;
-    }
-
-    $appId = config('services.agora.app_id');
-    $appCertificate = config('services.agora.app_certificate');
-    $user = $rtmUid;
-    $expireTimeInSeconds = 86400;
-    $role = RtcTokenBuilder2::ROLE_PUBLISHER;
-
-    $expireTimeInSeconds = 86400;
 
 
-    $token = RtcTokenBuilder2::buildTokenWithRtm(
-        $appId,
-        $appCertificate,
-        $channelName,
-        $rtmUid,
-        $role,
-        time() + 86400,
-        time() + 86400,
-    );
 
-
-    return $token;
-}
 
 
 

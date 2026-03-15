@@ -224,7 +224,6 @@ return [
     "opay" => 'OPay',
     "public_key" => 'Public Key',
     "country_code" => 'Kode Negara',
-    "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
     "chess" => "Catur",
 

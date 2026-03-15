@@ -225,7 +225,6 @@ return [
     "opay" => 'أوباي',
     "public_key" => 'المفتاح العام',
     "country_code" => 'رمز الدولة',
-    "Tencent" => 'تينسينت',
     "lucky_flex" => "لاكي فليكس",
     "chess" => "الشطرنج",
 
