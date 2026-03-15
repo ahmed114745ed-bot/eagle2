@@ -18,7 +18,7 @@ jobs:
           echo "$USER"
           cd /var/www/for-developer
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          composer install --no-dev --optimize-autoloader
+          composer update --no-dev --optimize-autoloader
           php artisan migrate --force
           php artisan optimize:clear
           sudo supervisorctl restart all-jobs-for-developer for-developer-Zigo-Handeling for-developer-calculate-target sub_queue_work heavy_queue_work
