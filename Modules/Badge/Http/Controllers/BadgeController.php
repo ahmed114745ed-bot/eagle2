@@ -16,7 +16,6 @@ class BadgeController extends Controller
 
     public function index(int $userId)
     {
-        info('badges');
         if ($userId <= 0) {
             return Common::apiResponse(0, 'Invalid user ID', null, 400);
         }
