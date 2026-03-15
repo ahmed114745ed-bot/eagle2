@@ -126,7 +126,8 @@ class UserRepository extends AbstractRepository
             ->with([
                 'agency:id,owner_id,name,type',
                 'profile:id,user_id,avatar',
-                'family:id,user_id,name,total_diamond,current_level_id'
+                'family:id,user_id,name,total_diamond,current_level_id',
+                'currentMonthlyDiamond'
             ])
             ->whereIn('id', $ids)->get();
     }

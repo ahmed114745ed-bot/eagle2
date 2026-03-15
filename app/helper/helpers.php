@@ -815,7 +815,7 @@ if (!function_exists('showSvgaImage')) {
                             setTimeout(initSvga_{$model}, 50);
                             return;
                         }
-                        
+
                         try {
                             var $model = new SVGA.Player('#$model');
                             $model.loops = 100;
@@ -857,7 +857,7 @@ if (!function_exists('showSvgaImage2')) {
                             setTimeout(initSvga2_{$model}, 50);
                             return;
                         }
-                        
+
                         try {
                             var $model = new SVGA.Player('#$model');
                             $model.loops = 100;
@@ -889,7 +889,7 @@ if (typeof initSvgaPlayers === 'undefined') {
         context.querySelectorAll('.svga-player').forEach(el => {
             if (el.dataset.loaded) return;
             if (!el || !el.id) return; // Skip if element is not valid
-            
+
             el.dataset.loaded = true;
 
             try {

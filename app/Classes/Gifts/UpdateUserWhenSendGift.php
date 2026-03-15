@@ -83,12 +83,12 @@ class UpdateUserWhenSendGift
         sort($userIds);
         DB::transaction(function () use ($totalCoins, $userIds) {
            $users = User::whereIn('id', $userIds)
-                ->orderBy('id') 
+                ->orderBy('id')
                 ->lockForUpdate()
                 ->get();
 
             foreach ($users as $user) {
-             
+
                 $user->increment('total_diamond_received', $totalCoins);
 
                 if ($user->agency_id == 0) {
@@ -101,7 +101,7 @@ class UpdateUserWhenSendGift
                 );
             }
 
-        }, 5); 
+        }, 5);
     }
     public function updateReceivedLevels(User $receivedUser)
     {
@@ -150,7 +150,7 @@ class UpdateUserWhenSendGift
             throw new NotInfMoneyException();
         }
 
-        // Re-fetch latest user state
+        // Re-fetch latest user state after raw DB update
         $senderUser->refresh();
 
         $lastLevel = $senderUser->total_sender_level;
@@ -167,7 +167,7 @@ class UpdateUserWhenSendGift
         }
 
 
-        return $senderUser->fresh();
+        return $senderUser;
     }
     /**
      * @throws \Throwable

@@ -357,8 +357,9 @@ class GiftLogTestController extends Controller
         $request = Request::create('/', 'POST', [
             'owner_id' => '1206',
             'id' => '374',
-            'toUid' => '1206',
-            'num' => '20',
+            'toUid' => '1206,1208, 1422, 1421, 1451, 1414, 1431, 1421',
+            'num' => '2',
+            'type' => 'normal',
         ]);
 
         $close_open_gifts = settings()->get('close_open_gifts');
