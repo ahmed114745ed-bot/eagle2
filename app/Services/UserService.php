@@ -1277,7 +1277,7 @@ class UserService
 
             if ($progressNext > 0) {
                 $prog = $progressCurrent / $progressNext;
-                $progress = (int) (clamp($prog, 0, 1) * 100);
+                $progress = (int) (max(0, min(1, $prog)) * 100);
             } else {
                 $progress = 100;
             }
@@ -1300,7 +1300,6 @@ class UserService
             'remaining'     => (int) $remaining,
             'progress'      => (int) $progress,
             'exp_charge'    => $expPercentages['exp_charge_percentage'] ?? 1,
-            'total_exp'     => $expLevel, // Added for clarity/debugging if needed
         ];
 
         return [
