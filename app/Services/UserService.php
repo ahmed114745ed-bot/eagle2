@@ -1277,13 +1277,13 @@ class UserService
 
             if ($progressNext > 0) {
                 $prog = $progressCurrent / $progressNext;
-                $progress = (int) (max(0, min(1, $prog)) * 100);
+                $progress = max(0, min(1, $prog));
             } else {
-                $progress = 100;
+                $progress = 1;
             }
         } elseif ($currentLevel) {
             // Max level reached
-            $progress  = 100;
+            $progress  = 1;
             $remaining = 0;
             $exactlyValue = $currentLevel->exp;
         }
@@ -1298,7 +1298,7 @@ class UserService
             'next_exp'      => $secondLevel ? $secondLevel->exp : ($currentLevel->exp ?? 0),
             'next_img'      => $secondLevel ? $secondLevel->img ?? '' : ($currentLevel->img ?? ''),
             'remaining'     => (int) $remaining,
-            'progress'      => (int) $progress,
+            'progress'      => $progress,
             'exp_charge'    => $expPercentages['exp_charge_percentage'] ?? 1,
         ];
 
