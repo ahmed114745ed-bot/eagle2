@@ -41,11 +41,8 @@ class SettingsController extends Controller
     {
         $settings = Setting::pluck('value', 'key')->toArray();
         $timezones = Timezone::all();
-        $agora_app_id = Common::getConfig('app_id');
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
-        $tencent_server_secret = Common::getConfig('tencent_server_secret');
-        $tencent_app_id = Common::getConfig('tencent_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
@@ -69,7 +66,6 @@ class SettingsController extends Controller
             'pusher_app_id',
             'settings',
             'timezones',
-            'agora_app_id',
             'zego_server_secret',
             'zego_app_id',
             'app_sign',
@@ -82,8 +78,6 @@ class SettingsController extends Controller
             'supabase_url',
             'supabase_key',
             'supabase_service_role_key',
-            'tencent_app_id',
-            'tencent_server_secret',
             'soundLibrary',
             'videoLibrary',
             'gamesLibrary'

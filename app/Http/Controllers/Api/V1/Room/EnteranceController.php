@@ -62,41 +62,10 @@ class EnteranceController extends Controller
         return $this->enteranceRoomService->updateRoomCountFromZego2($request);
     }
 
-    // public function libraryAgoraZego()
-    // {
-    //     $agora_app_id = Common::getConfig('app_id');
-    //     $zego_server_secret = Common::getConfig('zego_server_secret');
-    //     $zego_app_id = Common::getConfig('zego_app_id');
-    //     $app_sign = Common::getConfig('app_sign');
-    //     $library = Common::getConfig('video_library');
-    //     $liveLibrary = (int) Common::getConfig('live_library');
-    //     $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
-    //     $is_auto_preview = (int) Common::getConfig('is_auto_preview');
 
-
-    //     $libraries = ['agora', 'zego', 'tencent'];
-    //     $liveTypes = ['RTC', 'CDN', 'L3' ];
-
-    //     $data = [
-    //         'agora_app_id' => $agora_app_id,
-    //         'zego' => [
-    //             'server_secret' => $zego_server_secret,
-    //             'app_id' => $zego_app_id,
-    //             'app_sign' => $app_sign,
-    //             'filter' => $zego_filter_enabled == 1 ? true : false,
-    //             'live_type' => $liveTypes[@$liveLibrary ?? 0]
-    //         ],
-    //         'library' => $libraries[$library],
-    //         'is_auto_preview' => $is_auto_preview == 1 ? true : false,
-
-
-    //     ];
-    //     return Common::apiResponse(1, '', $data);
-    // }
 
     public function libraryAgoraZego()
     {
-        $agora_app_id = Common::getConfig('app_id');
         $zego_server_secret = Common::zegoData('zego_server_secret');
         $zego_app_id = Common::zegoData('zego_app_id');
         $app_sign = Common::zegoData('zego_app_sign');
@@ -106,11 +75,11 @@ class EnteranceController extends Controller
         $is_auto_preview = (int) Common::getConfig('is_auto_preview');
 
 
-        $libraries = ['agora', 'zego', 'tencent', 'utd zego'];
+        $libraries = [ 'zego', 'utd zego'];
         $liveTypes = ['RTC', 'CDN', 'L3'];
 
         $data = [
-            'agora_app_id' => $agora_app_id,
+            'agora_app_id' => '',
             'zego' => [
                 'server_secret' => $zego_server_secret,
                 'app_id' => $zego_app_id,
@@ -191,16 +160,7 @@ class EnteranceController extends Controller
         Common::sendToZego('SendCustomCommand', $room->id, $ownerId, json_encode($message));
     }
 
-    //    public function checkSignature($signature,$timestamp,$nonce)
-    //    {
-    //        $secret = Common::getConf('zego_server_secret');
-    //        $tempArr = [$secret, (string)$timestamp, $nonce];
-    //        sort($tempArr, SORT_STRING);
-    //
-    //        $tmpStr = implode('', $tempArr);
-    //        $calculatedSignature = sha1($tmpStr);
-    //        return $signature == $calculatedSignature;
-    //    }
+
 
     public function updateRoomCount(Request $request)
     {
@@ -283,13 +243,13 @@ class EnteranceController extends Controller
     public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
         $user = $request->user();
-        $zego_feature = \Cache::rememberForever('zego_feature', function () {
-            return \DB::table('settings')->where('key', 'zego_feature')->value('value');
-        });
+        // $zego_feature = \Cache::rememberForever('zego_feature', function () {
+        //     return \DB::table('settings')->where('key', 'zego_feature')->value('value');
+        // });
 
-        if ($zego_feature && $zego_feature == 1) {
-            throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
-        }
+        // if ($zego_feature && $zego_feature == 1) {
+        //     throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
+        // }
         $user     = $request->user();
         $roomId   = (int)$request->input('room_id');
         $roomPass = $request->input('room_pass');
@@ -412,15 +372,15 @@ class EnteranceController extends Controller
         $user->save();
         $this->calcTime($user_id);
         if ($isToZegoCharisma && isset($userDataWithCharisma)) {
-            $ms = [
+           $ms = [
                 'messageContent' => [
                     "message" => "updateCharisma",
                     'data' => $userDataWithCharisma
                 ]
             ];
             $json = json_encode($ms);
-
-            Common::sendToZego('SendCustomCommand', $room->id, $request->owner_id, $json);
+        
+           Common::sendToZego('SendCustomCommand', $room->id, $request->owner_id, $json);
         }
 
         $this->handleLeaveCp($user, $room);

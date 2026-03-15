@@ -26,12 +26,10 @@ class SettingController extends MainController
     {
         $settings = Setting::pluck('value', 'key')->toArray();
         $timezones = Timezone::all();
-        $agora_app_id = Common::getConfig('app_id');
-        $agora_app_certificate = Common::getConfig('agora_app_certificate');
+
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
-        $tencent_server_secret = Common::getConfig('tencent_server_secret');
-        $tencent_app_id = Common::getConfig('tencent_app_id');
+    
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
@@ -56,6 +54,8 @@ class SettingController extends MainController
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
         $zego_key = Common::getConf('zego_key');
+        $utd_api_key = Common::getConf('utd_api_key');
+        $utd_app_id = Common::getConf('utd_app_id');
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
@@ -79,7 +79,6 @@ class SettingController extends MainController
                 'settings',
                 'languages',
                 'timezones',
-                'agora_app_id',
                 'zego_server_secret',
                 'zego_app_id',
                 'app_sign',
@@ -92,16 +91,15 @@ class SettingController extends MainController
                 'supabase_url',
                 'supabase_key',
                 'supabase_service_role_key',
-                'tencent_app_id',
-                'tencent_server_secret',
                 'soundLibrary',
                 'videoLibrary',
                 'liveLibrary',
                 'gamesLibrary',
-                'agora_app_certificate',
                 'zego_filter_enabled',
                 'is_auto_preview',
-                'countries'
+                'countries' ,
+                'utd_api_key',
+                'utd_app_id'
             ]))));
     }
 

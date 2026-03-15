@@ -70,10 +70,7 @@ return [
         "url"              => env('ZINIPAY_URL','https://api.zinipay.com/v1/payment/create'),
     ],
 
-    'agora' => [
-        'app_id' => env('AGORA_APP_ID'),
-        'app_certificate' => env('AGORA_APP_CERTIFICATE'),
-    ],
+ 
     'firebase' => [
     'credentials' => env('FILE_NAME'),
     ],

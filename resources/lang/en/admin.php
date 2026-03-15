@@ -230,11 +230,12 @@ return [
     "opay" => 'Opay',
     "public_key" => 'Public Key',
     "country_code" => 'Country Code',
-    "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
     "chess" => "Chess",
-
-    // Fawry
+    "server_secret" => "Server Secret",
+    "app_id" => "App Id",
+    "app_sign" => "App Sign",
+        // Fawry
     "fawry_secret" => "Secret",
     "fawry_merchant_code" => "Merchant Code",
     "fawry_utd_url" => "Utd Url",

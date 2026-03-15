@@ -27,43 +27,7 @@
                                     </div>
 
                         <!-- Settings Fields -->
-                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('app key') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="app_key"
-                                                        placeholder="app_key"
-                                                        value="{{ $bytesunSettings->app_key ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('app id') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="app_id"
-                                                        placeholder="app_id"
-                                                        value="{{ $bytesunSettings->app_id ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('channel') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="channel"
-                                                        placeholder="channel"
-                                                        value="{{ $bytesunSettings->channel ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('gsp') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="gsp"
-                                                        placeholder="gsp"
-                                                        value="{{ $bytesunSettings->gsp ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-                                    </div>
+               
 
                         <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
 
