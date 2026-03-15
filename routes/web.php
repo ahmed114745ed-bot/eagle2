@@ -1797,3 +1797,10 @@ $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
 dd($negativeLimit, $appFeeRate, $receiverFeeRate);
 }); 
+
+
+
+
+Route::get('/test-branch2', function (\Illuminate\Http\Request $request) {
+    dd("branch tested");
+});
