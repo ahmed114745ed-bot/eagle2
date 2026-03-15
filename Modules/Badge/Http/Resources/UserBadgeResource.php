@@ -25,7 +25,7 @@ class UserBadgeResource extends JsonResource
             ?? $this->badge?->image;
 
         info($this->badge?->images?->firstWhere('language', $userLang)?->image);
-        info($this->badge?->images?->firstWhere('language', 'default')?->image());
+        info($this->badge?->images?->firstWhere('language', 'default')?->image);
         info($this->badge?->images?->first()?->image);
         info($this->badge?->image);
 
