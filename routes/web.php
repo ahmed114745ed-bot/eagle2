@@ -647,6 +647,29 @@ Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkControl
 Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
 
 
+Route::get('/fix-receiver-levels', function () {
+    $updated = 0;
+    $upgradeService = new \Modules\Public\Http\Services\UpgradeReceiverLevelServices();
+
+    \App\Models\User::query()
+        ->where('total_diamond_received', '>', 0)
+        ->chunkById(200, function ($users) use (&$updated, $upgradeService) {
+            foreach ($users as $user) {
+                $oldLevel = $user->received_level;
+                $upgradeService->checkUserLevelUpgrated($user);
+                if ($user->received_level != $oldLevel) {
+                    $user->save();
+                    $updated++;
+                }
+            }
+        });
+
+    return response()->json([
+        'status' => 'success',
+        'message' => "Receiver levels recalculated. Updated: {$updated} users."
+    ]);
+});
+
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
