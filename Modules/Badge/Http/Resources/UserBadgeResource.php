@@ -18,19 +18,18 @@ class UserBadgeResource extends JsonResource
         $user = request()->user();
         $userLang = $user->lan ?? 'en';
 
-        // Get image for user's language with fallback
-        $badgeImage = $this->badge?->images?->firstWhere('language', $userLang)?->image
-            ?? $this->badge?->images?->firstWhere('language', 'default')?->image
-            ?? $this->badge?->images?->first()?->image
-            ?? $this->badge?->image;
+        $badgeImage = $this->badge?->images?->firstWhere('language', $userLang);
 
-        info($this->badge?->images?->firstWhere('language', $userLang)?->image);
-        info($this->badge?->images?->firstWhere('language', 'default')?->image);
-        info($this->badge?->images?->first()?->image);
-        info($this->badge?->image);
+        if (!$badgeImage || !$badgeImage->image) {
+            $badgeImage = $this->badge?->images?->firstWhere('language', 'default');
+        }
+
+        if (!$badgeImage || !$badgeImage->image) {
+            $badgeImage = $this->badge?->images?->first();
+        }
 
         return [
-            'image' => $badgeImage,
+            'image' => $badgeImage?->image ?? $this->badge?->image ?? '',
             'image_type' => $badgeImage?->image_type ?? $this->badge?->image_type ?? '',
         ];
     }
