@@ -22,4 +22,6 @@ jobs:
           composer update --no-dev --optimize-autoloader
           php artisan migrate --force
           php artisan optimize:clear
+          sudo service php8.2-fpm restart || sudo systemctl restart php8.2-fpm || true
+          php artisan route:list --path=test-branch2 || true
           sudo supervisorctl restart all-jobs-for-developer for-developer-Zigo-Handeling for-developer-calculate-target sub_queue_work heavy_queue_work
