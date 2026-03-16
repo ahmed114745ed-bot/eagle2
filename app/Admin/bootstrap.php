@@ -35,7 +35,7 @@ Admin::favicon(getFavIcon());
 Admin::navbar(function ($navbar) {
 
     $languages = MultiLanguage::config('languages');
-    $current   = app()->getLocale(); // أو من الكوكي
+    $current   = app()->getLocale();
 
     $navbar->right(
         view('vendor.multi-language.language-menu', compact('languages', 'current'))
