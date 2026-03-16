@@ -596,7 +596,7 @@ trait CalcsTrait
 
         // $current_star_num       = self::getCurrentLevel(1, $star_level, 'exp');
         //        $vipsData = DB::table('vips')->get();
-        $vipsData = Vip::collectionBuilder()->get();
+        $vipsData = Vip::collectionBuilder()->orderBy('level')->get();
 
         $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
         //        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);

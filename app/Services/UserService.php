@@ -1267,11 +1267,11 @@ class UserService
         if ($secondLevel) {
             $exactlyValue    = $secondLevel->exp;
             $remaining       = max(0, $exactlyValue - $expLevel);
-            
+
             // Calculate progress based on thresholds between levels
             $currentThreshold = $currentLevel ? $currentLevel->exp : 0;
             $nextThreshold    = $secondLevel->exp;
-            
+
             $progressNext     = $nextThreshold - $currentThreshold;
             $progressCurrent  = $expLevel - $currentThreshold;
 
@@ -1289,7 +1289,7 @@ class UserService
         }
 
         $expPercentages = Config::get('exp_percentages') ?? cache('exp_percentages');
-        
+
         $chargeLevel = [
             'current_level' => $currentLevel->level ?? 0,
             'current_exp'   => $currentLevel->exp ?? 0, // Threshold for current level
@@ -1303,7 +1303,7 @@ class UserService
         ];
 
         return [
-            'gift_level'   => Common::level_center($user->id),
+            'gift_level'   => Common::level_center_v2($user),
             'charge_level' => $chargeLevel,
             'room_level'   => $this->roomLevel($user),
         ];
