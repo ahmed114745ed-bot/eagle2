@@ -497,10 +497,9 @@ trait CalcsTrait
         // self::vipByLevelAndType($star_level, 1);
 
         $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
-        $vipsData = DB::table('vips')->get()->groupBy('type');
+        $vipsData = DB::table('vips')->orderBy('level')->get()->groupBy('type');
 
         $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
-
 
         $gold_level             = @$user->total_sender_level;
 
@@ -521,10 +520,6 @@ trait CalcsTrait
         $next_star_level = $nextStarData['next_level'];
         $next_gold_num = $nextGoldData['next_exp'];
         $next_gold_level = $nextGoldData['next_level'];
-
-
-
-
 
         $data['receiver_num']        = (int)$receivedNum;
         $data['receiver_img']        = $star_level_img;
@@ -558,7 +553,6 @@ trait CalcsTrait
         $data['rc'] = $rc < 0 ? 0 : $rc;
         $data['sc'] = $sc < 0 ? 0 : $sc;
 
-
         if ($rt > 0 && ($rc / $rt) < 1 && ($rc / $rt) > 0) {
             $data['receiver_per'] = (float)($rc / $rt);
         } else {
@@ -578,39 +572,6 @@ trait CalcsTrait
         }
 
         return $data;
-    }
-
-    public static function userLevelPer($user)
-    {
-        $gold_level             = $user->total_sender_level;
-        $vipsData = DB::table('vips')->get()->groupBy('type');
-
-        $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
-
-        $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
-
-        $diamondSend             = $user->total_sender_diamonds;
-
-        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
-
-        $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
-
-
-        $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
-
-
-        $data = min(1, max(0, ($senderNum - $current_gold_num) / $sender_div));
-        return  $data;
-    }
-
-
-    public static function searchVipByLevelAndType($vips, $level, $type)
-    {
-        foreach ($vips as $vip) {
-            if ($vip->level == $level && $vip->type == $type) {
-                return $vip;
-            }
-        }
     }
 
     public static function level_center_v2($user_id)
@@ -718,6 +679,39 @@ trait CalcsTrait
         }
 
         return $data;
+    }
+
+    public static function userLevelPer($user)
+    {
+        $gold_level             = $user->total_sender_level;
+        $vipsData = DB::table('vips')->get()->groupBy('type');
+
+        $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
+
+        $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
+
+        $diamondSend             = $user->total_sender_diamonds;
+
+        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
+
+        $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+
+
+        $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
+
+
+        $data = min(1, max(0, ($senderNum - $current_gold_num) / $sender_div));
+        return  $data;
+    }
+
+
+    public static function searchVipByLevelAndType($vips, $level, $type)
+    {
+        foreach ($vips as $vip) {
+            if ($vip->level == $level && $vip->type == $type) {
+                return $vip;
+            }
+        }
     }
 
     public static function level_center_ranking($user_id)
