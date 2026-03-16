@@ -16,7 +16,11 @@ jobs:
         command_timeout: 5m
         script: |
           cd /var/www/for-developer
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          sudo git fetch origin
+          sudo git checkout for-developer || sudo git checkout -b for-developer origin/for-developer
+          sudo git reset --hard origin/for-developer
+          sudo chmod -R 777 storage
+          sudo chown -R www-data:www-data storage
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
