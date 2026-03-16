@@ -171,23 +171,28 @@ Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Reque
         'url' => $request->fullUrl(),
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
-Route::get('/user-salary', function () {
+Route::get('/user-salaries-test', function () {
+
     $salary = UserSallary::join('users', 'user_sallaries.user_id', '=', 'users.id')
         ->where('users.uuid', 1406)
         ->where('user_sallaries.month', now()->month)
         ->where('user_sallaries.year', now()->year)
         ->get();
+
     $user = User::where('uuid', 1406)->first();
-    $lastDiamond = $user->lastSallary?->achieved_diamond ?? 0;
+
+    $lastDiamond = $user?->lastSallary?->achieved_diamond ?? 0;
+
     return response()->json([
         'status' => 'success',
-        'message' => '✅ All seeders executed successfully.',
-        'data'  => $salary,
+        'message' => 'Success',
+        'data' => $salary,
         'last_diamond' => $lastDiamond,
-        'user' => $user,
-
+        'user' => $user
     ]);
 });
+
+
 Route::get('/clear', function () {
 
     Artisan::call('cache:clear');
