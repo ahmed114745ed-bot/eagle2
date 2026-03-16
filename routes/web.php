@@ -182,13 +182,16 @@ Route::get('/user-salaries-test', function () {
     $user = User::where('uuid', 1406)->first();
 
     $lastDiamond = $user?->lastSallary?->achieved_diamond ?? 0;
+    $data = [
 
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Success',
         'data' => $salary,
         'last_diamond' => $lastDiamond,
         'user' => $user
+    ];
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Success',
+        'data' => $data,
     ]);
 });
 
@@ -1755,7 +1758,6 @@ Route::get('/fix-paid-usd', function () {
                 }
 
                 $updated++;
-
             } else {
 
                 Log::warning('Coin not found for obtained_coins', [
@@ -1765,7 +1767,6 @@ Route::get('/fix-paid-usd', function () {
 
                 $skipped++;
             }
-
         } catch (\Exception $e) {
 
             Log::error('Error while processing log', [
@@ -1789,7 +1790,7 @@ Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
 
-     $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
     $seeder->run();
 
     return 'seeders have been executed successfully!';
@@ -1830,14 +1831,13 @@ Route::get('/queue-control/{queue}', function ($queue) {
             'output' => $output
         ]);
     }
-
 });
 
 
 Route::get('/get-gift-percentages', function () {
-$negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
-$appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
-$receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
+    $negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
+    $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
+    $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
-dd($negativeLimit, $appFeeRate, $receiverFeeRate);
-}); 
+    dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+});
