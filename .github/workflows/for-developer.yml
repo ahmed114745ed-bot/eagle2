@@ -1,0 +1,26 @@
+name: SSh-for-developer-pipline
+on:
+  push:
+    branches: ["for-developer"]
+jobs:
+  run_for-developer_job:
+    runs-on: [self-hosted]
+    steps:
+    - name: Deploy for-developer
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 10m
+        script: |
+          echo "$USER"
+          cd /var/www/for-developer
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          sudo chown -R $USER:$USER /var/www/for-developer
+          composer install --no-dev --optimize-autoloader
+          php artisan migrate --force
+          php artisan optimize:clear
+          php artisan octane:reload || php artisan octane:stop && php artisan octane:start --server=swoole --host=127.0.0.1 --port=8000 &
+          sudo supervisorctl restart all-jobs-for-developer for-developer-Zigo-Handeling for-developer-calculate-target sub_queue_work heavy_queue_work
