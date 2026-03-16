@@ -33,7 +33,7 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 Admin::favicon(getFavIcon());
 
 Admin::navbar(function ($navbar) {
-    
+
     $languages = MultiLanguage::config('languages');
     $cookieName = MultiLanguage::config('cookie-name', 'locale');
     $current = request()->cookie($cookieName, config('app.locale'));
