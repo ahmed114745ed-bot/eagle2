@@ -18,7 +18,9 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libzip-dev \
     libjpeg-dev \
-    libfreetype6-dev
+    libfreetype6-dev \
+    libssl-dev \
+    libcurl4-openssl-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -84,7 +86,7 @@ RUN cat .env
 
 RUN chmod -R 777 /app/storage
 RUN chmod -R 777 /app/bootstrap
-RUN chmod 777 /app/public/settings.json
+RUN test -f /app/public/settings.json && chmod 777 /app/public/settings.json || true
 
 RUN REDIS_HOST=172.17.0.1 \
     php artisan migrate --force
