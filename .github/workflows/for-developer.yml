@@ -16,16 +16,11 @@ jobs:
         command_timeout: 5m
         script: |
           cd /var/www/for-developer
-          sudo git fetch origin
-          sudo git checkout for-developer || sudo git checkout -b for-developer origin/for-developer
-          sudo git reset --hard origin/for-developer
-          sudo chmod -R 777 storage
-          sudo chown -R www-data:www-data storage
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          mkdir -p storage/jobs-logs
+          chmod -R 777 storage/jobs-logs
           test -f public/settings.json || echo '{}' > public/settings.json
           test -f gcp.json || echo '{}' > gcp.json
-          # Remove broken services from previous failed deploys
-          sudo docker service rm for-developer-octa 2>/dev/null || true
-          sudo docker service rm for-developer-job 2>/dev/null || true
   run_for-developer_app:
     runs-on: [self-hosted]
     needs: run_for-developer_hub
@@ -39,29 +34,9 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
-          set -e
           cd /var/www/for-developer
           sudo docker build -t for-developer-octa:${{ github.sha }} -f Dockerfile-octana .
-          if sudo docker service ls --format '{{.Name}}' | grep -q '^for-developer-octa$'; then
-            sudo docker service update --image for-developer-octa:${{ github.sha }} for-developer-octa
-          else
-            sudo docker service create \
-              --name for-developer-octa \
-              --network app-network \
-              --replicas 2 \
-              --publish 8080:8000 \
-              --mount type=bind,source=/var/www/for-developer/storage,target=/app/storage \
-              --mount type=bind,source=/var/www/for-developer/public/settings.json,target=/app/public/settings.json \
-              --mount type=bind,source=/var/www/for-developer/gcp.json,target=/app/docker/gcp.json \
-              --hostname for-developer-octa \
-              --limit-memory 2g \
-              --stop-grace-period 30s \
-              --stop-signal SIGINT \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              --update-failure-action rollback \
-              for-developer-octa:${{ github.sha }}
-          fi
+          sudo docker service update --image for-developer-octa:${{ github.sha }} for-developer-octa
           sudo docker image prune -f 2>/dev/null || true
   run_for-developer_job:
     runs-on: [self-hosted]
@@ -76,23 +51,7 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
-          set -e
           cd /var/www/for-developer
           sudo docker build -t for-developer-job:${{ github.sha }} -f Dockerfile-jobs .
-          if sudo docker service ls --format '{{.Name}}' | grep -q '^for-developer-job$'; then
-            sudo docker service update --image for-developer-job:${{ github.sha }} for-developer-job
-          else
-            sudo docker service create \
-              --name for-developer-job \
-              --network app-network \
-              --replicas 1 \
-              --mount type=bind,source=/var/www/for-developer/storage,target=/app/storage \
-              --mount type=bind,source=/var/www/for-developer/public/settings.json,target=/app/public/settings.json \
-              --mount type=bind,source=/var/www/for-developer/gcp.json,target=/app/docker/gcp.json \
-              --hostname for-developer-job \
-              --limit-memory 2g \
-              --stop-grace-period 30s \
-              --stop-signal SIGINT \
-              for-developer-job:${{ github.sha }}
-          fi
+          sudo docker service update --image for-developer-job:${{ github.sha }} for-developer-job
           sudo docker image prune -f 2>/dev/null || true
