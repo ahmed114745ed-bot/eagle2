@@ -7,10 +7,19 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 
     <style>
-        /* === RTL Support === */
-        [dir="rtl"] .form-check { padding-right: 0; padding-left: 25px; flex-direction: row-reverse; }
-        [dir="rtl"] .form-check-input { margin-right: 0; margin-left: 0; }
-        [dir="rtl"] .permission-group-title { flex-direction: row-reverse; }
+        /* RTL Specific Styles */
+        [dir="rtl"] .form-check {
+            padding-right: 0;
+            padding-left: 25px;
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .form-check-input {
+            margin-right: 0;
+            margin-left: 0;
+        }
+        [dir="rtl"] .permission-group-title {
+            flex-direction: row-reverse;
+        }
 
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
@@ -18,284 +27,149 @@
             --text-primary-color: {{ config('themes.textPrimaryColor') }};
             --text-secondary-color: {{ config('themes.textSecondaryColor') }};
             --box-background-color: {{ config('themes.boxBackgroundColor') }};
-            --primary-rgb: {{ implode(',', array_map('hexdec', str_split(ltrim(config('themes.primaryColor'), '#'), 2))) }};
         }
 
-        * { box-sizing: border-box; }
-
-        /* === Main Role Tabs (Country / Area Manager) === */
-        .agency-tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 24px;
-            overflow-x: auto;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 0;
+        .label-small-font {
+            font-size: 12px;
         }
 
-        .tab-btn {
-            padding: 14px 28px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            white-space: nowrap;
-            color: #8898aa;
-            letter-spacing: 0.3px;
-            position: relative;
-            bottom: -2px;
-        }
-
-        .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-            background: linear-gradient(180deg, transparent 60%, rgba(var(--primary-rgb), 0.06) 100%);
-        }
-
-        .tab-btn:hover:not(.active) {
-            color: #525f7f;
-            border-bottom-color: #dee2e6;
-        }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* === Main Card === */
-        .card {
-            background: #ffffff;
-            border-radius: 14px;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            margin-bottom: 30px;
-            border: 1px solid #e9ecef;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 18px 24px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color) 100%);
-        }
-
-        .card-title {
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 17px;
-            letter-spacing: 0.3px;
-            margin: 0;
-        }
-
-        .card-body {
-            padding: 20px 24px;
-        }
-
-        /* === Category Nav Tabs (inside card) === */
         .nav-tabs {
             background: var(--secondary-color);
-            border-bottom: none;
-            border-radius: 10px;
-            padding: 6px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
+            border-bottom: var(--primary-color);
         }
 
-        .nav-tabs > li > a:hover { border-color: transparent; }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.7);
-            border: none !important;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            letter-spacing: 0.2px;
-        }
-
-        .nav-link:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
+        .nav-tabs > li > a:hover {
+            border-color: var(--primary-color);
         }
 
         .nav-link.active {
-            background: var(--primary-color) !important;
-            color: #fff !important;
-            box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.35);
+            background-color: var(--primary-color);
+            color: white;
         }
 
-        /* === Select All Category Checkbox === */
-        .category-select-all-container {
-            padding: 0 4px !important;
+        .nav-link {
+            color: white;
         }
 
-        .category-select-wrapper .form-check {
-            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.06) 0%, rgba(var(--primary-rgb), 0.02) 100%);
-            border: 1px solid rgba(var(--primary-rgb), 0.15);
-            border-radius: 10px;
-            padding: 12px 18px;
-            margin: 0;
-            transition: all 0.2s ease;
+        .permissions-section {
+            display: none;
         }
 
-        .category-select-wrapper .form-check:hover {
-            border-color: rgba(var(--primary-rgb), 0.3);
-            box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.08);
-        }
-
-        /* === Permissions Grid === */
-        .permissions-section { display: none; }
-        .permissions-section.active { display: block; animation: fadeIn 0.25s ease; }
-
-        #permissions-container {
-            margin: 0 !important;
-            padding: 0 4px;
+        .permissions-section.active {
+            display: block;
         }
 
         .permissions-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+            gap: 15px;
         }
 
-        @media (max-width: 1200px) {
-            .permissions-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .permissions-grid { grid-template-columns: 1fr; }
-        }
-
-        /* === Permission Group Card === */
         .permission-group {
-            background: #ffffff;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 0;
-            transition: all 0.25s ease;
-            overflow: hidden;
-        }
-
-        .permission-group:hover {
-            border-color: rgba(var(--primary-rgb), 0.25);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-            transform: translateY(-1px);
+            background-color: var(--text-secondary-color);
+            border-radius: 8px;
+            padding: 15px;
         }
 
         .permission-group-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #2d3748;
-            padding: 14px 16px;
-            margin: 0;
-            border-bottom: 1px solid #f0f0f0;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
             display: flex;
-            align-items: center;
             gap: 10px;
-            background: linear-gradient(135deg, #f8f9fc 0%, #f1f3f8 100%);
         }
 
-        .label-small-font {
-            font-size: 13px;
-            font-weight: 700;
-            color: #2d3748;
+        .group-select-all {
+            margin: 0;
         }
 
-        .group-select-all { margin: 0; }
-
-        /* === Individual Permission Checkboxes === */
         .form-check {
+            margin-bottom: 8px;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
-            margin: 0;
-            padding: 10px 16px;
-            transition: background 0.15s ease;
-            border-bottom: 1px solid #f7f7f7;
+            gap: 8px;
+            margin: 20px 0px;
         }
 
-        .form-check:last-child {
-            border-bottom: none;
-        }
-
-        .form-check:hover {
-            background: rgba(var(--primary-rgb), 0.03);
-        }
-
-        /* === Custom Checkbox Styling === */
         .form-check-input {
             margin: 0;
             flex-shrink: 0;
             margin-top: 2px;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #cbd5e0;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            appearance: auto;
-        }
-
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .form-check-input:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
         }
 
         .form-check-label {
-            font-size: 13px;
-            color: #4a5568;
-            line-height: 1.5;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.4;
             word-wrap: break-word;
             flex: 1;
-            cursor: pointer;
-            transition: color 0.15s ease;
         }
 
-        .form-check:hover .form-check-label {
-            color: #2d3748;
+        .agency-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            overflow-x: auto;
         }
 
-        /* === Save Button === */
-        .save-btn {
-            margin: 20px 0 !important;
-            padding: 12px 36px !important;
-            font-size: 15px;
-            font-weight: 700;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%);
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
             border: none;
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.3);
-            transition: all 0.25s ease;
-            letter-spacing: 0.3px;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
         }
 
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.4);
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
         }
 
-        .save-btn:active {
-            transform: translateY(0);
+        .tab-btn:hover:not(.active) {
+            color: #34495e;
         }
 
-        /* === Loading Overlay === */
-        #tab-loading {
-            backdrop-filter: blur(4px);
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--secondary-color);
+        }
+
+        .card-title {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        #permissions-container {
+            margin: 0px 20px !important;
+        }
+
+        .save-btn {
+            margin: 17px 16px !important;
         }
     </style>
 
