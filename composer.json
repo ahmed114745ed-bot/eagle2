@@ -111,7 +111,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.2.21"
+            "php": "8.2.21",
+            "ext-redis": "5.3.7"
         }
     },
     "minimum-stability": "stable",

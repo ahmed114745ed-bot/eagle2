@@ -18,6 +18,7 @@ jobs:
           echo "$USER"
           cd /var/www/for-developer
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          sudo chown -R $USER:$USER /var/www/for-developer
           composer install --no-dev --optimize-autoloader
           php artisan migrate --force
           php artisan optimize:clear
