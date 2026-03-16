@@ -543,6 +543,13 @@ class UserCommon
             Common::send_firebase_notification($tokens_notfacion, $title, $body);
         } catch (\Exception $exception) {
             DB::rollBack();
+            \Log::error("حدث خطأ أثناء منح مكافأة الإنجاز: " . $exception->getMessage(), [
+                'user_id' => $user->id,
+                'reward_id' => $reward->id ?? 'N/A',
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(), 
+            ]);
             throw $exception;
         }
     }
