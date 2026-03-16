@@ -647,6 +647,29 @@ Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkControl
 Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
 
 
+Route::get('/fix-receiver-levels', function () {
+    $updated = 0;
+    $upgradeService = new \Modules\Public\Http\Services\UpgradeReceiverLevelServices();
+
+    \App\Models\User::query()
+        ->where('total_diamond_received', '>', 0)
+        ->chunkById(200, function ($users) use (&$updated, $upgradeService) {
+            foreach ($users as $user) {
+                $oldLevel = $user->received_level;
+                $upgradeService->checkUserLevelUpgrated($user);
+                if ($user->received_level != $oldLevel) {
+                    $user->save();
+                    $updated++;
+                }
+            }
+        });
+
+    return response()->json([
+        'status' => 'success',
+        'message' => "Receiver levels recalculated. Updated: {$updated} users."
+    ]);
+});
+
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
@@ -1759,3 +1782,41 @@ Route::get('make-seeders-for-permission', function () {
 });
 
 
+
+Route::get('/queue-control/{queue}', function ($queue) {
+
+    $check = shell_exec("ps aux | grep 'queue:work --queue=$queue' | grep -v grep");
+
+    if ($check) {
+        $output = [];
+        $returnVar = 0;
+        exec("php artisan queue:restart 2>&1", $output, $returnVar);
+        return response()->json([
+            'action' => 'restarted',
+            'queue' => $queue,
+            'return_code' => $returnVar,
+            'output' => $output
+        ]);
+    } else {
+        $output = [];
+        $returnVar = 0;
+        exec("php artisan queue:work --queue=$queue --tries=1 2>&1 &", $output, $returnVar);
+
+        return response()->json([
+            'action' => 'started',
+            'queue' => $queue,
+            'return_code' => $returnVar,
+            'output' => $output
+        ]);
+    }
+
+});
+
+
+Route::get('/get-gift-percentages', function () {
+$negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
+$appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
+$receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
+
+dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+}); 

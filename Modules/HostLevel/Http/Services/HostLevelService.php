@@ -132,8 +132,11 @@ class HostLevelService
                     ];
                 }
             } elseif ($reward->type == "achievement") {
-                $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
-
+                
+           //     $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+              
+            $dateTimestamp = now()->addDays((int)$reward->expire)->format("Y-m-d H:i:s");
+              
                 $attributes = [
                     'user_id'       => $user->id,
                     'custom_achievement_id' => $reward->target,
@@ -179,7 +182,7 @@ class HostLevelService
 
         return  GiftLog::where('receiver_id', $userId)
             ->filterByEventType($eventType)
-            ->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total_diamond')->groupBy("receiver_id")
+            ->selectRaw('receiver_id, SUM(giftPrice) AS total_diamond')->groupBy("receiver_id")
             ->value('total_diamond');
-    }
+    } 
 }

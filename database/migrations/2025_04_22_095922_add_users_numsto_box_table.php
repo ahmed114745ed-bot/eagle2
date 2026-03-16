@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('boxs', function (Blueprint $table) {
-            $table->string('dynamic_users_values')->nullable();
-
-        });
+        if (!Schema::hasColumn('boxs', 'dynamic_users_values')) {
+            Schema::table('boxs', function (Blueprint $table) {
+                $table->string('dynamic_users_values')->nullable();
+            });
+        }
     }
 
     /**

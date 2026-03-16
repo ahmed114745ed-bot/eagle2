@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('game_provider_settings', function (Blueprint $table) {
-            $table->string('channel')->nullable();
-            $table->string('app_id')->nullable();
-            $table->string('gsp')->nullable();
+            if (!Schema::hasColumn('game_provider_settings', 'channel')) {
+                $table->string('channel')->nullable();
+            }
+            if (!Schema::hasColumn('game_provider_settings', 'app_id')) {
+                $table->string('app_id')->nullable();
+            }
+            if (!Schema::hasColumn('game_provider_settings', 'gsp')) {
+                $table->string('gsp')->nullable();
+            }
         });
     }
 

@@ -207,13 +207,17 @@ class PkEventController extends MainController
         
         $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        
+        if ($minStartDate && $minStartDate < date("Y-m-d")) {
+            $minStartDate = date("Y-m-d");
+        }
         // Use start_date directly instead of start_date_local
         $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
             ->rules(function ($form) {
                 $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
-                
+                if ($minStartDate && $minStartDate < date("Y-m-d")) {
+                    $minStartDate = \Carbon\Carbon::now()->subDay()->format('Y-m-d');
+                }
                 if ($minStartDate) {
                     if (!$id = $form->model()->id) {
                         return 'required|after:' . $minStartDate;

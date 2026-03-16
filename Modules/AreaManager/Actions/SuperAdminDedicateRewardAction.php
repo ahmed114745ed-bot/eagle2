@@ -40,24 +40,31 @@ class SuperAdminDedicateRewardAction extends Action
 
 
         $reward = SuperAdminReward::find($request->id);
-        $rewardNom =  $reward->no_reward -  $reward->gave_reward_no;
+        $noReward = $request->input('no_reward') ?? 1;
+        $remainingRewards = $reward->no_reward - $reward->gave_reward_no;
         try {
-            if ($rewardNom == 0) {
+            if ($remainingRewards <= 0) {
                 return $this->response()->error(__('your reward finished'));
+            }
+            if ($noReward > $remainingRewards) {
+                return $this->response()->error(__('not enough rewards, remaining: ') . $remainingRewards);
             }
             if ($request->user_type == 'user') {
                 $user = User::query()->searchByUuid($request->user_uuid)->first();
                 if (!$user)   return $this->response()->error(__('dashboard.userNotFound'))->refresh();
-                $this->assignRewards($reward, $user);
+                for ($i = 0; $i < $noReward; $i++) {
+                    $this->assignRewards($reward, $user);
+                }
             } else {
                 $user = SuperAdmin::find($request->super_admin_id);
                 if (!$user) return $this->response()->error(__('dashboard.userNotFound'))->refresh();
+
                 DB::table('admin_rewards')->insert([
                     'super_admin_id' => $user->id,
                     'type' => $reward->type,
                     'target' => $reward->target,
                     'expire' => $reward->expire,
-                    'no_reward' => 1,
+                    'no_reward' => $noReward,
                     'user_type' => 'super_admin',
                     'created_by' => Admin::user()->id,
                     'created_at' => now()
@@ -66,11 +73,10 @@ class SuperAdminDedicateRewardAction extends Action
             }
 
             SuperAdminReward::where('id', $request->id)
-                ->increment('gave_reward_no', 1);
-            return $this->response()->success(__('dashboard.successful'));
+                ->increment('gave_reward_no', $noReward);
+            return $this->response()->success(__('dashboard.successful'))->refresh();
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
-            return $this->response()->error('you dedicate all reward');
+            return $this->response()->error('some thing went wrong')->refresh();
         }
     }
 
@@ -84,6 +90,7 @@ class SuperAdminDedicateRewardAction extends Action
             ->options(self::getSuperAdmins())
             // ->ajax('/areaManager/search/super-admin', 'id', 'name')
             ->attribute(['id' => 'super-admin-select']);
+        $this->integer('no_reward', __('No reward'))->default(1);
 
         Admin::script(<<<'SCRIPT'
             function toggleUserTypeFields() {
@@ -92,6 +99,7 @@ class SuperAdminDedicateRewardAction extends Action
                 if (selected === 'user') {
                     $('#user-select').closest('.form-group').show();
                     $('#super-admin-select').closest('.form-group').hide();
+                    
                 } else if (selected === 'super_admin') {
                     $('#super-admin-select').closest('.form-group').show();
                     $('#user-select').closest('.form-group').hide();
@@ -103,6 +111,17 @@ class SuperAdminDedicateRewardAction extends Action
 
             // run on page load
             toggleUserTypeFields();
+
+            // Fix Select2 search input not working inside Bootstrap modal
+            $(document).on('shown.bs.modal', '.modal', function() {
+                $(this).removeAttr('tabindex');
+            });
+            $(document).on('select2:open', '#super-admin-select', function() {
+                setTimeout(function() {
+                    var searchField = document.querySelector('.select2-container--open .select2-search__field');
+                    if (searchField) searchField.focus();
+                }, 100);
+            });
             SCRIPT);
     }
 
@@ -147,9 +166,9 @@ function pu(val) {
         return cache()->remember(
             "super_admins_by_manager_{$authId}",
             600,
-            function () use ($authId){
+            function () use ($authId) {
                 $region = Region::where('manager_id', $authId)->with('countries')->first();
-        $countries = $region->countries->pluck('id')->toArray();
+                $countries = $region->countries->pluck('id')->toArray();
 
                 return SuperAdmin::query()
                     ->select('id', 'name')
@@ -162,7 +181,7 @@ function pu(val) {
         );
     }
 
-   
+
 
 
 

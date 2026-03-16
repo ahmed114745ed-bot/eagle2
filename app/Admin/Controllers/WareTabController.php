@@ -331,8 +331,8 @@ class WareTabController extends MainController
                     $extension = $file->guessExtension();
                 }
                 return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
-            })
-            ->default('1.png');
+            })->default('1.png');
+        $form->switch('half_image_profile', trans('half image'))->states(Common::getSwitchStates());
 
        /* $form->display('img2', 'Preview')->with(function ($value) {
             if (!$value) return "<div id='preview-display-img2'></div>";

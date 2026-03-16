@@ -14,8 +14,12 @@ class AddToBoxUse extends Migration
     public function up()
     {
         Schema::table('box_uses', function (Blueprint $table) {
-            $table->integer ('used_coins')->nullable ()->default (0);
-            $table->integer ('unused_coins')->nullable ()->default (0);
+            if (!Schema::hasColumn('box_uses', 'used_coins')) {
+                $table->integer('used_coins')->nullable()->default(0);
+            }
+            if (!Schema::hasColumn('box_uses', 'unused_coins')) {
+                $table->integer('unused_coins')->nullable()->default(0);
+            }
         });
     }
 
