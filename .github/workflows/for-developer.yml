@@ -23,6 +23,11 @@ jobs:
           sudo chown -R www-data:www-data storage
           test -f public/settings.json || echo '{}' > public/settings.json
           test -f gcp.json || echo '{}' > gcp.json
+          # Remove broken services from previous failed deploys
+          sudo docker service rm for-developer-octa 2>/dev/null || true
+          sudo docker service rm for-developer-job 2>/dev/null || true
+          # Clean up unused images
+          sudo docker image prune -af 2>/dev/null || true
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
@@ -66,6 +71,8 @@ jobs:
               --update-failure-action rollback \
               for-developer-octa:${{ github.sha }}
           fi
+          # Clean up old unused images
+          sudo docker image prune -af 2>/dev/null || true
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
@@ -105,3 +112,5 @@ jobs:
               --stop-signal SIGINT \
               for-developer-job:${{ github.sha }}
           fi
+          # Clean up old unused images
+          sudo docker image prune -af 2>/dev/null || true
