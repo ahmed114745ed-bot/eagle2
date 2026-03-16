@@ -319,7 +319,7 @@ class CoinGameUserService
 
         $grid->column('game_name', __('Game'))->display(function () {
             $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($this->game_image ?? @$this->customGame?->image) ?? $defaultImage;
+            $url = getImagePath(@$this->customGame?->image ?? $this->game_image) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
 
             $uniqueId = $this->game_id ?? 'game-unknown';
