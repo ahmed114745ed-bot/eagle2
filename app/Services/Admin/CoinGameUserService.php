@@ -26,7 +26,7 @@ class CoinGameUserService
         $this->userService = $userService;
     }
 
-    
+
     public function applyFilters($query,  array $filters)
     {
         if (!empty($filters['user']['uuid'])) {
@@ -41,24 +41,26 @@ class CoinGameUserService
             $query->Where('game_id', $gameId);
         }
 
-        if (isset($filters['date']['start'], $filters['date']['end']) &&
-            $filters['date']['start'] && $filters['date']['end']) {
-            
+        if (
+            isset($filters['date']['start'], $filters['date']['end']) &&
+            $filters['date']['start'] && $filters['date']['end']
+        ) {
+
             $startInput = $filters['date']['start'];
             $endInput   = $filters['date']['end'];
-        
+
             $start = Carbon::parse($startInput);
             $end   = Carbon::parse($endInput);
-        
-         
-        
+
+
+
             $query->whereBetween('date', [$start, $end]);
         }
 
         return $query;
     }
 
-   
+
     public function calculateTotals($query, $filters): object
     {
 
@@ -70,7 +72,7 @@ class CoinGameUserService
         ")->first();
     }
 
-  
+
     public function renderInfoBoxes(Row $row, $totals): void
     {
         $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
@@ -100,7 +102,7 @@ class CoinGameUserService
 
 
 
-   public function buildGrid(): Grid
+    public function buildGrid(): Grid
     {
         $grid = new Grid(new CoinGameUserDailyAggregated());
         $grid->model()
@@ -176,28 +178,29 @@ class CoinGameUserService
     public function buildGrid_details($user_id): Grid
     {
         $grid = new Grid(new CoinGameUserAggregated());
-    
+
         $grid->model()
-        ->where('user_id' , $user_id)
-        ->select([
-            'game_id',
-            'game_name',
-            'game_image',
+            ->where('user_id', $user_id)
+            ->with(['user', 'game', 'customGame'])
+            ->select([
+                'game_id',
+                'game_name',
+                'game_image',
                 DB::raw('SUM(total_played) as total_played'),
                 DB::raw('SUM(total_loss) as total_loss'),
                 DB::raw('SUM(total_win) as total_win'),
                 DB::raw('SUM(app_profit) as app_profit'),
-            'user_id',
-            'user_uuid',
-            'user_name',
-            'user_avatar',
-        ])
-        ->groupBy('game_id', 'game_name', 'game_image', 'user_id', 'user_uuid', 'user_name', 'user_avatar')
-        ->orderByDesc('total_played');    
+                'user_id',
+                'user_uuid',
+                'user_name',
+                'user_avatar',
+            ])
+            ->groupBy('game_id', 'game_name', 'game_image', 'user_id', 'user_uuid', 'user_name', 'user_avatar')
+            ->orderByDesc('total_played');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
-    
+
             $filter->like('user_uuid', 'User UUID')->placeholder('UUID');
             $filter->like('game_id', 'Game')->placeholder('ID');
             $filter->between('date', __('Created At'))->datetime([
@@ -205,9 +208,9 @@ class CoinGameUserService
                 'locale' => 'en'
             ]);
         });
-    
+
         $userService = $this->userService;
-    
+
         $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
             return $userService->adminUserAvatar((object)[
                 'id'     => $this->user_id,
@@ -216,18 +219,18 @@ class CoinGameUserService
                 'avatar' => $this->user_avatar,
             ], withoutLevels: true);
         });
-    
+
         $grid->column('game_id', __('Game'))->display(function () {
             $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($this->game_image) ?? $defaultImage;
+            $url = getImagePath($this->game_image ?? $this->customGame->image ) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
-    
+
             $uniqueId = $this->game_id ?? 'game-unknown';
             $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
-            
+
             $gameIdHtml = "game-{$this->game_id}";
             $urlLink = admin_url("all-games/{$this->game_id}");
-    
+
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
                 $imageTag
@@ -241,11 +244,11 @@ class CoinGameUserService
             </a>
         HTML;
         });
-    
+
         $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v))->sortable();
         $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v))->sortable();
         $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v))->sortable();
-    
+
         $grid->column('details', __('Details'))->display(function () {
 
             $filters = request()->only(['date', 'user_id', 'game_id']);
@@ -262,12 +265,12 @@ class CoinGameUserService
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
-    
+
         return $grid;
     }
 
 
- 
+
     public function buildShowAllGrid($userId, $gameId): Grid
     {
         $grid = new Grid(new CoinGameUserAll());
@@ -277,7 +280,7 @@ class CoinGameUserService
         if (!empty($createdAt['start']) && !empty($createdAt['end'])) {
             $grid->model()->whereBetween('created_at', [$createdAt['start'], $createdAt['end']]);
         }
-       
+
         $grid->model()
             ->selectRaw("
                 game_name,
@@ -291,7 +294,7 @@ class CoinGameUserService
             ")
             ->where('user_id', $userId)
             ->where('game_id', $gameId)
-            ->groupBy('game_name', 'round_id' , 'game_image' ,'game_id')
+            ->groupBy('game_name', 'round_id', 'game_image', 'game_id')
             ->orderByDesc('last_played');
 
         $grid->filter(function ($filter) {
@@ -316,13 +319,13 @@ class CoinGameUserService
             $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($this->game_image) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
-    
+
             $uniqueId = $this->game_id ?? 'game-unknown';
             $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
-            
+
             $gameIdHtml = "game-{$this->game_id}";
             $urlLink = admin_url("all-games/{$this->game_id}");
-    
+
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
                 $imageTag
