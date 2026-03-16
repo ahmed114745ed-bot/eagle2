@@ -172,6 +172,19 @@ Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Reque
         'url' => $request->fullUrl(),
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
+Route::get('/user-salary', function () {
+    $salary = UserSallary::join('users', 'user_sallaries.user_id', '=', 'users.id')
+        ->where('users.uuid', 10004)
+        ->where('user_sallaries.month', now()->month)
+        ->where('user_sallaries.year', now()->year)
+        ->get();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.',
+        'data'  => $salary,
+    ]);
+});
 
 Route::get('/clear', function () {
 
@@ -1869,7 +1882,6 @@ Route::get('/fix-paid-usd', function () {
                 }
 
                 $updated++;
-
             } else {
 
                 Log::warning('Coin not found for obtained_coins', [
@@ -1879,7 +1891,6 @@ Route::get('/fix-paid-usd', function () {
 
                 $skipped++;
             }
-
         } catch (\Exception $e) {
 
             Log::error('Error while processing log', [
@@ -1903,7 +1914,7 @@ Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
 
-     $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
     $seeder->run();
 
     return 'seeders have been executed successfully!';
@@ -1944,14 +1955,13 @@ Route::get('/queue-control/{queue}', function ($queue) {
             'output' => $output
         ]);
     }
-
 });
 
 
 Route::get('/get-gift-percentages', function () {
-$negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
-$appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
-$receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
+    $negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
+    $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
+    $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
-dd($negativeLimit, $appFeeRate, $receiverFeeRate);
-}); 
+    dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+});
