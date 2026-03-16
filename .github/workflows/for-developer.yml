@@ -26,16 +26,6 @@ jobs:
           # Remove broken services from previous failed deploys
           sudo docker service rm for-developer-octa 2>/dev/null || true
           sudo docker service rm for-developer-job 2>/dev/null || true
-          # Clean up unused images
-          sudo docker image prune -af 2>/dev/null || true
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-            sudo docker system prune -a -f && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
   run_for-developer_app:
     runs-on: [self-hosted]
     needs: run_for-developer_hub
@@ -49,6 +39,7 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/for-developer
           sudo docker build -t for-developer-octa:${{ github.sha }} -f Dockerfile-octana .
           if sudo docker service ls --format '{{.Name}}' | grep -q '^for-developer-octa$'; then
@@ -71,16 +62,7 @@ jobs:
               --update-failure-action rollback \
               for-developer-octa:${{ github.sha }}
           fi
-          # Clean up old unused images
-          sudo docker image prune -af 2>/dev/null || true
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-            sudo docker system prune -a -f && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
+          sudo docker image prune -f 2>/dev/null || true
   run_for-developer_job:
     runs-on: [self-hosted]
     needs: run_for-developer_hub
@@ -94,6 +76,7 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/for-developer
           sudo docker build -t for-developer-job:${{ github.sha }} -f Dockerfile-jobs .
           if sudo docker service ls --format '{{.Name}}' | grep -q '^for-developer-job$'; then
@@ -112,5 +95,4 @@ jobs:
               --stop-signal SIGINT \
               for-developer-job:${{ github.sha }}
           fi
-          # Clean up old unused images
-          sudo docker image prune -af 2>/dev/null || true
+          sudo docker image prune -f 2>/dev/null || true
