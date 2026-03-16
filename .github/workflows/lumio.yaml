@@ -84,3 +84,4 @@ jobs:
           #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
           docker service update --image lumio-job:${{ github.sha }} lumio-job
+
