@@ -230,7 +230,7 @@ class CoinGameUserService
             $id = $this->customGame->id ?? $this->game_id;
             $gameIdHtml = "game-{$this->game_id}";
             $urlLink = admin_url("all-games/{$id}");
-            $name =  app()->getLocale() === 'ar' ? ($this->game_name ?? $this->customGame->name ?? @$this->customGame?->name_en) : ($this->game_name ?? @$this->customGame?->name_en ?? @$this->customGame?->name);
+            $name =  app()->getLocale() === 'ar' ? ($this->game_name ?? @$this->customGame?->name ?? @$this->customGame?->name_en) : ($this->game_name ?? @$this->customGame?->name_en ?? @$this->customGame?->name);
 
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
@@ -327,7 +327,7 @@ class CoinGameUserService
             $id = $this->customGame->id ?? $this->game_id;
             $gameIdHtml = "game-{$this->game_id}";
             $urlLink = admin_url("all-games/{$id}");
-            $name =  app()->getLocale() === 'ar' ? ($this->game_name ?? $this->customGame->name ?? @$this->customGame?->name_en) : ($this->game_name ?? @$this->customGame?->name_en ?? @$this->customGame?->name);
+            $name =  app()->getLocale() === 'ar' ? ($this->game_name ?? @$this->customGame?->name ?? @$this->customGame?->name_en) : ($this->game_name ?? @$this->customGame?->name_en ?? @$this->customGame?->name);
 
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
