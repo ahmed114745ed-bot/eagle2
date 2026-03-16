@@ -24,7 +24,7 @@
 use Encore\Admin\Widgets\Navbar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-
+use KevinSoft\MultiLanguage\MultiLanguage;
 
 
 //Encore\Admin\Form::forget( ['map', 'editor']);
@@ -32,6 +32,16 @@ use Illuminate\Support\Facades\Schema;
 
 Admin::favicon(getFavIcon());
 
+Admin::navbar(function ($navbar) {
+
+    info('lang');
+    $languages = MultiLanguage::config('languages');
+    $current   = app()->getLocale();
+
+    $navbar->right(
+        view('vendor.multi-language.language-menu', compact('languages', 'current'))
+    );
+});
 
 Admin::css ('css/admin.css');
 Admin::js(asset('js/laravel_admin.js'));
