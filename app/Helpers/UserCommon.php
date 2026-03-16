@@ -515,11 +515,10 @@ class UserCommon
             $arr['target_id'] = $ware->id;
             $arr['num']       = 1;
             $arr['is_read']   = 1;
-            $arr['use_num']   = 1;
-            $arr['using']     = 1;
-            $arr['is_read']   = 1;
+            $arr['use_num']   = 0;
+            $arr['using']     = 0;
             $arr['days']      = $expir;
-            $arr['expire']   = $expir ? time() + ($expir * 86400) : 0;
+            $arr['expire']   =  null;
 
             $arr['receive_type']      = $receiveType;
 
