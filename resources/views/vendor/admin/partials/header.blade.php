@@ -31,7 +31,7 @@
         var token = document.querySelector('meta[name="csrf-token"]');
         if (token) {
             window.Laravel = { csrfToken: token.content };
-            
+
             // Setup jQuery AJAX defaults
             if (typeof $ !== 'undefined') {
                 $.ajaxSetup({
@@ -40,7 +40,7 @@
                     }
                 });
             }
-            
+
             // Also setup when jQuery loads later
             document.addEventListener('DOMContentLoaded', function() {
                 if (typeof $ !== 'undefined' || typeof jQuery !== 'undefined') {
