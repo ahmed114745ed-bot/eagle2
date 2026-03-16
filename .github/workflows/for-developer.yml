@@ -1,0 +1,69 @@
+name: SSh-for-developer-pipline
+on:
+  push:
+    branches: ["for-developer"]
+jobs:
+  run_for-developer_hub:
+    runs-on: [self-hosted]
+    steps:
+    - name: Pull latest code
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          cd /var/www/for-developer
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_for-developer_app:
+    runs-on: [self-hosted]
+    needs: run_for-developer_hub
+    steps:
+    - name: Build and deploy for-developer Octane
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/for-developer
+          pwd
+          docker build -t for-developer-octa:${{ github.sha }} -f Dockerfile-octana .
+          docker service update --image for-developer-octa:${{ github.sha }} for-developer-octa
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_for-developer_job:
+    runs-on: [self-hosted]
+    needs: run_for-developer_hub
+    steps:
+    - name: Build and deploy for-developer jobs
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/for-developer
+          pwd
+          docker build -t for-developer-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image for-developer-job:${{ github.sha }} for-developer-job
