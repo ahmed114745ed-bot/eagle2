@@ -21,6 +21,8 @@ jobs:
           sudo git reset --hard origin/for-developer
           sudo chmod -R 777 storage
           sudo chown -R www-data:www-data storage
+          test -f public/settings.json || echo '{}' > public/settings.json
+          test -f gcp.json || echo '{}' > gcp.json
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
