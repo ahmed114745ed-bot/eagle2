@@ -184,7 +184,8 @@ Route::get('/user-salary', function () {
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.',
         'data'  => $salary,
-        'last_diamond' => $lastDiamond
+        'last_diamond' => $lastDiamond,
+        'user' => $user,
 
     ]);
 });
