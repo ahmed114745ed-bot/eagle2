@@ -44,12 +44,21 @@ class LuckyGiftService
 
     private function acquireUserLock(int $userId, int $timeoutSeconds = 30): \Illuminate\Contracts\Cache\Lock
     {
-        $lock = Cache::lock(
+     /*   $lock = Cache::lock(
             "lucky_gift_lock:user:{$userId}",
             $timeoutSeconds
         );
 
         if (!$lock->get()) {
+            throw new InvalidArgumentException(__('api_responses.try_again'));
+        }
+
+        return $lock;*/
+        $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
+
+        try {
+            $lock->block(5); 
+        } catch (LockTimeoutException $e) {
             throw new InvalidArgumentException(__('api_responses.try_again'));
         }
 
