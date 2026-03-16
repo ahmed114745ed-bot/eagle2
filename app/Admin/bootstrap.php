@@ -34,6 +34,7 @@ Admin::favicon(getFavIcon());
 
 Admin::navbar(function ($navbar) {
 
+    info('lang');
     $languages = MultiLanguage::config('languages');
     $current   = app()->getLocale();
 
