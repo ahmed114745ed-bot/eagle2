@@ -230,7 +230,7 @@ Route::group(
         Route::post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
         Route::resource('rooms-preview', TestController::class); //
-    
+
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -238,7 +238,7 @@ Route::group(
         Route::get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         Route::get('agency-statistic', 'AgencyStatisticController@index');
         //    Route::get('agency-settings', 'AgencySettingController@index');
-    
+
         Route::resource('test-test', 'TestTestController');
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
@@ -288,7 +288,7 @@ Route::group(
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
-    
+
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
@@ -759,6 +759,12 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
+
+            Route::get('/agencies-test', [GiftLogTestController::class, 'showAgencies']);
+            Route::post('/agencies-test', [GiftLogTestController::class, 'agencies']);
+
+            Route::get('/gift-test', [GiftLogTestController::class, 'showSendGift']);
+            Route::post('/gift-test', [GiftLogTestController::class, 'sendGift']);
 
             Route::get('/pusher-test/{id}', function ($id) {
                 $user = \App\Models\User::findOrFail($id);

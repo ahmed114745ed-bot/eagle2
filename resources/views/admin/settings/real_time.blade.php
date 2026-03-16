@@ -68,7 +68,7 @@
                                             <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
-                                                        for="zego_server_secret">{{ __('UTD VOICE') }}:</label>
+                                                        for="zego_server_secret">{{ __('Encrypted Token') }}:</label>
                                                     <input type="text" id="zego_server_secret"
                                                         name="zego_token" placeholder="{{ __('server_secret') }}"
                                                         value="{{ $zego_token }}" class="form-control"
@@ -79,7 +79,7 @@
                                             <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
-                                                        for="zego_server_secret">{{ __('UTD VOICE Key') }}:</label>
+                                                        for="zego_server_secret">{{ __('client Id') }}:</label>
                                                     <input type="text" id="zego_server_secret_key"
                                                         name="zego_key" placeholder="{{ __('server_secret_key') }}"
                                                         value="{{ $zego_key }}" class="form-control"
@@ -237,7 +237,7 @@
 
                 <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <h4 class="m-0">{{ __('UTD VOICE') }}</h4>
                         <div class="d-flex align-items-center">
                             <input type="radio" id="utdZegoSoundRadio" class="custom-radio libraryRealTime"
                                    name="sound_library"
@@ -294,7 +294,7 @@
 
                 <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <h4 class="m-0">{{ __('UTD VOICE') }}</h4>
                         <div class="d-flex align-items-center">
                             <input type="radio" id="utdZegoVideoRadio" class="custom-radio libraryRealTime"
                                    name="video_library"

@@ -18,6 +18,16 @@
   "Super Roles": "الأدوار",
 "Browse super roles": "تصفح الأدوار",
     "today_balance": " هدايا اليوم",
+    "Dark Body Color": "لون الجسم الداكن",
+    "Light Body Color": "لون الجسم الفاتح",
+    "Use Count": "عدد الاستخدام",
+"Sort Order": "ترتيب العرض",
+"Back to List": "العودة إلى القائمة",
+"Category": "الفئة",
+"Basic Information": "المعلومات الأساسية",
+"Technical Details": "التفاصيل التقنية",
+"Category Type": "نوع الفئة",
+"Music Gift": "هدية موسيقية",
     "Zego Feature": "ميزة زيجو",
     "super admins": "سوبر ادمن",
     "Super Admins": "سوبر ادمن",
@@ -1773,6 +1783,10 @@
     "Login": "تسجيل الدخول",
     "login": "الدخول",
     "Logs": "السجلات",
+    "Settings": "إعدادات ",
+    "Encrypted Token": "رمز  المشفّر",
+    "client Id": "معرّف عميل ",
+
     "show achievement": "عرض الاوسمة",
     "show achievement_level": "عرض مستوى الإنجاز",
     "show admin users": "عرض المستخدمين الإداريين",
@@ -3097,6 +3111,7 @@
     "select_default_superadmin": "اختر مدير دوله ليكون الافتراضي",
     "set_as_default": "تعيين كـ BD افتراضي",
     "Updated": "تم التحديث",
+    "Default area manager not found. Please set a default area manager before deleting.": "لم يتم العثور على مدير منطقة افتراضي. يرجى تعيين مدير منطقة افتراضي قبل الحذف.",
     "dodo": "     ",
     "Default Super Admin has been set successfully": "تم تعيين مدير دوله الافتراضي بنجاح",
     "set_superadmin_as_default": "تعيين كمدير دوله افتراضي",
@@ -4620,6 +4635,8 @@
     "Required": "مطلوب",
     "Enabled": "مفعل",
     "Gift moved successfully": "تم نقل الهدية بنجاح",
+    "You cannot delete the default BD":" لا يمكنك حذف BD الافتراضي",
+    "No default BD  for this country found to transfer agencies to.": "لم يتم العثور على BD افتراضي لهذه الدولة لنقل الوكالات إليه.",
     "BD Registration Form": "نموذج التسجيل BD",
     "Main Section": "القسم الرئيسي",
     "Submit Form": "إرسال النموذج",
@@ -5309,5 +5326,7 @@
     "Bottom Nav Inactive Color": "لون شريط التنقل غير النشط",
     "Text Header Color": "لون نص الرأس",
     "Button Text Color": "لون نص الزر",
-    "New Theme Enabled": "تفعيل المظهر الجديد"
+    "New Theme Enabled": "تفعيل المظهر الجديد",
+    "Owner Fee Rate (0.10 = 10%)": "النسبة  للغرفة (0.10 = 10%)" 
+
 }

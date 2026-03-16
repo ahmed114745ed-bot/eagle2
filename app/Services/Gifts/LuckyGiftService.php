@@ -26,7 +26,9 @@ use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Carbon\Carbon;
 use App\Helpers\CacheHelper;
+use Illuminate\Support\Facades\Cache;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
+use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 
 class LuckyGiftService
 {
@@ -38,6 +40,29 @@ class LuckyGiftService
 
     public function send($data)
     {
+    }
+
+    private function acquireUserLock(int $userId, int $timeoutSeconds = 30): \Illuminate\Contracts\Cache\Lock
+    {
+     /*   $lock = Cache::lock(
+            "lucky_gift_lock:user:{$userId}",
+            $timeoutSeconds
+        );
+
+        if (!$lock->get()) {
+            throw new InvalidArgumentException(__('api_responses.try_again'));
+        }
+
+        return $lock;*/
+        $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
+
+        try {
+            $lock->block(5); 
+        } catch (LockTimeoutException $e) {
+            throw new InvalidArgumentException(__('api_responses.try_again'));
+        }
+
+        return $lock;
     }
 
     public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
@@ -76,8 +101,16 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
+        $lock = $this->acquireUserLock($userId);
+        try {
+            $user->refresh();
+            $userCoins = $user->di;
+            $oldUserCoin = $userCoins;
+            $amountBefore = $user->di;
 
-
+            if ($userCoins < $totalPrice) {
+                throw new InvalidArgumentException(__('api_responses.insufficient'));
+            }
 
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
@@ -278,18 +311,17 @@ class LuckyGiftService
         //     'total_diamond' => $room->total_diamond,
         //     'totalPrice' => $totalPrice,
         // ]);
+        $responseData['total_pk'] = $coinsForReceiver;
 
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
-            // \Log::info('sendLuckyGift2 - Upgrading Room Level', [
-            //     'room_id' => $room->id,
-            //     'diamonds' => $totalPrice,
-            //     'type' => $room->type,
-            // ]);
             $serviceLevel->sendGift($room, $totalPrice);
         }
 
         return $responseData;
+        } finally {
+            $lock->release();
+        }
     }
 
     /**
@@ -305,9 +337,11 @@ class LuckyGiftService
         $number = $data['num'];
         $count = $data['count'] ?? 1;
         $amountBefore = $user->di;
-        $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 10;
-        $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
-        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
+
+        $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
+        $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+        $roomrPercentage = \App\Models\FairLuckSetting::getOwnerFeeRate();
+        $hostPercentage = $receiverFeeRate;
         $total_cashback_percentage = 0;
 
 
@@ -335,6 +369,17 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
         }
 
+        $lock = $this->acquireUserLock($userId);
+        try {
+            $user->refresh();
+            $userCoins = $user->di;
+            $oldUserCoin = $userCoins;
+            $amountBefore = $user->di;
+
+            if ($userCoins < $totalPriceFull) {
+                throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
+            }
+
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
                 ->where('uid', $ownerId)
@@ -354,8 +399,8 @@ class LuckyGiftService
         $roomId = $room->id;
 
 
-        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
-        $receiverName = $receivedUsers->first()->name;
+        $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
+        $receiverName = $receivedUsers->first()?->name;
         $receiversCount = $receivedUsers->count();
         $isToRoom = $receiversCount > 1;
         $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
@@ -370,8 +415,7 @@ class LuckyGiftService
 
         $coinsForOwner = ($giftPrice * $number * $receiversCount) * $roomrPercentage;
 
-        $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
-        $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+     
 
         $senderBalanceBefore = $user->di;
         $totalWalletsBefore = null;
@@ -379,9 +423,8 @@ class LuckyGiftService
 
         $totalPriceFull = $giftPrice * $number * $receiversCount;
 
-        while ($user->di >= $unitPrice && $index > 0) {
+        while ($user->di >= $totalPriceFull && $index > 0) {
             $balanceBeforeIteration = $user->di;
-            // Only logging the total amount once per throw batch to match V3
             UserCoinLogHelper::logByType(
                 $user->id,
                 -abs($totalPriceFull),
@@ -403,12 +446,7 @@ class LuckyGiftService
 
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
-                $netBetAmount = $unitPrice - $appFee - $receiverFee;
-
-                $recUser = User::find($receiverId);
-                if ($recUser) {
-                    $recUser->increment('di', (int) round($receiverFee));
-                }
+                $netBetAmount = $unitPrice - $appFee - $receiverFee - $coinsForOwner;
 
                 try {
                     $result = $fairService->processBet($user, $gift, $netBetAmount, $roomId, $receiverId, $appFee, $receiverFee, $senderBalanceBeforeHit, $user->di - $unitPrice);
@@ -586,6 +624,7 @@ class LuckyGiftService
             $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
             $totalRoomGift->increment('current_total', $totalHostDiamond);
         }
+        $responseData['total_pk'] = $coinsForReceiver;
 
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
@@ -593,6 +632,9 @@ class LuckyGiftService
         }
 
         return $responseData;
+        } finally {
+            $lock->release();
+        }
     }
 
 
@@ -633,8 +675,16 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
+        $lock = $this->acquireUserLock($userId);
+        try {
+            $user->refresh();
+            $userCoins = $user->di;
+            $oldUserCoin = $userCoins;
+            $amountBefore = $user->di;
 
-
+            if ($userCoins < $totalPrice) {
+                throw new InvalidArgumentException(__('api_responses.insufficient'));
+            }
 
 
         if (isset($ownerId)) {
@@ -834,15 +884,13 @@ class LuckyGiftService
         // Upgrade room level for audio rooms
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
-            // \Log::info('sendLuckyGift2V2 - Upgrading Room Level', [
-            //     'room_id' => $room->id,
-            //     'diamonds' => $totalPrice,
-            //     'type' => $room->type,
-            // ]);
             $serviceLevel->sendGift($room, $totalPrice);
         }
 
         return $responseData;
+        } finally {
+            $lock->release();
+        }
     }
 
     public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
@@ -880,18 +928,26 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
+        $lock = $this->acquireUserLock($userId);
+        try {
+            $user->refresh();
+            $userCoins = $user->di;
+            $oldUserCoin = $userCoins;
+            $amountBefore = $user->di;
 
-
+            if ($userCoins < $totalPrice) {
+                throw new InvalidArgumentException(__('api_responses.insufficient'));
+            }
 
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
                 ->where('uid', $ownerId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
         } else {
             $room = Room::withoutAppends()
                 ->where('id', $roomId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
             $ownerId = $room?->uid;
         }
@@ -1102,6 +1158,9 @@ class LuckyGiftService
         }
 
         return $responseData;
+        } finally {
+            $lock->release();
+        }
     }
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
@@ -1582,24 +1641,37 @@ class LuckyGiftService
     /**
      * @param mixed $di
      * @param mixed $userCoins
-     * @return void
+     * @return bool
      */
-    public function updateUserCoins(int $userId, mixed $currentDi, mixed $userCoins, int $totalDiamond, $senderLevel = null): void
+    public function updateUserCoins(int $userId, mixed $currentDi, mixed $userCoins, int $totalDiamond, $senderLevel = null): bool
     {
-        \DB::transaction(function () use ($userId, $currentDi, $userCoins, $totalDiamond, $senderLevel) {
+        return \DB::transaction(function () use ($userId, $currentDi, $userCoins, $totalDiamond, $senderLevel) {
             $user = \DB::table('users')
                 ->where('id', $userId)
                 ->lockForUpdate()
                 ->first();
 
             if (!$user) {
-                return;
+                return false;
             }
 
             $diDifference = $currentDi - $userCoins;
+            $newBalance = $user->di + $diDifference;
+
+            if ($newBalance < 0) {
+                Log::warning('updateUserCoins: rejected negative balance', [
+                    'user_id' => $userId,
+                    'current_db_di' => $user->di,
+                    'stale_start_di' => $userCoins,
+                    'computed_end_di' => $currentDi,
+                    'delta' => $diDifference,
+                    'would_be' => $newBalance,
+                ]);
+                return false;
+            }
 
             $updateData = [
-                'di' => $user->di + $diDifference,
+                'di' => $newBalance,
                 'total_diamond_send' => $user->total_diamond_send + $totalDiamond,
             ];
 
@@ -1607,6 +1679,7 @@ class LuckyGiftService
                 $updateData['sender_level'] = $senderLevel;
             }
             \DB::table('users')->where('id', $userId)->update($updateData);
+            return true;
         });
     }
 
