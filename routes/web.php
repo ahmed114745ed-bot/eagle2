@@ -178,11 +178,14 @@ Route::get('/user-salary', function () {
         ->where('user_sallaries.month', now()->month)
         ->where('user_sallaries.year', now()->year)
         ->get();
-
+    $user = User::where('uuid', 10004)->first();
+    $lastDiamond = $user->lastSallary?->achieved_diamond ?? 0;
     return response()->json([
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.',
         'data'  => $salary,
+        'last_diamond' => $lastDiamond
+
     ]);
 });
 
