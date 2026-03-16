@@ -3,6 +3,7 @@
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AdminAuthController;
+use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
