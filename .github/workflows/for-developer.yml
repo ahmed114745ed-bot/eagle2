@@ -55,3 +55,4 @@ jobs:
           sudo docker build -t for-developer-job:${{ github.sha }} -f Dockerfile-jobs .
           sudo docker service update --image for-developer-job:${{ github.sha }} for-developer-job
           sudo docker image prune -f 2>/dev/null || true
+
