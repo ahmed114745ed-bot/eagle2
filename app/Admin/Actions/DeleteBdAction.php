@@ -31,6 +31,10 @@ class DeleteBdAction extends RowAction
 
     public function handle(Model $model, Request $request)
     {
+
+        if ($model->default == 1 && !$model->country_id) {
+            return $this->response()->error(__('You cannot delete the default BD.'))->refresh();
+        }
         if ($model->default == 1) {
             return $this->response()->error(__('You cannot delete the default BD for this country.'))->refresh();
         }
@@ -40,22 +44,10 @@ class DeleteBdAction extends RowAction
         }
 
         if ($this->agencyCount > 0) {
-            $defaultBd = Bd::where('default', 1)->where('id', '!=', $model->app_id)->first();
-            if (!$defaultBd) {
-                return $this->response()->error(__('No default BD found to transfer agencies to.'))->refresh();
-            }
-            if (!$defaultBd->app_id) return $this->response()->error(__('No default BD found to transfer agencies to.'))->refresh();
-            Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->app_id]);
+            $defaultBd = Bd::where('default', 1)->where('country_id', $model->country_id)->first();
+            if (!$defaultBd)   return $this->response()->error(__('No default BD  for this country found to transfer agencies to.'))->refresh();
+            Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->id]);
         }
-
-
-        // if ($this->agencyCount > 0) {
-        //     $defaultBd = Bd::where('default', 1)->where('country_id', $model->country_id)->first();
-        //     if (!$defaultBd)  return $this->response()->error(__('No default BD found to transfer agencies to.'))->refresh();
-
-
-        //     Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->id]);
-        // }
 
         $model->delete();
 
