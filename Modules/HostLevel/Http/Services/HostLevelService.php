@@ -47,13 +47,13 @@ class HostLevelService
         $current = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('diamonds')->first();
         $nextLevel = HostLevel::where('diamonds', '>', $diamonds)->orderBy('diamonds')->first();
 
-        $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level')->value('level');
+//        $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level')->value('level');
         $lastLevelEvent = HostLevel::orderByDesc('level')->first();
         if ($lastLevelEvent && $diamonds > ($lastLevelEvent->diamonds ?? 0)) {
             $nextLevel = $lastLevelEvent;
         }
 
-        return [$diamonds, $nextLevel->level ?? 0, $current->level ?? 0, $level, $eventType];
+        return [$diamonds, $nextLevel->level ?? 0, $current->level ?? 0, $current->level, $eventType];
     }
 
 
