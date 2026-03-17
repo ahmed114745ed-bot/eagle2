@@ -173,6 +173,12 @@ class AgencyAppController extends Controller
         $data = [
             'agencies' => FilterAgancyResource::collection($agencies),
             'agency_masters' => FilterAgencyMangerResource::collection($agencyManger),
+            'agencies_pagination' => [
+                'current_page' => $agencies->currentPage(),
+                'last_page' => $agencies->lastPage(),
+                'per_page' => $agencies->perPage(),
+                'total' => $agencies->total(),
+            ],
         ];
         return Common::apiResponse(1, '', $data);
     }

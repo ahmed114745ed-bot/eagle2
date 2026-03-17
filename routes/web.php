@@ -172,6 +172,30 @@ Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Reque
         'url' => $request->fullUrl(),
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
+Route::get('/user-salaries-test', function () {
+
+    $salary = UserSallary::join('users', 'user_sallaries.user_id', '=', 'users.id')
+        ->where('users.uuid', 1406)
+        ->where('user_sallaries.month', now()->month)
+        ->where('user_sallaries.year', now()->year)
+        ->get();
+
+    $user = User::where('uuid', 1406)->first();
+
+    $lastDiamond = $user?->lastSallary?->achieved_diamond ?? 0;
+    $data = [
+
+        'data' => $salary,
+        'last_diamond' => $lastDiamond,
+        'user' => $user
+    ];
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Success',
+        'data' => $data,
+    ]);
+});
+
 
 
 
@@ -263,6 +287,16 @@ Route::get('/run-seeders', function () {
 Route::get('/run-permission', function () {
 
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/user-join-agency', function () {
+
+    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
 
     return response()->json([
         'status' => 'success',
