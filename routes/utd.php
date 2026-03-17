@@ -100,7 +100,7 @@ use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\RoomController as RoomControllerVi;
-use Modules\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
+use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
 
 // 'utd.decreptHeader'
 // utd apis
