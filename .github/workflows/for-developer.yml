@@ -3,25 +3,56 @@ on:
   push:
     branches: ["for-developer"]
 jobs:
-  run_for-developer_job:
+  run_for-developer_hub:
     runs-on: [self-hosted]
     steps:
-    - name: Deploy for-developer
+    - name: Pull latest code
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.18.32"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 10m
+        command_timeout: 5m
         script: |
-          echo "$USER"
           cd /var/www/for-developer
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          sudo chown -R $USER:$USER /var/www/for-developer
-          composer install --no-dev --optimize-autoloader
-          php artisan migrate --force
-          php artisan optimize:clear
-          php artisan route:list --path=test-branch2 2>&1 || true
-          php artisan route:list 2>&1 | tail -5 || true
-          sudo supervisorctl restart all-jobs-for-developer for-developer-Zigo-Handeling for-developer-calculate-target sub_queue_work heavy_queue_work
+          mkdir -p storage/jobs-logs
+          chmod -R 777 storage/jobs-logs
+          test -f public/settings.json || echo '{}' > public/settings.json
+          test -f gcp.json || echo '{}' > gcp.json
+  run_for-developer_app:
+    runs-on: [self-hosted]
+    needs: run_for-developer_hub
+    steps:
+    - name: Build and deploy for-developer Octane
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/for-developer
+          sudo docker build -t for-developer-octa:${{ github.sha }} -f Dockerfile-octana .
+          sudo docker service update --image for-developer-octa:${{ github.sha }} for-developer-octa
+          sudo docker image prune -f 2>/dev/null || true
+  run_for-developer_job:
+    runs-on: [self-hosted]
+    needs: run_for-developer_hub
+    steps:
+    - name: Build and deploy for-developer jobs
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/for-developer
+          sudo docker build -t for-developer-job:${{ github.sha }} -f Dockerfile-jobs .
+          sudo docker service update --image for-developer-job:${{ github.sha }} for-developer-job
+          sudo docker image prune -f 2>/dev/null || true
+
