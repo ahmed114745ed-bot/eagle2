@@ -11,6 +11,7 @@ use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\LiveTime;
 use App\Helpers\UserCommon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use App\Facades\UserHandling;
 use App\Models\AgencyJoinRequest;
@@ -664,6 +665,16 @@ class AgencyService
 
         $agencyManger = $this->userRepository->getAgencyMangerByFilter($keyword);
         return [$agencies, $agencyManger];
+    }
+
+    public function filterV2($keyword)
+    {
+        return $this->agencyRepository->getAgencyByFilter($keyword);
+    }
+
+    public function agencyMangers($keyword)
+    {
+        return $this->userRepository->getAgencyMangerByFilter($keyword);
     }
 
     public function dailyReport($user, $month, $year, $agencyId = null)
