@@ -266,6 +266,16 @@ Route::get('/run-permission', function () {
     ]);
 });
 
+Route::get('/user-join-agency', function () {
+
+    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
 
 
 Route::get('/badge-seeders', function () {
