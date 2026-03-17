@@ -52,7 +52,7 @@ class ProbabilityCalculator
 
         if ($rtpGap > 0) {
             // User is BELOW target RTP - boost probability
-            $scalingFactor = (float) FairLuckSetting::getByKey('v6_boost_scaling', 0.05);
+            $scalingFactor = (float) FairLuckSetting::getByKey('v6_boost_scaling', 0.08);
             $boost = min(4.0, $betImpact * $scalingFactor);
             $adjustedProb = $baseProb * (1 + $boost);
 
