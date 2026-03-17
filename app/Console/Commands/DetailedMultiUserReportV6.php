@@ -19,7 +19,7 @@ class DetailedMultiUserReportV6 extends Command
                             {--initial_balance=1000 : الرصيد الابتدائي}
                             {--max_rounds=3000 : الحد الأقصى للأدوار}
                             {--force_completion : إجبار الإكمال حتى انتهاء جميع الأرصدة}
-                            {--vault=0 : رصيد المحفظة الموحدة الابتدائي}';
+                            {--vault=50000 : رصيد المحفظة الموحدة الابتدائي}';
 
     protected $description = 'تقرير شامل V6 لمحفظة موحدة مع تتبع الميزانية السالبة والانهيار';
 
@@ -115,15 +115,25 @@ class DetailedMultiUserReportV6 extends Command
         ];
 
         foreach ($v6Wallets as $type => $balance) {
-            FairLuckWallet::where('wallet_type', $type)->update(['balance' => $balance, 'last_updated' => now()]);
+            FairLuckWallet::updateOrCreate(
+                ['wallet_type' => $type],
+                ['balance' => $balance, 'last_updated' => now()]
+            );
             Redis::set("fairluck:wallet:{$type}", $balance);
         }
-        
+
         $this->minVaultBalance = $initialVault;
 
         // تصفير المحفظة الموحدة (V5) لضمان عدم التداخل
-        FairLuckWallet::where('wallet_type', 'unified_vault')->update(['balance' => 0]);
+        FairLuckWallet::updateOrCreate(
+            ['wallet_type' => 'unified_vault'],
+            ['balance' => 0, 'last_updated' => now()]
+        );
         Redis::set("fairluck:wallet:unified_vault", 0);
+
+        // تأكيد التهيئة
+        $poolCheck = app(\App\Services\FairLuck\V6\PoolManager::class)->getTotalBalance();
+        $this->info("✅ تم تهيئة المحافظ - إجمالي Pool: " . number_format($poolCheck));
         
         $this->info("🎲 بدء المحاكاة V6 (نظام 3 محافظ)...");
         
@@ -134,39 +144,45 @@ class DetailedMultiUserReportV6 extends Command
             }
             
             foreach ($this->users as $index => &$userData) {
-                // ملاحظة: V6 تحسب التكلفة الإجمالية (bet + fees)
-                $appFee = $betAmount * 0.05;
-                $receiverFee = $betAmount * 0.05;
-                $totalCost = $betAmount + $appFee + $receiverFee;
+                // مطابق لـ LuckyGiftService::sendLuckyGift6
+                $unitPrice = $betAmount; // سعر الهدية = ما يدفعه اليوزر
+                $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();       // 0.10
+                $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate(); // 0.10
+                $ownerFeeRate = \App\Models\FairLuckSetting::getOwnerFeeRate();    // 0.10
 
-                if ($userData['user']->di < $totalCost) {
+                $appFee = $unitPrice * $appFeeRate;
+                $receiverFee = $unitPrice * $receiverFeeRate;
+                $ownerFee = $unitPrice * $ownerFeeRate;
+                $netBetAmount = $unitPrice - $appFee - $receiverFee - $ownerFee;
+
+                if ($userData['user']->di < $unitPrice) {
                     continue;
                 }
-                
+
                 try {
                     $poolManager = app(\App\Services\FairLuck\V6\PoolManager::class);
                     $walletsBefore = $poolManager->getTotalBalance();
-                    
+
                     $profileManager = app(ProfileManager::class);
                     $profileBefore = $profileManager->getProfile($userData['user']->id);
                     $fairService = app(FairLuckServiceV6::class);
 
                     $userBalanceBefore = $userData['user']->di;
-                    
-                    // خصم الرصيد يدوياً كما تفعل الخدمة الحقيقية
-                    $userData['user']->di -= $totalCost;
+
+                    // خصم سعر الهدية فقط (مثل LuckyGiftService سطر 1162)
+                    $userData['user']->di -= $unitPrice;
                     $userData['user']->save();
 
                     $result = $fairService->processBet(
-                        $userData['user'], 
-                        $gift, 
-                        $betAmount, 
-                        $betAmount, // unitPrice
-                        null, 
+                        $userData['user'],
+                        $gift,
+                        $netBetAmount,
+                        $unitPrice,
                         null,
-                        $appFee, 
-                        $receiverFee, 
-                        $userBalanceBefore, 
+                        null,
+                        $appFee,
+                        $receiverFee,
+                        $userBalanceBefore,
                         $userData['user']->di
                     );
                     
@@ -181,7 +197,7 @@ class DetailedMultiUserReportV6 extends Command
                     
                     $actualBalanceChange = $userBalanceAfter - $userBalanceBefore;
                     $userData['attempts']++;
-                    $userData['total_bet'] += $totalCost;
+                    $userData['total_bet'] += $unitPrice;
                     
                     if ($result->isWinner) {
                         $userData['wins']++;
@@ -202,7 +218,7 @@ class DetailedMultiUserReportV6 extends Command
                         $this->minVaultBalance = $walletsAfter;
                     }
                     
-                    $this->totalAppProfit += ($totalCost - ($result->isWinner ? $result->profitAmount : 0));
+                    $this->totalAppProfit += ($unitPrice - ($result->isWinner ? $result->profitAmount : 0));
                     
                     $this->allRounds[] = [
                         'global_round' => $round,
@@ -218,7 +234,7 @@ class DetailedMultiUserReportV6 extends Command
                         'total_app_profit' => $this->totalAppProfit
                     ];
                     
-                    if ($userData['user']->di < $totalCost && $userData['finished_round'] == 0) {
+                    if ($userData['user']->di < $unitPrice && $userData['finished_round'] == 0) {
                         $userData['finished_round'] = $round;
                         $this->line("💸 انتهى رصيد المستخدم {$userData['letter']} في الدور {$round}");
                     }
@@ -227,13 +243,11 @@ class DetailedMultiUserReportV6 extends Command
                     $this->error("خطأ: " . $e->getMessage());
                 }
             }
-            
+            unset($userData); // break reference from &$userData foreach
+
             $activeUsers = 0;
             foreach ($this->users as $userData) {
-                // التحقق من القدرة على الرهان القادم
-                $appFee = $betAmount * 0.05;
-                $receiverFee = $betAmount * 0.05;
-                if ($userData['user']->di >= ($betAmount + $appFee + $receiverFee)) {
+                if ($userData['user']->di >= $betAmount) {
                     $activeUsers++;
                 }
             }

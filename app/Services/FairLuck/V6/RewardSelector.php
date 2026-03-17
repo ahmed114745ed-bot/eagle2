@@ -25,8 +25,16 @@ class RewardSelector
             $baseWeight = $this->getBaseWeight($m);
             $payout = $m * $betAmount;
 
-            // Pool solvency check
-            if ($payout > $totalPoolBalance * 0.95) {
+            // Pool solvency check - graduated by tier
+            // Higher multiplier = more relaxed (jackpots are rare, pool recovers)
+            // solvencyLimit: higher = more relaxed (pool needs less % of payout)
+            $solvencyLimit = match(true) {
+                $m >= 500  => 2.50,  // pool needs > 40% of payout
+                $m >= 250  => 2.00,  // pool needs > 50% of payout
+                $m >= 100  => 1.50,  // pool needs > 67% of payout
+                default    => 0.95,  // pool needs > 105% of payout (strict)
+            };
+            if ($payout > $totalPoolBalance * $solvencyLimit) {
                 $weights[] = 0;
                 continue;
             }
@@ -80,21 +88,24 @@ class RewardSelector
             $gapBoost = 1 + $rtpGap * 5;
 
             if ($multiplier >= 250) {
-                return $baseWeight * $gapBoost * 0.5;
+                return $baseWeight * $gapBoost;
             } else {
                 return $baseWeight * $gapBoost;
             }
         }
 
         if ($rtpGap > -0.05) {
-            // Near target or slightly above
-            if ($multiplier >= 250) return 0;
+            // Near target or slightly above - still allow small jackpot chance
+            if ($multiplier >= 500) return max(1, (int) ($baseWeight * 0.08));
+            if ($multiplier >= 250) return max(2, (int) ($baseWeight * 0.15));
             if ($multiplier >= 50) return $baseWeight * 0.3;
             return $baseWeight;
         }
 
-        // Well above target - only small wins
-        if ($multiplier > 20) return 0;
+        // Well above target - reduce but don't fully block jackpots
+        if ($multiplier >= 500) return 0;
+        if ($multiplier >= 250) return max(1, (int) ($baseWeight * 0.05));
+        if ($multiplier > 20) return $baseWeight * 0.1;
         if ($multiplier > 5) return $baseWeight * 0.3;
         return $baseWeight * 0.5;
     }
@@ -109,9 +120,9 @@ class RewardSelector
             50 => 800,
             70 => 500,
             100 => 300,
-            250 => 60,
-            500 => 15,
-            1000 => 3,
+            250 => 150,
+            500 => 40,
+            1000 => 10,
             default => 1,
         };
     }
@@ -138,12 +149,14 @@ class RewardSelector
     public function validateAndFallback(int $selectedMultiplier, float $betAmount, int $totalPoolBalance): int
     {
         $allMultipliers = [1000, 500, 250, 100, 70, 50, 20, 10, 5];
+        $negativeLimit = \App\Models\FairLuckSetting::getNegativeLimit();
+        $effectiveBalance = $totalPoolBalance + $negativeLimit;
 
         foreach ($allMultipliers as $m) {
             if ($m > $selectedMultiplier) continue;
 
             $payout = $m * $betAmount;
-            if ($totalPoolBalance >= $payout) {
+            if ($effectiveBalance >= $payout) {
                 return $m;
             }
         }
