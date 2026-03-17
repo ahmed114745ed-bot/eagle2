@@ -164,6 +164,7 @@ class AgencyAppController extends Controller
 
     public function agency_filter(Request $request)
     {
+        info('new logic');
         $app_feature = Cache::get('host_agency');
         if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
