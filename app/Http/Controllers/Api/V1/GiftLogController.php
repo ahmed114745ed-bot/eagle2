@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use App\Services\Gifts\LuckyGiftService;
-use App\Services\FairLuck5\FairLuckServiceV5;
-use App\Services\FairLuck5\GlobalStabilityManager;
+use App\Services\FairLuck\V5\FairLuckServiceV5;
+use App\Services\FairLuck\V5\GlobalStabilityManager;
 use App\Models\Gift;
 
 
