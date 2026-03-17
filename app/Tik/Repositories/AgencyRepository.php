@@ -216,7 +216,10 @@ class AgencyRepository extends AbstractRepository
                 'giftLogs.receiver.specialId.ware'])
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%');
-            })->paginate(10);
+            })
+            ->orderBy('id')
+            ->cursorPaginate(request('per_page', 10));
+//            ->paginate(10);
     }
 
     public function countAgencyUserAdmin($userId)
