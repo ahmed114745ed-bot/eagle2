@@ -62,6 +62,7 @@ use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Dashboard\StatisticsController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\CountriesInPolygonController;
+use App\Http\Controllers\Api\FairLuckV5Controller;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
@@ -395,6 +396,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post('/v5/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGiftV5'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 // Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V3'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 // Route::post('/v4/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift4'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v6/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift6'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
