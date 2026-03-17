@@ -19,15 +19,15 @@ class CheckAllowedMoment
         };
 
         $momentStatus = $getSetting('moment_status') ?? 0;
-        $momentStatusSetting = $getSetting('moment_status_setting') ?? 0;
-        if (!$momentStatus && !$momentStatusSetting) {
+        // $momentStatusSetting = $getSetting('moment_status_setting') ?? 0;
+        if (!$momentStatus) {
             if (request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'هذه الميزة غير مفعلة'
                 ], 403);
             }
-            
+
             abort(403, 'هذه الميزة غير مفعلة');
         }
 
