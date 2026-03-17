@@ -44,7 +44,7 @@ class HostLevelService
 //        $courant = $lastPickLevel?->hostLevel?->level;
 
         $diamonds = $this->computeDiamonds($user->id) ?? 0;
-        $current = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('diamonds')->first() ?? null;
+        $current = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('diamonds')->first();
         $nextLevel = HostLevel::where('diamonds', '>', $diamonds)->orderBy('diamonds')->first();
 
         $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level')->value('level');
