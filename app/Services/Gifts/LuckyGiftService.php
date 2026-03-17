@@ -796,6 +796,9 @@ class LuckyGiftService
 
                             $total_user_win += $iterationWin;
                             $total_count_win++;
+                            if ($iterationWin > $max_single_win) {
+                                $max_single_win = $iterationWin;
+                            }
 
                             if ($multiplier > 1) {
                                 $message = $this->winnerMessage($multiplier);
@@ -844,8 +847,8 @@ class LuckyGiftService
                         'error_message' => '',
                         'sender_balance_before' => (int) $senderBalanceBeforeHit,
                         'sender_balance_after' => $senderBalanceAfterHit,
-                        'wallets_before' => $result->wallets_before ?? null,
-                        'wallets_after' => $result->wallets_after ?? null,
+                        'wallets_before' => $result?->wallets_before,
+                        'wallets_after' => $result?->wallets_after,
                     ];
 
                     $user->di -= $unitPrice;

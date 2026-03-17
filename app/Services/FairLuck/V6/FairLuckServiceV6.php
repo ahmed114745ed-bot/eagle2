@@ -63,12 +63,14 @@ class FairLuckServiceV6
             $this->poolManager->distributeBet($totalAmount);
 
             // 4. Calculate win probability based on RTP gap
+            // RTP is tracked on totalAmount (what enters pool), so probability uses totalAmount too
             $expectedMultiplier = $this->rewardSelector->getExpectedMultiplier();
+
             $finalProbability = $this->probabilityCalculator->calculate(
                 $actualRTP,
                 $targetRTP,
                 $stats->total_spent,
-                $unitPrice,
+                $totalAmount,
                 $stats->bet_count,
                 $expectedMultiplier
             );
@@ -123,10 +125,11 @@ class FairLuckServiceV6
                 }
             }
 
-            // 11. Track RTP in Redis (using actual user-facing amounts)
+            // 11. Track RTP in Redis (using pool amounts for sustainable RTP)
+            // spent = totalAmount (what enters pool), received = payoutAmount (what leaves pool)
             $this->rtpTracker->recordBet(
                 $user->id,
-                $unitPrice,
+                $totalAmount,
                 $payoutAmount,
                 $isWinner && $multiplier > 0
             );

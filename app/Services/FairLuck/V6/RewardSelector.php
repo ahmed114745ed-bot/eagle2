@@ -44,6 +44,11 @@ class RewardSelector
 
     private function adjustWeight(int $multiplier, int $baseWeight, float $rtpGap, int $betCount): float
     {
+        // Guard: prevent early jackpots that destabilize user RTP
+        // A 1000x win at bet #25 creates RTP ~50.0, taking hundreds of bets to normalize
+        if ($betCount < 30 && $multiplier > 100) return 0;
+        if ($betCount < 100 && $multiplier > 500) return 0;
+
         if ($rtpGap > 0.15) {
             // Significant deficit - boost ALL tiers, especially medium/high
             $gapBoost = min(8.0, $rtpGap * 30);

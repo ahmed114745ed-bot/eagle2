@@ -24,7 +24,7 @@ class ProbabilityCalculator
         float $expectedMultiplier
     ): float {
         $newPlayerBets = (int) FairLuckSetting::getByKey('v6_new_player_bets', 20);
-        $newPlayerBoost = (float) FairLuckSetting::getByKey('v6_new_player_boost', 1.5);
+        $newPlayerBoost = (float) FairLuckSetting::getByKey('v6_new_player_boost', 3.0);
 
         // Base probability: targetRTP / expectedMultiplier
         // This ensures long-term convergence: prob * E[multiplier] ≈ targetRTP
@@ -52,7 +52,7 @@ class ProbabilityCalculator
 
         if ($rtpGap > 0) {
             // User is BELOW target RTP - boost probability
-            $scalingFactor = (float) FairLuckSetting::getByKey('v6_boost_scaling', 0.008);
+            $scalingFactor = (float) FairLuckSetting::getByKey('v6_boost_scaling', 0.05);
             $boost = min(4.0, $betImpact * $scalingFactor);
             $adjustedProb = $baseProb * (1 + $boost);
 
