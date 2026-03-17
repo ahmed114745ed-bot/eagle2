@@ -1292,7 +1292,7 @@ class UserService
 
         $chargeLevel = [
             'current_level' => $currentLevel->level ?? 0,
-            'current_exp'   => $currentLevel->exp ?? 0, // Threshold for current level
+            'current_exp'   => $expLevel ?? 0,
             'current_img'   => $currentLevel->img ?? '',
             'next_level'    => $secondLevel ? $secondLevel->level : ($currentLevel->level ?? 0),
             'next_exp'      => $secondLevel ? $secondLevel->exp : ($currentLevel->exp ?? 0),

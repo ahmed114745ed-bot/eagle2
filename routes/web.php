@@ -171,6 +171,30 @@ Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Reque
         'url' => $request->fullUrl(),
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
+Route::get('/user-salaries-test', function () {
+
+    $salary = UserSallary::join('users', 'user_sallaries.user_id', '=', 'users.id')
+        ->where('users.uuid', 1406)
+        ->where('user_sallaries.month', now()->month)
+        ->where('user_sallaries.year', now()->year)
+        ->get();
+
+    $user = User::where('uuid', 1406)->first();
+
+    $lastDiamond = $user?->lastSallary?->achieved_diamond ?? 0;
+    $data = [
+
+        'data' => $salary,
+        'last_diamond' => $lastDiamond,
+        'user' => $user
+    ];
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Success',
+        'data' => $data,
+    ]);
+});
+
 
 Route::get('/clear', function () {
 
@@ -235,6 +259,16 @@ Route::get('/run-seeders', function () {
 Route::get('/run-permission', function () {
 
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/user-join-agency', function () {
+
+    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
 
     return response()->json([
         'status' => 'success',
@@ -1734,7 +1768,6 @@ Route::get('/fix-paid-usd', function () {
                 }
 
                 $updated++;
-
             } else {
 
                 Log::warning('Coin not found for obtained_coins', [
@@ -1744,7 +1777,6 @@ Route::get('/fix-paid-usd', function () {
 
                 $skipped++;
             }
-
         } catch (\Exception $e) {
 
             Log::error('Error while processing log', [
@@ -1768,7 +1800,7 @@ Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
 
-     $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
     $seeder->run();
 
     return 'seeders have been executed successfully!';
@@ -1809,14 +1841,13 @@ Route::get('/queue-control/{queue}', function ($queue) {
             'output' => $output
         ]);
     }
-
 });
 
 
 Route::get('/get-gift-percentages', function () {
-$negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
-$appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
-$receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
+    $negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
+    $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
+    $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
 dd($negativeLimit, $appFeeRate, $receiverFeeRate);
 }); 

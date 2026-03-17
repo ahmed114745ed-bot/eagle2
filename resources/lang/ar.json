@@ -4636,6 +4636,8 @@
     "Required": "مطلوب",
     "Enabled": "مفعل",
     "Gift moved successfully": "تم نقل الهدية بنجاح",
+    "You cannot delete the default BD":" لا يمكنك حذف BD الافتراضي",
+    "No default BD  for this country found to transfer agencies to.": "لم يتم العثور على BD افتراضي لهذه الدولة لنقل الوكالات إليه.",
     "BD Registration Form": "نموذج التسجيل BD",
     "Main Section": "القسم الرئيسي",
     "Submit Form": "إرسال النموذج",
