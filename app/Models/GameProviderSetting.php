@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 
 class GameProviderSetting extends Model
 {
@@ -29,6 +31,15 @@ class GameProviderSetting extends Model
 
     public function getAppKeyAttribute($value)
     {
-        return $value ? Crypt::decryptString($value) : null;
+        if (!$value) {
+            return null;
+        }
+
+        try {
+            return Crypt::decryptString($value);
+        } catch (DecryptException $e) {
+            Log::warning("GameProviderSetting: Failed to decrypt app_key for provider [{$this->provider_code}]. The APP_KEY may have changed since this value was encrypted. Error: {$e->getMessage()}");
+            return null; // Return null instead of crashing
+        }
     }
 }
