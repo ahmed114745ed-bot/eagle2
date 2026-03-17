@@ -53,7 +53,7 @@ class HostLevelService
 //            $nextLevel = $lastLevelEvent;
 //        }
 
-        return [$diamonds, $nextLevel/*->level*/ ?? 0, $current ?? 0, $level, $eventType];
+        return [$diamonds, $nextLevel->level ?? 0, $current->level ?? 0, $level, $eventType];
     }
 
 
