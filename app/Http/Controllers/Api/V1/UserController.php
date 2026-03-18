@@ -910,9 +910,7 @@ public function zegoCredential(Request $request)
         $user = auth()->user();
         $roomId = (string) $request->input('room_id');
 
-        if (!$roomId) {
-            return Common::apiResponse(0, 'room_id is required');
-        }
+      
 
         $utdKeys = Common::getUtdData();
         $apiKey = $utdKeys['utd_api_key'] ?? null;
