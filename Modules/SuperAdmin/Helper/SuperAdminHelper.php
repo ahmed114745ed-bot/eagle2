@@ -14,10 +14,15 @@ class SuperAdminHelper
     public static function addCoins($userID,  $coins_deducted)
     {
         $user = SuperAdmin::find($userID);
+
+        if (!$user) {
+            return false;
+        }
+
         $user->di +=  $coins_deducted;
         $user->save();
-
     }
+
     public static function bannerDeductAmount(HomeCarousel $banner, $type = null)
     {
 
