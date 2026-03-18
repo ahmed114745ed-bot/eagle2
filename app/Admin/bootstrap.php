@@ -25,6 +25,7 @@ use Encore\Admin\Widgets\Navbar;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Services\Admin\AdminMenuService;
 
 
 //Encore\Admin\Form::forget( ['map', 'editor']);
@@ -47,6 +48,25 @@ Admin::css ('css/admin.css');
 Admin::js(asset('js/laravel_admin.js'));
 
 app('view')->prependNamespace('admin', resource_path('views/admin'));
+
+/*
+ | Sanitize admin menu: validate for circular references before rendering.
+ | Uses AdminMenuService (Octane-safe, no static state).
+ */
+view()->composer('vendor.admin.partials.sidebar', function (Illuminate\View\View $view) {
+    try {
+        $menuService = new AdminMenuService();
+        $data = $view->getData();
+        if (isset($data['filteredMenu']) && is_array($data['filteredMenu'])) {
+            $view->with('filteredMenu', $menuService->validateAndSanitize($data['filteredMenu']));
+        }
+    } catch (\Throwable $e) {
+        \Log::error('AdminMenuService: failed to sanitize menu', [
+            'error' => $e->getMessage(),
+        ]);
+    }
+});
+
 view()->composer('admin::partials.menu', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/menu.blade.php'));
 });
