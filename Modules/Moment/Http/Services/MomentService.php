@@ -118,7 +118,7 @@ class MomentService extends MomentBaseModelService
             foreach ($request->file('multi_image') as $file) {
 
                 if ($file && $file->isValid()) {
-                    $tempPath = $file->store('temp');
+                    $tempPath = $file->store('temp', 'local');
 
                     UploadMomentImageJob::dispatch(
                         $moment->id,

@@ -41,11 +41,13 @@ class UploadMomentImageJob implements ShouldQueue
             return;
         }
 
-        if (!file_exists($this->filePath)) {
-            throw new \Exception("Temp file not found: {$this->filePath}");
+        $fullPath = storage_path('app/' . $this->filePath);
+
+        if (!file_exists($fullPath)) {
+            throw new \Exception("Temp file not found: {$fullPath}");
         }
 
-        $file = new File($this->filePath);
+        $file = new File($fullPath);
 
         $path = Common::upload('profile', $file);
 
