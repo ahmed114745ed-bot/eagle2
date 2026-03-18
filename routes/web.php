@@ -1367,6 +1367,12 @@ Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
 
         $output['composer'] = shell_exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1');
 
+        \Artisan::call('migrate', ['--force' => true]);
+        $output['migrate'] = \Artisan::output();
+
+        \Artisan::call('optimize:clear');
+        $output['optimize_clear'] = \Artisan::output();
+
         \Artisan::call('config:cache');
         $output['config_cache'] = \Artisan::output();
 
@@ -1850,4 +1856,9 @@ Route::get('/get-gift-percentages', function () {
     $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
     dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+});
+
+
+Route::get('/test-upload', function () {
+    dd("uploaded successfully");
 });
