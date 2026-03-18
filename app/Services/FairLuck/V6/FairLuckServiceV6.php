@@ -45,7 +45,8 @@ class FairLuckServiceV6
             $user, $gift, $betAmount, $unitPrice, $roomId, $appFee, $receiverFee,
             $senderBalanceBefore, $senderBalanceAfter
         ) {
-            $totalAmount = $betAmount + $appFee + $receiverFee;
+            // receiver fee goes directly to receiver (via updateUsers), not into pool
+            $totalAmount = $betAmount + $appFee;
 
             // 1. Get user's RTP stats from Redis
             $stats = $this->rtpTracker->getStats($user->id);
@@ -53,7 +54,9 @@ class FairLuckServiceV6
                 ? $stats->total_received / $stats->total_spent
                 : 0.0;
 
-            $targetRTP = (float) FairLuckSetting::getByKey('v6_target_rtp', 0.97);
+            // Target RTP on totalAmount (80% of unitPrice after fees)
+            // 0.90 on pool = ~72% effective user RTP (0.90 × 80/100)
+            $targetRTP = (float) FairLuckSetting::getByKey('v6_target_rtp', 0.90);
             $rtpGap = $targetRTP - $actualRTP;
 
             // 2. Get pool balances (before)

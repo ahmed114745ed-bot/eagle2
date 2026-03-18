@@ -7,8 +7,9 @@ use App\Models\FairLuckWallet;
 use App\Models\User;
 use App\Models\Gift;
 use App\Services\FairLuck\FairLuckService3;
-use App\Services\FairLuck\DeviationCalculator;
 use App\Services\FairLuck\ProfileManager;
+use App\Services\FairLuck\V5\FairLuckServiceV5;
+use App\Services\FairLuck\V5\DeviationCalculator as DeviationCalculatorV5;
 use Illuminate\Console\Command;
 
 class DetailedMultiUserReport extends Command
@@ -19,7 +20,9 @@ class DetailedMultiUserReport extends Command
                             {--users=3 : عدد المستخدمين}
                             {--initial_balance=1000 : الرصيد الابتدائي}
                             {--max_rounds=3000 : الحد الأقصى للأدوار}
-                            {--force_completion : إجبار الإكمال حتى انتهاء جميع الأرصدة}';
+                            {--force_completion : إجبار الإكمال حتى انتهاء جميع الأرصدة}
+                            {--v5 : استخدام الإصدار الخامس FairLuck V5}
+                            {--vault=0 : رصيد المحفظة الموحدة الابتدائي}';
 
     protected $description = 'تقرير شامل متعدد المستخدمين مع تفاصيل كاملة للمحافظ وفلاتر';
 
@@ -40,7 +43,8 @@ class DetailedMultiUserReport extends Command
         $this->info("🎯 تقرير شامل مع {$userCount} مستخدمين");
         $this->info("💰 الرصيد الابتدائي: " . number_format($initialBalance) . " | مبلغ الرهان: " . number_format($betAmount));
         $maxRounds = (int) $this->option('max_rounds');
-        $this->info("⏰ حد أقصى: {$maxRounds} دور");
+        $initialVault = (int) $this->option('vault');
+        $this->info("⏰ حد أقصى: {$maxRounds} دور | 🏦 رصيد المحفظة الابتدائي: " . number_format($initialVault));
         
         $gift = Gift::find($giftId);
         if (!$gift) {
@@ -95,15 +99,23 @@ class DetailedMultiUserReport extends Command
 
     private function runDetailedSimulation($gift, $betAmount, $forceCompletion)
     {
-        $fairLuckService = app(FairLuckService3::class);
         $round = 1;
         $activeUsers = count($this->users);
         
-        // تصفير جميع المحافظ في البداية
-        $this->info("🔄 تصفير المحافظ...");
-        FairLuckWallet::where('wallet_type', 'global_vault')->update(['balance' => 0]);
-        FairLuckWallet::where('wallet_type', 'jackpot_wallet')->update(['balance' => 0]);
-        FairLuckWallet::where('wallet_type', 'medium_wallet')->update(['balance' => 0]);
+        // تعيين رصيد المحفظة الموحدة (unified_vault)
+        $initialVault = (int) $this->option('vault');
+        $this->info("🔄 تهيئة المحفظة الموحدة (unified_vault) برصيد " . number_format($initialVault) . "...");
+        FairLuckWallet::where('wallet_type', 'unified_vault')->update([
+            'balance' => $initialVault,
+            'last_updated' => now()
+        ]);
+        
+        // مزامنة Redis
+        $vaultKey = "fairluck:wallet:unified_vault";
+        \Illuminate\Support\Facades\Redis::set($vaultKey, $initialVault);
+
+        // تصفير المحافظ المتبقية (Legacy)
+        FairLuckWallet::whereIn('wallet_type', ['global_vault', 'jackpot_wallet', 'medium_wallet'])->update(['balance' => 0]);
         
         // حفظ الحالة الأولية للمحافظ (بعد التصفير)
         $this->walletHistory[0] = FairLuckWallet::getAllBalances();
@@ -128,16 +140,36 @@ class DetailedMultiUserReport extends Command
                     $profileManager = app(ProfileManager::class);
                     $profileBefore = $profileManager->getProfile($userData['user']->id);
                     
-                    $calculator = new DeviationCalculator();
-                    $deviationBefore = $calculator->calculate(
-                        $profileBefore->total_bets,
-                        $profileBefore->total_profit,
-                        $profileBefore->medium_wallet_wins ?? 0,
-                        $profileBefore->jackpot_wallet_wins ?? 0
-                    );
+                    if ($this->option('v5')) {
+                        $fairLuckService = app(FairLuckServiceV5::class);
+                    } else {
+                        $fairLuckService = app(FairLuckService3::class);
+                    }
+
+                    $deviationBefore = (float) $profileBefore->current_deviation;
                     
                     // تنفيذ الرهان
-                    $result = $fairLuckService->processBet($userData['user'], $gift, $betAmount);
+                    if ($this->option('v5')) {
+                        // V5 attributes
+                        $appFee = $betAmount * 0.05;
+                        $receiverFee = $betAmount * 0.05;
+                        $senderBalanceBefore = $userData['user']->di;
+                        $senderBalanceAfter = $senderBalanceBefore - ($betAmount + $appFee + $receiverFee);
+                        
+                        $result = $fairLuckService->processBet(
+                            $userData['user'], 
+                            $gift, 
+                            $betAmount, 
+                            null, // roomId
+                            null, // receiverId
+                            $appFee, 
+                            $receiverFee, 
+                            $senderBalanceBefore, 
+                            $senderBalanceAfter
+                        );
+                    } else {
+                        $result = $fairLuckService->processBet($userData['user'], $gift, $betAmount);
+                    }
                     
                     $userBalanceBefore = $userData['user']->di;
                     $actualProfit = $result->isWinner ? $result->profitAmount : -$betAmount;
@@ -169,16 +201,17 @@ class DetailedMultiUserReport extends Command
                     
                     $userData['final_balance'] = $userBalanceAfter;
                     $userData['net_result'] = $userData['total_win'] - $userData['total_bet'];
-                    $userData['app_cut'] += $result->houseCut;
+                    $userData['app_cut'] += $result->houseCut ?? 0;
                     
                     // الحالة بعد الرهان
                     $walletsAfter = FairLuckWallet::getAllBalances();
                     
-                    // حساب تغييرات المحافظ
+                    // حساب تغييرات المحفظة الموحدة
                     $walletChanges = [
-                        'global_vault' => $walletsAfter['global_vault'] - $walletsBefore['global_vault'],
-                        'jackpot_wallet' => $walletsAfter['jackpot_wallet'] - $walletsBefore['jackpot_wallet'],
-                        'medium_wallet' => $walletsAfter['medium_wallet'] - $walletsBefore['medium_wallet']
+                        'unified_vault' => ($walletsAfter['unified_vault'] ?? 0) - ($walletsBefore['unified_vault'] ?? 0),
+                        'global_vault' => 0,
+                        'jackpot_wallet' => 0,
+                        'medium_wallet' => 0
                     ];
                     
                     $this->totalAppProfit += ($betAmount - ($result->isWinner ? $result->profitAmount : 0));
@@ -191,7 +224,7 @@ class DetailedMultiUserReport extends Command
                         'user_letter' => $userData['letter'],
                         'result' => $result,
                         'deviation_before' => $deviationBefore,
-                        'deviation_after' => $result->newDeviation,
+                        'deviation_after' => $result->newDeviation ?? 0,
                         'wallets_before' => $walletsBefore,
                         'wallets_after' => $walletsAfter,
                         'wallet_changes' => $walletChanges,
@@ -388,12 +421,9 @@ class DetailedMultiUserReport extends Command
                                 <th>الرصيد التراكمي</th>
                                 <th>انحراف قبل</th>
                                 <th>انحراف بعد</th>
-                                <th>تغيير المحفظة الرئيسية</th>
-                                <th>المحفظة الرئيسية تراكمي</th>
-                                <th>تغيير محفظة الجاكبوت</th>
-                                <th>محفظة الجاكبوت تراكمي</th>
-                                <th>تغيير المحفظة المتوسطة</th>
-                                <th>المحفظة المتوسطة تراكمي</th>
+                                <th>المحفظة قبل</th>
+                                <th>تغيير المحفظة</th>
+                                <th>المحفظة بعد</th>
                                 <th>صافي التطبيق</th>
                             </tr>
                         </thead>
@@ -425,12 +455,9 @@ class DetailedMultiUserReport extends Command
                         <td>" . number_format($round['user_balance']) . "</td>
                         <td>" . number_format($round['deviation_before'], 4) . "</td>
                         <td>" . number_format($round['deviation_after'], 4) . "</td>
-                        <td class='" . ($round['wallet_changes']['global_vault'] >= 0 ? 'text-success' : 'text-danger') . "'>" . ($round['wallet_changes']['global_vault'] >= 0 ? '+' : '') . number_format($round['wallet_changes']['global_vault']) . "</td>
-                        <td>" . number_format($round['wallets_after']['global_vault']) . "</td>
-                        <td class='" . ($round['wallet_changes']['jackpot_wallet'] >= 0 ? 'text-success' : 'text-danger') . "'>" . ($round['wallet_changes']['jackpot_wallet'] >= 0 ? '+' : '') . number_format($round['wallet_changes']['jackpot_wallet']) . "</td>
-                        <td>" . number_format($round['wallets_after']['jackpot_wallet']) . "</td>
-                        <td class='" . ($round['wallet_changes']['medium_wallet'] >= 0 ? 'text-success' : 'text-danger') . "'>" . ($round['wallet_changes']['medium_wallet'] >= 0 ? '+' : '') . number_format($round['wallet_changes']['medium_wallet']) . "</td>
-                        <td>" . number_format($round['wallets_after']['medium_wallet']) . "</td>
+                        <td>" . number_format($round['wallets_before']['unified_vault'] ?? 0) . "</td>
+                        <td class='" . (($round['wallet_changes']['unified_vault'] ?? 0) >= 0 ? 'text-success' : 'text-danger') . "'>" . (($round['wallet_changes']['unified_vault'] ?? 0) >= 0 ? '+' : '') . number_format($round['wallet_changes']['unified_vault'] ?? 0) . "</td>
+                        <td>" . number_format($round['wallets_after']['unified_vault'] ?? 0) . "</td>
                         <td>" . number_format($round['total_app_profit']) . "</td>
                       </tr>";
         }

@@ -16,73 +16,9 @@ class WalletManager
     }
 
     /**
-     * تحويل مبلغ من محفظة إلى أخرى
+     * Unified Vault Migration: Transfer and Rebalance are no longer needed.
+     * Logic removed to prevent split-liquidity operations.
      */
-    public static function transferBetweenWallets(string $fromWallet, string $toWallet, int $amount): bool
-    {
-        if ($amount <= 0) {
-            return false;
-        }
-
-        $fromBalance = FairLuckWallet::getBalance($fromWallet);
-        if ($fromBalance < $amount) {
-            return false;
-        }
-
-        // خصم من المحفظة المصدر
-        $decreaseSuccess = FairLuckWallet::decreaseBalance($fromWallet, $amount);
-        if (!$decreaseSuccess) {
-            return false;
-        }
-
-        // إضافة للمحفظة الهدف
-        $increaseSuccess = FairLuckWallet::increaseBalance($toWallet, $amount);
-        if (!$increaseSuccess) {
-            // إعادة المبلغ للمحفظة المصدر في حالة الفشل
-            FairLuckWallet::increaseBalance($fromWallet, $amount);
-            return false;
-        }
-
-        Log::info("Wallet Transfer: {$amount} من {$fromWallet} إلى {$toWallet}");
-        return true;
-    }
-
-    /**
-     * إعادة توزيع الأرصدة بين المحافظ (لإعادة التوازن)
-     */
-    public static function rebalanceWallets(): void
-    {
-        $balances = self::getAllWalletBalances();
-        $totalBalance = array_sum($balances);
-
-        if ($totalBalance <= 0) {
-            return;
-        }
-
-        // نسب التوزيع المحدثة
-        $targetRatios = [
-            FairLuckWallet::TYPE_GLOBAL_VAULT => 0.60,    // 60% للمحفظة الرئيسية الاقتصادية (5x,10x,20x)
-            FairLuckWallet::TYPE_JACKPOT_WALLET => 0.20,  // 20% للجاكبوت (250x,500x,1000x)
-            FairLuckWallet::TYPE_MEDIUM_WALLET => 0.10,   // 10% للمضاعفات المتوسطة (50x,70x,100x)
-            // 10% ربح التطبيق لا يحتاج محفظة منفصلة
-        ];
-
-        foreach ($targetRatios as $walletType => $ratio) {
-            $targetAmount = (int) round($totalBalance * $ratio);
-            $currentAmount = $balances[$walletType] ?? 0;
-            
-            if ($currentAmount < $targetAmount) {
-                $needed = $targetAmount - $currentAmount;
-                // نقل من المحفظة الأكبر
-                $largestWallet = array_keys($balances, max($balances))[0];
-                if ($largestWallet !== $walletType && $balances[$largestWallet] > $needed) {
-                    self::transferBetweenWallets($largestWallet, $walletType, $needed);
-                }
-            }
-        }
-
-        Log::info("Wallet Rebalancing completed", self::getAllWalletBalances());
-    }
 
     /**
      * التحقق من صحة أرصدة المحافظ
@@ -92,7 +28,11 @@ class WalletManager
         $balances = self::getAllWalletBalances();
         
         foreach ($balances as $walletType => $balance) {
-            if ($balance < 0) {
+            if ($walletType === FairLuckWallet::TYPE_GLOBAL_VAULT && $balance < -FairLuckWallet::getNegativeLimit()) {
+                 Log::error("Unified vault below negative limit", ['balance' => $balance]);
+                 return false;
+            }
+            if ($walletType !== FairLuckWallet::TYPE_GLOBAL_VAULT && $balance < 0) {
                 Log::error("Negative wallet balance detected", [
                     'wallet_type' => $walletType,
                     'balance' => $balance
@@ -110,20 +50,15 @@ class WalletManager
     public static function logWalletStatus(): void
     {
         $balances = self::getAllWalletBalances();
-        $total = array_sum($balances);
+        $total = $balances['global_vault'] ?? 0;
         
         $report = [
-            'total_balance' => $total,
+            'unified_vault_balance' => $total,
             'wallets' => $balances,
-            // النسب ثابتة حسب التصميم وليست محسوبة من الأرصدة الحالية
-            'percentages' => [
-                'global_vault' => '60% (المحفظة الرئيسية الاقتصادية - للمضاعفات 5x,10x,20x)',
-                'jackpot_wallet' => '20% (محفظة الجاكبوت - للمضاعفات 250x,500x,1000x)', 
-                'medium_wallet' => '10% (المحفظة المتوسطة - للمضاعفات 50x,70x,100x)',
-                'app_profit' => '10% (ربح التطبيق)',
-            ],
+            'note' => 'System is now using a Single Unified Vault (global_vault)',
+            'status' => 'CONSOLIDATED'
         ];
         
-        Log::info("FairLuck Wallets Status Report", $report);
+        Log::info("FairLuck Wallets Status Report (UNIFIED)", $report);
     }
 }
