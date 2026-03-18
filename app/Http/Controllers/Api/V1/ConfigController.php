@@ -199,6 +199,10 @@ class ConfigController extends Controller
         Cache::forget('all_configs');
         Cache::flush();
 
+        // Re-cache all_configs immediately from DB so the redirected page has fresh data
+        // This is critical for Octane: Common::getConfig() uses Cache::get('all_configs')
+        // which does NOT auto-repopulate like rememberForever does.
+        \App\Helpers\CacheHelper::cacheConfig();
 
         if (method_exists(Cache::store('octane'), 'flush')) {
             Cache::store('octane')->flush();
