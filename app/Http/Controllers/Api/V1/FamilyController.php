@@ -82,7 +82,8 @@ class FamilyController extends Controller
     {
         $user = $request->user();
 
-        $family_price = Common::getSettingsValue('price_family') ?? 0;
+        $family_price = Common::getConfig('family_price');
+        \Log::info('family_price: ' . $family_price);
         if (!isset($family_price)) {
             return Common::apiResponse(0, 'Not available now', null, 407);
         }

@@ -37,14 +37,14 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">{{ __('family settings') }}</h3>
                 </div>
-                <form action="{{ route('admin.app.settings.update') }}" method="POST" class="form-horizontal">
+                <form action="{{ route('admin.update-configs-group-chat') }}" method="POST" class="form-horizontal">
                     @csrf
                     <div class="box-body">
                         <div class="form-group">
                             <label class="col-sm-3 control-label">{{ __('price family') }}</label>
                             <div class="col-sm-8">
-                                <input type="number" name="price_family" class="form-control"
-                                         value="{{ $config['price_family'] ?? 0 }}"
+                                <input type="number" name="family_price" class="form-control"
+                                         value="{{ $config['family_price'] ?? 0 }}"
                                     required>
                                 <span
                                     class="help-block">{{ __('The price for creating a family.') }}</span>

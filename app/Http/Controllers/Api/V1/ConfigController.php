@@ -135,9 +135,9 @@ class ConfigController extends Controller
 
     public function UpdateConfigsGroupChat(Request $request)
     {
-        if (!Admin::user()->can('*')) {
-            Permission::check('edit-' . $this->permission_config_name);
-        }
+        // if (!Admin::user()->can('*')) {
+        //     Permission::check('edit-' . $this->permission_config_name);
+        // }
 
         foreach ($request->except('_token') as $key => $value) {
             if (!is_null($value)) {

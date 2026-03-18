@@ -246,7 +246,7 @@ class MyDataResource extends JsonResource
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select('id', "img"),
-            "family_price" =>  Common::getSettingsValue('price_family') ?? 0,
+            "family_price" =>  Common::getConfig('family_price') ?? 0,
             'image_color'          => @$this->color_image,
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
