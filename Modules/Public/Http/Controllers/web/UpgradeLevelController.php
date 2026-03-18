@@ -62,7 +62,8 @@ class UpgradeLevelController extends MainController
             }
         }
         
-        return redirect($redirectUrl)->with('message', __('dashboard.update'));
+        admin_toastr(__('Settings updated successfully!'), 'success');
+        return redirect($redirectUrl);
     }
 
     public function exchange(Request $request)
@@ -104,7 +105,8 @@ class UpgradeLevelController extends MainController
             }
         }
         
-        return redirect($redirectUrl)->with('message', __('dashboard.update'));
+        admin_toastr(__('Settings updated successfully!'), 'success');
+        return redirect($redirectUrl);
     }
     public function group_chat_config(Request $request)
     {

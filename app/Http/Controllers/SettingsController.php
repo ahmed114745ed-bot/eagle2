@@ -272,8 +272,6 @@ class SettingsController extends Controller
 
         Cache::flush();
 
-        admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
-
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
 
         if ($request->has('current_tab')) {
