@@ -3,6 +3,7 @@
 namespace Modules\Moment\Http\Services;
 
 use App\Helpers\Common;
+use App\Jobs\UploadMomentImageJob;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -117,10 +118,12 @@ class MomentService extends MomentBaseModelService
             foreach ($request->file('multi_image') as $file) {
 
                 if ($file && $file->isValid()) {
-                    $imagePath = Common::upload('profile', $file);
-                    $moment->images()->create([
-                        'image' => $imagePath,
-                    ]);
+                    $tempPath = $file->store('temp', 'local');
+
+                    UploadMomentImageJob::dispatch(
+                        $moment->id,
+                        storage_path('app/' . $tempPath)
+                    );
                 }
             }
         }
