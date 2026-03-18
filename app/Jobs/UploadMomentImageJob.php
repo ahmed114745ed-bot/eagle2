@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\File;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -47,8 +48,8 @@ class UploadMomentImageJob implements ShouldQueue
             throw new \Exception("Temp file not found: {$fullPath}");
         }
 
-        $file = new File($fullPath);
-
+        $file = new UploadedFile($fullPath, basename($fullPath), null, null, true);
+        
         $path = Common::upload('profile', $file);
 
         if (!Storage::disk(config('filesystems.default'))->exists($path)) {
