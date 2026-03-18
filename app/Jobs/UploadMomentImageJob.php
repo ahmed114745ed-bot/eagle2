@@ -19,8 +19,8 @@ class UploadMomentImageJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 5;
-    public $backoff = [10, 30, 60, 120];
-
+    public $backoff = [1, 1, 1, 1, 1];
+    
     protected $momentId;
     protected $filePath;
 
