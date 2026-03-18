@@ -7,7 +7,7 @@ use App\Models\MomentGallery;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Http\File;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -35,6 +35,12 @@ class UploadMomentImageJob implements ShouldQueue
      */
     public function handle()
     {
+        Log::info('UploadMomentImageJob attempt', [
+            'moment_id' => $this->momentId,
+            'attempt' => $this->attempts(),
+            'max_tries' => $this->tries,
+        ]);
+
         $moment = Moment::find($this->momentId);
 
         if (!$moment) {
@@ -47,7 +53,7 @@ class UploadMomentImageJob implements ShouldQueue
             throw new \Exception("Temp file not found: {$fullPath}");
         }
 
-        $file = new File($fullPath);
+        $file = new UploadedFile($fullPath, basename($fullPath), null, null, true);
 
         $path = Common::upload('profile', $file);
 
@@ -72,6 +78,14 @@ class UploadMomentImageJob implements ShouldQueue
             'error' => $exception->getMessage(),
         ]);
 
-        @unlink($this->filePath);
+        $fullPath = storage_path('app/' . $this->filePath);
+        if (file_exists($fullPath)) {
+            @unlink($fullPath);
+        }
+
+        $moment = Moment::find($this->momentId);
+        if ($moment) {
+            $moment->delete(); // remove the moment if any image failed
+        }
     }
 }
