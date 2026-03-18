@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ config('app.locale') }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="{{ config('app.locale') }}" translate="no" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -10,12 +10,14 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="manifest" href="{{ route('manifest.json') }}">
-{{--    <link rel="shortcut icon" href="{{ getAppLogo() }}" type="image/png">--}}
-{{--    <link rel="shortcut icon" href="{{ asset('images/favicon/android-chrome-512x512.png') }}" type="image/png">--}}
 
-{{--    @if(!is_null($favicon = Admin::favicon()))--}}
-{{--        <link rel="shortcut icon" href="{{$favicon}}">--}}
-{{--    @endif--}}
+    @if(!is_null($favicon = Admin::favicon()))
+        <link rel="shortcut icon" href="{{ $favicon }}" type="image/png">
+        <link rel="icon" href="{{ $favicon }}" type="image/png">
+    @else
+        <link rel="shortcut icon" href="{{ getAppLogo() }}" type="image/png">
+        <link rel="icon" href="{{ getAppLogo() }}" type="image/png">
+    @endif
     {!! Admin::css() !!}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
 

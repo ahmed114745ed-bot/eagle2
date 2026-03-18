@@ -12,10 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('room_boom_levels', function (Blueprint $table) {
-            $table->string('background_image')->nullable();
-            $table->string('image_type_background')->nullable();
-            $table->string('boom_image')->nullable();
-            $table->string('image_type_boom')->nullable();
+            if (!Schema::hasColumn('room_boom_levels', 'background_image')) {
+                $table->string('background_image')->nullable();
+            }
+            if (!Schema::hasColumn('room_boom_levels', 'image_type_background')) {
+                $table->string('image_type_background')->nullable();
+            }
+            if (!Schema::hasColumn('room_boom_levels', 'boom_image')) {
+                $table->string('boom_image')->nullable();
+            }
+            if (!Schema::hasColumn('room_boom_levels', 'image_type_boom')) {
+                $table->string('image_type_boom')->nullable();
+            }
         });
     }
 

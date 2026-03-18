@@ -1204,20 +1204,45 @@
             }
         }
 
-        // Load saved tab on page load
-        const savedTab = localStorage.getItem('activeDashboardTab');
-        if (savedTab) {
-            activateTab(savedTab);
-            // Trigger custom event for chart loading
-            $(document).trigger('tabActivated', [savedTab]);
+        // Load tab from URL hash first, then fallback to localStorage
+        const validTabs = ['#overview', '#users', '#rooms', '#agencies', '#bd', '#game'];
+        const urlHash = window.location.hash;
+        let initialTab = null;
+
+        if (urlHash && validTabs.includes(urlHash)) {
+            initialTab = urlHash;
+        } else {
+            const savedTab = localStorage.getItem('activeDashboardTab');
+            if (savedTab && validTabs.includes(savedTab)) {
+                initialTab = savedTab;
+            }
         }
 
-        // Save active tab when clicked
+        if (initialTab) {
+            activateTab(initialTab);
+            // Update URL hash without scrolling
+            history.replaceState(null, null, initialTab);
+            // Trigger custom event for chart loading
+            $(document).trigger('tabActivated', [initialTab]);
+        }
+
+        // Save active tab and update URL when clicked
         tabs.forEach(tab => {
             tab.addEventListener('click', function() {
                 const target = this.getAttribute('data-bs-target');
                 localStorage.setItem('activeDashboardTab', target);
+                // Update URL hash so the link is shareable
+                history.pushState(null, null, target);
             });
+        });
+
+        // Handle browser back/forward navigation between tabs
+        window.addEventListener('popstate', function() {
+            const hash = window.location.hash;
+            if (hash && validTabs.includes(hash)) {
+                activateTab(hash);
+                initializeTabWidgets(hash);
+            }
         });
 
         // Function to initialize all widgets for a specific tab

@@ -815,7 +815,7 @@ if (!function_exists('showSvgaImage')) {
                             setTimeout(initSvga_{$model}, 50);
                             return;
                         }
-                        
+
                         try {
                             var $model = new SVGA.Player('#$model');
                             $model.loops = 100;
@@ -857,7 +857,7 @@ if (!function_exists('showSvgaImage2')) {
                             setTimeout(initSvga2_{$model}, 50);
                             return;
                         }
-                        
+
                         try {
                             var $model = new SVGA.Player('#$model');
                             $model.loops = 100;
@@ -889,7 +889,7 @@ if (typeof initSvgaPlayers === 'undefined') {
         context.querySelectorAll('.svga-player').forEach(el => {
             if (el.dataset.loaded) return;
             if (!el || !el.id) return; // Skip if element is not valid
-            
+
             el.dataset.loaded = true;
 
             try {
@@ -1365,4 +1365,13 @@ function formatLargeNumber($number): string
         return number_format($number / 1000, 2) . 'Thousand'; // Thousand
     }
     return number_format($number);
+}
+
+
+if (! function_exists('getFairLuckSetting')) {
+    function getFairLuckSetting(string $key, $default = null)
+    {
+        $setting = \App\Models\FairLuckSetting::where('key', $key)->first();
+        return $setting ? $setting->value : $default;
+    }
 }

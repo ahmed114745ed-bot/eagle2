@@ -35,7 +35,7 @@ class VipController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->grid()));
     }
 
@@ -46,7 +46,7 @@ class VipController extends MainController
             Permission::check('browse-' . $this->permission_name);
         }
         return parent::index($content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->senderGrid()));
     }
     protected function senderGrid()
@@ -90,7 +90,7 @@ class VipController extends MainController
     public function receiverIndex(Content $content)
     {
         return $content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->receiverGrid());
     }
     protected function receiverGrid()
@@ -125,7 +125,7 @@ class VipController extends MainController
     public function cpIndex(Content $content)
     {
         return $content
-            ->title(trans('charge level'))
+            ->title(trans(' level'))
             ->body($this->cpGrid());
     }
 
@@ -163,7 +163,7 @@ class VipController extends MainController
     public function roomIndex(Content $content)
     {
         return $content
-            ->title(trans('charge level'))
+            ->title(trans(' level'))
             ->body($this->roomGrid());
     }
 
@@ -244,7 +244,7 @@ class VipController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->detail($id)));
     }
 
@@ -258,14 +258,14 @@ class VipController extends MainController
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
         return parent::create($content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->form()));
     }
 

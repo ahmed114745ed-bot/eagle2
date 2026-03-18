@@ -116,6 +116,7 @@ class RoomRepository extends AbstractRepository
     public function findTypeUserRoom($ownerId, $type = 'audio', $selectRow = "*")
     {
         return $this->model->withoutAppends()
+            ->with('owner:id,uuid')
             ->where(['uid' => $ownerId])
             ->where('type', $type)
             ->selectRaw($selectRow)->first();
@@ -125,6 +126,7 @@ class RoomRepository extends AbstractRepository
     {
         return $this->model
             ->withoutAppends()
+            ->with('owner:id,uuid')
             ->where(['id' => $ownerId])
             ->selectRaw($selectRow)
             ->first();

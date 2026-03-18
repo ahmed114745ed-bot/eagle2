@@ -133,6 +133,7 @@ class WeeklyEventNController extends MainController
 
     protected function form()
     {
+        
         $form = new Form(new WeeklyStar);
         $this->disableFormTools($form);
 
@@ -142,12 +143,18 @@ class WeeklyEventNController extends MainController
         $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_star')->max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
+        if ($minStartDate && $minStartDate < date("Y-m-d")) {
+            $minStartDate = date("Y-m-d");
+        }
         $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
             ->rules(function ($form) {
 
                 $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_star')->max('start_date');
 
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
+                if ($minStartDate && $minStartDate < date("Y-m-d")) {
+                    $minStartDate = \Carbon\Carbon::now()->subDay()->format('Y-m-d');
+                }
                 if ($minStartDate) {
                     if (!$id = $form->model()->id) {
                         return 'required|after:' . $minStartDate;

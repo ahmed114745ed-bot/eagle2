@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_achievement_levels', function (Blueprint $table) {
-           $table->unsignedBigInteger('custom_achievement_id')->nullable();
-        });
+        if (!Schema::hasColumn('user_achievement_levels', 'custom_achievement_id')) {
+            Schema::table('user_achievement_levels', function (Blueprint $table) {
+                $table->unsignedBigInteger('custom_achievement_id')->nullable();
+            });
+        }
     }
 
     /**

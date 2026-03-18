@@ -137,7 +137,12 @@ class CalculateRoomCupRewards extends Command
                 ->orderBy('id')
                 ->chunk(100, function ($gifts) {
                     foreach ($gifts as $gift) {
-                        $this->processGift($gift);
+                        try {
+                            $this->processGift($gift);
+                        } catch (\Throwable $e) {
+                            $this->error("Failed to process gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()}");
+                            $this->logRoomCup("EXCEPTION processing gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()} | Trace: {$e->getTraceAsString()}");
+                        }
                     }
                 });
         } else {
@@ -154,7 +159,12 @@ class CalculateRoomCupRewards extends Command
                 ->get();
 
             foreach ($aggregatedGifts as $gift) {
-                $this->processGift($gift);
+                try {
+                    $this->processGift($gift);
+                } catch (\Throwable $e) {
+                    $this->error("Failed to process gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()}");
+                    $this->logRoomCup("EXCEPTION processing gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()} | Trace: {$e->getTraceAsString()}");
+                }
             }
         }
     }

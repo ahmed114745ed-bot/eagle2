@@ -83,7 +83,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('application wallet percentage') }}</label>
                                 <div class="col-sm-8">
-                                    <input type="number" name="app_wallet_lucky_gift" class="form-control"
+                                    <input type="number" step="any" name="app_wallet_lucky_gift" class="form-control"
                                         value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" required>
                                     <span class="help-block">{{ __('App owner profit') }}</span>
                                 </div>
@@ -92,7 +92,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('owner percentage') }}</label>
                                 <div class="col-sm-8">
-                                    <input type="number" name="owner_lucky_gift" class="form-control"
+                                    <input type="number" step="any" name="owner_lucky_gift" class="form-control"
                                         value="{{ $config['owner_lucky_gift'] ?? 0 }}" required>
                                     <span class="help-block">{{ __('owner gift') }}</span>
                                 </div>
@@ -101,7 +101,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('host percentage') }}</label>
                                 <div class="col-sm-8">
-                                    <input type="number" name="host_lucky_gift" class="form-control"
+                                    <input type="number" step="any" name="host_lucky_gift" class="form-control"
                                         value="{{ $config['host_lucky_gift'] ?? 0 }}" required>
                                 </div>
                             </div>
@@ -132,14 +132,21 @@
                                 <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="fair_luck_app_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0.10' }}">
+                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0' }}">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="fair_luck_receiver_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0.10' }}">
+                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_owner_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0' }}">
                                 </div>
                             </div>
                         </div>
@@ -177,7 +184,7 @@
                             <label class="col-sm-3 control-label">{{ __('lucky gift coins') }}</label>
                             <div class="col-sm-8">
                                 <input type="number" name="lucky_gift_coins" class="form-control"
-                                    value="{{ (isset($config['lucky_gift_coins']) && $config['lucky_gift_coins'] != 0) ? $config['lucky_gift_coins'] : 2000 }}"
+                                         value="{{ $config['lucky_gift_coins'] ?? 0 }}"
                                     required>
                                 <span
                                     class="help-block">{{ __('Play coin sound inside the room when the win amount is greater than or equal to the added value.') }}</span>

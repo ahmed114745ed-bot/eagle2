@@ -171,6 +171,30 @@ Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Reque
         'url' => $request->fullUrl(),
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
+Route::get('/user-salaries-test', function () {
+
+    $salary = UserSallary::join('users', 'user_sallaries.user_id', '=', 'users.id')
+        ->where('users.uuid', 1406)
+        ->where('user_sallaries.month', now()->month)
+        ->where('user_sallaries.year', now()->year)
+        ->get();
+
+    $user = User::where('uuid', 1406)->first();
+
+    $lastDiamond = $user?->lastSallary?->achieved_diamond ?? 0;
+    $data = [
+
+        'data' => $salary,
+        'last_diamond' => $lastDiamond,
+        'user' => $user
+    ];
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Success',
+        'data' => $data,
+    ]);
+});
+
 
 Route::get('/clear', function () {
 
@@ -235,6 +259,16 @@ Route::get('/run-seeders', function () {
 Route::get('/run-permission', function () {
 
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/user-join-agency', function () {
+
+    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
 
     return response()->json([
         'status' => 'success',
@@ -646,6 +680,29 @@ Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkControl
 
 Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
 
+
+Route::get('/fix-receiver-levels', function () {
+    $updated = 0;
+    $upgradeService = new \Modules\Public\Http\Services\UpgradeReceiverLevelServices();
+
+    \App\Models\User::query()
+        ->where('total_diamond_received', '>', 0)
+        ->chunkById(200, function ($users) use (&$updated, $upgradeService) {
+            foreach ($users as $user) {
+                $oldLevel = $user->received_level;
+                $upgradeService->checkUserLevelUpgrated($user);
+                if ($user->received_level != $oldLevel) {
+                    $user->save();
+                    $updated++;
+                }
+            }
+        });
+
+    return response()->json([
+        'status' => 'success',
+        'message' => "Receiver levels recalculated. Updated: {$updated} users."
+    ]);
+});
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
@@ -1641,7 +1698,7 @@ use App\Models\GameProviderSetting;
 
 Route::get('/save-game-app-key', function (Request $request) {
     $providerCode = $request->provider_code ?? 'quantum_nexus';
-    $appKey = env('GAME_APP_KEY');
+    $appKey = env('LEADER_CC_GAME_SECRET_KEY');
     try {
         $gameSetting = GameProviderSetting::updateOrCreate(
             ['provider_code' => $providerCode],
@@ -1663,33 +1720,94 @@ Route::get('/save-game-app-key', function (Request $request) {
     }
 });
 
+use Illuminate\Support\Facades\Log;
+
 Route::get('/fix-paid-usd', function () {
+
+    Log::info('Fix paid_usd process started');
+
     $logs = CoinLog::whereNull('paid_usd')
         ->orWhere('paid_usd', 0)
         ->get();
 
+    Log::info('Total logs fetched', ['count' => $logs->count()]);
+
     $updated = 0;
     $skipped = 0;
+    $errors = 0;
 
     foreach ($logs as $log) {
-        $coin = Coin::find($log->product_id); 
 
-        if ($coin) {
-            $log->paid_usd = $coin->usd;
-            $log->save();
-            $updated++;
-        } else {
-            $skipped++; 
+        try {
+
+            Log::info('Processing log', [
+                'log_id' => $log->id,
+                'obtained_coins' => $log->obtained_coins,
+                'current_paid_usd' => $log->paid_usd
+            ]);
+
+            $coin = Coin::where('coin', $log->obtained_coins)->first();
+
+            if ($coin) {
+
+                $oldValue = $log->paid_usd;
+
+                $log->paid_usd = $coin->usd;
+                $saved = $log->save();
+
+                if ($saved) {
+                    Log::info('Log updated successfully', [
+                        'log_id' => $log->id,
+                        'old_paid_usd' => $oldValue,
+                        'new_paid_usd' => $coin->usd
+                    ]);
+                } else {
+                    Log::warning('Log save returned false', [
+                        'log_id' => $log->id
+                    ]);
+                }
+
+                $updated++;
+            } else {
+
+                Log::warning('Coin not found for obtained_coins', [
+                    'log_id' => $log->id,
+                    'obtained_coins' => $log->obtained_coins
+                ]);
+
+                $skipped++;
+            }
+        } catch (\Exception $e) {
+
+            Log::error('Error while processing log', [
+                'log_id' => $log->id,
+                'error' => $e->getMessage()
+            ]);
+
+            $errors++;
         }
     }
 
-    return "Updated: {$updated} | Skipped (no product_id): {$skipped}";
+    Log::info('Fix paid_usd process finished', [
+        'updated' => $updated,
+        'skipped' => $skipped,
+        'errors' => $errors
+    ]);
+
+    return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
 });
 Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
 
-     $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder->run();
+
+    return 'seeders have been executed successfully!';
+});
+
+Route::get('make-seeders-for-permission', function () {
+    $seeder = new \Database\Seeders\PermissionTypeSeeder();
     $seeder->run();
 
     return 'seeders have been executed successfully!';
@@ -1697,4 +1815,39 @@ Route::get('make-seeders-for-new-update', function () {
 
 
 
+Route::get('/queue-control/{queue}', function ($queue) {
 
+    $check = shell_exec("ps aux | grep 'queue:work --queue=$queue' | grep -v grep");
+
+    if ($check) {
+        $output = [];
+        $returnVar = 0;
+        exec("php artisan queue:restart 2>&1", $output, $returnVar);
+        return response()->json([
+            'action' => 'restarted',
+            'queue' => $queue,
+            'return_code' => $returnVar,
+            'output' => $output
+        ]);
+    } else {
+        $output = [];
+        $returnVar = 0;
+        exec("php artisan queue:work --queue=$queue --tries=1 2>&1 &", $output, $returnVar);
+
+        return response()->json([
+            'action' => 'started',
+            'queue' => $queue,
+            'return_code' => $returnVar,
+            'output' => $output
+        ]);
+    }
+});
+
+
+Route::get('/get-gift-percentages', function () {
+    $negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
+    $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
+    $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
+
+    dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+});
