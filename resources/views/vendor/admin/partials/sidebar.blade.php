@@ -145,6 +145,8 @@
                                 ['uri' => '/auth-users', 'icon' => '👥', 'title' => __('Sub Super Admin'), 'permission' => 'auth-users'],
                             ],
                         ],
+                        ['uri' => '/coin-rate-settings', 'icon' => '💰', 'title' => __('coin rate settings'), 'permission' => 'coin-recharge'],
+
                     ];
 
                     function hasPermission($permission) {
@@ -310,6 +312,8 @@
                                 ['uri' => '/auth-users', 'icon' => '👥', 'title' => __('users'), 'permission' => 'auth-users'],
                             ],
                         ],
+                        ['uri' => '/coin-rate-settings', 'icon' => '💰', 'title' => __('coin rate settings'), 'permission' => 'coin-recharge'],
+
                     ];
 
                     function hasPermission($permission) {
