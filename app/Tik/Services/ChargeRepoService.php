@@ -370,7 +370,7 @@ class ChargeRepoService
             'amount_type' => 2,
             'usd' => $baseUsd,
             'is_used_transferred' => $transferred,
-            'action_user_id' =>  (isset($sender->id) ? $sender->id : null),
+            'action_user_id' => auth()->user()?->id ?? (isset($sender->id) ? $sender->id : null),
             'total_coins' => $totalCoins,
             'transaction_type' => $transactionType,
             'rate_source' => $rateSource,
