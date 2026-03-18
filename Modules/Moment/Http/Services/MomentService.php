@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Http\Repositories\MomentRepository;
@@ -118,11 +119,15 @@ class MomentService extends MomentBaseModelService
             foreach ($request->file('multi_image') as $file) {
 
                 if ($file && $file->isValid()) {
+                    if (!Storage::disk('local')->exists('temp')) {
+                        Storage::disk('local')->makeDirectory('temp');
+                    }
+
                     $tempPath = $file->store('temp', 'local');
 
                     UploadMomentImageJob::dispatch(
                         $moment->id,
-                        storage_path('app/' . $tempPath)
+                        $tempPath
                     );
                 }
             }
