@@ -111,12 +111,12 @@ class AreaManagerChargeAction extends Action
     {
         $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
         $effectiveRate = $appBaseRate;
-        
+
         $baseUsd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / $appBaseRate;
         $totalCoins = $coins;
-        
+
         $calc = \App\Services\ChargeCalculationService::calculate($baseUsd, 'usd', $effectiveRate);
-        
+
         $baseCoins = $calc['base_coins'];
         $profitCoins = $calc['profit_coins'];
         $profitUsd = $calc['profit_usd'];
@@ -130,10 +130,10 @@ class AreaManagerChargeAction extends Action
         $charge->amount = $request->charge_type == 'increment' ? $totalCoins : -$coins;
         $charge->usd = $baseUsd;
         $charge->balance_before =  $areaManager->di  - ($request->charge_type == 'increment' ? $totalCoins : -$coins);
-        
+
         $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
         $charge->transaction_type = 'area_manager_charge';
-        
+
         $charge->rate_source = 'app';
         $charge->applied_coin_rate = $effectiveRate;
         $charge->base_usd = $baseUsd;
@@ -141,7 +141,7 @@ class AreaManagerChargeAction extends Action
         $charge->bonus_coins = $extraCoins;
         $charge->profit_usd = $profitUsd;
         $charge->profit_coins = $profitCoins;
-        
+
         $charge->save();
 
         if ($request->hasFile('invoice')) {
@@ -203,10 +203,12 @@ class AreaManagerChargeAction extends Action
             ])
             ->attribute(['id' => 'form-select']);
 
-        $this->image('invoice', __('invoice'))
+        $this->text('invoice', __('invoice'))
             ->attribute([
                 'id' => 'invoice-field',
-
+                'type' => 'file',
+                'accept' => 'image/*',
+                'style' => 'padding: 10px; background: transparent; border: 2px dashed #4a5568; border-radius: 12px; cursor: pointer; color: #a0aec0;',
             ]);
 
         $this->hidden('amount_type')->value(1);
@@ -234,17 +236,17 @@ class AreaManagerChargeAction extends Action
                     $('#invoice-field').closest('.form-group').hide();
                 }
             }
-            
+
             function updateConversions() {
                 var rate = parseFloat($('#coin-rate').val()) || 1;
                 var amount = parseFloat($('#amount-input').val()) || 0;
                 var extraCoinsVal = parseFloat($('#extra-coins-input').val()) || 0;
                 var unit = $('#amount-unit-select').val();
                 var cashbackType = $('#cashback-type-select').val();
-                
+
                 var baseCoins = 0;
                 var baseUsd = 0;
-                
+
                 if (unit === 'usd') {
                     baseCoins = amount * rate;
                     baseUsd = amount;
@@ -254,23 +256,28 @@ class AreaManagerChargeAction extends Action
                     baseUsd = amount / rate;
                     $('#amount-conversion-help').text(transEquivalent + ' ' + baseUsd.toFixed(2) + ' ' + transUsd);
                 }
-                
+
                 var extraCoins = 0;
                 if (cashbackType === 'percent') {
                     extraCoins = baseCoins * (extraCoinsVal / 100);
                 } else {
                     extraCoins = extraCoinsVal;
                 }
-                
+
                 var totalCoins = baseCoins + extraCoins;
                 $('#total-coins-help').text(transTotalSent + ' ' + totalCoins.toLocaleString() + ' ' + transCoins + ' (' + transBase + ': ' + baseCoins.toLocaleString() + ' + ' + transExtra + ': '+ extraCoins.toLocaleString() +')');
             }
 
             $(document).off('change', '#form-select').on('change', '#form-select', toggleInvoiceField);
-            
+
             $(document).on('input', '#amount-input, #extra-coins-input', updateConversions);
             $(document).on('change', '#amount-unit-select, #cashback-type-select', updateConversions);
-            
+
+
+            $(document).on('shown.bs.modal', function() {
+                setTimeout(toggleInvoiceField, 100);
+            });
+
             toggleInvoiceField();
             updateConversions();
         SCRIPT);

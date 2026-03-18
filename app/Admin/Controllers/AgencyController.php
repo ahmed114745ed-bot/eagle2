@@ -842,7 +842,14 @@ class AgencyController extends MainController
                 }
             }
             $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
-            if ($bd) $form->country_id = $bd->country_id;
+            if ($bd) {
+                if ($bd->country_id == 0 || empty($bd->country_id)) {
+                    $owner = User::select(['id', 'country_id'])->find($form->input('app_owner_id'));
+                    $form->country_id = $owner?->country_id ?? 0;
+                } else {
+                    $form->country_id = $bd->country_id;
+                }
+            }
 
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
@@ -871,7 +878,12 @@ class AgencyController extends MainController
             }
             $bd = Bd::find($form->bd_id);
             if ($bd) {
-                $form->model()->country_id = $bd->country_id;
+                if ($bd->country_id == 0 || empty($bd->country_id)) {
+                    $owner = User::select(['id', 'country_id'])->find($form->input('app_owner_id') ?? $form->model()->app_owner_id);
+                    $form->model()->country_id = $owner?->country_id ?? 0;
+                } else {
+                    $form->model()->country_id = $bd->country_id;
+                }
             }
         });
     }
