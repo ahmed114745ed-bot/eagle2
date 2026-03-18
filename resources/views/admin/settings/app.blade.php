@@ -1,10 +1,11 @@
 <div id="appSettings" class="app-settings settings-section">
     <h3>{{ __('App Settings') }}</h3>
-    <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data" class="settings-form">
+    <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data"
+          class="settings-form">
         @csrf
         <div class="form row">
             <input type="hidden" name="reset" id="reset" value="3">
-            
+
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="app_primary_color">{{ __('Primary Color') }}</label>
@@ -13,7 +14,8 @@
                             <i style="background-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};"></i>
                         </span>
                         <input type="text" name="app_primary_color" id="app_primary_color" class="form-control"
-                               value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}" placeholder="اختر لون" required>
+                               value="{{ data_get($settings, 'app_primary_color', '#32e5ac') }}" placeholder="اختر لون"
+                               required>
                     </div>
                 </div>
             </div>
@@ -21,10 +23,20 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label>{{ __('Background Type') }}</label>
-                    <select name="background_type" id="background_type" class="form-control" onchange="toggleBackgroundInput()">
-                        <option value="color" {{ data_get($settings, 'background_type') === 'color' ? 'selected' : '' }}>Color</option>
-                        <option value="image" {{ data_get($settings, 'background_type') === 'image' ? 'selected' : '' }}>Image</option>
-                        <option value="gradient" {{ data_get($settings, 'background_type') === 'gradient' ? 'selected' : '' }}>Gradient</option>
+                    <select name="background_type" id="background_type" class="form-control"
+                            onchange="toggleBackgroundInput()">
+                        <option
+                            value="color" {{ data_get($settings, 'background_type') === 'color' ? 'selected' : '' }}>
+                            Color
+                        </option>
+                        <option
+                            value="image" {{ data_get($settings, 'background_type') === 'image' ? 'selected' : '' }}>
+                            Image
+                        </option>
+                        <option
+                            value="gradient" {{ data_get($settings, 'background_type') === 'gradient' ? 'selected' : '' }}>
+                            Gradient
+                        </option>
                     </select>
                 </div>
             </div>
@@ -50,7 +62,8 @@
                     <input type="file" name="background_image" class="form-control" accept="image/*">
                     @if(data_get($settings, 'background_type') === 'image' && !empty(data_get($settings, 'app_background')))
                         <div class="mt-2">
-                            <img src="{{ getImagePath(data_get($settings, 'app_background')) }}" width="100" class="img-thumbnail">
+                            <img src="{{ getImagePath(data_get($settings, 'app_background')) }}" width="100"
+                                 class="img-thumbnail">
                         </div>
                     @endif
                 </div>
@@ -90,7 +103,8 @@
                             <i style="background-color: {{ data_get($settings, 'bottom_nav_inactive_color', '') }};"></i>
                         </span>
                         <input type="text" name="inactive_color" id="inactive_color" class="form-control"
-                               value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}" placeholder="اختر لون">
+                               value="{{ data_get($settings, 'bottom_nav_inactive_color', '') }}"
+                               placeholder="اختر لون">
                     </div>
                 </div>
             </div>
@@ -107,7 +121,7 @@
                     </div>
                 </div>
             </div>
-          
+
 
             <div class="col-md-6">
                 <div class="form-group">
@@ -142,31 +156,31 @@
                             <i style="background-color: {{ data_get($settings, 'light_mode_color', '') }};"></i>
                         </span>
                         <input type="text" name="light_mode_color" id="light_mode_color" class="form-control"
-                               value="{{ data_get($settings, 'light_mode_color', '') }}" placeholder="اختر لون" required>
+                               value="{{ data_get($settings, 'light_mode_color', '') }}" placeholder="اختر لون"
+                               required>
                     </div>
                 </div>
             </div>
-        
-            @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio','Tiko Live','rixo-chat']))
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>
-                        <input type="hidden" name="is_new_theme_enabled" value="0">
-                        <input type="checkbox" name="is_new_theme_enabled" value="1"
-                               data-bootstrap-switch {{ data_get($settings, 'is_new_theme_enabled') ? 'checked' : '' }}>
-                    </div>
-                </div>
-            @endif
 
-             
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>
+                    <input type="hidden" name="is_new_theme_enabled" value="0">
+                    <input type="checkbox" name="is_new_theme_enabled" value="1"
+                           data-bootstrap-switch {{ data_get($settings, 'is_new_theme_enabled') ? 'checked' : '' }}>
+                </div>
             </div>
+
+
+        </div>
 
         <div class="col-12 d-flex gap-3 mt-4">
-         
+
             <button type="button" id="resetAppColorsSettings" class="btn btn-info">
                 <i class="fas fa-undo"></i> {{ __('Reset Colors') }}
             </button>
-            <button type="submit" class="btn btn-primary btn-save" style="margin: 0px 20px !important ;     display: inline !important;">
+            <button type="submit" class="btn btn-primary btn-save"
+                    style="margin: 0px 20px !important ;     display: inline !important;">
                 <i class="fas fa-save"></i> {{ __('Save') }}
             </button>
 
