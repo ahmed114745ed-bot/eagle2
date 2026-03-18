@@ -139,6 +139,20 @@ class ChargesController extends Controller
 
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $usdAmount = 0)
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = $appBaseRate;
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($amount, 'coins', $effectiveRate);
+        
+        $totalCoins = $calc['total_coins']; // In this controller 'amount' seems to be coins
+        $baseUsd = $usdAmount > 0 ? $usdAmount : $calc['base_usd']; // Use provided USD if available, else inferred
+        
+        // Recalculate base coins if USD was provided explicitly to ensure exact match
+        $baseCoins = $usdAmount > 0 ? $baseUsd * $effectiveRate : $calc['base_coins'];
+        
+        $profitCoins = $baseCoins;
+        $profitUsd = $baseUsd;
+
         $charge = new Charge();
         $charge->charger_id = Auth::id() ?? $request->charger_id;
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
@@ -146,9 +160,20 @@ class ChargesController extends Controller
         $charge->agency_id = $agency->id ?? null;
         $charge->user_type = $request->user_type ?? 'app';
         $charge->amount = $amount;
-        $charge->usd = $usdAmount;
+        $charge->usd = $baseUsd;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
-        //dd($charge);
+        
+        $charge->total_coins = $totalCoins;
+        $charge->transaction_type = $agency ? 'admin_to_agency' : 'admin_to_user';
+        
+        $charge->rate_source = 'app';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $baseUsd;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = 0;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
+
         $charge->save();
 
         UserCommon::UserEarnedInvitation($user->id, $amount,$charge->id);

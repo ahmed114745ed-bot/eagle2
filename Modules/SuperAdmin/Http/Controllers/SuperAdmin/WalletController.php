@@ -357,7 +357,7 @@ class WalletController extends MainController
             throw new \Exception(__('not_verified_agency'));
         }
 
-        $rate = Common::getCoinsValue('shipping_coins');
+        $rate = \App\Services\CoinRateService::getEffectiveRate();
         if (!$rate) {
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
         }
@@ -408,6 +408,17 @@ class WalletController extends MainController
 
         );
 
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate($fromUser);
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($usd, 'usd', $effectiveRate);
+        
+        $totalCoins = $calc['total_coins'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $totalCoins - $baseCoins;
+        $profitUsd = $calc['profit_usd'];
+
         $data = [
             'charger_id' => $fromUser->id,
             'charger_type' => $adminType,
@@ -418,7 +429,16 @@ class WalletController extends MainController
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
-            'user_charger_type' => $adminType
+            'user_charger_type' => $adminType,
+            'total_coins' => $totalCoins,
+            'transaction_type' => 'super_admin_to_agency',
+            'rate_source' => 'admin',
+            'applied_coin_rate' => $effectiveRate,
+            'base_usd' => $usd,
+            'base_coins' => $baseCoins,
+            'bonus_coins' => $bonusCoins,
+            'profit_usd' => $profitUsd,
+            'profit_coins' => $profitCoins,
 
         ];
 
@@ -448,9 +468,7 @@ class WalletController extends MainController
             throw new \Exception(__('This sub admin not found under your account.'));
         }
 
-        $userCoins = \Cache::rememberForever('super_admin_coins', function () {
-            return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
-        });
+        $userCoins = \App\Services\CoinRateService::getEffectiveRate();
 
         //        $coins = $amount * $userCoins;
 
@@ -487,6 +505,19 @@ class WalletController extends MainController
     private function createChargeRecord($request, SubAdmin $subAdmin, $coins = 0, $usdAmount)
     {
 
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = \App\Services\CoinRateService::getEffectiveRate();
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
+        
+        $totalCoins = $calc['total_coins'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $totalCoins - $baseCoins;
+        $profitUsd = $calc['profit_usd'];
+
+
+
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type =  UserTypeEnum::SUPER_ADMIN;
@@ -496,6 +527,16 @@ class WalletController extends MainController
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before =  $subAdmin->di  - $coins;
+        $charge->total_coins = $totalCoins;
+        $charge->transaction_type = 'super_admin_to_sub';
+        
+        $charge->rate_source = 'admin';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $usdAmount;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $bonusCoins;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
         $charge->save();
 
 

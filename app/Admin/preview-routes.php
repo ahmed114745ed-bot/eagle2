@@ -6,13 +6,13 @@ use App\Models\Background;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\BoxController;
-use App\Admin\Controllers\OVipController;
-use App\Admin\Controllers\ReelController;
-use App\Admin\Controllers\ColorController;
+use Modules\Vip\Http\Controllers\web\OVipController;
+use Modules\LuckyBox\Http\Controllers\Web\LuckyBoxController;
+use Modules\Reals\Http\Controllers\web\ReelController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\ExportController;
-use App\Admin\Controllers\MomentController;
+use Modules\Moment\Http\Controllers\web\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
@@ -33,7 +33,8 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\ParentUsersController;
-use App\Admin\Controllers\ReelSettingsController;
+use Modules\Reals\Http\Controllers\web\ReelSettingsController;
+use Modules\Moment\Http\Controllers\web\MomentSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\MangerSettingController;
@@ -43,7 +44,6 @@ use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
-use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
@@ -124,10 +124,15 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     Route::resource('agency-settings', AgencySettingsController::class);
     Route::get('agency-settings', 'AgencySettingController@index');
     Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
-    Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
-    Route::get('lucy-box-settings', [BoxController::class, 'box_settings']);
-    Route::resource('moment-settings', MomentSettingsController::class);
-    Route::resource('reel-settings', ReelSettingsController::class);
+    
+    Route::group(['namespace' => ''], function () {
+        Route::get('ovip-settings', [OVipController::class, 'vipSettings']);
+        Route::get('lucy-box-settings', [LuckyBoxController::class, 'box_settings']);
+        Route::resource('moment-settings', MomentSettingsController::class);
+        Route::resource('reel-settings', ReelSettingsController::class);
+        Route::resource('boxes', LuckyBoxController::class);
+    });
+
     Route::resource('custom-settings', CustomController::class);
     Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
     Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
@@ -212,12 +217,12 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     Route::resource('family_levels', 'FamilyLevelController');
     Route::resource('silver', 'SilverController');
     Route::resource('coins', 'CoinController');
-    Route::resource('ovip', 'OVipController');
+    Route::resource('ovip', OVipController::class);
     Route::resource('vip_privilege', 'VipPrivilegeController');
     Route::resource('tickets', 'TicketController');
     Route::resource('pages', 'PageController');
     Route::resource('exchanges', 'ExchangeController');
-    Route::resource('boxes', 'BoxController');
+    Route::resource('boxes', LuckyBoxController::class);
     Route::resource('thrown_boxes', 'BoxUseController');
     Route::resource('reports', 'ReportController');
     Route::resource('charges-reports', 'ChargeReportController');
@@ -232,8 +237,10 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     Route::post('cashing', 'ReportController@cashing')->name('cashing');
     Route::resource('trxs', 'CoinLogController');
     Route::resource('images', 'ImageController');
-    Route::resource('moments', MomentController::class);
-    Route::resource('reels', ReelController::class);
+    Route::group(['namespace' => ''], function () {
+        Route::resource('moments', MomentController::class);
+        Route::resource('reels', ReelController::class);
+    });
     Route::resource('levels/users', UserLevelController::class)->names([
         'index' => 'levels.users.index',
         'create' => 'levels.users.create',

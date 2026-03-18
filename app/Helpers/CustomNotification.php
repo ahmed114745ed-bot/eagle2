@@ -905,6 +905,9 @@ class CustomNotification
     public function charges($user, $title, $body, $replace)
     {
         $currentLang = app()->getLocale();
+        if (!in_array($currentLang, ['en', 'ar'])) {
+            $currentLang = 'en';
+        }
         $notificationToken = $user->notification_id;
 
         $translatedTitle = $this->multiLang($title);

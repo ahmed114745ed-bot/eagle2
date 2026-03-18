@@ -56,10 +56,7 @@ class AreaManagerChargeAction extends Action
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
         $typeCharge = $request->charge_type;
 
-        $userCoins = Cache::rememberForever('zones_coins', function () {
-            $setting = Setting::where('key', 'zones_coins')->first();
-            return $setting?->value;
-        });
+        $userCoins = \App\Services\CoinRateService::getAppBaseRate();
 
         if ($request->amount_unit === 'usd') {
             $coins = $amount * $userCoins;
@@ -67,27 +64,35 @@ class AreaManagerChargeAction extends Action
             $coins = $amount;
         }
 
-        if ($coins < 0 && $areaManager->di < abs($amount)) {
+        $extraCoins = 0;
+        if ($typeCharge === 'increment') {
+            $cashbackType = $request->cashback_type ?? 'fixed';
+            $cashbackVal = abs($request->extra_coins) ?? 0;
+            if ($cashbackType === 'percent') {
+                $extraCoins = $coins * ($cashbackVal / 100);
+            } else {
+                $extraCoins = $cashbackVal;
+            }
+        }
+        $totalCoins = $coins + $extraCoins;
+
+        if ($typeCharge === 'decrement' && $areaManager->di < abs($coins)) {
             return $this->response()->error(__('Insufficient user balance'))->refresh();
         }
 
-        if (! $userCoins || $userCoins == 0) {
-            return $this->response()->error(__('please set area manager coins in configs'))->refresh();
-        }
-
-        DB::transaction(function () use ($request, $areaManager,  $amount, $coins, $typeCharge) {
+        DB::transaction(function () use ($request, $areaManager,  $amount, $coins, $extraCoins, $totalCoins, $typeCharge) {
 
             $amountBefore = $areaManager->di; //Common::getCurrentBalance($areaManager->id);
 
             UserCoinLogHelper::logByType(
                 $areaManager->id,
-                $coins,
+                $typeCharge == 'increment' ? $totalCoins : -$coins,
                 $amountBefore,
                 UserCoinLogType::ADMIN_CHARGES,
                 userType: UserTypeEnum::AREA_MANAGER,
             );
 
-            $areaManager->di += $coins;
+            $areaManager->di += $typeCharge == 'increment' ? $totalCoins : -$coins;
             if ($areaManager->di < 0) {
                 throw ValidationException::withMessages([
                     'di' => [__('user does not have this coin')],
@@ -96,23 +101,47 @@ class AreaManagerChargeAction extends Action
 
             $areaManager->save();
 
-            $this->createChargeRecord($request,  $areaManager, $amount, $coins, $request->amount);
+            $this->createChargeRecord($request,  $areaManager, $amount, $coins, $extraCoins, $totalCoins, $request->amount);
         });
 
         return $this->response()->success('Success')->refresh();
     }
 
-    private function createChargeRecord(Request $request, AreaManager $areaManager, $amount, $coins = 0, $usdAmount): void
+    private function createChargeRecord(Request $request, AreaManager $areaManager, $amount, $coins, $extraCoins, $totalCoins, $usdAmount): void
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $effectiveRate = $appBaseRate;
+        
+        $baseUsd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / $appBaseRate;
+        $totalCoins = $coins;
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($baseUsd, 'usd', $effectiveRate);
+        
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $profitUsd = $calc['profit_usd'];
+
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
         $charge->user_id = $areaManager->id;
         $charge->agency_id =   null;
         $charge->user_type = UserTypeEnum::AREA_MANAGER;
-        $charge->amount = $coins;
-        $charge->usd = $request->amount_unit === 'usd' ? $usdAmount : $usdAmount / Cache::get('zones_coins', 1);
-        $charge->balance_before =  $areaManager->di  - $coins;
+        $charge->amount = $request->charge_type == 'increment' ? $totalCoins : -$coins;
+        $charge->usd = $baseUsd;
+        $charge->balance_before =  $areaManager->di  - ($request->charge_type == 'increment' ? $totalCoins : -$coins);
+        
+        $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
+        $charge->transaction_type = 'area_manager_charge';
+        
+        $charge->rate_source = 'app';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $baseUsd;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $extraCoins;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
+        
         $charge->save();
 
         if ($request->hasFile('invoice')) {
@@ -135,18 +164,34 @@ class AreaManagerChargeAction extends Action
         $this->hidden('userId')->attribute('id', 'vid');
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
 
+        $this->hidden('coin_rate')->value(\App\Services\CoinRateService::getAppBaseRate())->attribute(['id' => 'coin-rate']);
+
         $this->select('amount_unit', __('Amount Unit'))
             ->options([
                 'usd'   => __('Dollar'),
                 'coins' => __('Coins'),
             ])
             ->default('usd')
-            ->help(__('Choose whether the entered amount is in USD or Coins'));
+            ->attribute(['id' => 'amount-unit-select']);
 
         $this->text('amount', __('Amount'))
             ->rules('numeric|gt:0')
-            ->addElementClass('price-input')
-            ->help(__('Enter the amount based on the selected type'));
+            ->attribute(['id' => 'amount-input'])
+            ->help('<span id="amount-conversion-help" style="color: #28a745; font-weight: bold;"></span>');
+
+        $this->select('cashback_type', __('Cashback Type'))
+            ->options([
+                'fixed'   => __('Fixed Amount (Coins)'),
+                'percent' => __('Percentage (%)'),
+            ])
+            ->default('fixed')
+            ->attribute(['id' => 'cashback-type-select']);
+
+        $this->text('extra_coins', __('Extra Coins (Cashback)'))
+            ->rules('nullable|numeric|min:0')
+            ->default(0)
+            ->attribute(['id' => 'extra-coins-input'])
+            ->help('<span id="total-coins-help" style="color: #007bff; font-weight: bold;"></span>');
 
         $this->text('reason_en', __('reason en'));
         $this->text('reason_ar', __('reason ar'));
@@ -166,7 +211,21 @@ class AreaManagerChargeAction extends Action
 
         $this->hidden('amount_type')->value(1);
 
-        Admin::script(<<<'SCRIPT'
+        $transEquivalent = __('Equivalent:');
+        $transCoins = __('Coins');
+        $transUsd = __('Dollar');
+        $transTotalSent = __('Total sent:');
+        $transBase = __('Base');
+        $transExtra = __('Extra');
+
+        Admin::script("
+            var transEquivalent = '{$transEquivalent}';
+            var transCoins = '{$transCoins}';
+            var transUsd = '{$transUsd}';
+            var transTotalSent = '{$transTotalSent}';
+            var transBase = '{$transBase}';
+            var transExtra = '{$transExtra}';
+        " . <<<'SCRIPT'
             function toggleInvoiceField() {
                 var selected = $('#form-select').val();
                 if (selected === '1') {
@@ -175,9 +234,45 @@ class AreaManagerChargeAction extends Action
                     $('#invoice-field').closest('.form-group').hide();
                 }
             }
+            
+            function updateConversions() {
+                var rate = parseFloat($('#coin-rate').val()) || 1;
+                var amount = parseFloat($('#amount-input').val()) || 0;
+                var extraCoinsVal = parseFloat($('#extra-coins-input').val()) || 0;
+                var unit = $('#amount-unit-select').val();
+                var cashbackType = $('#cashback-type-select').val();
+                
+                var baseCoins = 0;
+                var baseUsd = 0;
+                
+                if (unit === 'usd') {
+                    baseCoins = amount * rate;
+                    baseUsd = amount;
+                    $('#amount-conversion-help').text(transEquivalent + ' ' + baseCoins.toLocaleString() + ' ' + transCoins);
+                } else {
+                    baseCoins = amount;
+                    baseUsd = amount / rate;
+                    $('#amount-conversion-help').text(transEquivalent + ' ' + baseUsd.toFixed(2) + ' ' + transUsd);
+                }
+                
+                var extraCoins = 0;
+                if (cashbackType === 'percent') {
+                    extraCoins = baseCoins * (extraCoinsVal / 100);
+                } else {
+                    extraCoins = extraCoinsVal;
+                }
+                
+                var totalCoins = baseCoins + extraCoins;
+                $('#total-coins-help').text(transTotalSent + ' ' + totalCoins.toLocaleString() + ' ' + transCoins + ' (' + transBase + ': ' + baseCoins.toLocaleString() + ' + ' + transExtra + ': '+ extraCoins.toLocaleString() +')');
+            }
 
             $(document).off('change', '#form-select').on('change', '#form-select', toggleInvoiceField);
+            
+            $(document).on('input', '#amount-input, #extra-coins-input', updateConversions);
+            $(document).on('change', '#amount-unit-select, #cashback-type-select', updateConversions);
+            
             toggleInvoiceField();
+            updateConversions();
         SCRIPT);
     }
 

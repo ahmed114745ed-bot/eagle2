@@ -21,7 +21,6 @@ class ChargesSettingController extends MainController
         return parent::index($content
             ->header(__('Settings'))
             ->description('')
-
             ->body(view('admin.charges_settings', compact('settings'))));
     }
 
@@ -31,7 +30,14 @@ class ChargesSettingController extends MainController
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            \Illuminate\Support\Facades\Cache::forget("setting_{$key}");
+            \Illuminate\Support\Facades\Cache::forget($key); // Legacy cache key if any
         }
+
+        \Illuminate\Support\Facades\Cache::forget('coin_rate_system_mode');
+        \Illuminate\Support\Facades\Cache::forget('user_transfer_rate_enabled');
+
+       
 
         admin_success('تمت العملية', 'تم تحديث الإعدادات بنجاح!');
         return back();

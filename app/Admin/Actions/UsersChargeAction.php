@@ -61,18 +61,22 @@ class UsersChargeAction extends Action
         if ($amount < 0 && $user->di < abs($amount)) {
             return $this->response()->error(__('Insufficient user balance'))->refresh();
         }
-        $userCoins = \Cache::rememberForever('user_coins', function () {
+      /*  $userCoins = \Cache::rememberForever('user_coins', function () {
             $setting =   Setting::where('key', 'user_coins')->first();
             return $setting?->value;
-        });
+        });*/
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRateOrUserCoins();
+        $effectiveRate = $appBaseRate;
         
-        $coins = $amount * $userCoins;
+        $calc = \App\Services\ChargeCalculationService::calculate($request->amount, 'usd', $effectiveRate);
         
-        if (! $userCoins || $userCoins == 0) {
+        $coins = $calc['total_coins'];
+        
+        if (!$coins || $coins == 0) {
             return $this->response()->error(__('please set user coins in configs'))->refresh();
         }
         
-        DB::transaction(function () use ($request, $user,  $amount, $coins, $typeCharge) {
+        DB::transaction(function () use ($request, $user, $amount, $coins, $typeCharge , $calc , $effectiveRate) {
             
             $amountBefore =  Common::getCurrentBalance($user->id);
 
@@ -91,7 +95,7 @@ class UsersChargeAction extends Action
             }
             $user->save();
 
-            $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount);
+            $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount , $calc , $effectiveRate);
 
             if ($typeCharge == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -114,8 +118,15 @@ class UsersChargeAction extends Action
 
 
 
-    private function createChargeRecord(Request $request, User $user, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, User $user, $amount, $coins = 0, $usdAmount , $calc , $effectiveRate)
     {
+       
+        $totalCoins = $calc['total_coins'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $totalCoins - $baseCoins;
+        $profitUsd = $calc['profit_usd'];
+
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
@@ -125,6 +136,16 @@ class UsersChargeAction extends Action
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before =  $user->di  - $coins;
+        $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
+        $charge->transaction_type = 'admin_to_user';
+
+        $charge->rate_source = 'app';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $usdAmount;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $bonusCoins;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
         $charge->save();
 
         UserCommon::UserEarnedInvitation($user->id, $coins,$charge->id);

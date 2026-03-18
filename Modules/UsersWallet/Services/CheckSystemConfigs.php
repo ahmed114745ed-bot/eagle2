@@ -40,7 +40,7 @@ class CheckSystemConfigs
      */
     public static function getConfigRate()
     {
-        $rate = Common::getCoinsValue('user_coins');
+        $rate = \App\Services\CoinRateService::getUserTransferRate();
 
         if (!$rate){
             throw new Exception( __('please set usd_value_in_coins in configs. Contact the administration!'));

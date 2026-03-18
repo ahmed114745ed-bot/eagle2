@@ -9,5 +9,5 @@ return [
     'appId' => env('FIREBASE_APP_ID'),
     'vapid_key' => env('FIREBASE_VAPID_KEY'),
     // 'credentials' => storage_path('app/firebase/service-account.json'),
-    'credentials' => base_path(env('FILE_NAME')),
+    'credentials' => public_path(env('FILE_NAME')),
 ];
