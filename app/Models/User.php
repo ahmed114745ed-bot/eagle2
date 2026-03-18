@@ -47,7 +47,7 @@ use Modules\UsersWallet\Entities\UserWallet;
  */
 class User extends Authenticatable
 {
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
+    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel,RealRelationshipTrait;
 
     /*
      * To enable and disable observer saving and updating methods
