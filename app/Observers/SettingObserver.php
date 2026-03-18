@@ -23,6 +23,17 @@ class SettingObserver
     {
         Cache::forget('all_settings');
 
+        // Also clear individual color/theme cache keys so rememberForever picks up new values
+        $themeKeys = [
+            'primary_color', 'secondary_color', 'text_primary_color',
+            'text_secondary_color', 'box_background_color', 'app_background',
+            'brand_background_image', 'table_background_color', 'dark_mode',
+        ];
+
+        foreach ($themeKeys as $key) {
+            Cache::forget($key);
+        }
+
         CacheHelper::cacheSettings();
     }
 }
