@@ -81,6 +81,7 @@ use App\Admin\Controllers\RemainingDiamondSettingController;
 use App\Admin\Controllers\ReportController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
+use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomController;
@@ -561,6 +562,7 @@ Route::group(
         Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
         Route::resource('trxs', 'CoinLogController');
         Route::resource('images', 'ImageController');
+        Route::resource('view/reels', ReelController::class);
 
 
         Route::resource('change-level-histories', ChangeLevelHistoryController::class);
