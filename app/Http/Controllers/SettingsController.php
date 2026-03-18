@@ -41,11 +41,8 @@ class SettingsController extends Controller
     {
         $settings = Setting::pluck('value', 'key')->toArray();
         $timezones = Timezone::all();
-        $agora_app_id = Common::getConfig('app_id');
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
-        $tencent_server_secret = Common::getConfig('tencent_server_secret');
-        $tencent_app_id = Common::getConfig('tencent_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
@@ -69,7 +66,6 @@ class SettingsController extends Controller
             'pusher_app_id',
             'settings',
             'timezones',
-            'agora_app_id',
             'zego_server_secret',
             'zego_app_id',
             'app_sign',
@@ -82,8 +78,6 @@ class SettingsController extends Controller
             'supabase_url',
             'supabase_key',
             'supabase_service_role_key',
-            'tencent_app_id',
-            'tencent_server_secret',
             'soundLibrary',
             'videoLibrary',
             'gamesLibrary'
@@ -101,14 +95,12 @@ class SettingsController extends Controller
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
             ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
-            ($request->has('zones_coins') && !is_null($request->zones_coins) && $request->zones_coins != cache()->get('zones_coins')) ||
             ($request->has('user_coins') && !is_null($request->user_coins) && $request->user_coins != cache()->get('user_coins'))
         ) {
 
-            $zoneSetting = Setting::where('key', 'zones_coins')->first();
             $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
             $shippingSetting = Setting::where('key', 'shipping_coins')->first();
-            if ($zoneSetting && $superAdminSetting && $shippingSetting) {
+            if ($superAdminSetting && $shippingSetting) {
 
                 $userSalary = UserSallary::select('sallary', 'cut_amount')->first();
 

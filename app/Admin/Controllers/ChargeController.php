@@ -153,7 +153,8 @@ class ChargeController extends MainController
             ";
         });
         $grid->column('usd', __('usd'))->display(function ($coin) {
-            $shippingCoins = getSettingCash('shipping_coins');
+            $shippingCoins =  \App\Services\CoinRateService::getAppBaseRate2();
+
 
             if ($shippingCoins) {
                 $dollars = $this->coins / $shippingCoins;

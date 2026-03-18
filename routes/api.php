@@ -74,7 +74,6 @@ use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 Route::get('/health', [HealthCheckController::class, 'status']);
 Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
-Route::post('agora-webhook', [AgoraController::class, 'webhook']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('test-game-rtm', function () {
@@ -196,7 +195,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::get('user-room', [UserController::class, 'userRoom']);
 
-            Route::get('/agora-rtc-token', [AgoraController::class, 'RtcToken']);
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
 
             Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);

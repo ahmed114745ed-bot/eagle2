@@ -1168,7 +1168,10 @@ class ChargeReportController extends MainController
 
     private function tabsComponent()
     {
-        return view('admin.grid.common.report.charge')->render();
+        $mode = \App\Services\CoinRateService::getSystemMode();
+        $view = ($mode === 'unified') ? 'admin.grid.common.report.unified_charge' : 'admin.grid.common.report.charge';
+        
+        return view($view)->render();
     }
 
 
@@ -1443,5 +1446,72 @@ class ChargeReportController extends MainController
         $grid->disableActions();
 
         return $grid;
+    }
+
+    public function getStats(\Illuminate\Http\Request $request)
+    {
+        $name  = $request->input('name', 'dash');
+        $stats = [];
+        
+        // Reusable aggregate raw SQL - uses saved applied_coin_rate for historical accuracy
+        $aggregateRaw = '
+            SUM(COALESCE(amount, 0) + COALESCE(bonus_coins, 0))                                                          AS total_coins,
+            SUM(CASE WHEN COALESCE(applied_coin_rate, 0) > 0 THEN (COALESCE(amount, 0) + COALESCE(bonus_coins, 0)) / applied_coin_rate ELSE COALESCE(usd, 0) END) AS total_usd,
+            SUM(COALESCE(profit_coins, amount))                                                                           AS profit_coins,
+            SUM(CASE WHEN COALESCE(applied_coin_rate, 0) > 0 THEN COALESCE(profit_coins, amount) / applied_coin_rate ELSE COALESCE(profit_usd, usd) END)          AS profit_usd,
+            SUM(COALESCE(bonus_coins, 0))                                                                                 AS bonus_coins,
+            SUM(CASE WHEN COALESCE(applied_coin_rate, 0) > 0 THEN COALESCE(bonus_coins, 0) / applied_coin_rate ELSE 0 END)                                        AS bonus_usd
+        ';
+
+        // Helper closure
+        $makeCards = function (object $r, string $prefix = '') use (&$stats) {
+            $lb = $prefix ? "[$prefix] " : '';
+            $stats[] = ['label' => $lb . __('total transfer coins'), 'value' => number_format($r->total_coins ?? 0, 2), 'sub_value' => number_format($r->total_usd   ?? 0, 2) . ' $', 'icon' => 'fa-coins',      'color' => 'warning'];
+            $stats[] = ['label' => $lb . __('Total Profit (profit_coins)'),   'value' => number_format($r->profit_coins ?? 0, 2), 'sub_value' => number_format($r->profit_usd  ?? 0, 2) . ' $', 'icon' => 'fa-chart-line', 'color' => 'success'];
+            $stats[] = ['label' => $lb . __('Total Cashback (bonus_coins)'),  'value' => number_format($r->bonus_coins  ?? 0, 2), 'sub_value' => number_format($r->bonus_usd   ?? 0, 2) . ' $', 'icon' => 'fa-gift',       'color' => 'info'];
+        };
+
+        if ($name === 'dash' || empty($name)) {
+            // Tab 1: System dashboard – charged by the owner (dash)
+            $r = \App\Models\Charge::where('charger_type', 'dash')->selectRaw($aggregateRaw)->first();
+            $makeCards($r);
+
+        } elseif ($name === 'shipping-agency-activity') {
+            // Tab 2: What shipping agencies (user_type=agency) received
+            $r = \App\Models\Charge::where('user_type', 'agency')->selectRaw($aggregateRaw)->first();
+            $makeCards($r, __('Total recharge to recharge agencies'));
+
+        } elseif ($name === 'host') {
+            // Tab 3: What host agencies received (charger_type=host_agency)
+            $r = \App\Models\Charge::where('charger_type', 'host_agency')->selectRaw($aggregateRaw)->first();
+            $makeCards($r, __('charge host agent'));
+
+        } elseif ($name === 'stripe' || $name === 'stripenew' || $name === 'in-app-purchas') {
+            $query = \App\Models\CoinLog::query();
+            if ($name === 'stripe') {
+                $query->whereNotIn('method', ['huawei_pay', 'google_pay', 'strip', 'apple_pay']);
+            } elseif ($name === 'stripenew') {
+                $query->where('method', 'strip');
+            } else {
+                $query->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
+            }
+
+            $coins = (clone $query)->sum('obtained_coins');
+            $usd   = \DB::table('coin_logs')
+                ->join('coins', 'coin_logs.coin_id', '=', 'coins.id')
+                ->when($name === 'stripe',       fn($q) => $q->whereNotIn('coin_logs.method', ['huawei_pay', 'google_pay', 'strip', 'apple_pay']))
+                ->when($name === 'stripenew',    fn($q) => $q->where('coin_logs.method', 'strip'))
+                ->when($name === 'in-app-purchas', fn($q) => $q->whereIn('coin_logs.method', ['huawei_pay', 'google_pay', 'apple_pay']))
+                ->sum('coins.usd');
+
+            $stats[] = ['label' => __('total transfer dollars'), 'value' => number_format($usd,   2) . ' $', 'sub_value' => '', 'icon' => 'fa-dollar-sign', 'color' => 'success'];
+            $stats[] = ['label' => __('total transfer coins'),   'value' => number_format($coins, 2),        'sub_value' => '', 'icon' => 'fa-coins',       'color' => 'warning'];
+
+        } elseif ($name === 'exchange') {
+            $stats[] = ['label' => __('total diamonds'), 'value' => number_format(\App\Models\ExchangeLog::sum('diamonds'), 2), 'sub_value' => '', 'icon' => 'fa-gem',   'color' => 'info'];
+            $stats[] = ['label' => __('total coins'),    'value' => number_format(\App\Models\ExchangeLog::sum('value'),    2), 'sub_value' => '', 'icon' => 'fa-coins', 'color' => 'warning'];
+        }
+
+        return response()->json(['stats' => $stats]);
     }
 }

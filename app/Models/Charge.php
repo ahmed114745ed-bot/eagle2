@@ -22,7 +22,7 @@ class Charge extends Model
         'created_at' => 'datetime',
     ];
 
-    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred', 'usd', 'user_charger_type', 'action_user_id'];
+    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred', 'usd', 'user_charger_type', 'action_user_id', 'total_coins', 'transaction_type', 'rate_source', 'applied_coin_rate', 'base_usd', 'base_coins', 'bonus_coins', 'profit_usd', 'profit_coins'];
 
     public function user()
     {

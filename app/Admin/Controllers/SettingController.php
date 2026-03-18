@@ -26,12 +26,10 @@ class SettingController extends MainController
     {
         $settings = Setting::pluck('value', 'key')->toArray();
         $timezones = Timezone::all();
-        $agora_app_id = Common::getConfig('app_id');
-        $agora_app_certificate = Common::getConfig('agora_app_certificate');
+
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
-        $tencent_server_secret = Common::getConfig('tencent_server_secret');
-        $tencent_app_id = Common::getConfig('tencent_app_id');
+    
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
@@ -56,12 +54,17 @@ class SettingController extends MainController
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
         $zego_key = Common::getConf('zego_key');
+        $utd_api_key = Common::getConf('utd_api_key');
+        $utd_app_id = Common::getConf('utd_app_id');
+        $appCoinRate = data_get($settings, 'app_coin_rate');
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
+        $userTransferRateEnabled = data_get($settings, 'user_transfer_rate_enabled');
+        $userTransferCoinRate = data_get($settings, 'user_transfer_coin_rate');
         return parent::index($content
             ->header(__('Settings'))
             ->description('   ')
@@ -79,7 +82,6 @@ class SettingController extends MainController
                 'settings',
                 'languages',
                 'timezones',
-                'agora_app_id',
                 'zego_server_secret',
                 'zego_app_id',
                 'app_sign',
@@ -92,16 +94,18 @@ class SettingController extends MainController
                 'supabase_url',
                 'supabase_key',
                 'supabase_service_role_key',
-                'tencent_app_id',
-                'tencent_server_secret',
                 'soundLibrary',
                 'videoLibrary',
                 'liveLibrary',
                 'gamesLibrary',
-                'agora_app_certificate',
                 'zego_filter_enabled',
                 'is_auto_preview',
-                'countries'
+                'utd_api_key',
+                'utd_app_id',
+                'countries',
+                'appCoinRate',
+                'userTransferRateEnabled',
+                'userTransferCoinRate'
             ]))));
     }
 
@@ -248,5 +252,74 @@ class SettingController extends MainController
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function initCoinRates()
+    {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $superAdminCoins = Setting::where('key', 'super_admin_coins')->value('value') ?? $appBaseRate;
+        $areaManagerCoins = Setting::where('key', 'area_manager_coins')->value('value') ?? Setting::where('key', 'zones_coins')->value('value') ?? $appBaseRate;
+        $zones_coins =Setting::where('key', 'zones_coins')->value('value') ;
+        // Super Admins
+        $superAdmins = \App\Models\AdminUser::where('type', 'superadmin')->get();
+        foreach ($superAdmins as $admin) {
+            \App\Models\AdminCoinRate::updateOrCreate(
+                ['admin_id' => $admin->id],
+                ['rate' => $superAdminCoins]
+            );
+        }
+
+        // Area Managers
+        $areaManagers = \App\Models\AdminUser::where('type', 'area-manager')->get();
+        foreach ($areaManagers as $manager) {
+            \App\Models\AdminCoinRate::updateOrCreate(
+                ['admin_id' => $manager->id],
+                ['rate' => $areaManagerCoins]
+            );
+        }
+
+        $userCoinsConfig = \App\Models\Setting::where('key', 'user_coins')->first();
+        $userRate = (float) $userCoinsConfig->value ;
+
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'user_transfer_coin_rate'],
+            ['value' => $userRate]
+        );
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'user_transfer_rate_enabled'],
+            ['value' => 1]
+        );
+
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'app_coin_rate'],
+            ['value' => $zones_coins]
+        );
+        \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_coin_rate');
+        \Illuminate\Support\Facades\Cache::forget('user_transfer_coin_rate');
+        \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_rate_enabled');
+        \Illuminate\Support\Facades\Cache::forget('user_transfer_rate_enabled');
+
+        return 'تمت تهيئة قيم المشرفين بنجاح (Init Admin Rates Done)';
+    }
+
+    public function initUserCoinRates()
+    {
+ 
+        return 'تمت تهيئة قيم المستخدمين بنجاح (Init User Rates Done)';
+    }
+
+    public function backfillCharges()
+    {
+        set_time_limit(300);
+        $exitCode = \Artisan::call('charges:backfill', ['--chunk' => 500]);
+
+        $output = \Artisan::output();
+
+        if ($exitCode === 0) {
+           return  'تمت العملية تم تعبئة بيانات الشحنات القديمة بنجاح!';
+        } else {
+            return 'خطأ حدث خطأ أثناء تعبئة البيانات. راجع السجلات.';
+        }
+
     }
 }

@@ -101,7 +101,6 @@ class AdminPermission extends Seeder
             'charges-agency',
             'agent-home',
             'updates_group_chat',
-            'agora-zego',
             'uuid-dedicate',
             'agency-setting',
             'agency-settings',

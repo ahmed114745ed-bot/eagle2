@@ -93,10 +93,7 @@ class ChargeAction extends Action
         //            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
         //        }
 
-        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
-            $setting =   Setting::where('key', 'shipping_coins')->first();
-            return $setting?->value;
-        });
+        $shippingCoins = \App\Services\CoinRateService::getAppBaseRate2();
         if (! $shippingCoins || $shippingCoins == 0) {
             return $this->response()->error(__('please set agency coins in configs'))->refresh();
         }
@@ -124,10 +121,7 @@ class ChargeAction extends Action
         //        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
         //        $usdAmount = $request->amount / $percentage;
 
-        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
-            $setting =   Setting::where('key', 'shipping_coins')->first();
-            return $setting?->value;
-        });
+        $shippingCoins = \App\Services\CoinRateService::getAppBaseRate2();
         //        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
         $usdAmount = $request->amount * $shippingCoins;
 
@@ -154,17 +148,36 @@ class ChargeAction extends Action
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount)
     {
 
-        //        $shippingCoins = cache()->get('shipping_coins');
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate2();
+        $effectiveRate = $appBaseRate;
+
+        $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
+        
+        $totalCoins = $calc['total_coins'];
+        $baseCoins = $calc['base_coins'];
+        $profitCoins = $calc['profit_coins'];
+        $bonusCoins = $totalCoins - $baseCoins;
+        $profitUsd = $calc['profit_usd'];
+
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
-        $charge->user_id = $agency->id;
+        $charge->user_id = $agency->id ?? $user->id;
         $charge->agency_id = $agency->id ?? null;
-        $charge->user_type = 'agency';
+        $charge->user_type = $agency ? 'agency' : 'user';
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
-        //dd($charge);
+        $charge->total_coins = $totalCoins;
+        $charge->transaction_type = $agency ? 'admin_to_agency' : 'admin_to_user';
+        
+        $charge->rate_source = 'app';
+        $charge->applied_coin_rate = $effectiveRate;
+        $charge->base_usd = $usdAmount;
+        $charge->base_coins = $baseCoins;
+        $charge->bonus_coins = $bonusCoins;
+        $charge->profit_usd = $profitUsd;
+        $charge->profit_coins = $profitCoins;
         $charge->save();
         UserCommon::UserEarnedInvitation($user->id, $amount ,$charge->id);
     }

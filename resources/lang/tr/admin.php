@@ -213,7 +213,6 @@ return [
     "opay" => 'Opay',
     "public_key" => 'Genel Anahtar',
     "country_code" => 'Ülke Kodu',
-    "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
     "chess" => "Satranç",
 

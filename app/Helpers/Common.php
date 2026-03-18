@@ -1682,7 +1682,7 @@ class Common
         $level = Vip::collectionBuilder()->where('level', $amount)->orderByDesc('exp')->first();
         return $level;
     }
-    public static function zegoData($key = null)
+   /* public static function zegoData($key = null)
     {
         $zegoClientId =  Common::getConf('zego_key');
         $zego_token = Common::getConf('zego_token');
@@ -1709,7 +1709,6 @@ class Common
                 'zego_server_secret' => $zego_server_secret ?? '',
                 'zego_app_sign'      =>  $app_sign ?? '',
             ];
-            // dd($zegoData);
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
             $zegoData = [
@@ -1720,13 +1719,59 @@ class Common
         }
 
 
-        // If a key is provided, return that specific value
         if ($key) {
             return $zegoData[$key] ?? null;
         }
 
-        // Otherwise return all values
         return $zegoData;
+    }*/
+
+        public static function zegoData($key = null)
+    {
+        $soundProvider = Common::getConf('sound_library');
+        $videoProvider = Common::getConf('video_library');
+
+        $zegoData = [
+            'zego_app_id' => '',
+            'zego_server_secret' => '',
+            'zego_app_sign' => '',
+            'utd_app_id' => '',
+            'utd_api_key' => '',
+        ];
+
+        if ($soundProvider == '1' || $videoProvider == '1') {
+            $zegoData['zego_app_id'] = Common::getConfig('zego_app_id') ?? '';
+            $zegoData['zego_server_secret'] = Common::getConfig('zego_server_secret') ?? '';
+            $zegoData['zego_app_sign'] = Common::getConfig('app_sign') ?? '';
+        }
+
+        if ($soundProvider == '3' && $videoProvider == '3') {
+            $zegoData['utd_app_id'] = Common::getConfig('utd_app_id') ?? '';
+            $zegoData['utd_api_key'] = Common::getConfig('utd_api_key') ?? '';
+        }
+
+        $zegoClientId = Common::getConf('zego_key');
+        $zegoToken = Common::getConf('zego_token');
+        if (($soundProvider != '3' || $videoProvider != '3') && $zegoToken && $zegoClientId) {
+            $data = decryptToArray($zegoToken, $zegoClientId);
+            $zegoData['zego_app_id'] = $data['app_id'] ?? $zegoData['zego_app_id'];
+            $zegoData['zego_server_secret'] = $data['server_secret'] ?? $zegoData['zego_server_secret'];
+            $zegoData['zego_app_sign'] = $data['app_sign'] ?? $zegoData['zego_app_sign'];
+        }
+
+        return $key ? ($zegoData[$key] ?? null) : $zegoData;
+    }
+    public static function getUtdData( $key = null)
+    {
+        $data = [
+            'utd_app_id' => Common::getConf('utd_app_id'),
+            'utd_api_key' => Common::getConf('utd_api_key'),
+        ];  
+
+        if ($key) {
+            return $data[$key] ?? null;
+        }
+        return $data ?? null;
     }
     public static  function createUserAdmin($appOwnerId)
     {
@@ -1817,25 +1862,11 @@ class Common
 
     public  static function getTargetUsd($diamonds, $percentage)
     {
-        //$convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
-        //$coins = Common::getSettingValue($convertDiamond) ?? 1;
+        $coins = \App\Services\CoinRateService::getAppBaseRate();
 
-        // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
-        //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        // });
-        // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
-        //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
-        // });
-
-        $zones_coins = Cache::rememberForever('zones_coins', function () {
-            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        });
-
-        $coins = $zones_coins;
-
-        $usd = $diamonds / $coins;
-        $userUsd = $usd *  $percentage  / 100;
-        $usd = Common::roundToTwoDecimalPlaces($userUsd);
+        $endFormatted = $coins > 0 ? ($diamonds / $coins) : 0;
+        $userUsd = $endFormatted * $percentage / 100;
+        $usd = \App\Helpers\Common::roundToTwoDecimalPlaces($userUsd);
 
         return $usd;
     }
@@ -1853,21 +1884,7 @@ class Common
     }
     public  static function getMaxCoins()
     {
-        // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
-        //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        // });
-        // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
-        //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
-        // });
-        $zones_coins = Cache::rememberForever('zones_coins', function () {
-            return Setting::where('key', 'zones_coins')->value('value') ?? 1;
-        });
-
-        // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
-
-        $coins = $zones_coins;
-
-        return $coins;
+        return \App\Services\CoinRateService::getAppBaseRate();
     }
 
     public  static function getCoinsValue($key)

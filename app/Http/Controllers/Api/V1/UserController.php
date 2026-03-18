@@ -66,7 +66,7 @@ use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
-
+use Illuminate\Support\Facades\Http;
 class UserController extends Controller
 {
     protected $userService;
@@ -839,7 +839,7 @@ class UserController extends Controller
 
 
 
-    public function zegoCredential()
+ /*   public function zegoCredential()
     {
         $ZegoEncreyptkey = config('app.zego_credential');
 
@@ -887,9 +887,85 @@ class UserController extends Controller
         );
         return Common::apiResponse(1, '', $encryptedData);
     }
+*/
 
 
 
+
+public function zegoCredential(Request $request)
+{
+    $provider = Common::getConfig('sound_library');
+
+    if ($provider == '1') {
+        return Common::apiResponse(1, '', [
+            'library' => 'zego',
+            'app_id' => Common::zegoData('zego_app_id'),
+            'app_sign' => Common::zegoData('zego_app_sign'),
+            'server_secret' => Common::zegoData('zego_server_secret'),
+        ]);
+    }
+
+    if ($provider == '3') {
+
+        $user = auth()->user();
+        $roomId = (string) $request->input('room_id');
+
+      
+
+        $utdKeys = Common::getUtdData();
+        $apiKey = $utdKeys['utd_api_key'] ?? null;
+
+        if (!$apiKey) {
+            return Common::apiResponse(0, 'UTD API key not configured');
+        }
+
+        $cacheKey = "utd_token_{$user->id}_{$roomId}";
+
+        $tokenData = Cache::remember($cacheKey, 3600, function () use ($apiKey, $user, $roomId) {
+
+            $response = Http::timeout(5)
+                ->retry(2, 200)
+                ->post('https://us-central1-utd-cloud-f0a09.cloudfunctions.net/generateZegoToken', [
+                    'apiKey' => $apiKey,
+                    'userId' => (string) $user->id,
+                    'userName' => $user->name ?? '',
+                    'userImage' => $user->image ?? '',
+                    'roomId' => $roomId,
+                    'roomImage' => '',
+                ]);
+
+            if ($response->status() === 401) {
+                throw new \Exception('Invalid UTD API key');
+            }
+
+            if ($response->status() === 429) {
+                throw new \Exception('UTD rate limit exceeded');
+            }
+
+            if ($response->serverError()) {
+                throw new \Exception('UTD service unavailable');
+            }
+
+            if ($response->failed()) {
+                throw new \Exception('Failed to generate voice token');
+            }
+
+            return $response->json();
+        });
+
+        return Common::apiResponse(1, '', [
+            'library' => 'utd_voice',
+            'token' => $tokenData['token'] ?? null,
+            'app_id' => $tokenData['appId'] ?? null,
+            'user_id' => $tokenData['userId'] ?? null,
+            'room_id' => $tokenData['roomId'] ?? null,
+            'expires_in' => $tokenData['expiresIn'] ?? null,
+            'expires_at' => $tokenData['expiresAt'] ?? null,
+        ]);
+    }
+
+    return Common::apiResponse(0, 'Unsupported provider');
+}
     public function switchAccountAnonymous(Request $request)
     {
         $user = $request->user();

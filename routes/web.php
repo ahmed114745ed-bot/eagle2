@@ -516,7 +516,7 @@ Route::group(
         'as' => 'superadmin.',
     ],
     function () {
-        Route::get('auth/setting', [\Modules\SuperAdmin\Http\Controllers\AuthController::class, 'getSetting']);
+        Route::get('auth/setting', [\Modules\SuperAdmin\Http\Controllers\SuperAdmin\AuthController::class, 'getSetting']);
     }
 );
 
@@ -1849,5 +1849,13 @@ Route::get('/get-gift-percentages', function () {
     $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
     $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
-    dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+}); 
+
+
+
+
+Route::get('/test-branch2', function (\Illuminate\Http\Request $request) {
+    dd("branch tested");
+    dd("branch tested");
 });

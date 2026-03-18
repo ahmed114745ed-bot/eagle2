@@ -3,6 +3,7 @@
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AdminAuthController;
+use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
@@ -159,7 +160,7 @@ Route::group([
     ],
 ], function () {
 
-    Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
+    Route::get('change-password-view', [App\Admin\Controllers\AuthController::class, 'changePasswordView'])
         ->name('admin.change-password-view');
 });
 
@@ -642,6 +643,8 @@ Route::group(
         Route::get('admin-rewards-histories', [SuperAdminRewardControllerHistory::class, 'index']);
         Route::get('admin-rewards-histories/{id}', [SuperAdminRewardControllerHistory::class, 'getRewards']);
 
+        Route::get('charges-reports-stats', [ChargeReportController::class, 'getStats'])->name('charge-reports.stats');
+
         Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
         Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
 
@@ -691,10 +694,11 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-
-        Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
+        Route::resource('room-settings', RoomSettingsController::class);
+
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
+        Route::post('save-settings', [SettingController::class, 'saveSettings'])->name('saveSettings');
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
 
@@ -794,6 +798,7 @@ Route::group(
         });
         Route::get('fairluck', [FairLuckSettingsController::class, 'index'])->name('fairluck.index');
         Route::post('fairluck/save-settings', [FairLuckSettingsController::class, 'saveSettings'])->name('fairluck.save-settings');
+        Route::post('app-settings/update', [\App\Admin\Controllers\ChargesSettingController::class, 'saveSettings'])->name('admin.app.settings.update');
     }
 );
 
@@ -803,4 +808,10 @@ Route::group([
     'middleware' => ['web', 'admin'],
 ], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
+
 });
+
+    Route::get('init-coin-rates', [\App\Admin\Controllers\SettingController::class, 'initCoinRates']);
+    Route::get('backfill-charges', [\App\Admin\Controllers\SettingController::class, 'backfillCharges'])->name('admin.backfill-charges');
+    Route::get('init-user-coin-rates', [\App\Admin\Controllers\SettingController::class, 'initUserCoinRates'])->name('admin.init-user-coin-rates');
+    

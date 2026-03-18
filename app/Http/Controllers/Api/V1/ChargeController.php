@@ -115,9 +115,8 @@ class ChargeController extends Controller
             return Common::apiResponse(0, 'This value is not allowed', 422);
         }
 
-        if (!$usd)  return Common::apiResponse(0, 'not found', 404);
         
-        $rate = Common::getCoinsValue('user_coins');
+        $rate = \App\Services\CoinRateService::getUserTransferRate();
 
         if (!$rate)  return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
         
@@ -198,7 +197,7 @@ class ChargeController extends Controller
         if (!$usd || !$to) {
             return Common::apiResponse(0, 'not found', 404);
         }
-        $rate = Common::getCoinsValue('shipping_coins');
+        $rate = \App\Services\CoinRateService::getUserTransferRate();
 
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);

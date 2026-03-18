@@ -323,7 +323,7 @@ return [
     | Admin map field provider
     |--------------------------------------------------------------------------
     |
-    | Supported: "tencent", "google", "yandex".
+    | Supported: "", "google", "yandex".
     |
     */
     'map_provider' => 'google',

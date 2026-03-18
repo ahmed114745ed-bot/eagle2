@@ -320,9 +320,10 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
         </div>
 
         @php
-                $rate = App\Helpers\Common::getCoinsValue('shipping_coins');
-                $areaManagerRate = App\Helpers\Common::getCoinsValue('zones_coins');
-                $superAdminRate = App\Helpers\Common::getCoinsValue('super_admin_coins');
+                $rate = \App\Services\CoinRateService::getEffectiveRate();
+                $areaManagerRate = \App\Services\CoinRateService::getEffectiveRate();
+                $superAdminRate = \App\Services\CoinRateService::getEffectiveRate();
+                $effectiveRate = \App\Services\CoinRateService::getEffectiveRate();
             @endphp
 
             <div class="form-group">
@@ -340,11 +341,16 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                     {{ __('Now charge by dollar') }}
                 </small>
 
+                <small class="form-text text-info" style="font-weight: bold;">
+                    {{ __('1 USD = :rate Coins', ['rate' => $effectiveRate]) }}
+                </small>
+
                 <small id="convertedAmount"
                     class="form-text"
                     style="color: #007bff; font-weight: bold; display: none;">
                 </small>
             </div>
+
 
         <div class="text-right mt-1 actions">
             <button type="submit" class="btn btn-success">{{ __('confirm_charge') }}</button>

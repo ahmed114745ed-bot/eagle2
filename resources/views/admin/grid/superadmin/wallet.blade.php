@@ -297,9 +297,9 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             </select>
         </div>
 
-        @php
-                $shippingRate = App\Helpers\Common::getCoinsValue('shipping_coins');
-                $superAdminRate = App\Helpers\Common::getCoinsValue('super_admin_coins');
+            @php
+                $superAdminRate = \App\Services\CoinRateService::getEffectiveRate(\Encore\Admin\Facades\Admin::user());
+                $shippingRate = $superAdminRate;
             @endphp
 
             <div class="form-group">

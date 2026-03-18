@@ -220,6 +220,7 @@ class UsersChargeController extends MainController
                     // Update user balance
                     $user->increment('di', $coin);
 
+                    $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
                     $charges[] = [
                         'charger_id'      => 1,
                         'charger_type'    => 'dash',
@@ -232,6 +233,15 @@ class UsersChargeController extends MainController
                         'reason_en'       => $reason,
                         'created_at'      => now(),
                         'updated_at'      => now(),
+                        'applied_coin_rate' => $appBaseRate,
+                        'total_coins' => $coin,
+                        'transaction_type' => 'admin_bulk_charge',
+                        'rate_source' => 'app',
+                        'base_usd' => 0,
+                        'base_coins' => 0,
+                        'bonus_coins' => 0,
+                        'profit_usd' => 0,
+                        'profit_coins' => 0,
                     ];
 
                     // Dispatch queued job for notification
@@ -260,6 +270,9 @@ class UsersChargeController extends MainController
 
     private function createChargeRecord(User $user, $amount, $coins = 0, $usdAmount)
     {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $totalCoins = $coins;
+
         $charge = new Charge();
         $charge->charger_id = 1;
         $charge->charger_type =  'dash';
@@ -270,6 +283,16 @@ class UsersChargeController extends MainController
         $charge->usd = $usdAmount;
         $charge->balance_before =  $user->di  - $coins;
         $charge->reason_en = self::reason;
+
+        $charge->applied_coin_rate = $appBaseRate;
+        $charge->total_coins = $totalCoins;
+        $charge->transaction_type = 'admin_bulk_charge_single';
+        $charge->rate_source = 'app';
+        $charge->base_usd = $usdAmount;
+        $charge->base_coins = $usdAmount * $appBaseRate;
+        $charge->bonus_coins = $totalCoins - ($usdAmount * $appBaseRate);
+        $charge->profit_usd = $usdAmount;
+        $charge->profit_coins = $charge->base_coins;
         $charge->save();
 
         //        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
