@@ -22,6 +22,15 @@
       "Use Count": "उपयोग की संख्या",
 "Sort Order": "क्रम व्यवस्था",
 "Category": "श्रेणी",
+"The percentage that the inviter takes from each recharge of the invited person.": "आमंत्रित व्यक्ति के प्रत्येक रिचार्ज से आमंत्रक को मिलने वाला प्रतिशत।",
+  "Instant reward (coins) for the inviter at the moment the invitation is accepted.": "निमंत्रण स्वीकार करते ही आमंत्रक को तुरंत मिलने वाला इनाम (कॉइन्स)।",
+  "Instant reward (coins) for the invited person at the moment of acceptance.": "स्वीकार करने के समय आमंत्रित व्यक्ति को तुरंत मिलने वाला इनाम (कॉइन्स)।",
+  "Invitation validity period in months.": "निमंत्रण की वैधता अवधि (महीनों में)।",
+  "invitation code settings": "निमंत्रण कोड सेटिंग्स",
+  "earn from invitation": "निमंत्रण से कमाई",
+  "invitation host reward": "निमंत्रण होस्ट का इनाम",
+  "invitation invitee reward": "आमंत्रित व्यक्ति का इनाम",
+  "invitation code date": "निमंत्रण कोड की वैधता अवधि",
 "Basic Information": "मूल जानकारी",
 "Technical Details": "तकनीकी विवरण",
 "Category Type": "श्रेणी का प्रकार",
@@ -4078,6 +4087,15 @@
     "coins": "सिक्के",
     "wealth": "धन",
     "attraction": "आकर्षण",
-    "cp": "CP"
+    "cp": "CP",
+    "user parent": "आमंत्रण कोड",
+  "Browse user parent": "आमंत्रण कोड ब्राउज़ करें",
+  "Invitation Code Setting": "आमंत्रण कोड सेटिंग",
+  "Browse invitation code setting": "आमंत्रण कोड सेटिंग ब्राउज़ करें",
+  "price family": "परिवार का मूल्य",
+  "The price for creating a family.": "परिवार बनाने का मूल्य।",
+  "family settings": "परिवार सेटिंग्स",
+  "Family Setting": "परिवार सेटिंग",
+  "Browse family setting": "परिवार सेटिंग ब्राउज़ करें"
 
 }

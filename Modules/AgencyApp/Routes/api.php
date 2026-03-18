@@ -34,6 +34,11 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'appFeature
         Route::post('host-reports', [AgencyAppController::class, 'dailyReport']);//host center
     });
 
+    Route::prefix('v2/agencies')->group(function () {
+        Route::post('/filter', [AgencyAppController::class, 'agencyFilterV2']);
+        Route::post('/masters', [AgencyAppController::class, 'masters']);
+    });
+
     //dashboard
     Route::get('agency-data', [ApiAgencyAppController::class, 'agency_data']);
     Route::get('host-report/{id}', [ApiAgencyAppController::class, 'host_report']);
