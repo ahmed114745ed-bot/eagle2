@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Config;
 use App\Models\Family;
 use App\Models\FamilyUser;
 use App\Models\Setting;
@@ -270,10 +271,9 @@ class FamilyController extends MainController
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'family-setting');
         }
-
-        $config = Setting::whereIn('key', [
-            'price_family',
-        ])->pluck('value', 'key')->toArray();
+        $config = Config::whereIn('name', [
+            'family_price',
+        ])->pluck('value', 'name')->toArray();
         return $content->view('familiesSettings', [
             'config' => $config,
 
