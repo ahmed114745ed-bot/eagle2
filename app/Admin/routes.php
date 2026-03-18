@@ -647,6 +647,9 @@ Route::group(
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
+        Route::get('invitation-code', [InvitationSettingsController::class, 'inviteCode']);
+
+
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
         Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
         Route::resource('app-feature', FeatureAppController::class);
