@@ -628,7 +628,7 @@ Route::group(
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
-         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
+        // Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         Route::resource('agency-manger-users', AgencyMangerUsers::class);
