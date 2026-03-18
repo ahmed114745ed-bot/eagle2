@@ -4,13 +4,20 @@
         border-top-color: #3c8dbc;
     }
 
-    /* RTL Support for Horizontal Form Labels */
-    body.rtl .form-horizontal .control-label,
+    /* RTL Support for Horizontal Form */
+    .rtl .form-horizontal .control-label,
     [dir="rtl"] .form-horizontal .control-label {
-        text-align: left !important;
+        text-align: right !important;
     }
 
-    body:not(.rtl):not([dir="rtl"]) .form-horizontal .control-label {
+    .rtl .form-horizontal .col-sm-3,
+    .rtl .form-horizontal .col-sm-8,
+    [dir="rtl"] .form-horizontal .col-sm-3,
+    [dir="rtl"] .form-horizontal .col-sm-8 {
+        float: right !important;
+    }
+
+    .ltr .form-horizontal .control-label {
         text-align: right !important;
     }
 
