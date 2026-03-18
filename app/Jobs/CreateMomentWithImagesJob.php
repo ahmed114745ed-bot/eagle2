@@ -36,6 +36,12 @@ class UploadMomentImageJob implements ShouldQueue
      */
     public function handle()
     {
+        Log::info('UploadMomentImageJob attempt', [
+            'moment_id' => $this->momentId,
+            'attempt' => $this->attempts(),
+            'max_tries' => $this->tries,
+        ]);
+
         $moment = Moment::find($this->momentId);
 
         if (!$moment) {
@@ -49,7 +55,7 @@ class UploadMomentImageJob implements ShouldQueue
         }
 
         $file = new UploadedFile($fullPath, basename($fullPath), null, null, true);
-        
+
         $path = Common::upload('profile', $file);
 
         if (!Storage::disk(config('filesystems.default'))->exists($path)) {
