@@ -15,6 +15,8 @@
     "App": "Application",
     "Email": "Email",
       "Super Roles":"Roles",
+          
+
     "Browse super roles":"Browse Roles",
     "server_secret_key": "server secret key",
     "server_secret": "server secret",
@@ -1710,6 +1712,9 @@
     "Text Header Color": "Text Header Color",
     "Button Text Color": "Button Text Color",
     "New Theme Enabled": "New Theme Enabled",
-    "Owner Fee Rate (0.10 = 10%)": "Owner Fee Rate (0.10 = 10%)"
+    "Owner Fee Rate (0.10 = 10%)": "Owner Fee Rate (0.10 = 10%)",
+    "user parent": "invitation code",
+        "Browse user parent": "Browse invitation code"
+
 
 }

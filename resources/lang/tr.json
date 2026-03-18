@@ -4486,6 +4486,10 @@
     "client Id": "İstemci Kimliği",
     "cp": "CP",
         "Reel Settings": "Reel Ayarları",
-      "chat":"Chat"
+      "chat":"Chat",
+      "user parent": "Davet kodu",
+  "Browse user parent": "Davet koduna göz at",
+  "Invitation Code Setting": "Davet kodu ayarı",
+  "Browse invitation code setting": "Davet kodu ayarlarını görüntüle"
 
 }
