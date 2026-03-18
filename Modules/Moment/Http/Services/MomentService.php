@@ -127,7 +127,7 @@ class MomentService extends MomentBaseModelService
 
                     UploadMomentImageJob::dispatch(
                         $moment->id,
-                        storage_path('app/' . $tempPath)
+                        $tempPath
                     );
                 }
             }
