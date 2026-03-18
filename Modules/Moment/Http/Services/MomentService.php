@@ -3,7 +3,7 @@
 namespace Modules\Moment\Http\Services;
 
 use App\Helpers\Common;
-use App\Jobs\CreateMomentWithImagesJob;
+use App\Jobs\UploadMomentImageJob;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -103,24 +103,39 @@ class MomentService extends MomentBaseModelService
             ];
         }
 
-        $tempFiles = [];
+        // Create moment
+        $moment = $this->momentRepository->createMoment([
+            'user_id' => $userId,
+            'description' => $contacts,
+        ]);
 
+        if (!$moment) {
+            return [
+                'success' => false,
+                'message' => 'Try again',
+            ];
+        }
         if ($request->hasFile('multi_image')) {
             foreach ($request->file('multi_image') as $file) {
 
-                $tempFiles[] = $file->store('temp', 'local');
+                if ($file && $file->isValid()) {
+                    if (!Storage::disk('local')->exists('temp')) {
+                        Storage::disk('local')->makeDirectory('temp');
+                    }
+
+                    $tempPath = $file->store('temp', 'local');
+
+                    UploadMomentImageJob::dispatch(
+                        $moment->id,
+                        $tempPath
+                    );
+                }
             }
         }
 
-        CreateMomentWithImagesJob::dispatch(
-            $userId,
-            $contacts,
-            $tempFiles
-        );
-
         return [
             'success' => true,
-            'message' => 'Moment is being processed',
+            'message' => 'Success',
         ];
     }
 
@@ -144,7 +159,6 @@ class MomentService extends MomentBaseModelService
             'status' => 200,
         ];
     }
-
     public function show(User $user) {}
 
     public function create(array $data, int $userId) {}

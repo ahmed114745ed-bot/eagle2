@@ -10,100 +10,82 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Modules\Moment\Entities\Moment;
 
-class CreateMomentWithImagesJob implements ShouldQueue
+class UploadMomentImageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 5;
     public $backoff = [10, 30, 60, 120];
 
-    protected $userId;
-    protected $description;
-    protected $tempFiles;
+    protected $momentId;
+    protected $filePath;
 
-    public function __construct($userId, $description, array $tempFiles = [])
+    public function __construct($momentId, $filePath)
     {
-        $this->userId = $userId;
-        $this->description = $description;
-        $this->tempFiles = $tempFiles;
+        $this->momentId = $momentId;
+        $this->filePath = $filePath;
     }
 
     /**
-     * @throws \Throwable
+     * @throws \Exception
      */
     public function handle()
     {
-        Log::info('CreateMomentWithImagesJob attempt', [
-            'user_id' => $this->userId,
+        Log::info('UploadMomentImageJob attempt', [
+            'moment_id' => $this->momentId,
             'attempt' => $this->attempts(),
             'max_tries' => $this->tries,
         ]);
 
-        DB::beginTransaction();
+        $moment = Moment::find($this->momentId);
 
-        try {
-
-            $moment = Moment::create([
-                'user_id' => $this->userId,
-                'description' => $this->description,
-            ]);
-
-            foreach ($this->tempFiles as $tempPath) {
-
-                $fullPath = storage_path('app/' . $tempPath);
-
-                if (!file_exists($fullPath)) {
-                    throw new \Exception("Temp file not found: {$fullPath}");
-                }
-
-                $file = new UploadedFile(
-                    $fullPath,
-                    basename($fullPath),
-                    null,
-                    null,
-                    true
-                );
-
-                $path = Common::upload('profile', $file);
-
-                MomentGallery::create([
-                    'moment_id' => $moment->id,
-                    'image' => $path,
-                ]);
-
-                @unlink($fullPath);
-            }
-
-            DB::commit();
-
-        } catch (\Throwable $e) {
-
-            DB::rollBack();
-
-            foreach ($this->tempFiles as $tempPath) {
-                @unlink(storage_path('app/' . $tempPath));
-            }
-
-            Log::error('CreateMomentWithImagesJob failed', [
-                'user_id' => $this->userId,
-                'attempt' => $this->attempts(),
-                'error' => $e->getMessage(),
-            ]);
-
-            throw $e;
+        if (!$moment) {
+            return;
         }
+
+        $fullPath = storage_path('app/' . $this->filePath);
+
+        if (!file_exists($fullPath)) {
+            throw new \Exception("Temp file not found: {$fullPath}");
+        }
+
+        $file = new UploadedFile($fullPath, basename($fullPath), null, null, true);
+
+        $path = Common::upload('profile', $file);
+
+        if (!Storage::disk(config('filesystems.default'))->exists($path)) {
+            throw new \Exception("File not found on disk after upload: {$path}");
+        }
+
+        MomentGallery::create([
+            'moment_id' => $moment->id,
+            'image' => $path,
+        ]);
+
+        @unlink($this->filePath);
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(\Throwable $exception)
     {
-        Log::error('CreateMomentWithImagesJob permanently failed', [
-            'user_id' => $this->userId,
+        Log::error('UploadMomentImageJob failed permanently', [
+            'moment_id' => $this->momentId,
+            'file' => $this->filePath,
             'attempts' => $this->attempts(),
             'error' => $exception->getMessage(),
         ]);
+
+        $fullPath = storage_path('app/' . $this->filePath);
+        if (file_exists($fullPath)) {
+            @unlink($fullPath);
+        }
+
+        $moment = Moment::find($this->momentId);
+        if ($moment) {
+            $moment->delete(); // remove the moment if any image failed
+        }
     }
 }
