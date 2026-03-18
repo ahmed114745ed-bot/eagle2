@@ -1859,6 +1859,27 @@ Route::get('/get-gift-percentages', function () {
 });
 
 
+Route::get('/check-modules', function () {
+    $statusFile = base_path('modules_statuses.json');
+    $statuses = json_decode(file_get_contents($statusFile), true);
+
+    if (!isset($statuses['Reals']) || $statuses['Reals'] !== true) {
+        $statuses['Reals'] = true;
+        file_put_contents($statusFile, json_encode($statuses, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        Artisan::call('optimize:clear');
+
+        return response()->json([
+            'status' => 'fixed',
+            'message' => 'Reals module has been activated and cache cleared.',
+        ]);
+    }
+
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'Reals module is already active.',
+    ]);
+});
+
 Route::get('/test-upload', function () {
     dd("uploaded successfully");
 });
