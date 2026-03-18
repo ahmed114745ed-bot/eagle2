@@ -4492,6 +4492,9 @@
   "Invitation Code Setting": "Davet kodu ayarı",
   "Browse invitation code setting": "Davet kodu ayarlarını görüntüle",
   "price family": "Aile fiyatı",
-  "The price for creating a family.": "Bir aile oluşturmanın fiyatı."
+  "The price for creating a family.": "Bir aile oluşturmanın fiyatı.",
+   "family settings": "Aile ayarları",
+  "Family Setting": "Aile ayarı",
+  "Browse family setting": "Aile ayarlarını görüntüle"
 
 }
