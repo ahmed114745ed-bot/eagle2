@@ -481,6 +481,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'families-level', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                    ['key' => 'family-setting', 'except' => ['create', 'edit', 'show', 'delete'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
                 ],
             ],
 
