@@ -50,6 +50,20 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /* =========================================================
+ | Recursion protection (Octane-safe: NO static variables)
+ |=========================================================*/
+$depth = $depth ?? 0;
+$maxDepth = 10;
+
+if ($depth >= $maxDepth) {
+    \Log::warning('Menu recursion depth limit reached', [
+        'depth' => $depth,
+        'item' => Arr::get($item ?? [], 'title', 'unknown')
+    ]);
+    return;
+}
+
+/* =========================================================
  | Helper: can user see THIS item itself?
  |=========================================================*/
 $canSeeSelf = function ($item) {
@@ -69,16 +83,20 @@ $canSeeSelf = function ($item) {
 };
 
 /* =========================================================
- | Helper: recursively filter children
+ | Helper: recursively filter children (with depth guard)
  |=========================================================*/
-$filterChildren = function ($children) use (&$filterChildren, $canSeeSelf) {
+$filterChildren = function ($children, $currentDepth = 0) use (&$filterChildren, $canSeeSelf, $maxDepth) {
+    if ($currentDepth >= $maxDepth) {
+        return [];
+    }
+
     $visible = [];
 
     foreach ($children as $child) {
         $childChildren = Arr::get($child, 'children', []);
 
         // recurse first
-        $visibleGrandChildren = $filterChildren($childChildren);
+        $visibleGrandChildren = $filterChildren($childChildren, $currentDepth + 1);
 
         // show child ONLY if:
         // - user can see this child
@@ -100,10 +118,20 @@ $shouldHideBd = Str::startsWith($uri, 'bd/')
     && !Admin::user()->inRoles(['bd']);
 
 /* =========================================================
- | Prevent duplicate rendering
+ | Prevent duplicate rendering (Octane-safe: passed as param, NOT static)
  |=========================================================*/
 $renderedMenu = $renderedMenu ?? [];
 $itemId = Arr::get($item, 'id');
+
+// Check for circular references
+if ($itemId && in_array($itemId, $renderedMenu)) {
+    \Log::warning('Circular menu reference prevented', [
+        'item_id' => $itemId,
+        'item_title' => Arr::get($item, 'title', 'unknown'),
+        'depth' => $depth,
+    ]);
+    return;
+}
 
 /* =========================================================
  | Normalize title
@@ -118,7 +146,7 @@ $title = (string) $title;
  | Filter children (RECURSIVE & STRICT)
  |=========================================================*/
 $children = Arr::get($item, 'children', []);
-$visibleChildren = $filterChildren($children);
+$visibleChildren = $filterChildren($children, $depth);
 
 /* =========================================================
  | FINAL visibility decision
@@ -162,7 +190,8 @@ $isVisible =
         @foreach($visibleChildren as $child)
             @include('vendor.admin.partials.menu', [
                 'item' => $child,
-                'renderedMenu' => $renderedMenu
+                'renderedMenu' => $renderedMenu,
+                'depth' => $depth + 1
             ])
         @endforeach
     </ul>

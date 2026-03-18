@@ -258,6 +258,18 @@ class SettingsController extends Controller
         // Clear all cache including rememberForever keys
         Cache::forget('all_settings');
         Cache::forget('all_configs');
+
+        // Clear individual theme/color cache keys (critical for Octane)
+        $themeKeys = [
+            'primary_color', 'secondary_color', 'text_primary_color',
+            'text_secondary_color', 'box_background_color', 'app_background',
+            'brand_background_image', 'table_background_color', 'dark_mode',
+            'brand_background_type', 'box_background_color',
+        ];
+        foreach ($themeKeys as $key) {
+            Cache::forget($key);
+        }
+
         Cache::flush();
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');

@@ -1,56 +1,85 @@
 @php
+    use Illuminate\Support\Arr;
+
+    /* =========================================================
+     | Recursion protection (Octane-safe: NO static variables)
+     |=========================================================*/
+    $depth = $depth ?? 0;
+    $maxDepth = 10;
+
+    if ($depth >= $maxDepth) {
+        \Log::warning('Menu recursion depth limit reached (admin::partials.menu)', [
+            'depth' => $depth,
+            'item' => $item['title'] ?? 'unknown'
+        ]);
+        return;
+    }
+
+    /* =========================================================
+     | Duplicate / circular reference guard (Octane-safe)
+     |=========================================================*/
+    $renderedMenu = $renderedMenu ?? [];
+    $itemId = $item['id'] ?? null;
+
+    if ($itemId && in_array($itemId, $renderedMenu)) {
+        \Log::warning('Circular menu reference prevented (admin::partials.menu)', [
+            'item_id' => $itemId,
+            'item_title' => $item['title'] ?? 'unknown',
+            'depth' => $depth,
+        ]);
+        return;
+    }
+
     $anyChild = false;
     $permissionExists = false;
-            $roles = \Illuminate\Support\Arr::get($item, 'roles', []);
-            $roles = count($roles) > 0 ? $roles : null;
+    $roles = Arr::get($item, 'roles', []);
+    $roles = count($roles) > 0 ? $roles : null;
 
+    if (!function_exists('getPermissions')){
+        function getPermissions($child) {
+            if (!$child) {
+                return ['permission' => [], 'roles' => []];
+            }
 
-            if (!function_exists('getPermissions')){
-                function getPermissions($child) {
-                    if (!$child) {
-                        return ['permission' => [], 'roles' => []];
-                    }
+            $permissions = [
+                'permission' => Arr::get($child, 'permission') ? [Arr::get($child, 'permission')] : [],
+                'roles' => Arr::get($child, 'roles', [])
+            ];
 
-                    $permissions = [
-                        'permission' => Arr::get($child, 'permission') ? [Arr::get($child, 'permission')] : [],
-                        'roles' => Arr::get($child, 'roles', [])
-                    ];
-
-                    // Check if there are children and merge their permissions and roles recursively
-                    if (isset($child['children']) && is_array($child['children'])) {
-                        foreach ($child['children'] as $subChild) {
-                            $childPermissions = getPermissions($subChild);
-                            $permissions['permission'] = array_merge($permissions['permission'], $childPermissions['permission']);
-                            $permissions['roles'] = array_merge($permissions['roles'], $childPermissions['roles']);
-                        }
-                    }
-
-                    return $permissions;
+            // Check if there are children and merge their permissions and roles recursively
+            if (isset($child['children']) && is_array($child['children'])) {
+                foreach ($child['children'] as $subChild) {
+                    $childPermissions = getPermissions($subChild);
+                    $permissions['permission'] = array_merge($permissions['permission'], $childPermissions['permission']);
+                    $permissions['roles'] = array_merge($permissions['roles'], $childPermissions['roles']);
                 }
-                }
+            }
+
+            return $permissions;
+        }
+    }
 @endphp
 
 @if(isset($item['children']))
     @php
         $data = getPermissions(@$item);
 
-                    $rolesL = $data['roles'];
-                    $rolesL = count($rolesL) > 0 ? $rolesL : null;
+        $rolesL = $data['roles'];
+        $rolesL = count($rolesL) > 0 ? $rolesL : null;
 
-                    $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
+        $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
 
-                    foreach ($data['permission'] as $permission){
+        foreach ($data['permission'] as $permission){
+            if (!$permission)  continue;
 
-                        if (!$permission)  continue;
+            $permissionExists = ( Admin::user()->can($permission));
 
-                        $permissionExists =   ( Admin::user()->can($permission));
+            if ($permissionExists) break;
+        }
 
-                        if ($permissionExists) break;
-                    }
-
-                    if (@$permissionExists || $isRoleVisible ){
-                        $anyChild = true;
-                    }
+        if (@$permissionExists || $isRoleVisible ){
+            $anyChild = true;
+        }
     @endphp
 @endif
 
@@ -61,20 +90,18 @@
     $anyChildExists = $anyChild ?? false;
     $allPermission = Admin::user()->can('*');
     $isVisible = ($hasRoles || $hasPermission|| $allPermission || $anyChildExists );
-
-    // if (Arr::get($item, 'id') == '13'){
-    //     dump(Admin::user()->can(Arr::get($item, 'permission')));
-
-    //         dump($isVisible, $hasRoles , $hasPermission, $allPermission , $anyChildExists);
-    //     }
 @endphp
 
 @if($isVisible)
+    @php
+        $renderedMenu[] = $itemId;
+    @endphp
+
     @if(!isset($item['children']))
         <li>
             @if(url()->isValidUrl($item['uri']))
                 <a href="{{ $item['uri'] }}" target="_blank">
-                    @else
+                @else
 
 
 
@@ -107,18 +134,16 @@
                 @else
                     <span>{{ admin_trans($item['title']) }}</span>
                 @endif
-{{--                @if ($item['title'] == 'المحفظة')--}}
-{{--                    <i class="pull-left" style="margin-right: 2px;">{{ __('soon') }}</i>--}}
-{{--                @endif--}}
-{{--                @if ($item['title'] == 'Wallet')--}}
-{{--                    <i class="pull-right" style="margin-right: 2px;">{{ __('soon') }}</i>--}}
-{{--                @endif--}}
 
                 <i class="fa fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">
-                @foreach($item['children'] as $item)
-                    @include('admin::partials.menu', $item)
+                @foreach($item['children'] as $child)
+                    @include('admin::partials.menu', [
+                        'item' => $child,
+                        'renderedMenu' => $renderedMenu,
+                        'depth' => $depth + 1
+                    ])
                 @endforeach
             </ul>
         </li>
