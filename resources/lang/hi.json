@@ -4087,6 +4087,10 @@
     "coins": "सिक्के",
     "wealth": "धन",
     "attraction": "आकर्षण",
-    "cp": "CP"
+    "cp": "CP",
+    "user parent": "आमंत्रण कोड",
+  "Browse user parent": "आमंत्रण कोड ब्राउज़ करें",
+  "Invitation Code Setting": "आमंत्रण कोड सेटिंग",
+  "Browse invitation code setting": "आमंत्रण कोड सेटिंग ब्राउज़ करें"
 
 }

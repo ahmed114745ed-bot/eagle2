@@ -5336,6 +5336,10 @@
     "Text Header Color": "لون نص الرأس",
     "Button Text Color": "لون نص الزر",
     "New Theme Enabled": "تفعيل المظهر الجديد",
-    "Owner Fee Rate (0.10 = 10%)": "النسبة  للغرفة (0.10 = 10%)" 
+    "Owner Fee Rate (0.10 = 10%)": "النسبة  للغرفة (0.10 = 10%)" ,
+    "user parent": "رمز الدعوة",
+     "Browse user parent": " تصفح رمز الدعوة ",
+     "Invitation Code Setting": "إعدادات رمز الدعوة",
+     "Browse invitation code setting": "تصفح إعدادات رمز الدعوة",
 
-}
+}   
