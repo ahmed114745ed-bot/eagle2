@@ -158,10 +158,12 @@ class AreaManagerChargeAction extends Action
             ])
             ->attribute(['id' => 'form-select']);
 
-        $this->image('invoice', __('invoice'))
+        $this->text('invoice', __('invoice'))
             ->attribute([
                 'id' => 'invoice-field',
-
+                'type' => 'file',
+                'accept' => 'image/*',
+                'style' => 'padding: 10px; background: transparent; border: 2px dashed #4a5568; border-radius: 12px; cursor: pointer; color: #a0aec0;',
             ]);
 
         $this->hidden('amount_type')->value(1);
@@ -177,6 +179,11 @@ class AreaManagerChargeAction extends Action
             }
 
             $(document).off('change', '#form-select').on('change', '#form-select', toggleInvoiceField);
+
+            $(document).on('shown.bs.modal', function() {
+                setTimeout(toggleInvoiceField, 100);
+            });
+
             toggleInvoiceField();
         SCRIPT);
     }
