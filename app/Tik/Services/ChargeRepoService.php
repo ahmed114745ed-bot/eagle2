@@ -138,6 +138,7 @@ class ChargeRepoService
             return true;
         } catch (Exception $e) {
             \DB::rollBack();
+            \Log::info($e->getMessage());
             throw new Exception('An error occurred, please try again later');
         }
     }
