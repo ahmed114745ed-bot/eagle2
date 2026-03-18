@@ -536,26 +536,8 @@ class Common
         $config = $disk ?: config('filesystems.default');
         $extension = $file->getClientOriginalExtension();
         $fileName = Str::random(10) . '.' . $extension;
-        $path = $folder . DIRECTORY_SEPARATOR . $fileName;
-
-        Log::info('Starting file upload', [
-            'disk' => $config,
-            'folder' => $folder,
-            'file_name' => $fileName,
-            'original_name' => $file->getClientOriginalName(),
-            'size_kb' => round($file->getSize() / 1024, 2),
-        ]);
-
-        $result = $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, $config);
-
-        Log::info('Upload result', [
-            'result' => $result,
-            'expected_path' => $path,
-            'exists_after_upload' => $result ?
-                \Storage::disk($config)->exists($path) : false,
-        ]);
-
-        return $path;
+        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, $config);
+        return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 
     public static function uploadProfileUser($folder, $file, $id, $count)
