@@ -127,7 +127,7 @@ class ChargeRepoService
             } else {
                 $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
             }
-            $this->charge($fromUser, $toUser, $chargeType, $coins, $usd, false, 'user_to_user');
+          //  $this->charge($fromUser, $toUser, $chargeType, $coins, $usd, false, 'user_to_user');
 
             if ($toUser instanceof User) {
                 (new UserAchievementService())->insertCharging($toUser, $coins);
