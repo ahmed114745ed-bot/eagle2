@@ -37,7 +37,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">{{ __('family settings') }}</h3>
                 </div>
-                <form action="{{ route('admin.app.settings.update') }}" method="POST" class="form-horizontal">
+                <form action="{{ route('admin.update-config-group-chat') }}" method="POST" class="form-horizontal">
                     @csrf
                     <div class="box-body">
                         <div class="form-group">
