@@ -62,9 +62,9 @@ class ChargeAction2 extends Action
         });
         if (! $shippingCoins || $shippingCoins == 0) {
             return $this->response()->error(__('please set agency coins in configs'))->refresh();
-        }*/
-
-        DB::transaction(function () use ($request, $agency,  $amount, $shippingCoins) {
+        }
+*/
+        DB::transaction(function () use ($request, $agency,  $amount) {
           //  $coins = $amount * $shippingCoins;
             $appBaseRate = \App\Services\CoinRateService::getAppBaseRate2();
             $effectiveRate = $appBaseRate;
@@ -78,7 +78,7 @@ class ChargeAction2 extends Action
             }
             $agency->save();
 
-            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount, $shippingCoins,$calc , $effectiveRate);
+            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount,$calc , $effectiveRate);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -91,11 +91,9 @@ class ChargeAction2 extends Action
 
 
 
-    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount, $shippingCoins,$calc,$effectiveRate)
+    private function createChargeRecord(Request $request, ShippingAgency $agency, $amount, $coins = 0, $usdAmount,$calc,$effectiveRate)
     {
 
-      
-        
         $totalCoins = $calc['total_coins'];
         $baseCoins = $calc['base_coins'];
         $profitCoins = $calc['profit_coins'];
@@ -110,7 +108,7 @@ class ChargeAction2 extends Action
         $charge->user_type = 'agency';
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
-        $charge->balance_before =  $agency->coins  - ($amount * $shippingCoins);
+        $charge->balance_before =  $agency->coins  -  $calc['total_coins'];
         $charge->total_coins = $totalCoins;
         $charge->transaction_type = 'admin_to_agency';
         
