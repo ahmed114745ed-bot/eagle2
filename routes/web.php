@@ -705,10 +705,17 @@ Route::get('/fix-receiver-levels', function () {
 });
 
 Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
+    // Date range: from March 19, 2026 when the bag exploit was active
+    $startDate = '2026-03-19 00:00:00';
+
+    // Find bag gift transactions (source_type = 'gift') with multiple receivers
+    // where receiver_count > 1 (exploit: user sent to more people than they had gifts)
+    // We keep only 1 receiver per transaction and remove the rest
     $affected = DB::table('gift_logs')
-        ->selectRaw('room_boom_uuid, sender_id, giftId, MIN(giftPrice) as gift_price, COUNT(*) as receiver_count')
+        ->selectRaw('room_boom_uuid, sender_id, giftId, MIN(giftPrice) as gift_price, MIN(giftNum) as gift_num, COUNT(*) as receiver_count')
         ->where('source_type', 'gift')
         ->whereNotNull('room_boom_uuid')
+        ->where('created_at', '>=', $startDate)
         ->groupBy('room_boom_uuid', 'sender_id', 'giftId')
         ->havingRaw('COUNT(*) > 1')
         ->get();
@@ -717,6 +724,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
         return response()->json([
             'status' => 'ok',
             'message' => 'No affected bag gift transactions found.',
+            'date_range' => ['from' => $startDate, 'to' => 'now'],
         ]);
     }
 
@@ -727,7 +735,17 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
     DB::transaction(function () use ($affected, $shouldExecute, &$totalExcess, &$details) {
         foreach ($affected as $group) {
             $price = (int) $group->gift_price;
-            $excessDiamonds = $price * ($group->receiver_count - 1);
+            $receiverCount = (int) $group->receiver_count;
+
+            // Keep only 1 receiver, the rest are excess from the exploit
+            $legitimateReceivers = 1;
+            $excessReceivers = $receiverCount - $legitimateReceivers;
+
+            if ($excessReceivers <= 0) {
+                continue;
+            }
+
+            $excessDiamonds = $price * $excessReceivers;
             $totalExcess += $excessDiamonds;
 
             $logs = DB::table('gift_logs')
@@ -735,29 +753,37 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                 ->orderBy('id')
                 ->get(['id', 'receiver_id', 'giftPrice', 'created_at', 'room_id', 'receiver_family_id']);
 
-            $extraLogs = $logs->slice(1);
+            // Keep the first receiver (legitimate), remove the rest (exploit)
+            $keptLogs = $logs->take($legitimateReceivers);
+            $extraLogs = $logs->slice($legitimateReceivers);
 
             $details[] = [
                 'room_boom_uuid' => $group->room_boom_uuid,
                 'sender_id' => $group->sender_id,
                 'gift_id' => $group->giftId,
                 'gift_price_per_receiver' => $price,
-                'total_receivers' => $group->receiver_count,
+                'gift_num_per_receiver' => (int) $group->gift_num,
+                'total_receivers' => $receiverCount,
+                'legitimate_receivers' => $legitimateReceivers,
+                'excess_receivers' => $excessReceivers,
                 'excess_diamonds' => $excessDiamonds,
-                'kept_receiver' => $logs->first()->receiver_id,
+                'kept_receivers' => $keptLogs->pluck('receiver_id')->values()->toArray(),
                 'extra_receivers' => $extraLogs->pluck('receiver_id')->values()->toArray(),
             ];
 
             if ($shouldExecute) {
+                // Reverse diamonds for each extra receiver
                 foreach ($extraLogs as $log) {
                     $logPrice = (int) $log->giftPrice;
 
+                    // Reverse total_diamond_received
                     DB::table('users')
                         ->where('id', $log->receiver_id)
                         ->update([
                             'total_diamond_received' => DB::raw("GREATEST(0, total_diamond_received - {$logPrice})"),
                         ]);
 
+                    // Reverse exchange_diamonds (only for non-agency users)
                     DB::table('users')
                         ->where('id', $log->receiver_id)
                         ->where('agency_id', 0)
@@ -765,6 +791,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                             'exchange_diamonds' => DB::raw("GREATEST(0, exchange_diamonds - {$logPrice})"),
                         ]);
 
+                    // Reverse monthly_diamond_received
                     $logDate = \Carbon\Carbon::parse($log->created_at, getTimezone());
                     DB::table('monthly_diamond_receives')
                         ->where('user_id', $log->receiver_id)
@@ -775,6 +802,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ]);
                 }
 
+                // Reverse sender's inflated total_diamond_send & monthly_diamond_send
                 DB::table('users')
                     ->where('id', $group->sender_id)
                     ->update([
@@ -802,6 +830,17 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ]);
                 }
 
+                // Fix total_room_gifts (room boom totals were inflated)
+                if ($roomId) {
+                    $logDate = \Carbon\Carbon::parse($logs->first()->created_at, getTimezone());
+                    DB::table('total_room_gifts')
+                        ->where('room_id', $roomId)
+                        ->whereDate('created_at', $logDate->toDateString())
+                        ->update([
+                            'current_total' => DB::raw("GREATEST(0, current_total - {$excessDiamonds})"),
+                        ]);
+                }
+
                 // Fix family total_diamond for extra receivers' families
                 $familyIds = $extraLogs->pluck('receiver_family_id')->filter()->unique();
                 foreach ($familyIds as $familyId) {
@@ -814,6 +853,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ]);
                 }
 
+                // Delete the extra (exploit) gift_log records
                 $extraIds = $extraLogs->pluck('id')->toArray();
                 DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
             }
@@ -822,6 +862,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
 
     return response()->json([
         'status' => $shouldExecute ? 'fixed' : 'report',
+        'date_range' => ['from' => $startDate, 'to' => now()->toDateTimeString()],
         'total_affected_transactions' => $affected->count(),
         'total_excess_diamonds' => $totalExcess,
         'details' => $details,
