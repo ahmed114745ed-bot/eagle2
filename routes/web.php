@@ -866,6 +866,89 @@ Route::get('/fix-receiver-levels', function () {
     ]);
 });
 
+Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
+    $affected = DB::table('gift_logs')
+        ->selectRaw('room_boom_uuid, sender_id, giftId, MIN(giftPrice) as gift_price, COUNT(*) as receiver_count')
+        ->where('source_type', 'gift')
+        ->whereNotNull('room_boom_uuid')
+        ->groupBy('room_boom_uuid', 'sender_id', 'giftId')
+        ->havingRaw('COUNT(*) > 1')
+        ->get();
+
+    if ($affected->isEmpty()) {
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'No affected bag gift transactions found.',
+        ]);
+    }
+
+    $shouldExecute = $request->query('fix') == '1';
+    $totalExcess = 0;
+    $details = [];
+
+    DB::transaction(function () use ($affected, $shouldExecute, &$totalExcess, &$details) {
+        foreach ($affected as $group) {
+            $price = (int) $group->gift_price;
+            $excessDiamonds = $price * ($group->receiver_count - 1);
+            $totalExcess += $excessDiamonds;
+
+            $logs = DB::table('gift_logs')
+                ->where('room_boom_uuid', $group->room_boom_uuid)
+                ->orderBy('id')
+                ->get(['id', 'receiver_id', 'giftPrice']);
+
+            $extraLogs = $logs->slice(1);
+
+            $details[] = [
+                'room_boom_uuid' => $group->room_boom_uuid,
+                'sender_id' => $group->sender_id,
+                'gift_id' => $group->giftId,
+                'gift_price_per_receiver' => $price,
+                'total_receivers' => $group->receiver_count,
+                'excess_diamonds' => $excessDiamonds,
+                'kept_receiver' => $logs->first()->receiver_id,
+                'extra_receivers' => $extraLogs->pluck('receiver_id')->values()->toArray(),
+            ];
+
+            if ($shouldExecute) {
+                foreach ($extraLogs as $log) {
+                    $logPrice = (int) $log->giftPrice;
+
+                    DB::table('users')
+                        ->where('id', $log->receiver_id)
+                        ->update([
+                            'total_diamond_received' => DB::raw("GREATEST(0, total_diamond_received - {$logPrice})"),
+                        ]);
+
+                    DB::table('users')
+                        ->where('id', $log->receiver_id)
+                        ->where('agency_id', 0)
+                        ->update([
+                            'exchange_diamonds' => DB::raw("GREATEST(0, exchange_diamonds - {$logPrice})"),
+                        ]);
+                }
+
+                DB::table('users')
+                    ->where('id', $group->sender_id)
+                    ->update([
+                        'total_diamond_send' => DB::raw("GREATEST(0, total_diamond_send - {$excessDiamonds})"),
+                        'monthly_diamond_send' => DB::raw("GREATEST(0, monthly_diamond_send - {$excessDiamonds})"),
+                    ]);
+
+                $extraIds = $extraLogs->pluck('id')->toArray();
+                DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
+            }
+        }
+    });
+
+    return response()->json([
+        'status' => $shouldExecute ? 'fixed' : 'report',
+        'total_affected_transactions' => $affected->count(),
+        'total_excess_diamonds' => $totalExcess,
+        'details' => $details,
+    ]);
+});
+
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
