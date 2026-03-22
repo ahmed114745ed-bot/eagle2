@@ -895,7 +895,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
             $logs = DB::table('gift_logs')
                 ->where('room_boom_uuid', $group->room_boom_uuid)
                 ->orderBy('id')
-                ->get(['id', 'receiver_id', 'giftPrice']);
+                ->get(['id', 'receiver_id', 'giftPrice', 'created_at', 'room_id', 'receiver_family_id']);
 
             $extraLogs = $logs->slice(1);
 
@@ -926,6 +926,15 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->update([
                             'exchange_diamonds' => DB::raw("GREATEST(0, exchange_diamonds - {$logPrice})"),
                         ]);
+
+                    $logDate = \Carbon\Carbon::parse($log->created_at, getTimezone());
+                    DB::table('monthly_diamond_receives')
+                        ->where('user_id', $log->receiver_id)
+                        ->where('month', $logDate->month)
+                        ->where('year', $logDate->year)
+                        ->update([
+                            'monthly_diamond_received' => DB::raw("GREATEST(0, monthly_diamond_received - {$logPrice})"),
+                        ]);
                 }
 
                 DB::table('users')
@@ -934,6 +943,38 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         'total_diamond_send' => DB::raw("GREATEST(0, total_diamond_send - {$excessDiamonds})"),
                         'monthly_diamond_send' => DB::raw("GREATEST(0, monthly_diamond_send - {$excessDiamonds})"),
                     ]);
+
+                // Fix room session (was inflated by excess)
+                $roomId = $logs->first()->room_id;
+                if ($roomId) {
+                    DB::table('rooms')
+                        ->where('id', $roomId)
+                        ->update([
+                            'session' => DB::raw("GREATEST(0, session - {$excessDiamonds})"),
+                        ]);
+                }
+
+                // Fix room_top_users (sender coins were inflated)
+                if ($roomId) {
+                    DB::table('room_top_users')
+                        ->where('room_id', $roomId)
+                        ->where('user_id', $group->sender_id)
+                        ->update([
+                            'coins' => DB::raw("GREATEST(0, coins - {$excessDiamonds})"),
+                        ]);
+                }
+
+                // Fix family total_diamond for extra receivers' families
+                $familyIds = $extraLogs->pluck('receiver_family_id')->filter()->unique();
+                foreach ($familyIds as $familyId) {
+                    $familyReceiverCount = $extraLogs->where('receiver_family_id', $familyId)->count();
+                    $familyExcess = $price * $familyReceiverCount;
+                    DB::table('families')
+                        ->where('id', $familyId)
+                        ->update([
+                            'total_diamond' => DB::raw("GREATEST(0, total_diamond - {$familyExcess})"),
+                        ]);
+                }
 
                 $extraIds = $extraLogs->pluck('id')->toArray();
                 DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
