@@ -867,18 +867,10 @@ Route::get('/fix-receiver-levels', function () {
 });
 
 Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
-    // Date range: from March 19, 2026 when the bag exploit was active
-    $startDate = '2026-03-19 00:00:00';
-
-    // Find bag gift transactions (source_type = 'gift') with multiple receivers
-    // where receiver_count > 1 (exploit: user sent to more people than they had gifts)
-    // We keep only 1 receiver per transaction and remove the rest
     $affected = DB::table('gift_logs')
-        ->selectRaw('room_boom_uuid, sender_id, giftId, MIN(giftPrice) as gift_price, MIN(giftNum) as gift_num, COUNT(*) as receiver_count')
+        ->selectRaw('sender_id, giftId, created_at, MIN(giftPrice) as gift_price, COUNT(*) as receiver_count')
         ->where('source_type', 'gift')
-        ->whereNotNull('room_boom_uuid')
-        ->where('created_at', '>=', $startDate)
-        ->groupBy('room_boom_uuid', 'sender_id', 'giftId')
+        ->groupBy('sender_id', 'giftId', 'created_at')
         ->havingRaw('COUNT(*) > 1')
         ->get();
 
@@ -886,7 +878,6 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
         return response()->json([
             'status' => 'ok',
             'message' => 'No affected bag gift transactions found.',
-            'date_range' => ['from' => $startDate, 'to' => 'now'],
         ]);
     }
 
@@ -897,39 +888,27 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
     DB::transaction(function () use ($affected, $shouldExecute, &$totalExcess, &$details) {
         foreach ($affected as $group) {
             $price = (int) $group->gift_price;
-            $receiverCount = (int) $group->receiver_count;
-
-            // Keep only 1 receiver, the rest are excess from the exploit
-            $legitimateReceivers = 1;
-            $excessReceivers = $receiverCount - $legitimateReceivers;
-
-            if ($excessReceivers <= 0) {
-                continue;
-            }
-
-            $excessDiamonds = $price * $excessReceivers;
+            $excessDiamonds = $price * ($group->receiver_count - 1);
             $totalExcess += $excessDiamonds;
 
             $logs = DB::table('gift_logs')
-                ->where('room_boom_uuid', $group->room_boom_uuid)
+                ->where('sender_id', $group->sender_id)
+                ->where('giftId', $group->giftId)
+                ->where('created_at', $group->created_at)
+                ->where('source_type', 'gift')
                 ->orderBy('id')
                 ->get(['id', 'receiver_id', 'giftPrice', 'created_at', 'room_id', 'receiver_family_id']);
 
-            // Keep the first receiver (legitimate), remove the rest (exploit)
-            $keptLogs = $logs->take($legitimateReceivers);
-            $extraLogs = $logs->slice($legitimateReceivers);
+            $extraLogs = $logs->slice(1);
 
             $details[] = [
-                'room_boom_uuid' => $group->room_boom_uuid,
                 'sender_id' => $group->sender_id,
                 'gift_id' => $group->giftId,
+                'created_at' => $group->created_at,
                 'gift_price_per_receiver' => $price,
-                'gift_num_per_receiver' => (int) $group->gift_num,
-                'total_receivers' => $receiverCount,
-                'legitimate_receivers' => $legitimateReceivers,
-                'excess_receivers' => $excessReceivers,
+                'total_receivers' => $group->receiver_count,
                 'excess_diamonds' => $excessDiamonds,
-                'kept_receivers' => $keptLogs->pluck('receiver_id')->values()->toArray(),
+                'kept_receiver' => $logs->first()->receiver_id,
                 'extra_receivers' => $extraLogs->pluck('receiver_id')->values()->toArray(),
             ];
 
@@ -1024,7 +1003,6 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
 
     return response()->json([
         'status' => $shouldExecute ? 'fixed' : 'report',
-        'date_range' => ['from' => $startDate, 'to' => now()->toDateTimeString()],
         'total_affected_transactions' => $affected->count(),
         'total_excess_diamonds' => $totalExcess,
         'details' => $details,
