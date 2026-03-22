@@ -873,7 +873,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
         ->groupBy('sender_id', 'giftId', 'created_at')
         ->havingRaw('COUNT(*) > 1')
         ->get();
-
+    Log::info("Found " . $affected->count() . " affected bag gift transactions.");
     if ($affected->isEmpty()) {
         return response()->json([
             'status' => 'ok',
