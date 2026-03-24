@@ -2,9 +2,10 @@ name: SSh-lumio-pipline
 on:
   push:
     branches: ["lumio"]
+
 jobs:
   run_lumio_hub:
-    runs-on: [self-hosted]  #ubuntu-latest
+    runs-on: [self-hosted]
     steps:
     - name: print out lumio
       uses: appleboy/ssh-action@v1.2.1
@@ -21,13 +22,13 @@ jobs:
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
             echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
             docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
           else
             echo "Disk space is within acceptable limits $current% "
           fi
+
   run_lumio_app:
-    runs-on: [self-hosted]  #ubuntu-latest  #
+    runs-on: [self-hosted]
     needs: run_lumio_hub
     steps:
     - name: print out lumio
@@ -41,33 +42,32 @@ jobs:
         script: |
           cd /var/www/lumio
           pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
-          docker service update --image lumio-octa:${{ github.sha }} lumio-octa
 
-          # Get container ID of task 5live-app.1
+          docker service update --image lumio-octa:${{ github.sha }} \
+            --replicas 3 \
+            --limit-memory 1.2gb \
+            --reserve-memory 600mb \
+            lumio-octa
+
+
           CONTAINER_ID=$(docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
 
-          # Run artisan command inside that container
           if [ -n "$CONTAINER_ID" ]; then
-            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
+            docker exec $CONTAINER_ID php artisan whatsapp:change-token
           else
             echo "No running container found for lumio-octa.1 service task"
             exit 1
           fi
 
-          # check again
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
+            docker system prune -a -f && echo "Docker system cleaned successfully"
           fi
+
   run_lumio_job:
-    runs-on: [self-hosted]  #ubuntu-latest  #
+    runs-on: [self-hosted]
     needs: run_lumio_hub
     steps:
     - name: print out lumio Job
@@ -81,7 +81,9 @@ jobs:
         script: |
           cd /var/www/lumio
           pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
-          docker service update --image lumio-job:${{ github.sha }} lumio-job
-
+          docker service update --image lumio-job:${{ github.sha }} \
+            --replicas 3 \
+            --limit-memory 800mb \
+            --reserve-memory 400mb \
+            lumio-job
