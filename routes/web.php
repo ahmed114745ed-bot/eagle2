@@ -850,7 +850,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
             ", [now()->month, now()->year]);
 
             foreach ($salaryFixes as $sal) {
-                $corrected = (int) $sal->corrected_diamond;
+                $corrected = max(0, (int) $sal->corrected_diamond); // clamp to 0 for salary (column is unsigned)
                 $target = (int) $sal->target_diamonds;
 
                 if ($corrected >= $target) {
