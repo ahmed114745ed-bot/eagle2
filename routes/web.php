@@ -869,37 +869,39 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
     $shouldExecute = $request->query('fix') == '1';
     $rate = \App\Helpers\Common::getCoinsValue('user_coins');
 
-    // Helper: deduct from a user's di balance
+    // AGGRESSIVE MODE: Force-deduct all fake coins regardless of balance.
+    // If receiver got fake coins, we take them back even if balance goes negative.
+
+    // Helper: force-deduct from a user's di (allows negative)
     $deductDi = function ($userId, $amount, $shouldExecute) {
-        $user = DB::table('users')->where('id', $userId)->first();
-        if (!$user || (int)$user->di <= 0) return 0;
-        $canDeduct = min((int)$user->di, $amount);
-        if ($canDeduct > 0 && $shouldExecute) {
-            DB::table('users')->where('id', $userId)->update(['di' => DB::raw("di - {$canDeduct}")]);
+        if ($amount <= 0) return 0;
+        if ($shouldExecute) {
+            DB::table('users')->where('id', $userId)
+                ->update(['di' => DB::raw("CAST(di AS SIGNED) - {$amount}")]);
         }
-        return $canDeduct;
+        return $amount;
     };
 
-    // Helper: deduct from a user's exchange_diamonds
+    // Helper: force-deduct from a user's exchange_diamonds (allows negative, non-agency only)
     $deductExchange = function ($userId, $amount, $shouldExecute) {
+        if ($amount <= 0) return 0;
         $user = DB::table('users')->where('id', $userId)->first();
-        if (!$user || (int)$user->exchange_diamonds <= 0 || (int)$user->agency_id != 0) return 0;
-        $canDeduct = min((int)$user->exchange_diamonds, $amount);
-        if ($canDeduct > 0 && $shouldExecute) {
-            DB::table('users')->where('id', $userId)->update(['exchange_diamonds' => DB::raw("exchange_diamonds - {$canDeduct}")]);
+        if (!$user || (int)$user->agency_id != 0) return 0;
+        if ($shouldExecute) {
+            DB::table('users')->where('id', $userId)
+                ->update(['exchange_diamonds' => DB::raw("CAST(exchange_diamonds AS SIGNED) - {$amount}")]);
         }
-        return $canDeduct;
+        return $amount;
     };
 
-    // Helper: deduct from agency coins
+    // Helper: force-deduct from agency coins (allows negative)
     $deductAgency = function ($agencyId, $amount, $shouldExecute) {
-        $agency = DB::table('agencies')->where('id', $agencyId)->first();
-        if (!$agency || (int)$agency->coins <= 0) return 0;
-        $canDeduct = min((int)$agency->coins, $amount);
-        if ($canDeduct > 0 && $shouldExecute) {
-            DB::table('agencies')->where('id', $agencyId)->update(['coins' => DB::raw("coins - {$canDeduct}")]);
+        if ($amount <= 0) return 0;
+        if ($shouldExecute) {
+            DB::table('agencies')->where('id', $agencyId)
+                ->update(['coins' => DB::raw("CAST(coins AS SIGNED) - {$amount}")]);
         }
-        return $canDeduct;
+        return $amount;
     };
 
     // Helper: trace charges from a user (1 level)
@@ -934,7 +936,7 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
         return $recovered;
     };
 
-    // Helper: trace gifts from a user (1 level) — deduct from receivers
+    // Helper: trace gifts from a user (1 level) — force-deduct from receivers' di
     $traceGifts = function ($userId, $maxAmount, $shouldExecute, &$trace) use ($deductDi) {
         $recovered = 0;
         $remaining = $maxAmount;
@@ -949,12 +951,10 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
             if ($remaining <= 0) break;
             $amt = min((int)$gift->total_sent, $remaining);
 
-            // First try di
+            // Force-deduct from receiver's di (allows negative)
             $got = $deductDi($gift->receiver_id, $amt, $shouldExecute);
-            if ($got > 0) {
-                $remaining -= $got; $recovered += $got;
-                $trace[] = ['type' => 'gift→receiver_di', 'from' => "user:{$gift->receiver_id}", 'amount' => $got];
-            }
+            $remaining -= $got; $recovered += $got;
+            $trace[] = ['type' => 'gift→receiver_di', 'from' => "user:{$gift->receiver_id}", 'amount' => $got];
         }
         return $recovered;
     };
