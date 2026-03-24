@@ -78,7 +78,7 @@ class GiftLogService
             $totalPrice = $gift->price * $numberOfGift;
             $totalPriceForOnlyReceiver = $gift->price * $number;
             // if user didn't have inf coins throw exception
-            $check = $this->checkGiftAvailability($user, $gift, $number, $type, $totalPrice);
+            $check = $this->checkGiftAvailability($user, $gift, $numberOfGift, $type, $totalPrice);
             if ($check) {
                 return $check;
             }
@@ -121,7 +121,7 @@ class GiftLogService
                 $updateUserWhenSendGift->send($sendPrice, $user);
             } else {
 
-                $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
+                $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $numberOfGift);
             }
 
             //increase room session
@@ -270,7 +270,7 @@ class GiftLogService
             $totalPrice = $gift->price * $numberOfGift;
             $totalPriceForOnlyReceiver = $gift->price * $number;
             // if user didn't have inf coins throw exception
-            $check = $this->checkGiftAvailability($user, $gift, $number, $type, $totalPrice);
+            $check = $this->checkGiftAvailability($user, $gift, $numberOfGift, $type, $totalPrice);
             if ($check) {
                 return $check;
             }
@@ -313,7 +313,7 @@ class GiftLogService
                 $updateUserWhenSendGift->send($sendPrice, $user);
             } else {
 
-                $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
+                $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $numberOfGift);
             }
 
             //increase room session
@@ -447,7 +447,7 @@ class GiftLogService
                 })->first();
 
 
-            throw_if((!$existingGiftCount || $existingGiftCount->quantity < $number), \Exception::class, 'Receiver has reached maximum allowed gifts');
+            throw_if((!$existingGiftCount || $existingGiftCount->quantity < $number), \Exception::class, 'Not enough gifts in your bag');
 
 
             return null;
