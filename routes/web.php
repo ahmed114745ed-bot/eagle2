@@ -2197,3 +2197,76 @@ Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request)
 });
 
 
+
+
+
+Route::get('/fix-bag-monthly', function (\Illuminate\Http\Request $request) {
+    $shouldExecute = $request->query('fix') == '1';
+
+    // Step 1: Get total excess giftPrice per receiver from bag gifts
+    $receivers = DB::table('gift_logs')
+        ->selectRaw('receiver_id, SUM(giftPrice) as total_bag_diamonds')
+        ->where('source_type', 'gift')
+        ->where('created_at', '>=', '2026-03-19')
+        ->groupBy('receiver_id')
+        ->get();
+
+    if ($receivers->isEmpty()) {
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'No bag gift receivers found since 2026-03-19.',
+        ]);
+    }
+
+    $details = [];
+
+    foreach ($receivers as $receiver) {
+        $bagTotal = (int) $receiver->total_bag_diamonds;
+
+        // Step 2: Get monthly_diamond_receives for this receiver
+        $monthlyRecord = DB::table('monthly_diamond_receives')
+            ->where('user_id', $receiver->receiver_id)
+            ->where('month', 3)
+            ->where('year', 2026)
+            ->first();
+
+        if (!$monthlyRecord) {
+            $details[] = [
+                'receiver_id' => $receiver->receiver_id,
+                'bag_total' => $bagTotal,
+                'monthly_before' => null,
+                'monthly_after' => null,
+                'status' => 'no monthly record found',
+            ];
+            continue;
+        }
+
+        $monthlyBefore = (int) $monthlyRecord->monthly_diamond_received;
+        $monthlyAfter = max(0, $monthlyBefore - $bagTotal);
+
+        $details[] = [
+            'receiver_id' => $receiver->receiver_id,
+            'bag_total' => $bagTotal,
+            'monthly_before' => $monthlyBefore,
+            'monthly_after' => $monthlyAfter,
+            'deducted' => $monthlyBefore - $monthlyAfter,
+        ];
+
+        // Step 3: Update monthly_diamond_receives
+        if ($shouldExecute) {
+            DB::table('monthly_diamond_receives')
+                ->where('user_id', $receiver->receiver_id)
+                ->where('month', 3)
+                ->where('year', 2026)
+                ->update([
+                    'monthly_diamond_received' => $monthlyAfter,
+                ]);
+        }
+    }
+
+    return response()->json([
+        'status' => $shouldExecute ? 'fixed' : 'report',
+        'total_receivers' => $receivers->count(),
+        'details' => $details,
+    ]);
+});
