@@ -5,6 +5,7 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use Modules\AreaManager\Http\Controllers\BdController;
 use Modules\AreaManager\Http\Controllers\AuthController;
 use Modules\AreaManager\Http\Controllers\HomeController;
+use Modules\AreaManager\Http\Controllers\MultiLanguageController;
 use Modules\AreaManager\Http\Controllers\RoleController;
 use Modules\AreaManager\Http\Controllers\RoomController;
 use Modules\AreaManager\Http\Controllers\UserController;
@@ -78,6 +79,7 @@ Route::group(
         if (MultiLanguage::config("show-login-page", true)) {
             Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
         }
+        Route::post('/locale', MultiLanguageController::class . '@locale');
         Route::post('login', [AuthController::class, 'postLogin']);
         Route::get('logout', [AuthController::class, 'logout']);
         Route::Post('send-whatsapp-code', [AuthController::class, 'sendCodeWhatsapp']);

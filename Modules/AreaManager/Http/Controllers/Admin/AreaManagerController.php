@@ -172,10 +172,10 @@ class AreaManagerController extends MainController
 
         if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
-                $milestone = Cache::remember('milestone_area_manager', now()->addHours(1), function () {
+                $milestone = Cache::rememberForever('milestone_area_manager', function () {
                     return Milestone::where('slug', 'area-manager')->first();
                 });
-                $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
+                $url = url('admin/milestone-rewards/' . $milestone->id); // Generates absolute URL for /admin/milestones
                 $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML

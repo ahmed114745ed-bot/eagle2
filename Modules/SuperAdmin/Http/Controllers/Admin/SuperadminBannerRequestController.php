@@ -3,6 +3,7 @@
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
 use App\Models\HomeCarouselDisplay;
+use Carbon\Carbon;
 use Modules\SuperAdmin\Entities\SuperadminBannerRequest;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
@@ -27,16 +28,15 @@ class SuperadminBannerRequestController extends AdminController
     protected $title = 'SuperadminBannerRequest';
     public $permission_name = 'superadmin-banners';
 
-
-    public function __construct(SuperAdminService $userService)
+    public function __construct(protected SuperAdminService $userService)
     {
-        $this->userService = $userService;
     }
 
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(__('SuperadminBannerRequest'))
+        return parent::index(
+            $content
+                ->title(__('SuperadminBannerRequest'))
             // ->body($this->grid())
         );
     }
@@ -52,8 +52,8 @@ class SuperadminBannerRequestController extends AdminController
         $grid->model()->when($itemNotification, function ($query, $itemNotification) {
             $query->where('id', $itemNotification);
         });
-        $grid->model()->with(['superAdmin','homeCarousel:home_carousel_id.img'])->latest();
-        $countryID =session('filter_country_id');
+        $grid->model()->with(['superAdmin', 'homeCarousel:home_carousel_id.img'])->latest();
+        $countryID = session('filter_country_id');
         $grid->model()
             ->when($countryID, fn($q) => $q->whereHas('superAdmin', fn($q) => $q->where('country_id', $countryID)))
             ->with(['superAdmin', 'homeCarousel:home_carousel_id.img'])->latest();
@@ -61,9 +61,43 @@ class SuperadminBannerRequestController extends AdminController
 
         $userService = $this->userService;
 
-        // Super Admin
-        $grid->column('user_id', __('Super Admin'))->display(function () use ($userService) {
-            return $userService->adminUserAvatar($this->superAdmin ?? null, withoutLevels: true);
+        // // Super Admin
+        // $grid->column('user_id', __('Super Admin'))->display(function () use ($userService) {
+        //     return $userService->adminUserAvatar($this->superAdmin ?? null, withoutLevels: true);
+        // });
+
+        $grid->column('username', __('Super Admin'))->display(function ($name) {
+            if (!$this->superAdmin) {
+                return __('Unknown');
+            }
+            if (request()->filled('_export_')) {
+                return $name;
+            }
+
+            $id = @$this->superAdmin->id ?? '-';
+            $name = @$this->superAdmin->username ?? 'غير معروف';
+            $path = @$this->superAdmin->avatar ?? '';
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->superAdmin->id, $url, 40, 40);
+            $showUrl = url("admin/superadmin-users/{$this->superAdmin->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $id</span>
+                    </div>
+                </div>
+            ";
         });
 
         // Banner Image
@@ -73,10 +107,14 @@ class SuperadminBannerRequestController extends AdminController
         $grid->column('coins_deducted', __('Coins Deducted'));
         $grid->column('status', __('Status'))->display(function ($status) {
             switch ($status) {
-                case 'pending': return '<span class="text-warning">'. __('Pending') .'</span>';
-                case 'approved': return '<span class="text-success">'. __('Approved') .'</span>';
-                case 'rejected': return '<span class="text-danger">'. __('Rejected') .'</span>';
-                default: return $status;
+                case 'pending':
+                    return '<span class="text-warning">' . __('Pending') . '</span>';
+                case 'approved':
+                    return '<span class="text-success">' . __('Approved') . '</span>';
+                case 'rejected':
+                    return '<span class="text-danger">' . __('Rejected') . '</span>';
+                default:
+                    return $status;
             }
         });
 
@@ -91,18 +129,15 @@ class SuperadminBannerRequestController extends AdminController
                 return __('Display Live');
             } elseif ($value === 'display_room') {
                 return __('Display Room');
-            }
-
-
-            else {
+            } else {
                 return $value;
             }
         });
         $grid->column('hours', __('hours'));
         $grid->column('created_at', __('Created At'))
-        ->display(function ($createdAt) {
-            return \Carbon\Carbon::parse($createdAt)->format('d/m/Y H:i');
-        });
+            ->display(function ($createdAt) {
+                return Carbon::parse($createdAt)->format('d/m/Y H:i');
+            });
 
         // Actions
         if (Admin::user()->can('reject-switch-' . $this->permission_name) || Admin::user()->can('approve-switch-' . $this->permission_name) || Admin::user()->can('*')) {
@@ -131,91 +166,109 @@ class SuperadminBannerRequestController extends AdminController
             });
         }
 
-        Admin::script("
-                  document.addEventListener('DOMContentLoaded', function () {
+        Admin::script(<<<JS
+            function initBannerRequestActions() {
 
-                    function sendRequest(url) {
-                        return fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': LA.token,
-                                'Accept': 'application/json',
+                function sendRequest(url) {
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': LA.token,
+                            'Accept': 'application/json',
+                        },
+                    }).then(res => res.json());
+                }
+
+                function handleAction(button, actionType) {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+
+                        var messages = {
+                            approve: {
+                                title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                                confirm: 'نعم',
+                                cancel: 'إلغاء',
+                                color: '#28a745'
                             },
-                        }).then(res => res.json());
-                    }
+                            reject: {
+                                title: 'هل أنت متأكد من الرفض على هذا الطلب؟',
+                                confirm: 'نعم',
+                                cancel: 'إلغاء',
+                                color: '#dc3545'
+                            },
+                            success: {
+                                en: 'Action completed successfully!',
+                                ar: 'تمت العملية بنجاح!',
+                                hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                                tr: 'İşlem başarıyla tamamlandı!'
+                            },
+                            error: {
+                                en: 'An error occurred!',
+                                ar: 'حدث خطأ أثناء العملية',
+                                hi: 'एक त्रुटि हुई!',
+                                tr: 'İşlem sırasında hata oluştu!'
+                            }
+                        };
 
-                    function handleAction(button, actionType) {
-                        button.addEventListener('click', function(e){
-                            e.preventDefault();
+                        var locale = document.documentElement.lang || 'ar';
 
-                            // رسائل متعددة اللغات
-                            const messages = {
-                                approve: {
-                                    title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
-                                    confirm: 'نعم',
-                                    cancel: 'إلغاء',
-                                    color: '#28a745'
-                                },
-                                reject: {
-                                    title: 'هل أنت متأكد من الرفض على هذا الطلب؟',
-                                    confirm: 'نعم',
-                                    cancel: 'إلغاء',
-                                    color: '#dc3545'
-                                },
-                                success: {
-                                    en: 'Action completed successfully!',
-                                    ar: 'تمت العملية بنجاح!',
-                                    hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
-                                    tr: 'İşlem başarıyla tamamlandı!'
-                                },
-                                error: {
-                                    en: 'An error occurred!',
-                                    ar: 'حدث خطأ أثناء العملية',
-                                    hi: 'एक त्रुटि हुई!',
-                                    tr: 'İşlem sırasında hata oluştu!'
-                                }
-                            };
+                        Swal.fire({
+                            title: messages[actionType].title,
+                            type: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: messages[actionType].confirm,
+                            cancelButtonText: messages[actionType].cancel,
+                            confirmButtonColor: messages[actionType].color,
+                            cancelButtonColor: '#6c757d',
+                        }).then(function(result) {
+                            if (result.value) {
+                                var url = button.dataset.url;
 
-                            const locale = document.documentElement.lang || 'ar'; // افتراض لغة الموقع
+                                Swal.fire({
+                                    title: 'جاري التنفيذ...',
+                                    allowOutsideClick: false,
+                                    onOpen: function() { Swal.showLoading(); }
+                                });
 
-                            Swal.fire({
-                                title: messages[actionType].title,
-                                type: 'question',
-                                showCancelButton: true,
-                                confirmButtonText: messages[actionType].confirm,
-                                cancelButtonText: messages[actionType].cancel,
-                                confirmButtonColor: messages[actionType].color,
-                                cancelButtonColor: '#6c757d',
-                            }).then((result) => {
+                                sendRequest(url)
+                                    .then(function(res) {
+                                        Swal.close();
 
-                                if(result.value){
-                                    const url = button.dataset.url;
-                                    sendRequest(url).then(res => {
-                                        if(res.success){
+                                        if (res.success) {
                                             Swal.fire({
                                                 title: res.message || messages.success[locale],
                                                 type: 'success',
                                                 timer: 2000,
                                                 showConfirmButton: false
                                             });
-                                            button.closest('tr').remove(); // إزالة الصف بعد العملية
+
+                                            $.pjax.reload('#pjax-container');
                                         } else {
                                             Swal.fire('خطأ', res.message || messages.error[locale], 'error');
                                         }
-                                    }).catch(() => {
+                                    })
+                                    .catch(function(err) {
+                                        console.error('Fetch error:', err);
                                         Swal.fire('خطأ', messages.error[locale], 'error');
                                     });
-                                }
-                            });
+                            }
                         });
-                    }
-
-                    document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
-                    document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
                     });
-    ");
-    $grid->disableActions();
-    $grid->disableCreation();
+                }
+
+                document.querySelectorAll('.approve-btn').forEach(function(btn) { handleAction(btn, 'approve'); });
+                document.querySelectorAll('.reject-btn').forEach(function(btn) { handleAction(btn, 'reject'); });
+            }
+
+            initBannerRequestActions();
+
+            $(document).off('pjax:end.bannerRequest').on('pjax:end.bannerRequest', function() {
+                initBannerRequestActions();
+            });
+JS
+        );
+        $grid->disableActions();
+        $grid->disableCreation();
         return $grid;
     }
 
@@ -280,12 +333,12 @@ class SuperadminBannerRequestController extends AdminController
             ->first();
 
         if ($display) {
-            if ($display->end_at && $display->end_at->isFuture()) {
+            if ($display->end_at && Carbon::parse($display->end_at)->isFuture()) {
                 $existingHours = $this->convertToHours($display->duration, $display->duration_unit);
 
                 $totalHours = $existingHours + $hours;
 
-                $newEndAt = $display->end_at->copy()->addHours($hours);
+                $newEndAt = Carbon::parse($display->end_at)->copy()->addHours($hours);
 
                 $display->update([
                     'duration'      => $totalHours,
@@ -334,8 +387,8 @@ class SuperadminBannerRequestController extends AdminController
                     'coins' => $request->coins_deducted,
                 ]
 
-                ],
-                superAdminId:$request->user_id
+            ],
+            superAdminId: $request->user_id
 
         );
 
@@ -364,7 +417,6 @@ class SuperadminBannerRequestController extends AdminController
         $homeCarousel = $request->homeCarousel;
         SuperAdminHelper::addCoins($request->user_id, $request->coins_deducted);
 
-
         $request->status = 'rejected';
         $request->save();
         $hours = (int) ($request->hours ?? 1);
@@ -387,12 +439,11 @@ class SuperadminBannerRequestController extends AdminController
                     'coins' => $request->coins_deducted,
                 ]
 
-                ],
-                superAdminId:$request->user_id
+            ],
+            superAdminId: $request->user_id
 
         );
 
         return response()->json(['success' => true, 'message' => __('Banner rejected successfully')]);
     }
-
 }

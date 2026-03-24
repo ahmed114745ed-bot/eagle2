@@ -31,7 +31,6 @@ class BadgeController extends Controller
             ->active()
             ->with([
                 'badge:id,type',
-
             ])->get();
 
         $data = [

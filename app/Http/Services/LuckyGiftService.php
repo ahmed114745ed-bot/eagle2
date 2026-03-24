@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Jobs\UpdatePkAndSendToZigo;
+use App\Models\AppFeature;
 use App\Models\Gift;
 use App\Models\Room;
 use App\Models\User;
@@ -106,9 +107,11 @@ class LuckyGiftService
             dispatch(new UpdateUsersAndSendCharismaToZigo($room, $receiversIds, $price, $userId))->onQueue('default');
         }
         $updateUserWhenSendGift = new UpdateUserWhenSendGift();
+        $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
+
         foreach ($receivedUsers as $receivedUser) {
             // Lucky gift code
-            $sendGiftServices->sendGift($number, $room, $gift, $user, $receivedUser, totalPrice: $price);
+            $sendGiftServices->sendGift($number, $room, $gift, $user, $receivedUser, totalPrice: $price, appFeatureStatus: $appFeatureStatus);
             $updateUserWhenSendGift->updateReceivedLevels($receivedUser);
         }
 

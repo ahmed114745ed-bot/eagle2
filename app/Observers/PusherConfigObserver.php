@@ -77,18 +77,18 @@ class PusherConfigObserver
 
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
-        
+
         Cache::put('pusher_config_changed', $meta['timestamp'], 300);
-        
+
         $this->clearWorkerConfigCache();
-        
+
         $this->updateLaravelConfigRuntime();
 
         if (OctaneBroadcasterService::isOctane()) {
             OctaneBroadcasterService::rebuildBroadcaster();
             Cache::store('octane')->clear();
             Cache::put('octane_broadcaster_rebuilt_at', $meta['timestamp'], 60 * 60);
-            
+
             try {
                 $pusherConfig = getPusherConfig();
                 event(new PusherConfigUpdated($pusherConfig, $config->name));
@@ -101,7 +101,7 @@ class PusherConfigObserver
 
     }
 
-  
+
     private function updateLaravelConfigRuntime(): void
     {
         try {
@@ -114,17 +114,17 @@ class PusherConfigObserver
                 'broadcasting.connections.pusher.options.cluster' => $pusherConfig['app_cluster'],
             ]);
 
-           
+
         } catch (\Exception $e) {
             Log::error('pusher_runtime_config_update_error', ['message' => $e->getMessage()]);
         }
     }
 
-    
+
     private function clearWorkerConfigCache(): void
     {
         try {
-          
+
         } catch (\Exception $e) {
             Log::error('pusher_worker_cache_clear_error', ['message' => $e->getMessage()]);
         }
@@ -136,7 +136,7 @@ class PusherConfigObserver
             Cache::put('pusher_config_changed', $meta['timestamp'], 3600);
             Artisan::call('queue:restart');
             Cache::put('queue_restart_requested_at', $meta['timestamp'], 3600);
-            
+
         } catch (\Exception $e) {
             Log::error('queue_workers_restart_failed', [
                 'error' => $e->getMessage(),

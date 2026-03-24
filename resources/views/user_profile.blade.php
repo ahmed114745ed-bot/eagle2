@@ -2560,13 +2560,12 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" target="_blank"
+                                    <a href="{{ url('admin/gifts/' .  @$giftSLog->gift->id) }}" target="_blank"
                                        class="d-flex align-items-center text-decoration-none">
-                                        <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
-                                             width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        {!! handleShowImageWithTypes($giftSLog->gift->id ?? 0, getImagePath($giftSLog->gift->img ?? ''), 30, 30) !!}
                                         <div>
                                             <span>{{ $giftName }}</span><br>
+                                            <span>id: {{ $giftSLog->gift->id ?? 0 }}</span><br>
                                             <small class="text-muted">
                                                 {{ __('Type') }}
                                                 : {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}<br>
