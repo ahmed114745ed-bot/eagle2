@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::table('badges', function (Blueprint $table) {
             $table->string('name')->nullable()->change();
-            $table->string('language')->nullable()->after('name');
         });
+        if (!Schema::hasColumn('badges', 'language')) {
+            Schema::table('badges', function (Blueprint $table) {
+                $table->string('language')->nullable()->after('name');
+            });
+        }
     }
 
     /**

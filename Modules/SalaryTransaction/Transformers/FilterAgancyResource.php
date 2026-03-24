@@ -35,11 +35,18 @@ class FilterAgancyResource extends JsonResource
         } elseif ($this->type == 2) {
             $type = 'shipping';
         }
-        $year = request('year') ?? Carbon::now()->year;
-        $month = request('month') ?? Carbon::now()->month;
 
-        $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(5)->get();
+        $giftLog = $this->giftLogs->filter(fn($log) => $log->receiver)->groupBy('receiver_id')
+            ->map(function ($logs) {
+                return [
+                    'receiver' => $logs->first()->receiver,
+                    'exp' => $logs->sum('giftPrice')
+                ];
+            })
+            ->sortByDesc('exp')
+            ->take(5)
+            ->values();
+
         return [
             'id' => $this->id,
             'name' => @$this->name,
@@ -47,7 +54,7 @@ class FilterAgancyResource extends JsonResource
             'total_members' => $this->mempers->count(),
             'members' => AgencyMemberResource::collection($this->mempers),
             'agency_type' =>  $type,
-            'is_join_request' => AgencyJoinRequest::where('user_id', request()->user()->id)->where('agency_id', $this->id)->exists(),
+            'is_join_request' => $this->joinRequests->where('user_id', request()->user()->id)->isNotEmpty(),
             'owner' => [
                 'id' => $this->owner->id ?? 0,
                 'uuid' => $this->owner->uuid ?? '',

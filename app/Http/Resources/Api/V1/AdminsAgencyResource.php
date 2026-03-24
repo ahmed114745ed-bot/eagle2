@@ -19,7 +19,7 @@ class AdminsAgencyResource extends JsonResource
 
     public function toArray($request)
     {
-        $hasColor = Common::hasInPack(@$this->user->id, 18, true);
+        $hasColor = Common::hasInPackV2(@$this->user->packs, 18, true);
 
         return [
             'id' => $this->user->id ?? 0,

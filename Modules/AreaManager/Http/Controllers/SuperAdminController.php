@@ -363,6 +363,10 @@ class SuperAdminController extends MainController
             }
             $isEditing = $form->isEditing();
             if (!$isEditing) {
+                $authId = auth()->user()->type === 'area-manager'
+                    ? auth()->user()->id
+                    : auth()->user()->parent_id;
+                \Cache::forget('super_admins_by_manager_' . $authId);
                 $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
 
                 $newBdId = DB::table('admin_users')->insertGetId([

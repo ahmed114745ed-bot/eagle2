@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Tik\Services\AgencyService;
@@ -175,6 +176,37 @@ class AgencyAppController extends Controller
             'agency_masters' => FilterAgencyMangerResource::collection($agencyManger),
         ];
         return Common::apiResponse(1, '', $data);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function agencyFilterV2(Request $request): JsonResponse
+    {
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature) {
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
+        $keyword = $request->keyword;
+        $agencies = $this->agencyService->filterV2($keyword);
+
+        return Common::apiResponse(1, '', FilterAgancyResource::collection($agencies));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function masters(Request $request): JsonResponse
+    {
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature) {
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
+        $keyword = $request->keyword;
+        $agencyMangers = $this->agencyService->agencyMangers($keyword);
+        return Common::apiResponse(1, '', FilterAgencyMangerResource::collection($agencyMangers));
     }
 
     public function dailyReport()

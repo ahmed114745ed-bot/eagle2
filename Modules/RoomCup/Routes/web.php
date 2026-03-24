@@ -54,6 +54,6 @@ Route::get('/roomcup/calculate-rewards', function () {
     return response()->json([
         'status'  => 'success',
         'message' => 'RoomCup rewards calculated',
-        'output'  => $output, // هنرجعها كمان في الرد
+        'output'  => $output,
     ]);
 });

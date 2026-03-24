@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('box_uses', function (Blueprint $table) {
-            $table->boolean('is_closed')->default(true);
-        });
+        if (!Schema::hasColumn('box_uses', 'is_closed')) {
+            Schema::table('box_uses', function (Blueprint $table) {
+                $table->boolean('is_closed')->default(true);
+            });
+        }
     }
 
     /**

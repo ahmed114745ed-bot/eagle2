@@ -6,4 +6,5 @@ enum TargetType : string
 {
     case REGULAR = 'regular';
     case FIXED = 'fixed';
+    case APP = 'app';
 }

@@ -31,6 +31,22 @@ class AgencyObserver
         $user = User::find($agency->app_owner_id);
 
         MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
+        $exists = UsersJoinedAgency::where([
+            'user_id' =>  $user->id,
+            'agency_id' => $agency->id,
+            'type' => 1,
+        ])->whereNull('leave_date')->exists();
+
+        if (!$exists) {
+            UsersJoinedAgency::create([
+                'user_id' => $user->id,
+                'agency_id' => $agency->id,
+                'type' => 1,
+                'join_date' => now(),
+                'status' => 'Joined',
+            ]);
+        }
+
         info('create host-agency-owner milestone');
     }
 
@@ -53,6 +69,7 @@ class AgencyObserver
             if ($oldOwner) {
                 $oldOwner->update(['agency_id' => 0, 'is_host'  => 0]);
                 MilestoneHelper::removeReward($oldOwner, 'host-agency-owner');
+                $this->updatePreviousAgencyJoined($oldOwner, $agency->id);
                 info('update host-agency-owner milestone');
             }
         }
@@ -62,6 +79,22 @@ class AgencyObserver
             if ($newUser) {
                 $newUser->update(['agency_id' => $agency->id, 'is_host'  => 1]);
                 MilestoneHelper::grantMilestoneToUser($newUser, 'host-agency-owner');
+
+                $exists = UsersJoinedAgency::where([
+                    'user_id' =>  $newUser->id,
+                    'agency_id' => $agency->id,
+                    'type' => 1,
+                ])->whereNull('leave_date')->exists();
+
+                if (!$exists) {
+                    UsersJoinedAgency::create([
+                        'user_id' => $newUser->id,
+                        'agency_id' => $agency->id,
+                        'type' => 1,
+                        'join_date' => now(),
+                        'status' => 'Joined',
+                    ]);
+                }
                 info('update 2 host-agency-owner milestone');
             }
         }
@@ -69,23 +102,50 @@ class AgencyObserver
         User::query()->where('id', $agency->app_owner_id)->update(['agency_id' => $agency->id]);
     }
 
-        /**
-         * Handle the Agency "deleted" event.
-         *
-         * @return void
-         */
-        public function deleted(Agency $agency)
-        {
-//            if ($agency->Host_agency) {
-                AgencyJoinRequest::query()->where('agency_id', $agency->id)->delete();
-                UserHandling::kickOfAllUsersFromAgency($agency);
-                User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);
-                $joinedAgency = UsersJoinedAgency::where(['agency_id' => $agency->id])->get();
-                if ($joinedAgency) UsersJoinedAgency::where('agency_id', $agency->id)->update(['leave_date' => now(), 'status' => 'delete agency from admin']);
-                $user = User::find($agency->app_owner_id);
-                Admin::where('username', $user->uuid)->delete();
-                MilestoneHelper::removeReward($user, 'host-agency-owner');
-                info('delete host-agency-owner milestone');
-//            }
+    /**
+     * Handle the Agency "deleted" event.
+     *
+     * @return void
+     */
+    public function deleted(Agency $agency)
+    {
+        //            if ($agency->Host_agency) {
+        AgencyJoinRequest::query()->where('agency_id', $agency->id)->delete();
+        UserHandling::kickOfAllUsersFromAgency($agency);
+        User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);
+        $joinedAgency = UsersJoinedAgency::where(['agency_id' => $agency->id])->get();
+        if ($joinedAgency) UsersJoinedAgency::where('agency_id', $agency->id)->update(['leave_date' => now(), 'status' => 'delete agency from admin']);
+        $user = User::find($agency->app_owner_id);
+        Admin::where('username', $user->uuid)->delete();
+        MilestoneHelper::removeReward($user, 'host-agency-owner');
+        info('delete host-agency-owner milestone');
+        //            }
+    }
+
+
+    private function updatePreviousAgencyJoined(User $user, $agencyId)
+    {
+        $checkAgencyUser = UsersJoinedAgency::where([
+            'user_id' => $user->id,
+            'agency_id' => $agencyId,
+        ])->whereNull('leave_date')->first();
+
+        if (!$checkAgencyUser) {
+            UsersJoinedAgency::create([
+                'user_id' => $user->id,
+                'agency_id' => $agencyId,
+                'type' => 2,
+                'join_date' => now(),
+                'leave_date' => now(),
+                'status' => 'change agency by admin',
+                'kicked_by_admin' => Auth::id(),
+            ]);
+        } else {
+            $checkAgencyUser->update([
+                'leave_date' => now(),
+                'status' => 'change agency by admin',
+                'kicked_by_admin' => Auth::id()
+            ]);
         }
     }
+}

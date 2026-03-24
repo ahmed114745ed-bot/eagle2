@@ -26,6 +26,9 @@ use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use App\Services\Gifts\LuckyGiftService;
+use App\Services\FairLuck\V5\FairLuckServiceV5;
+use App\Services\FairLuck\V5\GlobalStabilityManager;
+use App\Models\Gift;
 
 
 class GiftLogController extends Controller
@@ -37,6 +40,8 @@ class GiftLogController extends Controller
         RoomTopUsersRepository $roomTopUsersRepository,
         private GiftLogService $giftLogService,
         LuckyGiftService $luckyGiftService,
+        private FairLuckServiceV5 $fairLuckService,
+        private GlobalStabilityManager $stabilityManager,
     ) {
 
         $this->roomTopUsersRepository = $roomTopUsersRepository;
@@ -356,6 +361,9 @@ class GiftLogController extends Controller
 
         if ($luckyStatus == 1) {
             $version = Common::getSettingValue('lucky_gift_version');
+            if ($version == 3) {
+                return $this->sendLuckyGift6($request, $updateUserWhenSendGift);
+            }
             if ($version == 2) {
                 return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
             }
@@ -487,6 +495,66 @@ class GiftLogController extends Controller
         return Common::apiResponse(1, __('api_responses.success'), $data);
     }
 
+    public function sendLuckyGiftV5(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+        $stopLucky = settings()->get('stop_luckyGift');
+        if ($stopLucky == 1) {
+            return Common::apiResponse(0, __('api_responses.try_again'));
+        }
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'owner_id' => 'nullable',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        $data = $request->all();
+        $user = $request->user();
+
+        try {
+            $data = $this->luckyGiftService->sendLuckyGiftV5($data, $user, $updateUserWhenSendGift);
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+        return Common::apiResponse(1, __('api_responses.success'), $data);
+    }
+
+
+    public function sendLuckyGift6(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+        $stopLucky = settings()->get('stop_luckyGift');
+        if ($stopLucky == 1) {
+            return Common::apiResponse(0, __('api_responses.try_again'));
+        }
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'owner_id' => 'nullable',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        $data = $request->all();
+        $user = $request->user();
+
+        try {
+            $data = $this->luckyGiftService->sendLuckyGift6($data, $user, $updateUserWhenSendGift);
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+        return Common::apiResponse(1, __('api_responses.success'), $data);
+    }
 
     // public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     // {

@@ -2,15 +2,19 @@
 
 namespace App\Admin\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
+use App\Models\Config;
 use App\Models\Family;
+use App\Models\FamilyUser;
+use App\Models\Setting;
+use App\Models\User;
+use App\Services\AppFeatureService;
+use Carbon\Carbon;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Models\FamilyUser;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class FamilyController extends MainController
 {
@@ -258,5 +262,21 @@ class FamilyController extends MainController
         });
 
         return $form;
+    }
+
+
+    public function familySettings( Content $content)
+    {
+        
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . 'family-setting');
+        }
+        $config = Config::whereIn('name', [
+            'family_price',
+        ])->pluck('value', 'name')->toArray();
+        return $content->view('familiesSettings', [
+            'config' => $config,
+
+        ]);
     }
 }
