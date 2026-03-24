@@ -7,7 +7,7 @@ jobs:
   run_lumio_hub:
     runs-on: [self-hosted]
     steps:
-    - name: print out lumio
+    - name: print out lumio hub cleanup
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
@@ -16,22 +16,20 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 7m
         script: |
-          cd /var/www/lumio
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+            echo "Disk space high ($current%), cleaning up..."
+            docker system prune -af
           else
-            echo "Disk space is within acceptable limits $current% "
+            echo "Disk space OK ($current%)"
           fi
 
   run_lumio_app:
     runs-on: [self-hosted]
     needs: run_lumio_hub
     steps:
-    - name: print out lumio
+    - name: Build and Deploy Lumio App (Octane)
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
@@ -41,36 +39,42 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/lumio
-          pwd
+          # 1. Build the new image
           docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
 
-          docker service update --image lumio-octa:${{ github.sha }} \
+          # 2. Update service with Zero-Downtime & Port Safety flags
+          docker service update \
+            --image lumio-octa:${{ github.sha }} \
             --replicas 3 \
             --limit-memory 1.2gb \
             --reserve-memory 600mb \
+            --update-order stop-first \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            --update-failure-action rollback \
             lumio-octa
 
+          # 3. Wait for the new container to be stable before running artisan
+          echo "Waiting for container to stabilize..."
+          sleep 15
 
           CONTAINER_ID=$(docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
 
           if [ -n "$CONTAINER_ID" ]; then
             docker exec $CONTAINER_ID php artisan whatsapp:change-token
           else
-            echo "No running container found for lumio-octa.1 service task"
+            echo "Error: No running container found for lumio-octa.1"
             exit 1
           fi
 
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            docker system prune -a -f && echo "Docker system cleaned successfully"
-          fi
+          # 4. Final Cleanup
+          docker image prune -f
 
   run_lumio_job:
     runs-on: [self-hosted]
     needs: run_lumio_hub
     steps:
-    - name: print out lumio Job
+    - name: Build and Deploy Lumio Job (Workers)
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
@@ -80,10 +84,12 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/lumio
-          pwd
           docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
-          docker service update --image lumio-job:${{ github.sha }} \
+          docker service update \
+            --image lumio-job:${{ github.sha }} \
             --replicas 3 \
             --limit-memory 800mb \
             --reserve-memory 400mb \
+            --update-parallelism 1 \
+            --update-delay 5s \
             lumio-job
