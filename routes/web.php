@@ -785,14 +785,8 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ]);
                 }
 
-                // Reverse sender's inflated send stats and refund their coins
-                DB::table('users')
-                    ->where('id', $group->sender_id)
-                    ->update([
-                        'total_diamond_send' => DB::raw("GREATEST(0, CAST(total_diamond_send AS SIGNED) - {$excessDiamonds})"),
-                        'monthly_diamond_send' => DB::raw("GREATEST(0, CAST(monthly_diamond_send AS SIGNED) - {$excessDiamonds})"),
-                        'di' => DB::raw("di + {$excessDiamonds}"),
-                    ]);
+                // NOTE: Sender refund intentionally skipped — senders already spent their diamonds
+                // and the app has already collected those coins. No refund needed.
 
                 // Fix room session (was inflated by excess)
                 $roomId = $logs->first()->room_id;
