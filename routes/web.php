@@ -2065,8 +2065,8 @@ Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request)
     DB::beginTransaction();
     try {
         $negativeUsers = DB::table('user_sallaries')
-            ->selectRaw('id, user_id, (sallary + COALESCE(extras, 0)) - cut_amount as balance, month, year')
-            ->whereRaw('(sallary + COALESCE(extras, 0)) - cut_amount < 0')
+            ->selectRaw('id, user_id, (sallary - cut_amount) as balance, month, year')
+            ->whereRaw('sallary - cut_amount < 0')
             ->get();
 
         $rate = Common::getCoinsValue('user_coins'); // Dynamic rate conversion
@@ -2166,7 +2166,7 @@ Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request)
             // تصفير عجز المرسل النهائي (Resolve negative balance in user_sallaries)
             if ($shouldExecute) {
                 DB::table('user_sallaries')->where('id', $user->id)
-                    ->update(['cut_amount' => DB::raw("sallary + COALESCE(extras, 0)")]);
+                    ->update(['cut_amount' => DB::raw("sallary")]);
             }
         }
 
