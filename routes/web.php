@@ -2084,7 +2084,7 @@ Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request)
                 ->latest()->first();
 
             if ($charge) {
-                $targetUserId = $charge->receiver_id;
+                $targetUserId = $charge->user_id;
                 $targetType = $charge->user_type; // user or agency
 
                 // --- سيناريو (أ): المستقبل وكالة وصرفتهم ---
@@ -2098,7 +2098,7 @@ Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request)
                             ->latest()->first();
                         
                         if ($agencySubCharge) {
-                            $targetUserId = $agencySubCharge->receiver_id;
+                            $targetUserId = $agencySubCharge->user_id;
                             $targetType = 'user'; // تحول الهدف لمستخدم الآن
                         }
                     } else {
