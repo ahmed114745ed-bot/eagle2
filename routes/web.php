@@ -705,143 +705,116 @@ Route::get('/fix-receiver-levels', function () {
 });
 
 Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
-    // Find bugged bag gift batches: source_type='gift' sent to multiple receivers after the bug date
-    $affected = DB::table('gift_logs')
-        ->selectRaw('sender_id, giftId, giftPrice, giftNum, created_at, COUNT(*) as receiver_count')
+    $shouldExecute = $request->query('fix') == '1';
+
+    // Step 1: Get ALL bag gift diamonds per receiver since the bug date
+    $receivers = DB::table('gift_logs')
+        ->selectRaw('receiver_id, SUM(giftPrice) as bag_total')
         ->where('source_type', 'gift')
         ->where('created_at', '>=', '2026-03-19')
-        ->groupBy('sender_id', 'giftId', 'giftPrice', 'giftNum', 'created_at')
-        ->havingRaw('COUNT(*) > 1')
+        ->groupBy('receiver_id')
         ->get();
 
-    Log::info("Found " . $affected->count() . " affected bag gift transactions.");
-
-    if ($affected->isEmpty()) {
-        return response()->json([
-            'status' => 'ok',
-            'message' => 'No affected bag gift transactions found.',
-        ]);
+    if ($receivers->isEmpty()) {
+        return response()->json(['status' => 'ok', 'message' => 'No bag gift receivers found.']);
     }
 
-    $shouldExecute = $request->query('fix') == '1';
-    $totalExcess = 0;
-    $details = [];
+    $zones = (int) DB::table('settings')->where('key', 'zones_coins')->value('value') ?: 30000;
+    $report = [
+        'status' => $shouldExecute ? 'fixed' : 'report',
+        'total_receivers' => $receivers->count(),
+        'total_bag_diamonds' => (int) $receivers->sum('bag_total'),
+        'salary_corrections' => 0,
+        'details' => [],
+    ];
 
-    DB::transaction(function () use ($affected, $shouldExecute, &$totalExcess, &$details) {
-        foreach ($affected as $group) {
-            $logs = DB::table('gift_logs')
-                ->where('sender_id', $group->sender_id)
-                ->where('giftId', $group->giftId)
-                ->where('giftPrice', $group->giftPrice)
-                ->where('giftNum', $group->giftNum)
-                ->where('created_at', $group->created_at)
-                ->where('source_type', 'gift')
-                ->orderBy('id')
-                ->get(['id', 'receiver_id', 'giftPrice', 'created_at', 'room_id', 'receiver_family_id']);
+    DB::transaction(function () use ($receivers, $shouldExecute, $zones, &$report) {
 
-            $extraLogs = $logs->slice(1);
-            $excessDiamonds = (int) $extraLogs->sum('giftPrice');
-            $totalExcess += $excessDiamonds;
-
-            $details[] = [
-                'sender_id' => $group->sender_id,
-                'gift_id' => $group->giftId,
-                'created_at' => $group->created_at,
-                'gift_price_per_receiver' => (int) $group->giftPrice,
-                'total_receivers' => $group->receiver_count,
-                'excess_diamonds' => $excessDiamonds,
-                'kept_receiver' => $logs->first()->receiver_id,
-                'extra_receivers' => $extraLogs->pluck('receiver_id')->values()->toArray(),
-            ];
+        // Step 2: Subtract ALL bag gift diamonds from each receiver
+        foreach ($receivers as $recv) {
+            $bagTotal = (int) $recv->bag_total;
+            $userId = $recv->receiver_id;
 
             if ($shouldExecute) {
-                // Reverse diamonds for each extra receiver
-                foreach ($extraLogs as $log) {
-                    $logPrice = (int) $log->giftPrice;
+                // Subtract from monthly_diamond_received (allow negative)
+                DB::table('monthly_diamond_receives')
+                    ->where('user_id', $userId)
+                    ->where('month', now()->month)
+                    ->where('year', now()->year)
+                    ->update([
+                        'monthly_diamond_received' => DB::raw("CAST(monthly_diamond_received AS SIGNED) - {$bagTotal}"),
+                    ]);
 
-                    // Reverse total_diamond_received (allow negative = unrecoverable loss)
-                    DB::table('users')
-                        ->where('id', $log->receiver_id)
-                        ->update([
-                            'total_diamond_received' => DB::raw("CAST(total_diamond_received AS SIGNED) - {$logPrice}"),
-                        ]);
+                // Subtract from total_diamond_received (allow negative)
+                DB::table('users')->where('id', $userId)->update([
+                    'total_diamond_received' => DB::raw("CAST(total_diamond_received AS SIGNED) - {$bagTotal}"),
+                ]);
 
-                    // Reverse exchange_diamonds (only for non-agency users, allow negative)
-                    DB::table('users')
-                        ->where('id', $log->receiver_id)
-                        ->where('agency_id', 0)
-                        ->update([
-                            'exchange_diamonds' => DB::raw("CAST(exchange_diamonds AS SIGNED) - {$logPrice}"),
-                        ]);
-
-                    // Reverse monthly_diamond_received (allow negative)
-                    $logDate = \Carbon\Carbon::parse($log->created_at, getTimezone());
-                    DB::table('monthly_diamond_receives')
-                        ->where('user_id', $log->receiver_id)
-                        ->where('month', $logDate->month)
-                        ->where('year', $logDate->year)
-                        ->update([
-                            'monthly_diamond_received' => DB::raw("CAST(monthly_diamond_received AS SIGNED) - {$logPrice}"),
-                        ]);
-                }
-
-                // NOTE: Sender refund intentionally skipped — senders already spent their diamonds
-                // and the app has already collected those coins. No refund needed.
-
-                // Fix room session (was inflated by excess)
-                $roomId = $logs->first()->room_id;
-                if ($roomId) {
-                    DB::table('rooms')
-                        ->where('id', $roomId)
-                        ->update([
-                            'session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$excessDiamonds})"),
-                        ]);
-                }
-
-                // Fix room_top_users (sender coins were inflated)
-                if ($roomId) {
-                    DB::table('room_top_users')
-                        ->where('room_id', $roomId)
-                        ->where('user_id', $group->sender_id)
-                        ->update([
-                            'coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$excessDiamonds})"),
-                        ]);
-                }
-
-                // Fix total_room_gifts (room boom totals were inflated)
-                if ($roomId) {
-                    $logDate = \Carbon\Carbon::parse($logs->first()->created_at, getTimezone());
-                    DB::table('total_room_gifts')
-                        ->where('room_id', $roomId)
-                        ->whereDate('created_at', $logDate->toDateString())
-                        ->update([
-                            'current_total' => DB::raw("GREATEST(0, CAST(current_total AS SIGNED) - {$excessDiamonds})"),
-                        ]);
-                }
-
-                // Fix family total_diamond for extra receivers' families
-                $familyIds = $extraLogs->pluck('receiver_family_id')->filter()->unique();
-                foreach ($familyIds as $familyId) {
-                    $familyExcess = (int) $extraLogs->where('receiver_family_id', $familyId)->sum('giftPrice');
-                    DB::table('families')
-                        ->where('id', $familyId)
-                        ->update([
-                            'total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$familyExcess})"),
-                        ]);
-                }
-
-                // Delete the extra (exploit) gift_log records
-                $extraIds = $extraLogs->pluck('id')->toArray();
-                DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
+                // Subtract from exchange_diamonds for non-agency users (allow negative)
+                DB::table('users')->where('id', $userId)->where('agency_id', 0)->update([
+                    'exchange_diamonds' => DB::raw("CAST(exchange_diamonds AS SIGNED) - {$bagTotal}"),
+                ]);
             }
         }
 
-        // Fix salaries: recalculate based on corrected monthly diamonds
+        // Step 3: Fix room/family stats and delete gift_log records
         if ($shouldExecute) {
-            // Get all salary records where achieved_diamond was inflated
-            $salaryFixes = DB::select("
-                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond,
-                       s.target_diamonds, s.dB, s.app_profit,
+            // Get all bag gift logs with room/family info for cleanup
+            $allBagGifts = DB::table('gift_logs')
+                ->where('source_type', 'gift')
+                ->where('created_at', '>=', '2026-03-19')
+                ->get(['id', 'sender_id', 'receiver_id', 'giftPrice', 'room_id', 'receiver_family_id', 'created_at']);
+
+            // Fix rooms: subtract bag gift totals per room
+            $roomTotals = $allBagGifts->whereNotNull('room_id')->groupBy('room_id');
+            foreach ($roomTotals as $roomId => $gifts) {
+                $roomExcess = (int) $gifts->sum('giftPrice');
+                DB::table('rooms')->where('id', $roomId)->update([
+                    'session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$roomExcess})"),
+                ]);
+
+                // Fix room_top_users per sender
+                $senderTotals = $gifts->groupBy('sender_id');
+                foreach ($senderTotals as $senderId => $senderGifts) {
+                    $senderExcess = (int) $senderGifts->sum('giftPrice');
+                    DB::table('room_top_users')
+                        ->where('room_id', $roomId)
+                        ->where('user_id', $senderId)
+                        ->update(['coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$senderExcess})")]);
+                }
+
+                // Fix total_room_gifts per day
+                $dayTotals = $gifts->groupBy(fn($g) => \Carbon\Carbon::parse($g->created_at)->toDateString());
+                foreach ($dayTotals as $date => $dayGifts) {
+                    $dayExcess = (int) $dayGifts->sum('giftPrice');
+                    DB::table('total_room_gifts')
+                        ->where('room_id', $roomId)
+                        ->whereDate('created_at', $date)
+                        ->update(['current_total' => DB::raw("GREATEST(0, CAST(current_total AS SIGNED) - {$dayExcess})")]);
+                }
+            }
+
+            // Fix families
+            $familyTotals = $allBagGifts->whereNotNull('receiver_family_id')->where('receiver_family_id', '>', 0)->groupBy('receiver_family_id');
+            foreach ($familyTotals as $familyId => $gifts) {
+                $familyExcess = (int) $gifts->sum('giftPrice');
+                DB::table('families')->where('id', $familyId)->update([
+                    'total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$familyExcess})"),
+                ]);
+            }
+
+            // Delete ALL bag gift log records since Mar 19
+            DB::table('gift_logs')
+                ->where('source_type', 'gift')
+                ->where('created_at', '>=', '2026-03-19')
+                ->delete();
+        }
+
+        // Step 4: Recalculate salaries using targets table
+        if ($shouldExecute) {
+            $salaryUsers = DB::select("
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.cut_amount,
+                       s.achieved_diamond, s.target_id, s.target_diamonds,
                        m.monthly_diamond_received as corrected_diamond
                 FROM user_sallaries s
                 JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
@@ -849,56 +822,55 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                   AND s.achieved_diamond > m.monthly_diamond_received
             ", [now()->month, now()->year]);
 
-            foreach ($salaryFixes as $sal) {
-                $corrected = max(0, (int) $sal->corrected_diamond); // clamp to 0 for salary (column is unsigned)
-                $target = (int) $sal->target_diamonds;
+            foreach ($salaryUsers as $sal) {
+                $corrected = max(0, (int) $sal->corrected_diamond);
 
-                if ($corrected >= $target) {
-                    // Still meets target with corrected diamonds — just update achieved_diamond
-                    DB::table('user_sallaries')
-                        ->where('id', $sal->id)
-                        ->update([
-                            'achieved_diamond' => $corrected,
-                            'diamond' => $corrected . ' / ' . $target,
-                            'remaining_diamond' => 0,
-                        ]);
+                // Find best qualifying target for corrected diamonds
+                $newTarget = DB::table('targets')
+                    ->where('diamonds', '<=', $corrected)
+                    ->orderByDesc('diamonds')
+                    ->first();
+
+                if ($newTarget) {
+                    $newSalary = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->usd / 100);
+                    $newAgency = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->agency_share / 100);
                 } else {
-                    // No longer meets target — zero out this salary tier
-                    DB::table('user_sallaries')
-                        ->where('id', $sal->id)
-                        ->update([
-                            'achieved_diamond' => $corrected,
-                            'sallary' => 0,
-                            'agency_sallary' => 0,
-                            'diamond' => $corrected . ' / ' . $target,
-                            'remaining_diamond' => $target - $corrected,
-                            'is_finished' => 0,
-                        ]);
+                    $newSalary = 0;
+                    $newAgency = 0;
                 }
+
+                $targetDiamonds = $newTarget->diamonds ?? 0;
+                $targetId = $newTarget->id ?? null;
+
+                DB::table('user_sallaries')->where('id', $sal->id)->update([
+                    'sallary' => $newSalary,
+                    'agency_sallary' => $newAgency,
+                    'achieved_diamond' => $corrected,
+                    'target_id' => $targetId,
+                    'target_diamonds' => $targetDiamonds,
+                    'diamond' => $corrected . ' / ' . $targetDiamonds,
+                    'remaining_diamond' => max(0, $targetDiamonds - $corrected),
+                    'is_finished' => $corrected >= $targetDiamonds ? 1 : 0,
+                ]);
+
+                $report['salary_corrections']++;
+                $report['details'][] = [
+                    'user_id' => $sal->user_id,
+                    'old_salary' => (float) $sal->sallary,
+                    'new_salary' => $newSalary,
+                    'old_agency' => (float) $sal->agency_sallary,
+                    'new_agency' => $newAgency,
+                    'cut_amount' => (float) $sal->cut_amount,
+                    'net' => $newSalary - (float) $sal->cut_amount,
+                    'old_achieved' => (int) $sal->achieved_diamond,
+                    'corrected_monthly' => $corrected,
+                    'new_target' => $targetDiamonds,
+                ];
             }
         }
     });
 
-    $salaryReport = DB::table('user_sallaries as s')
-        ->join('monthly_diamond_receives as m', function ($join) {
-            $join->on('m.user_id', '=', 's.user_id')
-                ->where('m.month', '=', DB::raw('s.month'))
-                ->where('m.year', '=', DB::raw('s.year'));
-        })
-        ->where('s.month', now()->month)
-        ->where('s.year', now()->year)
-        ->where('s.is_paid', 0)
-        ->whereColumn('s.achieved_diamond', '>', 'm.monthly_diamond_received')
-        ->select('s.user_id', 's.achieved_diamond', 'm.monthly_diamond_received', 's.target_diamonds', 's.sallary', 's.agency_sallary')
-        ->get();
-
-    return response()->json([
-        'status' => $shouldExecute ? 'fixed' : 'report',
-        'total_affected_transactions' => $affected->count(),
-        'total_excess_diamonds' => $totalExcess,
-        'salary_corrections' => $salaryReport->count(),
-        'details' => $details,
-    ]);
+    return response()->json($report);
 });
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
