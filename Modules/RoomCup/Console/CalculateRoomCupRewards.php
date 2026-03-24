@@ -268,9 +268,9 @@ class CalculateRoomCupRewards extends Command
                 }
 
                 RoomCupReward::create($reward);
-
                 $room->update(['session' => null]);
 
+                info($room->session);
                 $amountBefore = Common::getCurrentBalance($reward['user_id']);
                 $this->line("🪙 Adding {$reward['amount']} to user {$reward['user_id']} (balance before: {$amountBefore})");
                 $this->logRoomCup("Adding reward to user {$reward['user_id']}: Amount={$reward['amount']}, Balance before={$amountBefore}");
