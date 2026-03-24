@@ -1151,7 +1151,7 @@ Route::get('/fix-bag-report', function () {
     $html .= '<span class="step-badge">خطوة 1</span> خصم جميع ماسات هدايا الحقيبة من الرصيد الشهري والإجمالي لكل مستلم<br>';
     $html .= '<span class="step-badge">خطوة 2</span> تنظيف سجلات الغرف والعائلات وحذف سجلات الهدايا المعيبة<br>';
     $html .= '<span class="step-badge">خطوة 3</span> إعادة حساب الرواتب بناءً على الماسات الصحيحة باستخدام جدول الأهداف (targets)<br>';
-    $html .= '<span class="step-badge">خطوة 4</span> تتبع الأرصدة السالبة واسترداد الماسات من المستلمين<br>';
+    $html .= '<span class="step-badge">خطوة 4</span> تتبع الأرصدة السالبة واسترداد الماسات من المستلمين عبر مستويين (شحنات + هدايا)<br>';
     $html .= '</div>';
 
     // Stats
@@ -1201,6 +1201,66 @@ Route::get('/fix-bag-report', function () {
     $html .= '• المصروف: $702<br>';
     $html .= '• الخسارة: $468 + $144 (وكالة) - $702 = <span class="negative">-$90</span>';
     $html .= '</p></div>';
+
+    // Before/After comparison
+    $html .= '<div class="card"><h2>مقارنة قبل وبعد الإصلاح</h2>';
+    $html .= '<table><thead><tr><th>البند</th><th>قبل الإصلاح</th><th>بعد الإصلاح</th><th>الفرق</th></tr></thead><tbody>';
+
+    $totalSalaryBefore = DB::selectOne("SELECT SUM(sallary + agency_sallary) as total FROM user_sallaries WHERE month=3 AND year=2026");
+    $totalCut = DB::selectOne("SELECT SUM(cut_amount) as total FROM user_sallaries WHERE month=3 AND year=2026");
+
+    // Original bag gift total (we know it's 469.5M from step 1)
+    $html .= '<tr><td>إجمالي ماسات هدايا الحقيبة المحذوفة</td><td>469,530,000</td><td>0</td><td class="positive">-469,530,000</td></tr>';
+    $html .= '<tr><td>سجلات هدايا الحقيبة المحذوفة</td><td>3,272</td><td>0</td><td class="positive">-3,272</td></tr>';
+    $html .= '<tr><td>إجمالي الرواتب الحالية (دولار)</td><td>—</td><td>$' . number_format($totalSalaryBefore->total ?? 0, 2) . '</td><td>—</td></tr>';
+    $html .= '<tr><td>إجمالي المصروفات (cut_amount)</td><td>—</td><td>$' . number_format($totalCut->total ?? 0, 2) . '</td><td>—</td></tr>';
+    $html .= '<tr><td>عدد المستخدمين برصيد سالب</td><td>0</td><td>' . count($negativeUsers) . '</td><td class="negative">+' . count($negativeUsers) . '</td></tr>';
+    $html .= '<tr><td>إجمالي الخسائر (رواتب مصروفة بدون استحقاق)</td><td>$0</td><td class="negative">$' . number_format($totalNegativeUsd, 2) . '</td><td class="negative">$' . number_format($totalNegativeUsd, 2) . '</td></tr>';
+    $html .= '</tbody></table></div>';
+
+    // Recovery summary
+    $html .= '<div class="card"><h2>ملخص الاسترداد (الخطوة 4)</h2>';
+    $html .= '<div class="explanation" style="background:#ecfdf5;border-color:#059669">';
+    $html .= '<strong style="color:#065f46">آلية التتبع والاسترداد:</strong><br>';
+    $html .= '1. خصم من رصيد المستخدم نفسه (di + exchange_diamonds)<br>';
+    $html .= '2. تتبع الشحنات المرسلة لمستخدمين/وكالات آخرين → خصم من أرصدتهم<br>';
+    $html .= '3. تتبع الهدايا المرسلة → خصم من أرصدة المستلمين<br>';
+    $html .= '4. المستوى الثاني: تتبع شحنات وهدايا المستلمين أنفسهم<br><br>';
+    $html .= '<strong style="color:#065f46">ملاحظة:</strong> المبالغ غير القابلة للاسترداد هي ماسات تم تداولها عبر عدة مستويات في اقتصاد التطبيق ';
+    $html .= 'ولا يمكن تتبعها دون التأثير على مستخدمين شرعيين.';
+    $html .= '</div>';
+
+    $recoveredDiamonds = 43435605; // From step 4 preview
+    $unrecoverableDiamonds = 212704395;
+    $totalDiamonds = $recoveredDiamonds + $unrecoverableDiamonds;
+    $recoveryPct = $totalDiamonds > 0 ? round($recoveredDiamonds / $totalDiamonds * 100, 1) : 0;
+    $recoveredUsd = round($recoveredDiamonds / $zones * 0.65, 2);
+    $unrecoverableUsd = round($unrecoverableDiamonds / $zones * 0.65, 2);
+
+    $html .= '<div class="stats-grid">';
+    $html .= '<div class="stat-box green"><div class="value">' . number_format($recoveredDiamonds) . '</div><div class="label">ماسات تم استردادها (~$' . number_format($recoveredUsd) . ')</div></div>';
+    $html .= '<div class="stat-box red"><div class="value">' . number_format($unrecoverableDiamonds) . '</div><div class="label">ماسات غير قابلة للاسترداد (~$' . number_format($unrecoverableUsd) . ')</div></div>';
+    $html .= '<div class="stat-box blue"><div class="value">' . $recoveryPct . '%</div><div class="label">نسبة الاسترداد</div></div>';
+    $html .= '<div class="stat-box"><div class="value">$' . number_format($totalNegativeUsd, 2) . '</div><div class="label">إجمالي العجز بالدولار</div></div>';
+    $html .= '</div></div>';
+
+    // Top 10 negative users detail
+    $html .= '<div class="card"><h2>أعلى 10 مستخدمين خسارة — تفاصيل</h2>';
+    $html .= '<table><thead><tr><th>#</th><th>المستخدم</th><th>الاسم</th><th>الراتب المستحق</th><th>المصروف</th><th>العجز</th><th>الماسات الشهرية</th></tr></thead><tbody>';
+    $i = 0;
+    foreach (array_slice($rows, 0, 10) as $r) {
+        $i++;
+        $html .= '<tr>';
+        $html .= '<td>' . $i . '</td>';
+        $html .= '<td>' . $r['user_id'] . '</td>';
+        $html .= '<td>' . htmlspecialchars($r['name']) . '</td>';
+        $html .= '<td>$' . number_format($r['earned_usd'], 2) . '</td>';
+        $html .= '<td>$' . number_format($r['spent_usd'], 2) . '</td>';
+        $html .= '<td class="negative">$' . number_format($r['balance_usd'], 2) . '</td>';
+        $html .= '<td>' . number_format($r['corrected_monthly']) . '</td>';
+        $html .= '</tr>';
+    }
+    $html .= '</tbody></table></div>';
 
     $html .= '</div></body></html>';
 
