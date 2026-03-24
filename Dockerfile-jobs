@@ -77,5 +77,4 @@ RUN REDIS_HOST=172.17.0.1 \
 #EXPOSE 9000
 
 # Start supervisord
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
+CMD ["/usr/bin/supervisord", "-n"]
