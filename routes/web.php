@@ -705,18 +705,20 @@ Route::get('/fix-receiver-levels', function () {
 });
 
 // ============================================================
-// BAG GIFT FIX — 4 STEP ROUTES (run sequentially: step1 → step2 → step3 → step4)
+// إصلاح خلل هدايا الحقيبة — 4 خطوات منفصلة (تُشغَّل بالترتيب: خطوة1 → خطوة2 → خطوة3 → خطوة4)
 // ============================================================
 
-// STEP 1: Subtract ALL bag gift diamonds from receivers (bulk SQL, no PHP loops)
+// الخطوة 1: خصم جميع ماسات هدايا الحقيبة من المستلمين (استعلامات SQL مباشرة بدون حلقات PHP)
 Route::get('/fix-bag-step1', function () {
+    // احصاء عدد المستلمين وإجمالي الماسات المتأثرة قبل التعديل
     $before = DB::selectOne("SELECT COUNT(DISTINCT receiver_id) as receivers, SUM(giftPrice) as total FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
 
+    // إذا لم توجد هدايا حقيبة — الإصلاح تم مسبقاً أو لا يوجد شيء للإصلاح
     if (!$before || $before->total == 0) {
         return response()->json(['status' => 'ok', 'message' => 'No bag gifts found. Already fixed or nothing to do.']);
     }
 
-    // Subtract from monthly_diamond_received
+    // خصم من الماسات الشهرية المستلمة — يسمح بالقيم السالبة لتتبع الخسائر
     DB::statement("
         UPDATE monthly_diamond_receives m
         JOIN (SELECT receiver_id, SUM(giftPrice) as bag_total
@@ -726,7 +728,7 @@ Route::get('/fix-bag-step1', function () {
         WHERE m.month = ? AND m.year = ?
     ", [now()->month, now()->year]);
 
-    // Subtract from total_diamond_received
+    // خصم من إجمالي الماسات المستلمة في جدول المستخدمين
     DB::statement("
         UPDATE users u
         JOIN (SELECT receiver_id, SUM(giftPrice) as bag_total
@@ -735,7 +737,7 @@ Route::get('/fix-bag-step1', function () {
         SET u.total_diamond_received = CAST(u.total_diamond_received AS SIGNED) - g.bag_total
     ");
 
-    // Subtract from exchange_diamonds (non-agency only)
+    // خصم من ماسات التبادل — فقط للمستخدمين الذين ليسوا في وكالة
     DB::statement("
         UPDATE users u
         JOIN (SELECT receiver_id, SUM(giftPrice) as bag_total
@@ -745,27 +747,30 @@ Route::get('/fix-bag-step1', function () {
         WHERE u.agency_id = 0
     ");
 
-    // Verify user 2614
+    // التحقق من المستخدم 2614 — يجب أن تكون الماسات الشهرية = 21,873,932
     $check = DB::selectOne("SELECT monthly_diamond_received FROM monthly_diamond_receives WHERE user_id=2614 AND month=3 AND year=2026");
 
+    // إرجاع تقرير النتائج
     return response()->json([
         'status' => 'done',
         'step' => 1,
-        'receivers_affected' => $before->receivers,
-        'total_diamonds_subtracted' => (float) $before->total,
-        'verification_user_2614_monthly' => $check->monthly_diamond_received ?? null,
+        'receivers_affected' => $before->receivers, // عدد المستلمين المتأثرين
+        'total_diamonds_subtracted' => (float) $before->total, // إجمالي الماسات المخصومة
+        'verification_user_2614_monthly' => $check->monthly_diamond_received ?? null, // تحقق
     ]);
 });
 
-// STEP 2: Fix rooms, families, delete bag gift logs (bulk SQL)
+// الخطوة 2: إصلاح الغرف والعائلات وحذف سجلات هدايا الحقيبة
 Route::get('/fix-bag-step2', function () {
+    // عد سجلات هدايا الحقيبة المتبقية
     $count = DB::selectOne("SELECT COUNT(*) as cnt FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
 
+    // إذا لم توجد سجلات — تم التنظيف مسبقاً
     if (!$count || $count->cnt == 0) {
         return response()->json(['status' => 'ok', 'message' => 'No bag gift logs to clean up.']);
     }
 
-    // Fix rooms
+    // إصلاح الغرف — خصم إجمالي هدايا الحقيبة من session كل غرفة
     DB::statement("
         UPDATE rooms r
         JOIN (SELECT room_id, SUM(giftPrice) as total
@@ -774,7 +779,7 @@ Route::get('/fix-bag-step2', function () {
         SET r.session = GREATEST(0, CAST(r.session AS SIGNED) - g.total)
     ");
 
-    // Fix families
+    // إصلاح العائلات — خصم الماسات من إجمالي ماسات العائلة
     DB::statement("
         UPDATE families f
         JOIN (SELECT receiver_family_id, SUM(giftPrice) as total
@@ -784,24 +789,28 @@ Route::get('/fix-bag-step2', function () {
         SET f.total_diamond = GREATEST(0, CAST(f.total_diamond AS SIGNED) - g.total)
     ");
 
-    // Delete ALL bag gift logs
+    // حذف جميع سجلات هدايا الحقيبة منذ 19 مارس
     $deleted = DB::delete("DELETE FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
 
-    // Verify
+    // التحقق — يجب أن يكون العدد المتبقي = 0
     $remaining = DB::selectOne("SELECT COUNT(*) as cnt FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
 
+    // إرجاع تقرير النتائج
     return response()->json([
         'status' => 'done',
         'step' => 2,
-        'gift_logs_deleted' => $deleted,
-        'remaining_bag_gifts' => $remaining->cnt,
+        'gift_logs_deleted' => $deleted, // عدد السجلات المحذوفة
+        'remaining_bag_gifts' => $remaining->cnt, // المتبقي (يجب = 0)
     ]);
 });
 
-// STEP 3: Recalculate salaries using targets table
+// الخطوة 3: إعادة حساب الرواتب باستخدام جدول الأهداف (targets)
+// المعادلة: الراتب = (ماسات_الهدف ÷ zones_coins) × (نسبة_الدولار ÷ 100)
 Route::get('/fix-bag-step3', function () {
+    // جلب قيمة zones_coins من الإعدادات (افتراضي = 30000)
     $zones = (int) DB::table('settings')->where('key', 'zones_coins')->value('value') ?: 30000;
 
+    // جلب جميع سجلات الرواتب التي تأثرت — حيث الماسات المحققة أكبر من الشهرية المصححة
     $salaryUsers = DB::select("
         SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.cut_amount,
                s.achieved_diamond, s.target_id, s.target_diamonds,
@@ -812,52 +821,59 @@ Route::get('/fix-bag-step3', function () {
           AND s.achieved_diamond > m.monthly_diamond_received
     ", [now()->month, now()->year]);
 
-    $report = ['step' => 3, 'corrections' => 0, 'details' => []];
+    $report = ['step' => 3, 'corrections' => 0, 'details' => []]; // تقرير النتائج
 
+    // لكل مستخدم متأثر
     foreach ($salaryUsers as $sal) {
+        // الماسات الشهرية المصححة (لا تقل عن صفر لأن عمود achieved_diamond بدون إشارة)
         $corrected = max(0, (int) $sal->corrected_diamond);
 
+        // البحث عن أعلى هدف يتحقق مع الماسات المصححة
         $newTarget = DB::table('targets')
-            ->where('diamonds', '<=', $corrected)
-            ->orderByDesc('diamonds')
+            ->where('diamonds', '<=', $corrected) // الهدف يجب أن يكون أقل من أو يساوي الماسات
+            ->orderByDesc('diamonds') // ترتيب تنازلي للحصول على أعلى هدف
             ->first();
 
         if ($newTarget) {
+            // حساب الراتب الجديد: (ماسات_الهدف ÷ zones) × (نسبة_الدولار ÷ 100)
             $newSalary = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->usd / 100);
+            // حساب حصة الوكالة: (ماسات_الهدف ÷ zones) × (نسبة_الوكالة ÷ 100)
             $newAgency = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->agency_share / 100);
-            $targetDiamonds = (int) $newTarget->diamonds;
-            $targetId = $newTarget->id;
+            $targetDiamonds = (int) $newTarget->diamonds; // ماسات الهدف الجديد
+            $targetId = $newTarget->id; // معرف الهدف الجديد
         } else {
+            // لم يتحقق أي هدف — الراتب = صفر
             $newSalary = 0;
             $newAgency = 0;
             $targetDiamonds = 0;
             $targetId = null;
         }
 
+        // تحديث سجل الراتب بالقيم الجديدة
         DB::table('user_sallaries')->where('id', $sal->id)->update([
-            'sallary' => $newSalary,
-            'agency_sallary' => $newAgency,
-            'achieved_diamond' => $corrected,
-            'target_id' => $targetId,
-            'target_diamonds' => $targetDiamonds,
-            'diamond' => $corrected . ' / ' . $targetDiamonds,
-            'remaining_diamond' => max(0, $targetDiamonds - $corrected),
-            'is_finished' => $corrected >= $targetDiamonds ? 1 : 0,
+            'sallary' => $newSalary, // الراتب الجديد
+            'agency_sallary' => $newAgency, // حصة الوكالة الجديدة
+            'achieved_diamond' => $corrected, // الماسات المحققة المصححة
+            'target_id' => $targetId, // معرف الهدف الجديد
+            'target_diamonds' => $targetDiamonds, // ماسات الهدف الجديد
+            'diamond' => $corrected . ' / ' . $targetDiamonds, // عرض النص
+            'remaining_diamond' => max(0, $targetDiamonds - $corrected), // الماسات المتبقية
+            'is_finished' => $corrected >= $targetDiamonds ? 1 : 0, // هل اكتمل الهدف
         ]);
 
-        $report['corrections']++;
+        $report['corrections']++; // عداد التصحيحات
         $report['details'][] = [
             'user_id' => $sal->user_id,
-            'old_salary' => (float) $sal->sallary,
-            'new_salary' => $newSalary,
-            'cut_amount' => (float) $sal->cut_amount,
-            'net' => round($newSalary - (float) $sal->cut_amount, 2),
-            'corrected_monthly' => $corrected,
-            'new_target_diamonds' => $targetDiamonds,
+            'old_salary' => (float) $sal->sallary, // الراتب القديم
+            'new_salary' => $newSalary, // الراتب الجديد
+            'cut_amount' => (float) $sal->cut_amount, // المبلغ المصروف
+            'net' => round($newSalary - (float) $sal->cut_amount, 2), // الصافي (سالب = خسارة)
+            'corrected_monthly' => $corrected, // الماسات الشهرية بعد التصحيح
+            'new_target_diamonds' => $targetDiamonds, // الهدف الجديد
         ];
     }
 
-    // Verify user 2614
+    // التحقق من المستخدم 2614 — يجب: راتب=468، صافي=-234
     $check = DB::selectOne("SELECT sallary, cut_amount, (sallary - cut_amount) as net, target_id, target_diamonds FROM user_sallaries WHERE user_id=2614 AND month=3 AND year=2026");
 
     $report['verification_user_2614'] = $check ? (array) $check : null;
