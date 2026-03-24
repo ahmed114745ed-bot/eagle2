@@ -2153,6 +2153,9 @@ Route::get('/get-gift-percentages', function () {
     $negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
     $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
     $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
-
-    dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+    $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+    dd($negativeLimit, $appFeeRate, $receiverFeeRate,$hostPercentage);
 });
+
+
+
