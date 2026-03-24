@@ -894,14 +894,9 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
         return $amount;
     };
 
-    // Helper: force-deduct from agency coins (allows negative)
+    // Helper: skip agencies — they are handled separately
     $deductAgency = function ($agencyId, $amount, $shouldExecute) {
-        if ($amount <= 0) return 0;
-        if ($shouldExecute) {
-            DB::table('agencies')->where('id', $agencyId)
-                ->update(['coins' => DB::raw("CAST(coins AS SIGNED) - {$amount}")]);
-        }
-        return $amount;
+        return 0; // Agencies handled separately, don't deduct here
     };
 
     // Helper: trace charges from a user (1 level)
