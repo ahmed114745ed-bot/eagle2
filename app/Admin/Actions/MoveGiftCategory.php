@@ -24,11 +24,14 @@ class MoveGiftCategory extends RowAction
         if (!$newCategory) {
             return $this->response()->error('Please select category')->refresh();
         }
-    
+
         $gift->gift_category_id = $newCategory;
+        $gift->enable = 0;
         $gift->save();
 
-        return $this->response()->success('Gift moved successfully')->refresh();
+        $editUrl = admin_url('gifts/' . $gift->id . '/edit');
+
+        return $this->response()->success(__("Gift moved successfully"))->redirect($editUrl);
     }
 
     // Popup form
@@ -41,7 +44,7 @@ class MoveGiftCategory extends RowAction
             ->options(function () use ($locale) {
 
                 $categories = [];
-                foreach (GiftCategory::whereNotIn('type', ['lucky_gift', 'vip'])->get() as $category) {
+                foreach (GiftCategory::get() as $category) {
                     $title = $category->title[$locale]
                         ?? $category->title['en']
                         ?? reset($category->title);

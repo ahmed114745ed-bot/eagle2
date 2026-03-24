@@ -485,10 +485,11 @@ class ChargeReportController extends MainController
         $grid->disableRowSelector();
 
         $grid->model()->when(!request('from_date'), function ($query, ) {
+            
+            $start =   now()->startOfMonth();
 
-            $start = now()->startOfMonth();
             $end = $end = now()->endOfMonth();
-            $query->whereBetween('created_at', [$start, $end]);
+            $query->where('created_at', '>=',$start);
         })->with([
                     'user',
                     'user.profile',
@@ -529,7 +530,7 @@ class ChargeReportController extends MainController
                         ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
                         : now()->startOfMonth();
                     $query->where('created_at', '>=', $from->startOfDay());
-                }, __('From Date'), 'from_date')->date();
+                }, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
 
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
@@ -562,10 +563,7 @@ class ChargeReportController extends MainController
             .utd-custom-date {
                 display: block !important;
                 margin-bottom: 20px !important;
-                background: rgba(255, 255, 255, 0.05) !important;
                 backdrop-filter: blur(5px) !important;
-                border: 1px solid rgba(255, 255, 255, 0.1) !important;
-                border-radius: 12px !important;
                 padding: 15px !important;
                 transition: all 0.3s ease !important;
                 position: relative !important;
@@ -605,7 +603,6 @@ class ChargeReportController extends MainController
                 border-radius: 8px !important;
                 overflow: visible !important;
                 border: 1px solid #ddd !important;
-                background: #fff !important;
             }
             .utd-custom-date .input-group.date input {
                 border: none !important;
@@ -614,7 +611,6 @@ class ChargeReportController extends MainController
                 font-size: 13px !important;
             }
             .utd-custom-date .input-group-addon {
-                background: #f8f9fa !important;
                 border: none !important;
                 color: #777 !important;
                 padding: 0 8px !important;
@@ -626,8 +622,20 @@ class ChargeReportController extends MainController
                 box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
                 border: 1px solid rgba(0,0,0,0.15) !important;
                 padding: 10px !important;
-                background: #fff !important;
                 display: block !important;
+                background: #fff !important;
+
+            }
+           .dark-mode .bootstrap-datetimepicker-widget {
+                z-index: 999999999999999 !important;
+                max-width: 300px !important;
+                border-radius: 12px !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
+                border: 1px solid rgba(0,0,0,0.15) !important;
+                padding: 10px !important;
+                display: block !important;
+                background: #000000 !important;
+
             }
             /* Force parent containers to show the calendar */
             .filter-container, .filter-container .row, .filter-container .box-body, .box, .box-body {
@@ -645,11 +653,17 @@ class ChargeReportController extends MainController
 
         $grid->header(function () {
             $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/ ;
+       
+            $query->when(!request('from_date'), function ($query) {
+                $start = now()->startOfMonth();
+                $end = now()->endOfMonth();
+                $query->whereBetween('created_at', [$start, $end]);
+            });
 
             $query->when(
                 request('user.uuid'),
                 fn($q, $uuid) =>
-                $q->whereHas('user', fn($u) => $u->where('uuid', $uuid))
+                $q->whereHas('user', fn($u,$uuid) => $u->where('uuid', $uuid))
             );
 
             $query->when(

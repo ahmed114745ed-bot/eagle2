@@ -14,10 +14,18 @@ class AddDetailedBalancesToFairLuckTransactionsTable extends Migration
     public function up()
     {
         Schema::table('fair_luck_transactions', function (Blueprint $blueprint) {
-            $blueprint->bigInteger('sender_balance_before')->nullable()->after('room_id');
-            $blueprint->bigInteger('sender_balance_after')->nullable()->after('sender_balance_before');
-            $blueprint->json('wallets_before')->nullable()->after('sender_balance_after');
-            $blueprint->json('wallets_after')->nullable()->after('wallets_before');
+            if (!Schema::hasColumn('fair_luck_transactions', 'sender_balance_before')) {
+                $blueprint->bigInteger('sender_balance_before')->nullable()->after('room_id');
+            }
+            if (!Schema::hasColumn('fair_luck_transactions', 'sender_balance_after')) {
+                $blueprint->bigInteger('sender_balance_after')->nullable()->after('sender_balance_before');
+            }
+            if (!Schema::hasColumn('fair_luck_transactions', 'wallets_before')) {
+                $blueprint->json('wallets_before')->nullable()->after('sender_balance_after');
+            }
+            if (!Schema::hasColumn('fair_luck_transactions', 'wallets_after')) {
+                $blueprint->json('wallets_after')->nullable()->after('wallets_before');
+            }
         });
     }
 

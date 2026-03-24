@@ -13,14 +13,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_luck_profiles', function (Blueprint $table) {
-            // إضافة حقول لتتبع المكاسب من المحافظ المختلفة
-            $table->decimal('medium_wallet_wins', 15, 2)->default(0)->after('total_profit');
-            $table->decimal('jackpot_wallet_wins', 15, 2)->default(0)->after('medium_wallet_wins');
-            
-            // إضافة فهارس للبحث السريع
-            $table->index(['user_id', 'medium_wallet_wins']);
-            $table->index(['user_id', 'jackpot_wallet_wins']);
+            if (!Schema::hasColumn('user_luck_profiles', 'medium_wallet_wins')) {
+                $table->decimal('medium_wallet_wins', 15, 2)->default(0)->after('total_profit');
+            }
+            if (!Schema::hasColumn('user_luck_profiles', 'jackpot_wallet_wins')) {
+                $table->decimal('jackpot_wallet_wins', 15, 2)->default(0)->after('medium_wallet_wins');
+            }
         });
+
+        // Add indexes separately to avoid errors if they already exist
+        try {
+            Schema::table('user_luck_profiles', function (Blueprint $table) {
+                $table->index(['user_id', 'medium_wallet_wins']);
+                $table->index(['user_id', 'jackpot_wallet_wins']);
+            });
+        } catch (\Exception $e) {
+            // Indexes may already exist
+        }
     }
 
     /**

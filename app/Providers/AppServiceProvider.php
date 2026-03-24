@@ -112,6 +112,7 @@ class AppServiceProvider extends ServiceProvider
         // Override admin.pjax middleware for Swoole/Octane compatibility
         $this->overridePjaxMiddleware();
 
+
         $this->dashboardAdminConfig();
         $this->setupAppSettings();
         $this->setupLanguages();

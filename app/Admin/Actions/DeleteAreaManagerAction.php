@@ -38,6 +38,7 @@ class DeleteAreaManagerAction extends RowAction
             $user->save();
         }
         $default = AreaManager::where('default', 1)->first();
+        if(!$default) return $this->response()->error('Default area manager not found. Please set a default area manager before deleting.')->refresh();
         $this->transferCountriesToDefaultManager($model,$default);
 
         if ($default) SuperAdmin::where('parent_id', $model->id)->update(['parent_id' => $default->id]);
