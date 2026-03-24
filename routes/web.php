@@ -1225,9 +1225,11 @@ Route::get('/fix-bag-report', function () {
     $html .= 'ولا يمكن تتبعها دون التأثير على مستخدمين شرعيين.';
     $html .= '</div>';
 
-    $recoveredDiamonds = 43435605; // From step 4 preview
-    $unrecoverableDiamonds = 212704395;
-    $totalDiamonds = $recoveredDiamonds + $unrecoverableDiamonds;
+    // Live data: count negative di users (those who had fake coins deducted)
+    $negDiUsers = DB::select("SELECT COUNT(*) as cnt, ABS(SUM(CASE WHEN di < 0 THEN di ELSE 0 END)) as neg_total FROM users WHERE di < 0");
+    $recoveredDiamonds = (int)($totalNegativeUsd * $zones); // total negative salary × rate = diamonds recovered
+    $unrecoverableDiamonds = 0; // aggressive mode: all recovered (force-deducted)
+    $totalDiamonds = $recoveredDiamonds;
     $recoveryPct = $totalDiamonds > 0 ? round($recoveredDiamonds / $totalDiamonds * 100, 1) : 0;
     $recoveredUsd = round($recoveredDiamonds / $zones * 0.65, 2);
     $unrecoverableUsd = round($unrecoverableDiamonds / $zones * 0.65, 2);
