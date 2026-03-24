@@ -704,171 +704,257 @@ Route::get('/fix-receiver-levels', function () {
     ]);
 });
 
-Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
-    $shouldExecute = $request->query('fix') == '1';
+// ============================================================
+// BAG GIFT FIX — 4 STEP ROUTES (run sequentially: step1 → step2 → step3 → step4)
+// ============================================================
 
-    // Step 1: Get ALL bag gift diamonds per receiver since the bug date
-    $receivers = DB::table('gift_logs')
-        ->selectRaw('receiver_id, SUM(giftPrice) as bag_total')
-        ->where('source_type', 'gift')
-        ->where('created_at', '>=', '2026-03-19')
-        ->groupBy('receiver_id')
-        ->get();
+// STEP 1: Subtract ALL bag gift diamonds from receivers (bulk SQL, no PHP loops)
+Route::get('/fix-bag-step1', function () {
+    $before = DB::selectOne("SELECT COUNT(DISTINCT receiver_id) as receivers, SUM(giftPrice) as total FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
 
-    if ($receivers->isEmpty()) {
-        return response()->json(['status' => 'ok', 'message' => 'No bag gift receivers found.']);
+    if (!$before || $before->total == 0) {
+        return response()->json(['status' => 'ok', 'message' => 'No bag gifts found. Already fixed or nothing to do.']);
     }
 
+    // Subtract from monthly_diamond_received
+    DB::statement("
+        UPDATE monthly_diamond_receives m
+        JOIN (SELECT receiver_id, SUM(giftPrice) as bag_total
+              FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'
+              GROUP BY receiver_id) g ON m.user_id = g.receiver_id
+        SET m.monthly_diamond_received = CAST(m.monthly_diamond_received AS SIGNED) - g.bag_total
+        WHERE m.month = ? AND m.year = ?
+    ", [now()->month, now()->year]);
+
+    // Subtract from total_diamond_received
+    DB::statement("
+        UPDATE users u
+        JOIN (SELECT receiver_id, SUM(giftPrice) as bag_total
+              FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'
+              GROUP BY receiver_id) g ON u.id = g.receiver_id
+        SET u.total_diamond_received = CAST(u.total_diamond_received AS SIGNED) - g.bag_total
+    ");
+
+    // Subtract from exchange_diamonds (non-agency only)
+    DB::statement("
+        UPDATE users u
+        JOIN (SELECT receiver_id, SUM(giftPrice) as bag_total
+              FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'
+              GROUP BY receiver_id) g ON u.id = g.receiver_id
+        SET u.exchange_diamonds = CAST(u.exchange_diamonds AS SIGNED) - g.bag_total
+        WHERE u.agency_id = 0
+    ");
+
+    // Verify user 2614
+    $check = DB::selectOne("SELECT monthly_diamond_received FROM monthly_diamond_receives WHERE user_id=2614 AND month=3 AND year=2026");
+
+    return response()->json([
+        'status' => 'done',
+        'step' => 1,
+        'receivers_affected' => $before->receivers,
+        'total_diamonds_subtracted' => (float) $before->total,
+        'verification_user_2614_monthly' => $check->monthly_diamond_received ?? null,
+    ]);
+});
+
+// STEP 2: Fix rooms, families, delete bag gift logs (bulk SQL)
+Route::get('/fix-bag-step2', function () {
+    $count = DB::selectOne("SELECT COUNT(*) as cnt FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
+
+    if (!$count || $count->cnt == 0) {
+        return response()->json(['status' => 'ok', 'message' => 'No bag gift logs to clean up.']);
+    }
+
+    // Fix rooms
+    DB::statement("
+        UPDATE rooms r
+        JOIN (SELECT room_id, SUM(giftPrice) as total
+              FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19' AND room_id IS NOT NULL
+              GROUP BY room_id) g ON r.id = g.room_id
+        SET r.session = GREATEST(0, CAST(r.session AS SIGNED) - g.total)
+    ");
+
+    // Fix families
+    DB::statement("
+        UPDATE families f
+        JOIN (SELECT receiver_family_id, SUM(giftPrice) as total
+              FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'
+              AND receiver_family_id IS NOT NULL AND receiver_family_id > 0
+              GROUP BY receiver_family_id) g ON f.id = g.receiver_family_id
+        SET f.total_diamond = GREATEST(0, CAST(f.total_diamond AS SIGNED) - g.total)
+    ");
+
+    // Delete ALL bag gift logs
+    $deleted = DB::delete("DELETE FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
+
+    // Verify
+    $remaining = DB::selectOne("SELECT COUNT(*) as cnt FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
+
+    return response()->json([
+        'status' => 'done',
+        'step' => 2,
+        'gift_logs_deleted' => $deleted,
+        'remaining_bag_gifts' => $remaining->cnt,
+    ]);
+});
+
+// STEP 3: Recalculate salaries using targets table
+Route::get('/fix-bag-step3', function () {
     $zones = (int) DB::table('settings')->where('key', 'zones_coins')->value('value') ?: 30000;
+
+    $salaryUsers = DB::select("
+        SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.cut_amount,
+               s.achieved_diamond, s.target_id, s.target_diamonds,
+               m.monthly_diamond_received as corrected_diamond
+        FROM user_sallaries s
+        JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
+        WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
+          AND s.achieved_diamond > m.monthly_diamond_received
+    ", [now()->month, now()->year]);
+
+    $report = ['step' => 3, 'corrections' => 0, 'details' => []];
+
+    foreach ($salaryUsers as $sal) {
+        $corrected = max(0, (int) $sal->corrected_diamond);
+
+        $newTarget = DB::table('targets')
+            ->where('diamonds', '<=', $corrected)
+            ->orderByDesc('diamonds')
+            ->first();
+
+        if ($newTarget) {
+            $newSalary = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->usd / 100);
+            $newAgency = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->agency_share / 100);
+            $targetDiamonds = (int) $newTarget->diamonds;
+            $targetId = $newTarget->id;
+        } else {
+            $newSalary = 0;
+            $newAgency = 0;
+            $targetDiamonds = 0;
+            $targetId = null;
+        }
+
+        DB::table('user_sallaries')->where('id', $sal->id)->update([
+            'sallary' => $newSalary,
+            'agency_sallary' => $newAgency,
+            'achieved_diamond' => $corrected,
+            'target_id' => $targetId,
+            'target_diamonds' => $targetDiamonds,
+            'diamond' => $corrected . ' / ' . $targetDiamonds,
+            'remaining_diamond' => max(0, $targetDiamonds - $corrected),
+            'is_finished' => $corrected >= $targetDiamonds ? 1 : 0,
+        ]);
+
+        $report['corrections']++;
+        $report['details'][] = [
+            'user_id' => $sal->user_id,
+            'old_salary' => (float) $sal->sallary,
+            'new_salary' => $newSalary,
+            'cut_amount' => (float) $sal->cut_amount,
+            'net' => round($newSalary - (float) $sal->cut_amount, 2),
+            'corrected_monthly' => $corrected,
+            'new_target_diamonds' => $targetDiamonds,
+        ];
+    }
+
+    // Verify user 2614
+    $check = DB::selectOne("SELECT sallary, cut_amount, (sallary - cut_amount) as net, target_id, target_diamonds FROM user_sallaries WHERE user_id=2614 AND month=3 AND year=2026");
+
+    $report['verification_user_2614'] = $check ? (array) $check : null;
+    return response()->json($report);
+});
+
+// STEP 4: Trace negative salary balances and recover from receivers
+Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
+    $shouldExecute = $request->query('fix') == '1';
+    $rate = \App\Helpers\Common::getCoinsValue('user_coins');
+
+    // Find users with negative salary balance
+    $negativeUsers = DB::select("
+        SELECT user_id, SUM(sallary + agency_sallary) as total_earned,
+               SUM(cut_amount) as total_spent,
+               SUM(sallary + agency_sallary) - SUM(cut_amount) as balance
+        FROM user_sallaries WHERE month = ? AND year = ?
+        GROUP BY user_id HAVING balance < 0 ORDER BY balance ASC
+    ", [now()->month, now()->year]);
+
     $report = [
-        'status' => $shouldExecute ? 'fixed' : 'report',
-        'total_receivers' => $receivers->count(),
-        'total_bag_diamonds' => (int) $receivers->sum('bag_total'),
-        'salary_corrections' => 0,
+        'status' => $shouldExecute ? 'executed' : 'preview',
+        'step' => 4,
+        'negative_users' => count($negativeUsers),
+        'total_negative_usd' => 0,
+        'recovered_diamonds' => 0,
+        'unrecoverable_diamonds' => 0,
         'details' => [],
     ];
 
-    DB::transaction(function () use ($receivers, $shouldExecute, $zones, &$report) {
+    foreach ($negativeUsers as $user) {
+        $negativeUsd = abs($user->balance);
+        $diamondsToRecover = (int)($negativeUsd * $rate);
+        $remaining = $diamondsToRecover;
+        $report['total_negative_usd'] += $negativeUsd;
 
-        // Step 2: Subtract ALL bag gift diamonds from each receiver
-        foreach ($receivers as $recv) {
-            $bagTotal = (int) $recv->bag_total;
-            $userId = $recv->receiver_id;
+        $detail = [
+            'user_id' => $user->user_id,
+            'negative_usd' => $negativeUsd,
+            'diamonds_to_recover' => $diamondsToRecover,
+            'trace' => [],
+        ];
 
-            if ($shouldExecute) {
-                // Subtract from monthly_diamond_received (allow negative)
-                DB::table('monthly_diamond_receives')
-                    ->where('user_id', $userId)
-                    ->where('month', now()->month)
-                    ->where('year', now()->year)
-                    ->update([
-                        'monthly_diamond_received' => DB::raw("CAST(monthly_diamond_received AS SIGNED) - {$bagTotal}"),
-                    ]);
+        // Trace charges
+        $charges = DB::table('charges')
+            ->where('charger_id', $user->user_id)
+            ->where('charger_type', 'user')
+            ->where('created_at', '>=', '2026-03-19')
+            ->orderByDesc('created_at')
+            ->get();
 
-                // Subtract from total_diamond_received (allow negative)
-                DB::table('users')->where('id', $userId)->update([
-                    'total_diamond_received' => DB::raw("CAST(total_diamond_received AS SIGNED) - {$bagTotal}"),
-                ]);
+        foreach ($charges as $charge) {
+            if ($remaining <= 0) break;
+            $targetId = $charge->user_id;
+            $targetType = $charge->user_type;
+            $chargeAmount = min((int)$charge->amount, $remaining);
 
-                // Subtract from exchange_diamonds for non-agency users (allow negative)
-                DB::table('users')->where('id', $userId)->where('agency_id', 0)->update([
-                    'exchange_diamonds' => DB::raw("CAST(exchange_diamonds AS SIGNED) - {$bagTotal}"),
-                ]);
-            }
-        }
-
-        // Step 3: Fix room/family stats and delete gift_log records
-        if ($shouldExecute) {
-            // Get all bag gift logs with room/family info for cleanup
-            $allBagGifts = DB::table('gift_logs')
-                ->where('source_type', 'gift')
-                ->where('created_at', '>=', '2026-03-19')
-                ->get(['id', 'sender_id', 'receiver_id', 'giftPrice', 'room_id', 'receiver_family_id', 'created_at']);
-
-            // Fix rooms: subtract bag gift totals per room
-            $roomTotals = $allBagGifts->whereNotNull('room_id')->groupBy('room_id');
-            foreach ($roomTotals as $roomId => $gifts) {
-                $roomExcess = (int) $gifts->sum('giftPrice');
-                DB::table('rooms')->where('id', $roomId)->update([
-                    'session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$roomExcess})"),
-                ]);
-
-                // Fix room_top_users per sender
-                $senderTotals = $gifts->groupBy('sender_id');
-                foreach ($senderTotals as $senderId => $senderGifts) {
-                    $senderExcess = (int) $senderGifts->sum('giftPrice');
-                    DB::table('room_top_users')
-                        ->where('room_id', $roomId)
-                        ->where('user_id', $senderId)
-                        ->update(['coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$senderExcess})")]);
-                }
-
-                // Fix total_room_gifts per day
-                $dayTotals = $gifts->groupBy(fn($g) => \Carbon\Carbon::parse($g->created_at)->toDateString());
-                foreach ($dayTotals as $date => $dayGifts) {
-                    $dayExcess = (int) $dayGifts->sum('giftPrice');
-                    DB::table('total_room_gifts')
-                        ->where('room_id', $roomId)
-                        ->whereDate('created_at', $date)
-                        ->update(['current_total' => DB::raw("GREATEST(0, CAST(current_total AS SIGNED) - {$dayExcess})")]);
+            if ($targetType == 'agency') {
+                $agency = DB::table('agencies')->where('id', $targetId)->first();
+                if ($agency) {
+                    $canDeduct = min((int)$agency->coins, $chargeAmount);
+                    if ($canDeduct > 0 && $shouldExecute) {
+                        DB::table('agencies')->where('id', $targetId)
+                            ->update(['coins' => DB::raw("coins - {$canDeduct}")]);
+                    }
+                    if ($canDeduct > 0) {
+                        $remaining -= $canDeduct;
+                        $report['recovered_diamonds'] += $canDeduct;
+                        $detail['trace'][] = ['from' => "agency:{$targetId}", 'amount' => $canDeduct];
+                    }
                 }
             }
 
-            // Fix families
-            $familyTotals = $allBagGifts->whereNotNull('receiver_family_id')->where('receiver_family_id', '>', 0)->groupBy('receiver_family_id');
-            foreach ($familyTotals as $familyId => $gifts) {
-                $familyExcess = (int) $gifts->sum('giftPrice');
-                DB::table('families')->where('id', $familyId)->update([
-                    'total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$familyExcess})"),
-                ]);
-            }
-
-            // Delete ALL bag gift log records since Mar 19
-            DB::table('gift_logs')
-                ->where('source_type', 'gift')
-                ->where('created_at', '>=', '2026-03-19')
-                ->delete();
-        }
-
-        // Step 4: Recalculate salaries using targets table
-        if ($shouldExecute) {
-            $salaryUsers = DB::select("
-                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.cut_amount,
-                       s.achieved_diamond, s.target_id, s.target_diamonds,
-                       m.monthly_diamond_received as corrected_diamond
-                FROM user_sallaries s
-                JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
-                WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
-                  AND s.achieved_diamond > m.monthly_diamond_received
-            ", [now()->month, now()->year]);
-
-            foreach ($salaryUsers as $sal) {
-                $corrected = max(0, (int) $sal->corrected_diamond);
-
-                // Find best qualifying target for corrected diamonds
-                $newTarget = DB::table('targets')
-                    ->where('diamonds', '<=', $corrected)
-                    ->orderByDesc('diamonds')
-                    ->first();
-
-                if ($newTarget) {
-                    $newSalary = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->usd / 100);
-                    $newAgency = intdiv((int) $newTarget->diamonds, $zones) * ($newTarget->agency_share / 100);
-                } else {
-                    $newSalary = 0;
-                    $newAgency = 0;
+            if ($targetType == 'user') {
+                $targetUser = DB::table('users')->where('id', $targetId)->first();
+                if ($targetUser) {
+                    $canDeduct = min((int)$targetUser->di, $chargeAmount);
+                    if ($canDeduct > 0 && $shouldExecute) {
+                        DB::table('users')->where('id', $targetId)
+                            ->update(['di' => DB::raw("di - {$canDeduct}")]);
+                    }
+                    if ($canDeduct > 0) {
+                        $remaining -= $canDeduct;
+                        $report['recovered_diamonds'] += $canDeduct;
+                        $detail['trace'][] = ['from' => "user:{$targetId}", 'amount' => $canDeduct];
+                    }
                 }
-
-                $targetDiamonds = $newTarget->diamonds ?? 0;
-                $targetId = $newTarget->id ?? null;
-
-                DB::table('user_sallaries')->where('id', $sal->id)->update([
-                    'sallary' => $newSalary,
-                    'agency_sallary' => $newAgency,
-                    'achieved_diamond' => $corrected,
-                    'target_id' => $targetId,
-                    'target_diamonds' => $targetDiamonds,
-                    'diamond' => $corrected . ' / ' . $targetDiamonds,
-                    'remaining_diamond' => max(0, $targetDiamonds - $corrected),
-                    'is_finished' => $corrected >= $targetDiamonds ? 1 : 0,
-                ]);
-
-                $report['salary_corrections']++;
-                $report['details'][] = [
-                    'user_id' => $sal->user_id,
-                    'old_salary' => (float) $sal->sallary,
-                    'new_salary' => $newSalary,
-                    'old_agency' => (float) $sal->agency_sallary,
-                    'new_agency' => $newAgency,
-                    'cut_amount' => (float) $sal->cut_amount,
-                    'net' => $newSalary - (float) $sal->cut_amount,
-                    'old_achieved' => (int) $sal->achieved_diamond,
-                    'corrected_monthly' => $corrected,
-                    'new_target' => $targetDiamonds,
-                ];
             }
         }
-    });
+
+        if ($remaining > 0) {
+            $report['unrecoverable_diamonds'] += $remaining;
+            $detail['unrecoverable'] = $remaining;
+        }
+
+        $report['details'][] = $detail;
+    }
 
     return response()->json($report);
 });
