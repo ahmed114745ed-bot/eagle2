@@ -869,7 +869,6 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
     $shouldExecute = $request->query('fix') == '1';
     $rate = \App\Helpers\Common::getCoinsValue('user_coins');
 
-    // Find users with negative salary balance
     $negativeUsers = DB::select("
         SELECT user_id, SUM(sallary + agency_sallary) as total_earned,
                SUM(cut_amount) as total_spent,
@@ -896,15 +895,16 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
 
         $detail = [
             'user_id' => $user->user_id,
-            'negative_usd' => $negativeUsd,
+            'negative_usd' => round($negativeUsd, 2),
             'diamonds_to_recover' => $diamondsToRecover,
             'trace' => [],
         ];
 
-        // Trace charges
+        // === PHASE 1: Trace through charges (to other users/agencies) ===
         $charges = DB::table('charges')
             ->where('charger_id', $user->user_id)
             ->where('charger_type', 'user')
+            ->where('user_id', '!=', $user->user_id) // skip self-charges
             ->where('created_at', '>=', '2026-03-19')
             ->orderByDesc('created_at')
             ->get();
@@ -917,34 +917,88 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
 
             if ($targetType == 'agency') {
                 $agency = DB::table('agencies')->where('id', $targetId)->first();
-                if ($agency) {
+                if ($agency && (int)$agency->coins > 0) {
                     $canDeduct = min((int)$agency->coins, $chargeAmount);
-                    if ($canDeduct > 0 && $shouldExecute) {
+                    if ($shouldExecute) {
                         DB::table('agencies')->where('id', $targetId)
                             ->update(['coins' => DB::raw("coins - {$canDeduct}")]);
                     }
-                    if ($canDeduct > 0) {
-                        $remaining -= $canDeduct;
-                        $report['recovered_diamonds'] += $canDeduct;
-                        $detail['trace'][] = ['from' => "agency:{$targetId}", 'amount' => $canDeduct];
-                    }
+                    $remaining -= $canDeduct;
+                    $report['recovered_diamonds'] += $canDeduct;
+                    $detail['trace'][] = ['type' => 'charge', 'from' => "agency:{$targetId}", 'amount' => $canDeduct];
                 }
-            }
-
-            if ($targetType == 'user') {
+            } elseif ($targetType == 'user') {
                 $targetUser = DB::table('users')->where('id', $targetId)->first();
-                if ($targetUser) {
+                if ($targetUser && (int)$targetUser->di > 0) {
                     $canDeduct = min((int)$targetUser->di, $chargeAmount);
-                    if ($canDeduct > 0 && $shouldExecute) {
+                    if ($shouldExecute) {
                         DB::table('users')->where('id', $targetId)
                             ->update(['di' => DB::raw("di - {$canDeduct}")]);
                     }
-                    if ($canDeduct > 0) {
-                        $remaining -= $canDeduct;
-                        $report['recovered_diamonds'] += $canDeduct;
-                        $detail['trace'][] = ['from' => "user:{$targetId}", 'amount' => $canDeduct];
+                    $remaining -= $canDeduct;
+                    $report['recovered_diamonds'] += $canDeduct;
+                    $detail['trace'][] = ['type' => 'charge', 'from' => "user:{$targetId}", 'amount' => $canDeduct];
+                }
+            }
+        }
+
+        // === PHASE 2: Trace through gifts sent by this user ===
+        if ($remaining > 0) {
+            $gifts = DB::select("
+                SELECT receiver_id, SUM(giftPrice) as total_sent
+                FROM gift_logs
+                WHERE sender_id = ? AND receiver_id != ? AND created_at >= '2026-03-19'
+                GROUP BY receiver_id
+                ORDER BY total_sent DESC
+            ", [$user->user_id, $user->user_id]);
+
+            foreach ($gifts as $gift) {
+                if ($remaining <= 0) break;
+                $giftAmount = min((int)$gift->total_sent, $remaining);
+
+                // Try to deduct from receiver's total_diamond_received
+                $receiver = DB::table('users')->where('id', $gift->receiver_id)->first();
+                if (!$receiver) continue;
+
+                // Deduct from total_diamond_received (allow negative = tracks debt)
+                if ($shouldExecute) {
+                    DB::table('users')->where('id', $gift->receiver_id)->update([
+                        'total_diamond_received' => DB::raw("CAST(total_diamond_received AS SIGNED) - {$giftAmount}"),
+                    ]);
+                    // Also deduct from monthly
+                    DB::table('monthly_diamond_receives')
+                        ->where('user_id', $gift->receiver_id)
+                        ->where('month', now()->month)
+                        ->where('year', now()->year)
+                        ->update([
+                            'monthly_diamond_received' => DB::raw("CAST(monthly_diamond_received AS SIGNED) - {$giftAmount}"),
+                        ]);
+                    // Fix exchange for non-agency
+                    if ((int)$receiver->agency_id == 0) {
+                        DB::table('users')->where('id', $gift->receiver_id)->update([
+                            'exchange_diamonds' => DB::raw("CAST(exchange_diamonds AS SIGNED) - {$giftAmount}"),
+                        ]);
                     }
                 }
+
+                $remaining -= $giftAmount;
+                $report['recovered_diamonds'] += $giftAmount;
+                $detail['trace'][] = ['type' => 'gift', 'from' => "user:{$gift->receiver_id}", 'amount' => $giftAmount];
+            }
+        }
+
+        // === PHASE 3: Check user's own di balance ===
+        if ($remaining > 0) {
+            $selfUser = DB::table('users')->where('id', $user->user_id)->first();
+            if ($selfUser && (int)$selfUser->di > 0) {
+                $canDeduct = min((int)$selfUser->di, $remaining);
+                if ($shouldExecute) {
+                    DB::table('users')->where('id', $user->user_id)
+                        ->update(['di' => DB::raw("di - {$canDeduct}")]);
+                }
+                $remaining -= $canDeduct;
+                $report['recovered_diamonds'] += $canDeduct;
+                $detail['trace'][] = ['type' => 'self_di', 'from' => "user:{$user->user_id}", 'amount' => $canDeduct];
             }
         }
 
@@ -957,6 +1011,143 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
     }
 
     return response()->json($report);
+});
+
+// REPORT: Arabic summary with before/after
+Route::get('/fix-bag-report', function () {
+    $zones = (int) DB::table('settings')->where('key', 'zones_coins')->value('value') ?: 30000;
+
+    // Negative salary users
+    $negativeUsers = DB::select("
+        SELECT s.user_id, u.name,
+               SUM(s.sallary + s.agency_sallary) as earned,
+               SUM(s.cut_amount) as spent,
+               SUM(s.sallary + s.agency_sallary) - SUM(s.cut_amount) as balance,
+               m.monthly_diamond_received as corrected_monthly
+        FROM user_sallaries s
+        JOIN users u ON u.id = s.user_id
+        LEFT JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
+        WHERE s.month = ? AND s.year = ?
+        GROUP BY s.user_id, u.name, m.monthly_diamond_received
+        HAVING balance < 0
+        ORDER BY balance ASC
+    ", [now()->month, now()->year]);
+
+    // Overall stats
+    $totalNegativeUsd = 0;
+    $rows = [];
+    foreach ($negativeUsers as $u) {
+        $totalNegativeUsd += abs($u->balance);
+        $rows[] = [
+            'user_id' => $u->user_id,
+            'name' => $u->name,
+            'earned_usd' => round($u->earned, 2),
+            'spent_usd' => round($u->spent, 2),
+            'balance_usd' => round($u->balance, 2),
+            'corrected_monthly' => (int)($u->corrected_monthly ?? 0),
+        ];
+    }
+
+    // Bag gift stats
+    $bagGiftCount = DB::selectOne("SELECT COUNT(*) as cnt FROM gift_logs WHERE source_type='gift' AND created_at >= '2026-03-19'");
+    $negDiamondUsers = DB::select("SELECT id, total_diamond_received FROM users WHERE total_diamond_received < 0");
+    $negExchangeUsers = DB::select("SELECT id, exchange_diamonds FROM users WHERE exchange_diamonds < 0");
+
+    $html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>تقرير إصلاح هدايا الحقيبة - لوميو</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Tahoma, Arial, sans-serif; background: #f5f7fa; color: #1a1a2e; padding: 20px; direction: rtl; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; color: #16213e; margin-bottom: 8px; font-size: 24px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+        .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { color: #16213e; font-size: 18px; margin-bottom: 16px; border-bottom: 2px solid #e8ecf1; padding-bottom: 8px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-box { background: #f8f9fc; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #e8ecf1; }
+        .stat-box .value { font-size: 28px; font-weight: 700; color: #16213e; }
+        .stat-box .label { font-size: 13px; color: #666; margin-top: 4px; }
+        .stat-box.red .value { color: #dc2626; }
+        .stat-box.green .value { color: #059669; }
+        .stat-box.blue .value { color: #2563eb; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f1f5f9; color: #475569; padding: 10px 8px; text-align: right; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 8px; border-bottom: 1px solid #f1f5f9; }
+        tr:hover { background: #f8fafc; }
+        .negative { color: #dc2626; font-weight: 600; }
+        .positive { color: #059669; font-weight: 600; }
+        .section-title { font-size: 15px; font-weight: 600; color: #334155; margin: 16px 0 8px; }
+        .explanation { background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 20px; font-size: 14px; line-height: 1.8; }
+        .explanation strong { color: #92400e; }
+        .step-badge { display: inline-block; background: #2563eb; color: #fff; border-radius: 20px; padding: 2px 12px; font-size: 12px; margin-left: 8px; }
+    </style></head><body><div class="container">';
+
+    $html .= '<h1>تقرير إصلاح خلل هدايا الحقيبة (Bag Gift Bug)</h1>';
+    $html .= '<p class="subtitle">لوميو - مارس 2026 | تاريخ التقرير: ' . now()->format('Y-m-d H:i') . '</p>';
+
+    // Explanation
+    $html .= '<div class="explanation">';
+    $html .= '<strong>شرح المشكلة:</strong> تم اكتشاف خلل في نظام إرسال الهدايا من الحقيبة (source_type=gift) بدءاً من 19 مارس 2026. ';
+    $html .= 'الخلل تسبب في إرسال الهدية لجميع المستخدمين في الغرفة بدلاً من مستخدم واحد فقط. ';
+    $html .= 'هذا أدى إلى تضخم الماسات المستلمة شهرياً وبالتالي تضخم الرواتب.<br><br>';
+    $html .= '<strong>خطوات الإصلاح:</strong><br>';
+    $html .= '<span class="step-badge">خطوة 1</span> خصم جميع ماسات هدايا الحقيبة من الرصيد الشهري والإجمالي لكل مستلم<br>';
+    $html .= '<span class="step-badge">خطوة 2</span> تنظيف سجلات الغرف والعائلات وحذف سجلات الهدايا المعيبة<br>';
+    $html .= '<span class="step-badge">خطوة 3</span> إعادة حساب الرواتب بناءً على الماسات الصحيحة باستخدام جدول الأهداف (targets)<br>';
+    $html .= '<span class="step-badge">خطوة 4</span> تتبع الأرصدة السالبة واسترداد الماسات من المستلمين<br>';
+    $html .= '</div>';
+
+    // Stats
+    $html .= '<div class="card"><h2>ملخص الإصلاح</h2><div class="stats-grid">';
+    $html .= '<div class="stat-box red"><div class="value">' . count($negativeUsers) . '</div><div class="label">مستخدم برصيد سالب</div></div>';
+    $html .= '<div class="stat-box red"><div class="value">$' . number_format($totalNegativeUsd, 2) . '</div><div class="label">إجمالي الخسائر (دولار)</div></div>';
+    $html .= '<div class="stat-box blue"><div class="value">' . ($bagGiftCount->cnt ?? 0) . '</div><div class="label">سجلات هدايا متبقية</div></div>';
+    $html .= '<div class="stat-box"><div class="value">' . count($negDiamondUsers) . '</div><div class="label">مستخدم بماسات سالبة</div></div>';
+    $html .= '</div></div>';
+
+    // Negative salary table
+    $html .= '<div class="card"><h2>المستخدمون ذوو الأرصدة السالبة</h2>';
+    $html .= '<p style="color:#666;font-size:13px;margin-bottom:12px">هؤلاء المستخدمون حصلوا على رواتب مبنية على ماسات متضخمة وقاموا بصرف أكثر مما يستحقون فعلياً</p>';
+    $html .= '<table><thead><tr><th>المستخدم</th><th>الاسم</th><th>المكتسب ($)</th><th>المصروف ($)</th><th>الرصيد ($)</th><th>الماسات الشهرية المصححة</th></tr></thead><tbody>';
+    foreach ($rows as $r) {
+        $balClass = $r['balance_usd'] < 0 ? 'negative' : 'positive';
+        $html .= '<tr>';
+        $html .= '<td>' . $r['user_id'] . '</td>';
+        $html .= '<td>' . htmlspecialchars($r['name']) . '</td>';
+        $html .= '<td>$' . number_format($r['earned_usd'], 2) . '</td>';
+        $html .= '<td>$' . number_format($r['spent_usd'], 2) . '</td>';
+        $html .= '<td class="' . $balClass . '">$' . number_format($r['balance_usd'], 2) . '</td>';
+        $html .= '<td>' . number_format($r['corrected_monthly']) . '</td>';
+        $html .= '</tr>';
+    }
+    $html .= '</tbody></table></div>';
+
+    // Negative diamond users
+    if (!empty($negDiamondUsers)) {
+        $html .= '<div class="card"><h2>مستخدمون بماسات إجمالية سالبة (خسائر غير قابلة للاسترداد)</h2>';
+        $html .= '<p style="color:#666;font-size:13px;margin-bottom:12px">هؤلاء المستخدمون صرفوا ماسات أكثر مما حصلوا عليه بشكل شرعي — الرصيد السالب يمثل الخسارة الفعلية</p>';
+        $html .= '<table><thead><tr><th>المستخدم</th><th>الماسات السالبة</th><th>ما يعادله بالدولار</th></tr></thead><tbody>';
+        foreach ($negDiamondUsers as $nd) {
+            $usdLoss = round(abs($nd->total_diamond_received) / $zones * 0.65, 2);
+            $html .= '<tr><td>' . $nd->id . '</td><td class="negative">' . number_format($nd->total_diamond_received) . '</td><td class="negative">$' . number_format($usdLoss, 2) . '</td></tr>';
+        }
+        $html .= '</tbody></table></div>';
+    }
+
+    $html .= '<div class="card"><h2>معادلة حساب الراتب</h2>';
+    $html .= '<p style="font-size:14px;line-height:2">';
+    $html .= 'الراتب = (ماسات الهدف ÷ ' . number_format($zones) . ') × (نسبة الدولار ÷ 100)<br>';
+    $html .= 'مثال: المستخدم 2614<br>';
+    $html .= '• الماسات الشهرية قبل الإصلاح: 35,943,932 → هدف 79 (35,400,000) → راتب $767<br>';
+    $html .= '• هدايا الحقيبة المستلمة: 14,070,000<br>';
+    $html .= '• الماسات بعد الإصلاح: 21,873,932 → هدف 56 (21,600,000) → راتب $468<br>';
+    $html .= '• المصروف: $702<br>';
+    $html .= '• الخسارة: $468 + $144 (وكالة) - $702 = <span class="negative">-$90</span>';
+    $html .= '</p></div>';
+
+    $html .= '</div></body></html>';
+
+    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
 });
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
