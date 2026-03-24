@@ -838,19 +838,14 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
 
         // Fix salaries: zero out any salary where corrected monthly_diamond no longer meets target
         if ($shouldExecute) {
-            $salaryFixes = DB::table('user_sallaries as s')
-                ->join('monthly_diamond_receives as m', function ($join) {
-                    $join->on('m.user_id', '=', 's.user_id')
-                        ->where('m.month', '=', DB::raw('s.month'))
-                        ->where('m.year', '=', DB::raw('s.year'));
-                })
-                ->where('s.month', now()->month)
-                ->where('s.year', now()->year)
-                ->where('s.is_paid', 0)
-                ->whereColumn('m.monthly_diamond_received', '<', 's.target_diamonds')
-                ->whereColumn('s.achieved_diamond', '>', 'm.monthly_diamond_received')
-                ->select('s.id', 's.user_id', 's.sallary', 's.agency_sallary', 's.achieved_diamond', 's.target_diamonds', 'm.monthly_diamond_received')
-                ->get();
+            $salaryFixes = DB::select("
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond, s.target_diamonds, m.monthly_diamond_received
+                FROM user_sallaries s
+                JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
+                WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
+                  AND m.monthly_diamond_received < s.target_diamonds
+                  AND s.achieved_diamond > m.monthly_diamond_received
+            ", [now()->month, now()->year]);
 
             foreach ($salaryFixes as $sal) {
                 DB::table('user_sallaries')
