@@ -705,13 +705,17 @@ Route::get('/fix-receiver-levels', function () {
 });
 
 Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
+    // Find bugged bag gift batches: source_type='gift' sent to multiple receivers after the bug date
     $affected = DB::table('gift_logs')
-        ->selectRaw('sender_id, giftId, created_at, MIN(giftPrice) as gift_price, COUNT(*) as receiver_count')
+        ->selectRaw('sender_id, giftId, giftPrice, giftNum, created_at, COUNT(*) as receiver_count')
         ->where('source_type', 'gift')
-        ->groupBy('sender_id', 'giftId', 'created_at')
+        ->where('created_at', '>=', '2026-03-19')
+        ->groupBy('sender_id', 'giftId', 'giftPrice', 'giftNum', 'created_at')
         ->havingRaw('COUNT(*) > 1')
         ->get();
+
     Log::info("Found " . $affected->count() . " affected bag gift transactions.");
+
     if ($affected->isEmpty()) {
         return response()->json([
             'status' => 'ok',
@@ -725,25 +729,25 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
 
     DB::transaction(function () use ($affected, $shouldExecute, &$totalExcess, &$details) {
         foreach ($affected as $group) {
-            $price = (int) $group->gift_price;
-            $excessDiamonds = $price * ($group->receiver_count - 1);
-            $totalExcess += $excessDiamonds;
-
             $logs = DB::table('gift_logs')
                 ->where('sender_id', $group->sender_id)
                 ->where('giftId', $group->giftId)
+                ->where('giftPrice', $group->giftPrice)
+                ->where('giftNum', $group->giftNum)
                 ->where('created_at', $group->created_at)
                 ->where('source_type', 'gift')
                 ->orderBy('id')
                 ->get(['id', 'receiver_id', 'giftPrice', 'created_at', 'room_id', 'receiver_family_id']);
 
             $extraLogs = $logs->slice(1);
+            $excessDiamonds = (int) $extraLogs->sum('giftPrice');
+            $totalExcess += $excessDiamonds;
 
             $details[] = [
                 'sender_id' => $group->sender_id,
                 'gift_id' => $group->giftId,
                 'created_at' => $group->created_at,
-                'gift_price_per_receiver' => $price,
+                'gift_price_per_receiver' => (int) $group->giftPrice,
                 'total_receivers' => $group->receiver_count,
                 'excess_diamonds' => $excessDiamonds,
                 'kept_receiver' => $logs->first()->receiver_id,
@@ -759,7 +763,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                     DB::table('users')
                         ->where('id', $log->receiver_id)
                         ->update([
-                            'total_diamond_received' => DB::raw("GREATEST(0, total_diamond_received - {$logPrice})"),
+                            'total_diamond_received' => DB::raw("GREATEST(0, CAST(total_diamond_received AS SIGNED) - {$logPrice})"),
                         ]);
 
                     // Reverse exchange_diamonds (only for non-agency users)
@@ -767,7 +771,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('id', $log->receiver_id)
                         ->where('agency_id', 0)
                         ->update([
-                            'exchange_diamonds' => DB::raw("GREATEST(0, exchange_diamonds - {$logPrice})"),
+                            'exchange_diamonds' => DB::raw("GREATEST(0, CAST(exchange_diamonds AS SIGNED) - {$logPrice})"),
                         ]);
 
                     // Reverse monthly_diamond_received
@@ -777,17 +781,12 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('month', $logDate->month)
                         ->where('year', $logDate->year)
                         ->update([
-                            'monthly_diamond_received' => DB::raw("GREATEST(0, monthly_diamond_received - {$logPrice})"),
+                            'monthly_diamond_received' => DB::raw("GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - {$logPrice})"),
                         ]);
                 }
 
-                // Reverse sender's inflated total_diamond_send & monthly_diamond_send
-                DB::table('users')
-                    ->where('id', $group->sender_id)
-                    ->update([
-                        'total_diamond_send' => DB::raw("GREATEST(0, total_diamond_send - {$excessDiamonds})"),
-                        'monthly_diamond_send' => DB::raw("GREATEST(0, monthly_diamond_send - {$excessDiamonds})"),
-                    ]);
+                // NOTE: Sender refund intentionally skipped — senders already spent their diamonds
+                // and the app has already collected those coins. No refund needed.
 
                 // Fix room session (was inflated by excess)
                 $roomId = $logs->first()->room_id;
@@ -795,7 +794,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                     DB::table('rooms')
                         ->where('id', $roomId)
                         ->update([
-                            'session' => DB::raw("GREATEST(0, session - {$excessDiamonds})"),
+                            'session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$excessDiamonds})"),
                         ]);
                 }
 
@@ -805,7 +804,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('room_id', $roomId)
                         ->where('user_id', $group->sender_id)
                         ->update([
-                            'coins' => DB::raw("GREATEST(0, coins - {$excessDiamonds})"),
+                            'coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$excessDiamonds})"),
                         ]);
                 }
 
@@ -816,19 +815,18 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('room_id', $roomId)
                         ->whereDate('created_at', $logDate->toDateString())
                         ->update([
-                            'current_total' => DB::raw("GREATEST(0, current_total - {$excessDiamonds})"),
+                            'current_total' => DB::raw("GREATEST(0, CAST(current_total AS SIGNED) - {$excessDiamonds})"),
                         ]);
                 }
 
                 // Fix family total_diamond for extra receivers' families
                 $familyIds = $extraLogs->pluck('receiver_family_id')->filter()->unique();
                 foreach ($familyIds as $familyId) {
-                    $familyReceiverCount = $extraLogs->where('receiver_family_id', $familyId)->count();
-                    $familyExcess = $price * $familyReceiverCount;
+                    $familyExcess = (int) $extraLogs->where('receiver_family_id', $familyId)->sum('giftPrice');
                     DB::table('families')
                         ->where('id', $familyId)
                         ->update([
-                            'total_diamond' => DB::raw("GREATEST(0, total_diamond - {$familyExcess})"),
+                            'total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$familyExcess})"),
                         ]);
                 }
 
@@ -837,1168 +835,52 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                 DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
             }
         }
+
+        // Fix salaries: zero out any salary where corrected monthly_diamond no longer meets target
+        if ($shouldExecute) {
+            $salaryFixes = DB::select("
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond, s.target_diamonds, m.monthly_diamond_received
+                FROM user_sallaries s
+                JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
+                WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
+                  AND m.monthly_diamond_received < s.target_diamonds
+                  AND s.achieved_diamond > m.monthly_diamond_received
+            ", [now()->month, now()->year]);
+
+            foreach ($salaryFixes as $sal) {
+                DB::table('user_sallaries')
+                    ->where('id', $sal->id)
+                    ->update([
+                        'achieved_diamond' => $sal->monthly_diamond_received,
+                        'sallary' => 0,
+                        'agency_sallary' => 0,
+                        'diamond' => $sal->monthly_diamond_received . ' / ' . $sal->target_diamonds,
+                        'remaining_diamond' => max(0, $sal->target_diamonds - $sal->monthly_diamond_received),
+                        'is_finished' => 0,
+                    ]);
+            }
+        }
     });
+
+    $salaryReport = DB::table('user_sallaries as s')
+        ->join('monthly_diamond_receives as m', function ($join) {
+            $join->on('m.user_id', '=', 's.user_id')
+                ->where('m.month', '=', DB::raw('s.month'))
+                ->where('m.year', '=', DB::raw('s.year'));
+        })
+        ->where('s.month', now()->month)
+        ->where('s.year', now()->year)
+        ->where('s.is_paid', 0)
+        ->whereColumn('s.achieved_diamond', '>', 'm.monthly_diamond_received')
+        ->select('s.user_id', 's.achieved_diamond', 'm.monthly_diamond_received', 's.target_diamonds', 's.sallary', 's.agency_sallary')
+        ->get();
 
     return response()->json([
         'status' => $shouldExecute ? 'fixed' : 'report',
         'total_affected_transactions' => $affected->count(),
         'total_excess_diamonds' => $totalExcess,
+        'salary_corrections' => $salaryReport->count(),
         'details' => $details,
     ]);
 });
 
-Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
-Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
-Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
-Route::get('/emoji-image-type', [EmojiController::class, 'gitImage']);
-
-
-Route::get('/reset-fairluck', function () {
-    \Illuminate\Support\Facades\DB::table('fair_luck_wallets')->update(['balance' => 0, 'last_updated' => now()]);
-    \Illuminate\Support\Facades\DB::table('fair_luck_wallet_histories')->truncate();
-    if (\Illuminate\Support\Facades\Schema::hasTable('fair_luck_statistics')) {
-        \Illuminate\Support\Facades\DB::table('fair_luck_statistics')->truncate();
-    }
-
-    $redis = \Illuminate\Support\Facades\Redis::connection();
-    $prefix = config('database.redis.options.prefix', '');
-
-    $keys = $redis->keys('*fairluck*');
-    foreach ($keys as $key) {
-        if ($prefix && strpos($key, $prefix) === 0) {
-            $key = substr($key, strlen($prefix));
-        }
-        \Illuminate\Support\Facades\Redis::del($key);
-    }
-
-    return response()->json([
-        'status' => 'success',
-        'message' => 'FairLuck wallets (DB & Redis), histories, and statistics have been reset to 0.'
-    ]);
-});
-
-Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:10,1'
-    Route::get('/checkout/{id}', [PayPalController::class, 'checkout'])->name('paypal.checkout');
-    Route::post('/create-order', [PayPalController::class, 'create'])->name('paypal.create');
-    //    Route::get('/capture/{orderId}', [PayPalController::class, 'capture'])->name('paypal.capture');
-    //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
-});
-
-Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
-
-
-Route::get('/test-games', function () {
-
-    $fromDate = request()->get('fromDate');
-    $toDate = request()->get('toDate');
-    $userId = request()->get('userId');
-
-    $records = CoinGameUserAll::where('user_id', $userId)
-        ->whereBetween('created_at', [$fromDate, $toDate])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return $records;
-})->name('test-games');
-
-
-
-
-
-
-
-
-Route::get('/archive-old-coin-games', function () {
-    $now = Carbon::now();
-    $start = $now->copy()->subMonth();
-    $end = $now->copy()->subYears(2);
-
-    $current = $start->copy();
-
-    while ($current->greaterThanOrEqualTo($end)) {
-        $year = $current->year;
-        $month = $current->month;
-
-        Artisan::call('coin_game:archive', [
-            'year' => $year,
-            'month' => $month,
-        ]);
-
-        echo "Archived: {$year}-{$month}<br>";
-
-        $current->subMonth();
-    }
-
-    return "✅ Archiving finished!";
-});
-
-
-
-
-
-Route::get('/update-user-follow-counts', function () {
-    UpdateUserFollowCountsJob::dispatch()
-        ->onQueue('follow_counts');
-    return response()->json([
-        'success' => true,
-        'message' => 'done'
-    ]);
-});
-
-
-//Route::get('delete-payment', function (){
-//    $paymentTypes = PaymentCoin::pluck('type')->toArray();
-//    CoinLog::whereIn('method', $paymentTypes)->delete();
-//});
-
-
-Route::get('/fix-bans-user-id', function () {
-    $bans = Ban::all();
-
-    foreach ($bans as $ban) {
-        $user = User::where('uuid', $ban->uid)->first();
-
-        if ($user) {
-            $ban->user_id = $user->id;
-            $ban->save();
-        }
-    }
-
-    return "done";
-});
-
-
-Route::get('update/countries', function () {
-    $userCountries = User::whereNotNull('country_id')->get()->pluck('country_id')->toArray();
-
-    $unique = array_unique($userCountries);
-
-    Country::whereIn('id', $unique)->update(['status' => 1]);
-
-    Country::whereNotIn('id', $unique)->update(['status' => 0]);
-
-    return 'done';
-});
-
-Route::get('/week-zone', function () {
-
-
-
-    $startOfWeek = Carbon::now()->startOfWeek()->toDateTimeString();
-    $endOfWeek = Carbon::now()->endOfWeek()->toDateTimeString();
-
-    return response()->json([
-        'start_of_week' => $startOfWeek,
-        'end_of_week' => $endOfWeek,
-    ], 200, [], JSON_PRETTY_PRINT);
-});
-
-
-Route::get('update-country-id', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'CleanUpDuplicateCountriesSeeder',
-    ]);
-
-    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
-});
-
-Route::get('remove-new-country', function () {
-    User::where('country_id', 488)->update(['country_id' => null]);
-
-    Country::where('id', 488)->delete();
-
-    return 'done';
-});
-
-
-Route::get('/fix-agencies-bd', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
-    ]);
-
-    return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
-});
-
-Route::get('assign-super-admin-bd', function () {
-    $bds = Bd::whereNull('parent_id')->get();
-
-    foreach ($bds as $bd) {
-        if (!$bd->country_id) {
-            continue;
-        }
-
-        $superAdmin = SuperAdmin::where('country_id', $bd->country_id)
-            ->where('type', 'superadmin')
-            ->first();
-
-        if ($superAdmin) {
-            $bd->parent_id = $superAdmin->id;
-            $bd->save();
-        }
-    }
-
-    return "Parent IDs updated successfully.";
-});
-
-Route::get('/migrate-home-carousel', function () {
-
-    $carousels = DB::table('home_carousels')->get();
-
-    foreach ($carousels as $carousel) {
-
-        $displayTypes = [];
-        if ($carousel->display_home_top)
-            $displayTypes[] = 'home_top';
-        if ($carousel->display_home_middle)
-            $displayTypes[] = 'home_middle';
-        if ($carousel->display_live)
-            $displayTypes[] = 'live';
-        if ($carousel->display_country)
-            $displayTypes[] = 'country';
-        if ($carousel->display_discover)
-            $displayTypes[] = 'discover';
-
-
-        $unitMap = [
-            0 => null,
-            1 => 'hours',
-            2 => 'days',
-            3 => 'months',
-        ];
-
-        $unit = $unitMap[$carousel->form ?? 2] ?? 'days';
-
-        $endAt = null;
-        if (!empty($carousel->input) && $carousel->input > 0) {
-            $endAt = match ($unit) {
-                'hours' => Carbon::parse($carousel->created_at)->addHours($carousel->input),
-                'days' => Carbon::parse($carousel->created_at)->addDays($carousel->input),
-                'months' => Carbon::parse($carousel->created_at)->addMonths($carousel->input),
-                default => null,
-            };
-        }
-
-        foreach ($displayTypes as $type) {
-            DB::table('home_carousel_displays')->updateOrInsert(
-                [
-                    'home_carousel_id' => $carousel->id,
-                    'display_type' => $type,
-                ],
-                [
-                    'end_at' => $endAt,
-                    'duration' => $carousel->input ?? 0,
-                    'duration_unit' => $unit,
-                    'created_at' => $carousel->created_at,
-                    'updated_at' => $carousel->updated_at,
-                ]
-            );
-        }
-    }
-
-    return "✅ Migration completed successfully!";
-});
-
-
-Route::get('notifications/test', function () {
-    AdminNotificationHelper::notify(
-        AdminNotificationType::SYSTEM,
-        'إشعار تجريبي 🎉',
-        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
-        null,
-        ['created_at' => Carbon::now()->toDateTimeString()],
-        null
-    );
-
-    return 'تم إرسال الإشعار ✉️';
-});
-
-
-Route::get('notifications/test2', function () {
-    SuperAdminNotificationHelper::notify(
-        SuperAdminNotificationType::SYSTEM,
-        'إشعار تجريبي 🎉',
-        'هذا إشعار تم إنشاؤه من مسار الاختبار بنجاح.',
-        null,
-
-
-        ['created_at' => Carbon::now()->toDateTimeString()],
-        95,
-
-    );
-
-    return 'تم إرسال الإشعار ✉️';
-});
-
-Route::get('/codapay/create-payment', function () {
-    $trxId = rand(1000, 9999);
-    $amount = 1.00;
-    $userId = 123;
-
-    $payload = [
-        'initRequest' => [
-            'country' => "784",    // ✅ UAE (الإمارات)
-            'currency' => 840,      // ✅ USD (دولار أمريكي)
-            'apiKey' => env('CODAPAY_API_KEY', 'live_JI4WS6k27hHslcUOcmC9SGFDiyo'),
-            'projectId' => env('CODAPAY_PROJECT_ID', '289'),
-            'orderId' => (string) $trxId,
-            'returnUrl' => url('/codapay/success'),
-            'failUrl' => url('/codapay/fail'),
-            'items' => [
-                [
-                    'code' => '1',
-                    'price' => (float) $amount,
-                    'name' => "Order #{$trxId}"
-                ]
-            ],
-            'profile' => [
-                'entry' => [
-                    ['key' => 'user_id', 'value' => (string) $userId],
-                ],
-            ],
-        ],
-    ];
-
-    $url = 'https://airtime.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
-
-    try {
-        // Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
-
-        $response = Http::timeout(15)
-            ->withHeaders(['Content-Type' => 'application/json'])
-            ->post($url, $payload);
-
-        if ($response->failed()) {
-            // Log::error("❌ Codapay Connection Failed", [
-            //     'status'  => $response->status(),
-            //     'body'    => $response->body(),
-            //     'headers' => $response->headers(),
-            // ]);
-
-            return response()->json([
-                'error' => 'Failed to connect Codapay',
-                'status' => $response->status(),
-                'details' => $response->body(),
-                'url' => $url,
-                'payload' => $payload,
-            ], 500);
-        }
-
-        $result = $response->json();
-
-        // Log::info("✅ Codapay Response Received", ['result' => $result]);
-
-        // ✅ تحقق من النجاح
-        if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
-            $txnId = $result['initResult']['txnId'];
-            $paymentUrl = "https://airtime.codapayments.com/airtime/begin?type=3&txn_id={$txnId}";
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Payment link generated successfully.',
-                'paymentUrl' => $paymentUrl,
-                'txnId' => $txnId,
-                'result' => $result,
-            ]);
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to create payment',
-            'error_code' => $result['initResult']['resultCode'] ?? null,
-            'error_desc' => $result['initResult']['resultDesc'] ?? null,
-            'result' => $result,
-        ]);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'error' => 'Exception while connecting Codapay',
-            'details' => $e->getMessage(),
-        ], 500);
-    }
-});
-
-Route::view('/codapay-complete-landing', 'landing', ['title' => 'Complete Landing Page']);
-Route::view('/codapay-atm-pending', 'landing', ['title' => 'ATM Pending Landing Page']);
-Route::view('/codapay-pending-otc', 'landing', ['title' => 'Pending OTC Landing Page']);
-Route::view('/codapay-subscription-notification', 'landing', ['title' => 'Subscription Notification Page']);
-
-Route::get('remove-minus', function () {
-    try {
-        $currentMonth = date("m");
-        $currentYear = date("Y");
-
-        // DB::table('user_sallaries')
-        //     ->select('user_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
-        //     ->groupBy('user_id')
-        //     ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
-        //     ->orderBy('user_id')
-        //     ->chunk(100, function ($users) use ($currentMonth, $currentYear) {
-        //         $insertData = [];
-        //         foreach ($users as $user) {
-        //             $insertData[] = [
-        //                 'user_id' => $user->user_id,
-        //                 'cut_amount' => ($user->total_sallary - $user->total_cut_amount),
-        //                 'month' => $currentMonth,
-        //                 'year' => $currentYear,
-        //                 'sallary' => 0,
-        //                 'created_at' => now(),
-        //                 'updated_at' => now(),
-        //             ];
-        //         }
-        //         DB::table('user_sallaries')->insert($insertData);
-        //     });
-
-        DB::table('bd_sallaries')
-            ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
-            ->groupBy('bd_id', 'agency_id')
-            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
-            ->orderBy('bd_id')
-            ->chunk(100, function ($bds) use ($currentMonth, $currentYear) {
-                $insertData = [];
-                foreach ($bds as $bd) {
-                    $insertData[] = [
-                        'bd_id' => $bd->bd_id,
-                        'agency_id' => $bd->agency_id,
-                        'cut_amount' => ($bd->total_sallary - $bd->total_cut_amount),
-                        'month' => $currentMonth,
-                        'year' => $currentYear,
-                        'sallary' => 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-                DB::table('bd_sallaries')->insert($insertData);
-            });
-
-        DB::table('agency_sallaries')
-            ->select('agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
-            ->groupBy('agency_id')
-            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
-            ->orderBy('agency_id')
-            ->chunk(100, function ($agencies) use ($currentMonth, $currentYear) {
-                $insertData = [];
-                foreach ($agencies as $agency) {
-                    $insertData[] = [
-                        'agency_id' => $agency->agency_id,
-                        'cut_amount' => ($agency->total_sallary - $agency->total_cut_amount),
-                        'month' => $currentMonth,
-                        'year' => $currentYear,
-                        'sallary' => 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-                DB::table('agency_sallaries')->insert($insertData);
-            });
-
-        return 'تم بنجاح';
-    } catch (\Exception $e) {
-        return $e->getMessage();
-    }
-});
-
-Route::get('/manifest.json', function () {
-    $favIcon = getFavIcon();
-    return response()->json([
-        "name" => "",
-        "short_name" => "",
-        "icons" => [
-            [
-                "src" => $favIcon,
-                "sizes" => "192x192",
-                "type" => "image/png",
-            ],
-            [
-                "src" => $favIcon,
-                "sizes" => "512x512",
-                "type" => "image/png",
-            ],
-        ],
-        "theme_color" => "#ffffff",
-        "background_color" => "#ffffff",
-        "display" => "standalone",
-    ]);
-})->name('manifest.json');
-
-Route::get('/run-roomcup-rewards', function () {
-    Artisan::call('roomcup:calculate-rewards');
-
-    $output = Artisan::output();
-
-    return response()->json([
-        'message' => 'RoomCup rewards calculation executed successfully!',
-        'output' => $output,
-    ]);
-});
-
-Route::get('/fix-pack-expire', function () {
-    $packs = \App\Models\Pack::where('is_used', 1)
-        ->whereNull('expire')
-        ->get(['id', 'days']);
-
-    foreach ($packs as $pack) {
-        if ($pack->days >= 0) {
-            $pack->expire = $pack->days == 0 ? 0 : Carbon::now()->addDays($pack->days)->timestamp;
-            $pack->save();
-        }
-    }
-
-    return 'done';
-});
-
-Route::get('/users-without-admin', function () {
-    $types = [
-        'bd' => 'is_bd',
-        'superadmin' => 'is_super_admin',
-        'area-manager' => 'is_area_manager',
-    ];
-
-    $counts = [];
-    $lists = [];
-
-    foreach ($types as $type => $flag) {
-        $adminAppIds = \App\Models\Admin::where('type', $type)->pluck('app_id');
-
-        $users = User::where($flag, 1)
-            ->select('id')
-            ->whereNotIn('id', $adminAppIds)
-            ->get();
-
-        $counts["{$type}_count"] = $users->count();
-        $lists["{$type}_users"] = $users;
-    }
-
-    $response = array_merge($counts, $lists);
-
-    return response()->json($response);
-});
-
-Route::get('/users-without-admin/reset', function () {
-    $types = [
-        'bd' => 'is_bd',
-        'superadmin' => 'is_super_admin',
-        'area-manager' => 'is_area_manager',
-    ];
-
-    $result = [];
-
-    foreach ($types as $type => $flag) {
-        $adminAppIds = \App\Models\Admin::where('type', $type)->pluck('app_id');
-
-        $affectedRows = User::where($flag, 1)
-            ->whereNotIn('id', $adminAppIds)
-            ->update([$flag => 0]);
-
-        $result["{$type}_affected_rows"] = $affectedRows;
-    }
-
-    $result['success'] = true;
-    $result['message'] = 'Statuses reset successfully';
-
-    return response()->json($result);
-});
-
-/**
- *
- * tests
- *
- */
-Route::get('/diamond-discrepancy', [TestsController::class, 'discrepancyView'])->name('diamond.discrepancy');
-
-Route::get('/send-gift-test', [TestsController::class, 'form'])->name('gift.test.form');
-Route::post('/send-gift-test/run', [TestsController::class, 'run'])->name('gift.test.run');
-Route::post('/load-test/run', [TestsController::class, 'run'])->name('load.test');
-
-
-
-Route::get('/send-lucky-gift-test', [TestsController::class, 'lucky_form'])->name('lucky.gift.test.form');
-Route::post('/send-lucky-gift-test/run', [TestsController::class, 'lucky_run'])->name('lucky.gift.test.run');
-Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])->name('lucky.load.test');
-
-
-
-
-Route::get('/run-lucky-gift-test', function () {
-    Artisan::call('cache:clear');
-    $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
-
-    $process = new Process([
-        $phpunitPath,
-        '--filter=SendLuckyGift2FeatureTest',
-        'tests/Feature/SendLuckyGift2FeatureTest.php'
-    ]);
-
-    $process->setWorkingDirectory(base_path()); // قاعدة مهمة جداً
-    $process->setTimeout(300);
-    $process->run();
-
-    return response()->json([
-        'exit_code' => $process->getExitCode(),
-        'output' => $process->getOutput(),
-        'error_output' => $process->getErrorOutput(),
-    ]);
-});
-
-Route::get('/run-lucky-gift-unit-test', function () {
-    $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
-        ' --filter SendLuckyGift2FeatureTest';
-
-    $process = Process::fromShellCommandline($command, base_path());
-    $process->setTimeout(300);
-
-    $process->run();
-
-    $output = $process->getOutput() . $process->getErrorOutput();
-
-    return response('<pre>' . e($output) . '</pre>');
-});
-
-Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
-    Debugbar::info('Viewport:', $request->all());
-    return response()->json(['ok' => true]);
-});
-
-Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
-    dd("branch tested");
-});
-
-Route::get('/octane', function () {
-    Cache::store('octane')->clear();
-
-    return 'Octane Swoole memory cache cleared!';
-});
-
-Route::get('/sys/flush-octane', function () {
-    Cache::store('octane')->clear();
-    return response()->json(['status' => 'Octane Memory Cache Cleared']);
-})->middleware('auth.basic');
-
-Route::get('/sys/signal-flush', function () {
-    $triggerFile = storage_path('framework/cache_flush_signal');
-    if (!file_exists(dirname($triggerFile))) {
-        @mkdir(dirname($triggerFile), 0775, true);
-    }
-    @touch($triggerFile);
-    return response()->json(['status' => 'Signal file created']);
-})->middleware('auth.basic');
-
-Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
-    $secret = config('app.deploy_secret', 'your-secret-token-here');
-
-    $githubSignature = $request->header('X-Hub-Signature-256');
-    $customToken = $request->header('X-Deploy-Token') ?? $request->input('token');
-
-    $authorized = false;
-
-    if ($githubSignature) {
-        $payload = $request->getContent();
-        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
-        $authorized = hash_equals($expectedSignature, $githubSignature);
-    }
-
-    if (!$authorized && $customToken === $secret) {
-        $authorized = true;
-    }
-
-    if (!$authorized) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    $output = [];
-
-    try {
-        $output['git_pull'] = shell_exec('cd ' . base_path() . ' && git pull 2>&1');
-
-        $output['composer'] = shell_exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1');
-
-        \Artisan::call('config:cache');
-        $output['config_cache'] = \Artisan::output();
-
-        \Artisan::call('route:cache');
-        $output['route_cache'] = \Artisan::output();
-
-        \Artisan::call('view:cache');
-        $output['view_cache'] = \Artisan::output();
-
-        \Artisan::call('octane:reload');
-        $output['octane_reload'] = \Artisan::output();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Deployment completed successfully',
-            'output' => $output,
-            'time' => now()->toDateTimeString(),
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'output' => $output,
-        ], 500);
-    }
-})->name('deploy.webhook');
-
-Route::get('/quick-reload/{token}', function ($token) {
-    $secret = config('app.deploy_secret', 'your-secret-token-here');
-
-    if ($token !== $secret) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    \Artisan::call('octane:reload');
-    \Artisan::call('cache:clear');
-
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Octane reloaded & cache cleared',
-        'time' => now()->toDateTimeString(),
-    ]);
-});
-
-
-
-Route::get('/debug/force-pusher-refresh', function () {
-    $timestamp = now()->toDateTimeString();
-
-    Cache::forget('pusher_config');
-    Cache::forget('all_configs');
-
-    Cache::put('pusher_config_changed', $timestamp, 3600);
-
-    \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
-
-    Artisan::call('queue:restart');
-    $queueRestartOutput = Artisan::output();
-
-    $octaneReloadOutput = '';
-    try {
-        Artisan::call('octane:reload');
-        $octaneReloadOutput = Artisan::output();
-    } catch (\Throwable $e) {
-        $octaneReloadOutput = 'Not running or error: ' . $e->getMessage();
-    }
-
-    $freshConfig = getPusherConfig();
-    return response()->json([
-        'success' => true,
-        'message' => '🔄 Pusher config refresh triggered!',
-        'actions_taken' => [
-            '1_cache_cleared' => true,
-            '2_flag_set' => Cache::has('pusher_config_changed'),
-            '3_broadcaster_purged' => true,
-            '4_queue_restart' => trim($queueRestartOutput) ?: 'Signal sent',
-            '5_octane_reload' => trim($octaneReloadOutput) ?: 'Signal sent',
-        ],
-        'fresh_config' => [
-            'app_id' => $freshConfig['app_id'],
-            'app_cluster' => $freshConfig['app_cluster'],
-        ],
-        'next_steps' => [
-            'Supervisor will restart queue workers automatically',
-            'Octane workers will reload automatically',
-            'New broadcasts will use fresh DB config',
-        ],
-        'timestamp' => $timestamp,
-    ], 200, [], JSON_PRETTY_PRINT);
-});
-
-
-
-// ⭐ Test GiftBannerEvent broadcast (via Queue)
-Route::get('/debug/test-gift-banner', function () {
-    $dbConfig = getPusherConfig();
-
-    // Create test gift data
-    $testGift = [
-        'id' => rand(1000, 9999),
-        'name' => 'Test Gift 🎁',
-        'sender' => [
-            'id' => 1,
-            'name' => 'Test Sender',
-        ],
-        'receiver' => [
-            'id' => 2,
-            'name' => 'Test Receiver',
-        ],
-        'count' => 1,
-        'timestamp' => now()->toDateTimeString(),
-        'debug_info' => [
-            'pusher_app_id' => $dbConfig['app_id'],
-            'pusher_cluster' => $dbConfig['app_cluster'],
-        ],
-    ];
-
-    try {
-        // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
-        event(new \App\Events\GiftBannerEvent($testGift));
-
-        return response()->json([
-            'success' => true,
-            'message' => '🎁 GiftBannerEvent dispatched to Queue!',
-            'event' => [
-                'class' => \App\Events\GiftBannerEvent::class,
-                'channel' => 'gift_banner',
-                'broadcast_as' => 'gift_banner',
-                'queue' => 'heavyProcessing (or similar)',
-            ],
-            'test_data' => $testGift,
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
-            ],
-            'next_steps' => [
-                '1. Check Pusher Debug Console for the event',
-                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i gift',
-                '3. If not received, run: /debug/force-pusher-refresh',
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ], 200, [], JSON_PRETTY_PRINT);
-    } catch (\Throwable $e) {
-        // Log::error('GiftBannerEvent failed', [
-        //     'error' => $e->getMessage(),
-        //     'trace' => $e->getTraceAsString(),
-        // ]);
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ], 500, [], JSON_PRETTY_PRINT);
-    }
-});
-
-
-// ⭐ Test UserOnline broadcast (via Queue - PresenceChannel)
-Route::get('/debug/test-user-online', function () {
-    $dbConfig = getPusherConfig();
-
-    // Get a test user (first user or create mock)
-    $userId = request()->get('user_id', 1);
-    $user = \App\Models\User::find($userId);
-
-    if (!$user) {
-        return response()->json([
-            'success' => false,
-            'error' => "User with ID {$userId} not found",
-            'hint' => 'Add ?user_id=123 to specify a different user',
-        ], 404, [], JSON_PRETTY_PRINT);
-    }
-
-    try {
-        // Dispatch UserOnline event (goes through Queue because it implements ShouldBroadcast)
-        event(new \App\Events\UserOnline($user));
-
-        return response()->json([
-            'success' => true,
-            'message' => '👤 UserOnline event dispatched to Queue!',
-            'event' => [
-                'class' => \App\Events\UserOnline::class,
-                'channel' => 'presence-enter-user-room',
-                'channel_type' => 'PresenceChannel',
-            ],
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'uuid' => $user->uuid ?? null,
-            ],
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
-            ],
-            'next_steps' => [
-                '1. Check Pusher Debug Console for the event',
-                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i "UserOnline"',
-                '3. If not received, run: /debug/force-pusher-refresh',
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ], 200, [], JSON_PRETTY_PRINT);
-    } catch (\Throwable $e) {
-        // Log::error('UserOnline failed', [
-        //     'error' => $e->getMessage(),
-        //     'user_id' => $user->id,
-        //     'trace' => $e->getTraceAsString(),
-        // ]);
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ], 500, [], JSON_PRETTY_PRINT);
-    }
-});
-
-Route::get('/time-start-week', function () {
-    $date = '2026-02-15';
-
-    // room_id => sum(current_total)
-    $totalRoomGifts = TotalRoomGift::whereDate('created_at', $date)
-        ->groupBy('room_id')
-        ->pluck(DB::raw('SUM(current_total)'), 'room_id');
-
-    // room_id => sum(giftPrice)
-    $totalGiftLogs = GiftLog::whereDate('created_at', $date)
-        ->groupBy('room_id')
-        ->pluck(DB::raw('SUM(giftPrice)'), 'room_id');
-
-    dd([
-        'date' => $date,
-        'total_room_gifts' => $totalRoomGifts,
-        'total_gift_logs' => $totalGiftLogs,
-    ]);
-});
-
-Route::get('/fix-total-room-gifts', function () {
-    $tz = getTimezone();
-    $startOfWeek = Carbon::now($tz)->startOfWeek()->copy()->setTimezone('UTC');
-    $endOfWeek = Carbon::now($tz)->endOfWeek()->copy()->setTimezone('UTC');
-
-    // Get correct totals from gift_logs for each room per day
-    $correctTotals = GiftLog::whereBetween('created_at', [$startOfWeek, $endOfWeek])
-        ->groupBy('room_id', DB::raw('DATE(created_at)'))
-        ->selectRaw('room_id, DATE(created_at) as gift_date, SUM(giftPrice) as correct_total')
-        ->get();
-
-    $updated = 0;
-    $created = 0;
-    $results = [];
-
-    foreach ($correctTotals as $row) {
-        $roomId = $row->room_id;
-        $giftDate = $row->gift_date;
-        $correctTotal = $row->correct_total;
-
-        // Find or create TotalRoomGift record for this room on this date
-        $record = TotalRoomGift::whereDate('created_at', $giftDate)
-            ->where('room_id', $roomId)
-            ->first();
-
-        if ($record) {
-            $oldValue = $record->current_total;
-            if ($oldValue != $correctTotal) {
-                $record->current_total = $correctTotal;
-                $record->save();
-                $updated++;
-
-                $results[] = [
-                    'action' => 'updated',
-                    'room_id' => $roomId,
-                    'date' => $giftDate,
-                    'old' => $oldValue,
-                    'new' => $correctTotal,
-                    'diff' => $correctTotal - $oldValue,
-                ];
-            }
-        } else {
-            // Create missing record only if correct_total > 0
-            if ($correctTotal > 0) {
-                TotalRoomGift::create([
-                    'room_id' => $roomId,
-                    'current_total' => $correctTotal,
-                    'created_at' => Carbon::parse($giftDate)->startOfDay(),
-                    'updated_at' => now(),
-                ]);
-                $created++;
-
-                $results[] = [
-                    'action' => 'created',
-                    'room_id' => $roomId,
-                    'date' => $giftDate,
-                    'old' => 0,
-                    'new' => $correctTotal,
-                    'diff' => $correctTotal,
-                ];
-            }
-        }
-    }
-
-    return response()->json([
-        'start' => $startOfWeek->toDateTimeString(),
-        'end' => $endOfWeek->toDateTimeString(),
-        'updated_count' => $updated,
-        'created_count' => $created,
-        'total_processed' => $updated + $created,
-        'results' => $results,
-    ]);
-});
-
-
-
-Route::get('/restart-queues', function () {
-    try {
-        Artisan::call('queue:restart');
-        return "✅ Artisan queue:restart signaled successfully.";
-    } catch (\Exception $e) {
-        return "❌ Failed to signal queue:restart: " . $e->getMessage();
-    }
-});
-
-use Illuminate\Http\Request;
-use App\Models\GameProviderSetting;
-
-
-Route::get('/save-game-app-key', function (Request $request) {
-    $providerCode = $request->provider_code ?? 'quantum_nexus';
-    $appKey = env('LEADER_CC_GAME_SECRET_KEY');
-    try {
-        $gameSetting = GameProviderSetting::updateOrCreate(
-            ['provider_code' => $providerCode],
-            [
-                'app_key' => $appKey,
-            ]
-        );
-        return response()->json([
-            'status' => 'success',
-            'message' => 'تم حفظ المفتاح بنجاح',
-            'data' => $gameSetting,
-            'appKey' => $appKey,
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'حدث خطأ أثناء الحفظ: ' . $e->getMessage(),
-        ], 500);
-    }
-});
-
-use Illuminate\Support\Facades\Log;
-
-Route::get('/fix-paid-usd', function () {
-
-    Log::info('Fix paid_usd process started');
-
-    $logs = CoinLog::whereNull('paid_usd')
-        ->orWhere('paid_usd', 0)
-        ->get();
-
-    Log::info('Total logs fetched', ['count' => $logs->count()]);
-
-    $updated = 0;
-    $skipped = 0;
-    $errors = 0;
-
-    foreach ($logs as $log) {
-
-        try {
-
-            Log::info('Processing log', [
-                'log_id' => $log->id,
-                'obtained_coins' => $log->obtained_coins,
-                'current_paid_usd' => $log->paid_usd
-            ]);
-
-            $coin = Coin::where('coin', $log->obtained_coins)->first();
-
-            if ($coin) {
-
-                $oldValue = $log->paid_usd;
-
-                $log->paid_usd = $coin->usd;
-                $saved = $log->save();
-
-                if ($saved) {
-                    Log::info('Log updated successfully', [
-                        'log_id' => $log->id,
-                        'old_paid_usd' => $oldValue,
-                        'new_paid_usd' => $coin->usd
-                    ]);
-                } else {
-                    Log::warning('Log save returned false', [
-                        'log_id' => $log->id
-                    ]);
-                }
-
-                $updated++;
-            } else {
-
-                Log::warning('Coin not found for obtained_coins', [
-                    'log_id' => $log->id,
-                    'obtained_coins' => $log->obtained_coins
-                ]);
-
-                $skipped++;
-            }
-        } catch (\Exception $e) {
-
-            Log::error('Error while processing log', [
-                'log_id' => $log->id,
-                'error' => $e->getMessage()
-            ]);
-
-            $errors++;
-        }
-    }
-
-    Log::info('Fix paid_usd process finished', [
-        'updated' => $updated,
-        'skipped' => $skipped,
-        'errors' => $errors
-    ]);
-
-    return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
-});
-Route::get('make-seeders-for-new-update', function () {
-    $seeder = new \Database\Seeders\WebhookGamesSeeder();
-    $seeder->run();
-
-    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
-Route::get('make-seeders-for-permission', function () {
-    $seeder = new \Database\Seeders\PermissionTypeSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
-
-
-Route::get('/queue-control/{queue}', function ($queue) {
-
-    $check = shell_exec("ps aux | grep 'queue:work --queue=$queue' | grep -v grep");
-
-    if ($check) {
-        $output = [];
-        $returnVar = 0;
-        exec("php artisan queue:restart 2>&1", $output, $returnVar);
-        return response()->json([
-            'action' => 'restarted',
-            'queue' => $queue,
-            'return_code' => $returnVar,
-            'output' => $output
-        ]);
-    } else {
-        $output = [];
-        $returnVar = 0;
-        exec("php artisan queue:work --queue=$queue --tries=1 2>&1 &", $output, $returnVar);
-
-        return response()->json([
-            'action' => 'started',
-            'queue' => $queue,
-            'return_code' => $returnVar,
-            'output' => $output
-        ]);
-    }
-});
-
-
-Route::get('/get-gift-percentages', function () {
-    $negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
-    $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
-    $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
-
-dd($negativeLimit, $appFeeRate, $receiverFeeRate);
-}); 
-
-
-
-
-Route::get('/test-branch2', function (\Illuminate\Http\Request $request) {
-    dd("branch tested");
-    dd("branch tested");
-});
