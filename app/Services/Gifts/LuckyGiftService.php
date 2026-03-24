@@ -1527,7 +1527,7 @@ class LuckyGiftService
         $amountBefore = $user->di;
         $appPercentage = getGiftPercentage('app_wallet_lucky_gift') / 100;
         $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 100;
-        $hostPercentage = getGiftPercentage('host_lucky_gift') / 100;
+        $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
         $total_cashback_percentage = 0;
 
 
