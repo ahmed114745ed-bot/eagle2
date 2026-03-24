@@ -956,9 +956,9 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
 
     // === MAIN LOGIC ===
     $negativeUsers = DB::select("
-        SELECT user_id, SUM(sallary + agency_sallary) as total_earned,
+        SELECT user_id, SUM(sallary) as total_earned,
                SUM(cut_amount) as total_spent,
-               SUM(sallary + agency_sallary) - SUM(cut_amount) as balance
+               SUM(sallary) - SUM(cut_amount) as balance
         FROM user_sallaries WHERE month = ? AND year = ?
         GROUP BY user_id HAVING balance < 0 ORDER BY balance ASC
     ", [now()->month, now()->year]);
@@ -1072,9 +1072,9 @@ Route::get('/fix-bag-report', function () {
     // Negative salary users
     $negativeUsers = DB::select("
         SELECT s.user_id, u.name,
-               SUM(s.sallary + s.agency_sallary) as earned,
+               SUM(s.sallary) as earned,
                SUM(s.cut_amount) as spent,
-               SUM(s.sallary + s.agency_sallary) - SUM(s.cut_amount) as balance,
+               SUM(s.sallary) - SUM(s.cut_amount) as balance,
                m.monthly_diamond_received as corrected_monthly
         FROM user_sallaries s
         JOIN users u ON u.id = s.user_id
@@ -1194,7 +1194,7 @@ Route::get('/fix-bag-report', function () {
     $html .= '• هدايا الحقيبة المستلمة: 14,070,000<br>';
     $html .= '• الماسات بعد الإصلاح: 21,873,932 → هدف 56 (21,600,000) → راتب $468<br>';
     $html .= '• المصروف: $702<br>';
-    $html .= '• الخسارة: $468 + $144 (وكالة) - $702 = <span class="negative">-$90</span>';
+    $html .= '• الخسارة: $468 - $702 = <span class="negative">-$234</span>';
     $html .= '</p></div>';
 
     // Before/After comparison
