@@ -2052,141 +2052,225 @@ Route::get('/get-gift-percentages', function () {
 
 
 Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request) {
-    // التفعيل يتم فقط عند إضافة ?fix=1 للرابط
     $shouldExecute = $request->query('fix') == '1';
     $report = [
         'status' => $shouldExecute ? 'Execution Mode' : 'Preview Mode',
         'processed_users' => 0,
         'recovered_diamonds' => 0,
+        'unrecoverable_diamonds' => 0,
         'cancelled_salaries' => 0,
-        'details' => []
+        'details' => [],
     ];
 
     DB::beginTransaction();
     try {
-        $negativeUsers = DB::table('user_sallaries')
-            ->selectRaw('id, user_id, (sallary - cut_amount) as balance, month, year')
-            ->whereRaw('sallary - cut_amount < 0')
-            ->get();
+        // Step 1: Find users with negative TOTAL salary balance (grouped, not per-record)
+        $negativeUsers = DB::select("
+            SELECT user_id, SUM(sallary + agency_sallary) as total_earned,
+                   SUM(cut_amount) as total_spent,
+                   SUM(sallary + agency_sallary) - SUM(cut_amount) as balance
+            FROM user_sallaries
+            WHERE month = ? AND year = ?
+            GROUP BY user_id
+            HAVING balance < 0
+            ORDER BY balance ASC
+        ", [now()->month, now()->year]);
 
-        $rate = Common::getCoinsValue('user_coins'); // Dynamic rate conversion
+        // Step 2: Get coin/USD rate
+        $rate = Common::getCoinsValue('user_coins');
 
         foreach ($negativeUsers as $user) {
-            $diamondsToRecover = abs($user->balance) * $rate;
+            $negativeUsd = abs($user->balance);
+            $diamondsToRecover = (int)($negativeUsd * $rate);
+            $remaining = $diamondsToRecover;
             $report['processed_users']++;
 
-            // 2- التحقق من جدول الشحنات (أين ذهب الرصيد؟)
-            $charge = DB::table('charges')
+            $userDetail = [
+                'user_id' => $user->user_id,
+                'negative_usd' => $negativeUsd,
+                'diamonds_to_recover' => $diamondsToRecover,
+                'trace' => [],
+            ];
+
+            // Step 3: Find ALL charges this user made (not just one)
+            $charges = DB::table('charges')
                 ->where('charger_id', $user->user_id)
                 ->where('charger_type', 'user')
-                ->where('amount', '>=', $diamondsToRecover)
-                ->latest()->first();
+                ->where('created_at', '>=', '2026-03-19')
+                ->orderByDesc('created_at')
+                ->get();
 
-            if ($charge) {
-                $targetUserId = $charge->user_id;
-                $targetType = $charge->user_type; // user or agency
+            foreach ($charges as $charge) {
+                if ($remaining <= 0) break;
 
-                // --- سيناريو (أ): المستقبل وكالة وصرفتهم ---
+                $targetId = $charge->user_id;
+                $targetType = $charge->user_type;
+                $chargeAmount = min((int)$charge->amount, $remaining);
+
+                // Scenario A: Receiver is agency
                 if ($targetType == 'agency') {
-                    $agency = DB::table('agencies')->where('id', $targetUserId)->first();
-                    if ($agency && $agency->coins < $diamondsToRecover) {
-                        // الوكالة صرفت الرصيد.. نتتبع المستخدم الذي شحنته الوكالة
-                        $agencySubCharge = DB::table('charges')
-                            ->where('charger_id', $targetUserId)
-                            ->where('charger_type', 'agency')
-                            ->latest()->first();
-                        
-                        if ($agencySubCharge) {
-                            $targetUserId = $agencySubCharge->user_id;
-                            $targetType = 'user'; // تحول الهدف لمستخدم الآن
-                        }
-                    } else {
-                        // الوكالة عندها رصيد.. خصم مباشر
+                    $agency = DB::table('agencies')->where('id', $targetId)->first();
+                    if ($agency && $agency->coins >= $chargeAmount) {
+                        // Agency has balance — deduct directly
                         if ($shouldExecute) {
-                            DB::table('agencies')->where('id', $targetUserId)
-                                ->update(['coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$diamondsToRecover})")]);
+                            DB::table('agencies')->where('id', $targetId)
+                                ->update(['coins' => DB::raw("CAST(coins AS SIGNED) - {$chargeAmount}")]);
+                        }
+                        $remaining -= $chargeAmount;
+                        $report['recovered_diamonds'] += $chargeAmount;
+                        $userDetail['trace'][] = ['from' => "agency:{$targetId}", 'amount' => $chargeAmount, 'method' => 'direct'];
+                        continue;
+                    }
+
+                    // Agency spent it — trace who they charged
+                    if ($agency) {
+                        $canDeduct = min((int)$agency->coins, $chargeAmount);
+                        if ($canDeduct > 0 && $shouldExecute) {
+                            DB::table('agencies')->where('id', $targetId)
+                                ->update(['coins' => DB::raw("CAST(coins AS SIGNED) - {$canDeduct}")]);
+                            $remaining -= $canDeduct;
+                            $report['recovered_diamonds'] += $canDeduct;
+                            $userDetail['trace'][] = ['from' => "agency:{$targetId}", 'amount' => $canDeduct, 'method' => 'partial'];
+                        }
+
+                        // Trace agency sub-charges
+                        $subCharges = DB::table('charges')
+                            ->where('charger_id', $targetId)
+                            ->where('charger_type', 'agency')
+                            ->where('created_at', '>=', '2026-03-19')
+                            ->orderByDesc('created_at')
+                            ->get();
+
+                        foreach ($subCharges as $sub) {
+                            if ($remaining <= 0) break;
+                            $targetId = $sub->user_id;
+                            $targetType = 'user';
+                            // Fall through to user scenario below
                         }
                     }
                 }
 
-                // --- سيناريو (ب): المستقبل مستخدم (سواء مباشر أو عن طريق وكالة) ---
+                // Scenario B: Receiver is user
                 if ($targetType == 'user') {
-                    $targetUser = DB::table('users')->where('id', $targetUserId)->first();
-                    
-                    // لو رصيد المستخدم لا يسمح.. ننتقل لجدول الهدايا
-                    if ($targetUser && (int)$targetUser->di < $diamondsToRecover) {
-                        $gift = DB::table('gift_logs')
-                            ->where('sender_id', $targetUserId)
-                            ->latest()->first();
+                    $targetUser = DB::table('users')->where('id', $targetId)->first();
+                    if (!$targetUser) continue;
 
-                        if ($gift) {
-                            $finalReceiverId = $gift->receiver_id;
-                            $report['recovered_diamonds'] += $diamondsToRecover;
+                    $deductAmount = min($remaining, $chargeAmount);
+
+                    if ((int)$targetUser->di >= $deductAmount) {
+                        // User has enough di — deduct directly
+                        if ($shouldExecute) {
+                            DB::table('users')->where('id', $targetId)
+                                ->update(['di' => DB::raw("CAST(di AS SIGNED) - {$deductAmount}")]);
+                        }
+                        $remaining -= $deductAmount;
+                        $report['recovered_diamonds'] += $deductAmount;
+                        $userDetail['trace'][] = ['from' => "user:{$targetId}", 'amount' => $deductAmount, 'method' => 'direct_di'];
+                    } else {
+                        // Deduct what they have
+                        $canDeduct = (int)$targetUser->di;
+                        if ($canDeduct > 0 && $shouldExecute) {
+                            DB::table('users')->where('id', $targetId)
+                                ->update(['di' => 0]);
+                            $remaining -= $canDeduct;
+                            $report['recovered_diamonds'] += $canDeduct;
+                            $userDetail['trace'][] = ['from' => "user:{$targetId}", 'amount' => $canDeduct, 'method' => 'partial_di'];
+                        }
+
+                        // Trace gifts sent by this user
+                        $giftRemaining = $deductAmount - $canDeduct;
+                        $gifts = DB::table('gift_logs')
+                            ->selectRaw('receiver_id, room_id, receiver_family_id, SUM(giftPrice) as total')
+                            ->where('sender_id', $targetId)
+                            ->where('created_at', '>=', '2026-03-19')
+                            ->groupBy('receiver_id', 'room_id', 'receiver_family_id')
+                            ->orderByDesc('total')
+                            ->get();
+
+                        foreach ($gifts as $gift) {
+                            if ($giftRemaining <= 0) break;
+                            $giftDeduct = min($giftRemaining, (int)$gift->total);
 
                             if ($shouldExecute) {
-                                // الخصم من مستقبل الهدية النهائي
-                                DB::table('users')->where('id', $finalReceiverId)
-                                    ->update(['di' => DB::raw("GREATEST(0, CAST(di AS SIGNED) - {$diamondsToRecover})")]);
+                                // Deduct from gift receiver's total_diamond_received
+                                DB::table('users')->where('id', $gift->receiver_id)
+                                    ->update(['total_diamond_received' => DB::raw("CAST(total_diamond_received AS SIGNED) - {$giftDeduct}")]);
 
-                                // تنظيف العائلة
-                                $familyId = DB::table('users')->where('id', $finalReceiverId)->value('family_id');
-                                if ($familyId) {
-                                    DB::table('families')->where('id', $familyId)
-                                        ->update(['total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$diamondsToRecover})")]);
+                                // Deduct from monthly diamond
+                                DB::table('monthly_diamond_receives')
+                                    ->where('user_id', $gift->receiver_id)
+                                    ->where('month', now()->month)
+                                    ->where('year', now()->year)
+                                    ->update(['monthly_diamond_received' => DB::raw("CAST(monthly_diamond_received AS SIGNED) - {$giftDeduct}")]);
+
+                                // Fix family
+                                if ($gift->receiver_family_id) {
+                                    DB::table('families')->where('id', $gift->receiver_family_id)
+                                        ->update(['total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$giftDeduct})")]);
                                 }
 
-                                // تنظيف الغرفة وتوب الداعمين
+                                // Fix room
                                 if ($gift->room_id) {
                                     DB::table('rooms')->where('id', $gift->room_id)
-                                        ->update(['session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$diamondsToRecover})")]);
-                                    
-                                    DB::table('room_top_users')->where('room_id', $gift->room_id)
-                                        ->where('user_id', $targetUserId)
-                                        ->update(['coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$diamondsToRecover})")]);
+                                        ->update(['session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$giftDeduct})")]);
+                                    DB::table('room_top_users')
+                                        ->where('room_id', $gift->room_id)
+                                        ->where('user_id', $targetId)
+                                        ->update(['coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$giftDeduct})")]);
                                 }
-
-                                // تحديث إحصائيات الاستلام الشهري للمستقبل
-                                DB::table('monthly_diamond_receives')
-                                    ->where('user_id', $finalReceiverId)
-                                    ->where('month', Carbon::now()->month)
-                                    ->where('year', Carbon::now()->year)
-                                    ->update(['monthly_diamond_received' => DB::raw("GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - {$diamondsToRecover})")]);
                             }
-                        }
-                    } else {
-                        // رصيد المستخدم يسمح.. خصم مباشر
-                        if ($shouldExecute) {
-                            DB::table('users')->where('id', $targetUserId)
-                                ->update(['di' => DB::raw("GREATEST(0, CAST(di AS SIGNED) - {$diamondsToRecover})")]);
+
+                            $giftRemaining -= $giftDeduct;
+                            $remaining -= $giftDeduct;
+                            $report['recovered_diamonds'] += $giftDeduct;
+                            $userDetail['trace'][] = ['from' => "gift_receiver:{$gift->receiver_id}", 'amount' => $giftDeduct, 'method' => 'gift_trace'];
                         }
                     }
                 }
             }
 
-            // تصفير عجز المرسل النهائي (Resolve negative balance in user_sallaries)
-            if ($shouldExecute) {
-                DB::table('user_sallaries')->where('id', $user->id)
-                    ->update(['cut_amount' => DB::raw("sallary")]);
+            // Track unrecoverable
+            if ($remaining > 0) {
+                $report['unrecoverable_diamonds'] += $remaining;
+                $userDetail['unrecoverable'] = $remaining;
             }
+
+            $report['details'][] = $userDetail;
         }
 
-        // 3- الضربة النهائية: إعادة فحص وتصفير الرواتب (Salary Correction)
+        // Step 4: Salary correction — recalculate based on corrected monthly diamonds
         if ($shouldExecute) {
             $salaryFixes = DB::select("
-                SELECT s.id, m.monthly_diamond_received, s.target_diamonds
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.target_diamonds,
+                       m.monthly_diamond_received as corrected_diamond
                 FROM user_sallaries s
                 JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
-                WHERE s.is_paid = 0 AND m.monthly_diamond_received < s.target_diamonds
-            ");
+                WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
+                  AND s.achieved_diamond > m.monthly_diamond_received
+            ", [now()->month, now()->year]);
 
             foreach ($salaryFixes as $sal) {
-                DB::table('user_sallaries')->where('id', $sal->id)->update([
-                    'sallary' => 0,
-                    'agency_sallary' => 0,
-                    'is_finished' => 0,
-                    'achieved_diamond' => $sal->monthly_diamond_received
-                ]);
-                $report['cancelled_salaries']++;
+                $corrected = max(0, (int)$sal->corrected_diamond);
+                $target = (int)$sal->target_diamonds;
+
+                if ($corrected >= $target) {
+                    // Still meets target — just update achieved_diamond
+                    DB::table('user_sallaries')->where('id', $sal->id)->update([
+                        'achieved_diamond' => $corrected,
+                        'diamond' => $corrected . ' / ' . $target,
+                    ]);
+                } else {
+                    // No longer meets target — zero out
+                    DB::table('user_sallaries')->where('id', $sal->id)->update([
+                        'sallary' => 0,
+                        'agency_sallary' => 0,
+                        'achieved_diamond' => $corrected,
+                        'diamond' => $corrected . ' / ' . $target,
+                        'remaining_diamond' => $target - $corrected,
+                        'is_finished' => 0,
+                    ]);
+                    $report['cancelled_salaries']++;
+                }
             }
         }
 
@@ -2205,73 +2289,6 @@ Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request)
 
 
 
-Route::get('/fix-bag-monthly', function (\Illuminate\Http\Request $request) {
-    $shouldExecute = $request->query('fix') == '1';
-
-    // Step 1: Get total excess giftPrice per receiver from bag gifts
-    $receivers = DB::table('gift_logs')
-        ->selectRaw('receiver_id, SUM(giftPrice) as total_bag_diamonds')
-        ->where('source_type', 'gift')
-        ->where('created_at', '>=', '2026-03-19')
-        ->groupBy('receiver_id')
-        ->get();
-
-    if ($receivers->isEmpty()) {
-        return response()->json([
-            'status' => 'ok',
-            'message' => 'No bag gift receivers found since 2026-03-19.',
-        ]);
-    }
-
-    $details = [];
-
-    foreach ($receivers as $receiver) {
-        $bagTotal = (int) $receiver->total_bag_diamonds;
-
-        // Step 2: Get monthly_diamond_receives for this receiver
-        $monthlyRecord = DB::table('monthly_diamond_receives')
-            ->where('user_id', $receiver->receiver_id)
-            ->where('month', 3)
-            ->where('year', 2026)
-            ->first();
-
-        if (!$monthlyRecord) {
-            $details[] = [
-                'receiver_id' => $receiver->receiver_id,
-                'bag_total' => $bagTotal,
-                'monthly_before' => null,
-                'monthly_after' => null,
-                'status' => 'no monthly record found',
-            ];
-            continue;
-        }
-
-        $monthlyBefore = (int) $monthlyRecord->monthly_diamond_received;
-        $monthlyAfter = max(0, $monthlyBefore - $bagTotal);
-
-        $details[] = [
-            'receiver_id' => $receiver->receiver_id,
-            'bag_total' => $bagTotal,
-            'monthly_before' => $monthlyBefore,
-            'monthly_after' => $monthlyAfter,
-            'deducted' => $monthlyBefore - $monthlyAfter,
-        ];
-
-        // Step 3: Update monthly_diamond_receives
-        if ($shouldExecute) {
-            DB::table('monthly_diamond_receives')
-                ->where('user_id', $receiver->receiver_id)
-                ->where('month', 3)
-                ->where('year', 2026)
-                ->update([
-                    'monthly_diamond_received' => $monthlyAfter,
-                ]);
-        }
-    }
-
-    return response()->json([
-        'status' => $shouldExecute ? 'fixed' : 'report',
-        'total_receivers' => $receivers->count(),
-        'details' => $details,
-    ]);
-});
+// NOTE: /fix-bag-monthly route REMOVED — it was double-deducting ALL bag gift diamonds
+// from monthly_diamond_received (not just the extras). The fix-bag-gifts route already
+// handles monthly diamond corrections per extra log row. Running both caused negative salaries.
