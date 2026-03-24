@@ -869,6 +869,97 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
     $shouldExecute = $request->query('fix') == '1';
     $rate = \App\Helpers\Common::getCoinsValue('user_coins');
 
+    // Helper: deduct from a user's di balance
+    $deductDi = function ($userId, $amount, $shouldExecute) {
+        $user = DB::table('users')->where('id', $userId)->first();
+        if (!$user || (int)$user->di <= 0) return 0;
+        $canDeduct = min((int)$user->di, $amount);
+        if ($canDeduct > 0 && $shouldExecute) {
+            DB::table('users')->where('id', $userId)->update(['di' => DB::raw("di - {$canDeduct}")]);
+        }
+        return $canDeduct;
+    };
+
+    // Helper: deduct from a user's exchange_diamonds
+    $deductExchange = function ($userId, $amount, $shouldExecute) {
+        $user = DB::table('users')->where('id', $userId)->first();
+        if (!$user || (int)$user->exchange_diamonds <= 0 || (int)$user->agency_id != 0) return 0;
+        $canDeduct = min((int)$user->exchange_diamonds, $amount);
+        if ($canDeduct > 0 && $shouldExecute) {
+            DB::table('users')->where('id', $userId)->update(['exchange_diamonds' => DB::raw("exchange_diamonds - {$canDeduct}")]);
+        }
+        return $canDeduct;
+    };
+
+    // Helper: deduct from agency coins
+    $deductAgency = function ($agencyId, $amount, $shouldExecute) {
+        $agency = DB::table('agencies')->where('id', $agencyId)->first();
+        if (!$agency || (int)$agency->coins <= 0) return 0;
+        $canDeduct = min((int)$agency->coins, $amount);
+        if ($canDeduct > 0 && $shouldExecute) {
+            DB::table('agencies')->where('id', $agencyId)->update(['coins' => DB::raw("coins - {$canDeduct}")]);
+        }
+        return $canDeduct;
+    };
+
+    // Helper: trace charges from a user (1 level)
+    $traceCharges = function ($userId, $maxAmount, $shouldExecute, &$trace) use ($deductDi, $deductAgency) {
+        $recovered = 0;
+        $remaining = $maxAmount;
+
+        $charges = DB::table('charges')
+            ->where('charger_id', $userId)->where('charger_type', 'user')
+            ->where('user_id', '!=', $userId)
+            ->where('created_at', '>=', '2026-03-19')
+            ->orderByDesc('amount')->get();
+
+        foreach ($charges as $charge) {
+            if ($remaining <= 0) break;
+            $amt = min((int)$charge->amount, $remaining);
+
+            if ($charge->user_type == 'agency') {
+                $got = $deductAgency($charge->user_id, $amt, $shouldExecute);
+                if ($got > 0) {
+                    $remaining -= $got; $recovered += $got;
+                    $trace[] = ['type' => 'charge→agency', 'from' => "agency:{$charge->user_id}", 'amount' => $got];
+                }
+            } else {
+                $got = $deductDi($charge->user_id, $amt, $shouldExecute);
+                if ($got > 0) {
+                    $remaining -= $got; $recovered += $got;
+                    $trace[] = ['type' => 'charge→user_di', 'from' => "user:{$charge->user_id}", 'amount' => $got];
+                }
+            }
+        }
+        return $recovered;
+    };
+
+    // Helper: trace gifts from a user (1 level) — deduct from receivers
+    $traceGifts = function ($userId, $maxAmount, $shouldExecute, &$trace) use ($deductDi) {
+        $recovered = 0;
+        $remaining = $maxAmount;
+
+        $gifts = DB::select("
+            SELECT receiver_id, SUM(giftPrice) as total_sent
+            FROM gift_logs WHERE sender_id = ? AND receiver_id != ? AND created_at >= '2026-03-19'
+            GROUP BY receiver_id ORDER BY total_sent DESC
+        ", [$userId, $userId]);
+
+        foreach ($gifts as $gift) {
+            if ($remaining <= 0) break;
+            $amt = min((int)$gift->total_sent, $remaining);
+
+            // First try di
+            $got = $deductDi($gift->receiver_id, $amt, $shouldExecute);
+            if ($got > 0) {
+                $remaining -= $got; $recovered += $got;
+                $trace[] = ['type' => 'gift→receiver_di', 'from' => "user:{$gift->receiver_id}", 'amount' => $got];
+            }
+        }
+        return $recovered;
+    };
+
+    // === MAIN LOGIC ===
     $negativeUsers = DB::select("
         SELECT user_id, SUM(sallary + agency_sallary) as total_earned,
                SUM(cut_amount) as total_spent,
@@ -900,105 +991,71 @@ Route::get('/fix-bag-step4', function (\Illuminate\Http\Request $request) {
             'trace' => [],
         ];
 
-        // === PHASE 1: Trace through charges (to other users/agencies) ===
-        $charges = DB::table('charges')
-            ->where('charger_id', $user->user_id)
-            ->where('charger_type', 'user')
-            ->where('user_id', '!=', $user->user_id) // skip self-charges
-            ->where('created_at', '>=', '2026-03-19')
-            ->orderByDesc('created_at')
-            ->get();
+        // PHASE 1: Deduct from user's own balances first
+        if ($remaining > 0) {
+            $got = $deductDi($user->user_id, $remaining, $shouldExecute);
+            if ($got > 0) {
+                $remaining -= $got; $report['recovered_diamonds'] += $got;
+                $detail['trace'][] = ['type' => 'self_di', 'from' => "user:{$user->user_id}", 'amount' => $got];
+            }
+        }
+        if ($remaining > 0) {
+            $got = $deductExchange($user->user_id, $remaining, $shouldExecute);
+            if ($got > 0) {
+                $remaining -= $got; $report['recovered_diamonds'] += $got;
+                $detail['trace'][] = ['type' => 'self_exchange', 'from' => "user:{$user->user_id}", 'amount' => $got];
+            }
+        }
 
-        foreach ($charges as $charge) {
-            if ($remaining <= 0) break;
-            $targetId = $charge->user_id;
-            $targetType = $charge->user_type;
-            $chargeAmount = min((int)$charge->amount, $remaining);
+        // PHASE 2: Trace charges (level 1) — deduct from charge recipients
+        if ($remaining > 0) {
+            $got = $traceCharges($user->user_id, $remaining, $shouldExecute, $detail['trace']);
+            $remaining -= $got; $report['recovered_diamonds'] += $got;
+        }
 
-            if ($targetType == 'agency') {
-                $agency = DB::table('agencies')->where('id', $targetId)->first();
-                if ($agency && (int)$agency->coins > 0) {
-                    $canDeduct = min((int)$agency->coins, $chargeAmount);
-                    if ($shouldExecute) {
-                        DB::table('agencies')->where('id', $targetId)
-                            ->update(['coins' => DB::raw("coins - {$canDeduct}")]);
-                    }
-                    $remaining -= $canDeduct;
-                    $report['recovered_diamonds'] += $canDeduct;
-                    $detail['trace'][] = ['type' => 'charge', 'from' => "agency:{$targetId}", 'amount' => $canDeduct];
-                }
-            } elseif ($targetType == 'user') {
-                $targetUser = DB::table('users')->where('id', $targetId)->first();
-                if ($targetUser && (int)$targetUser->di > 0) {
-                    $canDeduct = min((int)$targetUser->di, $chargeAmount);
-                    if ($shouldExecute) {
-                        DB::table('users')->where('id', $targetId)
-                            ->update(['di' => DB::raw("di - {$canDeduct}")]);
-                    }
-                    $remaining -= $canDeduct;
-                    $report['recovered_diamonds'] += $canDeduct;
-                    $detail['trace'][] = ['type' => 'charge', 'from' => "user:{$targetId}", 'amount' => $canDeduct];
+        // PHASE 3: Trace gifts sent (level 1) — deduct from gift receivers' di
+        if ($remaining > 0) {
+            $got = $traceGifts($user->user_id, $remaining, $shouldExecute, $detail['trace']);
+            $remaining -= $got; $report['recovered_diamonds'] += $got;
+        }
+
+        // PHASE 4: Level 2 — trace charge recipients' outgoing charges and gifts
+        if ($remaining > 0) {
+            $charges = DB::table('charges')
+                ->where('charger_id', $user->user_id)->where('charger_type', 'user')
+                ->where('user_id', '!=', $user->user_id)
+                ->where('created_at', '>=', '2026-03-19')
+                ->orderByDesc('amount')->get();
+
+            foreach ($charges as $charge) {
+                if ($remaining <= 0) break;
+                if ($charge->user_type != 'user') continue;
+
+                // Trace level 2: where did the charge recipient spend?
+                // Their charges
+                $got = $traceCharges($charge->user_id, $remaining, $shouldExecute, $detail['trace']);
+                $remaining -= $got; $report['recovered_diamonds'] += $got;
+
+                // Their gifts
+                if ($remaining > 0) {
+                    $got = $traceGifts($charge->user_id, $remaining, $shouldExecute, $detail['trace']);
+                    $remaining -= $got; $report['recovered_diamonds'] += $got;
                 }
             }
         }
 
-        // === PHASE 2: Trace through gifts sent by this user ===
+        // PHASE 5: Level 2 — trace gift receivers' outgoing gifts
         if ($remaining > 0) {
             $gifts = DB::select("
                 SELECT receiver_id, SUM(giftPrice) as total_sent
-                FROM gift_logs
-                WHERE sender_id = ? AND receiver_id != ? AND created_at >= '2026-03-19'
-                GROUP BY receiver_id
-                ORDER BY total_sent DESC
+                FROM gift_logs WHERE sender_id = ? AND receiver_id != ? AND created_at >= '2026-03-19'
+                GROUP BY receiver_id ORDER BY total_sent DESC LIMIT 20
             ", [$user->user_id, $user->user_id]);
 
             foreach ($gifts as $gift) {
                 if ($remaining <= 0) break;
-                $giftAmount = min((int)$gift->total_sent, $remaining);
-
-                // Try to deduct from receiver's total_diamond_received
-                $receiver = DB::table('users')->where('id', $gift->receiver_id)->first();
-                if (!$receiver) continue;
-
-                // Deduct from total_diamond_received (allow negative = tracks debt)
-                if ($shouldExecute) {
-                    DB::table('users')->where('id', $gift->receiver_id)->update([
-                        'total_diamond_received' => DB::raw("CAST(total_diamond_received AS SIGNED) - {$giftAmount}"),
-                    ]);
-                    // Also deduct from monthly
-                    DB::table('monthly_diamond_receives')
-                        ->where('user_id', $gift->receiver_id)
-                        ->where('month', now()->month)
-                        ->where('year', now()->year)
-                        ->update([
-                            'monthly_diamond_received' => DB::raw("CAST(monthly_diamond_received AS SIGNED) - {$giftAmount}"),
-                        ]);
-                    // Fix exchange for non-agency
-                    if ((int)$receiver->agency_id == 0) {
-                        DB::table('users')->where('id', $gift->receiver_id)->update([
-                            'exchange_diamonds' => DB::raw("CAST(exchange_diamonds AS SIGNED) - {$giftAmount}"),
-                        ]);
-                    }
-                }
-
-                $remaining -= $giftAmount;
-                $report['recovered_diamonds'] += $giftAmount;
-                $detail['trace'][] = ['type' => 'gift', 'from' => "user:{$gift->receiver_id}", 'amount' => $giftAmount];
-            }
-        }
-
-        // === PHASE 3: Check user's own di balance ===
-        if ($remaining > 0) {
-            $selfUser = DB::table('users')->where('id', $user->user_id)->first();
-            if ($selfUser && (int)$selfUser->di > 0) {
-                $canDeduct = min((int)$selfUser->di, $remaining);
-                if ($shouldExecute) {
-                    DB::table('users')->where('id', $user->user_id)
-                        ->update(['di' => DB::raw("di - {$canDeduct}")]);
-                }
-                $remaining -= $canDeduct;
-                $report['recovered_diamonds'] += $canDeduct;
-                $detail['trace'][] = ['type' => 'self_di', 'from' => "user:{$user->user_id}", 'amount' => $canDeduct];
+                $got = $traceGifts($gift->receiver_id, $remaining, $shouldExecute, $detail['trace']);
+                $remaining -= $got; $report['recovered_diamonds'] += $got;
             }
         }
 
