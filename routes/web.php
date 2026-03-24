@@ -759,29 +759,29 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                 foreach ($extraLogs as $log) {
                     $logPrice = (int) $log->giftPrice;
 
-                    // Reverse total_diamond_received
+                    // Reverse total_diamond_received (allow negative = unrecoverable loss)
                     DB::table('users')
                         ->where('id', $log->receiver_id)
                         ->update([
-                            'total_diamond_received' => DB::raw("GREATEST(0, CAST(total_diamond_received AS SIGNED) - {$logPrice})"),
+                            'total_diamond_received' => DB::raw("CAST(total_diamond_received AS SIGNED) - {$logPrice}"),
                         ]);
 
-                    // Reverse exchange_diamonds (only for non-agency users)
+                    // Reverse exchange_diamonds (only for non-agency users, allow negative)
                     DB::table('users')
                         ->where('id', $log->receiver_id)
                         ->where('agency_id', 0)
                         ->update([
-                            'exchange_diamonds' => DB::raw("GREATEST(0, CAST(exchange_diamonds AS SIGNED) - {$logPrice})"),
+                            'exchange_diamonds' => DB::raw("CAST(exchange_diamonds AS SIGNED) - {$logPrice}"),
                         ]);
 
-                    // Reverse monthly_diamond_received
+                    // Reverse monthly_diamond_received (allow negative)
                     $logDate = \Carbon\Carbon::parse($log->created_at, getTimezone());
                     DB::table('monthly_diamond_receives')
                         ->where('user_id', $log->receiver_id)
                         ->where('month', $logDate->month)
                         ->where('year', $logDate->year)
                         ->update([
-                            'monthly_diamond_received' => DB::raw("GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - {$logPrice})"),
+                            'monthly_diamond_received' => DB::raw("CAST(monthly_diamond_received AS SIGNED) - {$logPrice}"),
                         ]);
                 }
 
@@ -836,28 +836,45 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
             }
         }
 
-        // Fix salaries: zero out any salary where corrected monthly_diamond no longer meets target
+        // Fix salaries: recalculate based on corrected monthly diamonds
         if ($shouldExecute) {
+            // Get all salary records where achieved_diamond was inflated
             $salaryFixes = DB::select("
-                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond, s.target_diamonds, m.monthly_diamond_received
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond,
+                       s.target_diamonds, s.dB, s.app_profit,
+                       m.monthly_diamond_received as corrected_diamond
                 FROM user_sallaries s
                 JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
                 WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
-                  AND m.monthly_diamond_received < s.target_diamonds
                   AND s.achieved_diamond > m.monthly_diamond_received
             ", [now()->month, now()->year]);
 
             foreach ($salaryFixes as $sal) {
-                DB::table('user_sallaries')
-                    ->where('id', $sal->id)
-                    ->update([
-                        'achieved_diamond' => $sal->monthly_diamond_received,
-                        'sallary' => 0,
-                        'agency_sallary' => 0,
-                        'diamond' => $sal->monthly_diamond_received . ' / ' . $sal->target_diamonds,
-                        'remaining_diamond' => max(0, $sal->target_diamonds - $sal->monthly_diamond_received),
-                        'is_finished' => 0,
-                    ]);
+                $corrected = (int) $sal->corrected_diamond;
+                $target = (int) $sal->target_diamonds;
+
+                if ($corrected >= $target) {
+                    // Still meets target with corrected diamonds — just update achieved_diamond
+                    DB::table('user_sallaries')
+                        ->where('id', $sal->id)
+                        ->update([
+                            'achieved_diamond' => $corrected,
+                            'diamond' => $corrected . ' / ' . $target,
+                            'remaining_diamond' => 0,
+                        ]);
+                } else {
+                    // No longer meets target — zero out this salary tier
+                    DB::table('user_sallaries')
+                        ->where('id', $sal->id)
+                        ->update([
+                            'achieved_diamond' => $corrected,
+                            'sallary' => 0,
+                            'agency_sallary' => 0,
+                            'diamond' => $corrected . ' / ' . $target,
+                            'remaining_diamond' => $target - $corrected,
+                            'is_finished' => 0,
+                        ]);
+                }
             }
         }
     });
