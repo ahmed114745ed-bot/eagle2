@@ -901,3 +901,26 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
     ]);
 });
 
+
+Route::get('/manifest.json', function () {
+    $favIcon = getFavIcon();
+    return response()->json([
+        "name" => "",
+        "short_name" => "",
+        "icons" => [
+            [
+                "src" => $favIcon,
+                "sizes" => "192x192",
+                "type" => "image/png",
+            ],
+            [
+                "src" => $favIcon,
+                "sizes" => "512x512",
+                "type" => "image/png",
+            ],
+        ],
+        "theme_color" => "#ffffff",
+        "background_color" => "#ffffff",
+        "display" => "standalone",
+    ]);
+})->name('manifest.json');
