@@ -2958,7 +2958,7 @@ Route::get('/system-merge-and-recalculate', function (\Illuminate\Http\Request $
                 $joinRequest = DB::table('agency_join_requests')
                     ->where('user_id', $userId)
                     ->where('agency_id', $currentAgencyId)
-                    ->where('status', 'accepted') // تأكد من مسمى الحالة لديك (مثلاً accepted أو 1)
+                    ->where('status', 1) // تأكد من مسمى الحالة لديك (مثلاً accepted أو 1)
                     ->orderBy('created_at', 'desc')
                     ->first();
 
