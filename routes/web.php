@@ -2671,3 +2671,978 @@ Route::get('/system-audit-and-fix', function (\Illuminate\Http\Request $request)
 // NOTE: /fix-bag-monthly route REMOVED — it was double-deducting ALL bag gift diamonds
 // from monthly_diamond_received (not just the extras). The fix-bag-gifts route already
 // handles monthly diamond corrections per extra log row. Running both caused negative salaries.
+
+
+
+/**
+ * ============================================================================
+ * نظام إصلاح شامل لخلل "هدايا الحقيبة" - Bag Gift Fix System
+ * ============================================================================
+ * 
+ * التاريخ المرجعي: 2026-03-19
+ * الخلل: تكرار توزيع هدايا الحقيبة (source_type = 'gift') بشكل غير مستحق
+ * 
+ * الخطوات:
+ * 1. تصفير التضخم المالي (خصم من أرصدة المستلمين)
+ * 2. تنظيف الكيانات (الغرف والعائلات) وحذف السجلات
+ * 3. إعادة جدولة الرواتب
+ * 4. الاسترداد العدواني (تتبع الشحنات والهدايا)
+ * 
+ * الاستخدام:
+ * - معاينة: /bag-gift-fix-system
+ * - تنفيذ: /bag-gift-fix-system?fix=1
+ * ============================================================================
+ */
+Route::get('/bag-gift-fix-system', function (\Illuminate\Http\Request $request) {
+    $shouldExecute = $request->query('fix') == '1';
+    $bugDate = '2026-03-19';
+    $currentMonth = 3; // March
+    $currentYear = 2026;
+    
+    // Initialize report
+    $report = [
+        'execution_mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
+        'bug_date' => $bugDate,
+        'timestamp' => now()->toDateTimeString(),
+        'steps' => [],
+        'summary' => [
+            'total_fake_diamonds' => 0,
+            'total_affected_users' => 0,
+            'total_affected_rooms' => 0,
+            'total_affected_families' => 0,
+            'total_salary_adjustments' => 0,
+            'total_recovered_usd' => 0,
+            'total_unrecoverable_usd' => 0,
+            'deleted_gift_logs' => 0,
+        ],
+        'affected_users' => [],
+        'negative_balance_users' => [],
+    ];
+
+    // Get zones_coins from settings (default 30000)
+    $zonesCoins = (int) DB::table('settings')->where('key', 'zones_coins')->value('value') ?? 30000;
+    $report['zones_coins'] = $zonesCoins;
+
+    DB::beginTransaction();
+    
+    try {
+        // ============================================================================
+        // الخطوة 1: تصفير التضخم المالي
+        // ============================================================================
+        $step1 = [
+            'name' => 'تصفير التضخم المالي',
+            'description' => 'خصم مجموع giftPrice من أرصدة المستلمين',
+            'status' => 'pending',
+            'details' => [],
+        ];
+
+        // Get all fake gift logs grouped by receiver
+        $fakeGifts = DB::table('gift_logs')
+            ->selectRaw('receiver_id, SUM(giftPrice) as total_fake_diamonds, COUNT(*) as log_count')
+            ->where('source_type', 'gift')
+            ->where('created_at', '>=', $bugDate)
+            ->groupBy('receiver_id')
+            ->get();
+
+        $report['summary']['total_fake_diamonds'] = $fakeGifts->sum('total_fake_diamonds');
+        $report['summary']['total_affected_users'] = $fakeGifts->count();
+
+        foreach ($fakeGifts as $gift) {
+            $userId = $gift->receiver_id;
+            $fakeAmount = (int) $gift->total_fake_diamonds;
+
+            // Get user info before update
+            $userBefore = DB::table('users')
+                ->where('id', $userId)
+                ->select('id', 'uuid', 'di', 'total_diamond_received', 'exchange_diamonds', 'agency_id')
+                ->first();
+
+            if (!$userBefore) continue;
+
+            $userDetail = [
+                'user_id' => $userId,
+                'uuid' => $userBefore->uuid ?? 'N/A',
+                'fake_diamonds' => $fakeAmount,
+                'log_count' => $gift->log_count,
+                'before' => [
+                    'total_diamond_received' => $userBefore->total_diamond_received,
+                    'exchange_diamonds' => $userBefore->exchange_diamonds,
+                ],
+                'after' => [],
+            ];
+
+            if ($shouldExecute) {
+                // Update users table - allow negative values using CAST AS SIGNED
+                DB::statement("
+                    UPDATE users 
+                    SET total_diamond_received = CAST(total_diamond_received AS SIGNED) - ?,
+                        exchange_diamonds = CASE 
+                            WHEN agency_id = 0 OR agency_id IS NULL 
+                            THEN CAST(exchange_diamonds AS SIGNED) - ?
+                            ELSE exchange_diamonds 
+                        END
+                    WHERE id = ?
+                ", [$fakeAmount, $fakeAmount, $userId]);
+
+                // Update monthly_diamond_receives - allow negative
+                DB::statement("
+                    UPDATE monthly_diamond_receives 
+                    SET monthly_diamond_received = CAST(monthly_diamond_received AS SIGNED) - ?
+                    WHERE user_id = ? AND month = ? AND year = ?
+                ", [$fakeAmount, $userId, $currentMonth, $currentYear]);
+            }
+
+            // Get user info after update (for preview, calculate expected values)
+            $userDetail['after'] = [
+                'total_diamond_received' => $userBefore->total_diamond_received - $fakeAmount,
+                'exchange_diamonds' => ($userBefore->agency_id == 0 || $userBefore->agency_id === null) 
+                    ? $userBefore->exchange_diamonds - $fakeAmount 
+                    : $userBefore->exchange_diamonds,
+            ];
+
+            $report['affected_users'][] = $userDetail;
+        }
+
+        $step1['status'] = 'completed';
+        $step1['affected_count'] = $fakeGifts->count();
+        $report['steps'][] = $step1;
+
+        // ============================================================================
+        // الخطوة 2: تنظيف الكيانات والحذف
+        // ============================================================================
+        $step2 = [
+            'name' => 'تنظيف الكيانات والحذف',
+            'description' => 'تحديث الغرف والعائلات وحذف السجلات الوهمية',
+            'status' => 'pending',
+            'details' => [],
+        ];
+
+        // Update rooms.session - deduct fake diamonds per room
+        $roomUpdates = DB::table('gift_logs')
+            ->selectRaw('room_id, SUM(giftPrice) as fake_sum')
+            ->where('source_type', 'gift')
+            ->where('created_at', '>=', $bugDate)
+            ->whereNotNull('room_id')
+            ->where('room_id', '>', 0)
+            ->groupBy('room_id')
+            ->get();
+
+        $report['summary']['total_affected_rooms'] = $roomUpdates->count();
+
+        if ($shouldExecute) {
+            foreach ($roomUpdates as $room) {
+                DB::statement("
+                    UPDATE rooms 
+                    SET session = GREATEST(0, CAST(session AS SIGNED) - ?)
+                    WHERE id = ?
+                ", [$room->fake_sum, $room->room_id]);
+            }
+        }
+
+        $step2['details']['rooms_updated'] = $roomUpdates->count();
+
+        // Update families.total_diamond - deduct fake diamonds per family
+        $familyUpdates = DB::table('gift_logs')
+            ->selectRaw('receiver_family_id, SUM(giftPrice) as fake_sum')
+            ->where('source_type', 'gift')
+            ->where('created_at', '>=', $bugDate)
+            ->whereNotNull('receiver_family_id')
+            ->where('receiver_family_id', '>', 0)
+            ->groupBy('receiver_family_id')
+            ->get();
+
+        $report['summary']['total_affected_families'] = $familyUpdates->count();
+
+        if ($shouldExecute) {
+            foreach ($familyUpdates as $family) {
+                DB::statement("
+                    UPDATE families 
+                    SET total_diamond = GREATEST(0, CAST(total_diamond AS SIGNED) - ?)
+                    WHERE id = ?
+                ", [$family->fake_sum, $family->receiver_family_id]);
+            }
+        }
+
+        $step2['details']['families_updated'] = $familyUpdates->count();
+
+        // Delete fake gift_logs
+        $deleteCount = DB::table('gift_logs')
+            ->where('source_type', 'gift')
+            ->where('created_at', '>=', $bugDate)
+            ->count();
+
+        $report['summary']['deleted_gift_logs'] = $deleteCount;
+
+        if ($shouldExecute) {
+            DB::table('gift_logs')
+                ->where('source_type', 'gift')
+                ->where('created_at', '>=', $bugDate)
+                ->delete();
+        }
+
+        $step2['details']['gift_logs_deleted'] = $deleteCount;
+        $step2['status'] = 'completed';
+        $report['steps'][] = $step2;
+
+        // ============================================================================
+        // الخطوة 3: إعادة جدولة الرواتب
+        // ============================================================================
+        $step3 = [
+            'name' => 'إعادة جدولة الرواتب',
+            'description' => 'إعادة حساب الرواتب بناءً على الأرصدة المصححة',
+            'status' => 'pending',
+            'details' => [],
+        ];
+
+        // Get all unpaid salaries for current month
+        $unpaidSalaries = DB::table('user_sallaries')
+            ->where('is_paid', 0)
+            ->where('month', $currentMonth)
+            ->where('year', $currentYear)
+            ->get();
+
+        $salaryAdjustments = [];
+
+        foreach ($unpaidSalaries as $salary) {
+            // Get corrected monthly diamond
+            $correctedDiamond = DB::table('monthly_diamond_receives')
+                ->where('user_id', $salary->user_id)
+                ->where('month', $currentMonth)
+                ->where('year', $currentYear)
+                ->value('monthly_diamond_received') ?? 0;
+
+            // Allow negative for tracking, but use 0 for target calculation
+            $effectiveDiamond = max(0, $correctedDiamond);
+
+            // Find the highest achieved target
+            $achievedTarget = DB::table('targets')
+                ->where('diamonds', '<=', $effectiveDiamond)
+                ->orderByDesc('diamonds')
+                ->first();
+
+            $newSalary = 0;
+            $newAgencySalary = 0;
+            $targetId = null;
+
+            if ($achievedTarget) {
+                $targetId = $achievedTarget->id;
+                // Calculate salary: (achieved_diamonds / zones_coins) * usd_ratio
+                $newSalary = ($effectiveDiamond / $zonesCoins) * ($achievedTarget->usd ?? 0);
+                $newAgencySalary = ($effectiveDiamond / $zonesCoins) * ($achievedTarget->agency_share ?? 0);
+            }
+
+            $adjustment = [
+                'user_id' => $salary->user_id,
+                'old_achieved_diamond' => $salary->achieved_diamond,
+                'new_achieved_diamond' => $effectiveDiamond,
+                'corrected_monthly' => $correctedDiamond,
+                'old_salary' => $salary->sallary,
+                'new_salary' => round($newSalary, 2),
+                'old_agency_salary' => $salary->agency_sallary,
+                'new_agency_salary' => round($newAgencySalary, 2),
+                'target_id' => $targetId,
+            ];
+
+            $salaryAdjustments[] = $adjustment;
+
+            if ($shouldExecute) {
+                DB::table('user_sallaries')
+                    ->where('id', $salary->id)
+                    ->update([
+                        'achieved_diamond' => $effectiveDiamond,
+                        'sallary' => round($newSalary, 2),
+                        'agency_sallary' => round($newAgencySalary, 2),
+                        'target_id' => $targetId,
+                        'diamond' => $effectiveDiamond . ' / ' . ($achievedTarget->diamonds ?? 0),
+                        'remaining_diamond' => max(0, ($achievedTarget->diamonds ?? 0) - $effectiveDiamond),
+                    ]);
+            }
+        }
+
+        $report['summary']['total_salary_adjustments'] = count($salaryAdjustments);
+        $step3['details']['adjustments'] = $salaryAdjustments;
+        $step3['status'] = 'completed';
+        $report['steps'][] = $step3;
+
+        // ============================================================================
+        // الخطوة 4: الاسترداد العدواني
+        // ============================================================================
+        $step4 = [
+            'name' => 'الاسترداد العدواني',
+            'description' => 'تتبع واسترداد العجز من المستلمين',
+            'status' => 'pending',
+            'details' => [],
+        ];
+
+        // Find users with deficit (salary - cut_amount < 0)
+        $deficitUsers = DB::table('user_sallaries')
+            ->selectRaw('user_id, SUM(sallary) as total_salary, SUM(cut_amount) as total_cut, SUM(sallary) - SUM(cut_amount) as balance')
+            ->where('is_paid', 0)
+            ->where('month', $currentMonth)
+            ->where('year', $currentYear)
+            ->groupBy('user_id')
+            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+            ->get();
+
+        $recoveryDetails = [];
+        $totalRecovered = 0;
+        $totalUnrecoverable = 0;
+
+        foreach ($deficitUsers as $deficitUser) {
+            $deficit = abs($deficitUser->balance); // USD deficit
+            $deficitDiamonds = (int) ($deficit * $zonesCoins); // Convert to diamonds
+            $remaining = $deficitDiamonds;
+
+            $userRecovery = [
+                'user_id' => $deficitUser->user_id,
+                'deficit_usd' => round($deficit, 2),
+                'deficit_diamonds' => $deficitDiamonds,
+                'traces' => [],
+                'recovered' => 0,
+                'unrecoverable' => 0,
+            ];
+
+            // ================================================================
+            // Trace Level 1: Find charges made by this user TO OTHER USERS
+            // ================================================================
+            $charges = DB::table('charges')
+                ->where('charger_id', $deficitUser->user_id)
+                ->where('charger_type', 'user')
+                ->where('user_type', 'user') // المستلم مستخدم
+                ->where('created_at', '>=', $bugDate)
+                ->orderByDesc('created_at')
+                ->get();
+
+            foreach ($charges as $charge) {
+                if ($remaining <= 0) break;
+
+                $targetId = $charge->user_id;
+                $chargeAmount = min((int) $charge->amount, $remaining);
+
+                // Get target user's di balance
+                $targetUser = DB::table('users')->where('id', $targetId)->first();
+                if (!$targetUser) continue;
+
+                $canDeduct = min($chargeAmount, (int) $targetUser->di);
+                
+                if ($canDeduct > 0) {
+                    if ($shouldExecute) {
+                        DB::statement("
+                            UPDATE users 
+                            SET di = CAST(di AS SIGNED) - ?
+                            WHERE id = ?
+                        ", [$canDeduct, $targetId]);
+                    }
+
+                    $remaining -= $canDeduct;
+                    $totalRecovered += $canDeduct;
+                    $userRecovery['recovered'] += $canDeduct;
+                    $userRecovery['traces'][] = [
+                        'type' => 'charge_to_user',
+                        'target_id' => $targetId,
+                        'target_type' => 'user',
+                        'amount' => $canDeduct,
+                        'method' => 'di_deduction_level1',
+                    ];
+                }
+
+                // Trace Level 2: Find gifts sent by the charge recipient
+                if ($remaining > 0) {
+                    $gifts = DB::table('gift_logs')
+                        ->selectRaw('receiver_id, SUM(giftPrice) as total')
+                        ->where('sender_id', $targetId)
+                        ->where('created_at', '>=', $bugDate)
+                        ->groupBy('receiver_id')
+                        ->orderByDesc('total')
+                        ->get();
+
+                    foreach ($gifts as $gift) {
+                        if ($remaining <= 0) break;
+
+                        $giftDeduct = min($remaining, (int) $gift->total);
+                        $giftReceiver = DB::table('users')->where('id', $gift->receiver_id)->first();
+                        
+                        if ($giftReceiver) {
+                            $actualDeduct = min($giftDeduct, (int) $giftReceiver->di);
+                            
+                            if ($actualDeduct > 0) {
+                                if ($shouldExecute) {
+                                    DB::statement("
+                                        UPDATE users 
+                                        SET di = CAST(di AS SIGNED) - ?
+                                        WHERE id = ?
+                                    ", [$actualDeduct, $gift->receiver_id]);
+                                }
+
+                                $remaining -= $actualDeduct;
+                                $totalRecovered += $actualDeduct;
+                                $userRecovery['recovered'] += $actualDeduct;
+                                $userRecovery['traces'][] = [
+                                    'type' => 'gift_trace',
+                                    'target_id' => $gift->receiver_id,
+                                    'target_type' => 'user',
+                                    'amount' => $actualDeduct,
+                                    'method' => 'di_deduction_level2',
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ================================================================
+            // Trace Level 1.5: Agency Trace (If user sent to agency)
+            // ================================================================
+            if ($remaining > 0) {
+                $agencyCharges = DB::table('charges')
+                    ->where('charger_id', $deficitUser->user_id)
+                    ->where('charger_type', 'user')
+                    ->where('user_type', 'agency') // المستلم وكالة شحن
+                    ->where('created_at', '>=', $bugDate)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                foreach ($agencyCharges as $aCharge) {
+                    if ($remaining <= 0) break;
+
+                    $agencyId = $aCharge->user_id;
+                    $agency = DB::table('agencies')->where('id', $agencyId)->first();
+                    
+                    if (!$agency) continue;
+
+                    $chargeAmount = min((int) $aCharge->amount, $remaining);
+                    $deductFromAgency = min($chargeAmount, (int) $agency->coins);
+
+                    // Deduct from agency coins
+                    if ($deductFromAgency > 0) {
+                        if ($shouldExecute) {
+                            DB::statement("
+                                UPDATE agencies 
+                                SET coins = CAST(coins AS SIGNED) - ?
+                                WHERE id = ?
+                            ", [$deductFromAgency, $agencyId]);
+                        }
+
+                        $remaining -= $deductFromAgency;
+                        $totalRecovered += $deductFromAgency;
+                        $userRecovery['recovered'] += $deductFromAgency;
+                        $userRecovery['traces'][] = [
+                            'type' => 'charge_to_agency',
+                            'target_id' => $agencyId,
+                            'target_type' => 'agency',
+                            'agency_name' => $agency->name ?? 'N/A',
+                            'amount' => $deductFromAgency,
+                            'method' => 'agency_coins_deduction_level1.5',
+                        ];
+                    }
+
+                    // ================================================================
+                    // Trace Level 3: Agency Outgoing Trace
+                    // If agency distributed the coins to other users
+                    // ================================================================
+                    if ($remaining > 0) {
+                        $distributedCharges = DB::table('charges')
+                            ->where('charger_id', $agencyId)
+                            ->where('charger_type', 'agency')
+                            ->where('user_type', 'user') // الوكالة أرسلت لمستخدمين
+                            ->where('created_at', '>=', $bugDate)
+                            ->orderByDesc('created_at')
+                            ->get();
+
+                        foreach ($distributedCharges as $distCharge) {
+                            if ($remaining <= 0) break;
+
+                            $finalUserId = $distCharge->user_id;
+                            $finalUser = DB::table('users')->where('id', $finalUserId)->first();
+                            
+                            if (!$finalUser) continue;
+
+                            $distAmount = min((int) $distCharge->amount, $remaining);
+                            $canDeductFromFinal = min($distAmount, (int) $finalUser->di);
+
+                            if ($canDeductFromFinal > 0) {
+                                if ($shouldExecute) {
+                                    DB::statement("
+                                        UPDATE users 
+                                        SET di = CAST(di AS SIGNED) - ?
+                                        WHERE id = ?
+                                    ", [$canDeductFromFinal, $finalUserId]);
+                                }
+
+                                $remaining -= $canDeductFromFinal;
+                                $totalRecovered += $canDeductFromFinal;
+                                $userRecovery['recovered'] += $canDeductFromFinal;
+                                $userRecovery['traces'][] = [
+                                    'type' => 'agency_outgoing_trace',
+                                    'source_agency_id' => $agencyId,
+                                    'target_id' => $finalUserId,
+                                    'target_type' => 'user',
+                                    'amount' => $canDeductFromFinal,
+                                    'method' => 'di_deduction_level3',
+                                ];
+                            }
+
+                            // Level 4: Trace gifts sent by agency recipients
+                            if ($remaining > 0) {
+                                $finalUserGifts = DB::table('gift_logs')
+                                    ->selectRaw('receiver_id, SUM(giftPrice) as total')
+                                    ->where('sender_id', $finalUserId)
+                                    ->where('created_at', '>=', $bugDate)
+                                    ->groupBy('receiver_id')
+                                    ->orderByDesc('total')
+                                    ->get();
+
+                                foreach ($finalUserGifts as $fGift) {
+                                    if ($remaining <= 0) break;
+
+                                    $giftDeduct = min($remaining, (int) $fGift->total);
+                                    $giftReceiver = DB::table('users')->where('id', $fGift->receiver_id)->first();
+                                    
+                                    if ($giftReceiver) {
+                                        $actualDeduct = min($giftDeduct, (int) $giftReceiver->di);
+                                        
+                                        if ($actualDeduct > 0) {
+                                            if ($shouldExecute) {
+                                                DB::statement("
+                                                    UPDATE users 
+                                                    SET di = CAST(di AS SIGNED) - ?
+                                                    WHERE id = ?
+                                                ", [$actualDeduct, $fGift->receiver_id]);
+                                            }
+
+                                            $remaining -= $actualDeduct;
+                                            $totalRecovered += $actualDeduct;
+                                            $userRecovery['recovered'] += $actualDeduct;
+                                            $userRecovery['traces'][] = [
+                                                'type' => 'agency_gift_trace',
+                                                'source_agency_id' => $agencyId,
+                                                'intermediate_user_id' => $finalUserId,
+                                                'target_id' => $fGift->receiver_id,
+                                                'target_type' => 'user',
+                                                'amount' => $actualDeduct,
+                                                'method' => 'di_deduction_level4',
+                                            ];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // ================================================================
+                        // Trace Level 3.5: Agency to Agency Trace
+                        // If agency sent to another agency
+                        // ================================================================
+                        $agencyToAgencyCharges = DB::table('charges')
+                            ->where('charger_id', $agencyId)
+                            ->where('charger_type', 'agency')
+                            ->where('user_type', 'agency') // الوكالة أرسلت لوكالة أخرى
+                            ->where('created_at', '>=', $bugDate)
+                            ->orderByDesc('created_at')
+                            ->get();
+
+                        foreach ($agencyToAgencyCharges as $a2aCharge) {
+                            if ($remaining <= 0) break;
+
+                            $targetAgencyId = $a2aCharge->user_id;
+                            $targetAgency = DB::table('agencies')->where('id', $targetAgencyId)->first();
+                            
+                            if (!$targetAgency) continue;
+
+                            $a2aAmount = min((int) $a2aCharge->amount, $remaining);
+                            $canDeductFromTargetAgency = min($a2aAmount, (int) $targetAgency->coins);
+
+                            if ($canDeductFromTargetAgency > 0) {
+                                if ($shouldExecute) {
+                                    DB::statement("
+                                        UPDATE agencies 
+                                        SET coins = CAST(coins AS SIGNED) - ?
+                                        WHERE id = ?
+                                    ", [$canDeductFromTargetAgency, $targetAgencyId]);
+                                }
+
+                                $remaining -= $canDeductFromTargetAgency;
+                                $totalRecovered += $canDeductFromTargetAgency;
+                                $userRecovery['recovered'] += $canDeductFromTargetAgency;
+                                $userRecovery['traces'][] = [
+                                    'type' => 'agency_to_agency_trace',
+                                    'source_agency_id' => $agencyId,
+                                    'target_id' => $targetAgencyId,
+                                    'target_type' => 'agency',
+                                    'agency_name' => $targetAgency->name ?? 'N/A',
+                                    'amount' => $canDeductFromTargetAgency,
+                                    'method' => 'agency_coins_deduction_level3.5',
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+
+            $userRecovery['unrecoverable'] = $remaining;
+            $totalUnrecoverable += $remaining;
+            $recoveryDetails[] = $userRecovery;
+
+            // Track negative balance users
+            if ($remaining > 0) {
+                $report['negative_balance_users'][] = [
+                    'user_id' => $deficitUser->user_id,
+                    'deficit_usd' => round($deficit, 2),
+                    'unrecoverable_diamonds' => $remaining,
+                    'unrecoverable_usd' => round($remaining / $zonesCoins, 2),
+                ];
+            }
+        }
+
+        $report['summary']['total_recovered_usd'] = round($totalRecovered / $zonesCoins, 2);
+        $report['summary']['total_unrecoverable_usd'] = round($totalUnrecoverable / $zonesCoins, 2);
+        $step4['details']['recovery'] = $recoveryDetails;
+        $step4['status'] = 'completed';
+        $report['steps'][] = $step4;
+
+        // Commit or rollback
+        if ($shouldExecute) {
+            DB::commit();
+            $report['execution_status'] = 'COMMITTED';
+        } else {
+            DB::rollBack();
+            $report['execution_status'] = 'ROLLED BACK (Preview Mode)';
+        }
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        $report['execution_status'] = 'ERROR - ROLLED BACK';
+        $report['error'] = [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ];
+    }
+
+    // ============================================================================
+    // Generate HTML Report (RTL)
+    // ============================================================================
+    $html = '<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير إصلاح هدايا الحقيبة - Bag Gift Fix Report</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #0f3460 0%, #533483 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header .meta { color: #aaa; font-size: 0.9em; }
+        .mode-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .mode-preview { background: #f39c12; color: #000; }
+        .mode-live { background: #e74c3c; color: #fff; }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .summary-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .summary-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .summary-card .label { color: #888; font-size: 0.9em; }
+        .value-danger { color: #e74c3c; }
+        .value-success { color: #2ecc71; }
+        .value-warning { color: #f39c12; }
+        .value-info { color: #3498db; }
+        
+        .section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section h2 .step-num {
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            color: #000;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th {
+            background: rgba(0,0,0,0.3);
+            font-weight: 600;
+            color: #00d9ff;
+        }
+        tr:hover { background: rgba(255,255,255,0.05); }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        .status-completed { background: #2ecc71; color: #000; }
+        .status-pending { background: #f39c12; color: #000; }
+        .status-error { background: #e74c3c; color: #fff; }
+        
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        .progress-recovered { background: linear-gradient(90deg, #2ecc71, #27ae60); }
+        .progress-unrecoverable { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        
+        .action-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8em; }
+            .summary-card .value { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 تقرير إصلاح هدايا الحقيبة</h1>
+            <div class="meta">
+                <p>التاريخ المرجعي للخلل: <strong>' . $bugDate . '</strong></p>
+                <p>وقت التقرير: <strong>' . $report['timestamp'] . '</strong></p>
+                <p>معدل التحويل (zones_coins): <strong>' . number_format($zonesCoins) . '</strong></p>
+            </div>
+            <span class="mode-badge ' . ($shouldExecute ? 'mode-live' : 'mode-preview') . '">
+                ' . ($shouldExecute ? '⚡ وضع التنفيذ الفعلي' : '👁️ وضع المعاينة') . '
+            </span>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="value value-danger">' . number_format($report['summary']['total_fake_diamonds']) . '</div>
+                <div class="label">💎 إجمالي الماسات الوهمية</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-warning">' . number_format($report['summary']['total_affected_users']) . '</div>
+                <div class="label">👥 المستخدمين المتأثرين</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-info">' . number_format($report['summary']['total_affected_rooms']) . '</div>
+                <div class="label">🏠 الغرف المتأثرة</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-info">' . number_format($report['summary']['total_affected_families']) . '</div>
+                <div class="label">👨‍👩‍👧‍👦 العائلات المتأثرة</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-warning">' . number_format($report['summary']['total_salary_adjustments']) . '</div>
+                <div class="label">💰 تعديلات الرواتب</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-success">$' . number_format($report['summary']['total_recovered_usd'], 2) . '</div>
+                <div class="label">✅ المبالغ المستردة</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-danger">$' . number_format($report['summary']['total_unrecoverable_usd'], 2) . '</div>
+                <div class="label">❌ غير قابل للاسترداد</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-danger">' . number_format($report['summary']['deleted_gift_logs']) . '</div>
+                <div class="label">🗑️ سجلات محذوفة</div>
+            </div>
+        </div>';
+
+    // Recovery Progress Bar
+    $totalLoss = $report['summary']['total_recovered_usd'] + $report['summary']['total_unrecoverable_usd'];
+    $recoveryPercent = $totalLoss > 0 ? ($report['summary']['total_recovered_usd'] / $totalLoss) * 100 : 0;
+    
+    $html .= '
+        <div class="section">
+            <h2>📊 نسبة الاسترداد</h2>
+            <p>إجمالي الخسائر: <strong>$' . number_format($totalLoss, 2) . '</strong></p>
+            <div class="progress-bar">
+                <div class="progress-fill progress-recovered" style="width: ' . $recoveryPercent . '%;"></div>
+            </div>
+            <p style="margin-top: 10px;">
+                <span style="color: #2ecc71;">✅ مسترد: ' . number_format($recoveryPercent, 1) . '%</span> | 
+                <span style="color: #e74c3c;">❌ غير قابل للاسترداد: ' . number_format(100 - $recoveryPercent, 1) . '%</span>
+            </p>
+        </div>';
+
+    // Steps Details
+    foreach ($report['steps'] as $index => $step) {
+        $html .= '
+        <div class="section">
+            <h2>
+                <span class="step-num">' . ($index + 1) . '</span>
+                ' . $step['name'] . '
+                <span class="status-badge status-' . $step['status'] . '">' . $step['status'] . '</span>
+            </h2>
+            <p style="color: #888; margin-bottom: 15px;">' . $step['description'] . '</p>';
+        
+        if (isset($step['affected_count'])) {
+            $html .= '<p>عدد المتأثرين: <strong>' . number_format($step['affected_count']) . '</strong></p>';
+        }
+        
+        if (isset($step['details']) && is_array($step['details'])) {
+            foreach ($step['details'] as $key => $value) {
+                if (is_array($value)) continue;
+                $html .= '<p>' . $key . ': <strong>' . number_format($value) . '</strong></p>';
+            }
+        }
+        
+        $html .= '</div>';
+    }
+
+    // Negative Balance Users Table
+    if (!empty($report['negative_balance_users'])) {
+        $html .= '
+        <div class="section">
+            <h2>⚠️ المستخدمين ذوي الأرصدة السالبة</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>معرف المستخدم</th>
+                        <th>العجز (USD)</th>
+                        <th>الماسات غير المستردة</th>
+                        <th>القيمة غير المستردة (USD)</th>
+                    </tr>
+                </thead>
+                <tbody>';
+        
+        foreach ($report['negative_balance_users'] as $user) {
+            $html .= '
+                    <tr>
+                        <td>' . $user['user_id'] . '</td>
+                        <td style="color: #e74c3c;">$' . number_format($user['deficit_usd'], 2) . '</td>
+                        <td>' . number_format($user['unrecoverable_diamonds']) . '</td>
+                        <td style="color: #e74c3c;">$' . number_format($user['unrecoverable_usd'], 2) . '</td>
+                    </tr>';
+        }
+        
+        $html .= '
+                </tbody>
+            </table>
+        </div>';
+    }
+
+    // Action Button
+    if (!$shouldExecute) {
+        $html .= '
+        <div style="text-align: center; margin: 40px 0;">
+            <p style="color: #f39c12; font-size: 1.2em; margin-bottom: 20px;">
+                ⚠️ هذا تقرير معاينة فقط. لم يتم تنفيذ أي تغييرات.
+            </p>
+            <a href="?fix=1" class="action-btn" onclick="return confirm(\'هل أنت متأكد من تنفيذ الإصلاح؟ هذا الإجراء لا يمكن التراجع عنه!\');">
+                🚀 تنفيذ الإصلاح الآن
+            </a>
+        </div>';
+    } else {
+        $html .= '
+        <div style="text-align: center; margin: 40px 0;">
+            <p style="color: #2ecc71; font-size: 1.5em;">
+                ✅ تم تنفيذ الإصلاح بنجاح!
+            </p>
+        </div>';
+    }
+
+    $html .= '
+        <div class="footer">
+            <p>Lumio Bag Gift Fix System v1.0</p>
+            <p>Generated at ' . $report['timestamp'] . '</p>
+        </div>
+    </div>
+</body>
+</html>';
+
+    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
+});
