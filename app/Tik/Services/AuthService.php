@@ -224,17 +224,17 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-              //  try {
+                try {
                     if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
-                // } catch (\Exception $exception) {
-                //     Log::warning('Device token limit reached............ on Google login', [
-                //         'device_token' => $request['device_token'] ?? null,
-                //         'email' => $request['email'] ?? null,
-                //         'google_id' => $request['google_id'] ?? null,
-                //         'error' => $exception->getMessage(),
-                //     ]);
-                //     return Common::apiResponse(false, $exception->getMessage(), [], 422);
-                // }
+                } catch (\Exception $exception) {
+                    Log::warning('Device token limit reached............ on Google login', [
+                        'device_token' => $request['device_token'] ?? null,
+                        'email' => $request['email'] ?? null,
+                        'google_id' => $request['google_id'] ?? null,
+                        'error' => $exception->getMessage(),
+                    ]);
+                    return Common::apiResponse(false, $exception->getMessage(), [], 500);
+                }
                 $user = $this->userRepository->create($data);
 
                 $is_new = true;
