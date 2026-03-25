@@ -1,0 +1,73 @@
+name: SSh-tiko-live-pipline
+on:
+  push:
+    branches: ["tiko-live"]
+jobs:
+  run_tiko-live_hub:
+    runs-on: [self-hosted] #ubuntu-latest
+    steps:
+    - name: print out tiko-live
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.80.181"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 7m
+        script: |
+          cd /var/www/tiko-live
+          source /home/${{ secrets.USERNAME }}/Tiko/hub.sh
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_tiko-live_app:
+    runs-on: [self-hosted] #ubuntu-latest
+    needs: run_tiko-live_hub
+    steps:
+    - name: print out tiko-live
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.80.181"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/tiko-live
+          pwd
+          docker build -t tiko-live:${{ github.sha }} -f Dockerfile-octana .
+          docker service update --image tiko-live:${{ github.sha }} tiko-live-octa
+
+          # check again
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_tiko-live_job:
+    runs-on: [self-hosted] #ubuntu-latest
+    needs: run_tiko-live_hub
+    steps:
+    - name: print out tiko-live Job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.80.181"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/tiko-live
+          pwd
+          docker build -t tiko-live-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image tiko-live-job:${{ github.sha }} tiko-live-job
