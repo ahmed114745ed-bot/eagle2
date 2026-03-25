@@ -727,7 +727,7 @@ class AuthService
         if ($record) {
             $register_account = Common::getSettingValue('register_account') ?? 0;
             if ($record->count >= $register_account) {
-                throw new \Exception('You have reached the maximum number of accounts that can be registered with this device.');
+                return Common::apiResponse(false,'You have reached the maximum number of accounts that can be registered with this device.'[], 422);
             }
             $record->increment('count');
         } else {
