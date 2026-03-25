@@ -39,10 +39,13 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/lumio
-          # 1. Build the new image
+          # 1. Pull latest code from GitHub
+          git pull origin lumio
+
+          # 2. Build the new image
           docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
 
-          # 2. Update service with Zero-Downtime & Port Safety flags
+          # 3. Update service with Zero-Downtime & Port Safety flags
           docker service update \
             --image lumio-octa:${{ github.sha }} \
             --replicas 2 \
@@ -54,7 +57,7 @@ jobs:
             --update-failure-action rollback \
             lumio-octa
 
-          # 3. Wait for the new container to be stable before running artisan
+          # 4. Wait for the new container to be stable before running artisan
           echo "Waiting for container to stabilize..."
           sleep 15
 
@@ -67,7 +70,7 @@ jobs:
             exit 1
           fi
 
-          # 4. Final Cleanup
+          # 5. Final Cleanup
           docker image prune -f
 
   run_lumio_job:
@@ -84,6 +87,10 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/lumio
+          # 1. Pull latest code from GitHub
+          git pull origin lumio
+
+          # 2. Build and deploy job service
           docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
           docker service update \
             --image lumio-job:${{ github.sha }} \
