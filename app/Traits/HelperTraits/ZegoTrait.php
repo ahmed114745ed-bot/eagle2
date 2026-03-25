@@ -66,12 +66,8 @@ trait ZegoTrait
     }
     public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
     {
-        $phoneRequest = [
-        'phone_to_server_url' => request()->fullUrl(), // الرابط الذي طلبه الهاتف
-        'phone_ip' => request()->ip(),                 // IP الهاتف
-        'phone_method' => request()->method(),         // POST أو GET
-        'phone_payload' => request()->all(),           // البيانات التي أرسلها الهاتف للسيرفر
-        ];
+        
+        $roomId = $RoomId ?? request()->room_id;
         $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
@@ -83,7 +79,7 @@ trait ZegoTrait
         $SignatureVersion = '2.0';
         $params = [
             'Action' => $Action,
-            'RoomId' => $RoomId,
+            'RoomId' => $roomId,
             'FromUserId' => $FromUserId,
             'MessageContent' => $MessageContent,
             'AppId' => $AppId,
@@ -97,27 +93,14 @@ trait ZegoTrait
         try {
           
             $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
-            $pendingRequest = Http::withHeaders($headers)->acceptJson()->timeout(20);
-        
-                
-                $fullUrlWithParams = $url . '?' . http_build_query($params); 
-                $requestHeaders = $headers;
 
-            // Log failed Zego API calls for debugging
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
                 Log::warning('ZegoTrait::sendToZego failed', [
                     'action' => $Action,
-                    'roomId' => $RoomId,
+                    'roomId' => $roomId,
                     'fromUserId' => $FromUserId,
                     'response' => $response,
                 ]);
-              Log::warning('⚠️ الشرح التفصيلي للخطأ:', [
-                'STEP_1_PHONE_TO_SERVER' => $phoneRequest, 
-                'STEP_2_SERVER_TO_ZEGO' => [               
-                    'endpoint' => $url . '?' . http_build_query($params),
-                    'response' => $response->json(),
-                ]
-            ]);
             }
             
             return $response;
