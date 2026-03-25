@@ -114,7 +114,7 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                if ($request['device_token'])  $this->devicesTokenHistory($request['device_token'] ?? null);
+                if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
                 $user = $this->userRepository->create($data);
             }
@@ -224,7 +224,7 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                if ($request['device_token'])  $this->devicesTokenHistory($request['device_token']);
+                if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
                 $user = $this->userRepository->create($data);
 
@@ -569,7 +569,7 @@ class AuthService
             $country = Country::where('iso', strtoupper($request['iso']))->first();
             if ($country) $data['country_id'] = $country->id;
         }
-        if ($request['device_token'])  $this->devicesTokenHistory($request['device_token'] ?? null);
+        if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
         $newUser = $this->userRepository->create($data);
 
@@ -628,7 +628,7 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                if ($data['device_token'])  $this->devicesTokenHistory($request['device_token'] ?? null);
+                if (!empty($data['device_token']))  $this->devicesTokenHistory($data['device_token']);
 
                 $user = $this->userRepository->create($dataUser);
             }
