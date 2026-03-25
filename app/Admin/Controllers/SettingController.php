@@ -60,12 +60,14 @@ class SettingController extends MainController
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
+        $isThemeEnabled = Common::getSettingValue('isThemeEnabled') ?? 0;
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
             ->description('   ')
             ->body(view('admin.settings_new', compact([
+                'isThemeEnabled',
                 'zeroGamesSettings',
                 'bytesunSettings',
                 'quantumNexusSettings',
@@ -242,6 +244,24 @@ class SettingController extends MainController
             );
 
             Cache::forever('lucky_gifts_action', $request->value);
+            \Artisan::call('cache:clear');
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+
+    public function updateIsThemeEnabled(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => 'isThemeEnabled'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('isThemeEnabled', $request->value);
             \Artisan::call('cache:clear');
 
             return Common::apiResponse(true, 'created successfully');

@@ -785,14 +785,8 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ]);
                 }
 
-                // Reverse sender's inflated send stats and refund their coins
-                DB::table('users')
-                    ->where('id', $group->sender_id)
-                    ->update([
-                        'total_diamond_send' => DB::raw("GREATEST(0, CAST(total_diamond_send AS SIGNED) - {$excessDiamonds})"),
-                        'monthly_diamond_send' => DB::raw("GREATEST(0, CAST(monthly_diamond_send AS SIGNED) - {$excessDiamonds})"),
-                        'di' => DB::raw("di + {$excessDiamonds}"),
-                    ]);
+                // NOTE: Sender refund intentionally skipped — senders already spent their diamonds
+                // and the app has already collected those coins. No refund needed.
 
                 // Fix room session (was inflated by excess)
                 $roomId = $logs->first()->room_id;
@@ -841,12 +835,51 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                 DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
             }
         }
+
+        // Fix salaries: zero out any salary where corrected monthly_diamond no longer meets target
+        if ($shouldExecute) {
+            $salaryFixes = DB::select("
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond, s.target_diamonds, m.monthly_diamond_received
+                FROM user_sallaries s
+                JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
+                WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
+                  AND m.monthly_diamond_received < s.target_diamonds
+                  AND s.achieved_diamond > m.monthly_diamond_received
+            ", [now()->month, now()->year]);
+
+            foreach ($salaryFixes as $sal) {
+                DB::table('user_sallaries')
+                    ->where('id', $sal->id)
+                    ->update([
+                        'achieved_diamond' => $sal->monthly_diamond_received,
+                        'sallary' => 0,
+                        'agency_sallary' => 0,
+                        'diamond' => $sal->monthly_diamond_received . ' / ' . $sal->target_diamonds,
+                        'remaining_diamond' => max(0, $sal->target_diamonds - $sal->monthly_diamond_received),
+                        'is_finished' => 0,
+                    ]);
+            }
+        }
     });
+
+    $salaryReport = DB::table('user_sallaries as s')
+        ->join('monthly_diamond_receives as m', function ($join) {
+            $join->on('m.user_id', '=', 's.user_id')
+                ->where('m.month', '=', DB::raw('s.month'))
+                ->where('m.year', '=', DB::raw('s.year'));
+        })
+        ->where('s.month', now()->month)
+        ->where('s.year', now()->year)
+        ->where('s.is_paid', 0)
+        ->whereColumn('s.achieved_diamond', '>', 'm.monthly_diamond_received')
+        ->select('s.user_id', 's.achieved_diamond', 'm.monthly_diamond_received', 's.target_diamonds', 's.sallary', 's.agency_sallary')
+        ->get();
 
     return response()->json([
         'status' => $shouldExecute ? 'fixed' : 'report',
         'total_affected_transactions' => $affected->count(),
         'total_excess_diamonds' => $totalExcess,
+        'salary_corrections' => $salaryReport->count(),
         'details' => $details,
     ]);
 });

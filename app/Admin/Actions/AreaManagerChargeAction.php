@@ -96,7 +96,8 @@ class AreaManagerChargeAction extends Action
 
             $areaManager->save();
 
-            $this->createChargeRecord($request,  $areaManager, $amount, $coins, $request->amount);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request,  $areaManager, $amount, $coins, $usdAmount);
         });
 
         return $this->response()->success('Success')->refresh();
