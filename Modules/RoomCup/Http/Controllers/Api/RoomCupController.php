@@ -97,38 +97,40 @@ class RoomCupController extends Controller
 
     public function period($builder, $key = 'current', $type)
     {
-        $now = now();
+        $tz = getTimezone();
+        $now = Carbon::now($tz);
         switch ($type) {
             case 'daily':
                 if ($key === 'last') {
-                    $date = $now->copy()->subDay();
+                    $start = $now->copy()->subDay()->startOfDay()->setTimezone('UTC');
+                    $end   = $now->copy()->subDay()->endOfDay()->setTimezone('UTC');
                 } else {
-                    $date = $now;
+                    $start = $now->copy()->startOfDay()->setTimezone('UTC');
+                    $end   = $now->copy()->endOfDay()->setTimezone('UTC');
                 }
 
-                $builder->whereDay('created_at', $date->day)
-                    ->whereMonth('created_at', $date->month)
-                    ->whereYear('created_at', $date->year);
+                $builder->whereBetween('created_at', [$start, $end]);
                 break;
 
             case 'monthly':
                 if ($key === 'last') {
-                    $date = $now->copy()->subMonth();
+                    $start = $now->copy()->subMonth()->startOfMonth()->setTimezone('UTC');
+                    $end   = $now->copy()->subMonth()->endOfMonth()->setTimezone('UTC');
                 } else {
-                    $date = $now;
+                    $start = $now->copy()->startOfMonth()->setTimezone('UTC');
+                    $end   = $now->copy()->endOfMonth()->setTimezone('UTC');
                 }
 
-                $builder->whereMonth('created_at', $date->month)
-                    ->whereYear('created_at', $date->year);
+                $builder->whereBetween('created_at', [$start, $end]);
                 break;
 
             case 'weekly':
                 if ($key === 'last') {
-                    $start = $now->copy()->subWeek()->startOfWeek();
-                    $end   = $now->copy()->subWeek()->endOfWeek();
+                    $start = $now->copy()->subWeek()->startOfWeek()->setTimezone('UTC');
+                    $end   = $now->copy()->subWeek()->endOfWeek()->setTimezone('UTC');
                 } else {
-                    $start = $now->copy()->startOfWeek();
-                    $end   = $now->copy()->endOfWeek();
+                    $start = $now->copy()->startOfWeek()->setTimezone('UTC');
+                    $end   = $now->copy()->endOfWeek()->setTimezone('UTC');
                 }
 
                 $builder->whereBetween('created_at', [$start, $end]);

@@ -78,7 +78,8 @@ class ChargeAction2 extends Action
             }
             $agency->save();
 
-            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount,$calc , $effectiveRate);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request,  $agency, $amount, $coins, $usdAmount, $shippingCoins);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -111,7 +112,7 @@ class ChargeAction2 extends Action
         $charge->balance_before =  $agency->coins  -  $calc['total_coins'];
         $charge->total_coins = $totalCoins;
         $charge->transaction_type = 'admin_to_agency';
-        
+
         $charge->rate_source = 'app';
         $charge->applied_coin_rate = $effectiveRate;
         $charge->base_usd = $usdAmount;

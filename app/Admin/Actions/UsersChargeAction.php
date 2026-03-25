@@ -67,17 +67,17 @@ class UsersChargeAction extends Action
         });*/
         $appBaseRate = \App\Services\CoinRateService::getAppBaseRateOrUserCoins();
         $effectiveRate = $appBaseRate;
-        
+
         $calc = \App\Services\ChargeCalculationService::calculate($request->amount, 'usd', $effectiveRate);
-        
+
         $coins = $calc['total_coins'];
-        
+
         if (!$coins || $coins == 0) {
             return $this->response()->error(__('please set user coins in configs'))->refresh();
         }
-        
+
         DB::transaction(function () use ($request, $user, $amount, $coins, $typeCharge , $calc , $effectiveRate) {
-            
+
             $amountBefore =  Common::getCurrentBalance($user->id);
 
             UserCoinLogHelper::logByType(
@@ -95,7 +95,8 @@ class UsersChargeAction extends Action
             }
             $user->save();
 
-            $this->createChargeRecord($request,  $user, $amount, $coins, $request->amount , $calc , $effectiveRate);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request,  $user, $amount, $coins, $usdAmount);
 
             if ($typeCharge == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -120,7 +121,7 @@ class UsersChargeAction extends Action
 
     private function createChargeRecord(Request $request, User $user, $amount, $coins = 0, $usdAmount , $calc , $effectiveRate)
     {
-       
+
         $totalCoins = $calc['total_coins'];
         $baseCoins = $calc['base_coins'];
         $profitCoins = $calc['profit_coins'];
