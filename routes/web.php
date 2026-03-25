@@ -3374,25 +3374,6 @@ Route::get('/direct-recovery/export', function () {
 
 
 
-
-/**
- * ============================================================================
- * نظام دمج السجلات وإعادة تعيين أرصدة الماس الحقيقية
- * ============================================================================
- * 
- * الهدف: معالجة تكرار سجلات الرواتب وتصحيح أرصدة الماس الفعلية
- * 
- * الخطوات:
- * 1. تحديث الماس الفعلي للمنتسبين لوكالات (استثناء هدايا الحقيبة)
- * 2. دمج سجلات الرواتب المكررة لنفس المستخدم والوكالة
- * 3. إعادة تهيئة بيانات الراتب في السجل المدمج
- * 4. استدعاء محرك حساب الرواتب
- * 
- * الاستخدام:
- * - معاينة: /system-merge-and-recalculate
- * - تنفيذ: /system-merge-and-recalculate?fix=1
- * ============================================================================
- */
 Route::get('/system-merge-and-recalculate', function (\Illuminate\Http\Request $request) {
     $shouldExecute = $request->query('fix') == '1';
     $targetMonth = 3;
@@ -3401,12 +3382,9 @@ Route::get('/system-merge-and-recalculate', function (\Illuminate\Http\Request $
     $report = [
         'mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
         'timestamp' => now()->toDateTimeString(),
-        'step1_diamond_updates' => 0,
-        'step2_merged_users' => 0,
-        'step2_deleted_records' => 0,
-        'step2_total_cut_merged' => 0,
-        'step3_reset_records' => 0,
-        'step4_salary_recalculated' => false,
+        'total_users_processed' => 0,
+        'total_deleted_old_agency_records' => 0,
+        'total_merged_current_agency_records' => 0,
         'details' => [],
         'errors' => [],
     ];
@@ -3414,337 +3392,162 @@ Route::get('/system-merge-and-recalculate', function (\Illuminate\Http\Request $
     try {
         DB::transaction(function () use ($shouldExecute, $targetMonth, $targetYear, &$report) {
 
-            // ================================================================
-            // الخطوة 1: تحديث الماس الفعلي للمنتسبين لوكالات
-            // الماس الحقيقي = إجمالي giftPrice من gift_logs - هدايا الحقيبة (source_type='gift')
-            // ================================================================
-            $agencyUsers = DB::table('users')
-                ->whereNotNull('agency_id')
-                ->where('agency_id', '>', 0)
-                ->pluck('id');
+            // 1. جلب كل المستخدمين الذين لديهم سجلات رواتب هذا الشهر
+            $usersWithSalaries = DB::table('user_sallaries')
+                ->where('month', $targetMonth)
+                ->where('year', $targetYear)
+                ->distinct()
+                ->pluck('user_id');
 
-            foreach ($agencyUsers as $userId) {
-                // إجمالي الماس المستلم (كل الهدايا)
-                $totalReceived = DB::table('gift_logs')
-                    ->where('receiver_id', $userId)
-                    ->whereYear('created_at', $targetYear)
-                    ->whereMonth('created_at', $targetMonth)
-                    ->sum('giftPrice');
+            foreach ($usersWithSalaries as $userId) {
+                // جلب بيانات المستخدم الحالية (وكالته الحالية)
+                $user = DB::table('users')->where('id', $userId)->first();
+                if (!$user || !$user->agency_id) continue;
 
-                // إجمالي هدايا الحقيبة الوهمية (source_type='gift')
-                $fakeBagGifts = DB::table('gift_logs')
-                    ->where('receiver_id', $userId)
-                    ->where('source_type', 'gift')
-                    ->whereYear('created_at', $targetYear)
-                    ->whereMonth('created_at', $targetMonth)
-                    ->sum('giftPrice');
+                $currentAgencyId = $user->agency_id;
 
-                // الماس الحقيقي الصافي
-                $realDiamond = max(0, (int)$totalReceived - (int)$fakeBagGifts);
-
-                // تحديث أو إنشاء سجل monthly_diamond_receives
-                $existing = DB::table('monthly_diamond_receives')
+                // أ. حذف أي سجلات راتب للمستخدم تخص وكالات قديمة في نفس الشهر (لأنك تريد الحالية فقط)
+                $oldAgencyRecords = DB::table('user_sallaries')
                     ->where('user_id', $userId)
                     ->where('month', $targetMonth)
                     ->where('year', $targetYear)
-                    ->first();
+                    ->where('user_agency_id', '!=', $currentAgencyId);
+                
+                $oldRecordsCount = $oldAgencyRecords->count();
+                if ($shouldExecute && $oldRecordsCount > 0) {
+                    $oldAgencyRecords->delete();
+                }
 
-                if ($existing) {
+                // ب. التعامل مع تكرار السجلات داخل "الوكالة الحالية"
+                $currentAgencyRecords = DB::table('user_sallaries')
+                    ->where('user_id', $userId)
+                    ->where('month', $targetMonth)
+                    ->where('year', $targetYear)
+                    ->where('user_agency_id', $currentAgencyId)
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                if ($currentAgencyRecords->count() > 0) {
+                    $primaryRecord = $currentAgencyRecords->first();
+                    $duplicateIds = $currentAgencyRecords->slice(1)->pluck('id')->toArray();
+                    $totalCut = $currentAgencyRecords->sum('cut_amount');
+
+                    // ج. حساب الماسات: فقط التي استلمها وهو في الوكالة الحالية
+                    $realDiamonds = DB::table('gift_logs')
+                        ->where('receiver_id', $userId)
+                        ->where('agency_id', $currentAgencyId) // شرط الوكالة الحالية في الهدايا
+                        ->whereMonth('created_at', $targetMonth)
+                        ->whereYear('created_at', $targetYear)
+                        ->where(function($q) {
+                            $q->where('source_type', '!=', 'gift')->orWhereNull('source_type');
+                        })
+                        ->sum('giftPrice');
+
+                    // د. تحديث السجل الرئيسي وتصفير الرواتب لإعادة الحساب
                     if ($shouldExecute) {
-                        DB::table('monthly_diamond_receives')
-                            ->where('user_id', $userId)
-                            ->where('month', $targetMonth)
-                            ->where('year', $targetYear)
-                            ->update(['monthly_diamond_received' => $realDiamond]);
-                    }
-                    $report['step1_diamond_updates']++;
-                } else {
-                    if ($shouldExecute && $realDiamond > 0) {
-                        DB::table('monthly_diamond_receives')->insert([
-                            'user_id' => $userId,
-                            'monthly_diamond_received' => $realDiamond,
-                            'month' => $targetMonth,
-                            'year' => $targetYear,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                        $report['step1_diamond_updates']++;
-                    }
-                }
-            }
-
-            // ================================================================
-            // الخطوة 2: دمج سجلات الرواتب المكررة
-            // البحث عن مستخدمين لديهم أكثر من سجل لنفس user_id + user_agency_id
-            // ================================================================
-            $duplicates = DB::select("
-                SELECT user_id, user_agency_id, COUNT(*) as cnt,
-                       MIN(id) as primary_id,
-                       SUM(cut_amount) as total_cut,
-                       GROUP_CONCAT(id ORDER BY id ASC) as all_ids
-                FROM user_sallaries
-                WHERE month = ? AND year = ? AND is_paid = 0
-                GROUP BY user_id, user_agency_id
-                HAVING COUNT(*) > 1
-            ", [$targetMonth, $targetYear]);
-
-            foreach ($duplicates as $dup) {
-                $primaryId = $dup->primary_id;
-                $totalCut = (float) $dup->total_cut;
-                $allIds = explode(',', $dup->all_ids);
-                $duplicateIds = array_filter($allIds, fn($id) => (int)$id !== (int)$primaryId);
-
-                // الماس الحقيقي للمستخدم = مجموع giftPrice من gift_logs
-                // استثناء: هدايا الحقيبة (source_type='gift')
-                // فقط للهدايا المستلمة من نفس الوكالة الأخيرة هذا الشهر
-            $realDiamond = DB::table('gift_logs')
-                ->where('receiver_id', $dup->user_id)
-                ->where('agency_id', $dup->user_agency_id) 
-                ->where(function($query) {
-                    $query->where('source_type', '!=', 'gift') // استبعاد هدايا الخلل
-                        ->orWhereNull('source_type')         // حماية السجلات التي لا تملك نوع مصدر
-                        ->orWhere('source_type', 'coins');   // التأكد من شمول هدايا الكوينات الحقيقية
-                })
-                ->whereMonth('created_at', $targetMonth)
-                ->whereYear('created_at', $targetYear)
-                ->sum('giftPrice');
-
-         
-
-                $realDiamond = max(0, (int)$realDiamond);
-
-                DB::table('monthly_diamond_receives')->updateOrInsert(
-                    ['user_id' => $dup->user_id, 'month' => 3, 'year' => 2026],
-                    ['monthly_diamond_received' => $realDiamond]
-                );
-
-                DB::table('users')
-                ->where('id', $dup->user_id) 
-                ->update(['salary_is_updated' => 1]);
-
-                $report['details'][] = [
-                    'user_id' => $dup->user_id,
-                    'agency_id' => $dup->user_agency_id,
-                    'duplicate_count' => $dup->cnt,
-                    'primary_id' => $primaryId,
-                    'duplicate_ids' => array_values($duplicateIds),
-                    'total_cut_merged' => $totalCut,
-                    'real_diamond' => $realDiamond,
-                ];
-
-                $report['step2_total_cut_merged'] += $totalCut;
-
-                if ($shouldExecute) {
-                    // تحديث السجل الرئيسي بإجمالي cut_amount والماس الحقيقي
-                    DB::table('user_sallaries')
-                        ->where('id', $primaryId)
-                        ->update([
+                        DB::table('user_sallaries')->where('id', $primaryRecord->id)->update([
                             'cut_amount' => $totalCut,
-                            'achieved_diamond' => $realDiamond,
-                        ]);
-
-                    // حذف السجلات المكررة
-                    if (!empty($duplicateIds)) {
-                        DB::table('user_sallaries')
-                            ->whereIn('id', $duplicateIds)
-                            ->delete();
-                        $report['step2_deleted_records'] += count($duplicateIds);
-                    }
-                }
-
-                $report['step2_merged_users']++;
-            }
-
-            // ================================================================
-            // الخطوة 3: إعادة تهيئة بيانات الراتب في السجلات المدمجة
-            // تصفير sallary, agency_sallary, target_id لضمان حساب نظيف
-            // ================================================================
-            if ($shouldExecute) {
-                $mergedIds = array_column($report['details'], 'primary_id');
-                if (!empty($mergedIds)) {
-                    DB::table('user_sallaries')
-                        ->whereIn('id', $mergedIds)
-                        ->update([
+                            'achieved_diamond' => $realDiamonds,
                             'sallary' => 0,
                             'agency_sallary' => 0,
-                            'target_id' => null,
                             'is_finished' => 0,
-                            'remaining_diamond' => 0,
+                            'target_id' => null
                         ]);
-                    $report['step3_reset_records'] = count($mergedIds);
+
+                        if (!empty($duplicateIds)) {
+                            DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
+                        }
+                        
+                        DB::table('monthly_diamond_receives')->updateOrInsert(
+                            ['user_id' => $userId, 'month' => $targetMonth, 'year' => $targetYear],
+                            ['monthly_diamond_received' => $realDiamonds]
+                        );
+                    }
+
+                    // إضافة البيانات للتقرير
+                    $report['details'][] = [
+                        'user_id' => $userId,
+                        'uuid' => $user->uuid,
+                        'current_agency' => $currentAgencyId,
+                        'old_records_deleted' => $oldRecordsCount,
+                        'duplicates_merged' => count($duplicateIds),
+                        'total_cut' => $totalCut,
+                        'current_agency_diamonds' => $realDiamonds,
+                    ];
+
+                    $report['total_users_processed']++;
+                    $report['total_deleted_old_agency_records'] += $oldRecordsCount;
+                    $report['total_merged_current_agency_records'] += count($duplicateIds);
                 }
             }
+        });
 
-        }); // end transaction
-
-        // ================================================================
-        // الخطوة 4: استدعاء محرك حساب الرواتب
-        // ================================================================
+        // 2. إعادة تشغيل محرك الرواتب بعد التنظيف
         if ($shouldExecute) {
-            try {
-                $diamondController = app(\App\Http\Controllers\DiamondController::class);
-                $fakeRequest = \Illuminate\Http\Request::create('/calculate-salary', 'GET', [
-                    'month' => $targetMonth,
-                    'year' => $targetYear,
-                ]);
-                $diamondController->calculateSalary($fakeRequest);
-                $report['step4_salary_recalculated'] = true;
-            } catch (\Throwable $e) {
-                $report['step4_salary_recalculated'] = false;
-                $report['errors'][] = 'Salary recalculation error: ' . $e->getMessage();
-                Log::error('system-merge-and-recalculate: salary recalculation failed', [
-                    'error' => $e->getMessage(),
-                ]);
-            }
+            $diamondController = app(\App\Http\Controllers\DiamondController::class);
+            $diamondController->calculateSalary();
         }
 
-        Log::info('system-merge-and-recalculate completed', [
-            'mode' => $report['mode'],
-            'merged_users' => $report['step2_merged_users'],
-            'deleted_records' => $report['step2_deleted_records'],
-            'total_cut_merged' => $report['step2_total_cut_merged'],
-        ]);
-
-        $calcRequest = new \Illuminate\Http\Request();
-        $calcRequest->replace(['month' => $targetMonth, 'year' => $targetYear]);
-
-        $salaryController = app(\App\Http\Controllers\DiamondController::class);
-        $salaryResponse = $salaryController->calculateSalary();
     } catch (\Exception $e) {
-        $report['errors'][] = 'Transaction error: ' . $e->getMessage();
-        Log::error('system-merge-and-recalculate failed', ['error' => $e->getMessage()]);
+        $report['errors'][] = $e->getMessage();
     }
 
     // ================================================================
-    // توليد تقرير HTML
+    // واجهة التقرير (HTML RTL)
     // ================================================================
-    $html = '<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام دمج السجلات وإعادة الحساب</title>
+    $html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: "Segoe UI", Tahoma, Arial, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; direction: rtl; }
-        .container { max-width: 1300px; margin: 0 auto; }
-        h1 { text-align: center; font-size: 26px; margin-bottom: 8px; background: linear-gradient(90deg, #38bdf8, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitle { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 13px; }
-        .card { background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 20px; border: 1px solid #334155; }
-        .card h2 { color: #38bdf8; font-size: 16px; margin-bottom: 16px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
-        .stat-box { background: #0f172a; border-radius: 10px; padding: 16px; text-align: center; border: 1px solid #334155; }
-        .stat-box .value { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
-        .stat-box .label { font-size: 12px; color: #64748b; }
-        .red { color: #f87171; }
-        .green { color: #34d399; }
-        .blue { color: #38bdf8; }
-        .yellow { color: #fbbf24; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #0f172a; color: #38bdf8; padding: 10px 8px; text-align: right; font-weight: 600; border-bottom: 2px solid #334155; }
-        td { padding: 8px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
-        tr:hover { background: #1e293b; }
-        .negative { color: #f87171; font-weight: 600; }
-        .positive { color: #34d399; font-weight: 600; }
-        .mode-badge { display: inline-block; padding: 6px 18px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
-        .mode-preview { background: #f39c12; color: #000; }
-        .mode-live { background: #e74c3c; color: #fff; }
-        .action-btn { display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 1.1em; margin-top: 20px; }
-        .step-badge { display: inline-block; background: #1d4ed8; color: #fff; border-radius: 20px; padding: 2px 10px; font-size: 11px; margin-left: 6px; }
-        .error-box { background: #450a0a; border: 1px solid #f87171; border-radius: 8px; padding: 12px; margin-bottom: 16px; color: #fca5a5; font-size: 13px; }
-        .success-box { background: #052e16; border: 1px solid #34d399; border-radius: 8px; padding: 12px; margin-bottom: 16px; color: #86efac; font-size: 13px; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>🔄 نظام دمج السجلات وإعادة الحساب</h1>
-    <p class="subtitle">شهر مارس 2026 | ' . $report['timestamp'] . '</p>
-    <div style="text-align:center">
-        <span class="mode-badge ' . ($shouldExecute ? 'mode-live' : 'mode-preview') . '">
-            ' . ($shouldExecute ? '⚡ وضع التنفيذ الفعلي' : '👁️ وضع المعاينة') . '
-        </span>
-    </div>';
+        body { font-family: "Segoe UI", Tahoma; background: #0f172a; color: #e2e8f0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card { background: #1e293b; border-radius: 10px; padding: 20px; border: 1px solid #334155; margin-bottom: 20px; }
+        h1 { color: #38bdf8; text-align: center; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: #0f172a; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
+        .stat-box div:first-child { font-size: 24px; font-weight: bold; color: #34d399; }
+        table { width: 100%; border-collapse: collapse; background: #1e293b; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #334155; }
+        th { background: #334155; color: #38bdf8; }
+        .badge { padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        .mode-preview { background: #f59e0b; color: #000; }
+        .mode-live { background: #ef4444; color: #fff; }
+        .btn { display: inline-block; padding: 12px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px; }
+    </style></head><body>';
 
-    // أخطاء
-    if (!empty($report['errors'])) {
-        foreach ($report['errors'] as $err) {
-            $html .= '<div class="error-box">❌ ' . htmlspecialchars($err) . '</div>';
-        }
-    }
+    $html .= '<div class="container">
+        <h1>📊 تقرير تنظيف سجلات الوكالة الحالية</h1>
+        <div style="text-align:center; margin-bottom:20px;">
+            <span class="badge ' . ($shouldExecute ? 'mode-live' : 'mode-preview') . '">' . $report['mode'] . '</span>
+        </div>
 
-    // ملخص الأرقام
-    $html .= '<div class="stats-grid">
-        <div class="stat-box"><div class="value blue">' . number_format($report['step1_diamond_updates']) . '</div><div class="label">💎 تحديثات الماس الحقيقي</div></div>
-        <div class="stat-box"><div class="value yellow">' . number_format($report['step2_merged_users']) . '</div><div class="label">👥 مستخدمون تم دمج سجلاتهم</div></div>
-        <div class="stat-box"><div class="value red">' . number_format($report['step2_deleted_records']) . '</div><div class="label">🗑️ سجلات محذوفة</div></div>
-        <div class="stat-box"><div class="value yellow">$' . number_format($report['step2_total_cut_merged'], 2) . '</div><div class="label">💸 إجمالي cut_amount المدمج</div></div>
-        <div class="stat-box"><div class="value blue">' . number_format($report['step3_reset_records']) . '</div><div class="label">🔄 سجلات أُعيد تهيئتها</div></div>
-        <div class="stat-box"><div class="value ' . ($report['step4_salary_recalculated'] ? 'green' : 'red') . '">' . ($report['step4_salary_recalculated'] ? '✅' : ($shouldExecute ? '❌' : '⏸️')) . '</div><div class="label">🧮 إعادة حساب الرواتب</div></div>
-    </div>';
+        <div class="stats">
+            <div class="stat-box"><div>' . $report['total_users_processed'] . '</div><div>مستخدم تمت معالجته</div></div>
+            <div class="stat-box"><div>' . $report['total_deleted_old_agency_records'] . '</div><div>سجلات وكالات سابقة محذوفة</div></div>
+            <div class="stat-box"><div>' . $report['total_merged_current_agency_records'] . '</div><div>سجلات مكررة مدمجة</div></div>
+        </div>';
 
-    // شرح الخطوات
-    $html .= '<div class="card"><h2>📋 الخطوات المنفذة</h2>
-    <div style="font-size:14px;line-height:2.2">
-        <span class="step-badge">1</span> تحديث الماس الحقيقي الصافي (إجمالي الهدايا - هدايا الحقيبة) لـ ' . number_format($report['step1_diamond_updates']) . ' مستخدم في monthly_diamond_receives<br>
-        <span class="step-badge">2</span> دمج ' . number_format($report['step2_merged_users']) . ' مجموعة سجلات مكررة وحذف ' . number_format($report['step2_deleted_records']) . ' سجل زائد<br>
-        <span class="step-badge">3</span> إعادة تهيئة ' . number_format($report['step3_reset_records']) . ' سجل راتب (تصفير sallary, agency_sallary, target_id)<br>
-        <span class="step-badge">4</span> استدعاء DiamondController::calculateSalary() لإعادة حساب الرواتب
-    </div></div>';
-
-    // جدول تفاصيل الدمج
-    if (!empty($report['details'])) {
-        $html .= '<div class="card"><h2>📊 تفاصيل السجلات المدمجة (' . count($report['details']) . ' حالة)</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>المستخدم</th>
-                    <th>الوكالة</th>
-                    <th>عدد السجلات المكررة</th>
-                    <th>السجل الرئيسي (ID)</th>
-                    <th>السجلات المحذوفة (IDs)</th>
-                    <th>إجمالي cut_amount المدمج</th>
-                    <th>الماس الحقيقي</th>
-                </tr>
-            </thead>
-            <tbody>';
-
-        $i = 0;
-        foreach ($report['details'] as $d) {
-            $i++;
-            $html .= '<tr>
-                <td>' . $i . '</td>
-                <td>' . $d['user_id'] . '</td>
-                <td>' . $d['agency_id'] . '</td>
-                <td class="yellow">' . $d['duplicate_count'] . '</td>
-                <td class="green">' . $d['primary_id'] . '</td>
-                <td class="red" style="font-size:11px">' . implode(', ', $d['duplicate_ids']) . '</td>
-                <td class="yellow">$' . number_format($d['total_cut_merged'], 2) . '</td>
-                <td class="blue">' . number_format($d['real_diamond']) . '</td>
-            </tr>';
-        }
-
-        $html .= '</tbody></table></div>';
-    } else {
-        $html .= '<div class="card"><h2>✅ لا توجد سجلات مكررة</h2>
-        <p style="color:#64748b">لم يتم العثور على سجلات رواتب مكررة لنفس المستخدم والوكالة في شهر مارس 2026.</p></div>';
-    }
-
-    // زر التنفيذ
     if (!$shouldExecute) {
-        $html .= '<div style="text-align:center;margin:40px 0">
-            <p style="color:#f39c12;font-size:1.1em;margin-bottom:16px">⚠️ هذا تقرير معاينة فقط. لم يتم تنفيذ أي تغييرات.</p>
-            <a href="?fix=1" class="action-btn" onclick="return confirm(\'هل أنت متأكد من تنفيذ الدمج وإعادة الحساب؟\');">
-                🚀 تنفيذ الدمج وإعادة الحساب الآن
-            </a>
-        </div>';
-    } else {
-        $html .= '<div style="text-align:center;margin:40px 0">
-            <p style="color:#34d399;font-size:1.4em">✅ تم تنفيذ الدمج وإعادة الحساب بنجاح!</p>
-        </div>';
+        $html .= '<div style="text-align:center;"><a href="?fix=1" class="btn" onclick="return confirm(\'سيتم الآن حذف وحساب الرواتب فعلياً، استمرار؟\')">🚀 تشغيل التنفيذ الفعلي الآن</a></div>';
     }
 
-    $html .= '</div></body></html>';
+    $html .= '<div class="card"><h2>📝 تفاصيل المستخدمين</h2><table><thead><tr>
+        <th>ID</th><th>UUID</th><th>الوكالة الحالية</th><th>سجلات قديمة (حذف)</th><th>تكرار مدمج</th><th>إجمالي الخصم</th><th>الماس (الوكالة الحالية)</th>
+    </tr></thead><tbody>';
 
-    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
+    foreach ($report['details'] as $d) {
+        $html .= "<tr>
+            <td>{$d['user_id']}</td>
+            <td>{$d['uuid']}</td>
+            <td style='color:#fbbf24'>{$d['current_agency']}</td>
+            <td style='color:#f87171'>{$d['old_records_deleted']}</td>
+            <td>{$d['duplicates_merged']}</td>
+            <td>{$d['total_cut']}</td>
+            <td style='color:#38bdf8; font-weight:bold;'>" . number_format($d['current_agency_diamonds']) . "</td>
+        </tr>";
+    }
+
+    $html .= '</tbody></table></div></div></body></html>';
+
+    return response($html);
 });
+
+
