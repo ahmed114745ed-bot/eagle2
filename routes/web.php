@@ -2091,7 +2091,7 @@ Route::get('/fix-gift-logs/run', function () {
         SELECT COUNT(*) as total
         FROM gift_logs gl
         JOIN gifts g ON gl.giftId = g.id
-        WHERE g.type = 6
+        WHERE g.gift_category_id = 7
         AND gl.giftNum > 0
         AND g.price > 0
         AND gl.giftPrice = gl.giftNum * g.price
@@ -2109,7 +2109,7 @@ Route::get('/fix-gift-logs/run', function () {
             gl.app_profit_coins = gl.giftPrice * 0.1,
             gl.receiver_obtain = gl.giftPrice * 0.1,
             gl.giftPrice = gl.giftPrice * 0.1
-        WHERE g.type = 6
+        WHERE g.gift_category_id = 7
         AND gl.giftNum > 0
         AND g.price > 0
         AND gl.giftPrice = gl.giftNum * g.price
