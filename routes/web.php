@@ -2965,27 +2965,31 @@ Route::get('/system-merge-and-recalculate', function (\Illuminate\Http\Request $
                 // إذا لم يوجد طلب، نعتمد بداية الشهر كافتراض، لكن الأفضل وجود الطلب
                 $joinTime = $joinRequest ? $joinRequest->created_at : "$targetYear-$targetMonth-01 00:00:00";
 
-                // 1. حذف سجلات الوكالات السابقة
-                $oldAgencyRecords = DB::table('user_sallaries')
+              $invalidRecords = DB::table('user_sallaries')
                     ->where('user_id', $userId)
                     ->where('month', $targetMonth)
                     ->where('year', $targetYear)
-                    ->where('user_agency_id', '!=', $currentAgencyId);
-
-                $oldRecordsCount = $oldAgencyRecords->count();
+                    ->where(function($query) use ($currentAgencyId, $joinTime) {
+                        $query->where('user_agency_id', '!=', $currentAgencyId) // وكالة قديمة
+                              ->orWhere('created_at', '<', $joinTime);         // أو وكالة حالية لكن قبل الانضمام الرسمي
+                    });
+                
+                $oldRecordsCount = $invalidRecords->count();
                 if ($shouldExecute && $oldRecordsCount > 0) {
-                    $oldAgencyRecords->delete();
+                    $invalidRecords->delete();
                 }
 
-                // 2. معالجة السجلات الحالية
+                // 3. معالجة السجلات الصالحة (الوكالة الحالية + بعد وقت الانضمام)
                 $currentAgencyRecords = DB::table('user_sallaries')
                     ->where('user_id', $userId)
                     ->where('month', $targetMonth)
                     ->where('year', $targetYear)
                     ->where('user_agency_id', $currentAgencyId)
+                    ->where('created_at', '>=', $joinTime) // التأكد من أن السجل الذي سنعالجه قانوني
                     ->orderBy('id', 'asc')
                     ->get();
 
+                    
                 if ($currentAgencyRecords->count() > 0) {
                     $primaryRecord = $currentAgencyRecords->first();
                     $duplicateIds = $currentAgencyRecords->slice(1)->pluck('id')->toArray();
