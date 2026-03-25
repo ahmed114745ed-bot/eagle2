@@ -31,7 +31,6 @@
                             </div>
 
                             <div class="row">
-                                {{ info($coin->type) }}
                                 @if ($coin->type == 'fawry')
                                     @include('admin.settings.partial_payments.fawry')
                                 @endif
