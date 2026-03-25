@@ -224,17 +224,17 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                try {
+              //  try {
                     if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
-                } catch (\Exception $exception) {
-                    Log::warning('Device token limit reached............ on Google login', [
-                        'device_token' => $request['device_token'] ?? null,
-                        'email' => $request['email'] ?? null,
-                        'google_id' => $request['google_id'] ?? null,
-                        'error' => $exception->getMessage(),
-                    ]);
-                    return Common::apiResponse(false, $exception->getMessage(), [], 422);
-                }
+                // } catch (\Exception $exception) {
+                //     Log::warning('Device token limit reached............ on Google login', [
+                //         'device_token' => $request['device_token'] ?? null,
+                //         'email' => $request['email'] ?? null,
+                //         'google_id' => $request['google_id'] ?? null,
+                //         'error' => $exception->getMessage(),
+                //     ]);
+                //     return Common::apiResponse(false, $exception->getMessage(), [], 422);
+                // }
                 $user = $this->userRepository->create($data);
 
                 $is_new = true;
@@ -727,7 +727,7 @@ class AuthService
         if ($record) {
             $register_account = Common::getSettingValue('register_account') ?? 0;
             if ($record->count >= $register_account) {
-                throw new \Exception('You have reached the maximum number of accounts that can be registered with this device.');
+                throw new CValidationException('You have reached the maximum number of accounts that can be registered with this device.');
             }
             $record->increment('count');
         } else {
