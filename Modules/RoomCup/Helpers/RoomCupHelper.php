@@ -15,19 +15,22 @@ class RoomCupHelper
     public static function updateRoomVisitors(int $roomId): void
     {
         $timezone = Common::timeZone();
-        $today    = Carbon::now($timezone)->startOfDay();
-        $tomorrow = (clone $today)->endOfDay();
-    
+        $today    = Carbon::now($timezone)->startOfDay()->setTimezone('UTC');
+        $tomorrow = Carbon::now($timezone)->endOfDay()->setTimezone('UTC');
+//        $today    = Carbon::now($timezone)->startOfDay();
+//        $tomorrow = (clone $today)->endOfDay();
+
         $uniqueVisitors = EnteredRoom::query()
             ->where('rid', $roomId)
             ->whereBetween('entered_at', [$today, $tomorrow])
             ->distinct('uid')
             ->count('uid');
-    
+
         $gift = TotalRoomGift::where('room_id', $roomId)
             ->whereBetween('created_at', [$today, $tomorrow])
+            ->lockForUpdate()
             ->first();
-    
+
         if ($gift) {
             $gift->update(['number_of_visitors' => $uniqueVisitors]);
         } else {

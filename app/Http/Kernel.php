@@ -130,7 +130,7 @@ class Kernel extends HttpKernel
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
         'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
         'host.level' => \App\Http\Middleware\HostLevelMiddleware::class,
-         'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
+        'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
 
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
