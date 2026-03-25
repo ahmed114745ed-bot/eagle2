@@ -3462,9 +3462,12 @@ Route::get('/system-merge-and-recalculate', function (\Illuminate\Http\Request $
                             ['user_id' => $userId, 'month' => $targetMonth, 'year' => $targetYear],
                             ['monthly_diamond_received' => $realDiamonds]
                         );
+
+                            DB::table('users')
+                            ->where('id', $userId) 
+                            ->update(['salary_is_updated' => 1]);
                     }
 
-                    // إضافة البيانات للتقرير
                     $report['details'][] = [
                         'user_id' => $userId,
                         'uuid' => $user->uuid,
