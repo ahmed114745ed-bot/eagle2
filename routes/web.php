@@ -266,6 +266,17 @@ Route::get('/run-permission', function () {
     ]);
 });
 
+
+Route::get('/devices-token-seeder', function () {
+
+    Artisan::call('db:seed', ['--class' => 'DevicesTokenHistories']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
 Route::get('/user-join-agency', function () {
 
     Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
