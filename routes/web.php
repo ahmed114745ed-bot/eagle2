@@ -1821,6 +1821,7 @@ Route::get('/fix-total-room-gifts', function () {
         // Find or create TotalRoomGift record for this room on this date
         $record = TotalRoomGift::whereDate('created_at', $giftDate)
             ->where('room_id', $roomId)
+            ->lockForUpdate()
             ->first();
 
         if ($record) {
