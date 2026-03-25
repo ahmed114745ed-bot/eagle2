@@ -226,8 +226,8 @@ class AuthService
                 }
                 try {
                     if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
-                } catch (\Throwable $e) {
-                    throw $e; // rethrow
+                } catch (\Exception $exception) {
+                    return Common::apiResponse(false, $exception->getMessage(), [], 422);
                 }
                 $user = $this->userRepository->create($data);
 
