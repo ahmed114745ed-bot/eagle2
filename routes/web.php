@@ -2924,23 +2924,26 @@ Route::get('/direct-recovery/export', function () {
 
 
 
-Route::get('/system-merge-and-recalculate2', function (\Illuminate\Http\Request $request) {
+Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $request) {
     $shouldExecute = $request->query('fix') == '1';
     $targetMonth = 3;
     $targetYear = 2026;
+    
+    $startOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->startOfMonth();
+    $endOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->endOfMonth();
 
     $report = [
-        'mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
+        'mode' => $shouldExecute ? 'LIVE EXECUTION & CLEANUP' : 'PREVIEW MODE',
         'timestamp' => now()->toDateTimeString(),
         'total_users_processed' => 0,
-        'total_deleted_old_agency_records' => 0,
-        'total_merged_current_agency_records' => 0,
+        'total_merged_records' => 0,
+        'deleted_gift_count' => 0, 
         'details' => [],
         'errors' => [],
     ];
 
     try {
-        DB::transaction(function () use ($shouldExecute, $targetMonth, $targetYear, &$report) {
+        DB::transaction(function () use ($shouldExecute, $targetMonth, $targetYear, $startOfMonth, $endOfMonth, &$report) {
 
             $usersWithSalaries = DB::table('user_sallaries')
                 ->where('month', $targetMonth)
@@ -2954,60 +2957,47 @@ Route::get('/system-merge-and-recalculate2', function (\Illuminate\Http\Request 
 
                 $currentAgencyId = $user->agency_id;
 
-                // --- [جديد] جلب تاريخ الانضمام الرسمي للوكالة الحالية ---
+                // جلب آخر انضمام للوكالة الحالية
                 $joinRequest = DB::table('agency_join_requests')
                     ->where('user_id', $userId)
                     ->where('agency_id', $currentAgencyId)
-                    ->where('status', 1) // تأكد من مسمى الحالة لديك (مثلاً accepted أو 1)
+                    ->where('status', 1) 
+                    ->where('created_at', '<=', $endOfMonth)
                     ->orderBy('created_at', 'desc')
                     ->first();
 
-                // إذا لم يوجد طلب، نعتمد بداية الشهر كافتراض، لكن الأفضل وجود الطلب
-                $joinTime = $joinRequest ? $joinRequest->created_at : "$targetYear-$targetMonth-01 00:00:00";
+                $joinTime = $joinRequest ? $joinRequest->created_at : $startOfMonth->toDateTimeString();
+                $effectiveStartTime = max($joinTime, $startOfMonth->toDateTimeString());
 
-              $invalidRecords = DB::table('user_sallaries')
-                    ->where('user_id', $userId)
-                    ->where('month', $targetMonth)
-                    ->where('year', $targetYear)
-                    ->where(function($query) use ($currentAgencyId, $joinTime) {
-                        $query->where('user_agency_id', '!=', $currentAgencyId) // وكالة قديمة
-                              ->orWhere('created_at', '<', $joinTime);         // أو وكالة حالية لكن قبل الانضمام الرسمي
-                    });
-                
-                $oldRecordsCount = $invalidRecords->count();
-                if ($shouldExecute && $oldRecordsCount > 0) {
-                    $invalidRecords->delete();
-                }
-
-                // 3. معالجة السجلات الصالحة (الوكالة الحالية + بعد وقت الانضمام)
+                // جلب سجلات الرواتب المكررة في الوكالة الحالية فقط
                 $currentAgencyRecords = DB::table('user_sallaries')
                     ->where('user_id', $userId)
                     ->where('month', $targetMonth)
                     ->where('year', $targetYear)
                     ->where('user_agency_id', $currentAgencyId)
-                    ->where('created_at', '>=', $joinTime) // التأكد من أن السجل الذي سنعالجه قانوني
+                    ->where('created_at', '>=', $effectiveStartTime)
+                    ->where('created_at', '<=', $endOfMonth)
                     ->orderBy('id', 'asc')
                     ->get();
-
                     
-                if ($currentAgencyRecords->count() > 0) {
+                if ($currentAgencyRecords->count() > 1) {
                     $primaryRecord = $currentAgencyRecords->first();
                     $duplicateIds = $currentAgencyRecords->slice(1)->pluck('id')->toArray();
                     $totalCut = $currentAgencyRecords->sum('cut_amount');
 
-                    // --- [تعديل] حساب الماسات بشرط التاريخ أكبر من وقت الانضمام ---
+                    // 1. حساب الماس المستحق (بدون النوع gift وبدون النوع null إذا كان مطلوباً)
                     $realDiamonds = DB::table('gift_logs')
                         ->where('receiver_id', $userId)
                         ->where('agency_id', $currentAgencyId)
-                        ->where('created_at', '>=', $joinTime) // شرط وقت الانضمام الدقيق
-                        ->whereMonth('created_at', $targetMonth)
-                        ->whereYear('created_at', $targetYear)
+                        ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
                         ->where(function($q) {
-                            $q->where('source_type', '!=', 'gift')->orWhereNull('source_type');
+                            $q->where('source_type', '!=', 'gift')
+                              ->orWhereNull('source_type');
                         })
                         ->sum('giftPrice');
 
                     if ($shouldExecute) {
+                        // 2. تحديث السجل الرئيسي وحذف المكررات
                         DB::table('user_sallaries')->where('id', $primaryRecord->id)->update([
                             'cut_amount' => $totalCut,
                             'achieved_diamond' => $realDiamonds,
@@ -3017,9 +3007,17 @@ Route::get('/system-merge-and-recalculate2', function (\Illuminate\Http\Request 
                             'target_id' => null
                         ]);
 
-                        if (!empty($duplicateIds)) {
-                            DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
-                        }
+                        DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
+
+                        // 3. حذف الهدايا من نوع gift نهائياً من السجلات لهذه الفترة والوكالة
+                        $deletedCount = DB::table('gift_logs')
+                            ->where('receiver_id', $userId)
+                            ->where('agency_id', $currentAgencyId)
+                            ->where('source_type', 'gift')
+                            ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
+                            ->delete();
+                        
+                        $report['deleted_gift_count'] += $deletedCount;
 
                         DB::table('monthly_diamond_receives')->updateOrInsert(
                             ['user_id' => $userId, 'month' => $targetMonth, 'year' => $targetYear],
@@ -3033,21 +3031,19 @@ Route::get('/system-merge-and-recalculate2', function (\Illuminate\Http\Request 
                         'user_id' => $userId,
                         'uuid' => $user->uuid,
                         'current_agency' => $currentAgencyId,
-                        'join_date' => $joinTime,
-                        'old_records_deleted' => $oldRecordsCount,
+                        'join_date' => $effectiveStartTime,
                         'duplicates_merged' => count($duplicateIds),
                         'total_cut' => $totalCut,
                         'current_agency_diamonds' => $realDiamonds,
                     ];
 
                     $report['total_users_processed']++;
-                    $report['total_deleted_old_agency_records'] += $oldRecordsCount;
-                    $report['total_merged_current_agency_records'] += count($duplicateIds);
+                    $report['total_merged_records'] += count($duplicateIds);
                 }
             }
         });
 
-        if ($shouldExecute) {
+        if ($shouldExecute && $report['total_users_processed'] > 0) {
             $diamondController = app(\App\Http\Controllers\DiamondController::class);
             $diamondController->calculateSalary();
         }
@@ -3056,54 +3052,53 @@ Route::get('/system-merge-and-recalculate2', function (\Illuminate\Http\Request 
         $report['errors'][] = $e->getMessage();
     }
 
-    // --- واجهة التقرير المحدثة ---
+    // --- العرض المرئي للتقرير ---
+    // (أضفت حقل عدد الهدايا المحذوفة في الإحصائيات)
     $html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">
     <style>
         body { font-family: "Segoe UI", Tahoma; background: #0f172a; color: #e2e8f0; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         .card { background: #1e293b; border-radius: 10px; padding: 20px; border: 1px solid #334155; margin-bottom: 20px; }
         h1 { color: #38bdf8; text-align: center; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-box { background: #0f172a; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
-        .stat-box div:first-child { font-size: 24px; font-weight: bold; color: #34d399; }
+        .stat-box div:first-child { font-size: 22px; font-weight: bold; color: #34d399; }
+        .stat-box.danger div:first-child { color: #f87171; }
         table { width: 100%; border-collapse: collapse; background: #1e293b; font-size: 13px;}
         th, td { padding: 10px; text-align: center; border-bottom: 1px solid #334155; }
         th { background: #334155; color: #38bdf8; }
         .badge { padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
-        .mode-preview { background: #f59e0b; color: #000; }
         .mode-live { background: #ef4444; color: #fff; }
-        .btn { display: inline-block; padding: 12px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px; }
-        .date-small { font-size: 10px; color: #94a3b8; }
+        .btn { display: inline-block; padding: 12px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px; }
     </style></head><body>';
 
     $html .= '<div class="container">
-        <h1>📊 تقرير التصفية بناءً على وقت الانضمام الرسمي</h1>
+        <h1>🚀 معالج دمج الوكالات وتنظيف الهدايا</h1>
         <div style="text-align:center; margin-bottom:20px;">
             <span class="badge ' . ($shouldExecute ? 'mode-live' : 'mode-preview') . '">' . $report['mode'] . '</span>
         </div>
 
         <div class="stats">
-            <div class="stat-box"><div>' . $report['total_users_processed'] . '</div><div>مستخدم تمت معالجته</div></div>
-            <div class="stat-box"><div>' . $report['total_deleted_old_agency_records'] . '</div><div>سجلات وكالات قديمة</div></div>
-            <div class="stat-box"><div>' . $report['total_merged_current_agency_records'] . '</div><div>سجلات مكررة مدمجة</div></div>
+            <div class="stat-box"><div>' . $report['total_users_processed'] . '</div><div>مستخدمين</div></div>
+            <div class="stat-box"><div>' . $report['total_merged_records'] . '</div><div>سجلات مدمجة</div></div>
+            <div class="stat-box danger"><div>' . $report['deleted_gift_count'] . '</div><div>هدايا Gift محذوفة</div></div>
         </div>';
 
     if (!$shouldExecute) {
-        $html .= '<div style="text-align:center;"><a href="?fix=1" class="btn">🚀 تنفيذ التطهير وإعادة الحساب</a></div>';
+        $html .= '<div style="text-align:center; margin-bottom:20px;"><a href="?fix=1" class="btn">تحديث وحذف المكررات والهدايا الوهمية</a></div>';
     }
 
     $html .= '<div class="card"><table><thead><tr>
-        <th>ID</th><th>تاريخ الانضمام</th><th>الوكالة الحالية</th><th>سجلات محذوفة</th><th>تكرار مدمج</th><th>الخصم</th><th>الماس المستحق</th>
+        <th>UUID</th><th>منذ تاريخ</th><th>الوكالة</th><th>مكررات</th><th>الخصم المدمج</th><th>الماس الصافي</th>
     </tr></thead><tbody>';
 
     foreach ($report['details'] as $d) {
         $html .= "<tr>
             <td>{$d['uuid']}</td>
-            <td class='date-small'>{$d['join_date']}</td>
-            <td style='color:#fbbf24'>{$d['current_agency']}</td>
-            <td style='color:#f87171'>{$d['old_records_deleted']}</td>
+            <td style='font-size:10px;'>{$d['join_date']}</td>
+            <td>{$d['current_agency']}</td>
             <td>{$d['duplicates_merged']}</td>
-            <td>{$d['total_cut']}</td>
+            <td>" . number_format($d['total_cut']) . "</td>
             <td style='color:#38bdf8; font-weight:bold;'>" . number_format($d['current_agency_diamonds']) . "</td>
         </tr>";
     }
@@ -3112,4 +3107,3 @@ Route::get('/system-merge-and-recalculate2', function (\Illuminate\Http\Request 
 
     return response($html);
 });
-
