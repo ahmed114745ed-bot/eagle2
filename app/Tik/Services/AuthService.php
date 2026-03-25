@@ -231,10 +231,11 @@ class AuthService
                 try {
                     if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
                 } catch (\Exception $e) {
-                    logger()->error('Failed device token', [
+                    logger()->error('Failed device...... token', [
                         'device_token' => $request['device_token'] ?? null,
                         'error' => $e->getMessage()
                     ]);
+                    throw $e;
                 }
                 $user = $this->userRepository->create($data);
 
