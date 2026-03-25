@@ -48,6 +48,17 @@ class FairLuckServiceV6
             // receiver fee goes directly to receiver (via updateUsers), not into pool
             $totalAmount = $betAmount + $appFee;
 
+            // BANKRUPTCY PROTECTION: Check pool health before processing
+            $bankruptcyProtection = app(BankruptcyProtection::class);
+            $poolHealth = $bankruptcyProtection->getHealthStatus();
+            
+            if ($poolHealth['status'] === 'critical') {
+                $bankruptcyProtection->logCriticalEvent('BET_PROCESSED_IN_CRITICAL_STATE', [
+                    'user_id' => $user->id,
+                    'bet_amount' => $totalAmount,
+                ]);
+            }
+
             // 1. Get user's RTP stats from Redis
             $stats = $this->rtpTracker->getStats($user->id);
             $actualRTP = $stats->total_spent > 0
@@ -56,7 +67,7 @@ class FairLuckServiceV6
 
             // Target RTP on totalAmount (80% of unitPrice after fees)
             // 0.90 on pool = ~72% effective user RTP (0.90 × 80/100)
-            $targetRTP = (float) FairLuckSetting::getByKey('v6_target_rtp', 0.90);
+            $targetRTP = (float) FairLuckSetting::getByKey('v6_target_rtp', 0.85);
             $rtpGap = $targetRTP - $actualRTP;
 
             // 2. Get pool balances (before)
@@ -115,6 +126,14 @@ class FairLuckServiceV6
                 if ($multiplier > 0) {
                     $payoutAmount = (int) round($multiplier * $totalAmount);
 
+                    // BANKRUPTCY PROTECTION: Cap payout based on pool health
+                    $safePayout = $bankruptcyProtection->validateAndCapPayout($payoutAmount);
+                    if ($safePayout < $payoutAmount) {
+                        // Recalculate multiplier based on safe payout
+                        $multiplier = $totalAmount > 0 ? (int) round($safePayout / $totalAmount) : 0;
+                        $payoutAmount = $safePayout;
+                    }
+
                     // 10. Execute payout from pool (cascading across wallets)
                     $paid = $this->poolManager->payout($payoutAmount, $multiplier, $user->id);
 
@@ -122,6 +141,10 @@ class FairLuckServiceV6
                         $multiplier = 0;
                         $isWinner = false;
                         $payoutAmount = 0;
+                    } else if ($multiplier > 0 && $isWinner) {
+                        // POST-JACKPOT COOLDOWN: Record the jackpot
+                        $cooldown = app(\App\Services\FairLuck\V6\PostJackpotCooldown::class);
+                        $cooldown->recordJackpot($user->id, $stats->bet_count, $multiplier);
                     }
                 } else {
                     $isWinner = false;
@@ -177,6 +200,7 @@ class FairLuckServiceV6
                 'sender_balance_after' => $senderBalanceAfter,
                 'wallets_before' => $walletsBefore,
                 'wallets_after' => $walletsAfter,
+                'pool_health_status' => $poolHealth['status'],
             ]);
 
             return (object) [
@@ -188,6 +212,7 @@ class FairLuckServiceV6
                 'targetRTP' => $targetRTP,
                 'wallets_before' => $walletsBefore,
                 'wallets_after' => $walletsAfter,
+                'pool_health' => $poolHealth,
             ];
         });
     }
