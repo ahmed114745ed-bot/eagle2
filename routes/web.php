@@ -2143,125 +2143,115 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
     try {
         DB::transaction(function () use ($shouldExecute, $targetMonth, $targetYear, $startOfMonth, $endOfMonth, &$report) {
 
-            $usersWithSalaries = DB::table('user_sallaries')
+        $shouldExecute = $request->query('fix') == '1';
+    $targetMonth = 3;
+    $targetYear = 2026;
+    $thresholdDate = "2026-03-19 00:00:00"; 
+    
+    $startOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->startOfMonth();
+    $endOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->endOfMonth();
+
+    $report = [
+        'mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
+        'total_users_with_gifts_deleted' => 0,
+        'total_merged_records' => 0,
+        'deleted_gift_count' => 0, 
+    ];
+
+    try {
+        DB::transaction(function () use ($shouldExecute, $targetMonth, $targetYear, $startOfMonth, $endOfMonth, $thresholdDate, &$report) {
+
+            // 1. جلب كل المستخدمين الذين لديهم سجلات رواتب هذا الشهر
+            $userIds = DB::table('user_sallaries')
                 ->where('month', $targetMonth)
                 ->where('year', $targetYear)
                 ->distinct()
                 ->pluck('user_id');
 
-            foreach ($usersWithSalaries as $userId) {
+            foreach ($userIds as $userId) {
                 $user = DB::table('users')->where('id', $userId)->first();
                 if (!$user || !$user->agency_id) continue;
 
                 $currentAgencyId = $user->agency_id;
 
-                // جلب آخر انضمام للوكالة الحالية
+                // حساب تاريخ الانضمام
                 $joinRequest = DB::table('agency_join_requests')
                     ->where('user_id', $userId)
                     ->where('agency_id', $currentAgencyId)
                     ->where('status', 1) 
-                    ->where('created_at', '<=', $endOfMonth)
                     ->orderBy('created_at', 'desc')
                     ->first();
 
                 $joinTime = $joinRequest ? $joinRequest->created_at : $startOfMonth->toDateTimeString();
                 $effectiveStartTime = max($joinTime, $startOfMonth->toDateTimeString());
 
+                // --- [تعديل جوهري]: حذف الهدايا لكل مستخدم سواء عنده مكرر أو لا ---
+                if ($shouldExecute) {
+                    $deleted = DB::table('gift_logs')
+                        ->where('receiver_id', $userId)
+                        ->where('agency_id', $currentAgencyId)
+                        ->where('source_type', 'gift')
+                        ->where('created_at', '>=', $thresholdDate) // من يوم 19
+                        ->delete();
+                    
+                    if ($deleted > 0) {
+                        $report['deleted_gift_count'] += $deleted;
+                        $report['total_users_with_gifts_deleted']++;
+                    }
+                }
+
+                // 2. معالجة دمج المكررات (كما هي)
                 $currentAgencyRecords = DB::table('user_sallaries')
                     ->where('user_id', $userId)
                     ->where('month', $targetMonth)
                     ->where('year', $targetYear)
                     ->where('user_agency_id', $currentAgencyId)
                     ->where('created_at', '>=', $effectiveStartTime)
-                    ->where('created_at', '<=', $endOfMonth)
-                    ->orderBy('id', 'asc')
                     ->get();
-                    
-                if ($currentAgencyRecords->count() > 1) {
-                    $primaryRecord = $currentAgencyRecords->first();
-                    $duplicateIds = $currentAgencyRecords->slice(1)->pluck('id')->toArray();
-                    $totalCut = $currentAgencyRecords->sum('cut_amount');
 
-                    // 1. حساب الماس المستحق (بدون النوع gift وبدون النوع null إذا كان مطلوباً)
-                    $thresholdDate = "$targetYear-$targetMonth-19 00:00:00";
+                // حساب الماس الحقيقي (بدون الـ gift المحذوف)
+                $realDiamonds = DB::table('gift_logs')
+                    ->where('receiver_id', $userId)
+                    ->where('agency_id', $currentAgencyId)
+                    ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
+                    ->where(function($q) use ($thresholdDate) {
+                        $q->where(function($sub) {
+                            $sub->where('source_type', '!=', 'gift')->orWhereNull('source_type');
+                        })->orWhere(function($sub) use ($thresholdDate) {
+                            $sub->where('source_type', 'gift')->where('created_at', '<', $thresholdDate);
+                        });
+                    })->sum('giftPrice');
 
-                    $realDiamonds = DB::table('gift_logs')
-                        ->where('receiver_id', $userId)
-                        ->where('agency_id', $currentAgencyId)
-                        ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
-                        ->where(function($q) use ($thresholdDate) {
-                            // الشرط الجديد:
-                            $q->where(function($sub) use ($thresholdDate) {
-                                // 1. اقبل الهدايا التي ليست من نوع gift
-                                $sub->where('source_type', '!=', 'gift')
-                                    ->orWhereNull('source_type');
-                            })
-                            ->orWhere(function($sub) use ($thresholdDate) {
-                                // 2. أو اقبل النوع gift بشرط أن يكون تاريخه قبل يوم 19
-                                $sub->where('source_type', 'gift')
-                                    ->where('created_at', '<', $thresholdDate);
-                            });
-                        })
-                        ->sum('giftPrice');
-
+                // إذا وجد مكرر ندمج، وإذا لم يوجد نحدث الماس فقط
+                $primaryRecord = $currentAgencyRecords->first();
+                if ($primaryRecord) {
                     if ($shouldExecute) {
-                        // 2. تحديث السجل الرئيسي وحذف المكررات
-                        DB::table('user_sallaries')->where('id', $primaryRecord->id)->update([
-                            'cut_amount' => $totalCut,
+                        $updateData = [
                             'achieved_diamond' => $realDiamonds,
-                            'sallary' => 0,
-                            'agency_sallary' => 0,
-                            'is_finished' => 0,
-                            'target_id' => null
-                        ]);
+                            'salary_is_updated' => 1 // علامة للتحديث
+                        ];
 
-                        DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
-
-                           $thresholdDate = "2026-03-19 00:00:00";
-
-                        if ($shouldExecute) {
-                            // 3. حذف الهدايا من نوع gift "المرفوضة" فقط (من يوم 19 فصاعداً)
-                            $deletedCount = DB::table('gift_logs')
-                                ->where('receiver_id', $userId)
-                                ->where('agency_id', $currentAgencyId)
-                                ->where('source_type', 'gift')
-                                // الشرط الجديد: احذف فقط ما هو في يوم 19 أو بعده
-                                ->where('created_at', '>=', $thresholdDate) 
-                                ->where('created_at', '<=', $endOfMonth)
-                                ->delete();
+                        if ($currentAgencyRecords->count() > 1) {
+                            $duplicateIds = $currentAgencyRecords->slice(1)->pluck('id')->toArray();
+                            $updateData['cut_amount'] = $currentAgencyRecords->sum('cut_amount');
                             
-                            $report['deleted_gift_count'] += $deletedCount;
+                            DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
+                            $report['total_merged_records'] += count($duplicateIds);
                         }
-                        
-                        $report['deleted_gift_count'] += $deletedCount;
 
+                        DB::table('user_sallaries')->where('id', $primaryRecord->id)->update($updateData);
+                        
                         DB::table('monthly_diamond_receives')->updateOrInsert(
                             ['user_id' => $userId, 'month' => $targetMonth, 'year' => $targetYear],
                             ['monthly_diamond_received' => $realDiamonds]
                         );
-
-                        DB::table('users')->where('id', $userId)->update(['salary_is_updated' => 1]);
                     }
-
-                    $report['details'][] = [
-                        'user_id' => $userId,
-                        'uuid' => $user->uuid,
-                        'current_agency' => $currentAgencyId,
-                        'join_date' => $effectiveStartTime,
-                        'duplicates_merged' => count($duplicateIds),
-                        'total_cut' => $totalCut,
-                        'current_agency_diamonds' => $realDiamonds,
-                    ];
-
-                    $report['total_users_processed']++;
-                    $report['total_merged_records'] += count($duplicateIds);
                 }
             }
         });
 
-        if ($shouldExecute && $report['total_users_processed'] > 0) {
-            $diamondController = app(\App\Http\Controllers\DiamondController::class);
-            $diamondController->calculateSalary();
+        if ($shouldExecute) {
+            app(\App\Http\Controllers\DiamondController::class)->calculateSalary();
         }
 
     } catch (\Exception $e) {
