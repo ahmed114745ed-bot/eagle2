@@ -137,7 +137,15 @@ class AuthController extends Controller
     protected function loginWithGoogle($data)
     {
         try {
-            [$user, $token, $resource] = $this->authService->loginWithGoogle($data);
+            $result = $this->authService->loginWithGoogle($data);
+
+            // If the service returned a response directly (e.g. apiResponse for validation errors)
+            if (!is_array($result)) {
+                return $result;
+            }
+
+            [$user, $token, $resource] = $result;
+
             if (!$this->canLogin($user)) {
                 return Common::apiResponse(false, 'you are blocked', [], 422);
             }
