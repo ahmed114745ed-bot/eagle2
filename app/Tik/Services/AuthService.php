@@ -114,7 +114,7 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-             //   if ($request['device_token'])  $this->devicesTokenHistory($request['device_token'] ?? null);
+                if ($request['device_token'])  $this->devicesTokenHistory($request['device_token'] ?? null);
 
                 $user = $this->userRepository->create($data);
             }
@@ -224,7 +224,7 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                if ($request['device_token'])  $this->devicesTokenHistory($request['device_token'] ?? null);
+              //  if ($request['device_token'])  $this->devicesTokenHistory($request['device_token'] ?? null);
 
                 $user = $this->userRepository->create($data);
 
