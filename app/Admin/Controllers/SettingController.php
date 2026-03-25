@@ -29,7 +29,7 @@ class SettingController extends MainController
 
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
-    
+
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
@@ -61,6 +61,7 @@ class SettingController extends MainController
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
+        $isThemeEnabled = Common::getSettingValue('isThemeEnabled') ?? 0;
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         $userTransferRateEnabled = data_get($settings, 'user_transfer_rate_enabled');
@@ -69,6 +70,7 @@ class SettingController extends MainController
             ->header(__('Settings'))
             ->description('   ')
             ->body(view('admin.settings_new', compact([
+                'isThemeEnabled',
                 'zeroGamesSettings',
                 'bytesunSettings',
                 'quantumNexusSettings',
@@ -254,6 +256,24 @@ class SettingController extends MainController
         }
     }
 
+
+    public function updateIsThemeEnabled(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => 'isThemeEnabled'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('isThemeEnabled', $request->value);
+            \Artisan::call('cache:clear');
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function initCoinRates()
     {
         $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
@@ -304,7 +324,7 @@ class SettingController extends MainController
 
     public function initUserCoinRates()
     {
- 
+
         return 'تمت تهيئة قيم المستخدمين بنجاح (Init User Rates Done)';
     }
 

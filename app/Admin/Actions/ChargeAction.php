@@ -105,7 +105,8 @@ class ChargeAction extends Action
             if ($agency->coins < 0)  return $this->response()->error(__('agency does not have this coin'))->refresh();
             $agency->save();
 
-            $this->createChargeRecord($request, $user, $agency, $amount, $coins, $request->amount);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request, $user, $agency, $amount, $coins, $usdAmount);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -123,9 +124,10 @@ class ChargeAction extends Action
 
         $shippingCoins = \App\Services\CoinRateService::getAppBaseRate2();
         //        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
-        $usdAmount = $request->amount * $shippingCoins;
+        $usdAmountRaw = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+        $usdAmount = $usdAmountRaw * $shippingCoins;
 
-        DB::transaction(function () use ($request, $user, $usdAmount) {
+        DB::transaction(function () use ($request, $user, $usdAmount, $usdAmountRaw) {
             $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
             if ($amount < 0 && $user->di < abs($amount)) {
                 return $this->response()->error(__('Insufficient user balance'))->refresh();
@@ -137,7 +139,7 @@ class ChargeAction extends Action
                 $admin = Auth::user()->username ?? 'Admin';
                 CustomNotification::chargeAction($user, $request, $admin);
             }
-            $this->createChargeRecord($request, $user, null, $amount, $usdAmount, $request->amount);
+            $this->createChargeRecord($request, $user, null, $amount, $usdAmount, $usdAmountRaw);
 
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });

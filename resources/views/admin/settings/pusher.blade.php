@@ -6,7 +6,7 @@
             <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4 settings-form">
                 @csrf
                 <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                <div class="card p-3 shadow pusher-settings-form" style="">
+                <div class="card p-3 shadow pusher-settings-form" style="height: auto !important; min-height: 560px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="m-0 color-white">{{ __('pusher') }}</h4>
                         <div class="d-flex align-items-center">
@@ -47,9 +47,71 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-5 pusher-btn0bottom">
+                    <button type="submit" class="btn btn-primary mt-3 btn-save" style="position: relative; margin: 20px auto 0 auto; display: block;">
                         <i class="fas fa-save"></i> {{ __('save') }}
                     </button>
+
+                    <hr class="my-4">
+
+                    <h5 class="mb-3">{{ __('webhook_endpoints') }}</h5>
+
+                    {{-- Endpoint 1: Chat Room Listener - Channel Existence --}}
+                    <div class="mb-3">
+                        <label class="form-label text-capitalize fw-semibold">
+                            {{ __('chat_room_listener') }}
+                        </label>
+                        <small class="d-block text-muted mb-2" style="font-size: 12px;">
+                            {{ __('chat_room_listener_desc') }}
+                        </small>
+                        <div class="pusher-webhook-container">
+                            <input type="text" class="form-control pusher-webhook-url" value="{{ url('/api/chat-room-listener') }}" readonly>
+                            <button type="button" class="btn pusher-btn-copy" onclick="copyPusherWebhook(this)">
+                                {{ __('copy') }}
+                            </button>
+                        </div>
+                        <small class="d-block mt-1" style="font-size: 11px; color: #17a2b8;">
+                            <i class="fas fa-tag me-1"></i> {{ __('event') }}: {{ __('channel_existence') }}
+                        </small>
+                    </div>
+
+                    {{-- Endpoint 2: Chat Room Listener - Presence --}}
+                    <div class="mb-3">
+                        <label class="form-label text-capitalize fw-semibold">
+                            {{ __('chat_room_presence') }}
+                        </label>
+                        <small class="d-block text-muted mb-2" style="font-size: 12px;">
+                            {{ __('chat_room_presence_desc') }}
+                        </small>
+                        <div class="pusher-webhook-container">
+                            <input type="text" class="form-control pusher-webhook-url" value="{{ url('/api/chat-room-listener') }}" readonly>
+                            <button type="button" class="btn pusher-btn-copy" onclick="copyPusherWebhook(this)">
+                                {{ __('copy') }}
+                            </button>
+                        </div>
+                        <small class="d-block mt-1" style="font-size: 11px; color: #ffc107;">
+                            <i class="fas fa-tag me-1"></i> {{ __('event') }}: {{ __('presence') }}
+                        </small>
+                    </div>
+
+                    {{-- Endpoint 3: Pusher Edit User - Channel Existence --}}
+                    <div class="mb-3">
+                        <label class="form-label text-capitalize fw-semibold">
+                            {{ __('pusher_edit_user') }}
+                        </label>
+                        <small class="d-block text-muted mb-2" style="font-size: 12px;">
+                            {{ __('pusher_edit_user_desc') }}
+                        </small>
+                        <div class="pusher-webhook-container">
+                            <input type="text" class="form-control pusher-webhook-url" value="{{ url('/api/pusher-edit-user') }}" readonly>
+                            <button type="button" class="btn pusher-btn-copy" onclick="copyPusherWebhook(this)">
+                                {{ __('copy') }}
+                            </button>
+                        </div>
+                        <small class="d-block mt-1" style="font-size: 11px; color: #17a2b8;">
+                            <i class="fas fa-tag me-1"></i> {{ __('event') }}: {{ __('channel_existence') }}
+                        </small>
+                    </div>
+
                 </div>
             </form>
         </div>
@@ -153,3 +215,68 @@
         </div>
     </div>
 </div>
+
+<style>
+.pusher-webhook-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pusher-webhook-container .pusher-webhook-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: #555;
+}
+
+.pusher-webhook-container .pusher-webhook-url {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.pusher-webhook-container .pusher-btn-copy {
+    background: green !important;
+    color: white;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+</style>
+
+<script>
+function copyPusherWebhook(button) {
+    var container = button.closest('.pusher-webhook-container');
+    var input = container.querySelector('.pusher-webhook-url');
+    if (!input) return;
+
+    navigator.clipboard.writeText(input.value).then(function () {
+        var originalText = button.innerHTML;
+        button.innerHTML = 'Copied!';
+        button.style.background = '#218838';
+        setTimeout(function () {
+            button.innerHTML = originalText;
+            button.style.background = 'green';
+        }, 2000);
+    }).catch(function () {
+        var textarea = document.createElement('textarea');
+        textarea.value = input.value;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        var originalText = button.innerHTML;
+        button.innerHTML = 'Copied!';
+        button.style.background = '#218838';
+        setTimeout(function () {
+            button.innerHTML = originalText;
+            button.style.background = 'green';
+        }, 2000);
+    });
+}
+</script>
