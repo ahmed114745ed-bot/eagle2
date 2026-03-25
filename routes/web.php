@@ -2924,7 +2924,7 @@ Route::get('/direct-recovery/export', function () {
 
 
 
-Route::get('/system-merge-and-recalculate', function (\Illuminate\Http\Request $request) {
+Route::get('/system-merge-and-recalculate2', function (\Illuminate\Http\Request $request) {
     $shouldExecute = $request->query('fix') == '1';
     $targetMonth = 3;
     $targetYear = 2026;
