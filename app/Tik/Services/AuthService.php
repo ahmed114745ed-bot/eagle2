@@ -224,8 +224,14 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
-
+                try {
+                    if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
+                } catch (\Exception $e) {
+                    logger()->error('Failed to login google', [
+                        
+                        'error' => $e->getMessage()
+                    ]);
+                }
                 $user = $this->userRepository->create($data);
 
                 $is_new = true;
