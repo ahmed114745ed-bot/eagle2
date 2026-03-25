@@ -168,12 +168,12 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-        if (!$request['id_token']) return Common::apiResponse(false, 'google id token missing', [], 422);
-        $client = new Google_Client();
-        $payload = $client->verifyIdToken($request['id_token']);
-        if (!$payload) {
-            return Common::apiResponse(false, 'Google ID Token not found or invalid', [], 422);
-        }
+        // if (!$request['id_token']) return Common::apiResponse(false, 'google id token missing', [], 422);
+        // $client = new Google_Client();
+        // $payload = $client->verifyIdToken($request['id_token']);
+        // if (!$payload) {
+        //     return Common::apiResponse(false, 'Google ID Token not found or invalid', [], 422);
+        // }
         // $google_id = $payload['sub'];
 
         $google_id = $request['google_id'] ?? null;
