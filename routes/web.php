@@ -2157,5 +2157,12 @@ Route::get('/get-gift-percentages', function () {
     dd($negativeLimit, $appFeeRate, $receiverFeeRate,$hostPercentage);
 });
 
+Route::get('/get-gift-percentagesv2', function () {
+    $raw = \App\Models\Setting::where('key', 'host_lucky_gift')->value('value');
+    $cached = Cache::get('percentage_host_lucky_gift');
+    $fromFunction = getGiftPercentage('host_lucky_gift');
+    $final = $fromFunction / 10;
+    dd(['raw DB' => $raw, 'cached' => $cached, 'getGiftPercentage()' => $fromFunction, 'final /10' => $final]);
+});
 
 
