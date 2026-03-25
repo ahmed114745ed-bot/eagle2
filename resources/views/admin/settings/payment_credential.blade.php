@@ -31,6 +31,7 @@
                             </div>
 
                             <div class="row">
+                                {{ info($coin->type) }}
                                 @if ($coin->type == 'fawry')
                                     @include('admin.settings.partial_payments.fawry')
                                 @endif
@@ -66,6 +67,9 @@
                                 @endif
                                 @if ($coin->type == 'codapay')
                                     @include('admin.settings.partial_payments.codapay')
+                                @endif
+                                @if ($coin->type == 'utd')
+                                    @include('admin.settings.partial_payments.utd')
                                 @endif
                             </div>
 

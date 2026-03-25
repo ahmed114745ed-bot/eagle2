@@ -38,6 +38,7 @@ class PaymentGatewaysSeeder extends Seeder
 //            'huaweipay.png',
 //            'zinipay.jpg',
             'codapay.webp',
+            'utd.webp',
         ];
 
         foreach ($images as $img) {
@@ -1277,5 +1278,49 @@ class PaymentGatewaysSeeder extends Seeder
 //            ]);
 //        }
 
+        $utdId = PaymentCoin::updateOrCreate([
+            'type' => 'utd',
+            'package_type' => 'user',
+        ], [
+            'title' => 'utd',
+            'photo' => 'images/utd.webp',
+            'status' => 1,
+            'description' => 'utd pay payment method'
+
+        ]);
+
+        $utdFields = [
+            'new_1' => [
+                "name" => "utd_base_url",
+                "type" => "input",
+                "value" => "https://us-central1-utd-cloud-f0a09.cloudfunctions.net/utdPayCreate"
+            ],
+            'new_2' => [
+                "name" => "utd_api_key",
+                "type" => "input",
+                "value" => "YOUR_API_KEY"
+            ],
+            'new_3' => [
+                "name" => "utd_project_id",
+                "type" => "input",
+                "value" => 289
+            ],
+            'new_4' => [
+                "name" => "utd_webhook_url",
+                "type" => "input",
+                "value" => "/payWebhook"
+            ],
+        ];
+
+        foreach ($utdFields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $utdId->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
     }
 }
