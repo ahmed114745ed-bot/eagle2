@@ -114,6 +114,10 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
+                Log::info('Registration attempt', [
+                    'device_token' => $request['device_token'] ?? null,
+
+                ]);
                 if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
                 $user = $this->userRepository->create($data);
@@ -224,7 +228,14 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
+                try {
+                    if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
+                } catch (\Exception $e) {
+                    logger()->error('Failed device token', [
+                        'device_token' => $request['device_token'] ?? null,
+                        'error' => $e->getMessage()
+                    ]);
+                }
                 $user = $this->userRepository->create($data);
 
                 $is_new = true;
