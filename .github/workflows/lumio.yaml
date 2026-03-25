@@ -45,9 +45,9 @@ jobs:
           # 2. Update service with Zero-Downtime & Port Safety flags
           docker service update \
             --image lumio-octa:${{ github.sha }} \
-            --replicas 3 \
-            --limit-memory 1.2gb \
-            --reserve-memory 600mb \
+            --replicas 2 \
+            --limit-memory 2.0gb \
+            --reserve-memory 1.0gb \
             --update-order stop-first \
             --update-parallelism 1 \
             --update-delay 10s \
