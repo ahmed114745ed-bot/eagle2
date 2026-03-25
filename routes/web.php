@@ -2183,13 +2183,24 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
                     $totalCut = $currentAgencyRecords->sum('cut_amount');
 
                     // 1. حساب الماس المستحق (بدون النوع gift وبدون النوع null إذا كان مطلوباً)
+                    $thresholdDate = "$targetYear-$targetMonth-19 00:00:00";
+
                     $realDiamonds = DB::table('gift_logs')
                         ->where('receiver_id', $userId)
                         ->where('agency_id', $currentAgencyId)
                         ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
-                        ->where(function($q) {
-                            $q->where('source_type', '!=', 'gift')
-                              ->orWhereNull('source_type');
+                        ->where(function($q) use ($thresholdDate) {
+                            // الشرط الجديد:
+                            $q->where(function($sub) use ($thresholdDate) {
+                                // 1. اقبل الهدايا التي ليست من نوع gift
+                                $sub->where('source_type', '!=', 'gift')
+                                    ->orWhereNull('source_type');
+                            })
+                            ->orWhere(function($sub) use ($thresholdDate) {
+                                // 2. أو اقبل النوع gift بشرط أن يكون تاريخه قبل يوم 19
+                                $sub->where('source_type', 'gift')
+                                    ->where('created_at', '<', $thresholdDate);
+                            });
                         })
                         ->sum('giftPrice');
 
@@ -2206,13 +2217,21 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
 
                         DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
 
-                        // 3. حذف الهدايا من نوع gift نهائياً من السجلات لهذه الفترة والوكالة
-                        $deletedCount = DB::table('gift_logs')
-                            ->where('receiver_id', $userId)
-                            ->where('agency_id', $currentAgencyId)
-                            ->where('source_type', 'gift')
-                            ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
-                            ->delete();
+                           $thresholdDate = "2026-03-19 00:00:00";
+
+                        if ($shouldExecute) {
+                            // 3. حذف الهدايا من نوع gift "المرفوضة" فقط (من يوم 19 فصاعداً)
+                            $deletedCount = DB::table('gift_logs')
+                                ->where('receiver_id', $userId)
+                                ->where('agency_id', $currentAgencyId)
+                                ->where('source_type', 'gift')
+                                // الشرط الجديد: احذف فقط ما هو في يوم 19 أو بعده
+                                ->where('created_at', '>=', $thresholdDate) 
+                                ->where('created_at', '<=', $endOfMonth)
+                                ->delete();
+                            
+                            $report['deleted_gift_count'] += $deletedCount;
+                        }
                         
                         $report['deleted_gift_count'] += $deletedCount;
 
@@ -2303,4 +2322,593 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
     $html .= '</tbody></table></div></div></body></html>';
 
     return response($html);
+});
+
+
+
+Route::get('/direct-recovery', function (Request $request) {
+    $isLive = $request->query('fix') == '1';
+    $zonesCoins = (int) DB::table('settings')->where('key', 'zones_coins')->value('value') ?? 30000;
+    $bugDate = '2026-03-01';
+    $targetMonth = 3;
+    $targetYear = 2026;
+
+    $report = [
+        'mode' => $isLive ? 'LIVE EXECUTION' : 'PREVIEW MODE',
+        'timestamp' => now()->toDateTimeString(),
+        'zones_coins' => $zonesCoins,
+        'bug_date' => $bugDate,
+        'summary' => [
+            'total_debtors' => 0,
+            'total_debt_usd' => 0,
+            'total_debt_coins' => 0,
+            'total_recovered_coins' => 0,
+            'total_unrecoverable_coins' => 0,
+            'agencies_affected' => 0,
+            'users_affected' => 0,
+        ],
+        'debtors' => [],
+        'errors' => [],
+    ];
+
+    DB::beginTransaction();
+
+    try {
+        // ================================================================
+        // Step 1: Fetch all debtors (users with negative salary balance)
+        // ================================================================
+        $debtors = DB::select("
+            SELECT user_id, 
+                   SUM(sallary) as total_earned,
+                   SUM(cut_amount) as total_cut,
+                   SUM(sallary) - SUM(cut_amount) as total_debt
+            FROM user_sallaries
+            WHERE month = ? AND year = ?
+            GROUP BY user_id
+            HAVING total_debt < 0
+            ORDER BY total_debt ASC
+        ", [$targetMonth, $targetYear]);
+
+        $report['summary']['total_debtors'] = count($debtors);
+
+        // ================================================================
+        // Step 2: Process each debtor
+        // ================================================================
+        foreach ($debtors as $debtor) {
+            $debtUsd = abs($debtor->total_debt);
+            $debtCoins = (int) ($debtUsd * $zonesCoins);
+            $remaining = $debtCoins;
+
+            $debtorDetail = [
+                'user_id' => $debtor->user_id,
+                'total_earned_usd' => round($debtor->total_earned, 2),
+                'total_cut_usd' => round($debtor->total_cut, 2),
+                'debt_usd' => round($debtUsd, 2),
+                'debt_coins' => $debtCoins,
+                'traces' => [],
+                'recovered_coins' => 0,
+                'unrecoverable_coins' => 0,
+                'status' => 'pending',
+            ];
+
+            $report['summary']['total_debt_usd'] += $debtUsd;
+            $report['summary']['total_debt_coins'] += $debtCoins;
+
+            // Get user info
+            $user = DB::table('users')->where('id', $debtor->user_id)->first();
+            $debtorDetail['user_name'] = $user->name ?? 'N/A';
+            $debtorDetail['user_uuid'] = $user->uuid ?? 'N/A';
+
+            // ================================================================
+            // Scenario A: Trace charges to agencies
+            // ================================================================
+            $agencyCharges = DB::table('charges')
+                ->where('charger_id', $debtor->user_id)
+                ->where('charger_type', 'user')
+                ->where('user_type', 'agency')
+                ->where('created_at', '>=', $bugDate)
+                ->orderByDesc('amount')
+                ->get();
+
+            foreach ($agencyCharges as $charge) {
+                if ($remaining <= 0) break;
+
+                $agencyId = $charge->user_id;
+                $chargeAmount = (int) $charge->amount;
+                $deductAmount = min($remaining, $chargeAmount);
+
+                // Get agency info
+                $agency = DB::table('agencies')->where('id', $agencyId)->first();
+                if (!$agency) continue;
+
+                $agencyCoins = (int) $agency->coins;
+                $canDeduct = min($deductAmount, $agencyCoins);
+
+                $trace = [
+                    'type' => 'agency_charge',
+                    'target_id' => $agencyId,
+                    'target_name' => $agency->name ?? 'N/A',
+                    'charge_amount' => $chargeAmount,
+                    'requested_deduction' => $deductAmount,
+                    'agency_balance_before' => $agencyCoins,
+                    'deducted_amount' => $canDeduct,
+                    'agency_balance_after' => $agencyCoins - $canDeduct,
+                    'status' => $canDeduct >= $deductAmount ? 'success' : 'insufficient_balance',
+                ];
+
+                if ($isLive && $canDeduct > 0) {
+                    DB::statement("
+                        UPDATE agencies 
+                        SET coins = CAST(coins AS SIGNED) - ?
+                        WHERE id = ?
+                    ", [$canDeduct, $agencyId]);
+                }
+
+                $remaining -= $canDeduct;
+                $debtorDetail['recovered_coins'] += $canDeduct;
+                $debtorDetail['traces'][] = $trace;
+
+                if ($canDeduct < $deductAmount) {
+                    $report['summary']['agencies_affected']++;
+                }
+            }
+
+            // ================================================================
+            // Scenario B: Trace gifts to users
+            // ================================================================
+            if ($remaining > 0) {
+                $gifts = DB::select("
+                    SELECT receiver_id, SUM(giftPrice) as total_sent
+                    FROM gift_logs
+                    WHERE sender_id = ? AND created_at >= ? AND created_at < '2026-04-01'
+                    GROUP BY receiver_id
+                    ORDER BY total_sent DESC
+                    LIMIT 50
+                ", [$debtor->user_id, $bugDate]);
+
+                foreach ($gifts as $gift) {
+                    if ($remaining <= 0) break;
+
+                    $receiverId = $gift->receiver_id;
+                    $giftAmount = (int) $gift->total_sent;
+                    $deductAmount = min($remaining, $giftAmount);
+
+                    // Get receiver info
+                    $receiver = DB::table('users')->where('id', $receiverId)->first();
+                    if (!$receiver) continue;
+
+                    $receiverDi = (int) $receiver->di;
+                    $canDeduct = min($deductAmount, $receiverDi);
+
+                    $trace = [
+                        'type' => 'gift_to_user',
+                        'target_id' => $receiverId,
+                        'target_name' => $receiver->name ?? 'N/A',
+                        'gift_amount' => $giftAmount,
+                        'requested_deduction' => $deductAmount,
+                        'receiver_di_before' => $receiverDi,
+                        'deducted_amount' => $canDeduct,
+                        'receiver_di_after' => $receiverDi - $canDeduct,
+                        'status' => $canDeduct >= $deductAmount ? 'success' : 'insufficient_balance',
+                    ];
+
+                    if ($isLive && $canDeduct > 0) {
+                        DB::statement("
+                            UPDATE users 
+                            SET di = CAST(di AS SIGNED) - ?
+                            WHERE id = ?
+                        ", [$canDeduct, $receiverId]);
+                    }
+
+                    $remaining -= $canDeduct;
+                    $debtorDetail['recovered_coins'] += $canDeduct;
+                    $debtorDetail['traces'][] = $trace;
+
+                    if ($canDeduct < $deductAmount) {
+                        $report['summary']['users_affected']++;
+                    }
+                }
+            }
+
+            // ================================================================
+            // Scenario C: Trace charges to other users
+            // ================================================================
+            if ($remaining > 0) {
+                $userCharges = DB::table('charges')
+                    ->where('charger_id', $debtor->user_id)
+                    ->where('charger_type', 'user')
+                    ->where('user_type', 'user')
+                    ->where('created_at', '>=', $bugDate)
+                    ->orderByDesc('amount')
+                    ->get();
+
+                foreach ($userCharges as $charge) {
+                    if ($remaining <= 0) break;
+
+                    $chargeRecipientId = $charge->user_id;
+                    $chargeAmount = (int) $charge->amount;
+                    $deductAmount = min($remaining, $chargeAmount);
+
+                    // Get recipient info
+                    $recipient = DB::table('users')->where('id', $chargeRecipientId)->first();
+                    if (!$recipient) continue;
+
+                    $recipientDi = (int) $recipient->di;
+                    $canDeduct = min($deductAmount, $recipientDi);
+
+                    $trace = [
+                        'type' => 'charge_to_user',
+                        'target_id' => $chargeRecipientId,
+                        'target_name' => $recipient->name ?? 'N/A',
+                        'charge_amount' => $chargeAmount,
+                        'requested_deduction' => $deductAmount,
+                        'recipient_di_before' => $recipientDi,
+                        'deducted_amount' => $canDeduct,
+                        'recipient_di_after' => $recipientDi - $canDeduct,
+                        'status' => $canDeduct >= $deductAmount ? 'success' : 'insufficient_balance',
+                    ];
+
+                    if ($isLive && $canDeduct > 0) {
+                        DB::statement("
+                            UPDATE users 
+                            SET di = CAST(di AS SIGNED) - ?
+                            WHERE id = ?
+                        ", [$canDeduct, $chargeRecipientId]);
+                    }
+
+                    $remaining -= $canDeduct;
+                    $debtorDetail['recovered_coins'] += $canDeduct;
+                    $debtorDetail['traces'][] = $trace;
+
+                    if ($canDeduct < $deductAmount) {
+                        $report['summary']['users_affected']++;
+                    }
+                }
+            }
+
+            // ================================================================
+            // Final Status
+            // ================================================================
+            $debtorDetail['unrecoverable_coins'] = $remaining;
+            $debtorDetail['recovery_rate'] = $debtCoins > 0 
+                ? round(($debtorDetail['recovered_coins'] / $debtCoins) * 100, 2) 
+                : 0;
+            $debtorDetail['status'] = $remaining <= 0 ? 'fully_recovered' : 'partially_recovered';
+
+            $report['summary']['total_recovered_coins'] += $debtorDetail['recovered_coins'];
+            $report['summary']['total_unrecoverable_coins'] += $remaining;
+
+            $report['debtors'][] = $debtorDetail;
+        }
+
+        // Commit or rollback
+        if ($isLive) {
+            DB::commit();
+            $report['execution_status'] = 'COMMITTED';
+        } else {
+            DB::rollBack();
+            $report['execution_status'] = 'ROLLED BACK (Preview Mode)';
+        }
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        $report['execution_status'] = 'ERROR - ROLLED BACK';
+        $report['errors'][] = [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ];
+    }
+
+    // ================================================================
+    // Generate HTML Report (RTL)
+    // ================================================================
+    $html = '<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الاسترجاع المباشر - Direct Recovery System</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #0f3460 0%, #533483 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header .meta { color: #aaa; font-size: 0.9em; }
+        .mode-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .mode-preview { background: #f39c12; color: #000; }
+        .mode-live { background: #e74c3c; color: #fff; }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .summary-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .summary-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .summary-card .label { color: #888; font-size: 0.9em; }
+        .value-danger { color: #e74c3c; }
+        .value-success { color: #2ecc71; }
+        .value-warning { color: #f39c12; }
+        .value-info { color: #3498db; }
+        
+        .section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th {
+            background: rgba(0,0,0,0.3);
+            font-weight: 600;
+            color: #00d9ff;
+        }
+        tr:hover { background: rgba(255,255,255,0.05); }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        .status-success { background: #2ecc71; color: #000; }
+        .status-partial { background: #f39c12; color: #000; }
+        .status-insufficient { background: #e74c3c; color: #fff; }
+        
+        .action-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-left: 10px;
+        }
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .download-btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .trace-item {
+            background: rgba(255,255,255,0.02);
+            border-right: 3px solid #00d9ff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        
+        .trace-item .type { color: #00d9ff; font-weight: bold; }
+        .trace-item .status { margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 نظام الاسترجاع المباشر</h1>
+            <div class="meta">
+                <p>الفترة المستهدفة: <strong>' . $bugDate . ' إلى 2026-03-31</strong></p>
+                <p>وقت التقرير: <strong>' . $report['timestamp'] . '</strong></p>
+                <p>معدل التحويل (zones_coins): <strong>' . number_format($zonesCoins) . '</strong></p>
+            </div>
+            <span class="mode-badge ' . ($isLive ? 'mode-live' : 'mode-preview') . '">
+                ' . ($isLive ? '⚡ وضع التنفيذ الفعلي' : '👁️ وضع المعاينة') . '
+            </span>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="value value-warning">' . number_format($report['summary']['total_debtors']) . '</div>
+                <div class="label">👥 إجمالي المدينين</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-danger">$' . number_format($report['summary']['total_debt_usd'], 2) . '</div>
+                <div class="label">💸 إجمالي الديون (USD)</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-success">' . number_format($report['summary']['total_recovered_coins']) . '</div>
+                <div class="label">✅ الماسات المستردة</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-danger">' . number_format($report['summary']['total_unrecoverable_coins']) . '</div>
+                <div class="label">❌ الماسات غير المستردة</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-info">' . number_format($report['summary']['agencies_affected']) . '</div>
+                <div class="label">🏢 الوكالات المتأثرة</div>
+            </div>
+            <div class="summary-card">
+                <div class="value value-info">' . number_format($report['summary']['users_affected']) . '</div>
+                <div class="label">👤 المستخدمون المتأثرون</div>
+            </div>
+        </div>';
+
+    // Debtors Table
+    if (!empty($report['debtors'])) {
+        $html .= '
+        <div class="section">
+            <h2>📊 تفاصيل المدينين</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>معرف المستخدم</th>
+                        <th>الاسم</th>
+                        <th>الدين (USD)</th>
+                        <th>الدين (ماسات)</th>
+                        <th>المستردة</th>
+                        <th>غير المستردة</th>
+                        <th>نسبة الاسترجاع</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+        $i = 0;
+        foreach ($report['debtors'] as $debtor) {
+            $i++;
+            $statusClass = $debtor['status'] == 'fully_recovered' ? 'status-success' : 'status-partial';
+            $html .= '
+                    <tr>
+                        <td>' . $i . '</td>
+                        <td>' . $debtor['user_id'] . '</td>
+                        <td>' . htmlspecialchars($debtor['user_name']) . '</td>
+                        <td style="color: #e74c3c;">$' . number_format($debtor['debt_usd'], 2) . '</td>
+                        <td>' . number_format($debtor['debt_coins']) . '</td>
+                        <td style="color: #2ecc71;">' . number_format($debtor['recovered_coins']) . '</td>
+                        <td style="color: #e74c3c;">' . number_format($debtor['unrecoverable_coins']) . '</td>
+                        <td>' . $debtor['recovery_rate'] . '%</td>
+                        <td><span class="status-badge ' . $statusClass . '">' . $debtor['status'] . '</span></td>
+                    </tr>';
+        }
+
+        $html .= '
+                </tbody>
+            </table>
+        </div>';
+
+        // Detailed Traces
+        $html .= '
+        <div class="section">
+            <h2>🔍 تفاصيل التتبع</h2>';
+
+        foreach ($report['debtors'] as $debtor) {
+            if (empty($debtor['traces'])) continue;
+
+            $html .= '
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #00d9ff; margin-bottom: 15px;">المستخدم: ' . htmlspecialchars($debtor['user_name']) . ' (ID: ' . $debtor['user_id'] . ')</h3>';
+
+            foreach ($debtor['traces'] as $trace) {
+                $statusColor = $trace['status'] == 'success' ? '#2ecc71' : '#e74c3c';
+                $html .= '
+                <div class="trace-item">
+                    <div class="type">📍 ' . ucfirst(str_replace('_', ' ', $trace['type'])) . '</div>
+                    <div style="margin-top: 8px; color: #aaa;">
+                        <p>الهدف: <strong>' . htmlspecialchars($trace['target_name']) . '</strong> (ID: ' . $trace['target_id'] . ')</p>
+                        <p>المبلغ المطلوب: <strong>' . number_format($trace['requested_deduction']) . '</strong> ماسة</p>
+                        <p>المبلغ المستردة: <strong style="color: #2ecc71;">' . number_format($trace['deducted_amount']) . '</strong> ماسة</p>
+                        <p>الحالة: <span style="color: ' . $statusColor . '; font-weight: bold;">' . $trace['status'] . '</span></p>
+                    </div>
+                </div>';
+            }
+
+            $html .= '</div>';
+        }
+
+        $html .= '</div>';
+    }
+
+    // Action Buttons
+    if (!$isLive) {
+        $html .= '
+        <div style="text-align: center; margin: 40px 0;">
+            <p style="color: #f39c12; font-size: 1.2em; margin-bottom: 20px;">
+                ⚠️ هذا تقرير معاينة فقط. لم يتم تنفيذ أي تغييرات.
+            </p>
+            <a href="?fix=1" class="action-btn" onclick="return confirm(\'هل أنت متأكد من تنفيذ الاسترجاع؟ هذا الإجراء لا يمكن التراجع عنه!\');">
+                🚀 تنفيذ الاسترجاع الآن
+            </a>
+            <a href="/direct-recovery/export" class="download-btn">
+                📥 تحميل التقرير (CSV)
+            </a>
+        </div>';
+    } else {
+        $html .= '
+        <div style="text-align: center; margin: 40px 0;">
+            <p style="color: #2ecc71; font-size: 1.5em;">
+                ✅ تم تنفيذ الاسترجاع بنجاح!
+            </p>
+            <a href="/direct-recovery/export" class="download-btn">
+                📥 تحميل التقرير (CSV)
+            </a>
+        </div>';
+    }
+
+    $html .= '
+        <div class="footer">
+            <p>Direct Recovery System v1.0</p>
+            <p>Generated at ' . $report['timestamp'] . '</p>
+        </div>
+    </div>
+</body>
+</html>';
+
+    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
 });
