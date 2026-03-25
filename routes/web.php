@@ -2121,29 +2121,8 @@ Route::get('/fix-gift-logs/run', function () {
     ]);
 });
 
-
 Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $request) {
     $shouldExecute = $request->query('fix') == '1';
-    $targetMonth = 3;
-    $targetYear = 2026;
-    
-    $startOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->startOfMonth();
-    $endOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->endOfMonth();
-
-    $report = [
-        'mode' => $shouldExecute ? 'LIVE EXECUTION & CLEANUP' : 'PREVIEW MODE',
-        'timestamp' => now()->toDateTimeString(),
-        'total_users_processed' => 0,
-        'total_merged_records' => 0,
-        'deleted_gift_count' => 0, // عداد للهدايا المحذوفة
-        'details' => [],
-        'errors' => [],
-    ];
-
-    try {
-        DB::transaction(function () use ($shouldExecute, $targetMonth, $targetYear, $startOfMonth, $endOfMonth, &$report) {
-
-        $shouldExecute = $request->query('fix') == '1';
     $targetMonth = 3;
     $targetYear = 2026;
     $thresholdDate = "2026-03-19 00:00:00"; 
@@ -2255,63 +2234,10 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
         }
 
     } catch (\Exception $e) {
-        $report['errors'][] = $e->getMessage();
+        return "خطأ: " . $e->getMessage();
     }
 
-    // --- العرض المرئي للتقرير ---
-    // (أضفت حقل عدد الهدايا المحذوفة في الإحصائيات)
-    $html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">
-    <style>
-        body { font-family: "Segoe UI", Tahoma; background: #0f172a; color: #e2e8f0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .card { background: #1e293b; border-radius: 10px; padding: 20px; border: 1px solid #334155; margin-bottom: 20px; }
-        h1 { color: #38bdf8; text-align: center; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: #0f172a; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
-        .stat-box div:first-child { font-size: 22px; font-weight: bold; color: #34d399; }
-        .stat-box.danger div:first-child { color: #f87171; }
-        table { width: 100%; border-collapse: collapse; background: #1e293b; font-size: 13px;}
-        th, td { padding: 10px; text-align: center; border-bottom: 1px solid #334155; }
-        th { background: #334155; color: #38bdf8; }
-        .badge { padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
-        .mode-live { background: #ef4444; color: #fff; }
-        .btn { display: inline-block; padding: 12px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px; }
-    </style></head><body>';
-
-    $html .= '<div class="container">
-        <h1>🚀 معالج دمج الوكالات وتنظيف الهدايا</h1>
-        <div style="text-align:center; margin-bottom:20px;">
-            <span class="badge ' . ($shouldExecute ? 'mode-live' : 'mode-preview') . '">' . $report['mode'] . '</span>
-        </div>
-
-        <div class="stats">
-            <div class="stat-box"><div>' . $report['total_users_processed'] . '</div><div>مستخدمين</div></div>
-            <div class="stat-box"><div>' . $report['total_merged_records'] . '</div><div>سجلات مدمجة</div></div>
-            <div class="stat-box danger"><div>' . $report['deleted_gift_count'] . '</div><div>هدايا Gift محذوفة</div></div>
-        </div>';
-
-    if (!$shouldExecute) {
-        $html .= '<div style="text-align:center; margin-bottom:20px;"><a href="?fix=1" class="btn">تحديث وحذف المكررات والهدايا الوهمية</a></div>';
-    }
-
-    $html .= '<div class="card"><table><thead><tr>
-        <th>UUID</th><th>منذ تاريخ</th><th>الوكالة</th><th>مكررات</th><th>الخصم المدمج</th><th>الماس الصافي</th>
-    </tr></thead><tbody>';
-
-    foreach ($report['details'] as $d) {
-        $html .= "<tr>
-            <td>{$d['uuid']}</td>
-            <td style='font-size:10px;'>{$d['join_date']}</td>
-            <td>{$d['current_agency']}</td>
-            <td>{$d['duplicates_merged']}</td>
-            <td>" . number_format($d['total_cut']) . "</td>
-            <td style='color:#38bdf8; font-weight:bold;'>" . number_format($d['current_agency_diamonds']) . "</td>
-        </tr>";
-    }
-
-    $html .= '</tbody></table></div></div></body></html>';
-
-    return response($html);
+    return "✅ تمت المهمة بنجاح! <br> عدد الهدايا المحذوفة: " . $report['deleted_gift_count'] . " لعدد " . $report['total_users_with_gifts_deleted'] . " مستخدمين.";
 });
 
 
