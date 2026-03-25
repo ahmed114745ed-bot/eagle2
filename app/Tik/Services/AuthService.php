@@ -233,7 +233,7 @@ class AuthService
                         'google_id' => $request['google_id'] ?? null,
                         'error' => $exception->getMessage(),
                     ]);
-                    return Common::apiResponse(false, $exception->getMessage(), [], 422);
+                    return Common::apiResponse(false, $exception->getMessage(), [], 500);
                 }
                 $user = $this->userRepository->create($data);
 
@@ -727,7 +727,7 @@ class AuthService
         if ($record) {
             $register_account = Common::getSettingValue('register_account') ?? 0;
             if ($record->count >= $register_account) {
-                throw new \Exception('You have reached the maximum number of accounts that can be registered with this device.');
+                throw new CValidationException('You have reached the maximum number of accounts that can be registered with this device.');
             }
             $record->increment('count');
         } else {
