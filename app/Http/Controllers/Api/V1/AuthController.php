@@ -5,21 +5,22 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Events\DeviceTokenSent;
 use App\helper\AccountHelper;
-use App\Models\User;
-use Firebase\JWT\JWT;
 use App\Helpers\Common;
-use App\Tik\Services\AuthService;
-use App\Http\Services\WhatsappOtp;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
-use Google_Client;
-use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
-use Google\Client as GoogleClient;
+use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Services\WhatsappOtp;
+use App\Models\DevicesTokenHistory;
+use App\Models\User;
+use App\Tik\Services\AuthService;
 use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
+use Google_Client;
+use Google\Client as GoogleClient;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
 
 class AuthController extends Controller
 {
@@ -63,7 +64,7 @@ class AuthController extends Controller
     {
         $globalKeys = [
             'is_multi' => $request->input('is_multi', false),
-            'notification_id' => $request->input('notification_id' , null)
+            'notification_id' => $request->input('notification_id', null)
         ];
 
         switch ($request['type']) {
@@ -89,7 +90,7 @@ class AuthController extends Controller
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithApple($fields);
             case 'huawei':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token, 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
+                $fields = ['name' => $request->name, 'device_token'  => $request->device_token, 'email' => $request->email, 'huawei_id' => $request->huawei_id, 'id_token' => $request->id_token, 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithHuawei($fields);
 
@@ -131,7 +132,6 @@ class AuthController extends Controller
                 'auth_token'    => $user->auth_token
             ]
         );
-
     }
 
     protected function loginWithGoogle($data)
