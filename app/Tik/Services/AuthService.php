@@ -226,11 +226,8 @@ class AuthService
                 }
                 try {
                     if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
-                } catch (\Exception $e) {
-                    logger()->error('Failed to login google', [
-                        
-                        'error' => $e->getMessage()
-                    ]);
+                } catch (\Throwable $e) {
+                    throw $e; // rethrow
                 }
                 $user = $this->userRepository->create($data);
 
