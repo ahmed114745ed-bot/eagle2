@@ -235,7 +235,7 @@ class AuthService
                         'device_token' => $request['device_token'] ?? null,
                         'error' => $e->getMessage()
                     ]);
-                    throw $e;
+                    return Common::apiResponse(false,  $e->getMessage(), [], 422);
                 }
                 $user = $this->userRepository->create($data);
 
