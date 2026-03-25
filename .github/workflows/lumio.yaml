@@ -89,8 +89,8 @@ jobs:
             --image lumio-job:${{ github.sha }} \
             --replicas 1 \
             --limit-cpu 2.0 \
-            --limit-memory 800mb \
-            --reserve-memory 400mb \
+            --limit-memory 2gb \
+            --reserve-memory 1gb \
             --update-parallelism 1 \
             --update-delay 10s \
             lumio-job
