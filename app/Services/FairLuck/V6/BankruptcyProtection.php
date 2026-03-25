@@ -141,11 +141,11 @@ class BankruptcyProtection
      * Log critical event
      */
     public static function logCriticalEvent(string $event, array $context = []): void
-    {
+    {   /*
         Log::critical("BANKRUPTCY_PROTECTION: {$event}", array_merge([
             'pool_balance' => self::getTotalPoolBalance(),
             'health_status' => self::getHealthStatus(),
-        ], $context));
+        ], $context));*/
     }
 
     /**
