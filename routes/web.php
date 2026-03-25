@@ -2207,7 +2207,6 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
                     if ($shouldExecute) {
                         $updateData = [
                             'achieved_diamond' => $realDiamonds,
-                            'salary_is_updated' => 1 // علامة للتحديث
                         ];
 
                         if ($currentAgencyRecords->count() > 1) {
@@ -2224,6 +2223,8 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
                             ['user_id' => $userId, 'month' => $targetMonth, 'year' => $targetYear],
                             ['monthly_diamond_received' => $realDiamonds]
                         );
+                        DB::table('users')->where('id', $userId)->update(['salary_is_updated' => 1]);
+
                     }
                 }
             }
