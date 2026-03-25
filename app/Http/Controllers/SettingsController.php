@@ -271,6 +271,7 @@ class SettingsController extends Controller
         }
 
         Cache::flush();
+        try { \Artisan::call('octane:reload'); } catch (\Throwable $e) {}
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
 
@@ -393,6 +394,7 @@ class SettingsController extends Controller
         // Clear all cache including rememberForever keys
         Cache::forget('all_settings');
         Cache::flush();
+        try { \Artisan::call('octane:reload'); } catch (\Throwable $e) {}
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

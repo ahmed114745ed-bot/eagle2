@@ -37,11 +37,14 @@ class AddTargetToJsonController extends Controller
         foreach ($request->all() as $key => $value) {
             if (!is_null($value)) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-                
+
                 Cache::forget($key);
                 Cache::forever($key, $value);
             }
         }
+
+        Cache::flush();
+        try { \Artisan::call('octane:reload'); } catch (\Throwable $e) {}
 
         return Redirect::back();
     }
