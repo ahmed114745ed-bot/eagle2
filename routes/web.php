@@ -2241,7 +2241,112 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
     return "✅ تمت المهمة بنجاح! <br> عدد الهدايا المحذوفة: " . $report['deleted_gift_count'] . " لعدد " . $report['total_users_with_gifts_deleted'] . " مستخدمين.";
 });
 
+Route::get('v2/system-merge-only-duplicates', function (\Illuminate\Http\Request $request) {
+    $shouldExecute = $request->query('fix') == '1';
+    $targetMonth = 3;
+    $targetYear = 2026;
+    $thresholdDate = "2026-03-19 00:00:00";
 
+    $startOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->startOfMonth();
+    $endOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->endOfMonth();
+
+       DB::table('gift_logs')
+            ->where('source_type', 'gift')
+            ->where('created_at', '>=', $thresholdDate)
+            ->delete();
+
+    $report = [
+        'mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
+        'gifts_to_delete' => 0,
+        'users_count' => 0,
+        'users_details' => [],
+    ];
+
+    // عدد الهدايا اللي هتتحذف
+    $report['gifts_to_delete'] = DB::table('gift_logs')
+        ->where('source_type', 'gift')
+        ->where('created_at', '>=', $thresholdDate)
+        ->count();
+
+    $users = DB::table('users')->where('agency_id', '!=', null)->where('agency_id', '>', 0)->get();
+    $report['users_count'] = $users->count();
+
+    foreach ($users as $user) {
+        if (!$user || !$user->agency_id) continue;
+
+        $currentAgencyId = $user->agency_id;
+
+        $joinRequest = DB::table('agency_join_requests')
+            ->where('user_id', $user->id)
+            ->where('agency_id', $currentAgencyId)
+            ->where('status', 1)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        $joinTime = $joinRequest ? $joinRequest->created_at : $startOfMonth->toDateTimeString();
+        $effectiveStartTime = max($joinTime, $startOfMonth->toDateTimeString());
+
+        // الماس بدون الهدايا اللي هتتحذف
+        $realDiamonds = DB::table('gift_logs')
+            ->where('receiver_id', $user->id)
+            ->where('agency_id', $currentAgencyId)
+            ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
+            ->sum('giftPrice');
+
+        $totalCutAmount = DB::table('user_sallaries')
+            ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
+             ->where('user_agency_id', $currentAgencyId)
+            ->sum('cut_amount');
+
+        $salaryRecordsCount = DB::table('user_sallaries')
+            ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
+             ->where('user_agency_id', $currentAgencyId)
+            ->count();
+
+        $currentDiamond = DB::table('monthly_diamond_receives')
+            ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
+             ->where('user_agency_id', $currentAgencyId)
+            ->value('monthly_diamond_received');
+
+        // نضيف في التقرير لو فيه تغيير
+        if ($salaryRecordsCount > 1 || $currentDiamond != $realDiamonds) {
+            $report['users_details'][] = [
+                'user_id' => $user->id,
+                'agency_id' => $currentAgencyId,
+                'salary_records' => $salaryRecordsCount,
+                'total_cut' => $totalCutAmount,
+                'current_diamond' => $currentDiamond,
+                'real_diamond' => $realDiamonds,
+            ];
+        }
+
+        if ($shouldExecute) {
+            DB::table('monthly_diamond_receives')->updateOrInsert(
+                ['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear],
+                ['monthly_diamond_received' => $realDiamonds]
+            );
+
+            DB::table('user_sallaries')
+                ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
+                ->delete();
+
+            DB::table('user_sallaries')->insert([
+                'user_id' => $user->id,
+                'month' => $targetMonth,
+                'year' => $targetYear,
+                'user_agency_id' => $currentAgencyId,
+                'achieved_diamond' => $realDiamonds,
+                'cut_amount' => $totalCutAmount,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('users')->where('id', $user->id)->update(['salary_is_updated' => 1]);
+        }
+    }
+
+    return response()->json($report);
+});
 
 Route::get('/direct-recovery', function (Request $request) {
     $isLive = $request->query('fix') == '1';
