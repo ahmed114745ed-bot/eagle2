@@ -115,7 +115,6 @@ trait ZegoTrait
                 'STEP_1_PHONE_TO_SERVER' => $phoneRequest, 
                 'STEP_2_SERVER_TO_ZEGO' => [               
                     'endpoint' => $url . '?' . http_build_query($params),
-                    'response' => $response->json(),
                 ]
             ]);
             }
