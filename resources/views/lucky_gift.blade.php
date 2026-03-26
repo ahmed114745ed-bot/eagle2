@@ -300,97 +300,12 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="box box-info">
+                        <div class="box box-success">
                             <div class="box-header with-border">
-                                <h3 class="box-title">{{ __('Global Vault Inventory Statistics') }} / {{ __('إحصائيات مخزون الخزينة العام') }}</h3>
+                                <h3 class="box-title">{{ __('Global Vault Balance History') }} / {{ __('سجل رصيد الخزينة العام') }}</h3>
                             </div>
                             <div class="box-body">
-                                @php
-                                    $vaultBalance = $fairLuckSettings['global_vault_balance'] ?? 0;
-                                    $isPositive = $vaultBalance >= 0;
-                                    $statusColor = $isPositive ? 'success' : 'danger';
-                                    $statusText = $isPositive ? __('Positive') : __('Negative');
-                                    $statusTextAr = $isPositive ? __('موجب') : __('سالب');
-                                @endphp
-                                <div class="alert alert-{{ $statusColor }}">
-                                    <h4><i class="icon fa {{ $isPositive ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i> 
-                                        {{ __('Current Vault Balance') }} / {{ __('رصيد الخزينة الحالي') }}
-                                    </h4>
-                                    <p style="font-size: 18px; font-weight: bold;">
-                                        {{ number_format($vaultBalance, 2) }}
-                                        <span style="margin-left: 20px; padding: 5px 15px; border-radius: 4px; background-color: rgba(0,0,0,0.1);">
-                                            {{ $statusText }} / {{ $statusTextAr }}
-                                        </span>
-                                    </p>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <span class="info-box-icon bg-green"><i class="fa fa-arrow-up"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">{{ __('Above Zero') }} / {{ __('فوق الصفر') }}</span>
-                                                <span class="info-box-number">{{ $isPositive ? '✓ ' . __('Yes') . ' / نعم' : '✗ ' . __('No') . ' / لا' }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="info-box">
-                                            <span class="info-box-icon bg-red"><i class="fa fa-arrow-down"></i></span>
-                                            <div class="info-box-content">
-                                                <span class="info-box-text">{{ __('Below Zero') }} / {{ __('تحت الصفر') }}</span>
-                                                <span class="info-box-number">{{ !$isPositive ? '✓ ' . __('Yes') . ' / نعم' : '✗ ' . __('No') . ' / لا' }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row" style="margin-top: 20px;">
-                                    <div class="col-md-12">
-                                        <div class="box box-default">
-                                            <div class="box-header with-border">
-                                                <h3 class="box-title">{{ __('Safety Thresholds') }} / {{ __('حدود الأمان') }}</h3>
-                                            </div>
-                                            <div class="box-body">
-                                                <table class="table table-striped">
-                                                    <tr>
-                                                        <td><strong>{{ __('Min Safe Balance') }} / {{ __('الحد الأدنى الآمن') }}</strong></td>
-                                                        <td>{{ number_format($settings['bankruptcy_min_safe_balance'] ?? 100000, 0) }}</td>
-                                                        <td>
-                                                            @if($vaultBalance >= ($settings['bankruptcy_min_safe_balance'] ?? 100000))
-                                                                <span class="label label-success">{{ __('Safe') }} / {{ __('آمن') }}</span>
-                                                            @else
-                                                                <span class="label label-warning">{{ __('Warning') }} / {{ __('تحذير') }}</span>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>{{ __('Critical Threshold') }} / {{ __('حد الإنذار الحرج') }}</strong></td>
-                                                        <td>{{ number_format($settings['bankruptcy_critical_threshold'] ?? 50000, 0) }}</td>
-                                                        <td>
-                                                            @if($vaultBalance >= ($settings['bankruptcy_critical_threshold'] ?? 50000))
-                                                                <span class="label label-success">{{ __('Safe') }} / {{ __('آمن') }}</span>
-                                                            @else
-                                                                <span class="label label-danger">{{ __('Critical') }} / {{ __('حرج') }}</span>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><strong>{{ __('Negative Limit') }} / {{ __('حد الرصيد السالب') }}</strong></td>
-                                                        <td>-{{ number_format($settings['global_vault_negative_limit'] ?? 30000, 0) }}</td>
-                                                        <td>
-                                                            @if($vaultBalance >= -($settings['global_vault_negative_limit'] ?? 30000))
-                                                                <span class="label label-success">{{ __('Within Limit') }} / {{ __('ضمن الحد') }}</span>
-                                                            @else
-                                                                <span class="label label-danger">{{ __('Exceeded') }} / {{ __('تجاوز') }}</span>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <canvas id="vaultChartV6" style="height: 300px;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -427,7 +342,7 @@
     </div>
 </div>
 
-@if($luckyStatus == 1 && $currentVersion == 2 && isset($history))
+@if($luckyStatus == 1 && isset($history))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(function () {
@@ -444,13 +359,14 @@
             var labels = historyData.map(function (d) { return d.date; });
             var dataPoints = historyData.map(function (d) { return d.after; });
 
-            var ctx = document.getElementById('vaultChart').getContext('2d');
+            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : 'vaultChart' }}';
+            var ctx = document.getElementById(chartId).getContext('2d');
             var chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: "{{ __('Global Vault Balance') }}",
+                        label: "{{ __('Global Vault Balance') }} / {{ __('رصيد الخزينة العام') }}",
                         data: dataPoints,
                         borderColor: 'rgba(60,141,188,0.8)',
                         backgroundColor: 'rgba(60,141,188,0.2)',
@@ -503,5 +419,8 @@
                 }
             });
         });
-    </script>
+    </
+script>
+@endif
+script>
 @endif

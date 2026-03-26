@@ -41,12 +41,17 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $user = User::Find($this->userId);
         $luckyStatus = Common::getSettingValue('lucky_gifts_action');
         $hostPercentage = 0;
+        $receiverFeeRate =null;
         if ($luckyStatus == 1) {
             $version = Common::getSettingValue('lucky_gift_version');
             if ($version == 2) {
                $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
             }
-           $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+            if ($version == 3) {
+                $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+            }
+
+           $hostPercentage  = $receiverFeeRate ?? getGiftPercentage('host_lucky_gift')  / 10;
         }
 
         $room =
