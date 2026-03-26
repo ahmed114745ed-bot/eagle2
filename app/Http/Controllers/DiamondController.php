@@ -84,7 +84,7 @@ class DiamondController extends Controller
                         $targetService = new FixedTargetV2Service($user, month: $month, year: $year);
                         $targetService->calculateTarget();
                     } catch (\Throwable $e) {
-
+           Log::error("Failed to calculate salary for user ID {$user->id}: " . $e->getMessage());
                       //  $this->error("Failed user ID {$user->id}");
                     }
                 }
