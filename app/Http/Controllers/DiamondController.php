@@ -85,7 +85,7 @@ class DiamondController extends Controller
                         $targetService->calculateTarget();
                     } catch (\Throwable $e) {
 
-                        $this->error("Failed user ID {$user->id}");
+                      //  $this->error("Failed user ID {$user->id}");
                     }
                 }
             });
