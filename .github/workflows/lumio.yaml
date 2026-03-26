@@ -31,19 +31,15 @@ jobs:
     steps:
     - name: Build and Deploy Lumio App (Octane)
       uses: appleboy/ssh-action@v1.2.1
-      env:
-        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
         host: "34.18.61.136"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
         command_timeout: 20m
-        envs: PAT_TOKEN
         script: |
           cd /var/www/lumio
           git config --global safe.directory /var/www/lumio
-          git remote set-url origin https://${PAT_TOKEN}@github.com/BACK-END-UTD/Eagle.git
           git pull origin lumio
 
           docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
@@ -79,19 +75,15 @@ jobs:
     steps:
     - name: Build and Deploy Lumio Job (Workers)
       uses: appleboy/ssh-action@v1.2.1
-      env:
-        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
         host: "34.18.61.136"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
         command_timeout: 20m
-        envs: PAT_TOKEN
         script: |
           cd /var/www/lumio
           git config --global safe.directory /var/www/lumio
-          git remote set-url origin https://${PAT_TOKEN}@github.com/BACK-END-UTD/Eagle.git
           git pull origin lumio
 
           docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
