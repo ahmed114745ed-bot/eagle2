@@ -68,6 +68,8 @@ class UtdService
 
     public function callback(Request $request)
     {
+        info($request);
+        die();
         $txnId = $request->input('TxnId');
         $orderId = $request->input('OrderId');
         $totalPrice = $request->input('TotalPrice');
