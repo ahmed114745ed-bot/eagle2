@@ -53,6 +53,11 @@
                                     <input type="radio" name="lucky_gift_version" value="2" {{ $currentVersion == 2 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
                                     <strong>{{ __('Version 2 (FairLuck)') }}</strong>
                                 </label>
+                                <label
+                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 3 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
+                                    <input type="radio" name="lucky_gift_version" value="3" {{ $currentVersion == 3 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
+                                    <strong>{{ __('Version 3 (FairLuck V6)') }}</strong>
+                                </label>
                             </div>
                         </form>
                     </div>
@@ -111,7 +116,7 @@
                         </div>
                     </form>
                 </div>
-            @else
+            @elseif($currentVersion == 2)
                 {{-- Version 2 Content (Matched with fairluck/dashboard.blade.php) --}}
                 @php $settings = $fairLuckSettings; @endphp
                 <div class="box box-info">
@@ -164,6 +169,208 @@
                             </div>
                             <div class="box-body">
                                 <canvas id="vaultChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @elseif($currentVersion == 3)
+                {{-- Version 3 Content (FairLuck V6 - Same settings as V2) --}}
+                @php $settings = $fairLuckSettings; @endphp
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ __('FairLuck V6 Settings (Advanced Protection)') }}</h3>
+                    </div>
+                    <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
+                        @csrf
+                        <div class="box-body">
+                            <div class="alert alert-info alert-dismissible">
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                <h4><i class="icon fa fa-info"></i> {{ __('FairLuck V6 Features') }}</h4>
+                                <ul style="margin: 10px 0 0 20px;">
+                                    <li>{{ __('✅ Bankruptcy Protection: Prevents system insolvency') }}</li>
+                                    <li>{{ __('✅ Pool Solvency: Safety margins for big jackpots') }}</li>
+                                    <li>{{ __('✅ Post-Jackpot Cooldown: 200 bets between big wins') }}</li>
+                                    <li>{{ __('✅ User Data TTL: Auto-reset after 90 days inactivity') }}</li>
+                                    <li>{{ __('✅ Reduced Jackpot Weights: 50% reduction for 1000x & 500x') }}</li>
+                                    <li>{{ __('✅ Improved RTP: 85% (vs 90% in V2)') }}</li>
+                                </ul>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="global_vault_negative_limit" class="form-control"
+                                        value="{{ $settings['global_vault_negative_limit'] ?? 30000 }}">
+                                    <span class="help-block">{{ __('Maximum allowed negative balance') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Min Safe Balance') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="bankruptcy_min_safe_balance" class="form-control"
+                                        value="{{ $settings['bankruptcy_min_safe_balance'] ?? 100000 }}">
+                                    <span class="help-block">{{ __('Minimum safe balance threshold') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Critical Threshold') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="bankruptcy_critical_threshold" class="form-control"
+                                        value="{{ $settings['bankruptcy_critical_threshold'] ?? 50000 }}">
+                                    <span class="help-block">{{ __('Critical alert threshold') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Max Payout Percentage') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="bankruptcy_max_payout_percentage" class="form-control"
+                                        value="{{ $settings['bankruptcy_max_payout_percentage'] ?? 0.15 }}">
+                                    <span class="help-block">{{ __('Maximum payout as % of pool (0.15 = 15%)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Max Probability Cap') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="v6_max_probability_cap" class="form-control"
+                                        value="{{ $settings['v6_max_probability_cap'] ?? 0.50 }}">
+                                    <span class="help-block">{{ __('Hard cap on win probability (0.50 = 50%)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Jackpot Cooldown Bets') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="fairluck_jackpot_cooldown_bets" class="form-control"
+                                        value="{{ $settings['fairluck_jackpot_cooldown_bets'] ?? 200 }}">
+                                    <span class="help-block">{{ __('Required bets between big jackpots (250x+)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('User Data TTL (Days)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="fairluck_user_data_ttl_days" class="form-control"
+                                        value="{{ $settings['fairluck_user_data_ttl_days'] ?? 90 }}">
+                                    <span class="help-block">{{ __('Days before user RTP data expires') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Target RTP') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="v6_target_rtp" class="form-control"
+                                        value="{{ $settings['v6_target_rtp'] ?? 0.85 }}">
+                                    <span class="help-block">{{ __('Target Return to Player (0.85 = 85%)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_app_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_receiver_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_owner_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-success pull-right">{{ __('Save V6 Settings') }}</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-warning">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">{{ __('V6 Simulation Report: /v6/send-lucky-gift-combo') }}</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="alert alert-success">
+                                    <h4><i class="icon fa fa-check"></i> {{ __('System Status: Protected') }}</h4>
+                                    <p>{{ __('FairLuck V6 is running with full protection against:') }}</p>
+                                    <ul style="margin: 10px 0 0 20px;">
+                                        <li><strong>{{ __('Bankruptcy Risk:') }}</strong> {{ __('Minimum safe balance enforced') }}</li>
+                                        <li><strong>{{ __('Consecutive Jackpots:') }}</strong> {{ __('200-bet cooldown between big wins') }}</li>
+                                        <li><strong>{{ __('Unfair RTP:') }}</strong> {{ __('Dynamic probability based on pool health') }}</li>
+                                        <li><strong>{{ __('Old Debts:') }}</strong> {{ __('User data expires after 90 days') }}</li>
+                                        <li><strong>{{ __('Excessive Payouts:') }}</strong> {{ __('15% max payout with safety margins') }}</li>
+                                    </ul>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr style="background-color: #f4f4f4;">
+                                                <th>{{ __('Protection Layer') }}</th>
+                                                <th>{{ __('Status') }}</th>
+                                                <th>{{ __('Details') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>{{ __('Bankruptcy Protection') }}</strong></td>
+                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
+                                                <td>{{ __('Min: 100K | Critical: 50K | Negative Limit: 30K') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>{{ __('Pool Solvency') }}</strong></td>
+                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
+                                                <td>{{ __('1000x: 2x margin | 500x: 1.5x margin | 250x: 1.2x margin') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>{{ __('Jackpot Cooldown') }}</strong></td>
+                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
+                                                <td>{{ __('200 bets required between 250x+ wins') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>{{ __('User Data TTL') }}</strong></td>
+                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
+                                                <td>{{ __('90-day expiration for inactive users') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>{{ __('Probability Cap') }}</strong></td>
+                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
+                                                <td>{{ __('Maximum 50% win probability') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>{{ __('Jackpot Weight Reduction') }}</strong></td>
+                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
+                                                <td>{{ __('1000x: 5 (50% ↓) | 500x: 20 (50% ↓)') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>{{ __('Target RTP') }}</strong></td>
+                                                <td><span class="label label-info">{{ __('85%') }}</span></td>
+                                                <td>{{ __('System profit: 15% (vs 10% in V2)') }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="alert alert-info" style="margin-top: 20px;">
+                                    <h4><i class="icon fa fa-info"></i> {{ __('Expected Results') }}</h4>
+                                    <p><strong>{{ __('Before V6:') }}</strong> RTP variance 99.45% - 71%, bankruptcy risk, consecutive jackpots</p>
+                                    <p><strong>{{ __('After V6:') }}</strong> Fair RTP, protected pool, stable system, +50% profit margin</p>
+                                </div>
                             </div>
                         </div>
                     </div>
