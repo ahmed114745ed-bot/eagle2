@@ -14,7 +14,7 @@ class DirectRecoveryJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 300;
+    public $timeout = 600;
     public $tries = 1;
 
     protected $bugDate = '2026-03-01';
@@ -27,17 +27,14 @@ class DirectRecoveryJob implements ShouldQueue
     {
         ini_set('memory_limit', '1G');
 
-        // Disable Telescope to save memory
         if (class_exists(\Laravel\Telescope\Telescope::class)) {
             \Laravel\Telescope\Telescope::stopRecording();
         }
-
-        // Disable query log
         DB::disableQueryLog();
 
         $zonesCoins = (int) (DB::table('settings')->where('key', 'zones_coins')->value('value') ?? 30000);
 
-        // Get first debtor only
+        // Get first debtor
         $debtor = DB::selectOne("
             SELECT user_id,
                    SUM(sallary) as total_earned,
@@ -51,17 +48,15 @@ class DirectRecoveryJob implements ShouldQueue
             LIMIT 1
         ", [$this->targetMonth, $this->targetYear]);
 
-        // No more debtors — write final report
         if (!$debtor) {
-            $this->appendReport("=== ALL DONE === " . now()->toDateTimeString() . "\n");
-            Log::info("DirectRecovery: All debtors processed. Report at public/{$this->reportFile}");
+            $this->appendReport("\n=== ALL DONE === " . now()->toDateTimeString() . "\n");
+            Log::info("DirectRecovery: All debtors processed.");
             return;
         }
 
         $debtUsd = abs($debtor->total_debt);
         $debtCoins = (int) ($debtUsd * $zonesCoins);
         $remaining = $debtCoins;
-
         $user = DB::table('users')->where('id', $debtor->user_id)->first();
         $userName = $user->name ?? 'N/A';
         $affectedUserIds = [];
@@ -70,10 +65,8 @@ class DirectRecoveryJob implements ShouldQueue
         DB::beginTransaction();
 
         try {
-            // ============================================
-            // Scenario A: All charges (agency + user)
-            // ============================================
-            $allCharges = DB::table('charges')
+            // Get all charges by this debtor
+            $charges = DB::table('charges')
                 ->where('charger_id', $debtor->user_id)
                 ->where('charger_type', 'user')
                 ->whereIn('user_type', ['agency', 'user'])
@@ -81,10 +74,11 @@ class DirectRecoveryJob implements ShouldQueue
                 ->orderByDesc('created_at')
                 ->cursor();
 
-            foreach ($allCharges as $charge) {
+            foreach ($charges as $charge) {
                 if ($remaining <= 0) break;
 
                 if ($charge->user_type === 'agency') {
+                    // Agency charge → deduct from agency coins if available
                     $agency = DB::table('agencies')->where('id', $charge->user_id)->first();
                     if (!$agency) continue;
 
@@ -92,38 +86,96 @@ class DirectRecoveryJob implements ShouldQueue
                     if ($canDeduct > 0) {
                         DB::statement("UPDATE agencies SET coins = CAST(coins AS SIGNED) - ? WHERE id = ?", [$canDeduct, $agency->id]);
                         $remaining -= $canDeduct;
-                        $traces[] = "Agency #{$agency->id}: -{$canDeduct}";
+                        $traces[] = "Agency #{$agency->id}: di -{$canDeduct}";
                     }
                 } else {
-                    $recipient = DB::table('users')->where('id', $charge->user_id)->first();
-                    if (!$recipient) continue;
+                    // User charge: A (debtor) charged B
+                    $userB = DB::table('users')->where('id', $charge->user_id)->first();
+                    if (!$userB) continue;
 
-                    $deductAmount = min($remaining, (int) $charge->amount);
-                    $canDeduct = min($deductAmount, (int) $recipient->di);
+                    $chargeAmount = min($remaining, (int) $charge->amount);
+
+                    // Step 1: Delete the charge record (A→B)
+                    DB::table('charges')->where('id', $charge->id)->delete();
+                    $traces[] = "Charge #{$charge->id} deleted (Debtor -> User #{$userB->id})";
+
+                    // Step 2: Check if B has enough di
+                    $canDeduct = min($chargeAmount, (int) $userB->di);
 
                     if ($canDeduct > 0) {
-                        DB::statement("UPDATE users SET di = CAST(di AS SIGNED) - ? WHERE id = ?", [$canDeduct, $recipient->id]);
+                        DB::statement("UPDATE users SET di = CAST(di AS SIGNED) - ? WHERE id = ?", [$canDeduct, $userB->id]);
                         $remaining -= $canDeduct;
-                        $deductAmount -= $canDeduct;
-                        $traces[] = "User #{$recipient->id} di: -{$canDeduct}";
+                        $chargeAmount -= $canDeduct;
+                        $traces[] = "User #{$userB->id} di: -{$canDeduct}";
                     }
 
-                    if ($deductAmount > 0) {
-                        $remaining = $this->traceGiftChain($recipient->id, $remaining, $affectedUserIds, $traces);
+                    // Step 3: If B doesn't have enough di, trace B's gifts
+                    if ($chargeAmount > 0) {
+                        $giftsFromB = DB::select("
+                            SELECT receiver_id, SUM(giftPrice) as total_sent
+                            FROM gift_logs
+                            WHERE sender_id = ? AND created_at >= ? AND created_at < ?
+                            GROUP BY receiver_id
+                            ORDER BY total_sent DESC
+                            LIMIT 20
+                        ", [$userB->id, $this->bugDate, $this->endDate]);
+
+                        foreach ($giftsFromB as $gift) {
+                            if ($chargeAmount <= 0) break;
+
+                            $userC = DB::table('users')->where('id', $gift->receiver_id)->first();
+                            if (!$userC) continue;
+
+                            $giftAmount = min($chargeAmount, (int) $gift->total_sent);
+
+                            // Delete gift_logs (B→C)
+                            $remainingToDelete = $giftAmount;
+                            $idsToDelete = [];
+                            $giftLogRows = DB::table('gift_logs')
+                                ->where('sender_id', $userB->id)
+                                ->where('receiver_id', $userC->id)
+                                ->where('created_at', '>=', $this->bugDate)
+                                ->where('created_at', '<', $this->endDate)
+                                ->orderBy('giftPrice')
+                                ->select('id', 'giftPrice')
+                                ->cursor();
+
+                            $deletedAmount = 0;
+                            foreach ($giftLogRows as $row) {
+                                if ($remainingToDelete <= 0) break;
+                                $idsToDelete[] = $row->id;
+                                $deletedAmount += (int) $row->giftPrice;
+                                $remainingToDelete -= (int) $row->giftPrice;
+                            }
+                            if (!empty($idsToDelete)) {
+                                DB::table('gift_logs')->whereIn('id', $idsToDelete)->delete();
+                            }
+
+                            // Update monthly_diamond_received for C
+                            DB::statement(
+                                "UPDATE monthly_diamond_receives SET monthly_diamond_received = GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - ?) WHERE user_id = ? AND month = ? AND year = ?",
+                                [$deletedAmount, $userC->id, $this->targetMonth, $this->targetYear]
+                            );
+
+                            // Update monthly_diamond_send for B
+                            DB::statement(
+                                "UPDATE users SET monthly_diamond_send = GREATEST(0, CAST(monthly_diamond_send AS SIGNED) - ?) WHERE id = ?",
+                                [$deletedAmount, $userB->id]
+                            );
+
+                            $affectedUserIds[] = $userC->id;
+                            $affectedUserIds[] = $userB->id;
+
+                            $chargeAmount -= $deletedAmount;
+                            $remaining -= $deletedAmount;
+
+                            $traces[] = "Gift B#{$userB->id} -> C#{$userC->id}: gift_logs -{$deletedAmount}, monthly updated";
+                        }
                     }
                 }
             }
 
-            // ============================================
-            // Scenario B: Gifts sent by debtor
-            // ============================================
-            if ($remaining > 0) {
-                $remaining = $this->traceGiftChain($debtor->user_id, $remaining, $affectedUserIds, $traces);
-            }
-
-            // ============================================
-            // Final: Adjust cut_amount + flag affected
-            // ============================================
+            // Adjust cut_amount
             $recoveredCoins = $debtCoins - $remaining;
             $recoveredUsd = $recoveredCoins / $zonesCoins;
 
@@ -141,17 +193,18 @@ class DirectRecoveryJob implements ShouldQueue
                         ->where('id', $salaryRecord->id)
                         ->update(['cut_amount' => $newCut]);
                 }
-
-                $affectedUserIds = array_unique($affectedUserIds);
-                if (!empty($affectedUserIds)) {
-                    DB::table('users')
-                        ->whereIn('id', $affectedUserIds)
-                        ->update(['salary_is_updated' => 0]);
-                }
             }
 
-            // Mark debtor as processed (set cut = earned so debt = 0)
-            // This ensures the loop moves to the next debtor
+            // Mark affected users for salary recalc (include debtor)
+            $affectedUserIds[] = $debtor->user_id;
+            $affectedUserIds = array_unique($affectedUserIds);
+            if (!empty($affectedUserIds)) {
+                DB::table('users')
+                    ->whereIn('id', $affectedUserIds)
+                    ->update(['salary_is_updated' => 0]);
+            }
+
+            // Mark debtor as processed (zero out salary so loop moves on)
             if ($remaining > 0) {
                 $salaryRecord = $salaryRecord ?? DB::table('user_sallaries')
                     ->where('user_id', $debtor->user_id)
@@ -161,7 +214,6 @@ class DirectRecoveryJob implements ShouldQueue
                     ->first();
 
                 if ($salaryRecord) {
-                    // Set cut = sallary so debt becomes exactly 0
                     DB::table('user_sallaries')
                         ->where('id', $salaryRecord->id)
                         ->update(['cut_amount' => $salaryRecord->sallary]);
@@ -170,7 +222,7 @@ class DirectRecoveryJob implements ShouldQueue
 
             DB::commit();
 
-            // Append to report
+            // Report
             $line = "User #{$debtor->user_id} ({$userName}): debt=\${$debtUsd}";
             if ($recoveredCoins > 0) {
                 $line .= ", recovered=\$" . round($recoveredUsd, 2);
@@ -196,76 +248,6 @@ class DirectRecoveryJob implements ShouldQueue
 
         // Dispatch next debtor
         self::dispatch()->delay(now()->addSeconds(2));
-    }
-
-    private function traceGiftChain(int $senderId, int $remaining, array &$affectedUserIds, array &$traces, int $depth = 0, array $visitedUsers = []): int
-    {
-        if ($depth > 2 || $remaining <= 0) return $remaining;
-        if (in_array($senderId, $visitedUsers)) return $remaining;
-        $visitedUsers[] = $senderId;
-
-        $gifts = DB::select("
-            SELECT receiver_id, SUM(giftPrice) as total_sent
-            FROM gift_logs
-            WHERE sender_id = ? AND created_at >= ? AND created_at < ?
-            GROUP BY receiver_id
-            ORDER BY total_sent DESC
-            LIMIT 20
-        ", [$senderId, $this->bugDate, $this->endDate]);
-
-        foreach ($gifts as $gift) {
-            if ($remaining <= 0) break;
-            if ($gift->receiver_id == $senderId || in_array($gift->receiver_id, $visitedUsers)) continue;
-
-            $receiver = DB::table('users')->where('id', $gift->receiver_id)->first();
-            if (!$receiver) continue;
-
-            $deductAmount = min($remaining, (int) $gift->total_sent);
-            $canDeduct = min($deductAmount, (int) $receiver->di);
-
-            if ($canDeduct > 0) {
-                DB::statement("UPDATE users SET di = CAST(di AS SIGNED) - ? WHERE id = ?", [$canDeduct, $receiver->id]);
-                DB::statement("UPDATE users SET total_diamond_received = GREATEST(0, CAST(total_diamond_received AS SIGNED) - ?) WHERE id = ?", [$canDeduct, $receiver->id]);
-                DB::statement(
-                    "UPDATE monthly_diamond_receives SET monthly_diamond_received = GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - ?) WHERE user_id = ? AND month = ? AND year = ?",
-                    [$canDeduct, $receiver->id, $this->targetMonth, $this->targetYear]
-                );
-
-                // Delete gift_logs
-                $remainingToDelete = $canDeduct;
-                $idsToDelete = [];
-                $giftLogRows = DB::table('gift_logs')
-                    ->where('sender_id', $senderId)
-                    ->where('receiver_id', $receiver->id)
-                    ->where('created_at', '>=', $this->bugDate)
-                    ->where('created_at', '<', $this->endDate)
-                    ->orderBy('giftPrice')
-                    ->select('id', 'giftPrice')
-                    ->cursor();
-
-                foreach ($giftLogRows as $row) {
-                    if ($remainingToDelete <= 0) break;
-                    $idsToDelete[] = $row->id;
-                    $remainingToDelete -= (int) $row->giftPrice;
-                }
-                if (!empty($idsToDelete)) {
-                    DB::table('gift_logs')->whereIn('id', $idsToDelete)->delete();
-                }
-
-                $affectedUserIds[] = $receiver->id;
-                $remaining -= $canDeduct;
-                $deductAmount -= $canDeduct;
-
-                $depthLabel = str_repeat('  ', $depth);
-                $traces[] = "{$depthLabel}Gift: #{$senderId} -> #{$receiver->id}: -{$canDeduct}";
-            }
-
-            if ($deductAmount > 0 && $depth < 3) {
-                $remaining = $this->traceGiftChain($receiver->id, $remaining, $affectedUserIds, $traces, $depth + 1, $visitedUsers);
-            }
-        }
-
-        return $remaining;
     }
 
     private function appendReport(string $content): void
