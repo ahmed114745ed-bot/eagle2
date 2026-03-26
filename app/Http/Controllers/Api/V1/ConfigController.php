@@ -90,7 +90,7 @@ class ConfigController extends Controller
         return Common::apiResponse(true, 'config returned success', $configs, 200);
     }
 
-   
+
 
     public function index()
     {
@@ -147,12 +147,12 @@ class ConfigController extends Controller
                 Cache::forever($key, $value);
             }
         }
-        
+
         // Clear all cache including rememberForever keys
         Cache::forget('all_configs');
         Cache::flush();
         Artisan::call('config:cache');
-        
+
         admin_success('Saved Successfully');
         return Redirect::back();
     }
@@ -298,7 +298,7 @@ class ConfigController extends Controller
         } catch (\Exception $e) {
             Log::error('Live Library - Octane cache flush failed', ['error' => $e->getMessage()]);
         }
-        
+
         if ($hasPusherUpdate) {
             $pusherMapping = [
                 'pusher_app_key' => 'broadcasting.connections.pusher.key',
@@ -306,7 +306,7 @@ class ConfigController extends Controller
                 'pusher_app_id' => 'broadcasting.connections.pusher.app_id',
                 'pusher_app_cluster' => 'broadcasting.connections.pusher.options.cluster',
             ];
-            
+
             foreach ($pusherMapping as $key => $configKey) {
                 $value = $request->input($key);
                 if ($value !== null) {
@@ -317,9 +317,9 @@ class ConfigController extends Controller
                     }
                 }
             }
-            
+
             \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
-            
+
         }
 
         $redirectUrl = url('admin/settings?tab=realTimeSetting');
