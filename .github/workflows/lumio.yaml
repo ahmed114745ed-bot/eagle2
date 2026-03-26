@@ -2,20 +2,25 @@ name: SSh-lumio-pipline
 on:
   push:
     branches: ["lumio"]
-
 jobs:
   run_lumio_hub:
     runs-on: [self-hosted]
     steps:
-    - name: print out lumio hub cleanup
+    - name: Pull latest code
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 7m
+        command_timeout: 5m
         script: |
+          cd /var/www/lumio
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          mkdir -p storage/jobs-logs
+          chmod -R 777 storage/jobs-logs
+          test -f public/settings.json || echo '{}' > public/settings.json
+          test -f gcp.json || echo '{}' > gcp.json
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
@@ -24,12 +29,11 @@ jobs:
           else
             echo "Disk space OK ($current%)"
           fi
-
   run_lumio_app:
     runs-on: [self-hosted]
     needs: run_lumio_hub
     steps:
-    - name: Build and Deploy Lumio App (Octane)
+    - name: Build and deploy Lumio Octane
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
@@ -39,12 +43,8 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/lumio
-          git config --global safe.directory /var/www/lumio
-          git pull origin lumio
-
-          docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
-
-          docker service update \
+          sudo docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
+          sudo docker service update \
             --image lumio-octa:${{ github.sha }} \
             --replicas 2 \
             --limit-memory 2.0gb \
@@ -67,13 +67,12 @@ jobs:
             exit 1
           fi
 
-          docker image prune -f
-
+          sudo docker image prune -f 2>/dev/null || true
   run_lumio_job:
     runs-on: [self-hosted]
     needs: run_lumio_hub
     steps:
-    - name: Build and Deploy Lumio Job (Workers)
+    - name: Build and deploy Lumio jobs
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
@@ -83,11 +82,8 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/lumio
-          git config --global safe.directory /var/www/lumio
-          git pull origin lumio
-
-          docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
-          docker service update \
+          sudo docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
+          sudo docker service update \
             --image lumio-job:${{ github.sha }} \
             --replicas 4 \
             --limit-cpu 2.0 \
@@ -96,3 +92,4 @@ jobs:
             --update-parallelism 1 \
             --update-delay 10s \
             lumio-job
+          sudo docker image prune -f 2>/dev/null || true
