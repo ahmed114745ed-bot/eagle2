@@ -35,6 +35,7 @@ class DirectRecoveryJob implements ShouldQueue
             \Laravel\Telescope\Telescope::stopRecording();
         }
         DB::disableQueryLog();
+        DB::statement("SET SESSION innodb_lock_wait_timeout = 120");
 
         $zonesCoins = (int) (DB::table('settings')->where('key', 'zones_coins')->value('value') ?? 30000);
 
@@ -189,6 +190,23 @@ class DirectRecoveryJob implements ShouldQueue
             DB::rollBack();
             $this->appendReport("ERROR User #{$debtor->user_id}: {$e->getMessage()}\n");
             Log::error("DirectRecovery: Failed for user {$debtor->user_id}: " . $e->getMessage());
+
+            // Mark debtor as processed so it doesn't loop forever on error
+            try {
+                $salaryRecord = DB::table('user_sallaries')
+                    ->where('user_id', $debtor->user_id)
+                    ->where('month', $this->targetMonth)
+                    ->where('year', $this->targetYear)
+                    ->orderByDesc('cut_amount')
+                    ->first();
+                if ($salaryRecord) {
+                    DB::table('user_sallaries')
+                        ->where('id', $salaryRecord->id)
+                        ->update(['cut_amount' => $salaryRecord->sallary]);
+                }
+            } catch (\Exception $ex) {
+                // ignore
+            }
         }
 
         // Dispatch next debtor
