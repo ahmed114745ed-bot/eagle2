@@ -66,6 +66,12 @@ trait ZegoTrait
     }
     public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
     {
+        $phoneRequest = [
+        'phone_to_server_url' => request()->fullUrl(), // الرابط الذي طلبه الهاتف
+        'phone_ip' => request()->ip(),                 // IP الهاتف
+        'phone_method' => request()->method(),         // POST أو GET
+        'phone_payload' => request()->all(),           // البيانات التي أرسلها الهاتف للسيرفر
+        ];
         $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
@@ -105,11 +111,12 @@ trait ZegoTrait
                     'fromUserId' => $FromUserId,
                     'response' => $response,
                 ]);
-                Log::warning('⚠️ Zego API Failure Details:', [
-                'endpoint_full' => $fullUrlWithParams, 
-                'sent_headers'  => $requestHeaders,    
-                'payload_sent'  => $params,          
-               
+              Log::warning('⚠️ الشرح التفصيلي للخطأ:', [
+                'STEP_1_PHONE_TO_SERVER' => $phoneRequest, 
+                'STEP_2_SERVER_TO_ZEGO' => [               
+                    'endpoint' => $url . '?' . http_build_query($params),
+                    'response' => $response->json(),
+                ]
             ]);
             }
             
