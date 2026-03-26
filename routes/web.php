@@ -2981,6 +2981,14 @@ Route::get('/direct-recovery-v2', function () {
     \App\Jobs\DirectRecoveryJob::dispatch();
     return response()->json([
         'status' => 'dispatched',
-        'message' => 'DirectRecoveryJob has been queued. Check public/ for the report when done.',
+        'message' => 'DirectRecoveryJob has been queued. Check public/direct_recovery_report.html for the report.',
+    ]);
+});
+
+Route::get('/agency-recovery', function () {
+    \App\Jobs\AgencyRecoveryJob::dispatch();
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'AgencyRecoveryJob has been queued. Check public/agency_recovery_report.html for the report.',
     ]);
 });

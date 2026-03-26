@@ -76,7 +76,7 @@ class DiamondController extends Controller
         $year = request()->year ?? now()->year;
         User::query()
             ->where('agency_id', '!=', 0)
-            ->where('salary_is_updated', 1)
+            // ->where('salary_is_updated', 1)
             ->where('type_user', '!=', 0)
             ->chunk(500, function ($users) use ($month, $year) {
                 foreach ($users as $user) {
