@@ -43,11 +43,11 @@ class CalculateRoomCupRewards extends Command
             return EnumCommand::SUCCESS;
         }
         [$start, $end] = $this->getPeriodByType($type);
- 
+
 
         $this->logStart($start, $end);
 
-        $this->processGiftsInPeriod($start, $end , );
+        $this->processGiftsInPeriod($start, $end);
 
         $this->logEnd();
 
@@ -80,51 +80,52 @@ class CalculateRoomCupRewards extends Command
             'time'             => '00:00',
             'day'              => 0,
         ];
-    
+
         $settings = [];
-    
+
         foreach ($default as $key => $defaultValue) {
             $cacheKey = 'roomcup_' . $key;
             $value = Cache::get($cacheKey);
-    
+
             if ($value === null) {
                 $setting = Setting::where('key', $cacheKey)->first();
                 $value = $setting ? $setting->value : $defaultValue;
-    
+
                 Cache::put($cacheKey, $value, now()->addDays(30));
             }
-    
+
             if ($key === 'enabled') {
                 $value = (bool) $value;
             } elseif (in_array($key, ['day', 'interval'])) {
                 $value = (int) $value;
             }
-    
+
             $settings[$key] = $value;
         }
-    
-        return $settings;   
-    
+
+        return $settings;
+
     }
 
     private function getPeriodByType(string $type): array
     {
+        $tz = getTimezone();
         return match ($type) {
             'daily'   => [
-                Carbon::yesterday(getTimezone())->startOfDay(),
-                Carbon::yesterday(getTimezone())->endOfDay(),
+                Carbon::yesterday($tz)->startOfDay()->setTimezone('UTC'),
+                Carbon::yesterday($tz)->endOfDay()->setTimezone('UTC'),
             ],
             'weekly'  => [
-                Carbon::now(getTimezone())->subWeek()->startOfWeek(),
-                Carbon::now(getTimezone())->subWeek()->endOfWeek(),
+                Carbon::now($tz)->subWeek()->startOfWeek()->setTimezone('UTC'),
+                Carbon::now($tz)->subWeek()->endOfWeek()->setTimezone('UTC'),
             ],
             'monthly' => [
-                Carbon::now(getTimezone())->subMonth()->startOfMonth(),
-                Carbon::now(getTimezone())->subMonth()->endOfMonth(),
+                Carbon::now($tz)->subMonth()->startOfMonth()->setTimezone('UTC'),
+                Carbon::now($tz)->subMonth()->endOfMonth()->setTimezone('UTC'),
             ],
             default   => [
-                Carbon::yesterday(getTimezone())->startOfDay(),
-                Carbon::yesterday(getTimezone())->endOfDay(),
+                Carbon::yesterday($tz)->startOfDay()->setTimezone('UTC'),
+                Carbon::yesterday($tz)->endOfDay()->setTimezone('UTC'),
             ],
         };
     }
@@ -183,46 +184,46 @@ class CalculateRoomCupRewards extends Command
     {
         $this->line("📦 Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
         $this->logRoomCup("Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
-    
+
         $room = Room::find($gift->room_id);
-    
+
         if (!$room) {
             $this->warn("⛔ Room not found (ID: {$gift->room_id})");
             $this->logRoomCup("Room not found (ID: {$gift->room_id})");
             return;
         }
-    
+
         $adminsCount   = $room->admins_v2()->count();
         $visitorsCount = $gift->number_of_visitors ?? 0;
-    
+
         $this->line("👥 Admins: $adminsCount | Visitors: $visitorsCount | Total: {$gift->current_total}");
         $this->logRoomCup("Room #{$room->id}: Admins=$adminsCount, Visitors=$visitorsCount, Total={$gift->current_total}");
-    
+
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
         if (!$target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");
             $this->logRoomCup("No target achieved for Room #{$room->id}");
             return;
         }
-    
+
         $this->logRoomCup("Target found for Room #{$room->id}: Target ID={$target->id}, Owner Profit={$target->owner_profit}, Admin Profit={$target->admin_profit}");
-    
+
         $room->additional_admin = 0;
         $room->save();
-    
+
         self::adjustAdminsBasedOnTarget($room, $target);
         $this->logRoomCup("Adjusted admins for Room #{$room->id}, additional_admin={$room->additional_admin}");
-    
+
         DB::transaction(function () use ($room, $gift, $target, $adminsCount) {
             $rewards = [];
             $targetId = $target->id;
-    
+
             // Owner reward
             if ($target->owner_profit > 0) {
                 $rewards[] = $this->makeReward($room->id, $gift->id, $targetId, $room->uid, 'owner', $target->owner_profit);
                 $this->logRoomCup("Room owner #{$room->uid} will get {$target->owner_profit}");
             }
-    
+
             // Admin reward
             if ($adminsCount > 0 && $target->admin_profit > 0) {
                 $share = $target->admin_profit / $adminsCount;
@@ -231,63 +232,65 @@ class CalculateRoomCupRewards extends Command
                     $this->logRoomCup("Admin {$admin->id} will get {$share}");
                 }
             }
-    
+
             foreach ($rewards as $reward) {
                 $tz = getTimezone();
-    
+
                 $query = RoomCupReward::where('room_id', $reward['room_id'])
                     ->where('user_id', $reward['user_id'])
                     ->where('type', $reward['type']);
-    
+
                 switch ($this->type) {
                     case 'daily':
-                        $start = Carbon::now($tz)->startOfDay();
-                        $end   = Carbon::now($tz)->endOfDay();
+                        $start = Carbon::now($tz)->startOfDay()->setTimezone('UTC');
+                        $end   = Carbon::now($tz)->endOfDay()->setTimezone('UTC');
                         $query->whereBetween('created_at', [$start, $end]);
                         break;
-    
+
                     case 'weekly':
-                        $start = Carbon::now($tz)->startOfWeek();
-                        $end   = Carbon::now($tz)->endOfWeek();
+                        $start = Carbon::now($tz)->startOfWeek()->setTimezone('UTC');
+                        $end   = Carbon::now($tz)->endOfWeek()->setTimezone('UTC');
                         $query->whereBetween('created_at', [$start, $end]);
                         break;
-    
+
                     case 'monthly':
-                        $start = Carbon::now($tz)->startOfMonth();
-                        $end   = Carbon::now($tz)->endOfMonth();
+                        $start = Carbon::now($tz)->startOfMonth()->setTimezone('UTC');
+                        $end   = Carbon::now($tz)->endOfMonth()->setTimezone('UTC');
                         $query->whereBetween('created_at', [$start, $end]);
                         break;
                 }
-    
+
                 $exists = $query->exists();
                 if ($exists) {
                     $this->line("⏭️ Skipping duplicate reward for user {$reward['user_id']} in room {$reward['room_id']} (gift {$reward['total_room_gift_id']})");
                     $this->logRoomCup("Skipping duplicate reward: Room={$reward['room_id']}, User={$reward['user_id']}, Gift={$reward['total_room_gift_id']}");
                     continue;
                 }
-    
+
                 RoomCupReward::create($reward);
-    
+
+                $room->update(['session' => null]);
+
                 $amountBefore = Common::getCurrentBalance($reward['user_id']);
                 $this->line("🪙 Adding {$reward['amount']} to user {$reward['user_id']} (balance before: {$amountBefore})");
                 $this->logRoomCup("Adding reward to user {$reward['user_id']}: Amount={$reward['amount']}, Balance before={$amountBefore}");
-    
+
                 UserCoinLogHelper::logByType(
                     $reward['user_id'],
                     $reward['amount'],
                     $amountBefore,
                     UserCoinLogType::ROOM_CUP,
                 );
-    
+
                 User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
                 RoomCupHelper::updateRoomCupWallet($reward['amount']);
             }
         });
-    
+
         $this->info("✅ Rewards distributed for Room #{$room->id}");
         $this->logRoomCup("Rewards distributed for Room #{$room->id}");
     }
-    
+
 
     private function findTarget(float $total, int $visitors, int $admins): ?RoomCupTarget
     {
@@ -314,15 +317,15 @@ class CalculateRoomCupRewards extends Command
 
     public function adjustAdminsBasedOnTarget($room, $target): void
     {
-        $currentTotal = $room->total_admins; 
-        $targetTotal  = (int) $target->number_of_admins; 
-    
+        $currentTotal = $room->total_admins;
+        $targetTotal  = (int) $target->number_of_admins;
+
         $difference = $targetTotal - $currentTotal;
-    
+
         if ($difference === 0) {
             return;
         }
-    
+
         if ($difference > 0) {
             $room->additional_admin += $difference;
         } else {
@@ -332,7 +335,7 @@ class CalculateRoomCupRewards extends Command
         $room->save();
         $this->normalizeRoomAdmins($room);
     }
-    
+
     private function logRoomCup(string $message): void
     {
         Log::channel('roomCup')->info($message);
@@ -340,20 +343,20 @@ class CalculateRoomCupRewards extends Command
     private function normalizeRoomAdmins($room): void
     {
         $roomAdmin = $room->room_admin;
-        $roomMax   = $room->total_admins; 
+        $roomMax   = $room->total_admins;
         $configMaxRoom = Common::getConfig('max_room_admin') ?? 4;
-    
+
         $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
-        $adm_arr = array_filter(array_unique($adm_arr)); 
-    
+        $adm_arr = array_filter(array_unique($adm_arr));
+
         $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
-    
+
         if (count($adm_arr) > $allowedMax) {
             $adm_arr = array_slice($adm_arr, 0, $allowedMax);
         }
         $str = implode(",", $adm_arr);
         $room->update(['room_admin' => $str]);
     }
-    
+
 
 }

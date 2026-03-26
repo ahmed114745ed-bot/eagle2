@@ -7,6 +7,7 @@ use App\Facades\RoomHelper;
 use App\Models\RequestBackgroundImage;
 use App\Models\Room;
 use Illuminate\Support\Facades\DB;
+use Modules\RoomBoom\Entities\TotalRoomGift;
 
 class RoomService
 {
@@ -42,5 +43,22 @@ class RoomService
         if ($room == null) return '';
         return @$room->final_room_image ?? '';
 
+    }
+
+    public function getOrCreateTotalRoomGift($roomId, $todayStart)
+    {
+        $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
+            ->where('created_at', '>=', $todayStart)
+            ->lockForUpdate()
+            ->first();
+
+        if (!$totalRoomGift) {
+            $totalRoomGift = TotalRoomGift::create([
+                'room_id' => $roomId,
+                'current_total' => 0,
+            ]);
+        }
+
+        return $totalRoomGift;
     }
 }

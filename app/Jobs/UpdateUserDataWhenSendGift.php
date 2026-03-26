@@ -38,15 +38,18 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
      */
     public function handle(): void
     {
-        $user = User::Find($this->userId);
+        $user = User::find($this->userId);
         $luckyStatus = Common::getSettingValue('lucky_gifts_action');
         $hostPercentage = 0;
+        $receiverFeeRate =null;
         if ($luckyStatus == 1) {
             $version = Common::getSettingValue('lucky_gift_version');
-            if ($version == 2) {
-               $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
+           if (in_array($version, [2, 3])) {
+                $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
             }
-           $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
+           $hostPercentage  = $receiverFeeRate ?? getGiftPercentage('host_lucky_gift')  / 10;
+        }else {
+            $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
         }
 
         $room =
@@ -71,7 +74,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         if ($this->userCoin != null) {
             UserCommon::UserLuckyGift(0, $this->userId, $gift, ($this->userCoin), $this->number,$this->totalNumWin,$this->totalUserWin);
         }
-        $this->updateUserDataWhenSendGift($user, $room, $coins, $this->receiversIds, $gift, $this->number,$hostPercentage);
+         $this->updateUserDataWhenSendGift($user, $room, $coins, $this->receiversIds, $gift, $this->number,$hostPercentage);
     }
 
     private function updateUserDataWhenSendGift( $user, $room, $coins, array $receiversIds, $gift, $number,$hostPercentage)
@@ -80,7 +83,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $receivedUsers = User::withoutAppends()->with(['agency', 'profile'])->whereIn('id', $receiversIds)->get();
 
         $price = $number * ($gift->price * $hostPercentage);
-
+        \Log::info('price: ' . $price);
         $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
 
         $cpIds = [];
@@ -108,3 +111,11 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $topUser->save();
     }
 }
+
+
+
+
+
+
+
+

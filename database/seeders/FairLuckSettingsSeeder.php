@@ -54,6 +54,11 @@ class FairLuckSettingsSeeder extends Seeder
                 'value' => '0.5',
                 'description' => 'How strongly deviation affects probability',
             ],
+            [
+                'key' => 'v6_target_rtp',
+                'value' => '0.85',
+                'description' => 'Target RTP for V6 algorithm (85% = 0.85)',
+            ]
         ];
 
         foreach ($settings as $setting) {
