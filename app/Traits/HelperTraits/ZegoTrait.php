@@ -66,6 +66,8 @@ trait ZegoTrait
     }
     public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
     {
+        
+        $roomId = $RoomId ?? request()->room_id;
         $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
@@ -77,7 +79,7 @@ trait ZegoTrait
         $SignatureVersion = '2.0';
         $params = [
             'Action' => $Action,
-            'RoomId' => $RoomId,
+            'RoomId' => $roomId,
             'FromUserId' => $FromUserId,
             'MessageContent' => $MessageContent,
             'AppId' => $AppId,
@@ -91,12 +93,11 @@ trait ZegoTrait
         try {
           
             $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
-            
-            // Log failed Zego API calls for debugging
+
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
                 Log::warning('ZegoTrait::sendToZego failed', [
                     'action' => $Action,
-                    'roomId' => $RoomId,
+                    'roomId' => $roomId,
                     'fromUserId' => $FromUserId,
                     'response' => $response,
                 ]);

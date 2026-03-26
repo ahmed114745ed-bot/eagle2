@@ -266,6 +266,26 @@ Route::get('/run-permission', function () {
     ]);
 });
 
+Route::get('/run-payments', function () {
+
+    Artisan::call('db:seed', ['--class' => 'PaymentGatewaysSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/devices-token-seeder', function () {
+
+    Artisan::call('db:seed', ['--class' => 'DevicesTokenHistories']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
 Route::get('/user-join-agency', function () {
 
     Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
@@ -1810,6 +1830,7 @@ Route::get('/fix-total-room-gifts', function () {
         // Find or create TotalRoomGift record for this room on this date
         $record = TotalRoomGift::whereDate('created_at', $giftDate)
             ->where('room_id', $roomId)
+            ->lockForUpdate()
             ->first();
 
         if ($record) {
@@ -2028,4 +2049,82 @@ Route::get('/get-gift-percentages', function () {
     $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
     dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+});
+
+// Step 1: Diagnostic - show affected lucky gift logs (100% instead of 10%)
+Route::get('/fix-gift-logs/check', function () {
+    $affected = DB::select("
+        SELECT
+            gl.id,
+            gl.giftId,
+            gl.giftNum,
+            gl.giftPrice as logged_price,
+            gl.receiver_obtain,
+            g.price as actual_gift_price,
+            g.type as gift_type,
+            (gl.giftNum * g.price) as expected_full_price,
+            ROUND(gl.giftPrice / (gl.giftNum * g.price), 2) as current_ratio,
+            ROUND(gl.giftNum * g.price * 0.1, 2) as correct_10_percent,
+            gl.created_at
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.type = 6
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+        ORDER BY gl.id DESC
+        LIMIT 50
+    ");
+
+    $totalAffected = DB::selectOne("
+        SELECT COUNT(*) as total
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.type = 6
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    return response()->json([
+        'total_affected_records' => $totalAffected->total,
+        'sample_records' => $affected,
+        'message' => 'These records have giftPrice at 100% instead of 10%. Go to /fix-gift-logs/run to fix them.',
+    ]);
+});
+
+// Step 2: Fix - update affected records to 10%
+Route::get('/fix-gift-logs/run', function () {
+    $affected = DB::selectOne("
+        SELECT COUNT(*) as total
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.gift_category_id = 7
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    if ($affected->total == 0) {
+        return response()->json(['message' => 'No records to fix.']);
+    }
+
+    $updated = DB::update("
+        UPDATE gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        SET
+            gl.roomowner_obtain = FLOOR(gl.giftPrice * 0.1 * 0.03),
+            gl.app_profit_coins = gl.giftPrice * 0.1,
+            gl.receiver_obtain = gl.giftPrice * 0.1,
+            gl.giftPrice = gl.giftPrice * 0.1
+        WHERE g.gift_category_id = 7
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    return response()->json([
+        'message' => "Fixed {$updated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
+        'records_updated' => $updated,
+    ]);
 });

@@ -10,6 +10,7 @@ use App\Services\GooglePayService;
 use App\Services\PaymobPaymentService;
 use App\Services\PayPalService;
 use App\Services\StripeService;
+use App\Services\UtdService;
 use App\Services\ZiniPaymentService;
 use Exception;
 use App\Helpers\Common;
@@ -117,7 +118,7 @@ class CoinService
                     phone: $user->phone ?? null,
                     trx: $log->trx
                 );
-              
+
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else if ($paymentMethod == 'opay') {
                 $opay = new OPayController();
@@ -150,6 +151,17 @@ class CoinService
                     return $paymentUrl;
                 }
                 return Common::apiResponse(1, $paymentUrl, $paymentUrl, 200);
+            } elseif ($paymentMethod == 'utd') {
+                $active = config('is_utd_active');
+
+                if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                $utdService = new UtdService();
+
+                $paymentUrl = $utdService->initiatePayment($log->id, $coin->usd, $user->id);
+                if (isset($response['status']) && $paymentUrl['status']  == 0) {
+                    return $paymentUrl;
+                }
+                return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else {
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }

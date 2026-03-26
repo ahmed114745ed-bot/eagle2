@@ -884,7 +884,7 @@ class GiftLogController extends Controller
             'is_finished' => 0
         ])->whereNotIn('user_id', $remainingDiamonds)
             ->chunk(100, function ($userSalaries) {   // 🔥 process only 500 rows per chunk
-    
+
                 foreach ($userSalaries as $userSalary) {
 
                     try {
@@ -979,6 +979,7 @@ class GiftLogController extends Controller
                 foreach ($giftLogs as $log) {
                     $totalRoomGift = TotalRoomGift::where('room_id', $log->room_id)
                         ->whereDate('created_at', now())
+                        ->lockForUpdate()
                         ->first();
 
                     if (!$totalRoomGift) {

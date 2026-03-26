@@ -2,6 +2,7 @@
 
 namespace App\Services\Gifts;
 
+use App\Http\Services\RoomService;
 use App\Models\Cp;
 use App\Models\Gift;
 use App\Models\Room;
@@ -57,7 +58,7 @@ class LuckyGiftService
         $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
 
         try {
-            $lock->block(5); 
+            $lock->block(5);
         } catch (LockTimeoutException $e) {
             throw new InvalidArgumentException(__('api_responses.try_again'));
         }
@@ -415,7 +416,7 @@ class LuckyGiftService
 
         $coinsForOwner = ($giftPrice * $number * $receiversCount) * $roomrPercentage;
 
-     
+
 
         $senderBalanceBefore = $user->di;
         $totalWalletsBefore = null;
@@ -621,7 +622,7 @@ class LuckyGiftService
         } else {
             $tz = getTimezone();
             $todayStart = \Carbon\Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
-            $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+            $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
             $totalRoomGift->increment('current_total', $totalHostDiamond);
         }
         $responseData['total_pk'] = $coinsForReceiver;
@@ -726,7 +727,7 @@ class LuckyGiftService
 
         $coinsForOwner = 0; // V5 logic handles distribution inside processBet?
 
-     
+
 
         $senderBalanceBefore = $user->di;
         $totalWalletsBefore = null;
@@ -757,20 +758,20 @@ class LuckyGiftService
 
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
-                
+
                 // V5 logic handles its own distribution, netBetAmount passed to processBet
-                $netBetAmount = $unitPrice - $appFee - $receiverFee; 
+                $netBetAmount = $unitPrice - $appFee - $receiverFee;
 
                 try {
                     $result = $fairService->processBet(
-                        $user, 
-                        $gift, 
-                        $netBetAmount, 
-                        $roomId, 
-                        $receiverId, 
-                        $appFee, 
-                        $receiverFee, 
-                        $senderBalanceBeforeHit, 
+                        $user,
+                        $gift,
+                        $netBetAmount,
+                        $roomId,
+                        $receiverId,
+                        $appFee,
+                        $receiverFee,
+                        $senderBalanceBeforeHit,
                         $user->di - $unitPrice
                     );
                 } catch (\Throwable $e) {
@@ -883,7 +884,7 @@ class LuckyGiftService
         }
 
         // Room session update (fixed for V5 context if needed)
-        $room->session += (int)($totalPrice * $count * 0.05); 
+        $room->session += (int)($totalPrice * $count * 0.05);
         $room->save();
 
         $responseData['session'] = $room->session_string;
@@ -1245,7 +1246,7 @@ class LuckyGiftService
             } else {
                 $tz = getTimezone();
                 $todayStart = \Carbon\Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
-                $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+                $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
                 $totalRoomGift->increment('current_total', $totalHostDiamond);
             }
             $responseData['total_pk'] = $coinsForReceiver;
@@ -1770,7 +1771,7 @@ class LuckyGiftService
         } else {
             $tz = getTimezone();
             $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
-            $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+            $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
             $totalRoomGift->increment('current_total', $totalHostDiamond);
         }
 
@@ -2015,7 +2016,7 @@ class LuckyGiftService
     {
         $microphones = $room->microphones ?? collect();
 
-     
+
 
         $positions = $microphones
             ->filter(fn($mic) => in_array($mic->user_id, $receiversIds))

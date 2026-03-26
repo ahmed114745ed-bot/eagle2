@@ -112,7 +112,10 @@ class RewardSelector
 
     public function getBaseWeight(int $multiplier): int
     {
-        // Higher medium-tier weights than V3 so users feel real wins more often
+        // CRITICAL FIX: Reduce weights for big jackpots (1000x, 500x)
+        // This prevents system bankruptcy from consecutive big wins
+        // 1000x: 10 → 5 (50% reduction)
+        // 500x: 40 → 20 (50% reduction)
         return match ($multiplier) {
             5 => 2500,
             10 => 1800,
@@ -121,8 +124,8 @@ class RewardSelector
             70 => 500,
             100 => 300,
             250 => 150,
-            500 => 40,
-            1000 => 10,
+            500 => 20,    // REDUCED from 40 (50% reduction)
+            1000 => 5,    // REDUCED from 10 (50% reduction)
             default => 1,
         };
     }
@@ -145,8 +148,16 @@ class RewardSelector
     /**
      * Validate pool can afford the payout. If not, fall back to lower multiplier.
      * NEVER cancels a win - always finds the highest affordable multiplier.
+     * 
+     * POOL SOLVENCY PROTECTION:
+     * - High multipliers (1000x, 500x) require extra safety margin
+     * - Ensures pool never goes negative even with multiple big wins
+     * 
+     * POST-JACKPOT COOLDOWN:
+     * - After a big jackpot (250x+), require 200 bets before next big jackpot
+     * - Prevents "explosive luck" that drains the pool rapidly
      */
-    public function validateAndFallback(int $selectedMultiplier, float $betAmount, int $totalPoolBalance): int
+    public function validateAndFallback(int $selectedMultiplier, float $betAmount, int $totalPoolBalance, int $userId = null, int $betCount = null): int
     {
         $allMultipliers = [1000, 500, 250, 100, 70, 50, 20, 10, 5];
         $negativeLimit = \App\Models\FairLuckSetting::getNegativeLimit();
@@ -156,7 +167,31 @@ class RewardSelector
             if ($m > $selectedMultiplier) continue;
 
             $payout = $m * $betAmount;
-            if ($effectiveBalance >= $payout) {
+            
+            // POOL SOLVENCY: High multipliers need extra safety margin
+            // 1000x: requires 2x the payout (100% safety margin)
+            // 500x: requires 1.5x the payout (50% safety margin)
+            // Others: standard check
+            $safetyMargin = match(true) {
+                $m >= 1000 => 2.0,  // 100% safety margin
+                $m >= 500  => 1.5,  // 50% safety margin
+                $m >= 250  => 1.2,  // 20% safety margin
+                default    => 1.0,  // No extra margin
+            };
+
+            $requiredBalance = $payout * $safetyMargin;
+            
+            if ($effectiveBalance >= $requiredBalance) {
+                // POST-JACKPOT COOLDOWN: Check if user is in cooldown
+                if ($userId !== null && $betCount !== null && $m >= 250) {
+                    $cooldown = app(\App\Services\FairLuck\V6\PostJackpotCooldown::class);
+                    $m = $cooldown->applyRestriction($userId, $betCount, $m);
+                    
+                    if ($m === 0) {
+                        continue; // Skip this multiplier, try next lower one
+                    }
+                }
+                
                 return $m;
             }
         }
