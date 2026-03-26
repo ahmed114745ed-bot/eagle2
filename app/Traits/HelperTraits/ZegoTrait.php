@@ -91,7 +91,12 @@ trait ZegoTrait
         try {
           
             $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
-            
+            $pendingRequest = Http::withHeaders($headers)->acceptJson()->timeout(20);
+        
+                
+                $fullUrlWithParams = $url . '?' . http_build_query($params); 
+                $requestHeaders = $headers;
+
             // Log failed Zego API calls for debugging
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
                 Log::warning('ZegoTrait::sendToZego failed', [
@@ -100,6 +105,12 @@ trait ZegoTrait
                     'fromUserId' => $FromUserId,
                     'response' => $response,
                 ]);
+                Log::warning('⚠️ Zego API Failure Details:', [
+                'endpoint_full' => $fullUrlWithParams, 
+                'sent_headers'  => $requestHeaders,    
+                'payload_sent'  => $params,          
+               
+            ]);
             }
             
             return $response;
