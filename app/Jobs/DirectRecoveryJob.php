@@ -23,6 +23,10 @@ class DirectRecoveryJob implements ShouldQueue
     protected $targetYear = 2026;
     protected $reportFile = 'direct_recovery_report.txt';
 
+    protected $affectedUserIds = [];
+    protected $traces = [];
+    protected $visitedUsers = [];
+
     public function handle()
     {
         ini_set('memory_limit', '1G');
@@ -59,8 +63,6 @@ class DirectRecoveryJob implements ShouldQueue
         $remaining = $debtCoins;
         $user = DB::table('users')->where('id', $debtor->user_id)->first();
         $userName = $user->name ?? 'N/A';
-        $affectedUserIds = [];
-        $traces = [];
 
         DB::beginTransaction();
 
@@ -72,13 +74,12 @@ class DirectRecoveryJob implements ShouldQueue
                 ->whereIn('user_type', ['agency', 'user'])
                 ->where('created_at', '>=', $this->bugDate)
                 ->orderByDesc('created_at')
-                ->cursor();
+                ->get();
 
             foreach ($charges as $charge) {
                 if ($remaining <= 0) break;
 
                 if ($charge->user_type === 'agency') {
-                    // Agency charge → deduct from agency coins if available
                     $agency = DB::table('agencies')->where('id', $charge->user_id)->first();
                     if (!$agency) continue;
 
@@ -87,7 +88,7 @@ class DirectRecoveryJob implements ShouldQueue
                         DB::statement("UPDATE agencies SET coins = CAST(coins AS SIGNED) - ? WHERE id = ?", [$canDeduct, $agency->id]);
                         DB::table('charges')->where('id', $charge->id)->delete();
                         $remaining -= $canDeduct;
-                        $traces[] = "Agency #{$agency->id}: di -{$canDeduct}, charge #{$charge->id} deleted";
+                        $this->traces[] = "Agency #{$agency->id}: -{$canDeduct}, charge #{$charge->id} deleted";
                     }
                 } else {
                     // User charge: A (debtor) charged B
@@ -96,124 +97,23 @@ class DirectRecoveryJob implements ShouldQueue
 
                     $chargeAmount = min($remaining, (int) $charge->amount);
 
-                    // Step 1: Delete the charge record (A→B)
+                    // Step 1: Delete the charge record (A->B)
                     DB::table('charges')->where('id', $charge->id)->delete();
-                    $traces[] = "Charge #{$charge->id} deleted (Debtor -> User #{$userB->id})";
+                    $this->traces[] = "Charge #{$charge->id} deleted (Debtor -> User #{$userB->id})";
 
                     // Step 2: Check if B has enough di
                     $canDeduct = min($chargeAmount, (int) $userB->di);
-
                     if ($canDeduct > 0) {
                         DB::statement("UPDATE users SET di = CAST(di AS SIGNED) - ? WHERE id = ?", [$canDeduct, $userB->id]);
                         $remaining -= $canDeduct;
                         $chargeAmount -= $canDeduct;
-                        $traces[] = "User #{$userB->id} di: -{$canDeduct}";
+                        $this->traces[] = "User #{$userB->id} di: -{$canDeduct}";
                     }
 
-                    // Step 3: If B doesn't have enough di, trace B's gifts
+                    // Step 3: If B doesn't have enough di, trace B's gifts recursively
                     if ($chargeAmount > 0) {
-                        $giftsFromB = DB::select("
-                            SELECT receiver_id, SUM(giftPrice) as total_sent
-                            FROM gift_logs
-                            WHERE sender_id = ? AND created_at >= ? AND created_at < ?
-                            GROUP BY receiver_id
-                            ORDER BY total_sent DESC
-                            LIMIT 20
-                        ", [$userB->id, $this->bugDate, $this->endDate]);
-
-                        foreach ($giftsFromB as $gift) {
-                            if ($chargeAmount <= 0) break;
-
-                            $userC = DB::table('users')->where('id', $gift->receiver_id)->first();
-                            if (!$userC) continue;
-
-                            $giftAmount = min($chargeAmount, (int) $gift->total_sent);
-
-                            // Delete gift_logs (B→C) and reverse all related balances
-                            $remainingToDelete = $giftAmount;
-                            $logsToDelete = [];
-                            $giftLogRows = DB::table('gift_logs')
-                                ->where('sender_id', $userB->id)
-                                ->where('receiver_id', $userC->id)
-                                ->where('created_at', '>=', $this->bugDate)
-                                ->where('created_at', '<', $this->endDate)
-                                ->orderBy('giftPrice')
-                                ->select('id', 'giftPrice', 'room_id', 'receiver_family_id')
-                                ->cursor();
-
-                            $deletedAmount = 0;
-                            $roomAmounts = [];
-                            $familyAmounts = [];
-                            foreach ($giftLogRows as $row) {
-                                if ($remainingToDelete <= 0) break;
-                                $logsToDelete[] = $row->id;
-                                $price = (int) $row->giftPrice;
-                                $deletedAmount += $price;
-                                $remainingToDelete -= $price;
-
-                                if ($row->room_id) {
-                                    $roomAmounts[$row->room_id] = ($roomAmounts[$row->room_id] ?? 0) + $price;
-                                }
-                                if ($row->receiver_family_id) {
-                                    $familyAmounts[$row->receiver_family_id] = ($familyAmounts[$row->receiver_family_id] ?? 0) + $price;
-                                }
-                            }
-                            if (!empty($logsToDelete)) {
-                                DB::table('gift_logs')->whereIn('id', $logsToDelete)->delete();
-                            }
-
-                            // Reverse total_diamond_received for C
-                            DB::statement(
-                                "UPDATE users SET total_diamond_received = GREATEST(0, CAST(total_diamond_received AS SIGNED) - ?) WHERE id = ?",
-                                [$deletedAmount, $userC->id]
-                            );
-
-                            // Reverse exchange_diamonds for C (only non-agency users)
-                            DB::statement(
-                                "UPDATE users SET exchange_diamonds = GREATEST(0, CAST(exchange_diamonds AS SIGNED) - ?) WHERE id = ? AND agency_id = 0",
-                                [$deletedAmount, $userC->id]
-                            );
-
-                            // Reverse monthly_diamond_received for C
-                            DB::statement(
-                                "UPDATE monthly_diamond_receives SET monthly_diamond_received = GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - ?) WHERE user_id = ? AND month = ? AND year = ?",
-                                [$deletedAmount, $userC->id, $this->targetMonth, $this->targetYear]
-                            );
-
-                            // Reverse monthly_diamond_send for B
-                            DB::statement(
-                                "UPDATE users SET monthly_diamond_send = GREATEST(0, CAST(monthly_diamond_send AS SIGNED) - ?) WHERE id = ?",
-                                [$deletedAmount, $userB->id]
-                            );
-
-                            // Reverse room session & room_top_users
-                            foreach ($roomAmounts as $roomId => $amount) {
-                                DB::statement(
-                                    "UPDATE rooms SET session = GREATEST(0, CAST(session AS SIGNED) - ?) WHERE id = ?",
-                                    [$amount, $roomId]
-                                );
-                                DB::statement(
-                                    "UPDATE room_top_users SET coins = GREATEST(0, CAST(coins AS SIGNED) - ?) WHERE room_id = ? AND user_id = ?",
-                                    [$amount, $roomId, $userB->id]
-                                );
-                            }
-
-                            // Reverse family total_diamond
-                            foreach ($familyAmounts as $familyId => $amount) {
-                                DB::statement(
-                                    "UPDATE families SET total_diamond = GREATEST(0, CAST(total_diamond AS SIGNED) - ?) WHERE id = ?",
-                                    [$amount, $familyId]
-                                );
-                            }
-
-                            $affectedUserIds[] = $userC->id;
-                            $affectedUserIds[] = $userB->id;
-
-                            $chargeAmount -= $deletedAmount;
-                            $remaining -= $deletedAmount;
-
-                            $traces[] = "Gift B#{$userB->id} -> C#{$userC->id}: gift_logs -{$deletedAmount}, monthly updated";
-                        }
+                        $recovered = $this->traceGifts($userB->id, $chargeAmount, 1);
+                        $remaining -= $recovered;
                     }
                 }
             }
@@ -239,12 +139,14 @@ class DirectRecoveryJob implements ShouldQueue
             }
 
             // Mark affected users for salary recalc (include debtor)
-            $affectedUserIds[] = $debtor->user_id;
-            $affectedUserIds = array_unique($affectedUserIds);
+            $this->affectedUserIds[] = $debtor->user_id;
+            $affectedUserIds = array_unique($this->affectedUserIds);
             if (!empty($affectedUserIds)) {
-                DB::table('users')
-                    ->whereIn('id', $affectedUserIds)
-                    ->update(['salary_is_updated' => 0]);
+                foreach (array_chunk($affectedUserIds, 500) as $chunk) {
+                    DB::table('users')
+                        ->whereIn('id', $chunk)
+                        ->update(['salary_is_updated' => 0]);
+                }
             }
 
             // Mark debtor as processed (zero out salary so loop moves on)
@@ -276,7 +178,7 @@ class DirectRecoveryJob implements ShouldQueue
                 $line .= ", FULLY_RECOVERED";
             }
             $line .= "\n";
-            foreach ($traces as $t) {
+            foreach ($this->traces as $t) {
                 $line .= "  -> {$t}\n";
             }
             $this->appendReport($line);
@@ -291,6 +193,139 @@ class DirectRecoveryJob implements ShouldQueue
 
         // Dispatch next debtor
         self::dispatch()->delay(now()->addSeconds(2));
+    }
+
+    /**
+     * Recursively trace gifts from a sender and recover coins.
+     * Returns the total amount recovered.
+     */
+    private function traceGifts(int $senderId, int $amount, int $depth): int
+    {
+        if ($amount <= 0 || $depth > 10) return 0;
+
+        // Prevent infinite loops
+        if (in_array($senderId, $this->visitedUsers)) return 0;
+        $this->visitedUsers[] = $senderId;
+
+        $indent = str_repeat('  ', $depth);
+        $totalRecovered = 0;
+
+        $gifts = DB::select("
+            SELECT receiver_id, SUM(giftPrice) as total_sent
+            FROM gift_logs
+            WHERE sender_id = ? AND created_at >= ? AND created_at < ?
+            GROUP BY receiver_id
+            ORDER BY total_sent DESC
+            LIMIT 20
+        ", [$senderId, $this->bugDate, $this->endDate]);
+
+        foreach ($gifts as $gift) {
+            if ($amount <= 0) break;
+
+            $receiver = DB::table('users')->where('id', $gift->receiver_id)->first();
+            if (!$receiver) continue;
+
+            $giftAmount = min($amount, (int) $gift->total_sent);
+
+            // Delete gift_logs (sender -> receiver) and collect room/family data
+            $remainingToDelete = $giftAmount;
+            $logsToDelete = [];
+            $giftLogRows = DB::table('gift_logs')
+                ->where('sender_id', $senderId)
+                ->where('receiver_id', $receiver->id)
+                ->where('created_at', '>=', $this->bugDate)
+                ->where('created_at', '<', $this->endDate)
+                ->orderBy('giftPrice')
+                ->select('id', 'giftPrice', 'room_id', 'receiver_family_id')
+                ->get();
+
+            $deletedAmount = 0;
+            $roomAmounts = [];
+            $familyAmounts = [];
+            foreach ($giftLogRows as $row) {
+                if ($remainingToDelete <= 0) break;
+                $logsToDelete[] = $row->id;
+                $price = (int) $row->giftPrice;
+                $deletedAmount += $price;
+                $remainingToDelete -= $price;
+
+                if ($row->room_id) {
+                    $roomAmounts[$row->room_id] = ($roomAmounts[$row->room_id] ?? 0) + $price;
+                }
+                if ($row->receiver_family_id) {
+                    $familyAmounts[$row->receiver_family_id] = ($familyAmounts[$row->receiver_family_id] ?? 0) + $price;
+                }
+            }
+
+            if ($deletedAmount <= 0) continue;
+
+            if (!empty($logsToDelete)) {
+                foreach (array_chunk($logsToDelete, 500) as $chunk) {
+                    DB::table('gift_logs')->whereIn('id', $chunk)->delete();
+                }
+            }
+
+            // Reverse total_diamond_received for receiver
+            DB::statement(
+                "UPDATE users SET total_diamond_received = GREATEST(0, CAST(total_diamond_received AS SIGNED) - ?) WHERE id = ?",
+                [$deletedAmount, $receiver->id]
+            );
+
+            // Reverse exchange_diamonds for receiver (only non-agency users)
+            DB::statement(
+                "UPDATE users SET exchange_diamonds = GREATEST(0, CAST(exchange_diamonds AS SIGNED) - ?) WHERE id = ? AND agency_id = 0",
+                [$deletedAmount, $receiver->id]
+            );
+
+            // Reverse monthly_diamond_received for receiver
+            DB::statement(
+                "UPDATE monthly_diamond_receives SET monthly_diamond_received = GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - ?) WHERE user_id = ? AND month = ? AND year = ?",
+                [$deletedAmount, $receiver->id, $this->targetMonth, $this->targetYear]
+            );
+
+            // Reverse monthly_diamond_send for sender
+            DB::statement(
+                "UPDATE users SET monthly_diamond_send = GREATEST(0, CAST(monthly_diamond_send AS SIGNED) - ?) WHERE id = ?",
+                [$deletedAmount, $senderId]
+            );
+
+            // Reverse room session & room_top_users
+            foreach ($roomAmounts as $roomId => $roomAmount) {
+                DB::statement(
+                    "UPDATE rooms SET session = GREATEST(0, CAST(session AS SIGNED) - ?) WHERE id = ?",
+                    [$roomAmount, $roomId]
+                );
+                DB::statement(
+                    "UPDATE room_top_users SET coins = GREATEST(0, CAST(coins AS SIGNED) - ?) WHERE room_id = ? AND user_id = ?",
+                    [$roomAmount, $roomId, $senderId]
+                );
+            }
+
+            // Reverse family total_diamond
+            foreach ($familyAmounts as $familyId => $famAmount) {
+                DB::statement(
+                    "UPDATE families SET total_diamond = GREATEST(0, CAST(total_diamond AS SIGNED) - ?) WHERE id = ?",
+                    [$famAmount, $familyId]
+                );
+            }
+
+            $this->affectedUserIds[] = $receiver->id;
+            $this->affectedUserIds[] = $senderId;
+
+            $this->traces[] = "{$indent}Gift: #{$senderId} -> #{$receiver->id}: -{$deletedAmount}";
+
+            $amount -= $deletedAmount;
+            $totalRecovered += $deletedAmount;
+
+            // Recurse: trace receiver's gifts if we still need more
+            if ($amount > 0) {
+                $subRecovered = $this->traceGifts($receiver->id, $amount, $depth + 1);
+                $amount -= $subRecovered;
+                $totalRecovered += $subRecovered;
+            }
+        }
+
+        return $totalRecovered;
     }
 
     private function appendReport(string $content): void
