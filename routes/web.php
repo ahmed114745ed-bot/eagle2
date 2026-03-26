@@ -294,6 +294,15 @@ Route::get('/run-permission', function () {
     ]);
 });
 
+Route::get('/run-payments', function () {
+
+    Artisan::call('db:seed', ['--class' => 'PaymentGatewaysSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
 
 Route::get('/devices-token-seeder', function () {
 

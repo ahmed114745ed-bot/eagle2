@@ -67,6 +67,9 @@
                                 @if ($coin->type == 'codapay')
                                     @include('admin.settings.partial_payments.codapay')
                                 @endif
+                                @if ($coin->type == 'utd')
+                                    @include('admin.settings.partial_payments.utd')
+                                @endif
                             </div>
 
                             <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
