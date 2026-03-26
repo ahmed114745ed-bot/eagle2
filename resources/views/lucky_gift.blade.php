@@ -178,98 +178,98 @@
                 @php $settings = $fairLuckSettings; @endphp
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">{{ __('FairLuck V6 Settings (Advanced Protection)') }}</h3>
+                        <h3 class="box-title">{{ __('FairLuck V6 Settings (Advanced Protection)') }} / {{ __('إعدادات FairLuck V6 (الحماية المتقدمة)') }}</h3>
                     </div>
                     <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
                         @csrf
                         <div class="box-body">
                             <div class="alert alert-info alert-dismissible">
                                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                <h4><i class="icon fa fa-info"></i> {{ __('FairLuck V6 Features') }}</h4>
+                                <h4><i class="icon fa fa-info"></i> {{ __('FairLuck V6 Features') }} / {{ __('ميزات FairLuck V6') }}</h4>
                                 <ul style="margin: 10px 0 0 20px;">
-                                    <li>{{ __('✅ Bankruptcy Protection: Prevents system insolvency') }}</li>
-                                    <li>{{ __('✅ Pool Solvency: Safety margins for big jackpots') }}</li>
-                                    <li>{{ __('✅ Post-Jackpot Cooldown: 200 bets between big wins') }}</li>
-                                    <li>{{ __('✅ User Data TTL: Auto-reset after 90 days inactivity') }}</li>
-                                    <li>{{ __('✅ Reduced Jackpot Weights: 50% reduction for 1000x & 500x') }}</li>
-                                    <li>{{ __('✅ Improved RTP: 85% (vs 90% in V2)') }}</li>
+                                    <li>{{ __('✅ Bankruptcy Protection: Prevents system insolvency') }} / {{ __('✅ حماية الإفلاس: منع إعسار النظام') }}</li>
+                                    <li>{{ __('✅ Pool Solvency: Safety margins for big jackpots') }} / {{ __('✅ ملاءة المجموعة: هوامش أمان للجوائز الكبرى') }}</li>
+                                    <li>{{ __('✅ Post-Jackpot Cooldown: 200 bets between big wins') }} / {{ __('✅ فترة الانتظار بعد الجائزة الكبرى: 200 رهان بين الفوز الكبير') }}</li>
+                                    <li>{{ __('✅ User Data TTL: Auto-reset after 90 days inactivity') }} / {{ __('✅ TTL بيانات المستخدم: إعادة تعيين تلقائية بعد 90 يوم من عدم النشاط') }}</li>
+                                    <li>{{ __('✅ Reduced Jackpot Weights: 50% reduction for 1000x & 500x') }} / {{ __('✅ أوزان الجوائز المخفضة: تقليل 50% لـ 1000x و 500x') }}</li>
+                                    <li>{{ __('✅ Improved RTP: 85% (vs 90% in V2)') }} / {{ __('✅ RTP محسّن: 85% (مقابل 90% في V2)') }}</li>
                                 </ul>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit') }} / {{ __('حد الرصيد السالب العام') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" name="global_vault_negative_limit" class="form-control"
                                         value="{{ $settings['global_vault_negative_limit'] ?? 30000 }}">
-                                    <span class="help-block">{{ __('Maximum allowed negative balance') }}</span>
+                                    <span class="help-block">{{ __('Maximum allowed negative balance') }} / {{ __('الحد الأقصى للرصيد السالب المسموح به') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Min Safe Balance') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Min Safe Balance') }} / {{ __('الحد الأدنى الآمن لحماية الإفلاس') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" name="bankruptcy_min_safe_balance" class="form-control"
                                         value="{{ $settings['bankruptcy_min_safe_balance'] ?? 100000 }}">
-                                    <span class="help-block">{{ __('Minimum safe balance threshold') }}</span>
+                                    <span class="help-block">{{ __('Minimum safe balance threshold') }} / {{ __('حد الرصيد الآمن الأدنى') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Critical Threshold') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Critical Threshold') }} / {{ __('حد الإنذار الحرج للإفلاس') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" name="bankruptcy_critical_threshold" class="form-control"
                                         value="{{ $settings['bankruptcy_critical_threshold'] ?? 50000 }}">
-                                    <span class="help-block">{{ __('Critical alert threshold') }}</span>
+                                    <span class="help-block">{{ __('Critical alert threshold') }} / {{ __('حد الإنذار الحرج') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Max Payout Percentage') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Max Payout Percentage') }} / {{ __('أقصى نسبة دفع') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="bankruptcy_max_payout_percentage" class="form-control"
                                         value="{{ $settings['bankruptcy_max_payout_percentage'] ?? 0.15 }}">
-                                    <span class="help-block">{{ __('Maximum payout as % of pool (0.15 = 15%)') }}</span>
+                                    <span class="help-block">{{ __('Maximum payout as % of pool (0.15 = 15%)') }} / {{ __('أقصى دفع كنسبة من المجموعة (0.15 = 15%)') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Max Probability Cap') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Max Probability Cap') }} / {{ __('الحد الأقصى لسقف الاحتمالية') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="v6_max_probability_cap" class="form-control"
                                         value="{{ $settings['v6_max_probability_cap'] ?? 0.50 }}">
-                                    <span class="help-block">{{ __('Hard cap on win probability (0.50 = 50%)') }}</span>
+                                    <span class="help-block">{{ __('Hard cap on win probability (0.50 = 50%)') }} / {{ __('حد صارم على احتمالية الفوز (0.50 = 50%)') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Jackpot Cooldown Bets') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Jackpot Cooldown Bets') }} / {{ __('رهانات فترة الانتظار للجائزة الكبرى') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" name="fairluck_jackpot_cooldown_bets" class="form-control"
                                         value="{{ $settings['fairluck_jackpot_cooldown_bets'] ?? 200 }}">
-                                    <span class="help-block">{{ __('Required bets between big jackpots (250x+)') }}</span>
+                                    <span class="help-block">{{ __('Required bets between big jackpots (250x+)') }} / {{ __('الرهانات المطلوبة بين الجوائز الكبرى (250x+)') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('User Data TTL (Days)') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('User Data TTL (Days)') }} / {{ __('TTL بيانات المستخدم (أيام)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" name="fairluck_user_data_ttl_days" class="form-control"
                                         value="{{ $settings['fairluck_user_data_ttl_days'] ?? 90 }}">
-                                    <span class="help-block">{{ __('Days before user RTP data expires') }}</span>
+                                    <span class="help-block">{{ __('Days before user RTP data expires') }} / {{ __('الأيام قبل انتهاء صلاحية بيانات RTP للمستخدم') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Target RTP') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Target RTP') }} / {{ __('RTP المستهدف') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="v6_target_rtp" class="form-control"
                                         value="{{ $settings['v6_target_rtp'] ?? 0.85 }}">
-                                    <span class="help-block">{{ __('Target Return to Player (0.85 = 85%)') }}</span>
+                                    <span class="help-block">{{ __('Target Return to Player (0.85 = 85%)') }} / {{ __('العائد المستهدف للاعب (0.85 = 85%)') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }} / {{ __('معدل رسوم التطبيق (0.10 = 10%)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="fair_luck_app_fee_rate" class="form-control"
                                         value="{{ $settings['fair_luck_app_fee_rate'] ?? '0' }}">
@@ -277,7 +277,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }} / {{ __('معدل رسوم المستقبل (0.10 = 10%)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="fair_luck_receiver_fee_rate" class="form-control"
                                         value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0' }}">
@@ -285,7 +285,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }} / {{ __('معدل رسوم المالك (0.10 = 10%)') }}</label>
                                 <div class="col-sm-8">
                                     <input type="number" step="0.01" name="fair_luck_owner_fee_rate" class="form-control"
                                         value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0' }}">
@@ -293,83 +293,103 @@
                             </div>
                         </div>
                         <div class="box-footer">
-                            <button type="submit" class="btn btn-success pull-right">{{ __('Save V6 Settings') }}</button>
+                            <button type="submit" class="btn btn-success pull-right">{{ __('Save V6 Settings') }} / {{ __('حفظ إعدادات V6') }}</button>
                         </div>
                     </form>
                 </div>
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="box box-warning">
+                        <div class="box box-info">
                             <div class="box-header with-border">
-                                <h3 class="box-title">{{ __('V6 Simulation Report: /v6/send-lucky-gift-combo') }}</h3>
+                                <h3 class="box-title">{{ __('Global Vault Inventory Statistics') }} / {{ __('إحصائيات مخزون الخزينة العام') }}</h3>
                             </div>
                             <div class="box-body">
-                                <div class="alert alert-success">
-                                    <h4><i class="icon fa fa-check"></i> {{ __('System Status: Protected') }}</h4>
-                                    <p>{{ __('FairLuck V6 is running with full protection against:') }}</p>
-                                    <ul style="margin: 10px 0 0 20px;">
-                                        <li><strong>{{ __('Bankruptcy Risk:') }}</strong> {{ __('Minimum safe balance enforced') }}</li>
-                                        <li><strong>{{ __('Consecutive Jackpots:') }}</strong> {{ __('200-bet cooldown between big wins') }}</li>
-                                        <li><strong>{{ __('Unfair RTP:') }}</strong> {{ __('Dynamic probability based on pool health') }}</li>
-                                        <li><strong>{{ __('Old Debts:') }}</strong> {{ __('User data expires after 90 days') }}</li>
-                                        <li><strong>{{ __('Excessive Payouts:') }}</strong> {{ __('15% max payout with safety margins') }}</li>
-                                    </ul>
+                                @php
+                                    $vaultBalance = $fairLuckSettings['global_vault_balance'] ?? 0;
+                                    $isPositive = $vaultBalance >= 0;
+                                    $statusColor = $isPositive ? 'success' : 'danger';
+                                    $statusText = $isPositive ? __('Positive') : __('Negative');
+                                    $statusTextAr = $isPositive ? __('موجب') : __('سالب');
+                                @endphp
+                                <div class="alert alert-{{ $statusColor }}">
+                                    <h4><i class="icon fa {{ $isPositive ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i> 
+                                        {{ __('Current Vault Balance') }} / {{ __('رصيد الخزينة الحالي') }}
+                                    </h4>
+                                    <p style="font-size: 18px; font-weight: bold;">
+                                        {{ number_format($vaultBalance, 2) }}
+                                        <span style="margin-left: 20px; padding: 5px 15px; border-radius: 4px; background-color: rgba(0,0,0,0.1);">
+                                            {{ $statusText }} / {{ $statusTextAr }}
+                                        </span>
+                                    </p>
                                 </div>
 
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-bordered">
-                                        <thead>
-                                            <tr style="background-color: #f4f4f4;">
-                                                <th>{{ __('Protection Layer') }}</th>
-                                                <th>{{ __('Status') }}</th>
-                                                <th>{{ __('Details') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><strong>{{ __('Bankruptcy Protection') }}</strong></td>
-                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
-                                                <td>{{ __('Min: 100K | Critical: 50K | Negative Limit: 30K') }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>{{ __('Pool Solvency') }}</strong></td>
-                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
-                                                <td>{{ __('1000x: 2x margin | 500x: 1.5x margin | 250x: 1.2x margin') }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>{{ __('Jackpot Cooldown') }}</strong></td>
-                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
-                                                <td>{{ __('200 bets required between 250x+ wins') }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>{{ __('User Data TTL') }}</strong></td>
-                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
-                                                <td>{{ __('90-day expiration for inactive users') }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>{{ __('Probability Cap') }}</strong></td>
-                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
-                                                <td>{{ __('Maximum 50% win probability') }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>{{ __('Jackpot Weight Reduction') }}</strong></td>
-                                                <td><span class="label label-success">{{ __('Active') }}</span></td>
-                                                <td>{{ __('1000x: 5 (50% ↓) | 500x: 20 (50% ↓)') }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>{{ __('Target RTP') }}</strong></td>
-                                                <td><span class="label label-info">{{ __('85%') }}</span></td>
-                                                <td>{{ __('System profit: 15% (vs 10% in V2)') }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-box">
+                                            <span class="info-box-icon bg-green"><i class="fa fa-arrow-up"></i></span>
+                                            <div class="info-box-content">
+                                                <span class="info-box-text">{{ __('Above Zero') }} / {{ __('فوق الصفر') }}</span>
+                                                <span class="info-box-number">{{ $isPositive ? '✓ ' . __('Yes') . ' / نعم' : '✗ ' . __('No') . ' / لا' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-box">
+                                            <span class="info-box-icon bg-red"><i class="fa fa-arrow-down"></i></span>
+                                            <div class="info-box-content">
+                                                <span class="info-box-text">{{ __('Below Zero') }} / {{ __('تحت الصفر') }}</span>
+                                                <span class="info-box-number">{{ !$isPositive ? '✓ ' . __('Yes') . ' / نعم' : '✗ ' . __('No') . ' / لا' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="alert alert-info" style="margin-top: 20px;">
-                                    <h4><i class="icon fa fa-info"></i> {{ __('Expected Results') }}</h4>
-                                    <p><strong>{{ __('Before V6:') }}</strong> RTP variance 99.45% - 71%, bankruptcy risk, consecutive jackpots</p>
-                                    <p><strong>{{ __('After V6:') }}</strong> Fair RTP, protected pool, stable system, +50% profit margin</p>
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col-md-12">
+                                        <div class="box box-default">
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title">{{ __('Safety Thresholds') }} / {{ __('حدود الأمان') }}</h3>
+                                            </div>
+                                            <div class="box-body">
+                                                <table class="table table-striped">
+                                                    <tr>
+                                                        <td><strong>{{ __('Min Safe Balance') }} / {{ __('الحد الأدنى الآمن') }}</strong></td>
+                                                        <td>{{ number_format($settings['bankruptcy_min_safe_balance'] ?? 100000, 0) }}</td>
+                                                        <td>
+                                                            @if($vaultBalance >= ($settings['bankruptcy_min_safe_balance'] ?? 100000))
+                                                                <span class="label label-success">{{ __('Safe') }} / {{ __('آمن') }}</span>
+                                                            @else
+                                                                <span class="label label-warning">{{ __('Warning') }} / {{ __('تحذير') }}</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ __('Critical Threshold') }} / {{ __('حد الإنذار الحرج') }}</strong></td>
+                                                        <td>{{ number_format($settings['bankruptcy_critical_threshold'] ?? 50000, 0) }}</td>
+                                                        <td>
+                                                            @if($vaultBalance >= ($settings['bankruptcy_critical_threshold'] ?? 50000))
+                                                                <span class="label label-success">{{ __('Safe') }} / {{ __('آمن') }}</span>
+                                                            @else
+                                                                <span class="label label-danger">{{ __('Critical') }} / {{ __('حرج') }}</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><strong>{{ __('Negative Limit') }} / {{ __('حد الرصيد السالب') }}</strong></td>
+                                                        <td>-{{ number_format($settings['global_vault_negative_limit'] ?? 30000, 0) }}</td>
+                                                        <td>
+                                                            @if($vaultBalance >= -($settings['global_vault_negative_limit'] ?? 30000))
+                                                                <span class="label label-success">{{ __('Within Limit') }} / {{ __('ضمن الحد') }}</span>
+                                                            @else
+                                                                <span class="label label-danger">{{ __('Exceeded') }} / {{ __('تجاوز') }}</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
