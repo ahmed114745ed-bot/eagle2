@@ -477,7 +477,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email','sender_level', 'received_level', 'phone', 'bio']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email','sender_level', 'received_level', 'phone', 'bio', 'salary', 'exchange_diamonds', 'monthly_diamond_received', 'total_sender_level', 'total_received_level']);
 
         $with = [
             'profile:id,user_id,avatar,gender',

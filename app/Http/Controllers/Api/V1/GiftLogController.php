@@ -528,7 +528,6 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift6(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        Log::info('sendLuckyGift6 called with data: ' . json_encode($request->all()));
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return Common::apiResponse(0, __('api_responses.try_again'));

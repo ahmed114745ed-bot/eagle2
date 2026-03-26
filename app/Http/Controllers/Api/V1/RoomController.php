@@ -104,7 +104,6 @@ class RoomController extends Controller
         // }
         if (!$audioRoom) return Common::apiResponse(false, 'Audio rooms are disabled', null, 400);
 
-        Log::info('RoomController@index called with room_type: ' . $request->room_type);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
         $rooms = $this->roomService->getAllRooms($request);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
