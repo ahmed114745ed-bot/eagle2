@@ -2594,13 +2594,31 @@ Route::get('/direct-recovery', function (Request $request) {
             }
 
             // ================================================================
-            // Final Status
+            // Final Status: Update debtor's salary record with recovered amount
             // ================================================================
             $debtorDetail['unrecoverable_coins'] = $remaining;
             $debtorDetail['recovery_rate'] = $debtCoins > 0 
                 ? round(($debtorDetail['recovered_coins'] / $debtCoins) * 100, 2) 
                 : 0;
             $debtorDetail['status'] = $remaining <= 0 ? 'fully_recovered' : 'partially_recovered';
+
+            // Convert recovered coins to USD for cut_amount update
+            // cut_amount should be in USD, not coins
+            $recoveredUsd = $debtorDetail['recovered_coins'] > 0 
+                ? round($debtorDetail['recovered_coins'] / $zonesCoins, 2)
+                : 0;
+
+            // Update the debtor's salary record to increase cut_amount by recovered USD amount
+            // This shows that the recovered amount has been deducted from their debt
+            if ($isLive && $recoveredUsd > 0) {
+                DB::table('user_sallaries')
+                    ->where('user_id', $debtor->user_id)
+                    ->where('month', $targetMonth)
+                    ->where('year', $targetYear)
+                    ->update([
+                        'cut_amount' => DB::raw("CAST(cut_amount AS SIGNED) + " . $recoveredUsd),
+                    ]);
+            }
 
             $report['summary']['total_recovered_coins'] += $debtorDetail['recovered_coins'];
             $report['summary']['total_unrecoverable_coins'] += $remaining;
