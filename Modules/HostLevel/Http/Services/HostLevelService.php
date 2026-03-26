@@ -32,25 +32,28 @@ class HostLevelService
     public function userInfoLevel($user)
     {
         $eventType = $this->getEventType();
-        $lastPick = $user->lastHostLevelWinnerByEvent($eventType)->first();
-        if ($lastPick && $lastPick->hostLevel) {
-            $nextLevel = HostLevel::where('level', '>', $lastPick->hostLevel->level)
-                ->orderBy('level', 'asc')
-                ->first();
-        } else {
-            $nextLevel = HostLevel::orderBy('level', 'asc')->first();
-        }
-        $lastPickLevel = $user->lastHostLevelWinnerByEvent($eventType)->first();
-        $courant = $lastPickLevel?->hostLevel?->level;
+//        $lastPick = $user->lastHostLevelWinnerByEvent($eventType)->first();
+//        if ($lastPick && $lastPick->hostLevel) {
+//            $nextLevel = HostLevel::where('level', '>', $lastPick->hostLevel->level)
+//                ->orderBy('level', 'asc')
+//                ->first();
+//        } else {
+//            $nextLevel = HostLevel::orderBy('level', 'asc')->first();
+//        }
+//        $lastPickLevel = $user->lastHostLevelWinnerByEvent($eventType)->first();
+//        $courant = $lastPickLevel?->hostLevel?->level;
 
         $diamonds = $this->computeDiamonds($user->id) ?? 0;
-        $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level')->value('level');
+        $current = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('diamonds')->first();
+        $nextLevel = HostLevel::where('diamonds', '>', $diamonds)->orderBy('diamonds')->first();
+
+//        $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level')->value('level');
         $lastLevelEvent = HostLevel::orderByDesc('level')->first();
         if ($lastLevelEvent && $diamonds > ($lastLevelEvent->diamonds ?? 0)) {
             $nextLevel = $lastLevelEvent;
         }
 
-        return [$diamonds, $nextLevel->level ?? 0, $courant ?? 0, $level, $eventType];
+        return [$diamonds, $nextLevel->level ?? 0, $current->level ?? 0, $current?->level ?? 0, $eventType];
     }
 
 
@@ -132,7 +135,10 @@ class HostLevelService
                     ];
                 }
             } elseif ($reward->type == "achievement") {
-                $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+
+           //     $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+
+            $dateTimestamp = now()->addDays((int)$reward->expire)->format("Y-m-d H:i:s");
 
                 $attributes = [
                     'user_id'       => $user->id,
@@ -179,7 +185,7 @@ class HostLevelService
 
         return  GiftLog::where('receiver_id', $userId)
             ->filterByEventType($eventType)
-            ->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total_diamond')->groupBy("receiver_id")
+            ->selectRaw('receiver_id, SUM(giftPrice) AS total_diamond')->groupBy("receiver_id")
             ->value('total_diamond');
     }
 }

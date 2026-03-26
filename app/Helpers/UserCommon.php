@@ -229,6 +229,10 @@ class UserCommon
 
         $parentWin = ($amount * $percentage) / 100;
 
+        if ($parentWin <= 0) {
+            return;
+        }
+
         $parent->di += $parentWin;
         $parent->save();
 
@@ -515,11 +519,10 @@ class UserCommon
             $arr['target_id'] = $ware->id;
             $arr['num']       = 1;
             $arr['is_read']   = 1;
-            $arr['use_num']   = 1;
-            $arr['using']     = 1;
-            $arr['is_read']   = 1;
+            $arr['use_num']   = 0;
+            $arr['using']     = 0;
             $arr['days']      = $expir;
-            $arr['expire']   = $expir ? time() + ($expir * 86400) : 0;
+            $arr['expire']   =  null;
 
             $arr['receive_type']      = $receiveType;
 
@@ -543,6 +546,13 @@ class UserCommon
             Common::send_firebase_notification($tokens_notfacion, $title, $body);
         } catch (\Exception $exception) {
             DB::rollBack();
+            \Log::error("حدث خطأ أثناء منح مكافأة الإنجاز: " . $exception->getMessage(), [
+                'user_id' => $user->id,
+                'reward_id' => $reward->id ?? 'N/A',
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(), 
+            ]);
             throw $exception;
         }
     }

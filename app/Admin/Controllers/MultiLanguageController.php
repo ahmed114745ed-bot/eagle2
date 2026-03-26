@@ -18,7 +18,6 @@ class MultiLanguageController extends Controller
         $languages = MultiLanguage::config('languages');
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');
         if (array_key_exists($locale, $languages)) {
-
             return response('ok')->cookie($cookie_name, $locale);
         }
     }

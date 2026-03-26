@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Http\Services\RoomService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -46,7 +47,7 @@ class ProcessRoomBoomGiftJob implements ShouldQueue
             $tz = getTimezone();
             $todayStart = \Carbon\Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
-            $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($this->room->id, $todayStart);
+            $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($this->room->id, $todayStart);
 
             $totalRoomGift->increment('current_total', $this->totalPrice);
         }

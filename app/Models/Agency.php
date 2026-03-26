@@ -399,6 +399,11 @@ class Agency extends Model
         return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
     }
 
+    public function giftLogs()
+    {
+        return $this->hasMany(GiftLog::class);
+    }
+
     public function getIsFrozenAttribute($value)
     {
         return $value ?? 0;

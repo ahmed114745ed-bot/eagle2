@@ -13,8 +13,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_luck_profiles', function (Blueprint $table) {
-            $table->boolean('is_in_recovery')->default(false);
-            $table->decimal('recovery_target_profit', 20, 2)->default(0);
+            if (!Schema::hasColumn('user_luck_profiles', 'is_in_recovery')) {
+                $table->boolean('is_in_recovery')->default(false);
+            }
+            if (!Schema::hasColumn('user_luck_profiles', 'recovery_target_profit')) {
+                $table->decimal('recovery_target_profit', 20, 2)->default(0);
+            }
         });
     }
 

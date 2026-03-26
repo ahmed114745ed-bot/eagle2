@@ -62,9 +62,11 @@ class GiftController extends MainController
      */
     public function show($id, Content $content)
     {
+        $gift = Gift::with(['category', 'luckyGift', 'vip'])->findOrFail($id);
+
         return parent::show($id, $content
             ->title(trans('Gifts'))
-            ->body($this->detail($id)));
+            ->body(view('admin.gift_detail', compact('gift'))));
     }
 
     /**
@@ -157,7 +159,22 @@ class GiftController extends MainController
 
 
         $grid->id(__('ID'));
-        $grid->name(__('Name'));
+        $grid->column('name', __('Name'))->display(function ($name) {
+
+            $uid = @$this->id;
+            $showUrl =  admin_url("gifts/{$this->id}") ?? 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    <div>
+                       <a href='{$showUrl}'
+                        style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 5px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                        </a>
+                        <span style='font-size: smaller;'>ID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
 
         if ($category && $category->type == 'vip') {
             $grid->column('level', trans('vip'))->display(function () {
@@ -408,11 +425,10 @@ class GiftController extends MainController
                 'status' => true,
                 'message' => 'تم تحديث ترتيب الهدايا بنجاح'
             ])->withHeaders([
-                        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                        'Pragma' => 'no-cache',
-                        'Expires' => '0'
-                    ]);
-
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -682,7 +698,7 @@ class GiftController extends MainController
     public function saveLuckyGiftVersion(Request $request)
     {
         $version = $request->input('lucky_gift_version');
-        if (in_array($version, [1, 2])) {
+        if (in_array($version, [1, 2, 3])) {
             Setting::updateOrCreate(['key' => 'lucky_gift_version'], ['value' => $version]);
             Cache::forget('lucky_gift_version');
             Cache::put('lucky_gift_version', $version);
@@ -695,11 +711,30 @@ class GiftController extends MainController
             Cache::put('lucky_gift_coins', $request->lucky_gift_coins);
         }
 
-        // Handle V1 percentages
-        $v1_keys = ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'];
+        // Handle V1 percentages and FairLuck settings
+        $v1_keys = ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift', 'fair_luck_app_fee_rate', 'fair_luck_owner_fee_rate', 'fair_luck_receiver_fee_rate'];
         foreach ($v1_keys as $key) {
             if ($request->has($key)) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                Cache::forget($key);
+                Cache::put($key, $request->input($key));
+            }
+        }
+
+        // Handle V6 FairLuck settings
+        $v6_keys = [
+            'global_vault_negative_limit',
+            'bankruptcy_min_safe_balance',
+            'bankruptcy_critical_threshold',
+            'bankruptcy_max_payout_percentage',
+            'v6_max_probability_cap',
+            'fairluck_jackpot_cooldown_bets',
+            'fairluck_user_data_ttl_days',
+            'v6_target_rtp'
+        ];
+        foreach ($v6_keys as $key) {
+            if ($request->has($key)) {
+                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
                 Cache::forget($key);
                 Cache::put($key, $request->input($key));
             }

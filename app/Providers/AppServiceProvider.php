@@ -341,6 +341,12 @@ class AppServiceProvider extends ServiceProvider
                 'currency' => $settings['codapay_currency'] ?? '',
             ],
 
+            'utd' => [
+                'base_url' => $settings['utd_base_url'] ?? '',
+                'api_key' => $settings['utd_api_key'] ?? '',
+                'project_id' => $settings['utd_project_id'] ?? '',
+            ],
+
             'googlePay' => [
                 'payment_url' => $settings['google_pay_payment_url'] ?? '',
                 'node_server_name' => $settings['google_pay_node_server_name'] ?? '',
@@ -356,6 +362,7 @@ class AppServiceProvider extends ServiceProvider
             'is_applepay_active' => $settings['is_applepay_active'] ?? 0,
             'is_google_pay_active' => $settings['is_google_pay_active'] ?? 0,
             'is_codapay_active' => $settings['is_codapay_active'] ?? 0,
+            'is_utd_active' => $settings['is_utd_active'] ?? 0,
         ]);
 
         Cache::put('app_title', $appName, now()->addHours(24));
