@@ -3,7 +3,6 @@
 use Modules\RoomCup\Http\Controllers\web\RoomCupTargetController;
 use Modules\RoomCup\Http\Controllers\web\RoomCupSettingsController;
 use Modules\RoomCup\Http\Controllers\web\RoomCupReportsController;
-use  Modules\RoomCup\Console\CalculateRoomCupRewards;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,10 +33,10 @@ Route::group(
         Route::post('room-cup-settings/save', [RoomCupSettingsController::class, 'save'])->name('room-cup-settings.save');
 
         Route::resource('room-cup-reports', RoomCupReportsController::class);
-        
- 
-        
-   
+
+
+
+
     }
 );
 

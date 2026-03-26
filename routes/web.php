@@ -294,6 +294,17 @@ Route::get('/run-permission', function () {
     ]);
 });
 
+
+Route::get('/devices-token-seeder', function () {
+
+    Artisan::call('db:seed', ['--class' => 'DevicesTokenHistories']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
 Route::get('/user-join-agency', function () {
 
     Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
@@ -867,13 +878,17 @@ Route::get('/fix-receiver-levels', function () {
 });
 
 Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
+    // Find bugged bag gift batches: source_type='gift' sent to multiple receivers after the bug date
     $affected = DB::table('gift_logs')
-        ->selectRaw('sender_id, giftId, created_at, MIN(giftPrice) as gift_price, COUNT(*) as receiver_count')
+        ->selectRaw('sender_id, giftId, giftPrice, giftNum, created_at, COUNT(*) as receiver_count')
         ->where('source_type', 'gift')
-        ->groupBy('sender_id', 'giftId', 'created_at')
+        ->where('created_at', '>=', '2026-03-19')
+        ->groupBy('sender_id', 'giftId', 'giftPrice', 'giftNum', 'created_at')
         ->havingRaw('COUNT(*) > 1')
         ->get();
+
     Log::info("Found " . $affected->count() . " affected bag gift transactions.");
+
     if ($affected->isEmpty()) {
         return response()->json([
             'status' => 'ok',
@@ -887,25 +902,25 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
 
     DB::transaction(function () use ($affected, $shouldExecute, &$totalExcess, &$details) {
         foreach ($affected as $group) {
-            $price = (int) $group->gift_price;
-            $excessDiamonds = $price * ($group->receiver_count - 1);
-            $totalExcess += $excessDiamonds;
-
             $logs = DB::table('gift_logs')
                 ->where('sender_id', $group->sender_id)
                 ->where('giftId', $group->giftId)
+                ->where('giftPrice', $group->giftPrice)
+                ->where('giftNum', $group->giftNum)
                 ->where('created_at', $group->created_at)
                 ->where('source_type', 'gift')
                 ->orderBy('id')
                 ->get(['id', 'receiver_id', 'giftPrice', 'created_at', 'room_id', 'receiver_family_id']);
 
             $extraLogs = $logs->slice(1);
+            $excessDiamonds = (int) $extraLogs->sum('giftPrice');
+            $totalExcess += $excessDiamonds;
 
             $details[] = [
                 'sender_id' => $group->sender_id,
                 'gift_id' => $group->giftId,
                 'created_at' => $group->created_at,
-                'gift_price_per_receiver' => $price,
+                'gift_price_per_receiver' => (int) $group->giftPrice,
                 'total_receivers' => $group->receiver_count,
                 'excess_diamonds' => $excessDiamonds,
                 'kept_receiver' => $logs->first()->receiver_id,
@@ -921,7 +936,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                     DB::table('users')
                         ->where('id', $log->receiver_id)
                         ->update([
-                            'total_diamond_received' => DB::raw("GREATEST(0, total_diamond_received - {$logPrice})"),
+                            'total_diamond_received' => DB::raw("GREATEST(0, CAST(total_diamond_received AS SIGNED) - {$logPrice})"),
                         ]);
 
                     // Reverse exchange_diamonds (only for non-agency users)
@@ -929,7 +944,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('id', $log->receiver_id)
                         ->where('agency_id', 0)
                         ->update([
-                            'exchange_diamonds' => DB::raw("GREATEST(0, exchange_diamonds - {$logPrice})"),
+                            'exchange_diamonds' => DB::raw("GREATEST(0, CAST(exchange_diamonds AS SIGNED) - {$logPrice})"),
                         ]);
 
                     // Reverse monthly_diamond_received
@@ -939,17 +954,12 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('month', $logDate->month)
                         ->where('year', $logDate->year)
                         ->update([
-                            'monthly_diamond_received' => DB::raw("GREATEST(0, monthly_diamond_received - {$logPrice})"),
+                            'monthly_diamond_received' => DB::raw("GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - {$logPrice})"),
                         ]);
                 }
 
-                // Reverse sender's inflated total_diamond_send & monthly_diamond_send
-                DB::table('users')
-                    ->where('id', $group->sender_id)
-                    ->update([
-                        'total_diamond_send' => DB::raw("GREATEST(0, total_diamond_send - {$excessDiamonds})"),
-                        'monthly_diamond_send' => DB::raw("GREATEST(0, monthly_diamond_send - {$excessDiamonds})"),
-                    ]);
+                // NOTE: Sender refund intentionally skipped — senders already spent their diamonds
+                // and the app has already collected those coins. No refund needed.
 
                 // Fix room session (was inflated by excess)
                 $roomId = $logs->first()->room_id;
@@ -957,7 +967,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                     DB::table('rooms')
                         ->where('id', $roomId)
                         ->update([
-                            'session' => DB::raw("GREATEST(0, session - {$excessDiamonds})"),
+                            'session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$excessDiamonds})"),
                         ]);
                 }
 
@@ -967,7 +977,7 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('room_id', $roomId)
                         ->where('user_id', $group->sender_id)
                         ->update([
-                            'coins' => DB::raw("GREATEST(0, coins - {$excessDiamonds})"),
+                            'coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$excessDiamonds})"),
                         ]);
                 }
 
@@ -978,19 +988,18 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                         ->where('room_id', $roomId)
                         ->whereDate('created_at', $logDate->toDateString())
                         ->update([
-                            'current_total' => DB::raw("GREATEST(0, current_total - {$excessDiamonds})"),
+                            'current_total' => DB::raw("GREATEST(0, CAST(current_total AS SIGNED) - {$excessDiamonds})"),
                         ]);
                 }
 
                 // Fix family total_diamond for extra receivers' families
                 $familyIds = $extraLogs->pluck('receiver_family_id')->filter()->unique();
                 foreach ($familyIds as $familyId) {
-                    $familyReceiverCount = $extraLogs->where('receiver_family_id', $familyId)->count();
-                    $familyExcess = $price * $familyReceiverCount;
+                    $familyExcess = (int) $extraLogs->where('receiver_family_id', $familyId)->sum('giftPrice');
                     DB::table('families')
                         ->where('id', $familyId)
                         ->update([
-                            'total_diamond' => DB::raw("GREATEST(0, total_diamond - {$familyExcess})"),
+                            'total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$familyExcess})"),
                         ]);
                 }
 
@@ -999,12 +1008,51 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
                 DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
             }
         }
+
+        // Fix salaries: zero out any salary where corrected monthly_diamond no longer meets target
+        if ($shouldExecute) {
+            $salaryFixes = DB::select("
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond, s.target_diamonds, m.monthly_diamond_received
+                FROM user_sallaries s
+                JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
+                WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
+                  AND m.monthly_diamond_received < s.target_diamonds
+                  AND s.achieved_diamond > m.monthly_diamond_received
+            ", [now()->month, now()->year]);
+
+            foreach ($salaryFixes as $sal) {
+                DB::table('user_sallaries')
+                    ->where('id', $sal->id)
+                    ->update([
+                        'achieved_diamond' => $sal->monthly_diamond_received,
+                        'sallary' => 0,
+                        'agency_sallary' => 0,
+                        'diamond' => $sal->monthly_diamond_received . ' / ' . $sal->target_diamonds,
+                        'remaining_diamond' => max(0, $sal->target_diamonds - $sal->monthly_diamond_received),
+                        'is_finished' => 0,
+                    ]);
+            }
+        }
     });
+
+    $salaryReport = DB::table('user_sallaries as s')
+        ->join('monthly_diamond_receives as m', function ($join) {
+            $join->on('m.user_id', '=', 's.user_id')
+                ->where('m.month', '=', DB::raw('s.month'))
+                ->where('m.year', '=', DB::raw('s.year'));
+        })
+        ->where('s.month', now()->month)
+        ->where('s.year', now()->year)
+        ->where('s.is_paid', 0)
+        ->whereColumn('s.achieved_diamond', '>', 'm.monthly_diamond_received')
+        ->select('s.user_id', 's.achieved_diamond', 'm.monthly_diamond_received', 's.target_diamonds', 's.sallary', 's.agency_sallary')
+        ->get();
 
     return response()->json([
         'status' => $shouldExecute ? 'fixed' : 'report',
         'total_affected_transactions' => $affected->count(),
         'total_excess_diamonds' => $totalExcess,
+        'salary_corrections' => $salaryReport->count(),
         'details' => $details,
     ]);
 });
@@ -1935,6 +1983,7 @@ Route::get('/fix-total-room-gifts', function () {
         // Find or create TotalRoomGift record for this room on this date
         $record = TotalRoomGift::whereDate('created_at', $giftDate)
             ->where('room_id', $roomId)
+            ->lockForUpdate()
             ->first();
 
         if ($record) {
@@ -2157,12 +2206,80 @@ Route::get('/get-gift-percentages', function () {
     dd($negativeLimit, $appFeeRate, $receiverFeeRate,$hostPercentage);
 });
 
-Route::get('/get-gift-percentagesv2', function () {
-    $raw = \App\Models\Setting::where('key', 'host_lucky_gift')->value('value');
-    $cached = Cache::get('percentage_host_lucky_gift');
-    $fromFunction = getGiftPercentage('host_lucky_gift');
-    $final = $fromFunction / 10;
-    dd(['raw DB' => $raw, 'cached' => $cached, 'getGiftPercentage()' => $fromFunction, 'final /10' => $final]);
+// Step 1: Diagnostic - show affected lucky gift logs (100% instead of 10%)
+Route::get('/fix-gift-logs/check', function () {
+    $affected = DB::select("
+        SELECT
+            gl.id,
+            gl.giftId,
+            gl.giftNum,
+            gl.giftPrice as logged_price,
+            gl.receiver_obtain,
+            g.price as actual_gift_price,
+            g.type as gift_type,
+            (gl.giftNum * g.price) as expected_full_price,
+            ROUND(gl.giftPrice / (gl.giftNum * g.price), 2) as current_ratio,
+            ROUND(gl.giftNum * g.price * 0.1, 2) as correct_10_percent,
+            gl.created_at
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.type = 6
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+        ORDER BY gl.id DESC
+        LIMIT 50
+    ");
+
+    $totalAffected = DB::selectOne("
+        SELECT COUNT(*) as total
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.type = 6
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    return response()->json([
+        'total_affected_records' => $totalAffected->total,
+        'sample_records' => $affected,
+        'message' => 'These records have giftPrice at 100% instead of 10%. Go to /fix-gift-logs/run to fix them.',
+    ]);
 });
 
+// Step 2: Fix - update affected records to 10%
+Route::get('/fix-gift-logs/run', function () {
+    $affected = DB::selectOne("
+        SELECT COUNT(*) as total
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.gift_category_id = 7
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
 
+    if ($affected->total == 0) {
+        return response()->json(['message' => 'No records to fix.']);
+    }
+
+    $updated = DB::update("
+        UPDATE gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        SET
+            gl.roomowner_obtain = FLOOR(gl.giftPrice * 0.1 * 0.03),
+            gl.app_profit_coins = gl.giftPrice * 0.1,
+            gl.receiver_obtain = gl.giftPrice * 0.1,
+            gl.giftPrice = gl.giftPrice * 0.1
+        WHERE g.gift_category_id = 7
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    return response()->json([
+        'message' => "Fixed {$updated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
+        'records_updated' => $updated,
+    ]);
+});

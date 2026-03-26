@@ -60,7 +60,8 @@ class PoolManager
         if ($amount <= 0) return true;
 
         $totalBalance = $this->getTotalBalance();
-        if ($totalBalance < $amount) {
+        $negativeLimit = \App\Models\FairLuckSetting::getNegativeLimit();
+        if (($totalBalance + $negativeLimit) < $amount) {
             return false;
         }
 

@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 
+use App\Http\Services\RoomService;
 use App\Models\Cp;
 use Carbon\Carbon;
 use App\Models\User;
@@ -198,7 +199,7 @@ class GiftLogService
                 $tz = getTimezone();
                 $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
-                $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+                $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
 
                 $totalRoomGift->increment('current_total', $totalPrice);
             }
@@ -390,7 +391,7 @@ class GiftLogService
                 $tz = getTimezone();
                 $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
-                $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+                $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
 
                 $totalRoomGift->increment('current_total', $totalPrice);
             }

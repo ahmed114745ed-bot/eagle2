@@ -1,4 +1,4 @@
-<div id="brandSettings" class="settings-section active">
+<div id="brandSettings" class="settings-section">
     <h3>{{ __('Brand settings') }}</h3>
     <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" class="settings-form">
         @csrf
