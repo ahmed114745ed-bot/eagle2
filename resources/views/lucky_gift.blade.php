@@ -53,6 +53,11 @@
                                     <input type="radio" name="lucky_gift_version" value="2" {{ $currentVersion == 2 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
                                     <strong>{{ __('Version 2 (FairLuck)') }}</strong>
                                 </label>
+                                <label
+                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 3 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
+                                    <input type="radio" name="lucky_gift_version" value="3" {{ $currentVersion == 3 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
+                                    <strong>{{ __('Version 3 (FairLuck V6)') }}</strong>
+                                </label>
                             </div>
                         </form>
                     </div>
@@ -111,7 +116,7 @@
                         </div>
                     </form>
                 </div>
-            @else
+            @elseif($currentVersion == 2)
                 {{-- Version 2 Content (Matched with fairluck/dashboard.blade.php) --}}
                 @php $settings = $fairLuckSettings; @endphp
                 <div class="box box-info">
@@ -168,6 +173,132 @@
                         </div>
                     </div>
                 </div>
+            @elseif($currentVersion == 3)
+                {{-- Version 3 Content (FairLuck V6 - Same settings as V2) --}}
+                @php $settings = $fairLuckSettings; @endphp
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ __('FairLuck V6 Settings (Advanced Protection)') }} / {{ __('إعدادات FairLuck V6 (الحماية المتقدمة)') }}</h3>
+                    </div>
+                    <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
+                        @csrf
+                        <div class="box-body">
+                          
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit') }} / {{ __('حد الرصيد السالب العام') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="global_vault_negative_limit" class="form-control"
+                                        value="{{ $settings['global_vault_negative_limit'] ?? 30000 }}">
+                                    <span class="help-block">{{ __('Maximum allowed negative balance') }} / {{ __('الحد الأقصى للرصيد السالب المسموح به') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Min Safe Balance') }} / {{ __('الحد الأدنى الآمن لحماية الإفلاس') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="bankruptcy_min_safe_balance" class="form-control"
+                                        value="{{ $settings['bankruptcy_min_safe_balance'] ?? 100000 }}">
+                                    <span class="help-block">{{ __('Minimum safe balance threshold') }} / {{ __('حد الرصيد الآمن الأدنى') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Bankruptcy Critical Threshold') }} / {{ __('حد الإنذار الحرج للإفلاس') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="bankruptcy_critical_threshold" class="form-control"
+                                        value="{{ $settings['bankruptcy_critical_threshold'] ?? 50000 }}">
+                                    <span class="help-block">{{ __('Critical alert threshold') }} / {{ __('حد الإنذار الحرج') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Max Payout Percentage') }} / {{ __('أقصى نسبة دفع') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="bankruptcy_max_payout_percentage" class="form-control"
+                                        value="{{ $settings['bankruptcy_max_payout_percentage'] ?? 0.15 }}">
+                                    <span class="help-block">{{ __('Maximum payout as % of pool (0.15 = 15%)') }} / {{ __('أقصى دفع كنسبة من المجموعة (0.15 = 15%)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Max Probability Cap') }} / {{ __('الحد الأقصى لسقف الاحتمالية') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="v6_max_probability_cap" class="form-control"
+                                        value="{{ $settings['v6_max_probability_cap'] ?? 0.50 }}">
+                                    <span class="help-block">{{ __('Hard cap on win probability (0.50 = 50%)') }} / {{ __('حد صارم على احتمالية الفوز (0.50 = 50%)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Jackpot Cooldown Bets') }} / {{ __('رهانات فترة الانتظار للجائزة الكبرى') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="fairluck_jackpot_cooldown_bets" class="form-control"
+                                        value="{{ $settings['fairluck_jackpot_cooldown_bets'] ?? 200 }}">
+                                    <span class="help-block">{{ __('Required bets between big jackpots (250x+)') }} / {{ __('الرهانات المطلوبة بين الجوائز الكبرى (250x+)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('User Data TTL (Days)') }} / {{ __('TTL بيانات المستخدم (أيام)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" name="fairluck_user_data_ttl_days" class="form-control"
+                                        value="{{ $settings['fairluck_user_data_ttl_days'] ?? 90 }}">
+                                    <span class="help-block">{{ __('Days before user RTP data expires') }} / {{ __('الأيام قبل انتهاء صلاحية بيانات RTP للمستخدم') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Target RTP') }} / {{ __('RTP المستهدف') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="v6_target_rtp" class="form-control"
+                                        value="{{ $settings['v6_target_rtp'] ?? 0.85 }}">
+                                    <span class="help-block">{{ __('Target Return to Player (0.85 = 85%)') }} / {{ __('العائد المستهدف للاعب (0.85 = 85%)') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }} / {{ __('معدل رسوم التطبيق (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_app_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }} / {{ __('معدل رسوم المستقبل (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_receiver_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }} / {{ __('معدل رسوم المالك (0.10 = 10%)') }}</label>
+                                <div class="col-sm-8">
+                                    <input type="number" step="0.01" name="fair_luck_owner_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-success pull-right">{{ __('Save V6 Settings') }} / {{ __('حفظ إعدادات V6') }}</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">{{ __('Global Vault Balance History') }} / {{ __('سجل رصيد الخزينة العام') }}</h3>
+                            </div>
+                            <div class="box-body">
+                                <canvas id="vaultChartV6" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
         </div>
 
@@ -200,7 +331,7 @@
     </div>
 </div>
 
-@if($luckyStatus == 1 && $currentVersion == 2 && isset($history))
+@if($luckyStatus == 1 && isset($history))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(function () {
@@ -217,13 +348,14 @@
             var labels = historyData.map(function (d) { return d.date; });
             var dataPoints = historyData.map(function (d) { return d.after; });
 
-            var ctx = document.getElementById('vaultChart').getContext('2d');
+            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : 'vaultChart' }}';
+            var ctx = document.getElementById(chartId).getContext('2d');
             var chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: "{{ __('Global Vault Balance') }}",
+                        label: "{{ __('Global Vault Balance') }} / {{ __('رصيد الخزينة العام') }}",
                         data: dataPoints,
                         borderColor: 'rgba(60,141,188,0.8)',
                         backgroundColor: 'rgba(60,141,188,0.2)',
