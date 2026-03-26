@@ -2101,23 +2101,38 @@ Route::get('/fix-gift-logs/run', function () {
         return response()->json(['message' => 'No records to fix.']);
     }
 
-    $updated = DB::update("
-        UPDATE gift_logs gl
-        JOIN gifts g ON gl.giftId = g.id
-        SET
-            gl.roomowner_obtain = FLOOR(gl.giftPrice * 0.1 * 0.03),
-            gl.app_profit_coins = gl.giftPrice * 0.1,
-            gl.receiver_obtain = gl.giftPrice * 0.1,
-            gl.giftPrice = gl.giftPrice * 0.1
-        WHERE g.gift_category_id = 7
-        AND gl.giftNum > 0
-        AND g.price > 0
-        AND gl.giftPrice = gl.giftNum * g.price
-    ");
+    $totalUpdated = 0;
+    $batchSize = 1000;
+
+    do {
+        $ids = DB::table('gift_logs as gl')
+            ->join('gifts as g', 'gl.giftId', '=', 'g.id')
+            ->where('g.gift_category_id', 7)
+            ->where('gl.giftNum', '>', 0)
+            ->where('g.price', '>', 0)
+            ->whereRaw('gl.giftPrice = gl.giftNum * g.price')
+            ->limit($batchSize)
+            ->pluck('gl.id');
+
+        if ($ids->isEmpty()) break;
+
+        $updated = DB::update("
+            UPDATE gift_logs gl
+            JOIN gifts g ON gl.giftId = g.id
+            SET
+                gl.roomowner_obtain = FLOOR(gl.giftPrice * 0.1 * 0.03),
+                gl.app_profit_coins = gl.giftPrice * 0.1,
+                gl.receiver_obtain = gl.giftPrice * 0.1,
+                gl.giftPrice = gl.giftPrice * 0.1
+            WHERE gl.id IN (" . $ids->implode(',') . ")
+        ");
+
+        $totalUpdated += $updated;
+    } while ($ids->count() === $batchSize);
 
     return response()->json([
-        'message' => "Fixed {$updated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
-        'records_updated' => $updated,
+        'message' => "Fixed {$totalUpdated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
+        'records_updated' => $totalUpdated,
     ]);
 });
 
