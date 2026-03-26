@@ -2479,13 +2479,16 @@ Route::get('/direct-recovery', function (Request $request) {
             // Scenario B: Trace gifts to users
             // ================================================================
             if ($remaining > 0) {
+                // 1. جلب المستلمين والمبالغ التي حصلوا عليها من المديون
                 $gifts = DB::select("
                     SELECT receiver_id, SUM(giftPrice) as total_sent
                     FROM gift_logs
-                    WHERE sender_id = ? AND created_at >= ? AND created_at < '2026-04-01'
+                    WHERE sender_id = ? 
+                    AND created_at >= ? 
+                    AND created_at < '2026-04-01'
                     GROUP BY receiver_id
                     ORDER BY total_sent DESC
-                    LIMIT 50
+                    LIMIT 100
                 ", [$debtor->user_id, $bugDate]);
 
                 foreach ($gifts as $gift) {
@@ -2495,40 +2498,42 @@ Route::get('/direct-recovery', function (Request $request) {
                     $giftAmount = (int) $gift->total_sent;
                     $deductAmount = min($remaining, $giftAmount);
 
-                    // Get receiver info
-                    $receiver = DB::table('users')->where('id', $receiverId)->first();
-                    if (!$receiver) continue;
+                    // 2. البحث في جدول الماسات الشهرية للمستلم
+                    $monthlyRecord = DB::table('monthly_diamond_receives')
+                        ->where('user_id', $receiverId)
+                        ->where('month', $targetMonth)
+                        ->where('year', $targetYear)
+                        ->first();
 
-                    $receiverDi = (int) $receiver->di;
-                    $canDeduct = min($deductAmount, $receiverDi);
+                    if (!$monthlyRecord) continue;
+
+                    // الرصيد القابل للخصم هو ما استلمه فعلياً هذا الشهر
+                    $currentMonthlyDiamonds = (int) $monthlyRecord->monthly_diamond_received;
+                    $canDeduct = min($deductAmount, $currentMonthlyDiamonds);
 
                     $trace = [
-                        'type' => 'gift_to_user',
+                        'type' => 'monthly_gift_recovery',
                         'target_id' => $receiverId,
-                        'target_name' => $receiver->name ?? 'N/A',
+                        'target_name' => DB::table('users')->where('id', $receiverId)->value('name') ?? 'N/A',
                         'gift_amount' => $giftAmount,
                         'requested_deduction' => $deductAmount,
-                        'receiver_di_before' => $receiverDi,
+                        'monthly_diamonds_before' => $currentMonthlyDiamonds,
                         'deducted_amount' => $canDeduct,
-                        'receiver_di_after' => $receiverDi - $canDeduct,
-                        'status' => $canDeduct >= $deductAmount ? 'success' : 'insufficient_balance',
+                        'status' => $canDeduct >= $deductAmount ? 'success' : 'partial_from_monthly',
                     ];
 
                     if ($isLive && $canDeduct > 0) {
-                        DB::statement("
-                            UPDATE users 
-                            SET di = CAST(di AS SIGNED) - ?
-                            WHERE id = ?
-                        ", [$canDeduct, $receiverId]);
+                        // 3. التحديث الفعلي في جدول الماسات الشهرية وليس جدول المستخدمين
+                        DB::table('monthly_diamond_receives')
+                            ->where('id', $monthlyRecord->id)
+                            ->update([
+                                'monthly_diamond_received' => DB::raw("monthly_diamond_received - $canDeduct")
+                            ]);
                     }
 
                     $remaining -= $canDeduct;
                     $debtorDetail['recovered_coins'] += $canDeduct;
                     $debtorDetail['traces'][] = $trace;
-
-                    if ($canDeduct < $deductAmount) {
-                        $report['summary']['users_affected']++;
-                    }
                 }
             }
 
@@ -2602,6 +2607,8 @@ Route::get('/direct-recovery', function (Request $request) {
 
             $report['debtors'][] = $debtorDetail;
         }
+        app(\App\Http\Controllers\DiamondController::class)->calculateSalary();
+        
 
         // Commit or rollback
         if ($isLive) {
