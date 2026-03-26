@@ -2305,7 +2305,6 @@ Route::get('v2/system-merge-only-duplicates', function (\Illuminate\Http\Request
 
         $currentDiamond = DB::table('monthly_diamond_receives')
             ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
-             ->where('user_agency_id', $currentAgencyId)
             ->value('monthly_diamond_received');
 
         // نضيف في التقرير لو فيه تغيير
@@ -2958,4 +2957,15 @@ Route::get('/direct-recovery', function (Request $request) {
 </html>';
 
     return response($html)->header('Content-Type', 'text/html; charset=utf-8');
+});
+
+// ================================================================
+// Direct Recovery V2 - Dispatch Job
+// ================================================================
+Route::get('/direct-recovery-v2', function () {
+    \App\Jobs\DirectRecoveryJob::dispatch();
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'DirectRecoveryJob has been queued. Check public/ for the report when done.',
+    ]);
 });
