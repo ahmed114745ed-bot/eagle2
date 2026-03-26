@@ -419,8 +419,5 @@
                 }
             });
         });
-    </
-script>
-@endif
-script>
+    </script>
 @endif
