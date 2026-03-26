@@ -54,4 +54,8 @@ class FairLuckSetting extends Model
     {
         return (int) static::getByKey('global_vault_negative_limit', 30000);
     }
+    public static function getOwnerFeeRate(): float
+    {
+        return (float) static::getByKey('fair_luck_owner_fee_rate', 0.10);
+    }
 }

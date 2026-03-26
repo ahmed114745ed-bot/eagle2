@@ -47,7 +47,9 @@ use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\EmojiCategoryController;
 use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\ExportController;
+use App\Admin\Controllers\FairLuckSettingsController;
 use App\Admin\Controllers\FamilyConfigSettingController;
+use App\Admin\Controllers\FamilyController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\Filter\FilterController;
 use App\Admin\Controllers\GameChargeHistoryController;
@@ -121,7 +123,6 @@ use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
 use App\Admin\Controllers\WithdrawController;
 use App\Admin\Controllers\ZegoFeatureController;
-use App\Admin\Controllers\FairLuckSettingsController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 use App\Models\Room;
@@ -230,7 +231,7 @@ Route::group(
         Route::post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
         Route::resource('rooms-preview', TestController::class); //
-    
+
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -238,7 +239,7 @@ Route::group(
         Route::get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         Route::get('agency-statistic', 'AgencyStatisticController@index');
         //    Route::get('agency-settings', 'AgencySettingController@index');
-    
+
         Route::resource('test-test', 'TestTestController');
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
@@ -288,7 +289,7 @@ Route::group(
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
-    
+
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
@@ -385,6 +386,7 @@ Route::group(
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
+        Route::get('families-settings', [FamilyController::class, 'familySettings']);
         Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
         Route::get('/targets-confirm', [TargetController::class, 'confirm'])->name('targets.confirm');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf')->middleware('web-agency-feature');
@@ -626,7 +628,7 @@ Route::group(
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
-        Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
+        // Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         Route::resource('agency-manger-users', AgencyMangerUsers::class);
@@ -646,6 +648,9 @@ Route::group(
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
+
+        Route::get('invitation-code', [InvitationSettingsController::class, 'inviteCode']);
+
 
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
         Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
@@ -759,6 +764,12 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
+
+            Route::get('/agencies-test', [GiftLogTestController::class, 'showAgencies']);
+            Route::post('/agencies-test', [GiftLogTestController::class, 'agencies']);
+
+            Route::get('/gift-test', [GiftLogTestController::class, 'showSendGift']);
+            Route::post('/gift-test', [GiftLogTestController::class, 'sendGift']);
 
             Route::get('/pusher-test/{id}', function ($id) {
                 $user = \App\Models\User::findOrFail($id);

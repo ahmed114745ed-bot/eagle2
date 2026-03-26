@@ -45,6 +45,15 @@ class UpgradeLevelController extends MainController
         // Clear all cache including rememberForever keys
         Cache::forget('all_configs');
         Cache::flush();
+
+        // Re-populate exp_percentages cache after flush
+        $collection = Common::getConfFromKey($Keys);
+        $values = [];
+        foreach ($Keys as $key) {
+            $config = $collection->where('name', $key)->first();
+            $values[$key] = $config ? $config->value : 1;
+        }
+        Cache::put('exp_percentages', $values, now()->addMinutes(60));
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
@@ -53,7 +62,8 @@ class UpgradeLevelController extends MainController
             }
         }
         
-        return redirect($redirectUrl)->with('message', __('dashboard.update'));
+        admin_toastr(__('Settings updated successfully!'), 'success');
+        return redirect($redirectUrl);
     }
 
     public function exchange(Request $request)
@@ -70,6 +80,22 @@ class UpgradeLevelController extends MainController
         // Clear all cache including rememberForever keys
         Cache::forget('all_configs');
         Cache::flush();
+
+        // Re-populate exp_percentages cache after flush
+        $expKeys = [
+            'exp_sender_percentage',
+            'exp_received_percentage',
+            'exp_cp_percentage',
+            'exp_room_percentage',
+            'exp_charge_percentage'
+        ];
+        $collection = Common::getConfFromKey($expKeys);
+        $expValues = [];
+        foreach ($expKeys as $expKey) {
+            $conf = $collection->where('name', $expKey)->first();
+            $expValues[$expKey] = $conf ? $conf->value : 1;
+        }
+        Cache::put('exp_percentages', $expValues, now()->addMinutes(60));
         
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {
@@ -79,7 +105,8 @@ class UpgradeLevelController extends MainController
             }
         }
         
-        return redirect($redirectUrl)->with('message', __('dashboard.update'));
+        admin_toastr(__('Settings updated successfully!'), 'success');
+        return redirect($redirectUrl);
     }
     public function group_chat_config(Request $request)
     {

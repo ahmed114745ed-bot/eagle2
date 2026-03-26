@@ -68,6 +68,7 @@ use Modules\Events\Entities\WeeklyStar;
 use Modules\Events\Entities\Winner;
 use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
+use stdClass;
 use Twilio\Rest\Client as TwilioClint;
 
 class Common
@@ -158,7 +159,7 @@ class Common
     {
         $user = User::query()->find($user_id);
         if (!$user) {
-            return new \stdClass();
+            return new stdClass();
         }
 
         $star_level = $user->received_level + $user->sub_receiver_level;
@@ -171,6 +172,34 @@ class Common
 
         return $data;
     }
+
+    public static function level_center_min_v2($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new stdClass();
+        } else {
+            $user = $user_id;
+        }
+
+        if (!$user) {
+            return [
+                'receiver_img' => '',
+                'sender_img' => ''
+            ];
+        }
+
+        $star_level = $user->received_level + $user->sub_receiver_level;
+        $firstVip = Vip::collectionBuilder()->where('level', $star_level)->where('type', 1)->first();
+        $data['receiver_img'] = !is_null($firstVip) ? $firstVip->img : '';
+
+        $gold_level = $user->sender_level + $user->sub_sender_level;
+        $firstVip_type2 = Vip::collectionBuilder()->where('level', $gold_level)->where('type', 2)->first();
+        $data['sender_img'] = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
+
+        return $data;
+    }
+
     public static function backgroundCount($oldBackgroundId = 0, $newBackGroundId = 0)
     {
         $oldBackground = Background::where("id", $oldBackgroundId)->orWhere("img", $oldBackgroundId)->first();
@@ -1474,6 +1503,7 @@ class Common
 
         return $ch->isNotEmpty();
     }
+
     public static function hasProfileFramePack($user_id, $type, $use_status = false)
     {
         $ch =  self::checkPack($user_id, $type);

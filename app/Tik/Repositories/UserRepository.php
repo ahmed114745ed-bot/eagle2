@@ -126,7 +126,8 @@ class UserRepository extends AbstractRepository
             ->with([
                 'agency:id,owner_id,name,type',
                 'profile:id,user_id,avatar',
-                'family:id,user_id,name,total_diamond,current_level_id'
+                'family:id,user_id,name,total_diamond,current_level_id',
+                'currentMonthlyDiamond'
             ])
             ->whereIn('id', $ids)->get();
     }
@@ -420,7 +421,9 @@ class UserRepository extends AbstractRepository
 
     public function getAgencyMangerByFilter($keyword)
     {
-        return $this->model->query()->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keyword}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])->has('ownAgency')->where(function ($q) use ($keyword) {
+        return $this->model->query()
+            ->with(['profile', 'ownAgency.mempers.profile'])
+            ->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keyword}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])->has('ownAgency')->where(function ($q) use ($keyword) {
             $q->where('uuid', 'like', '%' . $keyword . '%')
                 ->orWhereHas('ownAgency', function ($query) use ($keyword) {
                     $query->where('id', 'like', '%' . $keyword . '%');

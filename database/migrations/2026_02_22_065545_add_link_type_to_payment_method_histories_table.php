@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payment_method_histories', function (Blueprint $table) {
-            $table->string('link_type')->nullable()->after('type');
-        });
+        if (!Schema::hasColumn('payment_method_histories', 'link_type')) {
+            Schema::table('payment_method_histories', function (Blueprint $table) {
+                $table->string('link_type')->nullable()->after('type');
+            });
+        }
     }
 
     /**

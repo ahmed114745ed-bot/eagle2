@@ -75,7 +75,8 @@ class ChargeAction2 extends Action
             }
             $agency->save();
 
-            $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount, $shippingCoins);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request,  $agency, $amount, $coins, $usdAmount, $shippingCoins);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';

@@ -35,11 +35,20 @@ class ChargeReportController extends Controller
 
     public function return($id){
         $coinlog = CoinLog::where('id', $id)->first();
+        if(!$coinlog){
+            return Common::apiResponse(false, 'Coin Log Not Found');
+        }
         $user = User::where('id', $coinlog->user_id)->first();
         if(!$user){
             return Common::apiResponse(false, 'User Not Found');
         }
-        $user->di = @$user->di - $coinlog->obtained_coins;
+        if ($coinlog->obtained_coins == 0) {
+            return Common::apiResponse(false, 'Invalid coin amount');
+        }
+        if ($coinlog->obtained_coins > 0 && $user->di < $coinlog->obtained_coins) {
+            return Common::apiResponse(false, 'Insufficient balance');
+        }
+        $user->di = $user->di - $coinlog->obtained_coins;
         $coinlog->obtained_coins = 0;
         $coinlog->delete();
         $user->update();

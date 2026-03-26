@@ -127,7 +127,7 @@
                         }
                     } elseif ($name === 'dollar') {
                         if($isDashboard) {
-                            $value = \App\Models\Charge::where('charger_type', 'dash')->sum('usd');
+                            $value = \App\Models\Charge::where('charger_type', 'dash')->where('amount', '>', 0)->sum('usd');
                         } elseif ($isHost) {
                             $value = \App\Models\Charge::where('charger_type', 'host_agency')->sum('usd');
                         } else {

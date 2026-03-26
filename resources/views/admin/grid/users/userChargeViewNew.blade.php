@@ -85,13 +85,6 @@
 
     <div class="box-body no-padding">
         <div class="switch-container">
-            {{-- <div class="switch-item">
-                <label for="stopChargeCheckbox" class="switch-label">{{ __("dashboard.roomOn") }}</label>
-                <label class="switch">
-                    <input type="checkbox" id="stopChargeCheckbox" {{ $make_rooms_top == 1 ? 'checked' : '' }}>
-                    <span class="slider round"></span>
-                </label>
-            </div> --}}
 
             <div class="switch-item">
                 <label for="stopCharge" class="switch-label">{{ __('dashboard.frazeCharge') }}</label>
@@ -134,6 +127,36 @@
             </div>
         </div>
     </div>
+        <div class="nav-tabs-custom">
+            <div class="tab-content">
+            <div class="tab-pane active" id="tab_2">
+                    <div class="box box-warning">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">{{ __('register accounts') }}</h3>
+                        </div>
+                        <form action="{{ route('admin.app.settings.update') }}" method="POST" class="form-horizontal">
+                            @csrf
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">{{ __('register account') }}</label>
+                                    <div class="col-sm-8">
+                                        <input type="number" name="register_account" class="form-control"
+                                                value="{{ $register_account ?? 0 }}"
+                                            required>
+                                        <span
+                                            class="help-block">{{ __('Number of accounts that can be registered with same device') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-warning pull-right">{{ __('Save') }}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
     <script>
         $(document).ready(function() {
@@ -144,17 +167,6 @@
                 }
             });
 
-            // Handle change event for stopChargeCheckbox
-            /* $('#stopChargeCheckbox').on('change', function() {
-                var isChecked = $(this).is(':checked');
-                $.ajax({
-                    url: '/admin/send-request-make-rooms-top',
-                    method: 'POST',
-                    data: { make_rooms_top: isChecked },
-                    success: function(response) { console.log(response); },
-                    error: function(error) { console.error(error); }
-                });
-            }); */
 
             $('#stopGiftCheckbox').on('change', function() {
                 var isChecked = $(this).is(':checked');

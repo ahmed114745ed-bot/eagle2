@@ -1,46 +1,20 @@
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #121212;
-        color: white;
+    :root {
+        --primary-color: {{ config('themes.primaryColor', '#FF9428') }};
+        --secondary-color: {{ config('themes.secondaryColor', '#1A1A1A') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor', '#fdf8f8') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor', '#c1b9b9') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor', '#222222') }};
+    }
+
+    * { box-sizing: border-box; }
+
+    .all-page {
         display: flex;
-    }
-
-    /* القائمة الجانبية */
-    .settings-sidebar {
-        width: 250px;
-        background: #222;
         min-height: 400px;
-
-        padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     }
 
-    .settings-sidebar h2 {
-        text-align: center;
-        color: #ff9800;
-    }
-
-    .settings-menu button {
-        display: block;
-        width: 100%;
-        text-align: right;
-        padding: 15px;
-        background: #333;
-        color: white;
-        border: none;
-        margin-bottom: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .settings-menu button:hover {
-        background: #ff9800;
-    }
-
-    /* محتوى الصفحة */
+    /* ═══════ CONTENT ═══════ */
     .settings-content {
         flex-grow: 1;
         padding: 20px;
@@ -50,59 +24,65 @@
         display: none;
     }
 
-    .active {
+    .settings-section.active {
         display: block;
     }
 
-    /* تنسيق النماذج */
+    /* ═══════ FORM ═══════ */
     form {
-        background: #222;
-        padding: 20px;
-        border-radius: 5px;
+        background: var(--text-secondary-color);
+        padding: 24px;
+        border-radius: 10px;
+    }
+
+    .form {
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
     }
 
     label {
         display: block;
-        margin: 10px 0 5px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #000000;
+        margin-bottom: 6px;
     }
 
-    input,
-    select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        background: #333;
-        border: 1px solid #444;
-        color: white;
+    input:focus,
+    select:focus {
+        border-color: var(--primary-color);
     }
 
-    button {
-        padding: 10px;
+    input::placeholder {
+        color: var(--text-secondary-color);
+        opacity: 0.5;
+    }
+
+    /* ═══════ BUTTON ═══════ */
+    .form-group .btn-primary,
+    form button[type="submit"] {
+        padding: 12px 28px;
+        background: var(--primary-color);
+        color: var(--text-primary-color);
         border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
         cursor: pointer;
-        font-weight: bold;
+        transition: opacity 0.2s;
+        width: auto;
     }
 
-    .all-page {
-        display: inline-flex;
+    .form-group .btn-primary:hover,
+    form button[type="submit"]:hover {
+        opacity: 0.85;
     }
 
-    .wrapper {
-        width: 100%;
-
-    }
-
-    .settings-content {
-        width: 869px;
-
-    }
-
-    .form {
-        width: 400px;
-        margin: auto;
-    }
-
-    /* تصميم النافذة */
+    /* ═══════ MODAL ═══════ */
     .modal {
         display: none;
         position: fixed;
@@ -115,7 +95,6 @@
         background-color: rgba(0, 0, 0, 0.9);
     }
 
-    /* الصورة داخل النافذة */
     .modal-content {
         margin: auto;
         display: block;
@@ -123,7 +102,6 @@
         max-width: 700px;
     }
 
-    /* زر الإغلاق */
     .close {
         position: absolute;
         top: 15px;
@@ -143,27 +121,22 @@
 
     button {
         width: 200px;
-
     }
 
-    @media (max-width: 576px) {
-    }
+    /* ═══════ RESPONSIVE ═══════ */
     @media (max-width: 768px) {
         .all-page {
             display: block;
         }
+
         .settings-content {
             width: 100%;
+            padding: 20px 16px;
         }
+
         .form {
             width: auto;
         }
-    }
-    @media (max-width: 992px) {
-    }
-    @media (max-width: 1200px) {
-    }
-    @media (max-width: 1400px) {
     }
 </style>
 </head>
@@ -209,17 +182,6 @@
                             <span class="help-block">{{ __('duration in hours') }}</span>
                         </div>
 
-                        {{-- <div class="form-group">
-                            <label for="lucky_box_percentage">{{ __('lucky box percentage') }}</label>
-                            <input type="number"
-                                id="lucky_box_percentage"
-                                name="lucky_box_percentage"
-                                min="1"
-                                value="{{ $config['lucky_box_percentage'] ?? 20 }}"
-                                class="form-control"
-                                placeholder="{{ __('Enter lucky box percentage') }}" />
-                        </div> --}}
-
                         <!-- Submit Button -->
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
@@ -233,55 +195,44 @@
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
         </div>
-        <!-- كود JavaScript -->
+
         <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Function to get query parameter by name
-    function getQueryParam(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
+            document.addEventListener("DOMContentLoaded", function () {
+                function getQueryParam(name) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(name);
+                }
 
-    // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-    const activeTab = getQueryParam("firsttab") || "VipSettings";
+                const activeTab = getQueryParam("firsttab") || "VipSettings";
+                showSection(activeTab);
+            });
 
-    // Show the selected tab
-    showSection(activeTab);
-});
+            function showSection(sectionId) {
+                document.querySelectorAll('.settings-section').forEach(section => {
+                    section.classList.remove('active');
+                });
 
-function showSection(sectionId) {
-    // Remove active class from all sections
-    document.querySelectorAll('.settings-section').forEach(section => {
-        section.classList.remove('active');
-    });
+                document.getElementById(sectionId).classList.add('active');
 
-    // Add active class to the selected section
-    document.getElementById(sectionId).classList.add('active');
+                document.querySelectorAll('.settings-menu button').forEach(button => {
+                    button.style.backgroundColor = '';
+                    button.style.color = '';
+                });
 
-    // Reset button styles
-    document.querySelectorAll('.settings-menu button').forEach(button => {
-        button.style.backgroundColor = '';
-        button.style.color = '';
-    });
+                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+                if (activeButton) {
+                    activeButton.style.backgroundColor = 'var(--primary-color)';
+                    activeButton.style.color = 'var(--text-secondary-color)';
+                }
 
-    // Highlight the active button
-    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-    if (activeButton) {
-        activeButton.style.backgroundColor = 'var(--primary-color)';
-        activeButton.style.color = 'var(--text-secondary-color)';
-    }
-
-    // Update the URL with the selected tab without reloading
-    const url = new URL(window.location);
-    url.searchParams.set("firsttab", sectionId);
-    window.history.pushState({}, "", url);
-}
-
+                const url = new URL(window.location);
+                url.searchParams.set("firsttab", sectionId);
+                window.history.pushState({}, "", url);
+            }
 
             function openFullScreen(imgElement) {
                 var modal = document.getElementById("imageModal");
                 var modalImg = document.getElementById("fullImage");
-
                 modal.style.display = "block";
                 modalImg.src = imgElement.src;
             }

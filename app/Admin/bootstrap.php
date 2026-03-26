@@ -34,9 +34,9 @@ Admin::favicon(getFavIcon());
 
 Admin::navbar(function ($navbar) {
 
-    info('lang');
     $languages = MultiLanguage::config('languages');
-    $current   = app()->getLocale();
+    $cookieName = MultiLanguage::config('cookie-name', 'locale');
+    $current = request()->cookie($cookieName, config('app.locale'));
 
     $navbar->right(
         view('vendor.multi-language.language-menu', compact('languages', 'current'))

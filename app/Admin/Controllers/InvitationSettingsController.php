@@ -4,13 +4,12 @@ namespace App\Admin\Controllers;
 
 use App\Models\Config;
 use Encore\Admin\Form;
-use Encore\Admin\Grid;
 use App\Models\Setting;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Auth\Permission;
+
 
 class InvitationSettingsController extends AdminController
 {
@@ -20,8 +19,8 @@ class InvitationSettingsController extends AdminController
     {
         $content = $content->title(__($this->title));
 
-        $content = $content->body(  $this->form());
-        
+        $content = $content->body($this->form());
+
 
         return $content;
     }
@@ -112,5 +111,26 @@ class InvitationSettingsController extends AdminController
     private function getSettingValue(string $key, $default = '')
     {
         return Setting::where('key', $key)->value('value') ?? $default;
+    }
+
+
+
+
+    public function inviteCode(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . 'invitation-code-setting');
+        }
+
+        $config = Setting::whereIn('key', [
+            'earn_from_invitation',
+            'invitation_host_reward',
+            'invitation_invitee_reward',
+            'invitation_code_date',
+        ])->pluck('value', 'key')->toArray();
+        return $content->view('inviteCode', [
+            'config' => $config,
+
+        ]);
     }
 }
