@@ -2,27 +2,29 @@
 
 namespace App\Tik\Services;
 
-use DB;
-use Google_Client;
-use App\Models\User;
-use function request;
-use Mockery\Exception;
+use App\Exceptions\CValidationException;
+use App\Facades\UserHandling;
 use App\Helpers\Common;
 use App\Models\Country;
+use App\Models\DevicesTokenHistory;
 use App\Models\Profile;
-use Illuminate\Support\Arr;
-use App\Facades\UserHandling;
-use Illuminate\Http\UploadedFile;
+use App\Models\User;
+use App\Tik\Repositories\CountryRepository;
+use App\Tik\Repositories\UserRepository;
+use DB;
+use Google_Client;
 use Google\Client as GoogleClient;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Exceptions\CValidationException;
-use App\Tik\Repositories\UserRepository;
-use App\Tik\Repositories\CountryRepository;
-use Modules\SwitchAccount\Traits\SwithAccountLogin;
+use Mockery\Exception;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
+use Modules\SwitchAccount\Traits\SwithAccountLogin;
+
+use function request;
 
 class AuthService
 {
@@ -112,6 +114,11 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
+                Log::info('Registration attempt', [
+                    'device_token' => $request['device_token'] ?? null,
+
+                ]);
+                if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
                 $user = $this->userRepository->create($data);
             }
@@ -167,7 +174,7 @@ class AuthService
         if (!$payload) {
             return Common::apiResponse(false, 'Google ID Token not found or invalid', [], 422);
         }
-        // $google_id = $payload['sub'];
+       // $google_id = $payload['sub'];
 
         $google_id = $request['google_id'] ?? null;
 
@@ -221,8 +228,17 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-
+                try {
+                    if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
+                } catch (\Exception $e) {
+                    logger()->error('Failed device...... token', [
+                        'device_token' => $request['device_token'] ?? null,
+                        'error' => $e->getMessage()
+                    ]);
+                    return Common::apiResponse(false,  $e->getMessage(), [], 422);
+                }
                 $user = $this->userRepository->create($data);
+
                 $is_new = true;
                 try {
                     $this->storeImage($request, $data, $user);
@@ -309,14 +325,14 @@ class AuthService
     //     if (isset($request['image']) && is_string($request['image']) && !empty($request['image'])) {
     //         try {
     //             $imageUrl = $request['image'];
-                
+
     //             // Download the image from URL
     //             $response = Http::get($imageUrl);
     //             if (!$response->successful()) {
     //                 Log::warning('Failed to download image from URL', ['url' => $imageUrl]);
     //                 return null;
     //             }
-                
+
     //             $imageContent = $response->body();
     //             if (empty($imageContent)) {
     //                 Log::warning('Image content is empty from URL', ['url' => $imageUrl]);
@@ -351,7 +367,7 @@ class AuthService
     //             // Create the filename with proper extension
     //             $fileName = $profile->id . '_' . $user->profile_count . '.' . $extension;
     //             $filePath = 'profile' . DIRECTORY_SEPARATOR . $fileName;
-                
+
     //             // Store the image directly
     //             Storage::put($filePath, $imageContent, config('filesystems.default'));
 
@@ -378,121 +394,120 @@ class AuthService
     // }
 
     public function storeImage(array $request, array $data, User $user): ?Profile
-{
-    if (!isset($request['image'])) {
-        return null;
-    }
-
-    if ($request['image'] instanceof UploadedFile) {
-        return $this->storeUploadedImage($request['image'], $user);
-    }
-
-    if (is_string($request['image']) && !empty($request['image'])) {
-        return $this->storeImageFromUrl($request['image'], $user);
-    }
-
-    return null;
-}
-
-private function storeUploadedImage(UploadedFile $image, User $user): Profile
-{
-    $extension = $this->getImageExtension($image);
-
-    if ($extension === 'gif' && !Common::hasInPack($user->id, 22, false)) {
-        throw new \Exception(__('api_responses.gifImage'));
-    }
-
-    $profile = $this->getOrCreateProfile($user);
-
-    $path = Common::uploadProfileUser(
-        'profile',
-        $image,
-        $profile->id,
-        $user->profile_count
-    );
-
-//    Log:: info('Uploaded profile image', [
-//         'extension' => $extension,
-//         'path' => $path,
-//     ]);
-
-    $profile->update(['avatar' => $path]);
-
-    return $profile;
-}
-private function storeImageFromUrl(string $url, User $user): ?Profile
-{
-    try {
-        $response = Http::get($url);
-
-        if (!$response->successful() || empty($response->body())) {
-            Log::warning('Failed to download image', ['url' => $url]);
+    {
+        if (!isset($request['image'])) {
             return null;
         }
 
-        $extension = $this->getExtensionFromUrl($url);
-        $profile   = $this->getOrCreateProfile($user);
+        if ($request['image'] instanceof UploadedFile) {
+            return $this->storeUploadedImage($request['image'], $user);
+        }
 
-        $fileName = "{$profile->id}_{$user->profile_count}.{$extension}";
-        $path     = "profile/{$fileName}";
+        if (is_string($request['image']) && !empty($request['image'])) {
+            return $this->storeImageFromUrl($request['image'], $user);
+        }
 
-        Storage::put($path, $response->body(), config('filesystems.default'));
+        return null;
+    }
 
-    //    Log:: info('Stored profile image from URL', [
-    //         'url' => $url,
-    //         'path' => $path,
-    //     ]);
+    private function storeUploadedImage(UploadedFile $image, User $user): Profile
+    {
+        $extension = $this->getImageExtension($image);
+
+        if ($extension === 'gif' && !Common::hasInPack($user->id, 22, false)) {
+            throw new \Exception(__('api_responses.gifImage'));
+        }
+
+        $profile = $this->getOrCreateProfile($user);
+
+        $path = Common::uploadProfileUser(
+            'profile',
+            $image,
+            $profile->id,
+            $user->profile_count
+        );
+
+        //    Log:: info('Uploaded profile image', [
+        //         'extension' => $extension,
+        //         'path' => $path,
+        //     ]);
 
         $profile->update(['avatar' => $path]);
 
         return $profile;
-
-    } catch (\Throwable $e) {
-        Log::error('Image URL upload failed', [
-            'user_id' => $user->id,
-            'url' => $url,
-            'error' => $e->getMessage(),
-        ]);
-
-        return null;
     }
-}
-private function getOrCreateProfile(User $user): Profile
-{
-    $user->increment('profile_count');
-    $user->load('profile');
+    private function storeImageFromUrl(string $url, User $user): ?Profile
+    {
+        try {
+            $response = Http::get($url);
 
-    return $user->profile ?? Profile::create([
-        'user_id'  => $user->id,
-        'gender'   => null,
-        'birthday' => null,
-        'province' => null,
-        'city'     => null,
-        'country'  => null,
-    ]);
-}
-private function getImageExtension(UploadedFile $image): string
-{
-    return $image->getClientOriginalExtension()
-        ?: match ($image->getMimeType()) {
-            'image/jpeg' => 'jpg',
-            'image/png'  => 'png',
-            'image/gif'  => 'gif',
-            'image/webp' => 'webp',
-            default      => 'jpg',
-        };
-}
-private function getExtensionFromUrl(string $url): string
-{
-    if (preg_match('/\.([a-z]+)(?:\?|$)/i', $url, $matches)) {
-        $ext = strtolower($matches[1]);
-        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-            return $ext;
+            if (!$response->successful() || empty($response->body())) {
+                Log::warning('Failed to download image', ['url' => $url]);
+                return null;
+            }
+
+            $extension = $this->getExtensionFromUrl($url);
+            $profile   = $this->getOrCreateProfile($user);
+
+            $fileName = "{$profile->id}_{$user->profile_count}.{$extension}";
+            $path     = "profile/{$fileName}";
+
+            Storage::put($path, $response->body(), config('filesystems.default'));
+
+            //    Log:: info('Stored profile image from URL', [
+            //         'url' => $url,
+            //         'path' => $path,
+            //     ]);
+
+            $profile->update(['avatar' => $path]);
+
+            return $profile;
+        } catch (\Throwable $e) {
+            Log::error('Image URL upload failed', [
+                'user_id' => $user->id,
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
         }
     }
+    private function getOrCreateProfile(User $user): Profile
+    {
+        $user->increment('profile_count');
+        $user->load('profile');
 
-    return 'jpg';
-}
+        return $user->profile ?? Profile::create([
+            'user_id'  => $user->id,
+            'gender'   => null,
+            'birthday' => null,
+            'province' => null,
+            'city'     => null,
+            'country'  => null,
+        ]);
+    }
+    private function getImageExtension(UploadedFile $image): string
+    {
+        return $image->getClientOriginalExtension()
+            ?: match ($image->getMimeType()) {
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/gif'  => 'gif',
+                'image/webp' => 'webp',
+                default      => 'jpg',
+            };
+    }
+    private function getExtensionFromUrl(string $url): string
+    {
+        if (preg_match('/\.([a-z]+)(?:\?|$)/i', $url, $matches)) {
+            $ext = strtolower($matches[1]);
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                return $ext;
+            }
+        }
+
+        return 'jpg';
+    }
 
 
 
@@ -565,6 +580,7 @@ private function getExtensionFromUrl(string $url): string
             $country = Country::where('iso', strtoupper($request['iso']))->first();
             if ($country) $data['country_id'] = $country->id;
         }
+        if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
         $newUser = $this->userRepository->create($data);
 
@@ -623,6 +639,7 @@ private function getExtensionFromUrl(string $url): string
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
+                if (!empty($data['device_token']))  $this->devicesTokenHistory($data['device_token']);
 
                 $user = $this->userRepository->create($dataUser);
             }
@@ -704,5 +721,19 @@ private function getExtensionFromUrl(string $url): string
             }
         }
         return false;
+    }
+
+    private function devicesTokenHistory($deviceToken)
+    {
+        $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
+        if ($record) {
+            $register_account = Common::getSettingValue('register_account') ?? 0;
+            if ($record->count >= $register_account) {
+                throw new CValidationException('You have reached the maximum number of accounts that can be registered with this device.');
+            }
+            $record->increment('count');
+        } else {
+            DevicesTokenHistory::create(['device_token' => $deviceToken, 'count' => 1]);
+        }
     }
 }

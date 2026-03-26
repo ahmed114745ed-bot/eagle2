@@ -8,10 +8,12 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\Box;
+
 class UserSettingController extends MainController
 {
     /**
@@ -42,25 +44,26 @@ class UserSettingController extends MainController
             });
         }
 
-       
+
 
         return $content;
     }
 
 
-     protected function grid2()
+    protected function grid2()
     {
         $transfer_salary = settings()->get('transfer_salary');
         $stop_invite_code = settings()->get('stop_invite_code');
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
         $make_gift_top = settings()->get('close_open_gifts');
-         $change_country = settings()->get('change_country');
+        $change_country = settings()->get('change_country');
+        $register_account = Common::getSettingValue('register_account') ?? 0;
 
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge','change_country', 'make_rooms_top', 'stop_invite_code', 'transfer_salary', 'make_gift_top'])),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'change_country', 'make_rooms_top', 'stop_invite_code', 'transfer_salary', 'make_gift_top', 'register_account'])),
         ));
     }
     /**

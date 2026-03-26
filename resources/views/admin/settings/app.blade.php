@@ -161,9 +161,8 @@
                     </div>
                 </div>
             </div>
-
-            {{info(env('APP_NAME'))}}
-            @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio','Tiko Live','rixo-chat']))
+        
+            @if ($isThemeEnabled)
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>

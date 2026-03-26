@@ -37,14 +37,14 @@ class VerifyLeaderCCMiddleWare
                 return response()->json([
                     'errorCode' => 4005,
                     'errorMsg'  => 'Game is not active now',
-                ], 400);
+                ]);
             }
 
             if (!$key) {
                 return response()->json([
                     'errorCode' => 4005,
                     'errorMsg'  => 'Missing or invalid parameters key',
-                ], 400);
+                ]);
             }
 
             if ($request->has('orderId')) {
@@ -53,7 +53,7 @@ class VerifyLeaderCCMiddleWare
                     return response()->json([
                         'errorCode' => 10003,
                         'errorMsg'  => 'Order already exists'
-                    ], 400);
+                    ]);
                 }
             }
             if ($request->has('token')) {
@@ -63,7 +63,7 @@ class VerifyLeaderCCMiddleWare
                     return response()->json([
                         'errorCode' => 10003,
                         'errorMsg'  => 'user not found'
-                    ], 400);
+                    ]);
                 }
             }
 
@@ -76,7 +76,7 @@ class VerifyLeaderCCMiddleWare
                             return response()->json([
                                 'errorCode' => 4005,
                                 'errorMsg' => 'Missing signature parameters'
-                            ], 400);
+                            ]);
                         }
                     }
                     $rawString =
@@ -101,7 +101,7 @@ class VerifyLeaderCCMiddleWare
                             return response()->json([
                                 'errorCode' => 4005,
                                 'errorMsg' => 'Missing signature parameters'
-                            ], 400);
+                            ]);
                         }
                     }
                     $rawString =
@@ -116,7 +116,7 @@ class VerifyLeaderCCMiddleWare
                     return response()->json([
                         'errorCode' => 4006,
                         'errorMsg' => 'Endpoint not allowed for this middleware'
-                    ], 400);
+                    ]);
             }
 
             $expectedSign = md5($rawString);
@@ -125,7 +125,7 @@ class VerifyLeaderCCMiddleWare
                 return response()->json([
                     'errorCode' => 10004,
                     'errorMsg' => 'Verify signature fail'
-                ], 400);
+                ]);
             }
 
 
@@ -136,9 +136,9 @@ class VerifyLeaderCCMiddleWare
             $duration = microtime(true) - $start;
             return response()->json([
                 'errorCode' => 5000,
-                'errorMsg'  => 'Internal server error',
-                'details'   => $e->getMessage(),
-            ], 500);
+                'errorMsg' => 'Internal server error',
+                'details' => $e->getMessage(),
+            ]);
         }
 
         $duration = microtime(true) - $start;

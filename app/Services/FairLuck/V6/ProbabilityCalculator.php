@@ -14,6 +14,7 @@ class ProbabilityCalculator
      * - When below target: probability increases proportional to (gap * totalSpent / betAmount)
      * - When above target: probability decreases
      * - Bet amount matters: small bets relative to deficit = more boost, large bets = less boost
+     * - BANKRUPTCY PROTECTION: Probability is capped based on pool health
      */
     public function calculate(
         float $actualRTP,
@@ -50,20 +51,31 @@ class ProbabilityCalculator
         // If deficit is 10000 and bet is 10 → betImpact = 1000 (high, needs many bets)
         $betImpact = $betAmount > 0 ? $rtpDeficit / $betAmount : 0;
 
+        $calculatedProb = $baseProb;
+
         if ($rtpGap > 0) {
             // User is BELOW target RTP - boost probability
-            $scalingFactor = (float) FairLuckSetting::getByKey('v6_boost_scaling', 0.08);
+            $scalingFactor = (float) FairLuckSetting::getByKey('v6_boost_scaling', 0.05);
             $boost = min(4.0, $betImpact * $scalingFactor);
             $adjustedProb = $baseProb * (1 + $boost);
 
-            return min(0.85, max($baseProb, $adjustedProb));
+            $calculatedProb = min(0.85, max($baseProb, $adjustedProb));
         } else {
             // User is AT or ABOVE target RTP - reduce probability (but not too harshly)
             $scalingFactor = (float) FairLuckSetting::getByKey('v6_reduce_scaling', 0.02);
             $reduction = min(0.80, abs($betImpact) * $scalingFactor);
             $adjustedProb = $baseProb * (1 - $reduction);
 
-            return max(0.05, $adjustedProb);
+            $calculatedProb = max(0.05, $adjustedProb);
         }
+
+        // BANKRUPTCY PROTECTION: Apply pool health reduction factor
+        $bankruptcyProtection = app(BankruptcyProtection::class);
+        $healthFactor = $bankruptcyProtection->getProbabilityReductionFactor();
+        $finalProb = $calculatedProb * $healthFactor;
+
+        // Hard cap: never exceed 50% probability (prevents exploitation)
+        $maxProbability = (float) FairLuckSetting::getByKey('v6_max_probability_cap', 0.50);
+        return min($maxProbability, $finalProb);
     }
 }
