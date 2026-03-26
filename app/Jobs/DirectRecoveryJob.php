@@ -65,6 +65,9 @@ class DirectRecoveryJob implements ShouldQueue
         $user = DB::table('users')->where('id', $debtor->user_id)->first();
         $userName = $user->name ?? 'N/A';
 
+        $maxRetries = 3;
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+
         DB::beginTransaction();
 
         try {
@@ -168,6 +171,17 @@ class DirectRecoveryJob implements ShouldQueue
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // Retry on deadlock
+            if ($attempt < $maxRetries && str_contains($e->getMessage(), 'Deadlock')) {
+                Log::warning("DirectRecovery: Deadlock for user {$debtor->user_id}, retry {$attempt}/{$maxRetries}");
+                $this->traces = [];
+                $this->affectedUserIds = [];
+                $this->visitedUsers = [];
+                sleep(2);
+                continue;
+            }
+
             $this->appendUserRow($debtor->user_id, $userName, $debtUsd, 0, $debtUsd, 'error', $e->getMessage());
             Log::error("DirectRecovery: Failed for user {$debtor->user_id}: " . $e->getMessage());
 
@@ -186,6 +200,9 @@ class DirectRecoveryJob implements ShouldQueue
             } catch (\Exception $ex) {
                 // ignore
             }
+        }
+
+        break; // Success or non-deadlock error, exit retry loop
         }
 
         self::dispatch()->delay(now()->addSeconds(2));
