@@ -72,6 +72,7 @@ trait ZegoTrait
         'phone_method' => request()->method(),         // POST أو GET
         'phone_payload' => request()->all(),           // البيانات التي أرسلها الهاتف للسيرفر
         ];
+        $roomId = $RoomId ?? request()->room_id;
         $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
@@ -83,7 +84,7 @@ trait ZegoTrait
         $SignatureVersion = '2.0';
         $params = [
             'Action' => $Action,
-            'RoomId' => $RoomId,
+            'RoomId' => $roomId,
             'FromUserId' => $FromUserId,
             'MessageContent' => $MessageContent,
             'AppId' => $AppId,
@@ -107,7 +108,7 @@ trait ZegoTrait
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
                 Log::warning('ZegoTrait::sendToZego failed', [
                     'action' => $Action,
-                    'roomId' => $RoomId,
+                    'roomId' => $roomId,
                     'fromUserId' => $FromUserId,
                     'response' => $response,
                 ]);
