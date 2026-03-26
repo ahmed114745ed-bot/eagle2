@@ -83,10 +83,11 @@ class DirectRecoveryJob implements ShouldQueue
                     if (!$agency) continue;
 
                     $canDeduct = min(min($remaining, (int) $charge->amount), (int) $agency->coins);
-                    if ($canDeduct > 0) {
+                    if ($canDeduct > 0 && (int) $agency->coins >= (int) $charge->amount) {
                         DB::statement("UPDATE agencies SET coins = CAST(coins AS SIGNED) - ? WHERE id = ?", [$canDeduct, $agency->id]);
+                        DB::table('charges')->where('id', $charge->id)->delete();
                         $remaining -= $canDeduct;
-                        $traces[] = "Agency #{$agency->id}: di -{$canDeduct}";
+                        $traces[] = "Agency #{$agency->id}: di -{$canDeduct}, charge #{$charge->id} deleted";
                     }
                 } else {
                     // User charge: A (debtor) charged B
@@ -128,40 +129,82 @@ class DirectRecoveryJob implements ShouldQueue
 
                             $giftAmount = min($chargeAmount, (int) $gift->total_sent);
 
-                            // Delete gift_logs (B→C)
+                            // Delete gift_logs (B→C) and reverse all related balances
                             $remainingToDelete = $giftAmount;
-                            $idsToDelete = [];
+                            $logsToDelete = [];
                             $giftLogRows = DB::table('gift_logs')
                                 ->where('sender_id', $userB->id)
                                 ->where('receiver_id', $userC->id)
                                 ->where('created_at', '>=', $this->bugDate)
                                 ->where('created_at', '<', $this->endDate)
                                 ->orderBy('giftPrice')
-                                ->select('id', 'giftPrice')
+                                ->select('id', 'giftPrice', 'room_id', 'receiver_family_id')
                                 ->cursor();
 
                             $deletedAmount = 0;
+                            $roomAmounts = [];
+                            $familyAmounts = [];
                             foreach ($giftLogRows as $row) {
                                 if ($remainingToDelete <= 0) break;
-                                $idsToDelete[] = $row->id;
-                                $deletedAmount += (int) $row->giftPrice;
-                                $remainingToDelete -= (int) $row->giftPrice;
+                                $logsToDelete[] = $row->id;
+                                $price = (int) $row->giftPrice;
+                                $deletedAmount += $price;
+                                $remainingToDelete -= $price;
+
+                                if ($row->room_id) {
+                                    $roomAmounts[$row->room_id] = ($roomAmounts[$row->room_id] ?? 0) + $price;
+                                }
+                                if ($row->receiver_family_id) {
+                                    $familyAmounts[$row->receiver_family_id] = ($familyAmounts[$row->receiver_family_id] ?? 0) + $price;
+                                }
                             }
-                            if (!empty($idsToDelete)) {
-                                DB::table('gift_logs')->whereIn('id', $idsToDelete)->delete();
+                            if (!empty($logsToDelete)) {
+                                DB::table('gift_logs')->whereIn('id', $logsToDelete)->delete();
                             }
 
-                            // Update monthly_diamond_received for C
+                            // Reverse total_diamond_received for C
+                            DB::statement(
+                                "UPDATE users SET total_diamond_received = GREATEST(0, CAST(total_diamond_received AS SIGNED) - ?) WHERE id = ?",
+                                [$deletedAmount, $userC->id]
+                            );
+
+                            // Reverse exchange_diamonds for C (only non-agency users)
+                            DB::statement(
+                                "UPDATE users SET exchange_diamonds = GREATEST(0, CAST(exchange_diamonds AS SIGNED) - ?) WHERE id = ? AND agency_id = 0",
+                                [$deletedAmount, $userC->id]
+                            );
+
+                            // Reverse monthly_diamond_received for C
                             DB::statement(
                                 "UPDATE monthly_diamond_receives SET monthly_diamond_received = GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - ?) WHERE user_id = ? AND month = ? AND year = ?",
                                 [$deletedAmount, $userC->id, $this->targetMonth, $this->targetYear]
                             );
 
-                            // Update monthly_diamond_send for B
+                            // Reverse monthly_diamond_send for B
                             DB::statement(
                                 "UPDATE users SET monthly_diamond_send = GREATEST(0, CAST(monthly_diamond_send AS SIGNED) - ?) WHERE id = ?",
                                 [$deletedAmount, $userB->id]
                             );
+
+                            // Reverse room session & room_top_users
+                            foreach ($roomAmounts as $roomId => $amount) {
+                                DB::statement(
+                                    "UPDATE rooms SET session = GREATEST(0, CAST(session AS SIGNED) - ?) WHERE id = ?",
+                                    [$amount, $roomId]
+                                );
+                                DB::statement(
+                                    "UPDATE room_top_users SET coins = GREATEST(0, CAST(coins AS SIGNED) - ?) WHERE room_id = ? AND user_id = ?",
+                                    [$amount, $roomId, $userB->id]
+                                );
+                            }
+
+                            // Reverse family total_diamond
+                            foreach ($familyAmounts as $familyId => $amount) {
+                                DB::statement(
+                                    "UPDATE families SET total_diamond = GREATEST(0, CAST(total_diamond AS SIGNED) - ?) WHERE id = ?",
+                                    [$amount, $familyId]
+                                );
+                            }
 
                             $affectedUserIds[] = $userC->id;
                             $affectedUserIds[] = $userB->id;
