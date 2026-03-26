@@ -94,7 +94,7 @@ jobs:
           docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
           docker service update \
             --image lumio-job:${{ github.sha }} \
-            --replicas 1 \
+            --replicas 4 \
             --limit-cpu 2.0 \
             --limit-memory 2gb \
             --reserve-memory 1gb \
