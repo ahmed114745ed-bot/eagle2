@@ -37,15 +37,15 @@ jobs:
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
         command_timeout: 20m
+        envs: PAT_TOKEN
         script: |
           cd /var/www/lumio
-          # 1. Pull latest code from GitHub
+          git config --global safe.directory /var/www/lumio
+          git remote set-url origin https://${PAT_TOKEN}@github.com/BACK-END-UTD/Eagle.git
           git pull origin lumio
 
-          # 2. Build the new image
           docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
 
-          # 3. Update service with Zero-Downtime & Port Safety flags
           docker service update \
             --image lumio-octa:${{ github.sha }} \
             --replicas 2 \
@@ -57,7 +57,6 @@ jobs:
             --update-failure-action rollback \
             lumio-octa
 
-          # 4. Wait for the new container to be stable before running artisan
           echo "Waiting for container to stabilize..."
           sleep 15
 
@@ -70,7 +69,6 @@ jobs:
             exit 1
           fi
 
-          # 5. Final Cleanup
           docker image prune -f
 
   run_lumio_job:
@@ -85,12 +83,13 @@ jobs:
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
         command_timeout: 20m
+        envs: PAT_TOKEN
         script: |
           cd /var/www/lumio
-          # 1. Pull latest code from GitHub
+          git config --global safe.directory /var/www/lumio
+          git remote set-url origin https://${PAT_TOKEN}@github.com/BACK-END-UTD/Eagle.git
           git pull origin lumio
 
-          # 2. Build and deploy job service
           docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
           docker service update \
             --image lumio-job:${{ github.sha }} \
