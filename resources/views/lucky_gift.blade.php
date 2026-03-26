@@ -183,18 +183,7 @@
                     <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
                         @csrf
                         <div class="box-body">
-                            <div class="alert alert-info alert-dismissible">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                <h4><i class="icon fa fa-info"></i> {{ __('FairLuck V6 Features') }} / {{ __('ميزات FairLuck V6') }}</h4>
-                                <ul style="margin: 10px 0 0 20px;">
-                                    <li>{{ __('✅ Bankruptcy Protection: Prevents system insolvency') }} / {{ __('✅ حماية الإفلاس: منع إعسار النظام') }}</li>
-                                    <li>{{ __('✅ Pool Solvency: Safety margins for big jackpots') }} / {{ __('✅ ملاءة المجموعة: هوامش أمان للجوائز الكبرى') }}</li>
-                                    <li>{{ __('✅ Post-Jackpot Cooldown: 200 bets between big wins') }} / {{ __('✅ فترة الانتظار بعد الجائزة الكبرى: 200 رهان بين الفوز الكبير') }}</li>
-                                    <li>{{ __('✅ User Data TTL: Auto-reset after 90 days inactivity') }} / {{ __('✅ TTL بيانات المستخدم: إعادة تعيين تلقائية بعد 90 يوم من عدم النشاط') }}</li>
-                                    <li>{{ __('✅ Reduced Jackpot Weights: 50% reduction for 1000x & 500x') }} / {{ __('✅ أوزان الجوائز المخفضة: تقليل 50% لـ 1000x و 500x') }}</li>
-                                    <li>{{ __('✅ Improved RTP: 85% (vs 90% in V2)') }} / {{ __('✅ RTP محسّن: 85% (مقابل 90% في V2)') }}</li>
-                                </ul>
-                            </div>
+                          
 
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit') }} / {{ __('حد الرصيد السالب العام') }}</label>
