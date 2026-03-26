@@ -182,10 +182,6 @@
         display: none;
     }
 
-    .active {
-        display: block;
-    }
-
     .settings-section.active {
         display: block;
     }

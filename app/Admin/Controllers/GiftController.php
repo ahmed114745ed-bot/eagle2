@@ -698,7 +698,7 @@ class GiftController extends MainController
     public function saveLuckyGiftVersion(Request $request)
     {
         $version = $request->input('lucky_gift_version');
-        if (in_array($version, [1, 2])) {
+        if (in_array($version, [1, 2, 3])) {
             Setting::updateOrCreate(['key' => 'lucky_gift_version'], ['value' => $version]);
             Cache::forget('lucky_gift_version');
             Cache::put('lucky_gift_version', $version);
@@ -711,11 +711,30 @@ class GiftController extends MainController
             Cache::put('lucky_gift_coins', $request->lucky_gift_coins);
         }
 
-        // Handle V1 percentages
+        // Handle V1 percentages and FairLuck settings
         $v1_keys = ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift', 'fair_luck_app_fee_rate', 'fair_luck_owner_fee_rate', 'fair_luck_receiver_fee_rate'];
         foreach ($v1_keys as $key) {
             if ($request->has($key)) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                Cache::forget($key);
+                Cache::put($key, $request->input($key));
+            }
+        }
+
+        // Handle V6 FairLuck settings
+        $v6_keys = [
+            'global_vault_negative_limit',
+            'bankruptcy_min_safe_balance',
+            'bankruptcy_critical_threshold',
+            'bankruptcy_max_payout_percentage',
+            'v6_max_probability_cap',
+            'fairluck_jackpot_cooldown_bets',
+            'fairluck_user_data_ttl_days',
+            'v6_target_rtp'
+        ];
+        foreach ($v6_keys as $key) {
+            if ($request->has($key)) {
+                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
                 Cache::forget($key);
                 Cache::put($key, $request->input($key));
             }

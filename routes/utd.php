@@ -522,6 +522,8 @@ Route::middleware([])->group(function () {
     Route::post('/update-host-level', [SettingController::class, 'updateHostLevel']);
     Route::post('/update-pk-live', [SettingController::class, 'updatePkLive']);
     Route::post('/update-lucky-gifts', [SettingController::class, 'updateLuckyGifts']);
+    Route::post('/update-is-theme-enabled', [SettingController::class, 'updateIsThemeEnabled']);
+
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
     // agency statistic

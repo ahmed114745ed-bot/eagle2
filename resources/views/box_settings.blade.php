@@ -14,50 +14,10 @@
         min-height: 400px;
     }
 
-    /* ═══════ SIDEBAR ═══════ */
-    .settings-sidebar {
-        width: 240px;
-        background: var(--secondary-color);
-        padding: 20px 12px;
-        flex-shrink: 0;
-    }
-
-    .settings-sidebar h2 {
-        text-align: center;
-        color: var(--text-primary-color);
-        font-size: 16px;
-        font-weight: 700;
-        margin-bottom: 20px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid var(--primary-color);
-    }
-
-    .settings-menu button {
-        display: block;
-        width: 100%;
-        text-align: right;
-        padding: 12px 16px;
-        background: var(--box-background-color);
-        color: var(--text-secondary-color);
-        border: none;
-        border-radius: 8px;
-        margin-bottom: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 600;
-        transition: all 0.2s;
-    }
-
-    .settings-menu button:hover {
-        background: var(--primary-color);
-        color: var(--text-primary-color);
-    }
-
     /* ═══════ CONTENT ═══════ */
     .settings-content {
-        flex: 1;
-        padding: 24px 30px;
-        background: var(--secondary-color);
+        flex-grow: 1;
+        padding: 20px;
     }
 
     .settings-section {
@@ -66,15 +26,6 @@
 
     .settings-section.active {
         display: block;
-    }
-
-    .settings-section h3 {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--text-primary-color);
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--box-background-color);
     }
 
     /* ═══════ FORM ═══════ */
@@ -101,20 +52,6 @@
         margin-bottom: 6px;
     }
 
-    input[type="number"],
-    input[type="text"],
-    select {
-        width: 100%;
-        padding: 12px 14px;
-        background: var(--secondary-color);
-        border: 1px solid var(--box-background-color);
-        border-radius: 8px;
-        color: var(--text-primary-color);
-        font-size: 14px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
     input:focus,
     select:focus {
         border-color: var(--primary-color);
@@ -123,14 +60,6 @@
     input::placeholder {
         color: var(--text-secondary-color);
         opacity: 0.5;
-    }
-
-    .help-block {
-        display: block;
-        margin-top: 4px;
-        font-size: 12px;
-        color: var(--text-secondary-color);
-        opacity: 0.6;
     }
 
     /* ═══════ BUTTON ═══════ */
@@ -198,10 +127,6 @@
     @media (max-width: 768px) {
         .all-page {
             display: block;
-        }
-
-        .settings-sidebar {
-            width: 100%;
         }
 
         .settings-content {

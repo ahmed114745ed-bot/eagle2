@@ -229,6 +229,10 @@ class UserCommon
 
         $parentWin = ($amount * $percentage) / 100;
 
+        if ($parentWin <= 0) {
+            return;
+        }
+
         $parent->di += $parentWin;
         $parent->save();
 

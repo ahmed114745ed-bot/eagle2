@@ -3,6 +3,7 @@
 namespace Modules\RoomBoom\Services;
 
 use App\Helpers\Common;
+use App\Http\Services\RoomService;
 use App\Models\GiftLog;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
@@ -29,7 +30,7 @@ class NewRoomBoomGiftService
             $tz = getTimezone();
             $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
-            $totalRoomGift = $this->getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice);
+            $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
 
             if ($totalRoomGift) {
                 $currentTotal = $totalRoomGift->current_total;
@@ -50,23 +51,6 @@ class NewRoomBoomGiftService
 
             $totalRoomGift->save();
         });
-    }
-
-    public function getOrCreateTotalRoomGift($roomId, $todayStart)
-    {
-        $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
-            ->where('created_at', '>=', $todayStart)
-            ->lockForUpdate()
-            ->first();
-
-        if (!$totalRoomGift) {
-            $totalRoomGift = TotalRoomGift::create([
-                'room_id' => $roomId,
-                'current_total' => 0,
-            ]);
-        }
-
-        return $totalRoomGift;
     }
 
     private function checkAndEndBoom($totalRoomGift, $userId, $newTotal, $room): void

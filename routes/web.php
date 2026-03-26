@@ -171,6 +171,30 @@ Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Reque
         'url' => $request->fullUrl(),
     ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
+Route::get('/user-salaries-test', function () {
+
+    $salary = UserSallary::join('users', 'user_sallaries.user_id', '=', 'users.id')
+        ->where('users.uuid', 1406)
+        ->where('user_sallaries.month', now()->month)
+        ->where('user_sallaries.year', now()->year)
+        ->get();
+
+    $user = User::where('uuid', 1406)->first();
+
+    $lastDiamond = $user?->lastSallary?->achieved_diamond ?? 0;
+    $data = [
+
+        'data' => $salary,
+        'last_diamond' => $lastDiamond,
+        'user' => $user
+    ];
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Success',
+        'data' => $data,
+    ]);
+});
+
 
 Route::get('/clear', function () {
 
@@ -235,6 +259,36 @@ Route::get('/run-seeders', function () {
 Route::get('/run-permission', function () {
 
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/run-payments', function () {
+
+    Artisan::call('db:seed', ['--class' => 'PaymentGatewaysSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/devices-token-seeder', function () {
+
+    Artisan::call('db:seed', ['--class' => 'DevicesTokenHistories']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/user-join-agency', function () {
+
+    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
 
     return response()->json([
         'status' => 'success',
@@ -667,6 +721,186 @@ Route::get('/fix-receiver-levels', function () {
     return response()->json([
         'status' => 'success',
         'message' => "Receiver levels recalculated. Updated: {$updated} users."
+    ]);
+});
+
+Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
+    // Find bugged bag gift batches: source_type='gift' sent to multiple receivers after the bug date
+    $affected = DB::table('gift_logs')
+        ->selectRaw('sender_id, giftId, giftPrice, giftNum, created_at, COUNT(*) as receiver_count')
+        ->where('source_type', 'gift')
+        ->where('created_at', '>=', '2026-03-19')
+        ->groupBy('sender_id', 'giftId', 'giftPrice', 'giftNum', 'created_at')
+        ->havingRaw('COUNT(*) > 1')
+        ->get();
+
+    Log::info("Found " . $affected->count() . " affected bag gift transactions.");
+
+    if ($affected->isEmpty()) {
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'No affected bag gift transactions found.',
+        ]);
+    }
+
+    $shouldExecute = $request->query('fix') == '1';
+    $totalExcess = 0;
+    $details = [];
+
+    DB::transaction(function () use ($affected, $shouldExecute, &$totalExcess, &$details) {
+        foreach ($affected as $group) {
+            $logs = DB::table('gift_logs')
+                ->where('sender_id', $group->sender_id)
+                ->where('giftId', $group->giftId)
+                ->where('giftPrice', $group->giftPrice)
+                ->where('giftNum', $group->giftNum)
+                ->where('created_at', $group->created_at)
+                ->where('source_type', 'gift')
+                ->orderBy('id')
+                ->get(['id', 'receiver_id', 'giftPrice', 'created_at', 'room_id', 'receiver_family_id']);
+
+            $extraLogs = $logs->slice(1);
+            $excessDiamonds = (int) $extraLogs->sum('giftPrice');
+            $totalExcess += $excessDiamonds;
+
+            $details[] = [
+                'sender_id' => $group->sender_id,
+                'gift_id' => $group->giftId,
+                'created_at' => $group->created_at,
+                'gift_price_per_receiver' => (int) $group->giftPrice,
+                'total_receivers' => $group->receiver_count,
+                'excess_diamonds' => $excessDiamonds,
+                'kept_receiver' => $logs->first()->receiver_id,
+                'extra_receivers' => $extraLogs->pluck('receiver_id')->values()->toArray(),
+            ];
+
+            if ($shouldExecute) {
+                // Reverse diamonds for each extra receiver
+                foreach ($extraLogs as $log) {
+                    $logPrice = (int) $log->giftPrice;
+
+                    // Reverse total_diamond_received
+                    DB::table('users')
+                        ->where('id', $log->receiver_id)
+                        ->update([
+                            'total_diamond_received' => DB::raw("GREATEST(0, CAST(total_diamond_received AS SIGNED) - {$logPrice})"),
+                        ]);
+
+                    // Reverse exchange_diamonds (only for non-agency users)
+                    DB::table('users')
+                        ->where('id', $log->receiver_id)
+                        ->where('agency_id', 0)
+                        ->update([
+                            'exchange_diamonds' => DB::raw("GREATEST(0, CAST(exchange_diamonds AS SIGNED) - {$logPrice})"),
+                        ]);
+
+                    // Reverse monthly_diamond_received
+                    $logDate = \Carbon\Carbon::parse($log->created_at, getTimezone());
+                    DB::table('monthly_diamond_receives')
+                        ->where('user_id', $log->receiver_id)
+                        ->where('month', $logDate->month)
+                        ->where('year', $logDate->year)
+                        ->update([
+                            'monthly_diamond_received' => DB::raw("GREATEST(0, CAST(monthly_diamond_received AS SIGNED) - {$logPrice})"),
+                        ]);
+                }
+
+                // NOTE: Sender refund intentionally skipped — senders already spent their diamonds
+                // and the app has already collected those coins. No refund needed.
+
+                // Fix room session (was inflated by excess)
+                $roomId = $logs->first()->room_id;
+                if ($roomId) {
+                    DB::table('rooms')
+                        ->where('id', $roomId)
+                        ->update([
+                            'session' => DB::raw("GREATEST(0, CAST(session AS SIGNED) - {$excessDiamonds})"),
+                        ]);
+                }
+
+                // Fix room_top_users (sender coins were inflated)
+                if ($roomId) {
+                    DB::table('room_top_users')
+                        ->where('room_id', $roomId)
+                        ->where('user_id', $group->sender_id)
+                        ->update([
+                            'coins' => DB::raw("GREATEST(0, CAST(coins AS SIGNED) - {$excessDiamonds})"),
+                        ]);
+                }
+
+                // Fix total_room_gifts (room boom totals were inflated)
+                if ($roomId) {
+                    $logDate = \Carbon\Carbon::parse($logs->first()->created_at, getTimezone());
+                    DB::table('total_room_gifts')
+                        ->where('room_id', $roomId)
+                        ->whereDate('created_at', $logDate->toDateString())
+                        ->update([
+                            'current_total' => DB::raw("GREATEST(0, CAST(current_total AS SIGNED) - {$excessDiamonds})"),
+                        ]);
+                }
+
+                // Fix family total_diamond for extra receivers' families
+                $familyIds = $extraLogs->pluck('receiver_family_id')->filter()->unique();
+                foreach ($familyIds as $familyId) {
+                    $familyExcess = (int) $extraLogs->where('receiver_family_id', $familyId)->sum('giftPrice');
+                    DB::table('families')
+                        ->where('id', $familyId)
+                        ->update([
+                            'total_diamond' => DB::raw("GREATEST(0, CAST(total_diamond AS SIGNED) - {$familyExcess})"),
+                        ]);
+                }
+
+                // Delete the extra (exploit) gift_log records
+                $extraIds = $extraLogs->pluck('id')->toArray();
+                DB::table('gift_logs')->whereIn('id', $extraIds)->delete();
+            }
+        }
+
+        // Fix salaries: zero out any salary where corrected monthly_diamond no longer meets target
+        if ($shouldExecute) {
+            $salaryFixes = DB::select("
+                SELECT s.id, s.user_id, s.sallary, s.agency_sallary, s.achieved_diamond, s.target_diamonds, m.monthly_diamond_received
+                FROM user_sallaries s
+                JOIN monthly_diamond_receives m ON m.user_id = s.user_id AND m.month = s.month AND m.year = s.year
+                WHERE s.month = ? AND s.year = ? AND s.is_paid = 0
+                  AND m.monthly_diamond_received < s.target_diamonds
+                  AND s.achieved_diamond > m.monthly_diamond_received
+            ", [now()->month, now()->year]);
+
+            foreach ($salaryFixes as $sal) {
+                DB::table('user_sallaries')
+                    ->where('id', $sal->id)
+                    ->update([
+                        'achieved_diamond' => $sal->monthly_diamond_received,
+                        'sallary' => 0,
+                        'agency_sallary' => 0,
+                        'diamond' => $sal->monthly_diamond_received . ' / ' . $sal->target_diamonds,
+                        'remaining_diamond' => max(0, $sal->target_diamonds - $sal->monthly_diamond_received),
+                        'is_finished' => 0,
+                    ]);
+            }
+        }
+    });
+
+    $salaryReport = DB::table('user_sallaries as s')
+        ->join('monthly_diamond_receives as m', function ($join) {
+            $join->on('m.user_id', '=', 's.user_id')
+                ->where('m.month', '=', DB::raw('s.month'))
+                ->where('m.year', '=', DB::raw('s.year'));
+        })
+        ->where('s.month', now()->month)
+        ->where('s.year', now()->year)
+        ->where('s.is_paid', 0)
+        ->whereColumn('s.achieved_diamond', '>', 'm.monthly_diamond_received')
+        ->select('s.user_id', 's.achieved_diamond', 'm.monthly_diamond_received', 's.target_diamonds', 's.sallary', 's.agency_sallary')
+        ->get();
+
+    return response()->json([
+        'status' => $shouldExecute ? 'fixed' : 'report',
+        'total_affected_transactions' => $affected->count(),
+        'total_excess_diamonds' => $totalExcess,
+        'salary_corrections' => $salaryReport->count(),
+        'details' => $details,
     ]);
 });
 
@@ -1596,6 +1830,7 @@ Route::get('/fix-total-room-gifts', function () {
         // Find or create TotalRoomGift record for this room on this date
         $record = TotalRoomGift::whereDate('created_at', $giftDate)
             ->where('room_id', $roomId)
+            ->lockForUpdate()
             ->first();
 
         if ($record) {
@@ -1734,7 +1969,6 @@ Route::get('/fix-paid-usd', function () {
                 }
 
                 $updated++;
-
             } else {
 
                 Log::warning('Coin not found for obtained_coins', [
@@ -1744,7 +1978,6 @@ Route::get('/fix-paid-usd', function () {
 
                 $skipped++;
             }
-
         } catch (\Exception $e) {
 
             Log::error('Error while processing log', [
@@ -1768,7 +2001,7 @@ Route::get('make-seeders-for-new-update', function () {
     $seeder = new \Database\Seeders\WebhookGamesSeeder();
     $seeder->run();
 
-     $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
+    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
     $seeder->run();
 
     return 'seeders have been executed successfully!';
@@ -1809,14 +2042,91 @@ Route::get('/queue-control/{queue}', function ($queue) {
             'output' => $output
         ]);
     }
-
 });
 
 
 Route::get('/get-gift-percentages', function () {
-$negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
-$appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
-$receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
+    $negativeLimit = getFairLuckSetting('global_vault_negative_limit', 0);
+    $appFeeRate = getFairLuckSetting('fair_luck_app_fee_rate', 0.05);
+    $receiverFeeRate = getFairLuckSetting('fair_luck_receiver_fee_rate', 0.05);
 
-dd($negativeLimit, $appFeeRate, $receiverFeeRate);
-}); 
+    dd($negativeLimit, $appFeeRate, $receiverFeeRate);
+});
+
+// Step 1: Diagnostic - show affected lucky gift logs (100% instead of 10%)
+Route::get('/fix-gift-logs/check', function () {
+    $affected = DB::select("
+        SELECT
+            gl.id,
+            gl.giftId,
+            gl.giftNum,
+            gl.giftPrice as logged_price,
+            gl.receiver_obtain,
+            g.price as actual_gift_price,
+            g.type as gift_type,
+            (gl.giftNum * g.price) as expected_full_price,
+            ROUND(gl.giftPrice / (gl.giftNum * g.price), 2) as current_ratio,
+            ROUND(gl.giftNum * g.price * 0.1, 2) as correct_10_percent,
+            gl.created_at
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.type = 6
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+        ORDER BY gl.id DESC
+        LIMIT 50
+    ");
+
+    $totalAffected = DB::selectOne("
+        SELECT COUNT(*) as total
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.type = 6
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    return response()->json([
+        'total_affected_records' => $totalAffected->total,
+        'sample_records' => $affected,
+        'message' => 'These records have giftPrice at 100% instead of 10%. Go to /fix-gift-logs/run to fix them.',
+    ]);
+});
+
+// Step 2: Fix - update affected records to 10%
+Route::get('/fix-gift-logs/run', function () {
+    $affected = DB::selectOne("
+        SELECT COUNT(*) as total
+        FROM gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        WHERE g.gift_category_id = 7
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    if ($affected->total == 0) {
+        return response()->json(['message' => 'No records to fix.']);
+    }
+
+    $updated = DB::update("
+        UPDATE gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        SET
+            gl.roomowner_obtain = FLOOR(gl.giftPrice * 0.1 * 0.03),
+            gl.app_profit_coins = gl.giftPrice * 0.1,
+            gl.receiver_obtain = gl.giftPrice * 0.1,
+            gl.giftPrice = gl.giftPrice * 0.1
+        WHERE g.gift_category_id = 7
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
+
+    return response()->json([
+        'message' => "Fixed {$updated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
+        'records_updated' => $updated,
+    ]);
+});

@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 timer: 2000,
                                 showConfirmButton: false
                             });
-                            button.closest('tr').remove(); // إزالة الصف بعد العملية
+                            $.pjax.reload('#pjax-container'); // تحديث الجدول بدلاً من إزالة الصف
                         } else {
                             Swal.fire('خطأ', res.message || messages.error[locale], 'error');
                         }

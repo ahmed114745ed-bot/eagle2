@@ -23,14 +23,44 @@ class FairLuckWallet extends Model
         'last_updated' => 'datetime',
     ];
 
+    const TYPE_UNIFIED_VAULT = 'unified_vault';
+    /** @deprecated Use unified_vault for unified liquidity */
     const TYPE_GLOBAL_VAULT = 'global_vault';
+    /** @deprecated Use unified_vault for unified liquidity */
     const TYPE_JACKPOT_WALLET = 'jackpot_wallet';
+    /** @deprecated Use unified_vault for unified liquidity */
     const TYPE_MEDIUM_WALLET = 'medium_wallet';
 
     public static function getBalance(string $walletType): int
     {
         $wallet = self::where('wallet_type', $walletType)->first();
         return $wallet ? $wallet->balance : 0;
+    }
+
+    /**
+     * Get the unified vault balance (The new Unified Pool).
+     */
+    public static function getVaultBalance(): int
+    {
+        return self::getRedisBalance(self::TYPE_UNIFIED_VAULT);
+    }
+
+    /**
+     * Increase the unified vault balance.
+     */
+    public static function increaseVault(int $amount, ?string $description = null, ?int $userId = null): bool
+    {
+        self::incrementRedisBalance(self::TYPE_UNIFIED_VAULT, $amount);
+        return self::increaseBalance(self::TYPE_UNIFIED_VAULT, $amount, $description, $userId);
+    }
+
+    /**
+     * Decrease the unified vault balance.
+     */
+    public static function decreaseVault(int $amount, ?string $description = null, ?int $userId = null): bool
+    {
+        self::decrementRedisBalance(self::TYPE_UNIFIED_VAULT, $amount);
+        return self::decreaseBalance(self::TYPE_UNIFIED_VAULT, $amount, $description, $userId);
     }
 
     /**
@@ -128,8 +158,9 @@ class FairLuckWallet extends Model
     public static function getAllBalances(): array
     {
         $wallets = self::all()->pluck('balance', 'wallet_type')->toArray();
-
+ 
         return [
+            'unified_vault' => $wallets[self::TYPE_UNIFIED_VAULT] ?? 0,
             'global_vault' => $wallets[self::TYPE_GLOBAL_VAULT] ?? 0,
             'jackpot_wallet' => $wallets[self::TYPE_JACKPOT_WALLET] ?? 0,
             'medium_wallet' => $wallets[self::TYPE_MEDIUM_WALLET] ?? 0,
@@ -183,8 +214,8 @@ class FairLuckWallet extends Model
         if (Redis::get($key) === null) {
             self::getRedisBalance($walletType);
         }
-
-        $limit = ($walletType === self::TYPE_GLOBAL_VAULT) ? self::getNegativeLimit() : 0;
+ 
+        $limit = ($walletType === self::TYPE_UNIFIED_VAULT) ? self::getNegativeLimit() : 0;
 
         $script = '
             local current = redis.call("get", KEYS[1])
