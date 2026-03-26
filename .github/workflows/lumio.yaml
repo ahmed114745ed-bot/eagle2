@@ -31,6 +31,8 @@ jobs:
     steps:
     - name: Build and Deploy Lumio App (Octane)
       uses: appleboy/ssh-action@v1.2.1
+      env:
+        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
         host: "34.18.61.136"
         username: ${{ secrets.USERNAME }}
@@ -77,6 +79,8 @@ jobs:
     steps:
     - name: Build and Deploy Lumio Job (Workers)
       uses: appleboy/ssh-action@v1.2.1
+      env:
+        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
         host: "34.18.61.136"
         username: ${{ secrets.USERNAME }}
