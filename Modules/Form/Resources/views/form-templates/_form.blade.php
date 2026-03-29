@@ -113,7 +113,7 @@
              style="margin: 0px 13px;"
             class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg">
         <i class="fas fa-save {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
-        {{ is_array($buttonText ?? null) ? json_encode($buttonText) : ($buttonText ?? __('Create Template')) }}
+        {{ is_array($buttonText ?? null) ? json_encode($buttonText) : ($buttonText ?? __('Save')) }}
     </button>
 </div>
 

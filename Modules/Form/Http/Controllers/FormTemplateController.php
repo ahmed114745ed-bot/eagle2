@@ -154,9 +154,10 @@ class FormTemplateController extends Controller
         }
     }
 
-    public function update(Request $request, FormTemplate $formTemplate)
+    public function update(Request $request,  $id)
     {
-
+        $formTemplate = FormTemplate::findOrFail($id);
+\Log::info('Updating Form Template ID: ' . $id, ['request' => $request->all()]);
         $validated = $request->validate([
             'title' => 'required|array',
             'title.*' => 'required|string',
@@ -167,6 +168,7 @@ class FormTemplateController extends Controller
 
         $allFieldNames = [];
         foreach ($request->sections as $sectionData) {
+            
             if (isset($sectionData['fields'])) {
                 foreach ($sectionData['fields'] as $fieldData) {
                     $name = trim($fieldData['name'] ?? '');
