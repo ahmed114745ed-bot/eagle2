@@ -741,11 +741,13 @@ class AuthService
 
     private function devicesTokenHistory($deviceToken)
     {
+        $register_account = (int)(Common::getSettingValue('register_account') ?? 1);
+
+        
         $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
         if ($record) {
-            $register_account = Common::getSettingValue('register_account') ?? 0;
             if ($record->count >= $register_account) {
-                throw new CValidationException('You have reached the maximum number of accounts that can be registered with this device.');
+                throw new CValidationException(__('api_responses.max_accounts_reached'));
             }
             $record->increment('count');
         } else {
