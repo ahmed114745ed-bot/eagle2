@@ -58,7 +58,7 @@
                 @foreach($locales as $key =>$locale)
                     <div class="relative">
                         <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
-                           <input type="text" name="title[{{ $locale }}]" {{ $loop->first ? 'required' : '' }}
+                           <input type="text" name="title[{{ $key }}]" {{ $loop->first ? 'required' : '' }}
                                @if($locale === 'ar') dir="rtl" @endif
                                class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                                placeholder="{{ __('Form Title') }}"
@@ -81,7 +81,7 @@
         
                 <div class="relative">
                     <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
-                    <textarea name="description[{{ $locale }}]" rows="3" @if($locale === 'ar') dir="rtl" @endif
+                    <textarea name="description[{{ $key }}]" rows="3" @if($locale === 'ar') dir="rtl" @endif
                               class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                               placeholder="{{ __('Form description') }}">{{ old('description.'.$key, is_array($template->getTranslation('description', $key)) ? json_encode($template->getTranslation('description', $key)) : $template->getTranslation('description', $key)) }}</textarea>
                 </div>
@@ -113,7 +113,7 @@
              style="margin: 0px 13px;"
             class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg">
         <i class="fas fa-save {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
-        {{ is_array($buttonText ?? null) ? json_encode($buttonText) : ($buttonText ?? __('Save')) }}
+        {{ __('Save') }}
     </button>
 </div>
 
