@@ -41,6 +41,22 @@ class AuthController extends Controller
             return Common::apiResponse(false, __('api_responses.invalid_code'));
         }
         $whatsappOtpService->resetCodes($phone);
+        
+        // Check device account limit BEFORE registration
+        $deviceToken = $request->input('device_token');
+        if (!empty($deviceToken)) {
+            try {
+                $register_account = (int)(Common::getSettingValue('register_account') ?? 1);
+                $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
+                
+                if ($record && $record->count >= $register_account) {
+                    return Common::apiResponse(false, __('api_responses.max_accounts_reached'), [], 422);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Device token check failed', ['error' => $e->getMessage()]);
+            }
+        }
+        
         try {
             [$user, $token] = $this->authService->registration($request);
         } catch (\Exception $exception) {
