@@ -95,7 +95,8 @@ class ChargeSuperAdminHistoryAction extends Action
 
             $superAdmin->save();
 
-            $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $request->amount);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $usdAmount);
         });
 
         return $this->response()->success('Success')->refresh();
