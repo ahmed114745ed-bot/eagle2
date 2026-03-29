@@ -2992,3 +2992,11 @@ Route::get('/agency-recovery', function () {
         'message' => 'AgencyRecoveryJob has been queued. Check public/agency_recovery_report.html for the report.',
     ]);
 });
+
+Route::get('/recovery-cycle', function () {
+    \App\Jobs\RecoveryCycleJob::dispatch();
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'RecoveryCycleJob started. Check public/recovery_cycle_report.html for progress.',
+    ]);
+});
