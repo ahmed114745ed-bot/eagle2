@@ -741,16 +741,45 @@ class AuthService
 
     private function devicesTokenHistory($deviceToken)
     {
-        $register_account = (int)(Common::getSettingValue('register_account') ?? 1);
+        $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
+        \Log::info('=== devicesTokenHistory called ===', [
+            'device_token' => $deviceToken,
+            'register_account_limit' => $register_account
+        ]);
         
         $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
+        \Log::info('Device token history lookup', [
+            'device_token' => $deviceToken,
+            'record_exists' => $record ? true : false,
+            'record_count' => $record?->count ?? 0
+        ]);
+        
         if ($record) {
+            \Log::info('Record found, checking limit', [
+                'device_token' => $deviceToken,
+                'current_count' => $record->count,
+                'limit' => $register_account,
+                'exceeds_limit' => $record->count >= $register_account
+            ]);
+            
             if ($record->count >= $register_account) {
+                \Log::warning('Device account limit exceeded in devicesTokenHistory', [
+                    'device_token' => $deviceToken,
+                    'current_count' => $record->count,
+                    'limit' => $register_account
+                ]);
                 throw new CValidationException(__('api_responses.max_accounts_reached'));
             }
             $record->increment('count');
+            \Log::info('Device token count incremented', [
+                'device_token' => $deviceToken,
+                'new_count' => $record->count
+            ]);
         } else {
+            \Log::info('Creating new device token record', [
+                'device_token' => $deviceToken
+            ]);
             DevicesTokenHistory::create(['device_token' => $deviceToken, 'count' => 1]);
         }
     }
