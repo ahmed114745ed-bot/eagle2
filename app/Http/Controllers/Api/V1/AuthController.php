@@ -216,7 +216,8 @@ class AuthController extends Controller
                 ]
             );
         } catch (\Throwable $exception) {
-            return Common::apiResponse(false, $exception->getMessage(), [], 422);
+            \Log::error('Google login exception', ['error' => $exception->getMessage()]);
+            return Common::apiResponse(false, __($exception->getMessage()), [], 422);
         }
     }
 
