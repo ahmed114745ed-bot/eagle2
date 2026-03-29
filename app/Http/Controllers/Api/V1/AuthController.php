@@ -118,7 +118,7 @@ class AuthController extends Controller
                 $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 $response = $this->loginWithGoogle($fields);
-   \Log::info('Google login response', ['response' => $response]);
+   \Log::info( $response);
                 return $response;
             case 'apple':
                 $fields = [
