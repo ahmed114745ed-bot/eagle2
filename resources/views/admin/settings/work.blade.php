@@ -46,14 +46,14 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="number" id="wealth_exp" name="exp_sender_percentage"
                                        value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" step="any" required>
                                 <small class="text-muted">1 coin = X EXP</small>
                             </div>
 
                             <div class="form-group">
                                 <label>{{ __('gift price') }}</label>
                                 <div class="input-with-result">
-                                    <input type="number" id="wealth_gift_price" name="test_calco"
+                                    <input type="number" id="wealth_gift_price" name="wealth_gift_price" step="any"
                                            value="{{ $settings['wealth_gift_price'] ?? '' }}"
                                            placeholder="{{ __('Enter price') }}" class="form-control">
                                     <span id="wealth_exp_result" class="result-badge"></span>
@@ -92,14 +92,14 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="number" id="attraction_exp" name="exp_received_percentage"
                                        value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" step="any" required>
                                 <small class="text-muted">1 Diamond = X EXP</small>
                             </div>
 
                             <div class="form-group">
                                 <label>{{ __('gift price') }}</label>
                                 <div class="input-with-result">
-                                    <input type="number" id="attraction_gift_price" name="test_calco"
+                                    <input type="number" id="attraction_gift_price" name="attraction_gift_price" step="any"
                                            value="{{ $settings['attraction_gift_price'] ?? '' }}"
                                            placeholder="{{ __('Enter price') }}" class="form-control">
                                     <span id="attraction_exp_result" class="result-badge"></span>
@@ -138,14 +138,14 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="number" id="charge_exp" name="exp_charge_percentage"
                                        value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" step="any" required>
                                 <small class="text-muted">1 charge = X EXP</small>
                             </div>
 
                             <div class="form-group">
                                 <label>{{ __('coins') }}</label>
                                 <div class="input-with-result">
-                                    <input type="number" id="charge_gift_price" name="test_calco"
+                                    <input type="number" id="charge_gift_price" name="charge_gift_price" step="any"
                                            value="{{ $settings['charge_gift_price'] ?? '' }}"
                                            placeholder="{{ __('Enter amount') }}" class="form-control">
                                     <span id="charge_exp_result" class="result-badge"></span>
@@ -184,14 +184,14 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="number" id="rooms_exp" name="exp_room_percentage"
                                        value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" step="any" required>
                                 <small class="text-muted">1 room action = X EXP</small>
                             </div>
 
                             <div class="form-group">
                                 <label>{{ __('gift price') }}</label>
                                 <div class="input-with-result">
-                                    <input type="number" id="rooms_gift_price" name="test_calco"
+                                    <input type="number" id="rooms_gift_price" name="rooms_gift_price" step="any"
                                            value="{{ $settings['rooms_gift_price'] ?? '' }}"
                                            placeholder="{{ __('Enter price') }}" class="form-control">
                                     <span id="rooms_exp_result" class="result-badge"></span>
@@ -230,14 +230,14 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="number" id="cp_exp" name="exp_cp_percentage"
                                        value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" step="any" required>
                                 <small class="text-muted">1 CP action = X EXP</small>
                             </div>
 
                             <div class="form-group">
                                 <label>{{ __('gift price') }}</label>
                                 <div class="input-with-result">
-                                    <input type="number" id="cp_gift_price" name="test_calco"
+                                    <input type="number" id="cp_gift_price" name="cp_gift_price" step="any"
                                            value="{{ $settings['cp_gift_price'] ?? '' }}"
                                            placeholder="{{ __('Enter price') }}" class="form-control">
                                     <span id="cp_exp_result" class="result-badge"></span>
@@ -287,14 +287,14 @@
                                 <label>{{ __('Exchange Rate') }}</label>
                                 <input type="number" id="coin_exp" name="exchange_coin_percentage"
                                        value="{{ $settings['exchange_coin_percentage'] ?? 1 }}"
-                                       placeholder="{{ __('Enter rate') }}" class="form-control" required>
+                                       placeholder="{{ __('Enter rate') }}" class="form-control" step="any" required>
                                 <small class="text-muted">1 diamond = X coin</small>
                             </div>
 
                             <div class="form-group calculator-box">
                                 <label>{{ __('Calculator') }}</label>
                                 <div class="input-with-result">
-                                    <input type="number" class="user_coin_input form-control"
+                                    <input type="number" class="user_coin_input form-control" step="any"
                                            placeholder="{{ __('Enter diamond amount') }}">
                                     <input type="hidden" class="exchange_rate"
                                            value="{{ $settings['exchange_coin_percentage'] ?? 1 }}">

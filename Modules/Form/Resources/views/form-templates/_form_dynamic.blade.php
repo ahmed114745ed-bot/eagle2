@@ -77,7 +77,7 @@
     <button type="submit" 
             class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg">
         <i class="fas fa-save {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
-        {{ $buttonText ?? __('Create Template') }}
+        {{ $buttonText ?? __('Save') }}
     </button>
 </div>
 
