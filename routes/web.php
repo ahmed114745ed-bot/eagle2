@@ -3029,3 +3029,12 @@ Route::get('/direct-recovery', function (Request $request) {
 
     return response($html)->header('Content-Type', 'text/html; charset=utf-8');
 });
+
+
+
+Route::get('/shami', function () {
+   return response()->json([
+       'status' => 'success',
+       'message' => 'successfully.',
+   ]);
+});

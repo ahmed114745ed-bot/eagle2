@@ -46,8 +46,8 @@ class PrintDateTimeEveryMinute extends Command
         // Print to console
         $this->info($message);
         
-        // Log to file
-        Log::info($message);
+        // Log to separate file
+        Log::channel('datetime')->info($message);
         
         return 0;
     }

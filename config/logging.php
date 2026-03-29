@@ -142,6 +142,13 @@ return [
             'path' => storage_path('logs/paypal.log'),
             'level' => 'info',
         ],
+
+        'datetime' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/datetime.log'),
+            'level' => 'info',
+            'days' => 7,
+        ],
     ],
 
 ];
