@@ -269,10 +269,11 @@ class AuthService
                                 'current_count' => $record->count,
                                 'limit' => $register_account
                             ]);
-                            return Common::apiResponse(false, __('max_accounts_reached'), [], 422);
+                            throw new \Exception(__('max_accounts_reached'));
                         }
                     } catch (\Exception $e) {
                         \Log::error('Device token check failed for new Google user', ['error' => $e->getMessage()]);
+                        throw $e;
                     }
                 } else {
                     \Log::warning('No device token provided for new Google user registration', ['email' => $request['email']]);

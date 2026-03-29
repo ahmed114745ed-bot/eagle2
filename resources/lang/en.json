@@ -1727,6 +1727,7 @@
     "user parent": "invitation code",
     "Browse user parent": "Browse invitation code",
     "max_accounts_reached": "You have reached the maximum number of accounts that can be registered with this device.",
+    "api_responses.max_accounts_reached": "You have reached the maximum number of accounts that can be registered with this device.",
     "already exists": "This phone number is already registered",
     "invalid_code": "Invalid or expired verification code"
 }
