@@ -41,12 +41,7 @@ class AuthService
         }
 
         if (substr_count($id_token, '.') !== 2) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Wrong number of segments in ID token',
-                'data' => null,
-                'paginates' => null
-            ], 422);
+            throw new \Exception('Wrong number of segments in ID token');
         }
         $googleResponse = Http::get('https://oauth2.googleapis.com/tokeninfo', [
             'id_token' => $id_token
@@ -118,8 +113,20 @@ class AuthService
                     'device_token' => $request['device_token'] ?? null,
 
                 ]);
-                if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
+               // if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
+                try {
+                    if (!empty($request['device_token'])) {
+                        $this->devicesTokenHistory($request['device_token']);
+                    }
+                } catch (CValidationException $e) { 
+                    throw $e;
+                } catch (\Exception $e) { 
+                    logger()->error('Technical error in device token history', [
+                        'error' => $e->getMessage()
+                    ]);
+                    throw new \Exception('Something went wrong');
+                }
                 $user = $this->userRepository->create($data);
             }
 
@@ -228,14 +235,19 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
+
+                // Check device account limit BEFORE creating new Google user
                 try {
-                    if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
-                } catch (\Exception $e) {
-                    logger()->error('Failed device...... token', [
-                        'device_token' => $request['device_token'] ?? null,
+                    if (!empty($request['device_token'])) {
+                        $this->devicesTokenHistory($request['device_token']);
+                    }
+                } catch (CValidationException $e) { 
+                    throw $e;
+                } catch (\Exception $e) { 
+                    logger()->error('Technical error in device token history', [
                         'error' => $e->getMessage()
                     ]);
-                    return Common::apiResponse(false,  $e->getMessage(), [], 422);
+                    throw new \Exception('Something went wrong');
                 }
                 $user = $this->userRepository->create($data);
 
@@ -725,14 +737,45 @@ class AuthService
 
     private function devicesTokenHistory($deviceToken)
     {
+        $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+        \Log::info('=== devicesTokenHistory called ===', [
+            'device_token' => $deviceToken,
+            'register_account_limit' => $register_account
+        ]);
+        
         $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
+        \Log::info('Device token history lookup', [
+            'device_token' => $deviceToken,
+            'record_exists' => $record ? true : false,
+            'record_count' => $record?->count ?? 0
+        ]);
+        
         if ($record) {
-            $register_account = Common::getSettingValue('register_account') ?? 0;
+            \Log::info('Record found, checking limit', [
+                'device_token' => $deviceToken,
+                'current_count' => $record->count,
+                'limit' => $register_account,
+                'exceeds_limit' => $record->count >= $register_account
+            ]);
+            
             if ($record->count >= $register_account) {
-                throw new CValidationException('You have reached the maximum number of accounts that can be registered with this device.');
+                \Log::warning('Device account limit exceeded in devicesTokenHistory', [
+                    'device_token' => $deviceToken,
+                    'current_count' => $record->count,
+                    'limit' => $register_account
+                ]);
+                throw new CValidationException(__('max_accounts_reached'));
             }
             $record->increment('count');
+            \Log::info('Device token count incremented', [
+                'device_token' => $deviceToken,
+                'new_count' => $record->count
+            ]);
         } else {
+            \Log::info('Creating new device token record', [
+                'device_token' => $deviceToken
+            ]);
             DevicesTokenHistory::create(['device_token' => $deviceToken, 'count' => 1]);
         }
     }

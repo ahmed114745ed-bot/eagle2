@@ -59,6 +59,8 @@ class FormTemplateController extends Controller
 
     public function store(Request $request)
     {
+        \Log::info('Creating Form Template', ['request' => $request->all()]);
+
         $validated = $request->validate([
             'title' => 'required|array',
             'title.*' => 'required|string',
@@ -136,6 +138,8 @@ class FormTemplateController extends Controller
 
     public function edit($id, Content $content)
     {
+        \Log::info('Updating Form Template ID: ' . $id);
+    
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
@@ -154,24 +158,49 @@ class FormTemplateController extends Controller
         }
     }
 
-    public function update(Request $request, FormTemplate $formTemplate)
+    public function update(Request $request,  $id)
     {
+        \Log::channel('single')->info('========== FORM TEMPLATE UPDATE START ==========');
+        \Log::channel('single')->info('Updating Form Template ID: ' . $id);
+        \Log::channel('single')->info('Request Method: ' . $request->method());
+        \Log::channel('single')->info('Request URL: ' . $request->fullUrl());
+        \Log::channel('single')->info('Request Headers:', $request->headers->all());
+        \Log::channel('single')->info('Request Data:', $request->all());
 
-        $validated = $request->validate([
-            'title' => 'required|array',
-            'title.*' => 'required|string',
-            'form_type' => 'required|string',
-            'description' => 'nullable|array',
-            'sections' => 'required|array',
+        try {
+
+        $formTemplate = FormTemplate::findOrFail($id);
+
+        \Log::channel('single')->info('Current Template Data BEFORE update:', [
+            'id' => $formTemplate->id,
+            'title' => $formTemplate->getRawOriginal('title'),
+            'form_type' => $formTemplate->form_type,
+            'description' => $formTemplate->getRawOriginal('description'),
         ]);
+
+        try {
+            $validated = $request->validate([
+                'title' => 'required|array',
+                'title.*' => 'required|string',
+                'form_type' => 'required|string',
+                'description' => 'nullable|array',
+                'sections' => 'required|array',
+            ]);
+            \Log::channel('single')->info('Validation PASSED', $validated);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::channel('single')->error('Validation FAILED', ['errors' => $e->errors()]);
+            throw $e;
+        }
 
         $allFieldNames = [];
         foreach ($request->sections as $sectionData) {
+            
             if (isset($sectionData['fields'])) {
                 foreach ($sectionData['fields'] as $fieldData) {
                     $name = trim($fieldData['name'] ?? '');
                     if ($name !== '') {
                         if (in_array($name, $allFieldNames)) {
+                            \Log::channel('single')->warning('Duplicate field name detected: ' . $name);
                             return back()->withErrors(['duplicate_field' => "حقل '$name' مكرر داخل نفس النموذج."])->withInput();
                         }
                         $allFieldNames[] = $name;
@@ -180,16 +209,36 @@ class FormTemplateController extends Controller
             }
         }
 
-       // dd($request->sections, $formTemplate->sections()->with('fields')->get());
         // Update form template basic info
-        $formTemplate->update([
+        \Log::channel('single')->info('Attempting to update template basic info:', [
             'title' => $request->title,
             'form_type' => $request->form_type,
             'description' => $request->description,
         ]);
 
+        $updateResult = $formTemplate->update([
+            'title' => $request->title,
+            'form_type' => $request->form_type,
+            'description' => $request->description,
+        ]);
+
+        \Log::channel('single')->info('Template update() result: ' . ($updateResult ? 'TRUE' : 'FALSE'));
+        
+        // Reload and verify
+        $formTemplate->refresh();
+        \Log::channel('single')->info('Template Data AFTER update:', [
+            'title' => $formTemplate->getRawOriginal('title'),
+            'form_type' => $formTemplate->form_type,
+            'description' => $formTemplate->getRawOriginal('description'),
+            'dirty' => $formTemplate->getDirty(),
+            'wasChanged' => $formTemplate->wasChanged(),
+        ]);
+
         // Delete old sections and fields (cascade will handle fields)
+        \Log::channel('single')->info('Deleting old sections for template ID: ' . $id);
+        $oldSectionsCount = $formTemplate->sections()->count();
         $formTemplate->sections()->delete();
+        \Log::channel('single')->info('Deleted ' . $oldSectionsCount . ' old sections');
 
         // Create new sections and fields
         if ($request->has('sections')) {
@@ -281,8 +330,24 @@ class FormTemplateController extends Controller
             }
         }
 
+        \Log::channel('single')->info('========== FORM TEMPLATE UPDATE COMPLETED SUCCESSFULLY ==========');
+        \Log::channel('single')->info('New sections count: ' . $formTemplate->sections()->count());
+        \Log::channel('single')->info('Final template state:', [
+            'id' => $formTemplate->id,
+            'title' => $formTemplate->getRawOriginal('title'),
+            'form_type' => $formTemplate->form_type,
+        ]);
+
         admin_success(__('Form template updated successfully!'));
         return redirect(admin_url('form-templates'));
+
+        } catch (\Exception $e) {
+            \Log::channel('single')->error('========== FORM TEMPLATE UPDATE FAILED ==========');
+            \Log::channel('single')->error('Error Message: ' . $e->getMessage());
+            \Log::channel('single')->error('Error File: ' . $e->getFile() . ':' . $e->getLine());
+            \Log::channel('single')->error('Error Trace: ' . $e->getTraceAsString());
+            throw $e;
+        }
     }
 
    
