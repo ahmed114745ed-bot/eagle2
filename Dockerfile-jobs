@@ -76,4 +76,4 @@ RUN REDIS_HOST=172.17.0.1 \
 #EXPOSE 9000
 RUN mkdir -p /var/log/supervisor && chmod 755 /var/log/supervisor
 # Start supervisord
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
