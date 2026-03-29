@@ -71,7 +71,7 @@ class TicketController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->model()->with([
-            'user:id,name,uuid,phone', 
+            'user:id,name,uuid,phone',
             'user.agency',
             'user.profile:user_id,avatar',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
@@ -154,7 +154,10 @@ class TicketController extends MainController
         $grid->column('status', __('status'))->switch(Common::getSwitchStates());
         $this->extendGrid($grid);
         $grid->disableExport();
-
+        $grid->disableCreateButton();
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
         return $grid;
     }
 
