@@ -72,7 +72,7 @@ class AuthController extends Controller
                         'current_count' => $record->count,
                         'limit' => $register_account
                     ]);
-                    return Common::apiResponse(false, __('api_responses.max_accounts_reached'), [], 422);
+                    return Common::apiResponse(false, __('max_accounts_reached'), [], 422);
                 }
             } catch (\Exception $e) {
                 \Log::error('Device token check failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
