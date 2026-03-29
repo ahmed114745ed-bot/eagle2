@@ -237,49 +237,17 @@ class AuthService
                 }
 
                 // Check device account limit BEFORE creating new Google user
-                \Log::info('=== NEW GOOGLE USER REGISTRATION ===', [
-                    'email' => $request['email'],
-                    'device_token' => $request['device_token'] ?? null
-                ]);
-
-                if (!empty($request['device_token'])) {
-                    $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
-                    \Log::info('Device token check for new Google user', [
-                        'device_token' => $request['device_token'],
-                        'register_account_limit' => $register_account
-                    ]);
-                    
-                    $record = DevicesTokenHistory::where('device_token', $request['device_token'])->first();
-                    \Log::info('Device token history record for new Google user', [
-                        'device_token' => $request['device_token'],
-                        'record_exists' => $record ? true : false,
-                        'record_count' => $record?->count ?? 0,
-                        'limit' => $register_account
-                    ]);
-                    
-                    if ($record && $record->count >= $register_account) {
-                        \Log::warning('Device account limit exceeded for new Google user', [
-                            'device_token' => $request['device_token'],
-                            'current_count' => $record->count,
-                            'limit' => $register_account
-                        ]);
-                        throw new CValidationException(__('max_accounts_reached'));
-                    }
-                } else {
-                    \Log::warning('No device token provided for new Google user registration', ['email' => $request['email']]);
-                }
-
-              try {
+                try {
                     if (!empty($request['device_token'])) {
                         $this->devicesTokenHistory($request['device_token']);
                     }
                 } catch (CValidationException $e) { 
-                    return Common::apiResponse(false, $e->getMessage(), [], 422);
+                    throw $e;
                 } catch (\Exception $e) { 
                     logger()->error('Technical error in device token history', [
                         'error' => $e->getMessage()
                     ]);
-                    return Common::apiResponse(false, 'Something went wrong', [], 500);
+                    throw new \Exception('Something went wrong');
                 }
                 $user = $this->userRepository->create($data);
 
