@@ -64,6 +64,8 @@ use Modules\RoomBoom\Http\Controllers\web\PercentageBoomController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\Vip\Entities\VipPrivilege;
 use Symfony\Component\Process\Process;
+use App\Admin\Controllers\AppearChargerAgencyController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -3032,7 +3034,7 @@ Route::get('/direct-recovery', function (Request $request) {
 
 
 
-Route::get('/shami', function () {
+Route::get('/shami2', function () {
    return response()->json([
        'status' => 'success',
        'message' => 'successfully.',
