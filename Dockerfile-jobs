@@ -30,7 +30,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /app
-
+RUN printenv | grep -v "no_proxy" >> /etc/environment
 # Copy application files
 COPY . /app
 
@@ -38,12 +38,11 @@ COPY . /app
 COPY docker/cron /etc/cron.d/app-cron
 
 # Give execution rights to the cron job
-RUN chmod 0644 /etc/cron.d/app-cron
+RUN chmod 0644 /etc/cron.d/app-cron && crontab /etc/cron.d/app-cron
 
 # Create log file for cron
 RUN touch /var/log/cron.log
 
-RUN crontab -u root /etc/cron.d/app-cron
 
 # Setup supervisord configuration
 COPY docker/supervisor.conf /etc/supervisor/conf.d/supervisord.conf
@@ -77,4 +76,4 @@ RUN REDIS_HOST=172.17.0.1 \
 #EXPOSE 9000
 
 # Start supervisord
-CMD ["/usr/bin/supervisord", "-n"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

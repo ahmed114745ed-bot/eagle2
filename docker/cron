@@ -1,0 +1,3 @@
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+* * * * * . /etc/environment; cd /app && /usr/local/bin/php artisan schedule:run >> /app/storage/jobs-logs/schedule-crons.log 2>&1
