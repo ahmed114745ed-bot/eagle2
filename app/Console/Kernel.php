@@ -190,6 +190,11 @@ class Kernel extends ConsoleKernel
             ->everyMinute()
             ->appendOutputTo(storage_path('logs/fairluck-sync-wallets.log'))
             ->runInBackground();
+
+        $schedule->command('app:print-datetime-every-minute')
+            ->everyMinute()
+            ->appendOutputTo(storage_path('logs/print-datetime-every-minute.log'))
+            ->runInBackground();
     }
 
     protected function commands(): void
