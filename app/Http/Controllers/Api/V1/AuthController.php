@@ -62,6 +62,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
+        \Log::info('Login request received', ['request' => $request->all()]);
         $globalKeys = [
             'is_multi' => $request->input('is_multi', false),
             'notification_id' => $request->input('notification_id', null)
