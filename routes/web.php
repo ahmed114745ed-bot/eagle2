@@ -2132,3 +2132,9 @@ Route::get('/fix-gift-logs/run', function () {
         'records_updated' => $updated,
     ]);
 });
+
+
+Route::get('test-g', function () {
+
+    return 'test successfully!';
+});
