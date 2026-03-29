@@ -41,12 +41,7 @@ class AuthService
         }
 
         if (substr_count($id_token, '.') !== 2) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Wrong number of segments in ID token',
-                'data' => null,
-                'paginates' => null
-            ], 422);
+            throw new \Exception('Wrong number of segments in ID token');
         }
         $googleResponse = Http::get('https://oauth2.googleapis.com/tokeninfo', [
             'id_token' => $id_token
@@ -268,7 +263,7 @@ class AuthService
                             'current_count' => $record->count,
                             'limit' => $register_account
                         ]);
-                        throw new \Exception(__('max_accounts_reached'));
+                        throw new CValidationException(__('max_accounts_reached'));
                     }
                 } else {
                     \Log::warning('No device token provided for new Google user registration', ['email' => $request['email']]);
