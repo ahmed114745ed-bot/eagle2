@@ -120,12 +120,12 @@ class AuthService
                         $this->devicesTokenHistory($request['device_token']);
                     }
                 } catch (CValidationException $e) { 
-                    return Common::apiResponse(false, $e->getMessage(), [], 422);
+                    throw $e;
                 } catch (\Exception $e) { 
                     logger()->error('Technical error in device token history', [
                         'error' => $e->getMessage()
                     ]);
-                    return Common::apiResponse(false, 'Something went wrong', [], 500);
+                    throw new \Exception('Something went wrong');
                 }
                 $user = $this->userRepository->create($data);
             }
