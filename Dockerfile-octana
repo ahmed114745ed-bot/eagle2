@@ -43,10 +43,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /app
+RUN printenv | grep -v "no_proxy" >> /etc/environment
 # Setup Laravel Cron Job
-RUN echo "* * * * * cd /app && php artisan schedule:run >> /dev/null 2>&1" > /etc/cron.d/laravel-scheduler
-RUN chmod 0644 /etc/cron.d/laravel-scheduler
-RUN crontab /etc/cron.d/laravel-scheduler
+RUN echo "* * * * * . /etc/environment; cd /app && /usr/local/bin/php artisan schedule:run >> /var/log/cron.out.log 2>&1" > /etc/cron.d/laravel-scheduler
+RUN chmod 0644 /etc/cron.d/laravel-scheduler && crontab /etc/cron.d/laravel-scheduler
+
 # Copy application files
 COPY . /app
 
