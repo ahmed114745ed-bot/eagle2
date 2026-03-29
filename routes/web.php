@@ -2136,5 +2136,5 @@ Route::get('/fix-gift-logs/run', function () {
 
 Route::get('test-g', function () {
 
-    return 'test successfully!';
+    return 'test successfully!---------';
 });
