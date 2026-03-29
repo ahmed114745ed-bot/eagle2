@@ -118,8 +118,20 @@ class AuthService
                     'device_token' => $request['device_token'] ?? null,
 
                 ]);
-                if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
+               // if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
+                try {
+                    if (!empty($request['device_token'])) {
+                        $this->devicesTokenHistory($request['device_token']);
+                    }
+                } catch (CValidationException $e) { 
+                    return Common::apiResponse(false, $e->getMessage(), [], 422);
+                } catch (\Exception $e) { 
+                    logger()->error('Technical error in device token history', [
+                        'error' => $e->getMessage()
+                    ]);
+                    return Common::apiResponse(false, 'Something went wrong', [], 500);
+                }
                 $user = $this->userRepository->create($data);
             }
 
@@ -228,14 +240,18 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                try {
-                    if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
-                } catch (\Exception $e) {
-                    logger()->error('Failed device...... token', [
-                        'device_token' => $request['device_token'] ?? null,
+
+              try {
+                    if (!empty($request['device_token'])) {
+                        $this->devicesTokenHistory($request['device_token']);
+                    }
+                } catch (CValidationException $e) { 
+                    return Common::apiResponse(false, $e->getMessage(), [], 422);
+                } catch (\Exception $e) { 
+                    logger()->error('Technical error in device token history', [
                         'error' => $e->getMessage()
                     ]);
-                    return Common::apiResponse(false,  $e->getMessage(), [], 422);
+                    return Common::apiResponse(false, 'Something went wrong', [], 500);
                 }
                 $user = $this->userRepository->create($data);
 
