@@ -62,6 +62,8 @@ use Modules\RoomBoom\Http\Controllers\web\PercentageBoomController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\Vip\Entities\VipPrivilege;
 use Symfony\Component\Process\Process;
+use App\Admin\Controllers\AppearChargerAgencyController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -2129,4 +2131,10 @@ Route::get('/fix-gift-logs/run', function () {
         'message' => "Fixed {$updated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
         'records_updated' => $updated,
     ]);
+});
+
+
+Route::get('test-g', function () {
+
+    return 'test successfully!';
 });
