@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static familyLevelUpgrade(int $id)
  * @method static officialMsg(\App\Models\OfficialMessageAdmin $officialMessageAdmin,$usersId)
  * @method static family(\App\Models\Family $family, mixed $user)
+ * @method static banUser(User $user, $duration)
+ * @method static removeBanUser(User $user)
+ * @method static roomcupReward(User $user, float $amount, string $rewardType = 'owner')
  */
 class CustomNotification extends Facade
 {

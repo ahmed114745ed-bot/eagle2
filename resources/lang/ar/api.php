@@ -79,6 +79,7 @@ return [
     'level'                            => 'مبروك لقد تم رفع مستواك :key',
     'ban_user_id'                      => ' ابلاغك انك لن تستطيع الدخول الى :appName الا بعد مرور  :duration ساعة. للاعتراض و الشكوى يرجى التواصل مع خدمة العملاء',
     'userVips'                         => ' مبروك تم حصولك على :vip لمدة :duration يوم ',
+    'roomcup_reward'                   => 'مبروك! لقد حصلت على :amount عملة كمكافأة :reward_type في رومكب',
     'wareVips'                         => ' مبروك تم حصولك على :name لمدة :duration يوم ',
     'removeBan_user_id'                => 'مبروك انت الان تستطيع استخدام :appName',
     'remove_from_family'               => 'تم حظرك من عائله :name',
