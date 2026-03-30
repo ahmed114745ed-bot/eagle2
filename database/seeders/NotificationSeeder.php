@@ -1044,6 +1044,38 @@ class NotificationSeeder extends Seeder
             ]
         ]);
 
+        // RoomCup Reward Notification
+        $roomcupReward = DB::table('notifications')->insertGetId([
+            'key' => 'roomcup_reward'
+        ]);
+
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $roomcupReward,
+                'title' => 'RoomCup Reward 🎉',
+                'message' => 'Congratulations! You received {amount} coins as {reward_type} reward in RoomCup',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $roomcupReward,
+                'title' => 'جائزة رومكب 🎉',
+                'message' => 'مبروك! لقد حصلت على {amount} عملة كمكافأة {reward_type} في رومكب',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $roomcupReward,
+                'title' => 'RoomCup Ödülü 🎉',
+                'message' => 'Tebrikler! RoomCup\'ta {reward_type} ödülü olarak {amount} jeton kazandınız',
+                'language' => 'tu'
+            ],
+            [
+                'notification_id' => $roomcupReward,
+                'title' => 'RoomCup पुरस्कार 🎉',
+                'message' => 'बधाई हो! आपने RoomCup में {reward_type} पुरस्कार के रूप में {amount} सिक्के प्राप्त किए',
+                'language' => 'hi'
+            ]
+        ]);
+
         $notifications = Notification::all();
         foreach ($notifications as $n) {
             Cache::forever($n->key, $n->translations->toArray());

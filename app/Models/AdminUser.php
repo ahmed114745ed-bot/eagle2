@@ -26,3 +26,5 @@ class AdminUser extends Administrator
         return $this->managerAgencies()->withoutGlobalScope(HostAgencyScope::class);
     }
 }
+
+
