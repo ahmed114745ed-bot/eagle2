@@ -3154,3 +3154,11 @@ Route::get('/fix-charges-usd', function () {
         'samples' => $samples,
     ], 200, [], JSON_PRETTY_PRINT);
 });
+
+
+
+Route::get('/d', function () {
+    return response()->json([
+        'status' => 'ok',
+    ]);
+});
