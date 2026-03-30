@@ -3162,3 +3162,16 @@ Route::get('/d', function () {
         'status' => 'ok',
     ]);
 });
+Route::get('/master-recovery', function () {
+    // Delete old reports
+    @unlink(public_path('master_recovery_report.html'));
+    @unlink(public_path('master_recovery_deductions.csv'));
+    @unlink(public_path('direct_recovery_report.html'));
+    @unlink(public_path('agency_recovery_report.html'));
+
+    \App\Jobs\MasterRecoveryJob::dispatch();
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'MasterRecoveryJob started. Check /master_recovery_report.html for progress, /master_recovery_deductions.csv for the deductions sheet.',
+    ]);
+});
