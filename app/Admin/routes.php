@@ -317,6 +317,15 @@ Route::group(
         Route::put('rooms/{room}/info', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
+
+        // API for room subcategories (used by room_class -> room_type dynamic loading)
+        Route::get('api/room-subcategories', function (\Illuminate\Http\Request $request) {
+            $parentId = $request->get('q');
+            $categories = \App\Models\RoomCategory::where('enable', 1)
+                ->where('parent_id', $parentId)
+                ->get(['id', 'name as text']);
+            return $categories;
+        });
         Route::resource('all-games', AllGameController::class);
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);

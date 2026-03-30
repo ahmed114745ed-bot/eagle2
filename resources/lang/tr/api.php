@@ -69,6 +69,7 @@ return [
     'ban_user_id'       => "Üzgünüm! Şu anda :appName\'ya giriş yapamazsınız, :duration saat sonra giriş yapabilirsiniz \nİtiraz ve şikayet için müşteri hizmetleri ile iletişime geçin",
     'removeBan_user_id' => 'Tebrikler! Şimdi :appName\'ya giriş yapabilirsiniz',
     'userVips'          => 'Tebrikler! VIP oldunuz, :duration gün boyunca',
+    'roomcup_reward'    => 'Tebrikler! RoomCup\'ta :reward_type ödülü olarak :amount jeton kazandınız',
     'wareVips'          => 'Tebrikler! :name\'e ulaştınız, :duration gün boyunca',
     'remove_from_family'  => 'Üzgünüm! Aileden çıkarıldınız: :name',
     'accept_agency'       => 'Tebrikler! :name ajansına katılma talebiniz kabul edildi',

@@ -845,7 +845,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'invitation-code-setting', 'except' => ['create', 'delete', 'edit', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse',],
                     ],],
-
+                    ['key' => 'invitation-code', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse',],
+                    ],],
                 ],
             ],
             [

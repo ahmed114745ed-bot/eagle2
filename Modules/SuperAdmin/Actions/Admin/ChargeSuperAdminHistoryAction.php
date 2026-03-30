@@ -95,7 +95,8 @@ class ChargeSuperAdminHistoryAction extends Action
 
             $superAdmin->save();
 
-            $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $request->amount);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $usdAmount);
         });
 
         return $this->response()->success('Success')->refresh();
@@ -188,12 +189,12 @@ class ChargeSuperAdminHistoryAction extends Action
         $html = '';
 
         if (Admin::user()->can('add-switch-charge-to-superadmin') || Admin::user()->can('*')) {
-            $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->userId . ')" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">'
+            $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->userId . ')" class="charge_action btn btn-sm btn-success">'
                 . htmlspecialchars($title) .
                 '</a>';
         }
 
-       
+
 
         $html .= <<<HTML
             <script>

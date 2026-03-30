@@ -25,6 +25,7 @@ class ConfigsSeeder extends Seeder
             array('name' => 'twilio_sid','value' => '000','desc' => '','created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
             array('name' => 'twilio_api_key','value' => '000','desc' => '','created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
             array('name' => 'twilio_from','value' => '000','desc' => 'المرسل','created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
+            array('name' => 'register_account','value' => '3','desc' => 'حد الحسابات المسموح بتسجيلها من نفس الجهاز','created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
 //            array('name' => 'f_yj_ratio','value' => '10','desc' => NULL,'created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
 //            array('name' => 'union_share','value' => '10','desc' => NULL,'created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
 //            array('name' => 'no_family_ratio','value' => '10','desc' => NULL,'created_at' => '2023-02-25 12:49:09','updated_at' => '2023-02-25 12:49:09'),
