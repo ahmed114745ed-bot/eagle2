@@ -25,6 +25,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "imdhemy/google-play-billing": "^1.5.1",
         "intervention/image": "^3.8",
+        "jenssegers/agent": "^2.6",
         "jxlwqq/material-ui": "^1.0",
         "jxlwqq/watermark": "^1.0",
         "kreait/firebase-php": "^7.19",
@@ -49,6 +50,7 @@
         "pusher/pusher-php-server": "*",
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/laravel-translatable": "^6.11",
+        "stevebauman/location": "^7.6",
         "stripe/stripe-php": "^9.9"
     },
     "require-dev": {
