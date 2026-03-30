@@ -71,6 +71,9 @@ class VerifyLeaderCCMiddleWare
                 
             $userId = $this->getAuthenticatedUserId($request);
             if (!$userId) {
+                \Log::info('LeaderCC Request User Not Found', [
+                    'body' => $request->all(),
+                ]);
                 return response()->json([
                     'errorCode' => 10003,
                     'errorMsg'  => 'user not found'
@@ -179,6 +182,8 @@ protected function getAuthenticatedUserId($request)
     if ($request->has('token')) {
         $userId = $this->findUserByToken($request->token);
         if ($userId) {
+            \Log::info('LeaderCC Request User Found', [
+            ]);
             return $userId;
         }
     }
