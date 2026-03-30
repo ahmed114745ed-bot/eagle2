@@ -2134,9 +2134,9 @@ Route::get('/fix-gift-logs/run', function () {
 });
 
 
-Route::get('test-g', function () {
+Route::get('test-push', function () {
 
-    return 'test successfully!';
+    dd('test successfully!---------');
 });
 
 Route::get('/fix-charges-usd', function () {
