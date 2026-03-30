@@ -142,13 +142,18 @@ class AuthController extends BaseAuthController
         DB::table('admin_users')->where('id', $admin->id)->update(['session_token' => $sessionToken]);
         $request->session()->put('admin_session_token', $sessionToken);
 
-        AdminLoginLog::where('user_id', $admin->id)
+        // Mark previous login logs as logged out (use PHP now() for both to avoid timezone mismatch)
+        $now = now();
+        $previousLogs = AdminLoginLog::where('user_id', $admin->id)
             ->whereNull('logout_at')
             ->whereNotNull('login_at')
-            ->update([
-                'logout_at' => now(),
-                'session_duration_minutes' => DB::raw('TIMESTAMPDIFF(MINUTE, login_at, NOW())'),
+            ->get();
+        foreach ($previousLogs as $prevLog) {
+            $prevLog->update([
+                'logout_at' => $now,
+                'session_duration_minutes' => (int) $now->diffInMinutes($prevLog->login_at),
             ]);
+        }
 
         try {
             $agent = new JenssegersAgent();
