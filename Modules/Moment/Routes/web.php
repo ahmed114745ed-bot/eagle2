@@ -4,7 +4,7 @@ use Modules\Moment\Http\Controllers\web\MomentController;
 use Modules\Moment\Http\Controllers\web\MomentViewerController;
 use Modules\Moment\Http\Controllers\web\ReportMomentController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
-use Modules\Moment\Http\Controllers\web\MomentSettingsController;
+use Modules\Moment\Http\Controllers\web\MomentSettingsController as MomentSettingsControllerAlias;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +26,6 @@ Route::get('delete-moment/{moment_id}/{id}', 'MomentController@destroy_dash')->n
 Route::group(
     [
         'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
         'middleware' => [
             'web',
             'admin',
@@ -43,7 +42,7 @@ Route::group(
         Route::post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
         Route::resource('moments', MomentController::class)->middleware('moment.allowed');
         Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery'])->middleware('moment.allowed');
-        Route::resource('moment-settings', MomentSettingsController::class)->middleware('moment.allowed');
+        Route::resource('moment-settings', MomentSettingsControllerAlias::class)->middleware('moment.allowed');
 
         // 🎯 Moment Viewer Routes (Facebook-like Experience)
         Route::prefix('moment-viewer')->name('moment-viewer.')->middleware('moment.allowed')->group(function () {
