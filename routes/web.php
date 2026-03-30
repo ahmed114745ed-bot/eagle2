@@ -3040,3 +3040,34 @@ Route::get('/shami2', function () {
        'message' => 'successfully.',
    ]);
 });
+// ================================================================
+// Recovery Routes
+// ================================================================
+Route::get('/direct-recovery-v2', function () {
+    \App\Jobs\DirectRecoveryJob::dispatch();
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'DirectRecoveryJob has been queued. Check public/ for the report when done.',
+    ]);
+});
+
+Route::get('/agency-recovery', function () {
+    \App\Jobs\AgencyRecoveryJob::dispatch();
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'AgencyRecoveryJob has been queued. Check public/agency_recovery_report.html for the report.',
+    ]);
+});
+
+Route::get('/master-recovery', function () {
+    @unlink(public_path('master_recovery_report.html'));
+    @unlink(public_path('master_recovery_deductions.csv'));
+    @unlink(public_path('direct_recovery_report.html'));
+    @unlink(public_path('agency_recovery_report.html'));
+
+    \App\Jobs\MasterRecoveryJob::dispatch();
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'MasterRecoveryJob started. Check /master_recovery_report.html for progress, /master_recovery_deductions.csv for the deductions sheet.',
+    ]);
+});
