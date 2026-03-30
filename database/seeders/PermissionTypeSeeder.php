@@ -850,7 +850,7 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => ['browse',],
                     ],],
                     ['key' => 'invitation-code', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
+                        PermissionType::ADMIN->value => ['browse',],
                     ],],
                 ],
             ],
