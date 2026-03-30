@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 use App\Helpers\UserCommon;
+use App\Models\Setting;
 
 class chargUsersSleemController extends AdminController
 {
@@ -177,9 +178,16 @@ class chargUsersSleemController extends AdminController
         $amount = $data['amount'];
         $chargerId = 1;
 
+        $userCoins = \Cache::rememberForever('user_coins', function () {
+            $setting = Setting::where('key', 'user_coins')->first();
+            return $setting?->value ?? 1;
+        });
+        $usdAmount = $userCoins > 0 ? $amount / $userCoins : 0;
+
         $charge = Charge::query()->create([
             'user_id' => $userId,
             'amount' => $amount,
+            'usd' => $usdAmount,
             'charger_id' => $chargerId,
             'charger_type' => 'admin',
             'user_type' => $user->type_user,
