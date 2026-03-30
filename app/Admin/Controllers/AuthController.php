@@ -18,6 +18,8 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use Jenssegers\Agent\Agent as JenssegersAgent;
 use Stevebauman\Location\Facades\Location;
 use App\Models\AdminLoginLog;
+use App\Enums\AdminNotificationType;
+use App\Helpers\AdminNotificationHelper;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 
 class AuthController extends BaseAuthController
@@ -142,17 +144,43 @@ class AuthController extends BaseAuthController
         DB::table('admin_users')->where('id', $admin->id)->update(['session_token' => $sessionToken]);
         $request->session()->put('admin_session_token', $sessionToken);
 
-        // Mark previous login logs as logged out (use PHP now() for both to avoid timezone mismatch)
         $now = now();
         $previousLogs = AdminLoginLog::where('user_id', $admin->id)
             ->whereNull('logout_at')
             ->whereNotNull('login_at')
             ->get();
-        foreach ($previousLogs as $prevLog) {
-            $prevLog->update([
-                'logout_at' => $now,
-                'session_duration_minutes' => (int) $now->diffInMinutes($prevLog->login_at),
-            ]);
+
+        if ($previousLogs->isNotEmpty()) {
+            foreach ($previousLogs as $prevLog) {
+                $prevLog->update([
+                    'logout_at' => $now,
+                    'session_duration_minutes' => (int) $now->diffInMinutes($prevLog->login_at),
+                ]);
+            }
+
+            try {
+                $agent = new JenssegersAgent();
+                $device = $agent->device() ?: ($agent->isDesktop() ? 'Desktop' : ($agent->isMobile() ? 'Mobile' : 'Unknown'));
+                $browser = $agent->browser();
+                $platform = $agent->platform();
+
+                AdminNotificationHelper::notify(
+                    type: AdminNotificationType::WARNING,
+                    title: __('Session Terminated'),
+                    message: __(
+                        'Your account was logged in from another device (:device, :browser on :platform, IP: :ip). Your previous session has been terminated.',
+                        [
+                            'device' => $device,
+                            'browser' => $browser,
+                            'platform' => $platform,
+                            'ip' => $request->ip(),
+                        ]
+                    ),
+                    adminId: $admin->id,
+                );
+            } catch (\Exception $e) {
+                \Log::warning('Failed to send device kick notification: ' . $e->getMessage());
+            }
         }
 
         try {
