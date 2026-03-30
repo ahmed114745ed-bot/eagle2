@@ -123,14 +123,9 @@ class SettingController extends MainController
 
             foreach ($data as $key => $value) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-                // Clear old cache first, then set new value
                 Cache::forget($key);
                 Cache::put($key, $value, now()->addYear());
             }
-
-            // Clear all settings cache for Octane
-            Cache::forget('all_settings');
-            Cache::flush();
 
             $redirectUrl = url(config('admin.route.prefix') . '/settings');
 
@@ -157,8 +152,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forever('room_cup', $request->value);
-            \Artisan::call('cache:clear');
+            Cache::forget('room_cup');
+            Cache::put('room_cup', $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -174,8 +169,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forever('room_boom', $request->value);
-            \Artisan::call('cache:clear');
+            Cache::forget('room_boom');
+            Cache::put('room_boom', $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -191,8 +186,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forever('remaining_diamonds_action', $request->value);
-            \Artisan::call('cache:clear');
+            Cache::forget('remaining_diamonds_action');
+            Cache::put('remaining_diamonds_action', $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -208,8 +203,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forever('host_level_action', $request->value);
-            \Artisan::call('cache:clear');
+            Cache::forget('host_level_action');
+            Cache::put('host_level_action', $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -226,8 +221,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forever('pk_live_action', $request->value);
-            \Artisan::call('cache:clear');
+            Cache::forget('pk_live_action');
+            Cache::put('pk_live_action', $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -243,8 +238,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forever('lucky_gifts_action', $request->value);
-            \Artisan::call('cache:clear');
+            Cache::forget('lucky_gifts_action');
+            Cache::put('lucky_gifts_action', $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -261,8 +256,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forever('isThemeEnabled', $request->value);
-            \Artisan::call('cache:clear');
+            Cache::forget('isThemeEnabled');
+            Cache::put('isThemeEnabled', $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
