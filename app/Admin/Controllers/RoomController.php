@@ -1059,18 +1059,47 @@ class RoomController extends MainController
                 $options[$cat->id] = $cat->name;
             }
             return $options;
-        });
+        })->load('room_type', '/admin/api/room-subcategories');
         $form->select('room_type', __('room type'))->options(function () {
             $options = [];
-            $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', $this->room_class)->get();
-            foreach ($cats as $cat) {
-                $options[$cat->id] = $cat->name;
+            $parentId = $this->room_class ?? 0;
+            if ($parentId) {
+                $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', $parentId)->get();
+                foreach ($cats as $cat) {
+                    $options[$cat->id] = $cat->name;
+                }
             }
             return $options;
         });
         $form->text('room_welcome', __('room welcome'));
         $form->number('sort_num', __('Sort Num'))->default(0);
 
+        // Add loading indicator when room_class changes and room_type is loading
+        Admin::script(<<<JS
+            $(document).ready(function() {
+                var roomTypeSelect = $('select[name="room_type"]').closest('.form-group');
+                
+                $('select[name="room_class"]').on('change', function() {
+                    // Disable room_type and show loading
+                    var select = $('select[name="room_type"]');
+                    select.prop('disabled', true);
+                    roomTypeSelect.css('opacity', '0.5');
+                    
+                    // Add a loading text
+                    select.empty().append('<option value="">Loading...</option>');
+                    select.trigger('change.select2');
+                });
+
+                // Re-enable after AJAX completes
+                $(document).ajaxComplete(function(event, xhr, settings) {
+                    if (settings.url && settings.url.indexOf('room-subcategories') !== -1) {
+                        var select = $('select[name="room_type"]');
+                        select.prop('disabled', false);
+                        roomTypeSelect.css('opacity', '1');
+                    }
+                });
+            });
+        JS);
 
         return $form;
     }
