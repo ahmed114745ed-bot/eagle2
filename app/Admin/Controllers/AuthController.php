@@ -119,30 +119,37 @@ class AuthController extends BaseAuthController
     {
         $this->loginValidator($request->all())->validate();
 
-        // Find admin where type IS NULL
         $admin = DB::table('admin_users')
             ->where('username', $request->username)
             ->whereNull('type')
             ->first();
 
-        // Check if admin exists
         if (!$admin) {
             return back()->withInput()->withErrors([
                 $this->username() => trans('admin.username_not_found'),
             ]);
         }
 
-        // Check password manually (if using bcrypt)
         if (!Hash::check($request->password, $admin->password)) {
             return back()->withInput()->withErrors([
                 'password' => trans('admin.password_incorrect'),
             ]);
         }
 
-        // Login using the ID
         Auth::guard('admin')->loginUsingId($admin->id, $request->boolean('remember'));
 
-        // --- Save login log to admin_operation_log (location, device info, session tracking) ---
+        $sessionToken = \Str::random(40);
+        DB::table('admin_users')->where('id', $admin->id)->update(['session_token' => $sessionToken]);
+        $request->session()->put('admin_session_token', $sessionToken);
+
+        AdminLoginLog::where('user_id', $admin->id)
+            ->whereNull('logout_at')
+            ->whereNotNull('login_at')
+            ->update([
+                'logout_at' => now(),
+                'session_duration_minutes' => DB::raw('TIMESTAMPDIFF(MINUTE, login_at, NOW())'),
+            ]);
+
         try {
             $agent = new JenssegersAgent();
             $ip = $request->ip();
@@ -173,7 +180,6 @@ class AuthController extends BaseAuthController
             \Log::warning('Failed to save admin login log: ' . $e->getMessage());
         }
 
-        // Redirect
         return $this->sendLoginResponse($request);
     }
 
@@ -296,10 +302,6 @@ class AuthController extends BaseAuthController
         return $form;
     }
 
-
-    /**
-     * Override the default admin logout to track session duration.
-     */
     public function getLogout(Request $request)
     {
         $this->updateLoginLogSessionDuration($request);
@@ -311,9 +313,6 @@ class AuthController extends BaseAuthController
         return redirect(config('admin.route.prefix'));
     }
 
-    /**
-     * Update session duration in login log before logout.
-     */
     private function updateLoginLogSessionDuration(Request $request): void
     {
         try {
@@ -353,6 +352,7 @@ class AuthController extends BaseAuthController
 
         return redirect('/bd/login');
     }
+
     public function customSuperadminLogout(Request $request)
     {
         $this->updateLoginLogSessionDuration($request);

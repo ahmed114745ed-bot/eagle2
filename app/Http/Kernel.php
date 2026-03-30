@@ -56,6 +56,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SetCountry::class,
+            'single.device' => \App\Http\Middleware\CheckSingleDevice::class,
         ],
 
         'api' => [
@@ -131,7 +132,6 @@ class Kernel extends HttpKernel
         'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
         'host.level' => \App\Http\Middleware\HostLevelMiddleware::class,
         'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
-
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
         'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,

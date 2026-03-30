@@ -71,6 +71,7 @@ return [
             'web',
             'admin',
             'multiLanguage',
+            'single.device',
             'admin.permission:deny,agency',
             'production.error'
         ],
