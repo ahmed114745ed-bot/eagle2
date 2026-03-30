@@ -3,6 +3,7 @@
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Services\UtdService;
 use Illuminate\Http\Request;
 use App\Services\PayPalService;
 use App\Services\CodapayService;
@@ -110,6 +111,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
     Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
     Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
+
+    Route::get('utd-success/{trx}', [UtdService::class, 'success'])->name('utd.success');
+    Route::get('utd-call', [UtdService::class, 'callback'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);

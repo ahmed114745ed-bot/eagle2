@@ -441,6 +441,7 @@ return [
     'country'      => 'الدولة',
     'pay_type'     => 'نوع الدفع',
     'codapay'        => 'كودا باي',
+    'utd'        => 'utd',
 
     "target_no" => 'رقم الهدف',
     "diamonds" => ' الماس',

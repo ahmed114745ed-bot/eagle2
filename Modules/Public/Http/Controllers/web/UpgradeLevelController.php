@@ -30,9 +30,21 @@ class UpgradeLevelController extends MainController
             'exp_room_percentage',
             'exp_charge_percentage'
         ];
+
+        $settingKeys = [
+            'wealth_gift_price',
+            'attraction_gift_price',
+            'charge_gift_price',
+            'rooms_gift_price',
+            'cp_gift_price',
+        ];
         
         foreach ($data as $key => $value) {
-            Config::updateOrCreate(['name' => $key], ['value' => $value]);
+            if (in_array($key, $settingKeys)) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            } else {
+                Config::updateOrCreate(['name' => $key], ['value' => $value]);
+            }
             // Clear old cache first, then set new value
             Cache::forget($key);
             Cache::put($key, $value, now()->addYear());

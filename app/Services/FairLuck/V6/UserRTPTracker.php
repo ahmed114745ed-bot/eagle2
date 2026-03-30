@@ -10,6 +10,19 @@ class UserRTPTracker
 
     public function getStats(int $userId): object
     {
+        // TTL PROTECTION: Validate and reset expired data
+        $ttlManager = app(UserDataTTLManager::class);
+        if (!$ttlManager->validateUserData($userId)) {
+            // Data was expired and reset, return fresh stats
+            return (object) [
+                'total_spent' => 0.0,
+                'total_received' => 0.0,
+                'bet_count' => 0,
+                'win_count' => 0,
+                'first_bet_ts' => 0,
+            ];
+        }
+
         $key = self::KEY_PREFIX . $userId;
         $data = Redis::hgetall($key);
 
@@ -47,5 +60,9 @@ class UserRTPTracker
         if (!Redis::hexists($key, 'first_bet_ts')) {
             Redis::hset($key, 'first_bet_ts', time());
         }
+
+        // TTL PROTECTION: Record activity timestamp
+        $ttlManager = app(UserDataTTLManager::class);
+        $ttlManager->recordActivity($userId);
     }
 }

@@ -5073,5 +5073,19 @@
     "Backfill Old Data": "تعبئة البيانات القديمة",
     "Are you sure you want to initialize user rates from old config?": "هل أنت متأكد من تهيئة تقييمات المستخدمين من الإعدادات القديمة؟",
     "Are you sure you want to initialize admin rates from current settings?": "هل أنت متأكد من تهيئة تقييمات المديرين من الإعدادات الحالية؟",
-    "This will process ALL old charges to calculate profit\/bonus. Are you sure?": "سيؤدي هذا لمعالجة كافة الشحنات القديمة لحساب الأرباح والمكافآت. هل أنت متأكد؟"
+    "This will process ALL old charges to calculate profit\/bonus. Are you sure?": "سيؤدي هذا لمعالجة كافة الشحنات القديمة لحساب الأرباح والمكافآت. هل أنت متأكد؟",
+    "Owner Fee Rate (0.10 = 10%)": "النسبة  للغرفة (0.10 = 10%)" ,
+    "user parent": "رمز الدعوة",
+     "Browse user parent": " تصفح رمز الدعوة ",
+     "Invitation Code Setting": "إعدادات رمز الدعوة",
+     "Browse invitation code setting": "تصفح إعدادات رمز الدعوة",
+     "price family": "سعر العائلة",
+     "The price for creating a family.": "السعر لإنشاء عائلة.",
+     "family settings": "إعدادات العائلة",
+     "Family Setting":"إعدادات العائلة",
+     "Browse family setting":"تصفح إعدادات العائلة",
+     "max_accounts_reached": "لقد وصلت إلى الحد الأقصى لعدد الحسابات التي يمكن تسجيلها على هذا الجهاز.",
+     "api_responses.max_accounts_reached": "لقد وصلت إلى الحد الأقصى لعدد الحسابات التي يمكن تسجيلها على هذا الجهاز.",
+     "already exists": "رقم الهاتف هذا مسجل بالفعل",
+     "invalid_code": "رمز التحقق غير صحيح أو انتهت صلاحيته"
 }

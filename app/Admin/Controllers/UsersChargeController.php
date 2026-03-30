@@ -221,6 +221,12 @@ class UsersChargeController extends MainController
                     $user->increment('di', $coin);
 
                     $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+                    $userCoinsRate = \Cache::rememberForever('user_coins', function () {
+                        $setting = Setting::where('key', 'user_coins')->first();
+                        return $setting?->value ?? 1;
+                    });
+                    $usdAmount = $userCoinsRate > 0 ? $coin / $userCoinsRate : 0;
+
                     $charges[] = [
                         'charger_id'      => 1,
                         'charger_type'    => 'dash',
@@ -228,7 +234,7 @@ class UsersChargeController extends MainController
                         'agency_id'       => null,
                         'user_type'       => 'user',
                         'amount'          => $coin,
-                        'usd'             => 0,
+                        'usd'             => $usdAmount,
                         'balance_before'  => $amountBefore,
                         'reason_en'       => $reason,
                         'created_at'      => now(),

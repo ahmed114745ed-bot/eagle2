@@ -67,55 +67,48 @@ trait ZegoTrait
 
     protected static function buildZegoParams(array $baseParams): array
     {
+        
+        $roomId = $RoomId ?? request()->room_id;
+        $url = 'https://rtc-api.zego.im';
+        // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
-        $signature = md5($AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp);
-        return array_merge($baseParams, [
+        // $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        $signature = md5($str);
+        $SignatureVersion = '2.0';
+        $params = [
+            'Action' => $Action,
+            'RoomId' => $roomId,
+            'FromUserId' => $FromUserId,
+            'MessageContent' => $MessageContent,
             'AppId' => $AppId,
             'SignatureNonce' => $SignatureNonce,
             'Timestamp' => $Timestamp,
             'Signature' => $signature,
             'SignatureVersion' => '2.0',
-        ]);
+        ];
     }
 
     protected static function sendZegoRequest(array $params, string $url = 'https://rtc-api.zego.im', int $timeout = 20)
     {
         try {
-            return Http::acceptJson()->timeout($timeout)->get($url, $params)->json();
-        } catch (\Exception $e) {
-            Log::error('ZegoTrait::sendZegoRequest exception', [
-                'params' => $params,
-                'error' => $e->getMessage(),
-            ]);
-            return null;
-        }
-    }
+          
+            $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
 
-    protected static function sendUtdRequest(array $params)
-    {
-        try {
-            return Http::timeout(10)
-                ->post('https://us-central1-utd-cloud-f0a09.cloudfunctions.net/zegoServerAction', $params)
-                ->json();
-        } catch (\Exception $e) {
-            Log::error('UTD sendUtdRequest error', [
-                'params' => $params,
-                'error' => $e->getMessage(),
-            ]);
-            return null;
-        }
-    }
-
-    public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
-    {
-        $provider = Common::getConfig('sound_library');
-
-        if ($provider == '3') {
-            $utdKeys = Common::getUtdData();
-            return self::sendUtdRequest([
-                'apiKey' => $utdKeys['utd_app_id'] ?? null,
+            if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
+                Log::warning('ZegoTrait::sendToZego failed', [
+                    'action' => $Action,
+                    'roomId' => $roomId,
+                    'fromUserId' => $FromUserId,
+                    'response' => $response,
+                ]);
+            }
+            
+            return $response;
+        } catch (\Exception $exception) {
+            Log::error('ZegoTrait::sendToZego exception', [
                 'action' => $Action,
                 'roomId' => (string)$RoomId,
                 'fromUserId' => (string)$FromUserId,

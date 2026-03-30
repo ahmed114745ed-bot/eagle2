@@ -19,6 +19,7 @@ use Modules\RoomCup\Helpers\RoomCupHelper;
 use Symfony\Component\Console\Command\Command as EnumCommand;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Facades\CustomNotification;
 
 
 
@@ -284,6 +285,11 @@ class CalculateRoomCupRewards extends Command
 
                 User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
                 RoomCupHelper::updateRoomCupWallet($reward['amount']);
+
+                $user = User::find($reward['user_id']);
+                if ($user) {
+                    CustomNotification::roomcupReward($user, $reward['amount'], $reward['type']);
+                }
             }
         });
 
@@ -357,6 +363,4 @@ class CalculateRoomCupRewards extends Command
         $str = implode(",", $adm_arr);
         $room->update(['room_admin' => $str]);
     }
-
-
 }

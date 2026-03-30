@@ -111,8 +111,9 @@ class SuperAdminChargeAction extends Action
                 $authAreaManager->di += abs($coins);
                 $authAreaManager->save();
             }
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
 
-            $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $extraCoins, $totalCoins, $request->amount);
+            $this->createChargeRecord($request,  $superAdmin, $amount, $coins, $extraCoins, $totalCoins, $usdAmount );
         });
 
         return $this->response()->success('Success')->refresh();

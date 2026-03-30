@@ -3061,7 +3061,6 @@
     /* Responsive fixes for smaller screens */
     @media (max-width: 768px) {
         .box-header .form-group {
-            width: 100% !important;
             display: block !important;
             margin-right: 0 !important;
             margin-bottom: 20px !important;

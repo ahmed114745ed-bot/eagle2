@@ -207,7 +207,7 @@ return [
     "closeSuperBox" => "Your Super Lucky Bos duration finished",
     "relations_help" => "🔒 When disabled, the message will be sent to only one friend. <br> 🔓 When enabled, the message will be sent to all friends.",
 
-    
+
     'resetSalary' => 'Are You sure you want to reset salary?',
     "fawry" => 'Fawry',
     'My Fawry'      => 'My Fawry',
@@ -429,7 +429,8 @@ return [
     'mada'          => 'Mada',
     'liqpay'        => 'LiqPay',
     'paypal'        => 'PayPal',
-    'codapay'        => 'CodaPay',
+    'codapay'       => 'CodaPay',
+    'utd'           => 'utd',
     'paytm'         => 'Paytm',
     'paytabs'       => 'PayTabs',
     'bkash'         => 'bKash',

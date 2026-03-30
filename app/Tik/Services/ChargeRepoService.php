@@ -94,13 +94,23 @@ class ChargeRepoService
                 'bonus_coins'       => $calc['bonus_coins'],
                 'profit_usd'        => $calc['profit_usd'],
                 'profit_coins'      => $calc['profit_coins'],
+                'charger_id' => $userId,
+                'charger_type' => 'host_agency',
+                'user_id' => $user_id,
+                'user_type' => $userType,
+                'amount' => $coins,
+                'usd' => $amount,
+                'amount_type' => 2,
+                'is_used_transferred' => true,
             ];
 
             $charge = $this->create($data);
             $this->roomSalaryRepo->incrementCutAmount($room->id, $amount);
             $this->userRepository->incrementCoins($toUserUuId, $coins);
 
-            DB::commit();
+            \DB::commit();
+            (new UserAchievementService())->insertCharging($userResve, $coins);
+            UserCommon::UserEarnedInvitation($userResve->id, $coins);
 
             // Notify achievements
             $achievementService = new UserAchievementService();
@@ -361,6 +371,12 @@ class ChargeRepoService
         );
     
         $this->userRepository->incrementUserCoins($receiver, $amount);
+
+        if ($usd === null) {
+            $userCoinsRate = Common::getCoinsValue('user_coins') ?: 1;
+            $usd = $amount / $userCoinsRate;
+        }
+
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
@@ -368,7 +384,7 @@ class ChargeRepoService
             'user_type' => 'user',
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $baseUsd,
+            'usd' => $usd,
             'is_used_transferred' => $transferred,
             'action_user_id' => auth()->user()?->id ?? (isset($sender->id) ? $sender->id : null),
             'total_coins' => $totalCoins,
@@ -434,7 +450,10 @@ class ChargeRepoService
             'user_type' => 'agency',
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $baseUsd,
+            'usd' => $usd ?? (function () use ($amount) {
+                $shippingCoinsRate = Common::getCoinsValue('shipping_coins') ?: 1;
+                return $amount / $shippingCoinsRate;
+            })(),
             'is_used_transferred' => $transferred,
             'total_coins' => $totalCoins,
             'transaction_type' => $transactionType,
@@ -469,6 +488,11 @@ class ChargeRepoService
 
         $receiver->increment('coins', $amount);
 
+        if ($usd === null) {
+            $shippingCoinsRate = Common::getCoinsValue('shipping_coins') ?: 1;
+            $usd = $amount / $shippingCoinsRate;
+        }
+
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
@@ -477,7 +501,7 @@ class ChargeRepoService
             'user_type' => 'agency',
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $baseUsd,
+            'usd' => $usd,
             'is_used_transferred' => $transferred,
             'action_user_id' => auth()->user()->id() ?? (isset($sender->id) ? $sender->id : null),
             'total_coins' => $totalCoins,
@@ -594,6 +618,11 @@ class ChargeRepoService
         $profitCoins = $calc['profit_coins'];
         $bonusCoins = $calc['bonus_coins'];
         $profitUsd = $calc['profit_usd'];
+        if ($usd === null) {
+            $coinsKey = ($type === 'agency') ? 'shipping_coins' : 'user_coins';
+            $coinsRate = Common::getCoinsValue($coinsKey) ?: 1;
+            $usd = $amount / $coinsRate;
+        }
 
         $data = [
             'charger_id' => $chargerId,
@@ -602,7 +631,7 @@ class ChargeRepoService
             'user_type' => $type,
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $baseUsd,
+            'usd' => $usd,
             'is_used_transferred' => $transferred,
             'agency_id' => $agencyId,
             'total_coins' => $totalCoins,

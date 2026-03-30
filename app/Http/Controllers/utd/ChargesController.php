@@ -104,7 +104,8 @@ class ChargesController extends Controller
             $agency->coins += $amount;
             $agency->save();
 
-            $this->createChargeRecord($request, $user, $agency, $amount);
+            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
+            $this->createChargeRecord($request, $user, $agency, $amount, $usdAmount);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -119,9 +120,9 @@ class ChargesController extends Controller
     private function handleUserCharge(Request $request, User $user)
     {
         $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
-        $usdAmount = $request->amount / $percentage;
+        $usdAmountRaw = $request->amount / $percentage;
 
-        DB::transaction(function () use ($request, $user, $usdAmount) {
+        DB::transaction(function () use ($request, $user, $usdAmountRaw) {
             $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
             if ($amount < 0 && $user->di < abs($amount)) {
                 return Common::apiResponse(false, __('Insufficient user balance'));
@@ -130,6 +131,7 @@ class ChargesController extends Controller
             $user->di += $amount;
             $user->save();
 
+            $usdAmount = $request->charge_type == 'decrement' ? -$usdAmountRaw : $usdAmountRaw;
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });

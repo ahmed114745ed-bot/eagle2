@@ -357,18 +357,18 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+        // $luckyStatus = Common::getSettingValue('lucky_gifts_action');
 
-        if ($luckyStatus == 1) {
-            $version = Common::getSettingValue('lucky_gift_version');
-            if ($version == 3) {
-                return $this->sendLuckyGift6($request, $updateUserWhenSendGift);
-            }
-            if ($version == 2) {
-                return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
-            }
-            return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
-        }
+        // if ($luckyStatus == 1) {
+        //     $version = Common::getSettingValue('lucky_gift_version');
+        //     if ($version == 3) {
+        //         return $this->sendLuckyGift6($request, $updateUserWhenSendGift);
+        //     }
+        //     if ($version == 2) {
+        //         return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
+        //     }
+        //     return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
+        // }
         return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
     }
 
@@ -884,7 +884,7 @@ class GiftLogController extends Controller
             'is_finished' => 0
         ])->whereNotIn('user_id', $remainingDiamonds)
             ->chunk(100, function ($userSalaries) {   // 🔥 process only 500 rows per chunk
-    
+
                 foreach ($userSalaries as $userSalary) {
 
                     try {
@@ -979,6 +979,7 @@ class GiftLogController extends Controller
                 foreach ($giftLogs as $log) {
                     $totalRoomGift = TotalRoomGift::where('room_id', $log->room_id)
                         ->whereDate('created_at', now())
+                        ->lockForUpdate()
                         ->first();
 
                     if (!$totalRoomGift) {

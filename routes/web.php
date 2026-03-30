@@ -62,6 +62,8 @@ use Modules\RoomBoom\Http\Controllers\web\PercentageBoomController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\Vip\Entities\VipPrivilege;
 use Symfony\Component\Process\Process;
+use App\Admin\Controllers\AppearChargerAgencyController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -266,6 +268,15 @@ Route::get('/run-permission', function () {
     ]);
 });
 
+Route::get('/run-payments', function () {
+
+    Artisan::call('db:seed', ['--class' => 'PaymentGatewaysSeeder']);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
 
 Route::get('/devices-token-seeder', function () {
 
@@ -1821,6 +1832,7 @@ Route::get('/fix-total-room-gifts', function () {
         // Find or create TotalRoomGift record for this room on this date
         $record = TotalRoomGift::whereDate('created_at', $giftDate)
             ->where('room_id', $roomId)
+            ->lockForUpdate()
             ->first();
 
         if ($record) {
@@ -2101,39 +2113,24 @@ Route::get('/fix-gift-logs/run', function () {
         return response()->json(['message' => 'No records to fix.']);
     }
 
-    $totalUpdated = 0;
-    $batchSize = 1000;
+    $updated = DB::update("
+        UPDATE gift_logs gl
+        JOIN gifts g ON gl.giftId = g.id
+        SET
+            gl.roomowner_obtain = FLOOR(gl.giftPrice * 0.1 * 0.03),
+            gl.app_profit_coins = gl.giftPrice * 0.1,
+            gl.receiver_obtain = gl.giftPrice * 0.1,
+            gl.giftPrice = gl.giftPrice * 0.1
+        WHERE g.gift_category_id = 7
+        AND gl.giftNum > 0
+        AND g.price > 0
+        AND gl.giftPrice = gl.giftNum * g.price
+    ");
 
-    do {
-        $ids = DB::table('gift_logs as gl')
-            ->join('gifts as g', 'gl.giftId', '=', 'g.id')
-            ->where('g.gift_category_id', 7)
-            ->where('gl.giftNum', '>', 0)
-            ->where('g.price', '>', 0)
-            ->whereRaw('gl.giftPrice = gl.giftNum * g.price')
-            ->limit($batchSize)
-            ->pluck('gl.id');
-
-        if ($ids->isEmpty()) break;
-
-        $updated = DB::update("
-            UPDATE gift_logs gl
-            JOIN gifts g ON gl.giftId = g.id
-            SET
-                gl.roomowner_obtain = FLOOR(gl.giftPrice * 0.1 * 0.03),
-                gl.app_profit_coins = gl.giftPrice * 0.1,
-                gl.receiver_obtain = gl.giftPrice * 0.1,
-                gl.giftPrice = gl.giftPrice * 0.1
-            WHERE gl.id IN (" . $ids->implode(',') . ")
-        ");
-
-        $totalUpdated += $updated;
-    } while ($ids->count() === $batchSize);
-
-    return response()->json([
+  /*  return response()->json([
         'message' => "Fixed {$totalUpdated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
         'records_updated' => $totalUpdated,
-    ]);
+    ]);*/
 });
 
 Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $request) {
@@ -2999,4 +2996,161 @@ Route::get('/recovery-cycle', function () {
         'status' => 'dispatched',
         'message' => 'RecoveryCycleJob started. Check public/recovery_cycle_report.html for progress.',
     ]);
+});
+
+
+Route::get('test-push', function () {
+
+    dd('test successfully!---------');
+});
+
+Route::get('/fix-charges-usd', function () {
+    $dryRun = request()->get('fix') != '1';
+
+    // Get the 4 rates from settings
+    $rates = [
+        'user_coins' => (float) (\Cache::rememberForever('user_coins', function () {
+            return \App\Models\Setting::where('key', 'user_coins')->value('value') ?? 1;
+        })),
+        'shipping_coins' => (float) (\Cache::rememberForever('shipping_coins', function () {
+            return \App\Models\Setting::where('key', 'shipping_coins')->value('value') ?? 1;
+        })),
+        'zones_coins' => (float) (\Cache::rememberForever('zones_coins', function () {
+            return \App\Models\Setting::where('key', 'zones_coins')->value('value') ?? 1;
+        })),
+        'super_admin_coins' => (float) (\Cache::rememberForever('super_admin_coins', function () {
+            return \App\Models\Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
+        })),
+    ];
+
+    // Map user_type to the correct rate key
+    $typeToRate = [
+        'agency' => 'shipping_coins',
+        'user' => 'user_coins',
+        'host' => 'user_coins',
+        'app' => 'user_coins',
+        'Host agent' => 'user_coins',
+        'freight forwarder' => 'shipping_coins',
+        'freight forwarder and Host agent' => 'shipping_coins',
+        'Administrative' => 'user_coins',
+        \App\Enums\Charges\UserTypeEnum::SUPER_ADMIN => 'super_admin_coins',
+        \App\Enums\Charges\UserTypeEnum::SUB_ADMIN => 'super_admin_coins',
+        \App\Enums\Charges\UserTypeEnum::AREA_MANAGER => 'zones_coins',
+        \App\Enums\Charges\UserTypeEnum::SUB_AREA_MANAGER => 'zones_coins',
+    ];
+
+    $stats = [
+        'negative_amount_positive_usd' => 0,
+        'usd_is_zero' => 0,
+        'usd_equals_amount' => 0,
+        'total_fixed' => 0,
+        'skipped_unknown_type' => 0,
+    ];
+
+    $samples = [];
+
+    // Case 1: amount is negative but usd is positive (or zero)
+    \App\Models\Charge::where('amount', '<', 0)
+        ->where('usd', '>=', 0)
+        ->chunkById(500, function ($charges) use ($dryRun, $rates, $typeToRate, &$stats, &$samples) {
+            foreach ($charges as $charge) {
+                $stats['negative_amount_positive_usd']++;
+
+                $rateKey = $typeToRate[$charge->user_type] ?? 'user_coins';
+                $rate = $rates[$rateKey] ?: 1;
+                $correctUsd = $charge->amount / $rate; // will be negative since amount is negative
+
+                if (count($samples) < 20) {
+                    $samples[] = [
+                        'id' => $charge->id,
+                        'case' => 'negative_amount_positive_usd',
+                        'amount' => $charge->amount,
+                        'old_usd' => $charge->usd,
+                        'new_usd' => round($correctUsd, 4),
+                        'user_type' => $charge->user_type,
+                        'rate_used' => $rateKey . '=' . $rate,
+                    ];
+                }
+
+                if (!$dryRun) {
+                    $charge->usd = $correctUsd;
+                    $charge->saveQuietly();
+                    $stats['total_fixed']++;
+                }
+            }
+        });
+
+    // Case 2: usd is 0 or null but amount is not 0
+    \App\Models\Charge::where('amount', '!=', 0)
+        ->where(function ($q) {
+            $q->whereNull('usd')->orWhere('usd', 0);
+        })
+        ->chunkById(500, function ($charges) use ($dryRun, $rates, $typeToRate, &$stats, &$samples) {
+            foreach ($charges as $charge) {
+                $stats['usd_is_zero']++;
+
+                $rateKey = $typeToRate[$charge->user_type] ?? 'user_coins';
+                $rate = $rates[$rateKey] ?: 1;
+                $correctUsd = $charge->amount / $rate;
+
+                if (count($samples) < 40) {
+                    $samples[] = [
+                        'id' => $charge->id,
+                        'case' => 'usd_is_zero',
+                        'amount' => $charge->amount,
+                        'old_usd' => $charge->usd,
+                        'new_usd' => round($correctUsd, 4),
+                        'user_type' => $charge->user_type,
+                        'rate_used' => $rateKey . '=' . $rate,
+                    ];
+                }
+
+                if (!$dryRun) {
+                    $charge->usd = $correctUsd;
+                    $charge->saveQuietly();
+                    $stats['total_fixed']++;
+                }
+            }
+        });
+
+    // Case 3: usd equals amount (not converted) — only when rate != 1
+    \App\Models\Charge::where('amount', '!=', 0)
+        ->whereColumn('usd', 'amount')
+        ->chunkById(500, function ($charges) use ($dryRun, $rates, $typeToRate, &$stats, &$samples) {
+            foreach ($charges as $charge) {
+                $rateKey = $typeToRate[$charge->user_type] ?? 'user_coins';
+                $rate = $rates[$rateKey] ?: 1;
+
+                // Skip if rate is 1 (usd = amount is correct)
+                if ($rate == 1) continue;
+
+                $stats['usd_equals_amount']++;
+                $correctUsd = $charge->amount / $rate;
+
+                if (count($samples) < 60) {
+                    $samples[] = [
+                        'id' => $charge->id,
+                        'case' => 'usd_equals_amount',
+                        'amount' => $charge->amount,
+                        'old_usd' => $charge->usd,
+                        'new_usd' => round($correctUsd, 4),
+                        'user_type' => $charge->user_type,
+                        'rate_used' => $rateKey . '=' . $rate,
+                    ];
+                }
+
+                if (!$dryRun) {
+                    $charge->usd = $correctUsd;
+                    $charge->saveQuietly();
+                    $stats['total_fixed']++;
+                }
+            }
+        });
+
+    return response()->json([
+        'mode' => $dryRun ? 'DRY RUN (add ?fix=1 to apply)' : 'APPLIED',
+        'rates' => $rates,
+        'stats' => $stats,
+        'samples' => $samples,
+    ], 200, [], JSON_PRETTY_PRINT);
 });

@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\SendCustomToZend;
 use App\Models\Charge;
+use App\Models\Setting;
 use App\Models\User;
 use App\Repositories\Room\RoomRepoInterface;
 use Illuminate\Validation\ValidationException;
@@ -49,7 +50,13 @@ class ChargesHistory
         $user_type = 'user';
         $balance_before = $value_before;
         $transaction_type = 'admin_adjustment'; // From original code
+        $userCoins = \Cache::rememberForever('user_coins', function () {
+            $setting = Setting::where('key', 'user_coins')->first();
+            return $setting?->value ?? 1;
+        });
+        $usdAmount = $userCoins > 0 ? $amount / $userCoins : 0;
 
+        
         Charge::create([
             'charger_id' => $charger_id,
             'charger_type' => $charger_type,
@@ -57,7 +64,7 @@ class ChargesHistory
             'user_type' => $user_type,
             'amount' => $amount,
             'amount_type' => 2,
-            'usd' => $usd,
+            'usd' => $usdAmount,
             'balance_before' => $balance_before,
             'total_coins' => $totalCoins,
             'transaction_type' => $transaction_type,
