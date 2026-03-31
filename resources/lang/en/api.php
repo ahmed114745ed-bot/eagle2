@@ -75,6 +75,7 @@ return [
 
     'ban_user_id'       => "Sorry! You cannot log in to :appName  now, you can log in after :duration hours \nFor objection and complaint contact customer service",
     'removeBan_user_id' => 'Congrats! You can log in to :appName now,',
+    'roomcup_reward'    => 'Congratulations! You received :amount coins as :reward_type reward in RoomCup',
     'userVips'          => 'Congrats! You reach vip, for :duration days ',
     'wareVips'          => 'Congrats! You reach :name, for :duration days ',
 

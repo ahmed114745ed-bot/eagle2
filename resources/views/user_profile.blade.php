@@ -58,6 +58,10 @@
             background-color: #f9f9f9;
         }
 
+        .wallet-filter-select {
+            padding: 0 !important;
+        }
+
         .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
@@ -1131,7 +1135,7 @@
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('type')}}:</span>
-                   
+
                     {!! @$user->userBadgeTop() !!}
                 </div>
 
@@ -1525,26 +1529,31 @@
                                 <div class="filter-container">
                                     <div class="filter-content">
                                         <div class="filter-group">
-                                            <label class="form-label">السنة</label>
+                                            <label class="form-label">{{ __('year') }}</label>
                                             <div class="input-group input-group-sm">
                                                 <div class="input-group-addon">
-                                                    <i class="fa fa-pencil"></i>
+                                                    <i class="fa fa-calendar"></i>
                                                 </div>
-                                                <input type="text" class="form-control year" placeholder="السنة"
-                                                       name="year"
-                                                       value="{{ request('year') }}" style="text-align: right;">
+                                                <select class="form-control form-select year" name="year">
+                                                    <option value="">{{ __('Select Year') }}</option>
+                                                    @for($y = now()->year; $y >= now()->year - 5; $y--)
+                                                        <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                                    @endfor
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="filter-group">
-                                            <label class="form-label">الشهر</label>
+                                            <label class="form-label">{{ __('month') }}</label>
                                             <div class="input-group input-group-sm">
                                                 <div class="input-group-addon">
-                                                    <i class="fa fa-pencil"></i>
+                                                    <i class="fa fa-calendar"></i>
                                                 </div>
-                                                <input type="text" class="form-control month"
-                                                       placeholder="الشهر"
-                                                       name="month" value="{{ request('month') }}"
-                                                       style="text-align: right;">
+                                                <select class="form-control form-select month" name="month">
+                                                    <option value="">{{ __('Select Month') }}</option>
+                                                    @for($m = 1; $m <= 12; $m++)
+                                                        <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>{{ $m }} - {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}</option>
+                                                    @endfor
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="filter-actions">
@@ -1744,29 +1753,42 @@
                                                 <div class="col-sm-8">
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-addon">
-                                                            <i class="fa fa-pencil"></i>
+                                                            <i class="fa fa-calendar"></i>
                                                         </div>
-                                                        <input type="text" class="form-control year"  placeholder="{{ __('year') }}"
-                                                               name="year"
-                                                               value="{{ request('year') }}" style="text-align: right;">
+                                                        <select class="form-control year wallet-filter-select" name="year">
+                                                            <option value="">{{ __('Select Year') }}</option>
+                                                            @for($y = now()->year; $y >= now()->year - 5; $y--)
+                                                                <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                                            @endfor
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="box-body">
+                                        <div class="fields-group">
 
                                             <div class="form-group">
                                                 <label class="col-sm-2 control-label">{{__('month')}}</label>
                                                 <div class="col-sm-8">
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-addon">
-                                                            <i class="fa fa-pencil"></i>
+                                                            <i class="fa fa-calendar"></i>
                                                         </div>
-                                                        <input type="text" class="form-control month"
-                                                               placeholder="{{__('month')}}"
-                                                               name="month" value="{{ request('month') }}"
-                                                               style="text-align: right;">
+                                                        <select class="form-control month wallet-filter-select" name="month">
+                                                            <option value="">{{ __('Select Month') }}</option>
+                                                            @for($m = 1; $m <= 12; $m++)
+                                                                <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>{{ $m }} - {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}</option>
+                                                            @endfor
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
