@@ -175,7 +175,8 @@ class AreaManagerController extends MainController
                 $milestone = Cache::rememberForever('milestone_area_manager', function () {
                     return Milestone::where('slug', 'area-manager')->first();
                 });
-                $url = url('admin/milestone-rewards/' . $milestone->id); // Generates absolute URL for /admin/milestones
+                $url = url('admin/milestone-rewards/' . $milestone?->id); // Generates absolute URL for /admin/milestones
+                 $url = $milestone?->id ? url('admin/milestone-rewards/' . $milestone?->id) : '';
                 $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML
