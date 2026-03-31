@@ -244,14 +244,17 @@ class FamilyController extends MainController
             ->pluck('user_id');
 
         $memberTargets = User::whereIn('id', $familyUserIds)
-            ->whereHas('targets', function ($query) use ($family, $month, $year) {
-                $query->where('add_month', $month)
-                    ->where('add_year', $year);
-            })
-            ->with(['targets' => function ($query) use ($family, $month, $year) {
-                $query->where('add_month', $month)
-                    ->where('add_year', $year);
-            }, 'profile:id,user_id,avatar'])
+            ->whereHas('targets')
+//        , function ($query) use ($family, $month, $year) {
+//                $query->where('add_month', $month)
+//                    ->where('add_year', $year);
+//            })
+            ->with(['targets', 'profile:id,user_id,avatar'])
+//            => function ($query) use ($family, $month, $year) {
+//                $query->where('add_month', $month)
+//                    ->where('add_year', $year);
+//            },
+//                'profile:id,user_id,avatar'])
             ->paginate(10, ['*'], 'target_page');
 
         return parent::show($id, $content->title(__('family profile'))
