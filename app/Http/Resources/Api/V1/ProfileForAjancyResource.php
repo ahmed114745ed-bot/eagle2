@@ -17,7 +17,8 @@ class ProfileForAjancyResource extends JsonResource
     {
 
         return [
-            'image'=>$this->avatar?:'',
+            'image'=>null,
+           // 'image'=>$this->avatar?:'',
             // 'gender'=>$this->gender == 1 ? __ ('male') : __ ('female'),
             // 'age'=>Carbon::parse ($this->birthday)->age,
             // 'country'=>$this->country?:''
