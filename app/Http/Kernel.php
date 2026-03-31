@@ -56,7 +56,6 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SetCountry::class,
-            'single.device' => \App\Http\Middleware\CheckSingleDevice::class,
         ],
 
         'api' => [
@@ -96,6 +95,7 @@ class Kernel extends HttpKernel
         'userBan' => UserBanMiddleware::class,
         //        'rate_limiting' => \App\Http\Middleware\RateLimitingMiddleware::class,
         'checkCpu' => \App\Http\Middleware\CheckCpu::class,
+        'single.device' => \App\Http\Middleware\CheckSingleDevice::class,
         'configM' => ConfigMiddleware::class,
         'appFeatureEnable' => \App\Http\Middleware\AppFeatureEnable::class,
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
