@@ -3158,6 +3158,7 @@ Route::get('/fix-charges-usd', function () {
 
 
 Route::get('/d', function () {
+    dd('test push successfully!---------');
     return response()->json([
         'status' => 'ok',
     ]);
