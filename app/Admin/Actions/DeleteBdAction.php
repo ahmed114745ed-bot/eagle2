@@ -75,7 +75,7 @@ class DeleteBdAction extends RowAction
         $milestone = Milestone::where('slug', 'bd')->first();
         if ($milestone) {
             MilestoneReward::where('milestone_id', $milestone->id)
-                ->where('user_id', $bd->app_id)
+                ->where('rewardable_id', $bd->app_id)
                 ->delete();
         }
     }
