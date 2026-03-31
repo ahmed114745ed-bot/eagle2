@@ -2340,8 +2340,8 @@ Route::get('remove-bd-rewards', function () {
 
 });
 
-Route::get('load-default-queue', function () {
-    for ($i = 0; $i < 50000; $i++) {
-        dispatch((new \App\Jobs\SlowTestJob())->onQueue('default'));
-    }
-})->middleware('local');
+//Route::get('load-default-queue', function () {
+//    for ($i = 0; $i < 50000; $i++) {
+//        dispatch((new \App\Jobs\SlowTestJob())->onQueue('default'));
+//    }
+//})->middleware('local');

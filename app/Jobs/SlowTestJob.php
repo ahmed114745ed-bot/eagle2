@@ -18,7 +18,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 class SlowTestJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    
+
     public function handle()
     {
         sleep(5);
