@@ -1725,7 +1725,9 @@
     "New Theme Enabled": "New Theme Enabled",
     "Owner Fee Rate (0.10 = 10%)": "Owner Fee Rate (0.10 = 10%)",
     "user parent": "invitation code",
-        "Browse user parent": "Browse invitation code"
-
-
+    "Browse user parent": "Browse invitation code",
+    "max_accounts_reached": "You have reached the maximum number of accounts that can be registered with this device.",
+    "api_responses.max_accounts_reached": "You have reached the maximum number of accounts that can be registered with this device.",
+    "already exists": "This phone number is already registered",
+    "invalid_code": "Invalid or expired verification code"
 }

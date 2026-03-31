@@ -784,27 +784,40 @@ class AgencyController extends MainController
                 const hidden = document.querySelector(hiddenId);
                 if (!input || input.classList.contains('iti-initialized')) return;
 
-                const iti = window.intlTelInput(input, {separateDialCode: true, preferredCountries: ["eg"], utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"});
+                // Wait for intlTelInput to be available
+                if (typeof window.intlTelInput !== 'function') {
+                    setTimeout(function() { initPhoneInputById(inputId, hiddenId); }, 150);
+                    return;
+                }
+
+                const iti = window.intlTelInput(input, {
+                    separateDialCode: true,
+                    preferredCountries: ["eg"],
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                });
                 input.classList.add('iti-initialized');
 
                 if (input.value && hidden && hidden.value) iti.setNumber(hidden.value + input.value);
 
-                input.addEventListener("countrychange", function () { if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode; });
-                const form = input.closest('form');
-                if(form && !form.classList.contains('phone-init')){
-                    form.addEventListener('submit', function(){
-                        // if(hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
-                        // input.value = iti.getNumber(intlTelInputUtils.numberFormat.NATIONAL);
-                         hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                input.addEventListener("countrychange", function () {
+                    if (hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
+                });
 
+                const form = input.closest('form');
+                if (form && !form.classList.contains('phone-init')) {
+                    form.addEventListener('submit', function() {
+                        if (hidden) hidden.value = "+" + iti.getSelectedCountryData().dialCode;
                     });
                     form.classList.add('phone-init');
-        }
-    }
+                }
+            }
 
-    function initAllPhones() { initPhoneInputById("#phone-input", "input[name='phone_code']"); }
-    initAllPhones();
-    $(document).on('pjax:complete', function () { setTimeout(initAllPhones, 100); });
+            function initAllPhones() {
+                initPhoneInputById("#phone-input", "input[name='phone_code']");
+            }
+
+            // Run after select2 and other scripts have initialized
+            setTimeout(initAllPhones, 200);
     JS;
     }
 

@@ -190,12 +190,19 @@ class AgentSalaryTransactionController extends Controller
             }
 
 
+            $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
+                $setting = \App\Models\Setting::where('key', 'shipping_coins')->first();
+                return $setting?->value ?? 1;
+            });
+            $usdAmount = $shippingCoins > 0 ? $count / $shippingCoins : 0;
+
             $charge = Charge::query()->create([
                 'charger_id'  => $user->id,
                 'charger_type' => 'agency',
                 'user_id'     => $user_id,
                 'user_type' => $type,
                 'amount' => $count,
+                'usd' => $usdAmount,
                 'amount_type' => 2,
                 'agency_id' => $agency->id
                 // 'balance_before'=>$user_id->di
