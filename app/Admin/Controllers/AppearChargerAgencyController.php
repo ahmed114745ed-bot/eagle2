@@ -430,54 +430,58 @@ class AppearChargerAgencyController extends MainController
         Admin::script(<<<'JS'
         function initPhoneInput() {
             const input = document.querySelector("#phone-input");
-            if (input && !input.classList.contains('iti-initialized')) {
-                const parentDiv = input.parentElement;
-                parentDiv.style.position = 'relative';
+            if (!input || input.classList.contains('iti-initialized')) return;
 
-                const iti = window.intlTelInput(input, {
-                    separateDialCode: true,
-                    preferredCountries: ["eg"],
-                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+            // Wait for intlTelInput to be available
+            if (typeof window.intlTelInput !== 'function') {
+                setTimeout(initPhoneInput, 150);
+                return;
+            }
+
+            const parentDiv = input.parentElement;
+            parentDiv.style.position = 'relative';
+
+            const iti = window.intlTelInput(input, {
+                separateDialCode: true,
+                preferredCountries: ["eg"],
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+            });
+
+            document.head.insertAdjacentHTML('beforeend', `
+                <style>
+                    .iti { width: 100%;  }
+                    .iti__flag-container { z-index: 99; }
+                    #phone-input {
+                        padding-left: 90px !important;
+                        width: 50%;
+                    }
+                    .fields-group .form-group { overflow: visible; }
+                </style>
+            `);
+
+            input.classList.add('iti-initialized');
+
+            const form = input.closest('form');
+            if (form && !form.classList.contains('phone-init')) {
+                form.addEventListener('submit', function () {
+                    if (iti) {
+                        const dialCode = iti.getSelectedCountryData().dialCode;
+                        const nationalNumber = input.value.replace(/\s/g, '');
+
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.name = 'phone_code';
+                        hiddenInput.value = `+${dialCode}`;
+                        form.appendChild(hiddenInput);
+
+                        input.value = nationalNumber;
+                    }
                 });
-
-                document.head.insertAdjacentHTML('beforeend', `
-                    <style>
-                        .iti { width: 100%;  }
-                        .iti__flag-container { z-index: 99; }
-                        #phone-input {
-                            padding-left: 90px !important;
-                            width: 50%;
-                        }
-                        .fields-group .form-group { overflow: visible; }
-                    </style>
-                `);
-
-                input.classList.add('iti-initialized');
-
-                const form = input.closest('form');
-                if (form && !form.classList.contains('phone-init')) {
-                    form.addEventListener('submit', function () {
-                        if (iti) {
-                            const dialCode = iti.getSelectedCountryData().dialCode;
-                            const nationalNumber = input.value.replace(/\s/g, '');
-
-                            const hiddenInput = document.createElement('input');
-                            hiddenInput.name = 'phone_code';
-                            hiddenInput.value = `+${dialCode}`;
-                            form.appendChild(hiddenInput);
-
-                            input.value = nationalNumber;
-                        }
-                    });
-                    form.classList.add('phone-init');
-                }
+                form.classList.add('phone-init');
             }
         }
 
-        initPhoneInput();
-        $(document).on('pjax:complete', function () {
-            setTimeout(initPhoneInput, 100);
-        });
+        // Run after select2 and other scripts have initialized
+        setTimeout(initPhoneInput, 200);
     JS);
         // $form->hidden('Shipping_agency')->default(1);
 
