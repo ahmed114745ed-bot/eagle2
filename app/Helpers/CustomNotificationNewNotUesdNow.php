@@ -668,6 +668,29 @@ class CustomNotificationNewNotUesdNow
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
+    public function roomcupReward(User $user, float $amount, string $rewardType = 'owner')
+    {
+        $tokens_notification = $user?->notification_id;
+        $lang = $user->lan ?? 'en';
+
+        $notification = Common::getNotificationContent(
+            'roomcup_reward',
+            $lang,
+            [
+                'amount' => $amount,
+                'reward_type' => $rewardType
+            ]
+        );
+
+        $data['user_id'] = $user?->id;
+        $data['reward_type'] = $rewardType;
+        $data['amount'] = (string) $amount;
+
+        Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], data: $data, messageType: 'roomcup-reward');
+        Common::sendOfficialMessage($user->id, $notification['body'], '', titleAr: $notification['body']);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
     public function vips(User $user, $duration, $img)
     {
         $tokens_notification = $user?->notification_id;

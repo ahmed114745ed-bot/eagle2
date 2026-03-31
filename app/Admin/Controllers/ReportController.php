@@ -615,26 +615,26 @@ class ReportController extends MainController
             $image = asset('images/dollar.jpg');
 
             return <<<HTML
-<div class="due-salary"
-     data-url="{$url}"
-     style="display:flex;align-items:center;gap:6px;">
-    <span class="salary-value">...</span>
-    <img src="{$image}" alt="USD" width="20" height="20">
-</div>
-HTML;
+            <div class="due-salary"
+                data-url="{$url}"
+                style="display:flex;align-items:center;gap:6px;">
+                <span class="salary-value">...</span>
+                <img src="{$image}" alt="USD" width="20" height="20">
+            </div>
+            HTML;
         });
         Admin::script(<<<JS
-document.querySelectorAll('.due-salary').forEach(el => {
-    fetch(el.dataset.url)
-        .then(res => res.json())
-        .then(data => {
-            el.querySelector('.salary-value').innerText = data.salary;
-        })
-        .catch(() => {
-            el.querySelector('.salary-value').innerText = '0';
-        });
-});
-JS);
+            document.querySelectorAll('.due-salary').forEach(el => {
+                fetch(el.dataset.url)
+                    .then(res => res.json())
+                    .then(data => {
+                        el.querySelector('.salary-value').innerText = data.salary;
+                    })
+                    .catch(() => {
+                        el.querySelector('.salary-value').innerText = '0';
+                    });
+            });
+            JS);
         $grid->export(function ($export) {
             $export->filename('report');
             $export->column('uuid', function ($value, $original) {

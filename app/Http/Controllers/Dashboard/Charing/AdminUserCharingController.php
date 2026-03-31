@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Charge;
+use App\Models\Setting;
 use App\Traits\Dashboard\DashBoardTrait;
 
 class AdminUserCharingController extends Controller
@@ -34,12 +35,20 @@ class AdminUserCharingController extends Controller
         ]);
         $sender = $request->user();
         $reciver  = User::find($request->id);
+
+        $userCoins = \Cache::rememberForever('user_coins', function () {
+            $setting = Setting::where('key', 'user_coins')->first();
+            return $setting?->value ?? 1;
+        });
+        $usdAmount = $userCoins > 0 ? $request->coins / $userCoins : 0;
+
         $data = new Charge();
         $data->charger_id = $sender->id;
         $data->charger_type =  'dash';
         $data->user_id =  $request->id;
         $data->user_type =  'app';
         $data->amount =  $request->coins ;
+        $data->usd = $usdAmount;
         $data->balance_before =  $reciver ->coins;
         $data->save();
 
