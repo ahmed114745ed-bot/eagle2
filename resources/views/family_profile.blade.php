@@ -447,7 +447,7 @@
 </head>
 <body>
 
-<div class="agency-profile-container">
+<div class="agency-profile-container" id="pjax-container">
     {{-- Header Section --}}
     <div class="agency-header">
         <div class="agency-avatar">
@@ -535,10 +535,10 @@
 
     {{-- Navigation Tabs --}}
     <div class="agency-tabs">
-        <a href="?tab=members" class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">
+        <a href="?tab=members" data-pjax class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">
             <i class="fas fa-users"></i> {{ __('members') }}
         </a>
-        <a href="?tab=targets" class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">
+        <a href="?tab=targets" data-pjax class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">
             <i class="fas fa-bullseye"></i> {{ __('Targets') }}
         </a>
     </div>
@@ -765,73 +765,96 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    function handleTabSwitching() {
         const urlParams = new URLSearchParams(window.location.search);
         const selectedTab = urlParams.get('tab') || 'members';
 
         const allTabs = document.querySelectorAll('.tab-btn');
-        const allTabContents = document.querySelectorAll('.tab-content');
-
-        allTabContents.forEach(c => c.style.display = 'none');
-        allTabs.forEach(t => t.classList.remove('active'));
+        let targetElement = null;
 
         allTabs.forEach(tab => {
             const target = tab.getAttribute('data-target');
+            const content = document.getElementById(target);
+
+            if (!content) return;
+
             if (target === selectedTab + '-tab') {
                 tab.classList.add('active');
-                const content = document.getElementById(target);
-                if (content) content.style.display = 'block';
+                content.classList.remove('d-none');
+                content.style.display = 'block';
+                targetElement = content;
+            } else {
+                tab.classList.remove('active');
+                content.classList.add('d-none');
+                content.style.display = 'none';
             }
-
-            tab.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.getElementById('tab-loading').style.display = 'block';
-                allTabs.forEach(t => t.style.pointerEvents = 'none');
-                setTimeout(() => {
-                    window.location.href = tab.getAttribute('href');
-                }, 300);
-            });
         });
+
+        if (targetElement) {
+            setTimeout(() => {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        }
+    }
+
+    // Initialize PJAX
+    $(document).pjax('a[data-pjax]', '#pjax-container');
+
+    $(document).on('pjax:start', function () {
+        document.getElementById('tab-loading').style.display = 'block';
+        document.querySelectorAll('.tab-btn').forEach(t => t.style.pointerEvents = 'none');
     });
 
-    $(document).ready(function () {
-        function showLoader() {
-            Swal.fire({
-                title: '{{ __("Loading...") }}',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-        }
+    $(document).on('pjax:end', function () {
+        document.getElementById('tab-loading').style.display = 'none';
+        document.querySelectorAll('.tab-btn').forEach(t => t.style.pointerEvents = '');
+        handleTabSwitching();
+        bindActionButtons();
+    });
 
-        function showSuccess(message, callback) {
-            Swal.fire({
-                icon: 'success',
-                title: message,
-                confirmButtonText: 'OK'
-            }).then(() => { if (callback) callback(); });
-        }
+    document.addEventListener("DOMContentLoaded", function () {
+        handleTabSwitching();
+    });
 
-        function showError(message) {
-            Swal.fire({ icon: 'error', title: message, confirmButtonText: 'OK' });
-        }
+    function showLoader() {
+        Swal.fire({
+            title: '{{ __("Loading...") }}',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+    }
 
-        function confirmAction(message, onConfirm) {
-            Swal.fire({
-                title: message,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: '{{ __("Yes") }}',
-                cancelButtonText: '{{ __("Cancel") }}'
-            }).then(result => {
-                if (result.isConfirmed) onConfirm();
-            });
-        }
+    function showSuccess(message, callback) {
+        Swal.fire({
+            icon: 'success',
+            title: message,
+            confirmButtonText: 'OK'
+        }).then(() => { if (callback) callback(); });
+    }
 
+    function showError(message) {
+        Swal.fire({ icon: 'error', title: message, confirmButtonText: 'OK' });
+    }
+
+    function confirmAction(message, onConfirm) {
+        Swal.fire({
+            title: message,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
+        }).then(result => {
+            if (result.isConfirmed) onConfirm();
+        });
+    }
+
+    function bindActionButtons() {
         // Kick member
-        $('.btn-kick').click(function () {
+        $(document).off('click', '.btn-kick').on('click', '.btn-kick', function () {
             const id = $(this).data('id');
             confirmAction('{{ __("Are you sure you want to remove this member?") }}', () => {
                 showLoader();
@@ -840,7 +863,7 @@
                 }, function (response) {
                     Swal.close();
                     if (response.status) {
-                        showSuccess(response.message, () => { location.reload(); });
+                        showSuccess(response.message, () => { $.pjax.reload('#pjax-container'); });
                     } else {
                         showError(response.message);
                     }
@@ -853,7 +876,7 @@
         });
 
         // Toggle admin
-        $('.btn-toggle-admin').click(function () {
+        $(document).off('click', '.btn-toggle-admin').on('click', '.btn-toggle-admin', function () {
             const id = $(this).data('id');
             const isAdmin = $(this).hasClass('is-admin');
             const message = isAdmin
@@ -867,7 +890,7 @@
                 }, function (response) {
                     Swal.close();
                     if (response.status) {
-                        showSuccess(response.message, () => { location.reload(); });
+                        showSuccess(response.message, () => { $.pjax.reload('#pjax-container'); });
                     } else {
                         showError(response.message);
                     }
@@ -878,6 +901,10 @@
                 });
             });
         });
+    }
+
+    $(document).ready(function () {
+        bindActionButtons();
     });
 </script>
 
