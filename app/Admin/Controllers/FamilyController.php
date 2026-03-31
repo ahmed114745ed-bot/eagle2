@@ -224,8 +224,8 @@ class FamilyController extends MainController
     public function show($id, Content $content)
     {
         $type = is_array(request('type')) ? null : request('type');
-        $month = request('month', now()->month);
-        $year = request('year', now()->year);
+        $year = request('year') ?? Carbon::now()->year;
+        $month = request('month') ?? Carbon::now()->month;
 
         $family = Family::with(['owner:id,name,uuid', 'owner.profile:id,user_id,avatar'])
             ->findOrFail($id);
