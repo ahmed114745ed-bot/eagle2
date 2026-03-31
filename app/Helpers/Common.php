@@ -164,11 +164,11 @@ class Common
 
         $star_level = $user->received_level + $user->sub_receiver_level;
         $firstVip = Vip::where('level', $star_level)->where('type', 1)->first();
-        $data['receiver_img'] =  '';
+        $data['receiver_img'] =  null;
 
         $gold_level = $user->sender_level + $user->sub_sender_level;
         $firstVip_type2 = Vip::where('level', $gold_level)->where('type', 2)->first();
-        $data['sender_img'] =  '';
+        $data['sender_img'] = null;
 
         return $data;
     }
