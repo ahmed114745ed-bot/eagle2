@@ -471,9 +471,9 @@
                 </div>
             </div>
         </div>
-        <button class="btn-back" onclick="window.history.back()">
+        <a href="{{ url('admin/families') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
-        </button>
+        </a>
     </div>
 
     {{-- Level Section --}}

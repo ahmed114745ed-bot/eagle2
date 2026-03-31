@@ -21,6 +21,7 @@ use Encore\Admin\Layout\Content;
 class FamilyController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'families';
     public $hiddenColumns = [];
 
@@ -65,7 +66,7 @@ class FamilyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Family);
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -83,7 +84,7 @@ class FamilyController extends MainController
                 $filter->where(function ($query) {
                     if ($date = request('date')) {
                         $dateEn = Carbon::parse(convertArabicToEnglishNumbers($date))->endOfDay();
-                        $query->whereDate('created_at',  $dateEn);
+                        $query->whereDate('created_at', $dateEn);
                     }
                 }, __('created_at'), 'date')->date();
             });
@@ -101,16 +102,43 @@ class FamilyController extends MainController
             ])
             ->orderByDesc('id');
 
-        $grid->id(__('ID'));
         $grid->column('image', __('family'))->display(function ($image) {
-            $name = e($this->name);
+            $name = mb_convert_encoding($this->name, 'UTF-8', 'UTF-8');
+
+            if (mb_strlen($name) > 50) {
+                $name = mb_substr($name, 0, 50) . ' ...';
+            }
+
+            if (strlen($name) > 50) {
+                $name = substr($name, 0, 50) . ' ...';
+            }
+
+            $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $name);
+            $encodedName = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
             $defaultImage = asset("images/family.jpg");
             $url = $image ? getImagePath($image) : $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
             $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                {$imgTag}<strong>{$name}</strong>
-            </div>";
+            $familyUrl = url("admin/families/{$this->id}");
+            $id = $this->id;
+
+            return "
+                <a href='{$familyUrl}' style='text-decoration: none; color: inherit;'>
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        {$imgTag}
+                        <div>
+                            <span style='cursor: pointer;'>{$encodedName}</span><br>
+                            <span style='cursor: pointer;'>ID: {$id}</span>
+                        </div>
+                    </div>
+                </a>
+            ";
         });
 
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
@@ -318,7 +346,7 @@ class FamilyController extends MainController
     }
 
 
-    public function familySettings( Content $content)
+    public function familySettings(Content $content)
     {
 
         if (!Admin::user()->can('*')) {
