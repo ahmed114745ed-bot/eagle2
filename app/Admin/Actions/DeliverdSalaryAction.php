@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use App\Classes\Enums\SubTypeMessagesType;
 use Modules\Public\Http\Services\UpgradeLevelServices;
+use App\Models\Setting;
 use App\Models\UserSallary;
 use App\Models\Charge;
 class DeliverdSalaryAction extends RowAction
@@ -44,9 +45,16 @@ class DeliverdSalaryAction extends RowAction
         ],[
             "cut_amount" => DB::raw("cut_amount + {$model->amount}"),
         ]);
+        $userCoins = \Cache::rememberForever('user_coins', function () {
+            $setting = Setting::where('key', 'user_coins')->first();
+            return $setting?->value ?? 1;
+        });
+        $usdAmount = $userCoins > 0 ? $model->amount / $userCoins : 0;
+
         Charge::query()->create([
             'user_id' => $user->id,
             'amount' => $model->amount,
+            'usd' => $usdAmount,
             'charger_id' => auth()->user()->id,
             'charger_type' => 'dash',
             'user_type' => $user->type_user,

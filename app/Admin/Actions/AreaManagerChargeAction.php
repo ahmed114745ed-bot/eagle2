@@ -198,7 +198,7 @@ class AreaManagerChargeAction extends Action
         $html = '';
 
         if (Admin::user()->can('add-switch-charge-to-user') || Admin::user()->can('*')) {
-            $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->userId . ')" class="charge_action btn btn-sm btn-action">'
+            $html .= '<a href="javascript:void(0);" onclick="pu(' . $this->userId . ')" class="charge_action btn btn-sm btn-success">'
                 . htmlspecialchars($title) .
                 '</a>';
             $html .= '&nbsp;&nbsp;';
@@ -206,7 +206,7 @@ class AreaManagerChargeAction extends Action
 
         if (Admin::user()->can('history-switch-charge-to-user') || Admin::user()->can('*')) {
             $html .= '<a href="' . htmlspecialchars($url) . '"
-            class="shipping_report btn btn-sm btn-action"
+            class="shipping_report btn btn-sm btn-danger"
             onclick="initDatePickersAfterNav()">'
                 . htmlspecialchars($shippingReports) .
                 '</a>';
