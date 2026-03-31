@@ -2136,7 +2136,7 @@ Route::get('/fix-gift-logs/run', function () {
 });
 
 
-Route::get('test-push', function () {
+Route::get('test-push-succ', function () {
 
     dd('test successfully!---------');
 });
@@ -2291,3 +2291,4 @@ Route::get('/fix-charges-usd', function () {
         'samples' => $samples,
     ], 200, [], JSON_PRETTY_PRINT);
 });
+
