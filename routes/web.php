@@ -2326,7 +2326,7 @@ Route::get('remove-bd-rewards', function () {
 
             if ($milestone) {
                 MilestoneReward::where('milestone_id', $milestone->id)
-                    ->where('user_id', $user->id)
+                    ->where('rewardable_id', $user->id)
                     ->delete();
             }
             $fixed++;
