@@ -830,25 +830,25 @@
 
     function showSuccess(message, callback) {
         Swal.fire({
-            icon: 'success',
+            type: 'success',
             title: message,
             confirmButtonText: 'OK'
         }).then(() => { if (callback) callback(); });
     }
 
     function showError(message) {
-        Swal.fire({ icon: 'error', title: message, confirmButtonText: 'OK' });
+        Swal.fire({ type: 'error', title: message, confirmButtonText: 'OK' });
     }
 
     function confirmAction(message, onConfirm) {
         Swal.fire({
             title: message,
-            icon: 'question',
+            type: 'question',
             showCancelButton: true,
             confirmButtonText: '{{ __("Yes") }}',
             cancelButtonText: '{{ __("Cancel") }}'
         }).then(result => {
-            if (result.isConfirmed) onConfirm();
+            if (result.value) onConfirm();
         });
     }
 
@@ -883,6 +883,7 @@
                 ? '{{ __("Are you sure you want to remove admin privileges?") }}'
                 : '{{ __("Are you sure you want to make this user an admin?") }}';
 
+                console.log(message)
             confirmAction(message, () => {
                 showLoader();
                 $.post(`/admin/families/toggle-admin/${id}`, {
