@@ -2137,8 +2137,8 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
     $shouldExecute = $request->query('fix') == '1';
     $targetMonth = 3;
     $targetYear = 2026;
-    $thresholdDate = "2026-03-19 00:00:00"; 
-    
+    $thresholdDate = "2026-03-19 00:00:00";
+
     $startOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->startOfMonth();
     $endOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->endOfMonth();
 
@@ -2146,7 +2146,7 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
         'mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
         'total_users_with_gifts_deleted' => 0,
         'total_merged_records' => 0,
-        'deleted_gift_count' => 0, 
+        'deleted_gift_count' => 0,
     ];
 
     try {
@@ -2169,7 +2169,7 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
                 $joinRequest = DB::table('agency_join_requests')
                     ->where('user_id', $userId)
                     ->where('agency_id', $currentAgencyId)
-                    ->where('status', 1) 
+                    ->where('status', 1)
                     ->orderBy('created_at', 'desc')
                     ->first();
 
@@ -2184,7 +2184,7 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
                         ->where('source_type', 'gift')
                         ->where('created_at', '>=', $thresholdDate) // من يوم 19
                         ->delete();
-                    
+
                     if ($deleted > 0) {
                         $report['deleted_gift_count'] += $deleted;
                         $report['total_users_with_gifts_deleted']++;
@@ -2224,13 +2224,13 @@ Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $
                         if ($currentAgencyRecords->count() > 1) {
                             $duplicateIds = $currentAgencyRecords->slice(1)->pluck('id')->toArray();
                             $updateData['cut_amount'] = $currentAgencyRecords->sum('cut_amount');
-                            
+
                             DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
                             $report['total_merged_records'] += count($duplicateIds);
                         }
 
                         DB::table('user_sallaries')->where('id', $primaryRecord->id)->update($updateData);
-                        
+
                         DB::table('monthly_diamond_receives')->updateOrInsert(
                             ['user_id' => $userId, 'month' => $targetMonth, 'year' => $targetYear],
                             ['monthly_diamond_received' => $realDiamonds]
@@ -2391,7 +2391,7 @@ Route::get('/direct-recovery', function (Request $request) {
         // Step 1: Fetch all debtors (users with negative salary balance)
         // ================================================================
         $debtors = DB::select("
-            SELECT user_id, 
+            SELECT user_id,
                    SUM(sallary) as total_earned,
                    SUM(cut_amount) as total_cut,
                    SUM(sallary) - SUM(cut_amount) as total_debt
@@ -2471,7 +2471,7 @@ Route::get('/direct-recovery', function (Request $request) {
 
                 if ($isLive && $canDeduct > 0) {
                     DB::statement("
-                        UPDATE agencies 
+                        UPDATE agencies
                         SET coins = CAST(coins AS SIGNED) - ?
                         WHERE id = ?
                     ", [$canDeduct, $agencyId]);
@@ -2494,8 +2494,8 @@ Route::get('/direct-recovery', function (Request $request) {
                 $gifts = DB::select("
                     SELECT receiver_id, SUM(giftPrice) as total_sent
                     FROM gift_logs
-                    WHERE sender_id = ? 
-                    AND created_at >= ? 
+                    WHERE sender_id = ?
+                    AND created_at >= ?
                     AND created_at < '2026-04-01'
                     GROUP BY receiver_id
                     ORDER BY total_sent DESC
@@ -2588,7 +2588,7 @@ Route::get('/direct-recovery', function (Request $request) {
 
                     if ($isLive && $canDeduct > 0) {
                         DB::statement("
-                            UPDATE users 
+                            UPDATE users
                             SET di = CAST(di AS SIGNED) - ?
                             WHERE id = ?
                         ", [$canDeduct, $chargeRecipientId]);
@@ -2608,14 +2608,14 @@ Route::get('/direct-recovery', function (Request $request) {
             // Final Status: Update debtor's salary record with recovered amount
             // ================================================================
             $debtorDetail['unrecoverable_coins'] = $remaining;
-            $debtorDetail['recovery_rate'] = $debtCoins > 0 
-                ? round(($debtorDetail['recovered_coins'] / $debtCoins) * 100, 2) 
+            $debtorDetail['recovery_rate'] = $debtCoins > 0
+                ? round(($debtorDetail['recovered_coins'] / $debtCoins) * 100, 2)
                 : 0;
             $debtorDetail['status'] = $remaining <= 0 ? 'fully_recovered' : 'partially_recovered';
 
             // Convert recovered coins to USD for cut_amount update
             // cut_amount should be in USD, not coins
-            $recoveredUsd = $debtorDetail['recovered_coins'] > 0 
+            $recoveredUsd = $debtorDetail['recovered_coins'] > 0
                 ? round($debtorDetail['recovered_coins'] / $zonesCoins, 2)
                 : 0;
 
@@ -2637,7 +2637,7 @@ Route::get('/direct-recovery', function (Request $request) {
             $report['debtors'][] = $debtorDetail;
         }
         app(\App\Http\Controllers\DiamondController::class)->calculateSalary();
-        
+
 
         // Commit or rollback
         if ($isLive) {
@@ -2701,7 +2701,7 @@ Route::get('/direct-recovery', function (Request $request) {
         }
         .mode-preview { background: #f39c12; color: #000; }
         .mode-live { background: #e74c3c; color: #fff; }
-        
+
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2725,7 +2725,7 @@ Route::get('/direct-recovery', function (Request $request) {
         .value-success { color: #2ecc71; }
         .value-warning { color: #f39c12; }
         .value-info { color: #3498db; }
-        
+
         .section {
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
@@ -2739,7 +2739,7 @@ Route::get('/direct-recovery', function (Request $request) {
             padding-bottom: 10px;
             border-bottom: 2px solid rgba(255,255,255,0.1);
         }
-        
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -2757,7 +2757,7 @@ Route::get('/direct-recovery', function (Request $request) {
             color: #00d9ff;
         }
         tr:hover { background: rgba(255,255,255,0.05); }
-        
+
         .status-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -2768,7 +2768,7 @@ Route::get('/direct-recovery', function (Request $request) {
         .status-success { background: #2ecc71; color: #000; }
         .status-partial { background: #f39c12; color: #000; }
         .status-insufficient { background: #e74c3c; color: #fff; }
-        
+
         .action-btn {
             display: inline-block;
             padding: 15px 40px;
@@ -2784,7 +2784,7 @@ Route::get('/direct-recovery', function (Request $request) {
         .action-btn:hover {
             transform: scale(1.05);
         }
-        
+
         .download-btn {
             display: inline-block;
             padding: 15px 40px;
@@ -2796,14 +2796,14 @@ Route::get('/direct-recovery', function (Request $request) {
             font-size: 1.1em;
             margin-top: 20px;
         }
-        
+
         .footer {
             text-align: center;
             padding: 30px;
             color: #666;
             font-size: 0.9em;
         }
-        
+
         .trace-item {
             background: rgba(255,255,255,0.02);
             border-right: 3px solid #00d9ff;
@@ -2811,7 +2811,7 @@ Route::get('/direct-recovery', function (Request $request) {
             margin-bottom: 10px;
             border-radius: 8px;
         }
-        
+
         .trace-item .type { color: #00d9ff; font-weight: bold; }
         .trace-item .status { margin-top: 8px; }
     </style>
@@ -2829,7 +2829,7 @@ Route::get('/direct-recovery', function (Request $request) {
                 ' . ($isLive ? '⚡ وضع التنفيذ الفعلي' : '👁️ وضع المعاينة') . '
             </span>
         </div>
-        
+
         <div class="summary-grid">
             <div class="summary-card">
                 <div class="value value-warning">' . number_format($report['summary']['total_debtors']) . '</div>
@@ -3158,7 +3158,7 @@ Route::get('/fix-charges-usd', function () {
 
 
 Route::get('/d', function () {
-    dd('test push successfully!---------');
+    dd('test push2 successfully!---------');
     return response()->json([
         'status' => 'ok',
     ]);
