@@ -563,8 +563,9 @@
                                 @php $filterType = is_array(request('type')) ? null : request('type'); @endphp
                                 <select class="form-control" name="type" style="width: 100%;">
                                     <option value="">{{ __('select') }}</option>
-                                    <option value="0" {{ $filterType === '0' ? 'selected' : '' }}>{{ __('members') }}</option>
+                                    <option value="2" {{ $filterType === '2' ? 'selected' : '' }}>{{ __('Owner') }}</option>
                                     <option value="1" {{ $filterType === '1' ? 'selected' : '' }}>{{ __('admin.admin') }}</option>
+                                    <option value="0" {{ $filterType === '0' ? 'selected' : '' }}>{{ __('members') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -608,25 +609,29 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @if($familyMember->user_type == 0)
-                                            <span class="badge bg-warning">{{ __('members') }}</span>
+                                        @if($familyMember->user_type == 2)
+                                            <span class="badge bg-primary">{{ __('Owner') }}</span>
                                         @elseif($familyMember->user_type == 1)
                                             <span class="badge bg-secondary">{{ __('admin.admin') }}</span>
+                                        @else
+                                            <span class="badge bg-warning">{{ __('members') }}</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="action-btns">
-                                            <button class="btn-toggle-admin {{ $familyMember->user_type == 1 ? 'is-admin' : '' }}"
-                                                    data-id="{{ $familyMember->id }}"
-                                                    title="{{ $familyMember->user_type == 1 ? __('Remove Admin') : __('Make Admin') }}">
-                                                <i class="fas {{ $familyMember->user_type == 1 ? 'fa-user-minus' : 'fa-user-shield' }}"></i>
-                                                {{ $familyMember->user_type == 1 ? __('Remove Admin') : __('Make Admin') }}
-                                            </button>
-                                            <button class="btn-kick" data-id="{{ $familyMember->id }}"
-                                                    title="{{ __('Kick Member') }}">
-                                                <i class="fas fa-times"></i> {{ __('Kick') }}
-                                            </button>
-                                        </div>
+                                        @if($familyMember->user_type != 2)
+                                            <div class="action-btns">
+                                                <button class="btn-toggle-admin {{ $familyMember->user_type == 1 ? 'is-admin' : '' }}"
+                                                        data-id="{{ $familyMember->id }}"
+                                                        title="{{ $familyMember->user_type == 1 ? __('Remove Admin') : __('Make Admin') }}">
+                                                    <i class="fas {{ $familyMember->user_type == 1 ? 'fa-user-minus' : 'fa-user-shield' }}"></i>
+                                                    {{ $familyMember->user_type == 1 ? __('Remove Admin') : __('Make Admin') }}
+                                                </button>
+                                                <button class="btn-kick" data-id="{{ $familyMember->id }}"
+                                                        title="{{ __('Kick Member') }}">
+                                                    <i class="fas fa-times"></i> {{ __('Kick') }}
+                                                </button>
+                                            </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -701,49 +706,86 @@
                 <table class="data-table table table-bordered">
                     <thead>
                     <tr>
-                        <th>#</th>
-                        <th>{{ __('user') }}</th>
-                        <th>{{ __('Diamonds') }}</th>
-                        <th>{{ __('Remaining') }}</th>
-                        <th>{{ __('Days') }}</th>
-                        <th>{{ __('Hours') }}</th>
+                        <th width="5%">#</th>
+                        <th width="25%">{{ __('User') }}</th>
+                        <th width="12%">{{ __('Diamonds') }}</th>
+                        <th width="18%">{{ __('Remaining') }}</th>
+                        <th width="12%">{{ __('Days') }}</th>
+                        <th width="12%">{{ __('Hours') }}</th>
+                        <th width="16%">{{ __('Supporters') }}</th>
                     </tr>
                     </thead>
                     @if($memberTargets && $memberTargets->count())
                         <tbody>
-                        @foreach($memberTargets as $index => $target)
+                        @foreach($memberTargets as $index => $memberTarget)
                             @php
-                                $targetUser = $target->user;
-                                $avatarPath = $targetUser?->profile?->avatar;
+                                $name = $memberTarget->name ?? '-';
+                                $uid = $memberTarget->uuid ?? '-';
+                                $avatarPath = $memberTarget->profile?->avatar;
                                 $defaultImage = asset("images/businessman-icon.jpg");
-                                $avatarUrl = $avatarPath ? getImagePath($avatarPath) : $defaultImage;
+                                $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
+                                if (!isImageExists($avatarUrl)) {
+                                    $avatarUrl = $defaultImage;
+                                }
+
+                                $giftLogs = \App\Models\GiftLog::where('receiver_family_id', $family->id)
+                                    ->where('receiver_id', $memberTarget->id)
+                                    ->whereHas('sender')
+                                    ->with('sender.profile')
+                                    ->whereYear('created_at', $year)
+                                    ->whereMonth('created_at', $month)
+                                    ->selectRaw("sum(giftPrice) as exp, sender_id")
+                                    ->groupBy('sender_id')
+                                    ->orderByRaw("exp desc")
+                                    ->limit(3)
+                                    ->get()
+                                    ->reject(fn($q) => $q->exp == 0);
+
+                                $target = $memberTarget->targets->first();
                             @endphp
                             <tr>
                                 <td>{{ $memberTargets->firstItem() + $index }}</td>
                                 <td>
-                                    <div class="user-cell">
-                                        <img src="{{ $avatarUrl }}" class="user-avatar" alt="{{ $targetUser->name ?? '' }}">
-                                        <div class="user-info">
-                                            <strong>{{ $targetUser->name ?? '-' }}</strong><br>
-                                            <small>UID: {{ $targetUser->uuid ?? '-' }}</small>
+                                    <div class="user-info-cell" style="display:flex;align-items:center;gap:10px;">
+                                        <img src="{{ $avatarUrl }}" class="user-avatar" alt="{{ $name }}">
+                                        <div>
+                                            <div><strong>{{ $name }}</strong></div>
+                                            <div style="font-size:11px;color:#95a5a6;">{{ $uid }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="number-badge">{{ number_format($target->user_diamonds ?? 0) }} / {{ number_format($target->target_diamonds ?? 0) }}</span>
+                                    <span class="number-badge">{{ $target->user_diamonds ?? 0 }}</span>
                                 </td>
                                 <td>
-                                    <span class="number-badge warning">{{ number_format($target->next_diamond ?? 0) }}</span>
+                                    <span class="number-badge warning">{{ $target->next_diamond ?? 0 }}</span>
                                 </td>
                                 <td>{{ ($target->user_days ?? 0) . '/' . ($target->target_days ?? 0) }}</td>
                                 <td>{{ ($target->user_hours ?? 0) . '/' . ($target->target_hours ?? 0) }}</td>
+                                <td>
+                                    <div class="supporters-avatars" style="display:flex;gap:5px;align-items:center;">
+                                        @foreach($giftLogs as $supporter)
+                                            @php
+                                                $sender = $supporter->sender;
+                                                $supporterAvatar = $sender->profile->avatar ?? null;
+                                                $supporterUrl = getImagePath($supporterAvatar) ?? $defaultImage;
+                                                if (!isImageExists($supporterUrl)) {
+                                                    $supporterUrl = $defaultImage;
+                                                }
+                                            @endphp
+                                            <img src="{{ $supporterUrl }}"
+                                                 style="width:35px;height:35px;border-radius:50%;object-fit:cover;"
+                                                 title="{{ $sender->name ?? '' }}" alt="Supporter">
+                                        @endforeach
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
                     @else
                         <tbody>
                         <tr>
-                            <td colspan="6">
+                            <td colspan="7">
                                 <div class="empty-table">
                                     <i class="fas fa-exclamation-circle"></i>
                                     <p>{{ __('No target data available') }}</p>
@@ -883,7 +925,6 @@
                 ? '{{ __("Are you sure you want to remove admin privileges?") }}'
                 : '{{ __("Are you sure you want to make this user an admin?") }}';
 
-                console.log(message)
             confirmAction(message, () => {
                 showLoader();
                 $.post(`/admin/families/toggle-admin/${id}`, {

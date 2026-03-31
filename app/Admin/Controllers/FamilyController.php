@@ -6,6 +6,7 @@ use App\Facades\UserHandling;
 use App\Models\Config;
 use App\Models\Family;
 use App\Models\FamilyUser;
+use App\Models\GiftLog;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserTarget;
@@ -231,15 +232,28 @@ class FamilyController extends MainController
 
         $familyLevel = $family->level;
 
-        $familyMembers = $family->allMembers()
+        $familyMembers = FamilyUser::where('family_id', $family->id)
+            ->where('status', 1)
             ->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])
             ->when($type !== null, fn($q) => $q->where('user_type', $type))
+            ->orderByDesc('user_type')
             ->paginate(10, ['*'], 'member_page');
 
-        $memberTargets = UserTarget::where('family_id', $family->id)
-            ->where('add_month', $month)
-            ->where('add_year', $year)
-            ->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])
+        $familyUserIds = FamilyUser::where('family_id', $family->id)
+            ->where('status', 1)
+            ->pluck('user_id');
+
+        $memberTargets = User::whereIn('id', $familyUserIds)
+            ->whereHas('targets', function ($query) use ($family, $month, $year) {
+                $query->where('family_id', $family->id)
+                    ->where('add_month', $month)
+                    ->where('add_year', $year);
+            })
+            ->with(['targets' => function ($query) use ($family, $month, $year) {
+                $query->where('family_id', $family->id)
+                    ->where('add_month', $month)
+                    ->where('add_year', $year);
+            }, 'profile:id,user_id,avatar'])
             ->paginate(10, ['*'], 'target_page');
 
         return parent::show($id, $content->title(__('family profile'))
