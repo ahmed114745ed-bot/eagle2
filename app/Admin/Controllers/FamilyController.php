@@ -2,11 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use App\Facades\UserHandling;
 use App\Models\Config;
 use App\Models\Family;
 use App\Models\FamilyUser;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\UserTarget;
 use App\Services\AppFeatureService;
 use Carbon\Carbon;
 use Encore\Admin\Auth\Permission;
@@ -114,7 +116,7 @@ class FamilyController extends MainController
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $owner = $this->owner;
             if (!$owner) return '-';
-            
+
             $uid = $owner->uuid;
             $avatar = $owner->profile?->avatar;
             $defaultImage = asset('images/businessman-icon.jpg');
@@ -165,7 +167,7 @@ class FamilyController extends MainController
      * Make a show builder.
      *
      * @param mixed $id
-     * @return Show
+     * @return Content
      */
     // protected function detail($id)
     // {
@@ -192,17 +194,68 @@ class FamilyController extends MainController
 
     public function show($id, Content $content)
     {
-        $type = request('type');
+        $type = is_array(request('type')) ? null : request('type');
+        $month = request('month', now()->month);
+        $year = request('year', now()->year);
+
         $family = Family::with(['owner:id,name,uuid', 'owner.profile:id,user_id,avatar'])
             ->findOrFail($id);
-        
+
+        $familyLevel = $family->level;
+
         $familyMembers = $family->allMembers()
             ->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])
             ->when($type !== null, fn($q) => $q->where('user_type', $type))
             ->paginate(10, ['*'], 'member_page');
-            
+
+        $memberTargets = UserTarget::where('family_id', $family->id)
+            ->where('add_month', $month)
+            ->where('add_year', $year)
+            ->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])
+            ->paginate(10, ['*'], 'target_page');
+
         return parent::show($id, $content->title(__('family profile'))
-            ->view('family_profile', compact('family', 'familyMembers')));
+            ->view('family_profile', compact('family', 'familyMembers', 'familyLevel', 'memberTargets', 'month', 'year')));
+    }
+
+    public function kickMember($id)
+    {
+        $familyUser = FamilyUser::findOrFail($id);
+
+        if ($familyUser->user_type == 2) {
+            return response()->json([
+                'status' => false,
+                'message' => __('This User is the host Of family can\'t delete it go to remove family first'),
+            ], 403);
+        }
+
+        User::where('id', $familyUser->user_id)->update(['family_id' => null]);
+        $familyUser->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done'),
+        ]);
+    }
+
+    public function toggleAdmin($id)
+    {
+        $familyUser = FamilyUser::findOrFail($id);
+
+        if ($familyUser->user_type == 2) {
+            return response()->json([
+                'status' => false,
+                'message' => __('Cannot change the owner role'),
+            ], 403);
+        }
+
+        $familyUser->user_type = $familyUser->user_type == 1 ? 0 : 1;
+        $familyUser->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done'),
+        ]);
     }
 
     /**
@@ -267,7 +320,7 @@ class FamilyController extends MainController
 
     public function familySettings( Content $content)
     {
-        
+
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'family-setting');
         }
