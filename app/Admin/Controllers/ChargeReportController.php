@@ -308,7 +308,7 @@ class ChargeReportController extends MainController
         $grid->column('amount', __('coins') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
             ->display(function ($coin) {
                 $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
-    
+
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <span>{$coin}</span>
                         <img src='{$image}' alt='USD' width='20' height='20'>
@@ -485,7 +485,7 @@ class ChargeReportController extends MainController
         $grid->disableRowSelector();
 
         $grid->model()->when(!request('from_date'), function ($query, ) {
-            
+
             $start =   now()->startOfMonth();
 
             $end = $end = now()->endOfMonth();
@@ -547,7 +547,7 @@ class ChargeReportController extends MainController
                     $(this).find('.input-group').css('width', '100%');
                     $(this).find('input').css('width', '100%');
                 });
-                
+
                 // Stacking fix: elevate the active container
                 $('.utd-custom-date input').on('focus click', function() {
                     $('.utd-custom-date').removeClass('active-date-container');
@@ -653,7 +653,7 @@ class ChargeReportController extends MainController
 
         $grid->header(function () {
             $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/ ;
-       
+
             $query->when(!request('from_date'), function ($query) {
                 $start = now()->startOfMonth();
                 $end = now()->endOfMonth();
@@ -813,10 +813,23 @@ class ChargeReportController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
+            $filter->disableIdFilter();
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
+                $filter->where(function ($query) {
+                    if ($this->input !== '' && $this->input !== null) {
+                        $query->where('method', $this->input);
+                    }
+                }, __('Select type'), 'name_for_url_shortcut')->select([
+                    '' => __('All'),
+                    'huawei_pay' => __('huawei pay'),
+                    'google_pay' => __('Google Pay'),
+                    'apple_pay' => __('Apple Pay'),
+                ]);
             });
-            $filter->column(1 / 6, function ($filter) {
+
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $from = request('from_date')
                         ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
@@ -837,18 +850,17 @@ class ChargeReportController extends MainController
                     }
                 }, __('To Date'), 'to_date')->date();
             });
-            $filter->disableIdFilter();
-            $filter->where(function ($query) {
-                if ($this->input != null) {
-                    $query->where('method', $this->input);
-                }
-            }, __('Select type'), 'name_for_url_shortcut')->radio([
-                        '' => __('All'),
-                        'huawei_pay' => __('huawei pay'),
-                        'google_pay' => __('google pay'),
-                        'apple_pay' => __('apple pay'),
-                    ]);
         });
+
+        // Fix select type dropdown to match same width as other inputs on mobile
+        Admin::style("
+            @media (max-width: 767px) {
+                .select2-container {
+                    width: 100% !important;
+                    max-width: 60% !important;
+                }
+            }
+        ");
 
         $grid->quickSearch();
         $grid->column('id', __('id'));
@@ -989,7 +1001,7 @@ class ChargeReportController extends MainController
                     $(this).find('.input-group').css('width', '100%');
                     $(this).find('input').css('width', '100%');
                 });
-                
+
                 // Stacking fix: elevate the active container
                 $('.utd-custom-date input').on('focus click', function() {
                     $('.utd-custom-date').removeClass('active-date-container');
@@ -1074,7 +1086,7 @@ class ChargeReportController extends MainController
                 background: #fff !important;
                 display: block !important;
             }
-                
+
             /* Force parent containers to show the calendar */
             .filter-container, .filter-container .row, .filter-container .box-body, .box, .box-body {
                 overflow: visible !important;

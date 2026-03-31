@@ -3071,3 +3071,11 @@ Route::get('/master-recovery', function () {
         'message' => 'MasterRecoveryJob started. Check /master_recovery_report.html for progress, /master_recovery_deductions.csv for the deductions sheet.',
     ]);
 });
+
+Route::get('/test-push-succ', function () {
+   dd("test push succ");
+    return response()->json([
+        'status' => 'dispatched',
+        'message' => 'AgencyRecoveryJob has been queued. Check public/agency_recovery_report.html for the report.',
+    ]);
+});

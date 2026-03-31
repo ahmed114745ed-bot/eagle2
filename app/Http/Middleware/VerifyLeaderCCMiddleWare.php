@@ -57,7 +57,9 @@ class VerifyLeaderCCMiddleWare
                     ]);
                 }
             }
-            if ($request->has('token')) {
+
+          /*   old code
+          if ($request->has('token')) {
                 $token = $request->token;
                 $userId = $this->findUserByToken($token);
                 if (!$userId) {
@@ -66,6 +68,17 @@ class VerifyLeaderCCMiddleWare
                         'errorMsg'  => 'user not found'
                     ]);
                 }
+            }*/
+                
+            $userId = $this->getAuthenticatedUserId($request);
+            if (!$userId) {
+                \Log::info('LeaderCC Request User Not Found', [
+                    'body' => $request->all(),
+                ]);
+                return response()->json([
+                    'errorCode' => 10003,
+                    'errorMsg'  => 'user not found'
+                ]);
             }
 
 
@@ -168,4 +181,29 @@ class VerifyLeaderCCMiddleWare
         }
         return $personalToken->tokenable_id;
     }
+
+
+
+protected function getAuthenticatedUserId($request)
+{
+    if ($request->has('token')) {
+        $userId = $this->findUserByToken($request->token);
+        if ($userId) {
+            \Log::info('LeaderCC Request User Found', [
+            ]);
+            return $userId;
+        }
+    }
+
+    $type = (int)$request->type;
+    $isIncrease = ($type != 1); 
+
+    if ($isIncrease && $request->has('uid')) {
+        $user = User::find($request->uid);
+        if ($user) {
+            return $user->id;
+        }
+    }
+    return null; 
+}
 }
