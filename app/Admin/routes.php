@@ -191,6 +191,14 @@ Route::group(
 
 Admin::routes();
 
+// Override the vendor LogController with our custom one that shows login tracking columns
+Route::group([
+    'prefix' => config('admin.route.prefix'),
+    'middleware' => config('admin.route.middleware'),
+], function () {
+    Route::resource('auth/logs', \App\Admin\Controllers\LogController::class, ['only' => ['index', 'destroy']])->names('admin.auth.logs');
+});
+
 $routes = collect(app('router')->getRoutes()->get());
 $filtered = $routes->reject(function ($route) {
     return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');

@@ -166,7 +166,7 @@
     "edit user parent": "edit users",
     "show user parent": "show users",
     "update user parent": "update users",
-    "user parent": "users",
+    "user parent": "invitation code",
     "browse auth users": "Browse Employees",
     "create auth users": "Create Employees",
     "delete auth users": "Delete Employees",
@@ -1108,7 +1108,7 @@
     "Delete level interval": "Delete level gift",
     "Show level interval": "Show level gift",
     "Create user parent": "Create user",
-    "Browse user parent": "Browse user",
+    "Browse user parent": "Browse invitation code",
     "Browse payment gat way": "Browse payment methods for shipping agents",
     "Create payment gat way": "Create payment methods for shipping agents",
     "Edit payment gat way": "Edit payment methods for shipping agents",
@@ -1789,10 +1789,11 @@
     "This will process ALL old charges to calculate profit\/bonus. Are you sure?": "This will process ALL old charges to calculate profit\/bonus. Are you sure?",
     "Owner Fee Rate (0.10 = 10%)": "Owner Fee Rate (0.10 = 10%)",
     "Owner Fee Rate (0.10 = 10%)": "Owner Fee Rate (0.10 = 10%)",
-    "user parent": "invitation code",
-    "Browse user parent": "Browse invitation code",
     "max_accounts_reached": "You have reached the maximum number of accounts that can be registered with this device.",
     "api_responses.max_accounts_reached": "You have reached the maximum number of accounts that can be registered with this device.",
     "already exists": "This phone number is already registered",
-    "invalid_code": "Invalid or expired verification code"
+    "invalid_code": "Invalid or expired verification code",
+    "Session Terminated": "Session Terminated",
+    "Your account was logged in from another device (:device, :browser on :platform, IP: :ip). Your previous session has been terminated.": "Your account was logged in from another device (:device, :browser on :platform, IP: :ip). Your previous session has been terminated.",
+    "Your account has been logged in from another device. You have been logged out.": "Your account has been logged in from another device. You have been logged out."
 }

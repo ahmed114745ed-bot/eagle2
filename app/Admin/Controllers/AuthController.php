@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cookie;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use Jenssegers\Agent\Agent as JenssegersAgent;
+use Stevebauman\Location\Facades\Location;
+use App\Models\AdminLoginLog;
+use App\Enums\AdminNotificationType;
+use App\Helpers\AdminNotificationHelper;
 use Encore\Admin\Controllers\AuthController as BaseAuthController;
 
 class AuthController extends BaseAuthController
@@ -116,30 +121,98 @@ class AuthController extends BaseAuthController
     {
         $this->loginValidator($request->all())->validate();
 
-        // Find admin where type IS NULL
         $admin = DB::table('admin_users')
             ->where('username', $request->username)
             ->whereNull('type')
             ->first();
 
-        // Check if admin exists
         if (!$admin) {
             return back()->withInput()->withErrors([
                 $this->username() => trans('admin.username_not_found'),
             ]);
         }
 
-        // Check password manually (if using bcrypt)
         if (!Hash::check($request->password, $admin->password)) {
             return back()->withInput()->withErrors([
                 'password' => trans('admin.password_incorrect'),
             ]);
         }
 
-        // Login using the ID
         Auth::guard('admin')->loginUsingId($admin->id, $request->boolean('remember'));
 
-        // Redirect
+        $sessionToken = \Str::random(40);
+        DB::table('admin_users')->where('id', $admin->id)->update(['session_token' => $sessionToken]);
+        $request->session()->put('admin_session_token', $sessionToken);
+
+        $now = now();
+        $previousLogs = AdminLoginLog::where('user_id', $admin->id)
+            ->whereNull('logout_at')
+            ->whereNotNull('login_at')
+            ->get();
+
+        if ($previousLogs->isNotEmpty()) {
+            foreach ($previousLogs as $prevLog) {
+                $prevLog->update([
+                    'logout_at' => $now,
+                    'session_duration_minutes' => (int) $now->diffInMinutes($prevLog->login_at),
+                ]);
+            }
+
+            try {
+                $agent = new JenssegersAgent();
+                $device = $agent->device() ?: ($agent->isDesktop() ? 'Desktop' : ($agent->isMobile() ? 'Mobile' : 'Unknown'));
+                $browser = $agent->browser();
+                $platform = $agent->platform();
+
+                AdminNotificationHelper::notify(
+                    type: AdminNotificationType::WARNING,
+                    title: __('Session Terminated'),
+                    message: __(
+                        'Your account was logged in from another device (:device, :browser on :platform, IP: :ip). Your previous session has been terminated.',
+                        [
+                            'device' => $device,
+                            'browser' => $browser,
+                            'platform' => $platform,
+                            'ip' => $request->ip(),
+                        ]
+                    ),
+                    adminId: $admin->id,
+                );
+            } catch (\Exception $e) {
+                \Log::warning('Failed to send device kick notification: ' . $e->getMessage());
+            }
+        }
+
+        try {
+            $agent = new JenssegersAgent();
+            $ip = $request->ip();
+            $location = Location::get($ip);
+
+            $loginLog = AdminLoginLog::create([
+                'user_id'          => $admin->id,
+                'path'             => 'admin/login',
+                'method'           => 'POST',
+                'ip'               => $ip,
+                'input'            => json_encode($request->except(['password', '_token'])),
+                'country'          => $location->countryName ?? null,
+                'city'             => $location->cityName ?? null,
+                'region'           => $location->regionName ?? null,
+                'latitude'         => $location->latitude ?? null,
+                'longitude'        => $location->longitude ?? null,
+                'device'           => $agent->device() ?: ($agent->isDesktop() ? 'Desktop' : ($agent->isMobile() ? 'Mobile' : ($agent->isTablet() ? 'Tablet' : 'Unknown'))),
+                'platform'         => $agent->platform(),
+                'platform_version' => $agent->version($agent->platform()),
+                'browser'          => $agent->browser(),
+                'browser_version'  => $agent->version($agent->browser()),
+                'user_agent'       => $request->userAgent(),
+                'login_at'         => now(),
+            ]);
+
+            $request->session()->put('admin_login_log_id', $loginLog->id);
+        } catch (\Exception $e) {
+            \Log::warning('Failed to save admin login log: ' . $e->getMessage());
+        }
+
         return $this->sendLoginResponse($request);
     }
 
@@ -262,9 +335,39 @@ class AuthController extends BaseAuthController
         return $form;
     }
 
+    public function getLogout(Request $request)
+    {
+        $this->updateLoginLogSessionDuration($request);
+
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        return redirect(config('admin.route.prefix'));
+    }
+
+    private function updateLoginLogSessionDuration(Request $request): void
+    {
+        try {
+            $loginLogId = $request->session()->get('admin_login_log_id');
+            if ($loginLogId) {
+                $log = AdminLoginLog::find($loginLogId);
+                if ($log) {
+                    $log->update([
+                        'logout_at' => now(),
+                        'session_duration_minutes' => (int) now()->diffInMinutes($log->login_at),
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to update admin login log on logout: ' . $e->getMessage());
+        }
+    }
 
     public function customLogout(Request $request)
     {
+        $this->updateLoginLogSessionDuration($request);
+
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -274,14 +377,19 @@ class AuthController extends BaseAuthController
 
     public function customBdLogout(Request $request)
     {
+        $this->updateLoginLogSessionDuration($request);
+
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect('/bd/login');
     }
+
     public function customSuperadminLogout(Request $request)
     {
+        $this->updateLoginLogSessionDuration($request);
+
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

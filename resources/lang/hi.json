@@ -2059,7 +2059,7 @@
     "edit box settings": "बॉक्स सेटिंग्स संपादित करें",
     "create group chat": "समूह चैट बनाएं",
     "Group chat": "समूह चैट",
-    "user parent": "उपयोगकर्ता अभिभावक",
+    "user parent": "आमंत्रण कोड",
     "general": "सामान्य",
     "Lucky box": "लकी बॉक्स",
     "Create Agencies": "एजेंसियां बनाएँ",
@@ -3127,7 +3127,7 @@
     "Browse level": "स्तर ब्राउज़ करें",
     "Browse level interval": "स्तर अंतराल ब्राउज़ करें",
     "Browse reward level interval": "इनाम स्तर अंतराल ब्राउज़ करें",
-    "Browse user parent": "उपयोगकर्ता ब्राउज़ करें",
+    "Browse user parent": "आमंत्रण कोड ब्राउज़ करें",
     "Delete switch BD": "डेटाबेस स्विच हटाएं",
     "Choose switch BD": "डेटाबेस स्विच चुनें",
     "Gift switch gift from the store": "स्टोर से उपहार स्विच करें",
@@ -4126,5 +4126,8 @@
     "The price for creating a family.": "परिवार बनाने का मूल्य।",
     "family settings": "परिवार सेटिंग्स",
     "Family Setting": "परिवार सेटिंग",
-    "Browse family setting": "परिवार सेटिंग ब्राउज़ करें"
+    "Browse family setting": "परिवार सेटिंग ब्राउज़ करें",
+    "Session Terminated": "सत्र समाप्त किया गया",
+    "Your account was logged in from another device (:device, :browser on :platform, IP: :ip). Your previous session has been terminated.": "आपके खाते में किसी अन्य डिवाइस से लॉगिन किया गया (:device, :browser on :platform, IP: :ip)। आपका पिछला सत्र समाप्त कर दिया गया है।",
+    "Your account has been logged in from another device. You have been logged out.": "आपके खाते में किसी अन्य डिवाइस से लॉगिन किया गया है। आपको लॉग आउट कर दिया गया है।"
 }

@@ -44,7 +44,7 @@ class SuperAdminNotificationHelper
                 'coins' => $data['coins_deducted'] ?? 0,
             ]
         );
-    
+
         $url = '';
         $previewUrlValue = $data['preview_url'] ?? null;
         if ($previewUrlValue) {
@@ -53,7 +53,7 @@ class SuperAdminNotificationHelper
                 $url = $enum->url($data);
             }
         }
-    
+
         broadcast(new \Modules\SuperAdmin\Events\SuperAdminNotificationCreated(
             notification: $notification,
             translatedTitle: $translatedTitle,
@@ -62,11 +62,11 @@ class SuperAdminNotificationHelper
         ))->toOthers();
 
 
-        
+
         if ($superAdminId) {
             $superAdmin = SuperAdmin::find($superAdminId);
             $token = $superAdmin?->fcm_token;
-           
+
 
         if (!empty($token)) {
            
@@ -75,7 +75,7 @@ class SuperAdminNotificationHelper
             self::sendNotification($token, $translatedTitle, $translatedMessage, $url);
         }
         }
-    
+
         return $notification;
 
     }
@@ -85,7 +85,7 @@ class SuperAdminNotificationHelper
         $notification->update(['is_read' => true, 'read_at' => now()]);
     }
 
-   
+
     public static function unreadCount(?int $adminId = null): int
     {
         $adminId = $adminId ?? Auth::id();
@@ -114,22 +114,22 @@ class SuperAdminNotificationHelper
                     "body" => $body,
                 ]
                 ,
-                "data" => [ 
+                "data" => [
                     "click_action" => $url
                 ]
             ]
         ];
-     
+
         $response = Http::withHeaders([
             "Authorization" => "Bearer $accessToken",
             "Content-Type" => "application/json",
         ])->post("https://fcm.googleapis.com/v1/projects/$projectId/messages:send", $payload);
-      
-   
+
+
         return $response->json();
     }
 
-  
+
 
 }
 
