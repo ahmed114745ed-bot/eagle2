@@ -245,13 +245,11 @@ class FamilyController extends MainController
 
         $memberTargets = User::whereIn('id', $familyUserIds)
             ->whereHas('targets', function ($query) use ($family, $month, $year) {
-                $query->where('family_id', $family->id)
-                    ->where('add_month', $month)
+                $query->where('add_month', $month)
                     ->where('add_year', $year);
             })
             ->with(['targets' => function ($query) use ($family, $month, $year) {
-                $query->where('family_id', $family->id)
-                    ->where('add_month', $month)
+                $query->where('add_month', $month)
                     ->where('add_year', $year);
             }, 'profile:id,user_id,avatar'])
             ->paginate(10, ['*'], 'target_page');
