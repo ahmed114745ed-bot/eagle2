@@ -395,6 +395,8 @@ Route::group(
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
+        Route::post('families/kick/{id}', [FamilyController::class, 'kickMember']);
+        Route::post('families/toggle-admin/{id}', [FamilyController::class, 'toggleAdmin']);
         Route::get('families-settings', [FamilyController::class, 'familySettings']);
         Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
         Route::get('/targets-confirm', [TargetController::class, 'confirm'])->name('targets.confirm');

@@ -22,6 +22,7 @@ yarn-error.log
 /config/websockets.php
 docker-compose.yml
 Dockerfile
+docker/supervisor.conf
 /nginx
 /data
 php.ini
