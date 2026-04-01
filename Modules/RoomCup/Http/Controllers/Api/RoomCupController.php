@@ -54,7 +54,7 @@ class RoomCupController extends Controller
 
         // 🧩 3. Get current period totals using helper
         $currentQuery = $this->period(clone $trophyQuery, 'current', $type);
-        $currentData = $currentQuery->with(['room.owner', 'room.level'])
+        $currentData = $currentQuery->with(['room.owner', 'room'])
             ->select(
                 'room_id',
                 DB::raw('SUM(current_total) as total_current'),
@@ -76,7 +76,7 @@ class RoomCupController extends Controller
             ],
             'trophies' => [
                 'level' => @$currentData->room->level ?? 0,
-                
+
                 'type'  =>  $type,
                 'current' => [
                     'total_current'  => $currentData->total_current ?? 0,
