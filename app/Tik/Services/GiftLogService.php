@@ -29,7 +29,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 
@@ -175,9 +174,7 @@ class GiftLogService
             }
 
             if ($room->charizma_status) {
-                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
-                    ->afterCommit()
-                    ->onQueue('default');
+                dispatchRoomsRedis($room->id, $userId, ($gift->price * $number), $receivedUsers->pluck('id')->toArray());
             }
 
             $realPrice = (int) ($number * $gift->price);
@@ -367,9 +364,7 @@ class GiftLogService
             }
 
             if ($room->charizma_status) {
-                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
-                    ->afterCommit()
-                    ->onQueue('default');
+                dispatchRoomsRedis($room->id, $userId, ($gift->price * $number), $receivedUsers->pluck('id')->toArray());
             }
 
             $realPrice = (int) ($number * $gift->price);
