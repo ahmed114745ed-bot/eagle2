@@ -222,8 +222,6 @@ class SettingsController extends Controller
 
 
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            // Clear old cache first
-            Cache::forget($key);
             Cache::put($key, $value);
 
             // //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
@@ -266,11 +264,11 @@ class SettingsController extends Controller
             'brand_background_image', 'table_background_color', 'dark_mode',
             'brand_background_type', 'box_background_color',
         ];
-        foreach ($themeKeys as $key) {
-            Cache::forget($key);
+        foreach ($themeKeys as $themeKey) {
+            if (isset($data[$themeKey])) {
+                Cache::forget($themeKey);
+            }
         }
-
-        Cache::flush();
         try { \Artisan::call('octane:reload'); } catch (\Throwable $e) {}
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
@@ -386,8 +384,6 @@ class SettingsController extends Controller
                 }
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            // Clear old cache first
-            Cache::forget($key);
             Cache::put($key, $value);
         }
 
