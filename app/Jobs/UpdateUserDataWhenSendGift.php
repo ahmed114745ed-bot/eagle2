@@ -58,7 +58,9 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                 ->with([
                            'owner' => function ($query) {
                                $query->withoutAppends();
-                           }
+                           },
+                           'lastPk',
+                           'lastPkSession'
                        ])->first(); 
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
@@ -94,7 +96,8 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         }
 
         $sendGiftServices = new SendGiftService();
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0 , cpIds: $cpIds);
+        $pk = (!is_null($room->lastPk) || !is_null($room->lastPkSession)) ? 1 : 0;
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds);
 
     }
 

@@ -37,7 +37,8 @@ class DefaultSuperAdminBdSeeder extends Seeder
             $q->where('country_id', 0)
                 ->orWhereNull('country_id');
         })->first();
-
+ \Log::info('Default Super Admin ID: ' . $defaultSuperAdmin->id);
+ \Log::info('Default Bd ID: ' . ($defaultBd ? $defaultBd->id : 'No default Bd found'));
         if ($defaultBd){
             if (is_null($defaultBd->country_id)) {
                 $defaultBd->update(['country_id' => 0]);

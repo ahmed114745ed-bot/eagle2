@@ -66,8 +66,8 @@ class HostDiamondController extends MainController
             ])
             ->where('agency_id', '!=', 0)
             ->groupBy('receiver_id', 'agency_id')
-            ->when(! request('from_date'), fn($q) => $q->where('created_at', '>=', now()->startOfMonth()))
-            ->when(! request('to_date'), fn($q) => $q->where('created_at', '<=', now()->endOfMonth()))
+            ->when(!request('from_date'), fn($q) => $q->where('created_at', '>=', now()->startOfMonth()))
+            ->when(!request('to_date'), fn($q) => $q->where('created_at', '<=', now()->endOfMonth()))
             ->when(request('total_gift_price'), fn($q) => $q->havingRaw('total_gift_price >= ?', [(int) request('total_gift_price')]))
             ->orderByDesc('total_gift_price');
 

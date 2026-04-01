@@ -69,6 +69,7 @@ class UtdService
     public function callback(Request $request)
     {
         info($request);
+        info('callback');
         die();
         $txnId = $request->input('TxnId');
         $orderId = $request->input('OrderId');
@@ -118,6 +119,7 @@ class UtdService
     public function success($trx): JsonResponse
     {
         info($trx);
+        info('success');
         die();
         $coinLog = CoinLog::where('trx', $trx)->whereMethod('utd')->firstOrFail();
 

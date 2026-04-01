@@ -31,6 +31,8 @@ class DeleteSuperAdminAction extends RowAction
             if ($model->default == 1) {
                 return $this->response()->error(__('You cannot delete the default super admin.'))->refresh();
             }
+            if ($model->country_id == 0 ) $this->response()->error(__('can not delete default super admin'))->refresh();
+
 
             if ($model->created_by == 'owner') {
                 return $this->response()->error(__('You cannot delete a super admin created by the owner.'))->refresh();

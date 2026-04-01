@@ -2347,3 +2347,5 @@ Route::get('remove-bd-rewards', function () {
 //        dispatch((new \App\Jobs\SlowTestJob())->onQueue('default'));
 //    }
 //})->middleware('local');
+
+Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
