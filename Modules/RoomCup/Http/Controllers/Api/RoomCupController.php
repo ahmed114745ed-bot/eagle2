@@ -75,7 +75,7 @@ class RoomCupController extends Controller
                 'admins' => $currentQueryTotal['admin'] ?? 0,
             ],
             'trophies' => [
-                'level' => @$currentData->room->level->level ?? 0,
+                'level' => @$currentData->room->level ?? 0,
                 'type'  =>  $type,
                 'current' => [
                     'total_current'  => $currentData->total_current ?? 0,
@@ -151,30 +151,30 @@ class RoomCupController extends Controller
             'interval_minutes' => 60,
             'type'             => 'daily',
         ];
-    
+
         $settings = [];
-    
+
         foreach ($default as $key => $defaultValue) {
             $cacheKey = 'roomcup_' . $key;
-    
+
             $value = Cache::get($cacheKey);
-    
+
             if ($value === null) {
                 $setting = Setting::where('key', $cacheKey)->first();
                 $value = $setting ? $setting->value : $defaultValue;
-    
+
                 Cache::put($cacheKey, $value, now()->addDays(30));
             }
-    
+
             if ($key === 'enabled') {
                 $value = (bool) $value;
             } elseif ($key === 'interval_minutes') {
                 $value = (int) $value;
             }
-    
+
             $settings[$key] = $value;
         }
-    
+
         return $settings;
     }
 
