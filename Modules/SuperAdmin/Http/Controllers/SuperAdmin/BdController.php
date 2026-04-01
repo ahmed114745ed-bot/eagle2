@@ -109,6 +109,15 @@ class BdController extends MainController
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
+            $filter->equal('country_id', __('Country'))->select(function () {
+                return \App\Models\Country::pluck('name', 'id');
+            });
+            $filter->equal('default', __('Default Status'))->select([
+                0 => 'Inactive',
+                1 => 'Active',
+            ]);
+            $filter->between('agencies_count', __('Agencies Count'));
+            $filter->between('bdSalaries_sum_salary', __('Total Profit'));
         });
         $grid->column('id', __('Id'))->sortable();
         $grid->column('username', __('Bd'))->display(function ($name) {
@@ -495,3 +504,5 @@ class BdController extends MainController
         ]);
     }
 }
+
+
