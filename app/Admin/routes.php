@@ -321,6 +321,15 @@ Route::group(
         Route::put('rooms/{room}/info', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
 
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
+
+        // API for room subcategories (used by room_class -> room_type dynamic loading)
+        Route::get('api/room-subcategories', function (\Illuminate\Http\Request $request) {
+            $parentId = $request->get('q');
+            $categories = \App\Models\RoomCategory::where('enable', 1)
+                ->where('parent_id', $parentId)
+                ->get(['id', 'name as text']);
+            return $categories;
+        });
         Route::resource('all-games', AllGameController::class);
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
@@ -386,6 +395,8 @@ Route::group(
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
+        Route::post('families/kick/{id}', [FamilyController::class, 'kickMember']);
+        Route::post('families/toggle-admin/{id}', [FamilyController::class, 'toggleAdmin']);
         Route::get('families-settings', [FamilyController::class, 'familySettings']);
         Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
         Route::get('/targets-confirm', [TargetController::class, 'confirm'])->name('targets.confirm');

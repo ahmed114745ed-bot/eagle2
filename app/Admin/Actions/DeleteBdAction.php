@@ -4,9 +4,12 @@ namespace App\Admin\Actions;
 
 use App\Models\Agency;
 use App\Models\Bd;
+use App\Models\User;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Modules\Milestones\Entities\Milestone;
+use Modules\Milestones\Entities\MilestoneReward;
 
 class DeleteBdAction extends RowAction
 {
@@ -48,19 +51,32 @@ class DeleteBdAction extends RowAction
             if (!$defaultBd)   return $this->response()->error(__('No default BD  for this country found to transfer agencies to.'))->refresh();
             Agency::where('bd_id', $model->id)->update(['bd_id' => $defaultBd->id]);
         }
+        if($model->app_id) {
+            $userApp = User::find($model->app_id);
+            if ($userApp) {
+                $userApp->is_bd = 0;
+                $userApp->save();
+            }
+        }
+        $this->deleteMilestoneRewards($model);
 
         $model->delete();
 
         return $this->response()->success('BD deleted successfully.')->refresh();
     }
 
-
-
-
-
-
     public function dialog()
     {
         $this->confirm(__('dashboard.chickDelete'), '', []);
+    }
+    
+    protected function deleteMilestoneRewards(Bd $bd)
+    {
+        $milestone = Milestone::where('slug', 'bd')->first();
+        if ($milestone) {
+            MilestoneReward::where('milestone_id', $milestone->id)
+                ->where('rewardable_id', $bd->app_id)
+                ->delete();
+        }
     }
 }

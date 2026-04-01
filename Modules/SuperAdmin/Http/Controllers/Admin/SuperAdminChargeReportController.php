@@ -119,7 +119,7 @@ class SuperAdminChargeReportController extends MainController
             });
         });
 
-        
+
 
         Admin::script(
             <<<JS

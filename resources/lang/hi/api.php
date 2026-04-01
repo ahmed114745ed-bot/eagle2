@@ -69,6 +69,7 @@ return [
     'removeBan_user_id' => 'बधाई हो! अब आप :appName में लॉग इन कर सकते हैं,',
     'userVips'          => 'बधाई हो! आप :duration दिनों के लिए वीआईपी स्तर पर पहुँच गए हैं',
     'wareVips'          => 'बधाई हो! आप :name पर पहुँच गए हैं, :duration दिनों के लिए',
+    'roomcup_reward'    => 'बधाई हो! आपने RoomCup में :reward_type पुरस्कार के रूप में :amount सिक्के प्राप्त किए',
     'reject_agency' => 'एजेंसी :name में शामिल होने का आपका अनुरोध अस्वीकार कर दिया गया है।',
     'agencyJoinRequest' => ':name आपकी एजेंसी :agencyName में शामिल होना चाहता है',
     'add_admin_agency' => 'आपको एजेंसी :name का एडमिन बनाया गया है',

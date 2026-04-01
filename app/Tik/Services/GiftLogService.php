@@ -29,7 +29,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 
@@ -175,16 +174,14 @@ class GiftLogService
             }
 
             if ($room->charizma_status) {
-                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
-                    ->afterCommit()
-                    ->onQueue('default');
+                dispatchRoomsRedis($room->id, $userId, ($gift->price * $number), $receivedUsers->pluck('id')->toArray());
             }
 
             $realPrice = (int) ($number * $gift->price);
 
             $price = ceil($realPrice);
-
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType, type: $type);
+            $pk = (!is_null($room->lastPk) || !is_null($room->lastPkSession)) ? 1 : 0;
+            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds, sourceType: $sourceType, type: $type);
 
             $settings = CacheHelper::cacheSettings();
             /** @var Collection $rememberForever*/
@@ -367,16 +364,15 @@ class GiftLogService
             }
 
             if ($room->charizma_status) {
-                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
-                    ->afterCommit()
-                    ->onQueue('default');
+                dispatchRoomsRedis($room->id, $userId, ($gift->price * $number), $receivedUsers->pluck('id')->toArray());
             }
 
             $realPrice = (int) ($number * $gift->price);
 
             $price = ceil($realPrice);
 
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType, type: $type);
+            $pk = (!is_null($room->lastPk) || !is_null($room->lastPkSession)) ? 1 : 0;
+            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds, sourceType: $sourceType, type: $type);
 
             $settings = CacheHelper::cacheSettings();
             /** @var Collection $rememberForever*/
