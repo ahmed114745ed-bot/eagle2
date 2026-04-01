@@ -1264,27 +1264,25 @@ class UserService
         $progress     = 0;
         $exactlyValue = 0;
 
-        if ($secondLevel) {
-            $exactlyValue    = $secondLevel->exp;
-            $remaining       = max(0, $exactlyValue - $expLevel);
+      if ($secondLevel) {
+            $exactlyValue = $secondLevel->exp;
+            $remaining    = max(0, $exactlyValue - $expLevel);
 
-            // Calculate progress based on thresholds between levels
             $currentThreshold = $currentLevel ? $currentLevel->exp : 0;
             $nextThreshold    = $secondLevel->exp;
 
-            $progressNext     = $nextThreshold - $currentThreshold;
-            $progressCurrent  = $expLevel - $currentThreshold;
+            $progressNext    = $nextThreshold - $currentThreshold;
+            $progressCurrent = $expLevel - $currentThreshold;
 
             if ($progressNext > 0) {
-                $prog = $progressCurrent / $progressNext;
-                $progress = max(0, min(100, $prog * 100));
+                $progress = $progressCurrent / $progressNext;
+                $progress = max(0, min(1, $progress)); // من 0 لـ 1
             } else {
-                $progress = 100;
+                $progress = 1;
             }
         } elseif ($currentLevel) {
-            // Max level reached
-            $progress  = 100;
-            $remaining = 0;
+            $progress     = 1;
+            $remaining    = 0;
             $exactlyValue = $currentLevel->exp;
         }
 
