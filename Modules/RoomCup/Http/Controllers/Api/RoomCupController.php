@@ -76,6 +76,7 @@ class RoomCupController extends Controller
             ],
             'trophies' => [
                 'level' => @$currentData->room->level ?? 0,
+                
                 'type'  =>  $type,
                 'current' => [
                     'total_current'  => $currentData->total_current ?? 0,
