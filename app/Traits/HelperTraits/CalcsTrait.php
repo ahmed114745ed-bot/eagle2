@@ -667,13 +667,13 @@ trait CalcsTrait
 
 
         if ($rt > 0 && ($rc / $rt) < 1 && ($rc / $rt) > 0) {
-            $data['receiver_per'] = (float)($rc / $rt);
+            $data['receiver_per'] = (float)(($rc / $rt) * 100);
         } else {
             $data['receiver_per'] = (float)0.00;
         }
 
         if ($st > 0 && ($sc / $st) < 1 && ($sc / $st) > 0) {
-            $data['sender_per'] = (float)($sc / $st);
+            $data['sender_per'] = (float)(($sc / $st) * 100);
         } else {
             $data['sender_per'] = (float)0.00;
         }

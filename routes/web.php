@@ -33,6 +33,7 @@ use App\Http\Controllers\SuperAdminCountryController;
 use App\Http\Controllers\TestsController;
 use App\Http\Controllers\WelcomeController;
 use App\Jobs\UpdateUserFollowCountsJob;
+use App\Models\Admin;
 use App\Models\AdminNotification;
 use App\Models\AgencySallary;
 use App\Models\Ban;
@@ -57,6 +58,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Modules\Form\Http\Controllers\FormTemplateController;
+use Modules\Milestones\Entities\Milestone;
+use Modules\Milestones\Entities\MilestoneReward;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use Modules\RoomBoom\Http\Controllers\web\PercentageBoomController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
@@ -2999,7 +3002,7 @@ Route::get('/recovery-cycle', function () {
 });
 
 
-Route::get('test-push', function () {
+Route::get('test-push-succ', function () {
 
     dd('test successfully!---------');
 });
@@ -3176,3 +3179,16 @@ Route::get('/master-recovery', function () {
         'message' => 'MasterRecoveryJob started. Check /master_recovery_report.html for progress, /master_recovery_deductions.csv for the deductions sheet.',
     ]);
 });
+
+
+
+
+
+
+//Route::get('load-default-queue', function () {
+//    for ($i = 0; $i < 50000; $i++) {
+//        dispatch((new \App\Jobs\SlowTestJob())->onQueue('default'));
+//    }
+//})->middleware('local');
+
+Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
