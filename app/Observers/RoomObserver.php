@@ -9,7 +9,7 @@ class RoomObserver
 {
     public function creating(Room $room)
     {
-        if($room->type == 'audio'){
+        if ($room->type == 'audio') {
             $room->mode = 3;
         }
         $room->muted_users = '';
@@ -19,8 +19,8 @@ class RoomObserver
     {
         if (!$room->enableSaving) return;
 
-        if($room->type  == 'audio'){
-        
+        if ($room->type  == 'audio') {
+
             $this->changeMode($room);
         }
         $this->resetRoomSession($room);
@@ -29,8 +29,8 @@ class RoomObserver
     public function saving(Room $room)
     {
         if (!$room->enableSaving) return;
-        
-        if($room->type  == 'audio'){
+
+        if ($room->type  == 'audio') {
             $this->changeMode($room);
         }
         //        $this->resetRoomSession ($room);
@@ -43,8 +43,8 @@ class RoomObserver
         if ($room->isDirty('mode')) {
             $mics = explode(',', $room->all_microphone);
             $count = count($mics);
-    
-           
+
+
             if ($room->mode == '0') {
                 if ($count <= 10) {
                     $m = array_merge($mics, array_fill(0, 10 - $count, '0'));
@@ -53,7 +53,6 @@ class RoomObserver
                     $m = array_slice($mics, 0, 10);
                     $room->microphone = implode(',', $m);
                 }
-
             } elseif ($room->mode == '1') { //16 seats
                 if ($count <= 17) {
                     $m = array_merge($mics, array_fill(0, 17 - $count, '0'));
@@ -67,7 +66,6 @@ class RoomObserver
                     $m = array_slice($mics, 0, 15);
                     $room->microphone = implode(',', $m);
                 }
-
             } elseif ($room->mode == '3') { //9 seats
                 if ($count <= 10) {
                     $m = array_merge($mics, array_fill(0, 10 - $count, '0'));
@@ -92,12 +90,20 @@ class RoomObserver
                     $m = array_slice($mics, 0, 10);
                     $room->microphone = implode(',', $m);
                 }
-            } elseif ($room->mode == '6') { //21 seats
-                if ($count <= 22) {
-                    $m = array_merge($mics, array_fill(0, 22 - $count, '0'));
+            } elseif ($room->mode == '6') { //2 seats
+                if ($count <= 3) {
+                    $m = array_merge($mics, array_fill(0, 3 - $count, '0'));
                     $room->microphone = implode(',', $m);
                 } else {
-                    $m = array_slice($mics, 0, 22);
+                    $m = array_slice($mics, 0, 3);
+                    $room->microphone = implode(',', $m);
+                }
+            } elseif ($room->mode == '7') { //22 seats
+                if ($count <= 23) {
+                    $m = array_merge($mics, array_fill(0, 23 - $count, '0'));
+                    $room->microphone = implode(',', $m);
+                } else {
+                    $m = array_slice($mics, 0, 23);
                     $room->microphone = implode(',', $m);
                 }
             } elseif ($room->mode == '8') { //8 seats
@@ -106,6 +112,14 @@ class RoomObserver
                     $room->microphone = implode(',', $m);
                 } else {
                     $m = array_slice($mics, 0, 10);
+                    $room->microphone = implode(',', $m);
+                }
+            } elseif ($room->mode == '9') { //8 seats
+                if ($count <= 9) {
+                    $m = array_merge($mics, array_fill(0, 9 - $count, '0'));
+                    $room->microphone = implode(',', $m);
+                } else {
+                    $m = array_slice($mics, 0, 9);
                     $room->microphone = implode(',', $m);
                 }
             } else { // 8 seats
