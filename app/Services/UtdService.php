@@ -30,6 +30,8 @@ class UtdService
 
     public static function redirect_if_payment_success($trx)
     {
+        info(url("/api/utd-success/$trx"));
+        return "https://eagle.utdsoftware.com/api/utd-success/$trx";
         return url("/api/utd-success/$trx");
     }
 
@@ -52,6 +54,7 @@ class UtdService
 
     protected function getBodyForutd($trx, $amount, $userId): array
     {
+        info(url('/api/utd-callback'));
         return [
             'apiKey' => $this->apiKey,
             'amount' => (int)$amount,
@@ -62,7 +65,8 @@ class UtdService
             'userEmail' => $user?->email ?? '',
             'reference' => (string)$trx,
             'returnUrl' => self::redirect_if_payment_success($trx),
-            'callbackUrl' => url('/api/utd-callback'),
+            'callbackUrl' => "https://eagle.utdsoftware.com/api/utd-callback",
+//            'callbackUrl' => url('/api/utd-callback'),
         ];
     }
 
