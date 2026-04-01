@@ -109,7 +109,7 @@ class BdController extends MainController
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
-            $filter->equal('country_id', __('Country'))->select(function () {
+            $filter->equal('country_id', __('Country'))->select2(function () {
                 return \App\Models\Country::pluck('name', 'id');
             });
             $filter->equal('default', __('Default Status'))->select([
