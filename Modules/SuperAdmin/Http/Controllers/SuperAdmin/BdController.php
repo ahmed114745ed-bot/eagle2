@@ -116,6 +116,9 @@ class BdController extends MainController
                 0 => 'Inactive',
                 1 => 'Active',
             ]);
+            $filter->like('username', __('username'));
+            $filter->like('createdBy.name', __('created by'));
+            $filter->between('created_at', __('Created at'));
             $filter->between('agencies_count', __('Agencies Count'));
             $filter->between('bdSalaries_sum_salary', __('Total Profit'));
         });
