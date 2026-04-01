@@ -45,6 +45,8 @@ class UtdService
 
         $json = $response->json();
 
+        info($json);
+
         if ($response->successful() && $json['success']) {
             return $json['payUrl'];
         }
