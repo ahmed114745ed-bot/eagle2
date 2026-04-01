@@ -30,8 +30,6 @@ class UtdService
 
     public static function redirect_if_payment_success($trx)
     {
-        info(url("/api/utd-success/$trx"));
-        return "https://eagle.utdsoftware.com/api/utd-success/$trx";
         return url("/api/utd-success/$trx");
     }
 
@@ -45,8 +43,6 @@ class UtdService
 
         $json = $response->json();
 
-        info($json);
-
         if ($response->successful() && $json['success']) {
             return $json['payUrl'];
         }
@@ -56,7 +52,6 @@ class UtdService
 
     protected function getBodyForutd($trx, $amount, $userId): array
     {
-        info(url('/api/utd-callback'));
         return [
             'apiKey' => $this->apiKey,
             'amount' => (int)$amount,
@@ -67,14 +62,14 @@ class UtdService
             'userEmail' => $user?->email ?? '',
             'reference' => (string)$trx,
             'returnUrl' => self::redirect_if_payment_success($trx),
-            'callbackUrl' => "https://eagle.utdsoftware.com/api/utd-callback",
-//            'callbackUrl' => url('/api/utd-callback'),
+            'callbackUrl' => url('/api/utd-callback'),
         ];
     }
 
     public function callback(Request $request)
     {
         info($request);
+        info('callback');
         die();
         $txnId = $request->input('TxnId');
         $orderId = $request->input('OrderId');
@@ -124,6 +119,7 @@ class UtdService
     public function success($trx): JsonResponse
     {
         info($trx);
+        info('success');
         die();
         $coinLog = CoinLog::where('trx', $trx)->whereMethod('utd')->firstOrFail();
 
