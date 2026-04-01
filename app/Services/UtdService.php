@@ -60,7 +60,7 @@ class UtdService
         return [
             'apiKey' => $this->apiKey,
             'amount' => (int)$amount,
-            'currency' => 'EGP',
+            'currency' => 'USD',
             'userId' => "$userId" ?? (string)($user?->id ?? 'guest'),
             'userName' => $user?->name ?? 'Guest User',
             'userPhone' => $user?->phone ?? '',
