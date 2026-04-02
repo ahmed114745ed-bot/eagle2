@@ -83,26 +83,28 @@ class RewardSelector
         if ($betCount < $minBets500x && $multiplier > 500) return 0;
 
         if ($rtpGap > 0.15) {
-            // Significant deficit - boost ALL tiers, especially medium/high
-            $gapBoost = min(8.0, $rtpGap * 30);
+            // Significant deficit - boost tiers moderately to avoid overshooting
+            // Cap rtpGap at 0.30 to prevent extreme boosts for brand-new users
+            $cappedGap = min(0.30, $rtpGap);
+            $gapBoost = min(3.0, $cappedGap * 10);
 
             if ($multiplier >= 250) {
-                return $baseWeight * $gapBoost * 4.0;
-            } elseif ($multiplier >= 50) {
-                return $baseWeight * $gapBoost * 2.5;
-            } else {
                 return $baseWeight * $gapBoost * 1.5;
+            } elseif ($multiplier >= 50) {
+                return $baseWeight * $gapBoost * 1.2;
+            } else {
+                return $baseWeight * $gapBoost;
             }
         }
 
         if ($rtpGap > 0.05) {
             // Moderate deficit
-            $gapBoost = 1 + $rtpGap * 12;
+            $gapBoost = 1 + $rtpGap * 6;
 
             if ($multiplier >= 250) {
-                return $baseWeight * $gapBoost * 2.0;
+                return $baseWeight * $gapBoost * 1.5;
             } elseif ($multiplier >= 50) {
-                return $baseWeight * $gapBoost * 1.8;
+                return $baseWeight * $gapBoost * 1.3;
             } else {
                 return $baseWeight * $gapBoost;
             }

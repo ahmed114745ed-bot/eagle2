@@ -45,16 +45,16 @@ class FairLuckSettingsController extends AdminController
     public function saveSettings(Request $request)
     {
         $request->validate([
-            'V7_target_rtp' => 'nullable|numeric|between:0.70,0.99',
-            'V7_max_probability_cap' => 'nullable|numeric|between:0.10,0.95',
-            'V7_boost_scaling' => 'nullable|numeric|between:0.01,0.20',
-            'V7_reduce_scaling' => 'nullable|numeric|between:0.01,0.10',
-            'V7_chaos_factor_min' => 'nullable|numeric|between:0.50,1.00',
-            'V7_chaos_factor_max' => 'nullable|numeric|between:1.00,1.50',
+            'V7_target_rtp' => 'nullable|numeric|between:70,99',
+            'V7_max_probability_cap' => 'nullable|numeric|between:10,100',
+            'V7_boost_scaling' => 'nullable|numeric|between:0,100',
+            'V7_reduce_scaling' => 'nullable|numeric|between:0,100',
+            'V7_chaos_factor_min' => 'nullable|numeric|between:0,100',
+            'V7_chaos_factor_max' => 'nullable|numeric|between:0,200',
             'V7_new_player_bets' => 'nullable|integer|between:5,100',
             'V7_new_player_boost' => 'nullable|numeric|between:1.0,5.0',
             'V7_low_balance_threshold' => 'nullable|integer|between:5,50',
-            'V7_low_balance_min_prob' => 'nullable|numeric|between:0.05,0.50',
+            'V7_low_balance_min_prob' => 'nullable|numeric|between:0,100',
             'coin_to_usd_rate' => 'nullable|numeric|between:0.0001,1.0000',
             'wallet_healthy_usd' => 'nullable|numeric|min:100',
             'wallet_warning_usd' => 'nullable|numeric|min:50',
@@ -64,18 +64,18 @@ class FairLuckSettingsController extends AdminController
             'V7_wallet_moderate_max_mult' => 'nullable|integer|between:50,500',
             'V7_wallet_low_max_mult' => 'nullable|integer|between:10,100',
             'V7_wallet_critical_max_mult' => 'nullable|integer|between:5,50',
-            'V7_min_prob_when_low' => 'nullable|numeric|between:0.30,0.80',
+            'V7_min_prob_when_low' => 'nullable|numeric|between:0,100',
             'fairluck_jackpot_cooldown_bets' => 'nullable|integer|between:0,1000',
             'V7_min_bets_100x' => 'nullable|integer|between:10,100',
             'V7_min_bets_500x' => 'nullable|integer|between:50,500',
-            'V7_max_single_win_pct' => 'nullable|numeric|between:0.05,0.50',
-            'V7_wallet_dist_global' => 'nullable|numeric|between:0.30,0.80',
-            'V7_wallet_dist_jackpot' => 'nullable|numeric|between:0.10,0.40',
-            'V7_wallet_dist_medium' => 'nullable|numeric|between:0.05,0.30',
+            'V7_max_single_win_pct' => 'nullable|numeric|between:0,100',
+            'V7_wallet_dist_global' => 'nullable|numeric|between:0,100',
+            'V7_wallet_dist_jackpot' => 'nullable|numeric|between:0,100',
+            'V7_wallet_dist_medium' => 'nullable|numeric|between:0,100',
             'global_vault_negative_limit' => 'nullable|numeric',
-            'fair_luck_owner_fee_rate' => 'nullable|numeric|between:0,1',
-            'fair_luck_app_fee_rate' => 'nullable|numeric|between:0,1',
-            'fair_luck_receiver_fee_rate' => 'nullable|numeric|between:0,1',
+            'fair_luck_owner_fee_rate' => 'nullable|numeric|between:0,100',
+            'fair_luck_app_fee_rate' => 'nullable|numeric|between:0,100',
+            'fair_luck_receiver_fee_rate' => 'nullable|numeric|between:0,100',
         ]);
 
         // Handle all standard settings
@@ -113,9 +113,35 @@ class FairLuckSettingsController extends AdminController
             'fair_luck_receiver_fee_rate',
         ];
 
+        // Percentage fields that need to be converted from percentage to decimal
+        $percentageFields = [
+            'V7_target_rtp',
+            'V7_max_probability_cap',
+            'V7_boost_scaling',
+            'V7_reduce_scaling',
+            'V7_chaos_factor_min',
+            'V7_chaos_factor_max',
+            'V7_low_balance_min_prob',
+            'V7_min_prob_when_low',
+            'V7_max_single_win_pct',
+            'V7_wallet_dist_global',
+            'V7_wallet_dist_jackpot',
+            'V7_wallet_dist_medium',
+            'fair_luck_owner_fee_rate',
+            'fair_luck_app_fee_rate',
+            'fair_luck_receiver_fee_rate',
+        ];
+
         foreach ($standardKeys as $key) {
             if ($request->has($key)) {
-                FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                $value = $request->input($key);
+                
+                // Convert percentage to decimal for percentage fields
+                if (in_array($key, $percentageFields) && $value !== null && $value !== '') {
+                    $value = (float)$value / 100;
+                }
+                
+                FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
             }
         }
 
