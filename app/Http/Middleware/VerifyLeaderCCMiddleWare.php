@@ -188,10 +188,7 @@ protected function getAuthenticatedUserId($request)
         }
     }
 
-    $type = (int)$request->type;
-    $isIncrease = ($type != 1); 
-
-    if ($isIncrease && $request->has('uid')) {
+    if ( $request->has('uid')) {
         $user = User::find($request->uid);
         if ($user) {
             return $user->id;
