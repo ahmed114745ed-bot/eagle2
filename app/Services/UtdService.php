@@ -24,7 +24,8 @@ class UtdService
     public function __construct()
     {
         $this->baseUrl = config('utd.base_url');
-        $this->apiKey = config('utd.api_key');
+//        $this->apiKey = config('utd.api_key');
+        $this->apiKey = "upk_038d0c0d88895b65c048332c278354656778782a90f737bb";
         $this->projectId = config('utd.project_id');
     }
 
