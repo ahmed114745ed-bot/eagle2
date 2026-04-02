@@ -124,9 +124,9 @@ class FairLuckServiceV7
                 );
 
                 if ($multiplier > 0) {
-                    // Payout is based on unitPrice (what user actually paid), not totalAmount (net pool contribution)
-                    // This ensures 5x means user gets 5 * unitPrice, not 5 * (unitPrice - fees)
-                    $payoutAmount = (int) round($multiplier * $unitPrice);
+                    // Payout is based on betAmount (what user actually paid per unit * quantity)
+                    // This ensures 5x means user gets 5 * betAmount (e.g., 5 * 100 = 500)
+                    $payoutAmount = (int) round($multiplier * $betAmount);
 
                     // BANKRUPTCY PROTECTION: Cap payout based on pool health
                     $safePayout = $bankruptcyProtection->validateAndCapPayout($payoutAmount);
