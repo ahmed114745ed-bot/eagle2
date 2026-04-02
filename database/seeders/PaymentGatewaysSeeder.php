@@ -15,6 +15,9 @@ class PaymentGatewaysSeeder extends Seeder
      */
     public function run(): void
     {
+        // Delete all existing payment coins and their related settings
+        PaymentCoin::query()->delete();
+
         $images = [
             'fawry.jpeg',
             'paysky.png',
