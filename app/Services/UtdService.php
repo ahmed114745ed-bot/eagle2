@@ -116,9 +116,10 @@ class UtdService
         }
     }
 
-    public function success($trx): JsonResponse
+    public function success(Request $request, $trx): JsonResponse
     {
         info($trx);
+        info($request);
         info('success');
         die();
         $coinLog = CoinLog::where('trx', $trx)->whereMethod('utd')->firstOrFail();
