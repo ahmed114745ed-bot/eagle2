@@ -15,6 +15,19 @@ class PaymentGatewaysSeeder extends Seeder
      */
     public function run(): void
     {
+        // Delete any extra payment coins not defined in this seeder
+        $validTypes = [
+            'fawry', 'utd_fawry', 'utd_paymob', 'sky_pay', 'strip',
+            'opay', 'cash_free', 'apple_pay', 'paypal', 'paytabs',
+            'google_pay', 'codapay', 'utd'
+        ];
+
+        $extraCoins = PaymentCoin::whereNotIn('type', $validTypes)->get();
+        // foreach ($extraCoins as $coin) {
+        //     Setting::where('item_id', $coin->id)->where('type', 'payment')->delete();
+        // }
+        PaymentCoin::whereNotIn('type', $validTypes)->delete();
+
         $images = [
             'fawry.jpeg',
             'paysky.png',
