@@ -114,7 +114,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
 
     Route::get('utd-success/{trx}', [UtdService::class, 'success'])->name('utd.success');
-    Route::get('utd-callback', [UtdService::class, 'callback'])->name('utd.callback');
+    Route::post('utd-callback', [UtdService::class, 'callback'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);

@@ -68,59 +68,50 @@ class UtdService
 
     public function callback(Request $request)
     {
-        info($request);
-        info('callback');
-//        die();
-//        $txnId = $request->input('TxnId');
-//        $orderId = $request->input('OrderId');
-//        $totalPrice = $request->input('TotalPrice');
-//        $resultCode = $request->input('ResultCode');
-//        $checksum = $request->input('Checksum');
-//
-//        // \Log::info('Codapay Callback Received', $request->all());
-//
-//        $secretKey = config('codapay.api_key');
-//        $computedChecksum = md5($txnId . $secretKey . $orderId . $resultCode);
-//
-//        if ($checksum !== $computedChecksum) {
-//            // \Log::warning('Codapay checksum failed', [
-//            //     'expected' => $computedChecksum,
-//            //     'received' => $checksum,
-//            // ]);
-//            return response()->json(['error' => 'Invalid checksum'], 403);
-//        }
-//
-//        $coinLog = CoinLog::where('id', $orderId)->first();
-//
-//        if (!$coinLog) {
-//            return response()->json([
-//                'status' => 'ignored',
-//                'trx' => $txnId,
-//                'message' => "Failed",
-//            ]);
-//        }
-//
-//        // \Log::info('Codapay callback verified', [
-//        //     'TxnId' => $txnId,
-//        //     'OrderId' => $orderId,
-//        //     'ResultCode' => $resultCode,
-//        // ]);
-//
-//        if ($resultCode === "0") {
-//            // Log::info("✅ Codapay Payment Success", compact('orderId', 'txnId'));
-//            return $this->webhookPayment($orderId, method: 'codapay', newTrx: $txnId);
-//        } else {
-//            // Log::info("❌ Codapay Payment Failed", compact('orderId', 'txnId', 'resultCode'));
-//            $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $txnId]);
-//            return response()->json(['status' => false, 'trx' => $txnId, 'message' => 'Transaction declined.',]);
-//        }
+        Log::info('utd-callback hit', ['method' => $request->method(), 'ip' => $request->ip(), 'headers' => $request->headers->all()]);
+
+        $payload = $request->all();
+        Log::info('utd-callback payload', $payload);
+
+        $orderId   = $payload['orderId']           ?? $payload['reference']              ?? $payload['MerchantReference'] ?? $payload['OrderId'] ?? null;
+        $event     = $payload['event']             ?? null;
+        $status    = $payload['status']            ?? $payload['resultCode']             ?? $payload['TransactionStatus'] ?? null;
+        $gateway   = $payload['gateway']           ?? $payload['gatewayName']            ?? null;
+        $amount    = $payload['amount']            ?? $payload['amountEGP']              ?? null;
+        $currency  = $payload['currency']          ?? $payload['currencyCode']          ?? null;
+        $reference = $payload['reference']         ?? null;
+
+        Log::info('utd-callback parsed', compact('orderId', 'event', 'status', 'gateway', 'amount', 'currency', 'reference'));
+
+        if (!$orderId) {
+            Log::warning('utd-callback missing orderId', $payload);
+            return response()->json(['success' => false, 'message' => 'Missing orderId'], 200);
+        }
+
+        if (isset($payload['signature']) || isset($payload['Signature'])) {
+            Log::info('utd-callback signature found', ['signature' => $payload['signature'] ?? $payload['Signature']]);
+            // TODO: Implement signature verification with shared secret if available
+        }
+
+        Log::info('utd-callback processing webhookPayment', ['orderId' => $orderId, 'gateway' => $gateway]);
+
+        try {
+            $response = $this->webhookPayment($orderId, $gateway);
+            Log::info('utd-callback webhookPayment response', ['orderId' => $orderId, 'response' => optional($response)->getContent()]);
+
+            return response()->json(['success' => true, 'orderId' => $orderId, 'updated' => true], 200);
+        } catch (\Exception $ex) {
+            Log::error('utd-callback error', ['orderId' => $orderId, 'error' => $ex->getMessage()]);
+            return response()->json(['success' => false, 'message' => $ex->getMessage()], 500);
+        }
     }
 
-    public function success(Request $request, $trx): JsonResponse
+    public function success($trx): JsonResponse
     {
         info($trx);
-        info($request);
         info('success');
+        return response()->json(['status' => 'ok']);
+
 //        die();
 //        $coinLog = CoinLog::where('trx', $trx)->whereMethod('utd')->firstOrFail();
 //
