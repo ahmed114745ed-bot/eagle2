@@ -1,5 +1,5 @@
 @php
-    $luckyStatus = $config['lucky_gifts_action'] ?? 0;
+    $luckyStatus = $config['lucky_gifts_action'] ?? 1;
     $currentVersion = $config['lucky_gift_version'] ?? 1;
 @endphp
 
@@ -57,6 +57,11 @@
                                     style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 3 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
                                     <input type="radio" name="lucky_gift_version" value="3" {{ $currentVersion == 3 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
                                     <strong>{{ __('Version 3 (FairLuck V6)') }}</strong>
+                                </label>
+                                <label
+                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 4 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
+                                    <input type="radio" name="lucky_gift_version" value="4" {{ $currentVersion == 4 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
+                                    <strong>{{ __('Version 4 (FairLuck V7)') }}</strong>
                                 </label>
                             </div>
                         </form>
@@ -299,6 +304,424 @@
                         </div>
                     </div>
                 </div>
+            @elseif($currentVersion == 4)
+                {{-- Version 4 Content (FairLuck V7 - User-First Overhaul) --}}
+                @php $settings = $fairLuckSettings; @endphp
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ __('FairLuck V7 Settings (User-First)') }} / {{ __('إعدادات FairLuck V7 (تركيز على المستخدم)') }}</h3>
+                        <span class="label label-success pull-right">92% RTP Default</span>
+                    </div>
+                    <form action="{{ route('admin.lucky-gift.version.update') }}" method="post" class="form-horizontal">
+                        @csrf
+
+                        {{-- Section 1: Core RTP Settings --}}
+                        <div class="box-header with-border bg-light-blue" style="margin-top: 15px;">
+                            <h4 class="box-title">{{ __('Core RTP Settings') }} / {{ __('إعدادات RTP الأساسية') }}</h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Target RTP') }} / {{ __('RTP المستهدف') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.70" max="0.99" name="V7_target_rtp" class="form-control"
+                                            value="{{ $settings['V7_target_rtp'] ?? 0.92 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">{{ __('Range: 70-99%. Default: 92%') }} / {{ __('النطاق: 70-99%. الافتراضي: 92%') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Max Win Probability') }} / {{ __('أقصى احتمالية فوز') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.10" max="0.95" name="V7_max_probability_cap" class="form-control"
+                                            value="{{ $settings['V7_max_probability_cap'] ?? 0.50 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">{{ __('Hard cap. Default: 50%') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Boost Scaling Factor') }} / {{ __('معامل زيادة الاحتمالية') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.01" min="0.01" max="0.20" name="V7_boost_scaling" class="form-control"
+                                        value="{{ $settings['V7_boost_scaling'] ?? 0.05 }}">
+                                    <span class="help-block">{{ __('Default: 0.05') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Reduce Scaling Factor') }} / {{ __('معامل تقليل الاحتمالية') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.01" min="0.01" max="0.10" name="V7_reduce_scaling" class="form-control"
+                                        value="{{ $settings['V7_reduce_scaling'] ?? 0.02 }}">
+                                    <span class="help-block">{{ __('Default: 0.02') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Chaos Factor Min') }} / {{ __('أدنى معامل عشوائية') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.01" min="0.50" max="1.00" name="V7_chaos_factor_min" class="form-control"
+                                        value="{{ $settings['V7_chaos_factor_min'] ?? 0.90 }}">
+                                    <span class="help-block">{{ __('Default: 0.90') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Chaos Factor Max') }} / {{ __('أقصى معامل عشوائية') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.01" min="1.00" max="1.50" name="V7_chaos_factor_max" class="form-control"
+                                        value="{{ $settings['V7_chaos_factor_max'] ?? 1.10 }}">
+                                    <span class="help-block">{{ __('Default: 1.10') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section 2: Multiplier Weights --}}
+                        <div class="box-header with-border bg-light-blue">
+                            <h4 class="box-title">{{ __('Multiplier Weights') }} / {{ __('أوزان المضاعفات') }}</h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="alert alert-info">
+                                {{ __('Higher weight = more frequent wins. Flattened distribution means big wins happen as often as small wins.') }}
+                            </div>
+
+                            <div class="row">
+                                @php
+                                    $multipliers = [5, 10, 20, 50, 70, 100, 250, 500, 1000];
+                                    $defaultWeights = [500, 500, 500, 500, 500, 500, 400, 300, 200];
+                                    $storedWeights = $settings['V7_multiplier_weights'] ?? [];
+                                    if (is_string($storedWeights)) {
+                                        $storedWeights = json_decode($storedWeights, true) ?? [];
+                                    }
+                                @endphp
+                                @foreach($multipliers as $index => $m)
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{{ $m }}x</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" min="1" max="5000" name="V7_multiplier_weights[{{ $m }}]" class="form-control weight-input"
+                                                data-multiplier="{{ $m }}"
+                                                value="{{ $storedWeights[$m] ?? $defaultWeights[$index] }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+
+                           
+                        </div>
+
+                        {{-- Section 3: New Player Settings --}}
+                        <div class="box-header with-border bg-light-blue">
+                            <h4 class="box-title">{{ __('New Player Settings') }} / {{ __('إعدادات اللاعب الجديد') }}</h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('New Player Boost Bets') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="5" max="100" name="V7_new_player_bets" class="form-control"
+                                        value="{{ $settings['V7_new_player_bets'] ?? 20 }}">
+                                    <span class="help-block">{{ __('Default: 20') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('New Player Boost Multiplier') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.1" min="1.0" max="5.0" name="V7_new_player_boost" class="form-control"
+                                        value="{{ $settings['V7_new_player_boost'] ?? 3.0 }}">
+                                    <span class="help-block">{{ __('Default: 3.0x') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Low Balance Threshold') }} / {{ __('حد الرصيد المنخفض') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="5" max="50" name="V7_low_balance_threshold" class="form-control"
+                                        value="{{ $settings['V7_low_balance_threshold'] ?? 15 }}">
+                                    <span class="help-block">{{ __('If user balance / bet < this, boost probability. Default: 15') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Low Balance Min Probability') }} / {{ __('أدنى احتمالية عند رصيد منخفض') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.05" max="0.50" name="V7_low_balance_min_prob" class="form-control"
+                                            value="{{ $settings['V7_low_balance_min_prob'] ?? 0.18 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">{{ __('Min win probability for low balance users. Default: 18%') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section 4: Wallet Protection (USD) --}}
+                        <div class="box-header with-border bg-light-blue">
+                            <h4 class="box-title">{{ __('Wallet Protection (USD)') }} / {{ __('حماية المحفظة (بالدولار)') }}</h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="alert alert-warning">
+                                <strong>{{ __('Important') }}:</strong> {{ __('All thresholds are now in USD. Set the Coin-to-USD rate below.') }}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Coin to USD Rate') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.0001" min="0.0001" max="1.0000" name="coin_to_usd_rate" class="form-control"
+                                        value="{{ $settings['coin_to_usd_rate'] ?? 0.01 }}">
+                                    <span class="help-block">{{ __('Example: 0.01 = 1 coin = $0.01 USD') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Healthy Wallet (USD)') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">$</span>
+                                        <input type="number" step="100" min="100" name="wallet_healthy_usd" class="form-control"
+                                            value="{{ $settings['wallet_healthy_usd'] ?? 1000 }}">
+                                    </div>
+                                    <span class="help-block">{{ __('Default: $1,000') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Warning Wallet (USD)') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">$</span>
+                                        <input type="number" step="100" min="50" name="wallet_warning_usd" class="form-control"
+                                            value="{{ $settings['wallet_warning_usd'] ?? 500 }}">
+                                    </div>
+                                    <span class="help-block">{{ __('Default: $500') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Critical Wallet (USD)') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">$</span>
+                                        <input type="number" step="100" min="0" name="wallet_critical_usd" class="form-control"
+                                            value="{{ $settings['wallet_critical_usd'] ?? 200 }}">
+                                    </div>
+                                    <span class="help-block">{{ __('Default: $200') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Max Negative Wallet (USD)') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <span class="input-group-addon">$</span>
+                                        <input type="number" step="100" min="0" name="wallet_max_negative_usd" class="form-control"
+                                            value="{{ $settings['wallet_max_negative_usd'] ?? 300 }}">
+                                    </div>
+                                    <span class="help-block">{{ __('Credit line. Default: $300') }}</span>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Wallet Healthy Max Multiplier') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="100" max="1000" name="V7_wallet_healthy_max_mult" class="form-control"
+                                        value="{{ $settings['V7_wallet_healthy_max_mult'] ?? 1000 }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Wallet Moderate Max Mult') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="50" max="500" name="V7_wallet_moderate_max_mult" class="form-control"
+                                        value="{{ $settings['V7_wallet_moderate_max_mult'] ?? 100 }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Wallet Low Max Mult') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="10" max="100" name="V7_wallet_low_max_mult" class="form-control"
+                                        value="{{ $settings['V7_wallet_low_max_mult'] ?? 50 }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Wallet Critical Max Mult') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="5" max="50" name="V7_wallet_critical_max_mult" class="form-control"
+                                        value="{{ $settings['V7_wallet_critical_max_mult'] ?? 20 }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Min Probability When Low') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.30" max="0.80" name="V7_min_prob_when_low" class="form-control"
+                                            value="{{ $settings['V7_min_prob_when_low'] ?? 0.60 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">{{ __('Default: 60% (never below this)') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section 5: Cooldown & Safety --}}
+                        <div class="box-header with-border bg-light-blue">
+                            <h4 class="box-title">{{ __('Cooldown & Safety') }} / {{ __('فترة الانتظار والسلامة') }}</h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="alert alert-info">
+                                {{ __('Cooldown is DISABLED by default (0 = disabled). Users can win big back-to-back.') }}
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Jackpot Cooldown (bets)') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="0" max="1000" name="fairluck_jackpot_cooldown_bets" class="form-control"
+                                        value="{{ $settings['fairluck_jackpot_cooldown_bets'] ?? 0 }}">
+                                    <span class="help-block">{{ __('0 = Disabled. Default: 0') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Min Bets for 100x+') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="10" max="100" name="V7_min_bets_100x" class="form-control"
+                                        value="{{ $settings['V7_min_bets_100x'] ?? 30 }}">
+                                    <span class="help-block">{{ __('Default: 30') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Min Bets for 500x+') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" min="50" max="500" name="V7_min_bets_500x" class="form-control"
+                                        value="{{ $settings['V7_min_bets_500x'] ?? 100 }}">
+                                    <span class="help-block">{{ __('Default: 100') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Max Single Win (% of wallet)') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.05" max="0.50" name="V7_max_single_win_pct" class="form-control"
+                                            value="{{ $settings['V7_max_single_win_pct'] ?? 0.15 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">{{ __('Range: 5-50%. Default: 15%') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section 6: Wallet Distribution --}}
+                        <div class="box-header with-border bg-light-blue">
+                            <h4 class="box-title">{{ __('Wallet Distribution') }} / {{ __('توزيع المحفظة') }}</h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Global Vault %') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.30" max="0.80" name="V7_wallet_dist_global" class="form-control"
+                                            value="{{ $settings['V7_wallet_dist_global'] ?? 0.65 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Jackpot Wallet %') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.10" max="0.40" name="V7_wallet_dist_jackpot" class="form-control"
+                                            value="{{ $settings['V7_wallet_dist_jackpot'] ?? 0.20 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Medium Wallet %') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0.05" max="0.30" name="V7_wallet_dist_medium" class="form-control"
+                                            value="{{ $settings['V7_wallet_dist_medium'] ?? 0.15 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Section 7: Fee Settings --}}
+                        <div class="box-header with-border bg-light-blue">
+                            <h4 class="box-title">{{ __('Fee Settings') }} / {{ __('إعدادات الرسوم') }}</h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('App Fee Rate') }} / {{ __('نسبة رسوم التطبيق') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.01" min="0" max="1" name="fair_luck_app_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0.10' }}">
+                                    <span class="help-block">{{ __('0.10 = 10%') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate') }} / {{ __('نسبة رسوم المستلم') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.01" min="0" max="1" name="fair_luck_receiver_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0.10' }}">
+                                    <span class="help-block">{{ __('0.10 = 10%') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate') }} / {{ __('نسبة رسوم المالك') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" step="0.01" min="0" max="1" name="fair_luck_owner_fee_rate" class="form-control"
+                                        value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0.10' }}">
+                                    <span class="help-block">{{ __('0.10 = 10%') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit (coins - legacy)') }}</label>
+                                <div class="col-sm-4">
+                                    <input type="number" name="global_vault_negative_limit" class="form-control"
+                                        value="{{ $settings['global_vault_negative_limit'] ?? 30000 }}">
+                                    <span class="help-block">{{ __('Only used if USD rate not set') }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-success btn-lg pull-right">{{ __('Save All V7 Settings') }} / {{ __('حفظ جميع إعدادات V7') }}</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">{{ __('Global Vault Balance History') }} / {{ __('سجل رصيد الخزينة العام') }}</h3>
+                            </div>
+                            <div class="box-body">
+                                <canvas id="vaultChartV7" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
         </div>
 
@@ -335,6 +758,85 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(function () {
+            // Live Preview Bar Chart for Multiplier Weights (V7 only)
+            @if($currentVersion == 4)
+            var weightChart = null;
+            function updateWeightChart() {
+                var labels = [];
+                var data = [];
+                var totalWeight = 0;
+                var colors = [
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(231, 76, 60, 0.8)',
+                    'rgba(142, 68, 173, 0.8)',
+                    'rgba(39, 174, 96, 0.8)'
+                ];
+
+                $('.weight-input').each(function() {
+                    var val = parseInt($(this).val()) || 0;
+                    totalWeight += val;
+                });
+
+                $('.weight-input').each(function() {
+                    var mult = $(this).data('multiplier');
+                    var val = parseInt($(this).val()) || 0;
+                    var pct = totalWeight > 0 ? ((val / totalWeight) * 100).toFixed(1) : 0;
+                    labels.push(mult + 'x (' + pct + '%)');
+                    data.push(val);
+                });
+
+                var canvas = document.getElementById('weightPreviewChart');
+                if (!canvas) return;
+
+                if (weightChart) {
+                    weightChart.destroy();
+                }
+
+                weightChart = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Weight',
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: colors.map(function(c) { return c.replace('0.8', '1'); }),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        var total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                        var pct = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+                                        return 'Weight: ' + context.raw + ' (' + pct + '%)';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Weight' } }
+                        }
+                    }
+                });
+            }
+
+            // Initialize chart and update on input change
+            updateWeightChart();
+            $(document).on('input change', '.weight-input', function() {
+                updateWeightChart();
+            });
+            @endif
+
             var historyData = {!! json_encode($history->map(function ($h) {
             return [
                 'date' => $h->created_at ? $h->created_at->format('m-d H:i:s') : '',
@@ -348,7 +850,7 @@
             var labels = historyData.map(function (d) { return d.date; });
             var dataPoints = historyData.map(function (d) { return d.after; });
 
-            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : 'vaultChart' }}';
+            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : ($currentVersion == 4 ? 'vaultChartV7' : 'vaultChart') }}';
             var ctx = document.getElementById(chartId).getContext('2d');
             var chart = new Chart(ctx, {
                 type: 'line',

@@ -44,9 +44,10 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $receiverFeeRate =null;
         if ($luckyStatus == 1) {
             $version = Common::getSettingValue('lucky_gift_version');
-           if (in_array($version, [2, 3])) {
+           if (in_array($version, [2, 3, 4])) {
                 $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
             }
+            
            $hostPercentage  = $receiverFeeRate ?? getGiftPercentage('host_lucky_gift')  / 10;
         }else {
             $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;

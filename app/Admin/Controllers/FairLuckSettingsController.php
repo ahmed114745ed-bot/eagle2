@@ -26,7 +26,6 @@ class FairLuckSettingsController extends AdminController
             ->get()->reverse()->values();
 
 
-
         $transactions = FairLuckTransaction::with(['user', 'gift'])
             ->orderBy('created_at', 'desc')
             ->limit(50)
@@ -46,21 +45,91 @@ class FairLuckSettingsController extends AdminController
     public function saveSettings(Request $request)
     {
         $request->validate([
-            'global_vault_negative_limit' => 'required|numeric',
-            'fair_luck_app_fee_rate' => 'required|numeric|between:0,1',
-            'fair_luck_receiver_fee_rate' => 'required|numeric|between:0,1',
-            'fair_luck_owner_fee_rate' => 'required|numeric|between:0,1',
+            'V7_target_rtp' => 'nullable|numeric|between:0.70,0.99',
+            'V7_max_probability_cap' => 'nullable|numeric|between:0.10,0.95',
+            'V7_boost_scaling' => 'nullable|numeric|between:0.01,0.20',
+            'V7_reduce_scaling' => 'nullable|numeric|between:0.01,0.10',
+            'V7_chaos_factor_min' => 'nullable|numeric|between:0.50,1.00',
+            'V7_chaos_factor_max' => 'nullable|numeric|between:1.00,1.50',
+            'V7_new_player_bets' => 'nullable|integer|between:5,100',
+            'V7_new_player_boost' => 'nullable|numeric|between:1.0,5.0',
+            'V7_low_balance_threshold' => 'nullable|integer|between:5,50',
+            'V7_low_balance_min_prob' => 'nullable|numeric|between:0.05,0.50',
+            'coin_to_usd_rate' => 'nullable|numeric|between:0.0001,1.0000',
+            'wallet_healthy_usd' => 'nullable|numeric|min:100',
+            'wallet_warning_usd' => 'nullable|numeric|min:50',
+            'wallet_critical_usd' => 'nullable|numeric|min:0',
+            'wallet_max_negative_usd' => 'nullable|numeric|min:0',
+            'V7_wallet_healthy_max_mult' => 'nullable|integer|between:100,1000',
+            'V7_wallet_moderate_max_mult' => 'nullable|integer|between:50,500',
+            'V7_wallet_low_max_mult' => 'nullable|integer|between:10,100',
+            'V7_wallet_critical_max_mult' => 'nullable|integer|between:5,50',
+            'V7_min_prob_when_low' => 'nullable|numeric|between:0.30,0.80',
+            'fairluck_jackpot_cooldown_bets' => 'nullable|integer|between:0,1000',
+            'V7_min_bets_100x' => 'nullable|integer|between:10,100',
+            'V7_min_bets_500x' => 'nullable|integer|between:50,500',
+            'V7_max_single_win_pct' => 'nullable|numeric|between:0.05,0.50',
+            'V7_wallet_dist_global' => 'nullable|numeric|between:0.30,0.80',
+            'V7_wallet_dist_jackpot' => 'nullable|numeric|between:0.10,0.40',
+            'V7_wallet_dist_medium' => 'nullable|numeric|between:0.05,0.30',
+            'global_vault_negative_limit' => 'nullable|numeric',
+            'fair_luck_owner_fee_rate' => 'nullable|numeric|between:0,1',
+            'fair_luck_app_fee_rate' => 'nullable|numeric|between:0,1',
+            'fair_luck_receiver_fee_rate' => 'nullable|numeric|between:0,1',
         ]);
-        $data = $request->only([
+
+        // Handle all standard settings
+        $standardKeys = [
+            'V7_target_rtp',
+            'V7_max_probability_cap',
+            'V7_boost_scaling',
+            'V7_reduce_scaling',
+            'V7_chaos_factor_min',
+            'V7_chaos_factor_max',
+            'V7_new_player_bets',
+            'V7_new_player_boost',
+            'V7_low_balance_threshold',
+            'V7_low_balance_min_prob',
+            'coin_to_usd_rate',
+            'wallet_healthy_usd',
+            'wallet_warning_usd',
+            'wallet_critical_usd',
+            'wallet_max_negative_usd',
+            'V7_wallet_healthy_max_mult',
+            'V7_wallet_moderate_max_mult',
+            'V7_wallet_low_max_mult',
+            'V7_wallet_critical_max_mult',
+            'V7_min_prob_when_low',
+            'fairluck_jackpot_cooldown_bets',
+            'V7_min_bets_100x',
+            'V7_min_bets_500x',
+            'V7_max_single_win_pct',
+            'V7_wallet_dist_global',
+            'V7_wallet_dist_jackpot',
+            'V7_wallet_dist_medium',
             'global_vault_negative_limit',
+            'fair_luck_owner_fee_rate',
             'fair_luck_app_fee_rate',
             'fair_luck_receiver_fee_rate',
-            'fair_luck_owner_fee_rate'
-        ]);
-        
-        foreach ($data as $key => $value) {
-            FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+        ];
+
+        foreach ($standardKeys as $key) {
+            if ($request->has($key)) {
+                FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+            }
         }
+
+        // Handle multiplier weights (array)
+        if ($request->has('V7_multiplier_weights')) {
+            $weights = $request->input('V7_multiplier_weights');
+            FairLuckSetting::updateOrCreate(
+                ['key' => 'V7_multiplier_weights'],
+                ['value' => json_encode($weights)]
+            );
+        }
+
+        // Clear the cache so changes take effect immediately
+        \Illuminate\Support\Facades\Cache::forget('fair_luck:settings');
 
         admin_success(__('Updated'), __('Settings updated successfully.'));
         return back();
