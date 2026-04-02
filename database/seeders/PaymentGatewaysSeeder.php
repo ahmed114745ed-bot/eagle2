@@ -76,9 +76,9 @@ class PaymentGatewaysSeeder extends Seeder
                 ->orderBy('id')
                 ->get();
 
-            $settings->each(function ($setting) {
+            // $settings->each(function ($setting) {
                 $setting->delete();
-            });
+            // });
         }
 
         $fawry_id = PaymentCoin::updateOrCreate([
@@ -122,7 +122,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($fawry_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $fawry_id->id,
                 'type' => 'payment'
@@ -173,7 +173,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($utd_fawry_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $utd_fawry_id->id,
                 'type' => 'payment'
@@ -219,7 +219,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($utd_paymob_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $utd_paymob_id->id,
                 'type' => 'payment'
@@ -270,7 +270,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($pay_sky_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $pay_sky_id->id,
                 'type' => 'payment'
@@ -328,7 +328,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($strip_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $strip_id->id,
                 'type' => 'payment'
@@ -390,7 +390,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($opay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $opay_id->id,
                 'type' => 'payment'
@@ -442,7 +442,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($cashfree_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $cashfree_id->id,
                 'type' => 'payment'
@@ -499,7 +499,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($applepay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $applepay_id->id,
                 'type' => 'payment'
@@ -649,7 +649,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($paypal_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $paypal_id->id,
                 'type' => 'payment'
@@ -755,7 +755,7 @@ class PaymentGatewaysSeeder extends Seeder
 
 
         foreach ($paytabs_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $paytabs_id->id,
                 'type' => 'payment'
@@ -1164,7 +1164,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($google_pay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $google_pay_id->id,
                 'type' => 'payment'
@@ -1210,7 +1210,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($codapay_fields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $codapay_id->id,
                 'type' => 'payment'
@@ -1326,7 +1326,7 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         foreach ($utdFields as $key => $value) {
-            Setting::updateOrCreate([
+            Setting::firstOrCreate([
                 'key' => $value['name'],
                 'item_id' => $utdId->id,
                 'type' => 'payment'

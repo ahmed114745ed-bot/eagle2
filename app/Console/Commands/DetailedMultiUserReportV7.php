@@ -172,8 +172,13 @@ class DetailedMultiUserReportV7 extends Command
                     );
                     
                     $userBalanceBefore = $userData['user']->di;
-                    $actualProfit = $result->isWinner ? $result->profitAmount : -$betAmount;
-                    $newBalance = $userBalanceBefore + $actualProfit;
+                    // FIX: On win, deduct bet AND add payout. On loss, deduct bet only.
+                    // profitAmount from service = payout (multiplier * betAmount), e.g. 5x * 100 = 500
+                    if ($result->isWinner && $result->profitAmount > 0) {
+                        $newBalance = $userBalanceBefore - $betAmount + $result->profitAmount;
+                    } else {
+                        $newBalance = $userBalanceBefore - $betAmount;
+                    }
                     
                     // تحديث قاعدة البيانات
                     $userData['user']->di = $newBalance;
@@ -188,7 +193,7 @@ class DetailedMultiUserReportV7 extends Command
                     $userData['attempts']++;
                     $userData['total_bet'] += $betAmount;
                     
-                    if ($result->isWinner) {
+                    if ($result->isWinner && $result->profitAmount > 0) {
                         $userData['wins']++;
                         $userData['total_win'] += $result->profitAmount;
                         if ($result->multiplier > $userData['max_multiplier']) {
