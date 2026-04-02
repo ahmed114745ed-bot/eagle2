@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\Common;
 use App\Models\PaymentCoin;
 use App\Models\Setting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Storage;
+use Illuminate\Http\UploadedFile;
 
 class PaymentGatewaysSeeder extends Seeder
 {
@@ -23,45 +24,11 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         $extraCoins = PaymentCoin::whereNotIn('type', $validTypes)->get();
-        // foreach ($extraCoins as $coin) {
-        //     Setting::where('item_id', $coin->id)->where('type', 'payment')->delete();
-        // }
+        foreach ($extraCoins as $coin) {
+            Setting::where('item_id', $coin->id)->where('type', 'payment')->delete();
+        }
         PaymentCoin::whereNotIn('type', $validTypes)->delete();
 
-        $images = [
-            'fawry.jpeg',
-            'paysky.png',
-            'stripe.png',
-            'opay.png',
-            'cashfree.jpg',
-            'applepay.png',
-//            'mada.png',
-//            'liqpay.png',
-            'paypal.png',
-//            'paytm.png',
-            'paytabs.webp',
-//            'bkash.png',
-//            'razorpay.webp',
-//            'senangpay.png',
-//            'paymob.png',
-//            'flutterwave.jpg',
-//            'paystack.png',
-//            'sslcommerz.png',
-            'googlepay.png',
-//            'huaweipay.png',
-//            'zinipay.jpg',
-            'codapay.webp',
-            'utd.webp',
-        ];
-
-        foreach ($images as $img) {
-            $localPath = public_path('images/' . $img);
-            $gcsPath = 'images/' . $img;
-
-            if (file_exists($localPath)) {
-                Storage::disk('gcs')->put($gcsPath, file_get_contents($localPath), 'public');
-            }
-        }
 
         $duplicates = Setting::select('key')//, 'item_id', 'type')
             ->groupBy('key')//, 'item_id', 'type')
@@ -76,9 +43,9 @@ class PaymentGatewaysSeeder extends Seeder
                 ->orderBy('id')
                 ->get();
 
-            // $settings->each(function ($setting) {
+             $settings->each(function ($setting) {
                 $setting->delete();
-            // });
+             });
         }
 
         $fawry_id = PaymentCoin::updateOrCreate([
@@ -86,7 +53,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'fawry',
-            'photo' => 'images/fawry.jpeg',
+            'photo' => $this->uploadPaymentImage('fawry.jpeg'),
             'status' => 1,
             'description' => 'Fawry payment method'
 
@@ -137,7 +104,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'utdFawry',
-            'photo' => 'images/fawry.jpeg',
+            'photo' => $this->uploadPaymentImage('fawry.jpeg'),
             'status' => 1,
             'description' => 'Utd Fawry payment method'
 
@@ -188,7 +155,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'utdPaymob',
-            'photo' => 'images/paymob.png',
+            'photo' => $this->uploadPaymentImage('paymob.png'),
             'status' => 1,
             'description' => 'Utd Paymob payment method'
 
@@ -234,7 +201,7 @@ class PaymentGatewaysSeeder extends Seeder
              'package_type' => 'user',
         ], [
              'title' => 'skyPay',
-             'photo' => 'images/paysky.png',
+             'photo' => $this->uploadPaymentImage('paysky.png'),
              'status' => 1,
             'description' => 'skyPay  payment method'
 
@@ -286,7 +253,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'strip',
-            'photo' => 'images/stripe.png',
+            'photo' => $this->uploadPaymentImage('stripe.png'),
             'status' => 1,
             'description' => 'strip  payment method'
 
@@ -343,7 +310,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'opay',
-            'photo' => 'images/opay.png',
+            'photo' => $this->uploadPaymentImage('opay.png'),
             'status' => 1,
             'description' => 'opay  payment method'
 
@@ -405,7 +372,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'cashfree',
-            'photo' => 'images/cashfree.jpg',
+            'photo' => $this->uploadPaymentImage('cashfree.jpg'),
             'status' => 1,
             'description' => 'cashfree  payment method'
 
@@ -457,7 +424,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'applepay',
-            'photo' => 'images/applepay.png',
+            'photo' => $this->uploadPaymentImage('applepay.png'),
             'status' => 1,
             'description' => 'applepay  payment method'
 
@@ -606,7 +573,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'paypal',
-            'photo' => 'images/paypal.png',
+            'photo' => $this->uploadPaymentImage('paypal.png'),
             'status' => 1,
             'description' => 'paypal  payment method'
 
@@ -718,7 +685,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'paytabs',
-            'photo' => 'images/paytabs.webp',
+            'photo' => $this->uploadPaymentImage('paytabs.webp'),
             'status' => 1,
             'description' => 'paytabs  payment method'
 
@@ -1139,7 +1106,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'google_pay',
-            'photo' => 'images/googlepay.png',
+            'photo' => $this->uploadPaymentImage('googlepay.png'),
             'status' => 1,
             'description' => 'google pay  payment method'
 
@@ -1180,7 +1147,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'codapay',
-            'photo' => 'images/codapay.webp',
+            'photo' => $this->uploadPaymentImage('codapay.webp'),
             'status' => 1,
             'description' => 'codapay pay  payment method'
 
@@ -1296,7 +1263,7 @@ class PaymentGatewaysSeeder extends Seeder
             'package_type' => 'user',
         ], [
             'title' => 'utd',
-            'photo' => 'images/utd.webp',
+            'photo' => $this->uploadPaymentImage('utd.webp'),
             'status' => 1,
             'description' => 'utd pay payment method'
 
@@ -1335,5 +1302,28 @@ class PaymentGatewaysSeeder extends Seeder
                 'input_type' => $value['type']
             ]);
         }
+    }
+
+    /**
+     * Upload payment image to storage using Common::upload
+     */
+    private function uploadPaymentImage(string $fileName): string
+    {
+        $fullPath = public_path('images/' . $fileName);
+
+        if (!file_exists($fullPath)) {
+            $this->command?->warn("Image not found: {$fileName}");
+            return 'images/' . $fileName;
+        }
+
+        $file = new UploadedFile(
+            $fullPath,
+            $fileName,
+            mime_content_type($fullPath),
+            null,
+            true
+        );
+
+        return Common::upload('images', $file);
     }
 }
