@@ -122,6 +122,8 @@ class UtdService
         info($trx);
         info($request);
         info('success');
+        return response()->json(['status' => 'ok']);
+
 //        die();
 //        $coinLog = CoinLog::where('trx', $trx)->whereMethod('utd')->firstOrFail();
 //
