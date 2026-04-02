@@ -74,13 +74,15 @@ class UtdService
         $payload = $request->all();
         Log::info('utd-callback payload', $payload);
 
-        $orderId   = $payload['orderId']           ?? $payload['reference']              ?? $payload['MerchantReference'] ?? $payload['OrderId'] ?? null;
-        $event     = $payload['event']             ?? null;
-        $status    = $payload['status']            ?? $payload['resultCode']             ?? $payload['TransactionStatus'] ?? null;
-        $gateway   = $payload['gateway']           ?? $payload['gatewayName']            ?? null;
-        $amount    = $payload['amount']            ?? $payload['amountEGP']              ?? null;
-        $currency  = $payload['currency']          ?? $payload['currencyCode']          ?? null;
-        $reference = $payload['reference']         ?? null;
+        $orderId = $payload['reference'] ?? $payload['orderId'] ?? null;
+
+//        $orderId = $payload['orderId'] ?? $payload['reference'] ?? $payload['MerchantReference'] ?? $payload['OrderId'] ?? null;
+        $event = $payload['event'] ?? null;
+        $status = $payload['status'] ?? $payload['resultCode'] ?? $payload['TransactionStatus'] ?? null;
+        $gateway = $payload['gateway'] ?? $payload['gatewayName'] ?? null;
+        $amount = $payload['amount'] ?? $payload['amountEGP'] ?? null;
+        $currency = $payload['currency'] ?? $payload['currencyCode'] ?? null;
+        $reference = $payload['reference'] ?? null;
 
         Log::info('utd-callback parsed', compact('orderId', 'event', 'status', 'gateway', 'amount', 'currency', 'reference'));
 
