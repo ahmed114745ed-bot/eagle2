@@ -2296,52 +2296,16 @@ Route::get('/fix-charges-usd', function () {
 
 
 
-Route::get('remove-bd-rewards', function () {
 
-    $milestone = Milestone::where('slug', 'bd')->first();
-    $users = \App\Models\User::where('is_bd', 1)->get();
-
-    if (!request()->has('confirm')) {
-        $count = 0;
-        foreach ($users as $user) {
-            $dashAccount = Admin::where('app_id', $user->id)->where('type', 'bd')->first();
-            if (!$dashAccount) {
-                $count++;
-            }
-        }
-        return response()->json([
-            'message' => 'عدد المستخدمين اللي عندهم مشكلة',
-            'count'   => $count,
-            'hint'    => 'أضف ?confirm=yes في اللينك عشان تبدأ التصحيح',
-        ]);
-    }
-
-    $fixed = 0;
-    foreach ($users as $user) {
-        $dashAccount = Admin::where('app_id', $user->id)->where('type', 'bd')->first();
-
-        if (!$dashAccount) {
-            $user->is_bd = 0;
-            $user->save();
-
-            if ($milestone) {
-                MilestoneReward::where('milestone_id', $milestone->id)
-                    ->where('rewardable_id', $user->id)
-                    ->delete();
-            }
-            $fixed++;
-        }
-    }
-
-    return response()->json([
-        'message' => 'تم التصحيح بنجاح',
-        'fixed'   => $fixed,
-    ]);
-
-});
 
 //Route::get('load-default-queue', function () {
 //    for ($i = 0; $i < 50000; $i++) {
 //        dispatch((new \App\Jobs\SlowTestJob())->onQueue('default'));
 //    }
 //})->middleware('local');
+
+Route::get('test-done', function () {
+   return 14;
+});
+
+Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');

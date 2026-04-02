@@ -27,6 +27,21 @@ class AreaManager extends Authenticatable
 
     protected $dates = ['deleted_at'];
 
+    protected $fillable = [
+        'username',
+        'name',
+        'password',
+        'type',
+        'default',
+        'app_id',
+        'country_id',
+        'parent_id',
+        'avatar',
+        'phone',
+        'email',
+        'created_by',
+    ];
+
 
     protected static function booted(): void
     {
@@ -45,7 +60,9 @@ class AreaManager extends Authenticatable
         static::deleting(function ($manager) {
 
             if ($manager->default == 1) {
-                throw new Exception(__('can not delete default area admin'));
+             
+                    throw new Exception(__('can not delete default area admin'));
+                
             }
             $defaultManager = self::where('default', 1)->first();
 

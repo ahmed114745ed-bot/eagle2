@@ -102,19 +102,24 @@ class Bd extends Model
 
                         $countryName = $country->e_name;
 
-                        $newBdId = DB::table('admin_users')->insertGetId([
-                            'parent_id'  => $superAdmin->id,
-                            'username'   => 'bd' . $countryName . 'default',
-                            'name'       => 'bd' . $countryName . 'default',
-                            'password'   => Hash::make('bd' . $countryName . 'default'),
-                            'default'    => 1,
-                            'country_id' => $superAdmin->country_id,
-                            'type'       => 'bd',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
+                        $existingDefaultBd = self::where('default', 1)->where('country_id', $superAdmin->country_id)->first();
+                        if ($existingDefaultBd) {
+                            $defaultBd = $existingDefaultBd;
+                        } else {
+                            $newBdId = DB::table('admin_users')->insertGetId([
+                                'parent_id'  => $superAdmin->id,
+                                'username'   => 'bd' . $countryName . 'default',
+                                'name'       => 'bd' . $countryName . 'default',
+                                'password'   => Hash::make('bd' . $countryName . 'default'),
+                                'default'    => 1,
+                                'country_id' => $superAdmin->country_id,
+                                'type'       => 'bd',
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ]);
 
-                        $defaultBd = self::find($newBdId);
+                            $defaultBd = self::find($newBdId);
+                        }
                     }
                 }
 

@@ -13,6 +13,11 @@ class AreaManagerSeeder extends Seeder
 {
     public function run(): void
     {
+
+     if (AreaManager::where('default', 1)->exists()) {
+        $this->command->info('المدير الإفتراضي موجود بالفعل، سيتم تخطي الأمر.');
+        return;
+        }
         $manager = AreaManager::create([
             'username' => 'default-area-manager',
             'name' => 'Default Area Manager',
