@@ -110,11 +110,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
     Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
 
-    Route::post('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
+    Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
     Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
 
     Route::get('utd-success/{trx}', [UtdService::class, 'success'])->name('utd.success');
-    Route::get('utd-callback', [UtdService::class, 'callback'])->name('utd.callback');
+    Route::post('utd-callback', [UtdService::class, 'callback'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);

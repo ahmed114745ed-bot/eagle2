@@ -117,10 +117,9 @@ class UtdService
         return response()->json(['status' => 'ok']);
     }
 
-    public function success(Request $request, $trx): JsonResponse
+    public function success($trx): JsonResponse
     {
         info($trx);
-        info($request);
         info('success');
         return response()->json(['status' => 'ok']);
 
