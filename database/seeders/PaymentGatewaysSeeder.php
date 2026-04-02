@@ -23,9 +23,9 @@ class PaymentGatewaysSeeder extends Seeder
         ];
 
         $extraCoins = PaymentCoin::whereNotIn('type', $validTypes)->get();
-        foreach ($extraCoins as $coin) {
-            Setting::where('item_id', $coin->id)->where('type', 'payment')->delete();
-        }
+        // foreach ($extraCoins as $coin) {
+        //     Setting::where('item_id', $coin->id)->where('type', 'payment')->delete();
+        // }
         PaymentCoin::whereNotIn('type', $validTypes)->delete();
 
         $images = [
