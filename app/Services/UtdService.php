@@ -114,6 +114,7 @@ class UtdService
 //            $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $txnId]);
 //            return response()->json(['status' => false, 'trx' => $txnId, 'message' => 'Transaction declined.',]);
 //        }
+        return response()->json(['status' => 'ok']);
     }
 
     public function success(Request $request, $trx): JsonResponse
