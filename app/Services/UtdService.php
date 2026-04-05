@@ -99,7 +99,7 @@ class UtdService
         Log::info('utd-callback processing webhookPayment', ['orderId' => $orderId, 'gateway' => $gateway]);
 
         try {
-            $response = $this->webhookPayment($orderId, $gateway);
+            $response = $this->webhookPayment($orderId);
             Log::info('utd-callback webhookPayment response', ['orderId' => $orderId, 'response' => optional($response)->getContent()]);
 
             return response()->json(['success' => true, 'orderId' => $orderId, 'updated' => true], 200);
