@@ -72,24 +72,34 @@ jobs:
     runs-on: [self-hosted]
     needs: run_lumio_hub
     steps:
-    - name: Build and deploy Lumio jobs
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.61.136"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 20m
-        script: |
-          cd /var/www/lumio
-          sudo docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
-          sudo docker service update \
-            --image lumio-job:${{ github.sha }} \
-            --replicas 4 \
-            --limit-cpu 2.0 \
-            --limit-memory 2gb \
-            --reserve-memory 1gb \
-            --update-parallelism 1 \
-            --update-delay 10s \
-            lumio-job
-          sudo docker image prune -f 2>/dev/null || true
+      - name: Build and deploy Lumio jobs
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: "34.18.61.136"
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.UTDVM }}
+          port: ${{ secrets.PORT }}
+          command_timeout: 20m
+          script: |
+            cd /var/www/lumio
+            sudo docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
+            
+            sudo docker service update \
+              --image lumio-job:${{ github.sha }} \
+              --replicas 4 \
+              --limit-cpu 2.0 \
+              --limit-memory 2gb \
+              --reserve-memory 1gb \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              lumio-job
+              
+            sudo docker service update --image lumio-job:${{ github.sha }} lumio-charizma-worker || \
+            sudo docker service create \
+              --name lumio-charizma-worker \
+              --network app-network \
+              --replicas 1 \
+              --image lumio-job:${{ github.sha }} \
+              sh -c "while true; do php /app/artisan app:handling-room-zigo-requests -v; sleep 10; done"
+
+            sudo docker image prune -f 2>/dev/null || true
