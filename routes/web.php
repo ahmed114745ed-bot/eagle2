@@ -1393,7 +1393,7 @@ Route::get('/run-roomcup-rewards', function () {
 });
 
 Route::get('/backfill-roomcup-rewards', function () {
-    $startDate = '2026-03-28';
+    $startDate = '2026-04-04';
     $endDate = '2026-04-04'; // أمبارح
     $tz = getTimezone();
     $results = [];
