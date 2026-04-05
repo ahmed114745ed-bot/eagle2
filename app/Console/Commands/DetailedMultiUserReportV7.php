@@ -47,6 +47,12 @@ class DetailedMultiUserReportV7 extends Command
         $initialVault = (int) $this->option('vault');
         $this->info("⏰ حد أقصى: {$maxRounds} دور | 🏦 رصيد المحفظة الابتدائي: " . number_format($initialVault));
         
+        // Seed V7 settings before running
+        $this->seedV7Settings();
+        
+        // Display current settings
+        $this->displaySettings();
+        
         $gift = Gift::find($giftId);
         if (!$gift) {
             $this->error('❌ الهدية غير موجودة');
@@ -64,6 +70,140 @@ class DetailedMultiUserReportV7 extends Command
         
         // عرض النتائج
         $this->displayResults();
+    }
+
+    /**
+     * Seed V7 settings to ensure simulation uses correct values
+     */
+    private function seedV7Settings(): void
+    {
+        $this->info("🔧 تهيئة إعدادات V7...");
+        
+        $defaultSettings = [
+            // Core RTP Settings - 92% default
+            'V7_target_rtp' => 0.92,
+            'V7_max_probability_cap' => 0.50,
+            'V7_boost_scaling' => 0.05,
+            'V7_reduce_scaling' => 0.02,
+            'V7_chaos_factor_min' => 0.90,
+            'V7_chaos_factor_max' => 1.10,
+            
+            // Multiplier Weights - favor smaller wins to reduce volatility & improve profitability
+            'V7_multiplier_weights' => json_encode([
+                5 => 800,      // زيادة الوزن (was 500)
+                10 => 750,     // زيادة الوزن (was 500)
+                20 => 700,     // زيادة الوزن (was 500)
+                50 => 600,     // زيادة الوزن (was 500)
+                70 => 500,     // نفس الوزن
+                100 => 400,    // تقليل الوزن (was 500)
+                250 => 300,    // تقليل الوزن (was 400)
+                500 => 150,    // تقليل الوزن (was 300)
+                1000 => 50,    // تقليل الوزن بشكل كبير (was 200)
+            ]),
+            
+            // New Player Settings
+            'V7_new_player_bets' => 20,
+            'V7_new_player_boost' => 3.0,
+            
+            // Low Balance Protection
+            'V7_low_balance_threshold' => 15,
+            'V7_low_balance_min_prob' => 0.18,
+            
+            // Wallet Protection (USD)
+            'coin_to_usd_rate' => 0.01,
+            'wallet_healthy_usd' => 1000,
+            'wallet_warning_usd' => 500,
+            'wallet_critical_usd' => 200,
+            'wallet_max_negative_usd' => 300,
+            
+            // Wallet-based max multipliers (smart wallet behavior)
+            'V7_wallet_healthy_max_mult' => 1000,
+            'V7_wallet_moderate_max_mult' => 100,
+            'V7_wallet_low_max_mult' => 50,
+            'V7_wallet_critical_max_mult' => 50,
+            
+            // Min probability when wallet low (60% floor)
+            'V7_min_prob_when_low' => 0.60,
+            
+            // Loss Streak Protection - Force win after max streak
+            'V7_max_loss_streak' => 20,
+            'V7_loss_streak_forced_mult' => 5,
+            
+            // Cooldown & Safety - DISABLED by default (0 = disabled)
+            'fairluck_jackpot_cooldown_bets' => 0,
+            'V7_min_bets_100x' => 30,
+            'V7_min_bets_500x' => 100,
+            'V7_max_single_win_pct' => 0.10,
+            
+            // Wallet Distribution (65% global, 20% jackpot, 15% medium)
+            'V7_wallet_dist_global' => 0.65,
+            'V7_wallet_dist_jackpot' => 0.20,
+            'V7_wallet_dist_medium' => 0.15,
+            
+            // Legacy settings
+            'global_vault_negative_limit' => 30000,
+            'fair_luck_owner_fee_rate' => 0.10,
+        ];
+        
+        foreach ($defaultSettings as $key => $value) {
+            \App\Models\FairLuckSetting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value, 'description' => 'V7 Default']
+            );
+        }
+        
+        // Clear cache to ensure fresh settings
+        \Illuminate\Support\Facades\Cache::forget('fair_luck:settings');
+        
+        $this->info("✅ تم تهيئة " . count($defaultSettings) . " إعداد V7");
+    }
+
+    /**
+     * Display current V7 settings being used
+     */
+    private function displaySettings(): void
+    {
+        $this->info("");
+        $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        $this->info("📋 إعدادات V7 المستخدمة في المحاكاة:");
+        $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        
+        $settings = [
+            ['الإعداد', 'القيمة'],
+            ['Target RTP (المستهدف)', (\App\Models\FairLuckSetting::getTargetRTP() * 100) . '%'],
+            ['Max Probability Cap', (\App\Models\FairLuckSetting::getByKey('V7_max_probability_cap', 0.50) * 100) . '%'],
+            ['Jackpot Cooldown', \App\Models\FairLuckSetting::getByKey('fairluck_jackpot_cooldown_bets', 0) . ' bets (0 = disabled)'],
+            ['Min Prob When Low', (\App\Models\FairLuckSetting::getMinProbabilityWhenLow() * 100) . '%'],
+            ['Max Single Win %', (\App\Models\FairLuckSetting::getMaxSingleWinPercentage() * 100) . '%'],
+            ['Max Loss Streak', \App\Models\FairLuckSetting::getMaxLossStreak()],
+            ['Forced Win Mult', \App\Models\FairLuckSetting::getLossStreakForcedMultiplier() . 'x'],
+            ['Coin to USD Rate', '$' . \App\Models\FairLuckSetting::getCoinToUsdRate()],
+            ['Wallet Healthy (USD)', '$' . \App\Models\FairLuckSetting::getHealthyWalletUsd()],
+            ['Wallet Warning (USD)', '$' . \App\Models\FairLuckSetting::getWarningWalletUsd()],
+            ['Wallet Critical (USD)', '$' . \App\Models\FairLuckSetting::getCriticalWalletUsd()],
+        ];
+        
+        $this->table(['الإعداد', 'القيمة'], array_slice($settings, 1));
+        
+        // Show multiplier weights
+        $weights = \App\Models\FairLuckSetting::getMultiplierWeights();
+        $this->info("📊 أوزان المضاعفات:");
+        $weightRows = [];
+        foreach ($weights as $mult => $weight) {
+            $weightRows[] = [$mult . 'x', $weight];
+        }
+        $this->table(['المضاعف', 'الوزن'], $weightRows);
+        
+        // Show wallet distribution
+        $this->info("💰 توزيع المحافظ:");
+        $distRows = [
+            ['Global Vault', (\App\Models\FairLuckSetting::getByKey('V7_wallet_dist_global', 0.65) * 100) . '%'],
+            ['Jackpot Wallet', (\App\Models\FairLuckSetting::getByKey('V7_wallet_dist_jackpot', 0.20) * 100) . '%'],
+            ['Medium Wallet', (\App\Models\FairLuckSetting::getByKey('V7_wallet_dist_medium', 0.15) * 100) . '%'],
+        ];
+        $this->table(['المحفظة', 'النسبة'], $distRows);
+        $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        $this->info("");
     }
 
     private function createTestUsers($userCount, $initialBalance)
@@ -93,7 +233,13 @@ class DetailedMultiUserReportV7 extends Command
                 'max_multiplier' => 0,
                 'high_multipliers' => 0,
                 'net_result' => 0,
-                'app_cut' => 0
+                'app_cut' => 0,
+                // New tracking fields
+                'multiplier_counts' => [5 => 0, 10 => 0, 20 => 0, 50 => 0, 70 => 0, 100 => 0, 250 => 0, 500 => 0, 1000 => 0],
+                'current_loss_streak' => 0,
+                'max_loss_streak' => 0,
+                'current_win_streak' => 0,
+                'max_win_streak' => 0,
             ];
         }
     }
@@ -107,11 +253,16 @@ class DetailedMultiUserReportV7 extends Command
         $initialVault = (int) $this->option('vault');
         $this->info("🔄 تهيئة المحافظ V7 برصيد " . number_format($initialVault) . "...");
         
+        // Get wallet distribution from settings (not hardcoded)
+        $globalDist = (float) \App\Models\FairLuckSetting::getByKey('V7_wallet_dist_global', 0.65);
+        $jackpotDist = (float) \App\Models\FairLuckSetting::getByKey('V7_wallet_dist_jackpot', 0.20);
+        $mediumDist = (float) \App\Models\FairLuckSetting::getByKey('V7_wallet_dist_medium', 0.15);
+        
         // تهيئة المحافظ الثلاث (global_vault, jackpot_wallet, medium_wallet)
         $distribution = [
-            FairLuckWallet::TYPE_GLOBAL_VAULT => (int) round($initialVault * 0.65),
-            FairLuckWallet::TYPE_JACKPOT_WALLET => (int) round($initialVault * 0.20),
-            FairLuckWallet::TYPE_MEDIUM_WALLET => (int) round($initialVault * 0.15),
+            FairLuckWallet::TYPE_GLOBAL_VAULT => (int) round($initialVault * $globalDist),
+            FairLuckWallet::TYPE_JACKPOT_WALLET => (int) round($initialVault * $jackpotDist),
+            FairLuckWallet::TYPE_MEDIUM_WALLET => (int) round($initialVault * $mediumDist),
         ];
         
         foreach ($distribution as $walletType => $amount) {
@@ -168,7 +319,8 @@ class DetailedMultiUserReportV7 extends Command
                         0, // appFee
                         0, // receiverFee
                         $senderBalanceBefore, 
-                        $senderBalanceAfter
+                        $senderBalanceAfter,
+                        $userData['current_loss_streak'] // Pass loss streak for protection
                     );
                     
                     $userBalanceBefore = $userData['user']->di;
@@ -201,6 +353,23 @@ class DetailedMultiUserReportV7 extends Command
                         }
                         if ($result->multiplier >= 250) {
                             $userData['high_multipliers']++;
+                        }
+                        // Track multiplier distribution
+                        if (isset($userData['multiplier_counts'][$result->multiplier])) {
+                            $userData['multiplier_counts'][$result->multiplier]++;
+                        }
+                        // Track win streak
+                        $userData['current_win_streak']++;
+                        $userData['current_loss_streak'] = 0;
+                        if ($userData['current_win_streak'] > $userData['max_win_streak']) {
+                            $userData['max_win_streak'] = $userData['current_win_streak'];
+                        }
+                    } else {
+                        // Track loss streak
+                        $userData['current_loss_streak']++;
+                        $userData['current_win_streak'] = 0;
+                        if ($userData['current_loss_streak'] > $userData['max_loss_streak']) {
+                            $userData['max_loss_streak'] = $userData['current_loss_streak'];
                         }
                     }
                     
@@ -394,6 +563,14 @@ class DetailedMultiUserReportV7 extends Command
                                 <small>أعلى مضاعف</small>
                                 <p class='h5 mb-0'>{$userData['max_multiplier']}x</p>
                             </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>أطول سلسلة خسارة</small>
+                                <p class='h5 text-danger mb-0'>{$userData['max_loss_streak']}</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>أطول سلسلة فوز</small>
+                                <p class='h5 text-success mb-0'>{$userData['max_win_streak']}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -401,6 +578,74 @@ class DetailedMultiUserReportV7 extends Command
         }
         
         $html .= "</div>
+
+        <!-- توزيع المضاعفات -->
+        <div class='card shadow-sm mb-4'>
+            <div class='card-body'>
+                <h2 class='h4 mb-3'>توزيع المضاعفات لكل مستخدم</h2>
+                <div class='table-responsive'>
+                    <table class='table table-sm table-bordered align-middle text-center'>
+                        <thead class='table-light'>
+                            <tr>
+                                <th>المستخدم</th>
+                                <th class='text-success'>5x</th>
+                                <th class='text-success'>10x</th>
+                                <th class='text-success'>20x</th>
+                                <th class='text-info'>50x</th>
+                                <th class='text-info'>70x</th>
+                                <th class='text-info'>100x</th>
+                                <th class='text-warning'>250x</th>
+                                <th class='text-warning'>500x</th>
+                                <th class='text-danger'>1000x</th>
+                                <th class='bg-primary text-white'>المجموع</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+        
+        foreach ($uniqueUsers as $userData) {
+            $totalWins = array_sum($userData['multiplier_counts']);
+            $html .= "<tr>
+                        <td class='fw-bold'>{$userData['letter']}</td>
+                        <td>{$userData['multiplier_counts'][5]}</td>
+                        <td>{$userData['multiplier_counts'][10]}</td>
+                        <td>{$userData['multiplier_counts'][20]}</td>
+                        <td>{$userData['multiplier_counts'][50]}</td>
+                        <td>{$userData['multiplier_counts'][70]}</td>
+                        <td>{$userData['multiplier_counts'][100]}</td>
+                        <td>{$userData['multiplier_counts'][250]}</td>
+                        <td>{$userData['multiplier_counts'][500]}</td>
+                        <td>{$userData['multiplier_counts'][1000]}</td>
+                        <td class='bg-primary text-white fw-bold'>{$totalWins}</td>
+                      </tr>";
+        }
+        
+        // Add totals row
+        $totals = [5 => 0, 10 => 0, 20 => 0, 50 => 0, 70 => 0, 100 => 0, 250 => 0, 500 => 0, 1000 => 0];
+        foreach ($uniqueUsers as $userData) {
+            foreach ($userData['multiplier_counts'] as $mult => $count) {
+                $totals[$mult] += $count;
+            }
+        }
+        $grandTotal = array_sum($totals);
+        
+        $html .= "<tr class='table-dark fw-bold'>
+                        <td>الإجمالي</td>
+                        <td>{$totals[5]}</td>
+                        <td>{$totals[10]}</td>
+                        <td>{$totals[20]}</td>
+                        <td>{$totals[50]}</td>
+                        <td>{$totals[70]}</td>
+                        <td>{$totals[100]}</td>
+                        <td>{$totals[250]}</td>
+                        <td>{$totals[500]}</td>
+                        <td>{$totals[1000]}</td>
+                        <td>{$grandTotal}</td>
+                      </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
         <!-- الجدول التفصيلي مع الفلاتر -->
         <div class='card shadow-sm'>
@@ -531,7 +776,12 @@ class DetailedMultiUserReportV7 extends Command
 
     private function displayResults()
     {
-        $this->info("\n🎯 ملخص النتائج - الإصدار السابع V7:");
+        $targetRTP = \App\Models\FairLuckSetting::getTargetRTP() * 100;
+        
+        $this->info("");
+        $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        $this->info("🎯 ملخص النتائج - الإصدار السابع V7:");
+        $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         $this->info("إجمالي الأدوار: {$this->totalRounds}");
         
         $summaryData = [];
@@ -556,10 +806,14 @@ class DetailedMultiUserReportV7 extends Command
                 'المستخدم' => $userData['letter'],
                 'المحاولات' => number_format($userData['attempts']),
                 'المكاسب' => number_format($userData['wins']),
+                'نسبة الفوز' => $userData['attempts'] > 0 ? number_format(($userData['wins'] / $userData['attempts']) * 100, 1) . '%' : '0%',
                 'RTP' => number_format($rtp, 1) . '%',
                 'الرصيد النهائي' => number_format($userData['final_balance']),
-                'الدور النهائي' => $userData['finished_round'],
-                'أعلى مضاعف' => $userData['max_multiplier'] . 'x'
+                'صافي الربح/خسارة' => number_format($userData['final_balance'] - $userData['initial_balance']),
+                'أعلى مضاعف' => $userData['max_multiplier'] . 'x',
+                'مضاعفات ≥250x' => $userData['high_multipliers'],
+                'أطول خسارة' => $userData['max_loss_streak'],
+                'أطول فوز' => $userData['max_win_streak'],
             ];
             
             $totalAttempts += $userData['attempts'];
@@ -573,7 +827,38 @@ class DetailedMultiUserReportV7 extends Command
         }
         
         $overallRTP = $totalBets > 0 ? ($totalWinnings / $totalBets) * 100 : 0;
-        $this->info("📊 RTP الإجمالي: " . number_format($overallRTP, 2) . '%');
-        $this->info("📊 صافي ربح التطبيق: " . number_format($this->totalAppProfit));
+        $winRate = $totalAttempts > 0 ? ($totalWins / $totalAttempts) * 100 : 0;
+        $rtpDiff = $overallRTP - $targetRTP;
+        $rtpDiffStr = $rtpDiff >= 0 ? '+' . number_format($rtpDiff, 2) : number_format($rtpDiff, 2);
+        
+        $this->info("");
+        $this->info("📊 إحصائيات النظام:");
+        $this->info("   • إجمالي الرهانات: " . number_format($totalBets));
+        $this->info("   • إجمالي المكاسب: " . number_format($totalWinnings));
+        $this->info("   • صافي ربح التطبيق: " . number_format($totalBets - $totalWinnings));
+        $this->info("   • معدل الفوز: " . number_format($winRate, 2) . '%');
+        $this->info("   • عدد مرات الفوز: {$totalWins} من {$totalAttempts}");
+        $this->info("");
+        $this->info("🎯 RTP Analysis:");
+        $this->info("   • RTP المستهدف (Target): " . number_format($targetRTP, 2) . '%');
+        $this->info("   • RTP الفعلي (Actual): " . number_format($overallRTP, 2) . '%');
+        $this->info("   • الفرق: " . $rtpDiffStr . '%');
+        
+        // Evaluation
+        if (abs($rtpDiff) <= 5) {
+            $this->info("   ✅ النظام يعمل ضمن المدى المقبول (±5%)");
+        } elseif ($rtpDiff > 0) {
+            $this->warn("   ⚠️ RTP أعلى من المستهدف - اللاعبون يكسبون أكثر مما هو مخطط");
+        } else {
+            $this->warn("   ⚠️ RTP أقل من المستهدف - اللاعبون يخسرون أكثر");
+        }
+        
+        // Smart system evaluation
+        $this->info("");
+        $this->info("🧠 تقييم النظام الذكي:");
+        $this->info("   • Cooldown: معطل (0 = users can win back-to-back)");
+        $this->info("   • Min Prob When Low: 60% (لا ينخفض أبداً عن 60% من الاحتمالية الطبيعية)");
+        $this->info("   • Prize Size Reduction: مفعل (تقليل حجم الجائزة عند انخفاض المحفظة)");
+        $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }
 }

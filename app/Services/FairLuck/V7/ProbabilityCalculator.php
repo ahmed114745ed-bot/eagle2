@@ -38,11 +38,11 @@ class ProbabilityCalculator
         // Get configurable parameters (stored as 0-100, convert to 0-1)
         $newPlayerBets    = (int)   FairLuckSetting::getByKey('V7_new_player_bets', 20);
         $newPlayerBoost   = (float) FairLuckSetting::getByKey('V7_new_player_boost', 3.0);
-        $chaosMin         = (float) FairLuckSetting::getByKey('V7_chaos_factor_min', 95)  / 100;  // 95 → 0.95
-        $chaosMax         = (float) FairLuckSetting::getByKey('V7_chaos_factor_max', 105) / 100;  // 105 → 1.05
-        $lowBalanceThreshold = (int) FairLuckSetting::getByKey('V7_low_balance_threshold', 8);
-        $lowBalanceMinProb   = (float) FairLuckSetting::getByKey('V7_low_balance_min_prob', 50) / 100; // 50 → 0.50
-        $maxProbabilityCap   = (float) FairLuckSetting::getByKey('V7_max_probability_cap', 85) / 100;  // 85 → 0.85
+        $chaosMin         = (float) FairLuckSetting::getByKey('V7_chaos_factor_min', 0.90);
+        $chaosMax         = (float) FairLuckSetting::getByKey('V7_chaos_factor_max', 1.10);
+        $lowBalanceThreshold = (int) FairLuckSetting::getByKey('V7_low_balance_threshold', 15);
+        $lowBalanceMinProb   = (float) FairLuckSetting::getByKey('V7_low_balance_min_prob', 0.18);
+        $maxProbabilityCap   = (float) FairLuckSetting::getByKey('V7_max_probability_cap', 0.50);
 
         // Base probability: targetRTP / expectedMultiplier
         // Use actual expected multiplier (not capped at 5) so baseProb correctly
@@ -74,7 +74,7 @@ class ProbabilityCalculator
         if ($rtpGap > 0) {
             // User is BELOW target RTP - boost probability
             // scalingFactor stored as 0-100, convert to 0-1
-            $scalingFactor = (float) FairLuckSetting::getByKey('V7_boost_scaling', 15) / 100; // 15 → 0.15
+            $scalingFactor = (float) FairLuckSetting::getByKey('V7_boost_scaling', 0.05);
             $boost = min(4.0, $betImpact * $scalingFactor);
             $adjustedProb = $baseProb * (1 + $boost);
 
@@ -82,7 +82,7 @@ class ProbabilityCalculator
         } else {
             // User is AT or ABOVE target RTP - reduce probability (but not too harshly)
             // scalingFactor stored as 0-100, convert to 0-1
-            $scalingFactor = (float) FairLuckSetting::getByKey('V7_reduce_scaling', 1) / 100; // 1 → 0.01
+            $scalingFactor = (float) FairLuckSetting::getByKey('V7_reduce_scaling', 0.02);
             $reduction = min(0.80, abs($betImpact) * $scalingFactor);
             $adjustedProb = $baseProb * (1 - $reduction);
 

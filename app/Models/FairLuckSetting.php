@@ -138,8 +138,9 @@ class FairLuckSetting extends Model
             return $defaultWeights;
         }
         
-        // Merge stored weights with defaults
-        return array_merge($defaultWeights, $stored);
+        // Use + operator instead of array_merge to preserve numeric keys
+        // array_merge reindexes numeric keys which breaks our multiplier keys!
+        return $stored + $defaultWeights;
     }
 
     /**
@@ -192,5 +193,21 @@ class FairLuckSetting extends Model
     public static function getMaxSingleWinPercentage(): float
     {
         return (float) static::getByKey('V7_max_single_win_pct', 0.15);
+    }
+
+    /**
+     * Get maximum consecutive losses before forced win (default 30)
+     */
+    public static function getMaxLossStreak(): int
+    {
+        return (int) static::getByKey('V7_max_loss_streak', 30);
+    }
+
+    /**
+     * Get multiplier for forced win after max loss streak (default 5x)
+     */
+    public static function getLossStreakForcedMultiplier(): int
+    {
+        return (int) static::getByKey('V7_loss_streak_forced_mult', 5);
     }
 }

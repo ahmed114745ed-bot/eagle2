@@ -41,11 +41,12 @@ class FairLuckServiceV7
         float $appFee = 0,
         float $receiverFee = 0,
         float $senderBalanceBefore = 0,
-        float $senderBalanceAfter = 0
+        float $senderBalanceAfter = 0,
+        ?int $currentLossStreak = null  // For loss streak protection tracking
     ): object {
         return DB::transaction(function () use (
             $user, $gift, $betAmount, $unitPrice, $roomId, $appFee, $receiverFee,
-            $senderBalanceBefore, $senderBalanceAfter
+            $senderBalanceBefore, $senderBalanceAfter, $currentLossStreak
         ) {
             // receiver fee goes directly to receiver (via updateUsers), not into pool
             $totalAmount = $betAmount + $appFee;
@@ -96,9 +97,32 @@ class FairLuckServiceV7
             // 5. Chaos factor & low balance protection are already applied inside
             // ProbabilityCalculator::calculate() — no need to duplicate here.
 
-            // 6. Roll the dice
-            $random = mt_rand(0, 10000) / 10000;
-            $isWinner = $random <= $finalProbability;
+            // LOSS STREAK PROTECTION: Check if user has exceeded max consecutive losses
+            $maxLossStreak = FairLuckSetting::getMaxLossStreak();
+            $forcedWinMultiplier = FairLuckSetting::getLossStreakForcedMultiplier();
+            $isForcedWin = false;
+            
+            // DEBUG: Log loss streak values
+            \Log::debug("Loss Streak Check", [
+                'currentLossStreak' => $currentLossStreak,
+                'maxLossStreak' => $maxLossStreak,
+                'forcedMultiplier' => $forcedWinMultiplier,
+                'shouldForce' => ($currentLossStreak !== null && $currentLossStreak >= $maxLossStreak)
+            ]);
+            
+            if ($currentLossStreak !== null && $currentLossStreak >= $maxLossStreak) {
+                // Force a win - user has suffered too many consecutive losses
+                $isForcedWin = true;
+                $isWinner = true;
+                $finalProbability = 1.0; // 100% probability
+                \Log::info("FORCED WIN triggered for user {$user->id} after {$currentLossStreak} losses");
+            }
+
+            // 6. Roll the dice (or force win if loss streak protection triggered)
+            if (!$isForcedWin) {
+                $random = mt_rand(0, 10000) / 10000;
+                $isWinner = $random <= $finalProbability;
+            }
 
             $multiplier = 0;
             $payoutAmount = 0;
@@ -106,12 +130,18 @@ class FairLuckServiceV7
             if ($isWinner) {
                 // 8. Select multiplier based on RTP gap and wallet health
                 $updatedPool = $this->poolManager->getTotalBalance();
-                $multiplier = $this->rewardSelector->select(
-                    $rtpGap,
-                    $totalAmount,
-                    $updatedPool,
-                    $stats->bet_count
-                );
+                
+                if ($isForcedWin) {
+                    // Use forced multiplier for loss streak protection
+                    $multiplier = $forcedWinMultiplier;
+                } else {
+                    $multiplier = $this->rewardSelector->select(
+                        $rtpGap,
+                        $totalAmount,
+                        $updatedPool,
+                        $stats->bet_count
+                    );
+                }
 
                 // 9. Validate pool can afford - NEVER cancel, always fallback to lower
                 // This also applies wallet health limits (prize size reduction, not frequency)
@@ -131,9 +161,19 @@ class FairLuckServiceV7
                     // BANKRUPTCY PROTECTION: Cap payout based on pool health
                     $safePayout = $bankruptcyProtection->validateAndCapPayout($payoutAmount);
                     if ($safePayout < $payoutAmount) {
-                        // Recalculate multiplier based on safe payout
-                        $multiplier = $totalAmount > 0 ? (int) round($safePayout / $totalAmount) : 0;
-                        $payoutAmount = $safePayout;
+                        // Find the nearest valid V7 multiplier that doesn't exceed safe payout
+                        // Must use ONLY configured multipliers: 5, 10, 20, 50, 70, 100, 250, 500, 1000
+                        $validMultipliers = [1000, 500, 250, 100, 70, 50, 20, 10, 5];
+                        $foundMultiplier = 0;
+                        foreach ($validMultipliers as $m) {
+                            $testPayout = (int) round($m * $betAmount);
+                            if ($testPayout <= $safePayout) {
+                                $foundMultiplier = $m;
+                                break;
+                            }
+                        }
+                        $multiplier = $foundMultiplier;
+                        $payoutAmount = $multiplier > 0 ? (int) round($multiplier * $betAmount) : 0;
                     }
 
                     // 10. Execute payout from pool (cascading across wallets)
