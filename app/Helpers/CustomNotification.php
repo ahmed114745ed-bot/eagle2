@@ -1033,4 +1033,28 @@ class CustomNotification
         Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
+
+    public function roomcupReward(User $user, float $amount, string $rewardType = 'owner')
+    {
+        $tokens_notification = $user?->notification_id;
+        $lang = $user?->lan ?? 'en';
+        $body = __('api.roomcup_reward', ['amount' => $amount, 'reward_type' => $rewardType], $lang);
+
+        $data['user_id'] = $user?->id;
+        $data['amount'] = $amount;
+        $data['reward_type'] = $rewardType;
+
+        if (!$user->is_logout) {
+            Common::send_firebase_notification(
+                $tokens_notification,
+                $this->appName($user->lan),
+                $body,
+                data: $data,
+                messageType: 'roomcup-reward'
+            );
+        }
+
+        Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
 }
