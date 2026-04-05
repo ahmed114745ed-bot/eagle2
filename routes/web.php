@@ -1746,6 +1746,149 @@ Route::get('/backfill-roomcup-rewards', function () {
     }
 });
 
+Route::get('/check-duplicate-roomcup-rewards', function () {
+    $startDate = '2026-03-28';
+    $endDate = '2026-04-05';
+
+    $duplicates = \Illuminate\Support\Facades\DB::select("
+        SELECT
+            room_id,
+            user_id,
+            type,
+            DATE(created_at) as reward_date,
+            COUNT(*) as duplicate_count,
+            SUM(amount) as total_amount,
+            GROUP_CONCAT(id) as reward_ids
+        FROM room_cup_rewards
+        WHERE DATE(created_at) BETWEEN ? AND ?
+        GROUP BY room_id, user_id, type, DATE(created_at)
+        HAVING COUNT(*) > 1
+        ORDER BY duplicate_count DESC
+    ", [$startDate, $endDate]);
+
+    $totalDuplicateRecords = 0;
+    $totalDuplicateAmount = 0;
+
+    foreach ($duplicates as $dup) {
+        $totalDuplicateRecords += ($dup->duplicate_count - 1);
+        $totalDuplicateAmount += ($dup->total_amount / $dup->duplicate_count) * ($dup->duplicate_count - 1);
+    }
+
+    return response()->json([
+        'total_duplicate_records' => $totalDuplicateRecords,
+        'total_duplicate_amount' => $totalDuplicateAmount,
+        'unique_combinations_duplicated' => count($duplicates),
+        'details' => $duplicates,
+    ]);
+});
+
+Route::get('/fix-duplicate-roomcup-rewards', function () {
+    $startDate = '2026-03-28';
+    $endDate = '2026-04-05';
+
+    try {
+        \Illuminate\Support\Facades\DB::beginTransaction();
+
+        $duplicates = \Illuminate\Support\Facades\DB::select("
+            SELECT
+                room_id,
+                user_id,
+                type,
+                DATE(created_at) as reward_date,
+                COUNT(*) as duplicate_count,
+                MIN(id) as keep_id,
+                SUM(amount) as total_amount
+            FROM room_cup_rewards
+            WHERE DATE(created_at) BETWEEN ? AND ?
+            GROUP BY room_id, user_id, type, DATE(created_at)
+            HAVING COUNT(*) > 1
+        ", [$startDate, $endDate]);
+
+        $fixedRecords = 0;
+        $refundedAmount = 0;
+        $details = [];
+
+        foreach ($duplicates as $dup) {
+            $dayStart = \Carbon\Carbon::parse($dup->reward_date)->startOfDay();
+            $dayEnd = \Carbon\Carbon::parse($dup->reward_date)->endOfDay();
+
+            // جيب كل الـ rewards المكررة
+            $rewards = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $dup->room_id)
+                ->where('user_id', $dup->user_id)
+                ->where('type', $dup->type)
+                ->whereBetween('created_at', [$dayStart, $dayEnd])
+                ->orderBy('id')
+                ->get();
+
+            if ($rewards->count() <= 1) {
+                continue;
+            }
+
+            // احتفظ بأول واحدة بس
+            $keepReward = $rewards->first();
+            $duplicatesToDelete = $rewards->slice(1);
+
+            foreach ($duplicatesToDelete as $duplicate) {
+                // ارجع الفلوس من اليوزر
+                $user = \App\Models\User::find($dup->user_id);
+                if ($user && $user->di >= $duplicate->amount) {
+                    \App\Models\User::whereKey($dup->user_id)->decrement('di', $duplicate->amount);
+                    $refundedAmount += $duplicate->amount;
+
+                    // امسح الـ coin log
+                    $amountBefore = \App\Helpers\Common::getCurrentBalance($dup->user_id);
+                    \App\Helpers\UserCoinLogHelper::logByType(
+                        $dup->user_id,
+                        -$duplicate->amount,
+                        $amountBefore,
+                        \App\Enums\UserCoinLogType::ROOM_CUP,
+                    );
+
+                    // ارجع فلوس الـ RoomCup Wallet
+                    \Modules\RoomCup\Helpers\RoomCupHelper::updateRoomCupWallet(-$duplicate->amount);
+                }
+
+                // امسح الـ reward
+                $duplicate->delete();
+                $fixedRecords++;
+            }
+
+            $details[] = [
+                'room_id' => $dup->room_id,
+                'user_id' => $dup->user_id,
+                'type' => $dup->type,
+                'date' => $dup->reward_date,
+                'kept_reward_id' => $keepReward->id,
+                'deleted_count' => $duplicatesToDelete->count(),
+                'refunded_amount' => ($duplicate->amount ?? 0) * $duplicatesToDelete->count(),
+            ];
+        }
+
+        \Illuminate\Support\Facades\DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Duplicates fixed successfully!',
+            'summary' => [
+                'fixed_records' => $fixedRecords,
+                'refunded_amount' => $refundedAmount,
+                'unique_combinations_fixed' => count($details),
+            ],
+            'details' => $details,
+        ]);
+
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\DB::rollBack();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Error fixing duplicates',
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    }
+});
+
 Route::get('/fix-pack-expire', function () {
     $packs = \App\Models\Pack::where('is_used', 1)
         ->whereNull('expire')
