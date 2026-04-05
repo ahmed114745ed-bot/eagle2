@@ -57,27 +57,23 @@ class VerifyLeaderCCMiddleWare
                 }
             }
 
-          /*   old code
-          if ($request->has('token')) {
-                $token = $request->token;
-                $userId = $this->findUserByToken($token);
-                if (!$userId) {
+            if ($request->has('token') && $request->has('uid')) {
+                $userId = $this->findUserByToken($request->token);
+                if ($userId && $userId != $request->uid) {
                     return response()->json([
                         'errorCode' => 10003,
-                        'errorMsg'  => 'user not found'
+                        'errorMsg' => 'token/uid mismatch'
                     ]);
                 }
-            }*/
-                
-            $userId = $this->getAuthenticatedUserId($request);
-            if (!$userId) {
-                \Log::info('LeaderCC Request User Not Found', [
-                    'body' => $request->all(),
-                ]);
-                return response()->json([
-                    'errorCode' => 10003,
-                    'errorMsg'  => 'user not found'
-                ]);
+                if (!$userId && !\App\Models\User::where('id', $request->uid)->exists()) {
+                    \Log::info('LeaderCC Request User Not Found', [
+                        'body' => $request->all(),
+                    ]);
+                    return response()->json([
+                        'errorCode' => 10003,
+                        'errorMsg' => 'user not found'
+                    ]);
+                }
             }
 
 
@@ -107,7 +103,6 @@ class VerifyLeaderCCMiddleWare
                     break;
 
                 case 'leader-cc-game/get-user-info':
-                case 'leader-cc-game/make-up-orders':
                     $requiredParams = ['gameId', 'uid', 'token', 'roomId', 'sign'];
                     foreach ($requiredParams as $p) {
                         if (!$request->has($p)) {
@@ -122,6 +117,28 @@ class VerifyLeaderCCMiddleWare
                         $request->uid .
                         $request->token .
                         $request->roomId .
+                        $key;
+                    break;
+
+                case 'leader-cc-game/make-up-orders':
+                    $requiredParams = ['orderId', 'gameId', 'roundId', 'uid', 'coin', 'rewardType', 'sign'];
+                    foreach ($requiredParams as $p) {
+                        if (!$request->has($p)) {
+                            return response()->json([
+                                'errorCode' => 4005,
+                                'errorMsg' => 'Missing signature parameters'
+                            ]);
+                        }
+                    }
+                    $rawString =
+                        $request->orderId .
+                        $request->gameId .
+                        $request->roundId .
+                        $request->uid .
+                        $request->coin .
+                        $request->rewardType .
+                        $request->input('winId', '') .
+                        $request->input('roomId', '') .
                         $key;
                     break;
 
@@ -177,23 +194,5 @@ class VerifyLeaderCCMiddleWare
 
 
 
-protected function getAuthenticatedUserId($request)
-{
-    if ($request->has('token')) {
-        $userId = $this->findUserByToken($request->token);
-        if ($userId) {
-            \Log::info('LeaderCC Request User Found', [
-            ]);
-            return $userId;
-        }
-    }
 
-    if ( $request->has('uid')) {
-        $user = User::find($request->uid);
-        if ($user) {
-            return $user->id;
-        }
-    }
-    return null; 
-}
 }
