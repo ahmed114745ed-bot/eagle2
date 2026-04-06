@@ -24,13 +24,13 @@ class UtdService
     public function __construct()
     {
         $this->baseUrl = config('utd.base_url');
-//        $this->apiKey = config('utd.api_key');
-        $this->apiKey = "upk_038d0c0d88895b65c048332c278354656778782a90f737bb";
+        $this->apiKey = config('utd.api_key');
         $this->projectId = config('utd.project_id');
     }
 
     public static function redirect_if_payment_success($trx)
     {
+//        return "https://eagle.test/api/utd-success/$trx";
         return url("/api/utd-success/$trx");
     }
 
@@ -63,7 +63,7 @@ class UtdService
             'userEmail' => $user?->email ?? '',
             'reference' => (string)$trx,
             'returnUrl' => self::redirect_if_payment_success($trx),
-            'callbackUrl' => url('/api/utd-callback'),
+            'callbackUrl' => url('/api/utd-callback'),//"https://eagle.test/api/utd-callback",
         ];
     }
 
