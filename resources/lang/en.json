@@ -1736,5 +1736,6 @@
     "api_responses.charge_to_self_disabled": "Charging to yourself is currently disabled",
     "api_responses.charge_agent_to_user_disabled": "Charging from charging agent to user is currently disabled",
     "api_responses.charge_agent_to_agent_disabled": "Charging from charging agent to another charging agent is currently disabled",
+    "api_responses.freeze_charge_settings": "Charging is currently disabled by the administrator.",
     "invalid_code": "Invalid or expired verification code"
 }
