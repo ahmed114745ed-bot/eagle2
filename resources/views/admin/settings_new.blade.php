@@ -32,6 +32,9 @@
         <button onclick="showSection('gamesSettings')" class="position-relative">
             {{ __('Games') }}
         </button>
+        <button onclick="showSection('chargeSettings')" class="position-relative">
+            {{ __('Charge settings') }}
+        </button>
         <button onclick="showSection('notificationSettings')" class="position-relative">
             {{ __('Notifications') }}
             <div class="ribbon-banner">
@@ -55,6 +58,7 @@
         @include('admin.settings.mobile_links')
         @include('admin.settings.app')
         @include('admin.settings.pusher')
+        @include('admin.settings.charge_transfer')
 
         <div id="notificationSettings" class="settings-section"></div>
 

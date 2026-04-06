@@ -5363,5 +5363,19 @@
      "max_accounts_reached": "لقد وصلت إلى الحد الأقصى لعدد الحسابات التي يمكن تسجيلها على هذا الجهاز.",
      "api_responses.max_accounts_reached": "لقد وصلت إلى الحد الأقصى لعدد الحسابات التي يمكن تسجيلها على هذا الجهاز.",
      "already exists": "رقم الهاتف هذا مسجل بالفعل",
-     "invalid_code": "رمز التحقق غير صحيح أو انتهت صلاحيته"
+     "invalid_code": "رمز التحقق غير صحيح أو انتهت صلاحيته",
+    "Charge Transfer Settings": "إعدادات تحويل الشحن",
+    "Control charging permissions for different transfer scenarios": "التحكم في أذونات الشحن لسيناريوهات التحويل المختلفة",
+    "User to User Transfer": "مستخدم لمستخدم",
+    "User to Charging Agent Transfer": "مستخدم لوكيل شحن",
+    "User to Self Transfer": "مستخدم لنفسه",
+    "Charging Agent to User Transfer": "وكيل شحن لمستخدم",
+    "Charging Agent to Charging Agent Transfer": "وكيل شحن لوكيل شحن",
+    "Allow Charging": "السماح بالشحن",
+    "When enabled, users can charge other users": "عند التمكين، يمكن للمستخدمين شحن المستخدمين الآخرين",
+    "When enabled, users can charge charging agents": "عند التمكين، يمكن للمستخدمين شحن وكلاء الشحن",
+    "When enabled, users can charge themselves": "عند التمكين، يمكن للمستخدمين شحن أنفسهم",
+    "When enabled, charging agents can charge users": "عند التمكين، يمكن لوكلاء الشحن شحن المستخدمين",
+    "When enabled, charging agents can charge other agents": "عند التمكين، يمكن لوكلاء الشحن شحن الوكلاء الآخرين",
+    "Save Settings": "حفظ الإعدادات"
 }
