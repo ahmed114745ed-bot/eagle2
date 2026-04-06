@@ -24,6 +24,7 @@
                         <div class="form-group switch-group">
                             <label class="switch-label">{{ __('Allow Charging') }}</label>
                             <label class="switch">
+                                <input type="hidden" name="charge_user_to_user" value="0">
                                 <input type="checkbox" name="charge_user_to_user" value="1"
                                     {{ ($settings['charge_user_to_user'] ?? 1) == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
@@ -47,6 +48,7 @@
                         <div class="form-group switch-group">
                             <label class="switch-label">{{ __('Allow Charging') }}</label>
                             <label class="switch">
+                                <input type="hidden" name="charge_user_to_agent" value="0">
                                 <input type="checkbox" name="charge_user_to_agent" value="1"
                                     {{ ($settings['charge_user_to_agent'] ?? 1) == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
@@ -70,6 +72,7 @@
                         <div class="form-group switch-group">
                             <label class="switch-label">{{ __('Allow Charging') }}</label>
                             <label class="switch">
+                                <input type="hidden" name="charge_user_to_self" value="0">
                                 <input type="checkbox" name="charge_user_to_self" value="1"
                                     {{ ($settings['charge_user_to_self'] ?? 1) == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
@@ -93,6 +96,7 @@
                         <div class="form-group switch-group">
                             <label class="switch-label">{{ __('Allow Charging') }}</label>
                             <label class="switch">
+                                <input type="hidden" name="charge_agent_to_user" value="0">
                                 <input type="checkbox" name="charge_agent_to_user" value="1"
                                     {{ ($settings['charge_agent_to_user'] ?? 1) == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
@@ -116,6 +120,7 @@
                         <div class="form-group switch-group">
                             <label class="switch-label">{{ __('Allow Charging') }}</label>
                             <label class="switch">
+                                <input type="hidden" name="charge_agent_to_agent" value="0">
                                 <input type="checkbox" name="charge_agent_to_agent" value="1"
                                     {{ ($settings['charge_agent_to_agent'] ?? 1) == 1 ? 'checked' : '' }}>
                                 <span class="slider round"></span>
