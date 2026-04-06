@@ -44,10 +44,10 @@ class ChangeTokenCommand extends Command
         if ($token) {
             RedisService::update('whatsapp_token', $token);
             $this->info('Making Token Done' );
-            return 1;
+            return 0;
         }
         $this->error('An error occurred');
-        return 0;
+        return 1;
     }
 
     private function login() : ?string
