@@ -696,9 +696,22 @@ trait CalcsTrait
 
         $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
 
+        // If there's no next level or user is at max level, return 100%
+        if (!isset($nextGoldData['next_exp']) || $nextGoldData['next_exp'] == 0) {
+            return 1.0;
+        }
 
-        $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
+        // Calculate the exp range for current level
+        $sender_div = $nextGoldData['next_exp'] - $current_gold_num;
 
+        // If next level exp equals current level exp (data issue), return 0 to avoid division by zero
+        if ($sender_div <= 0) {
+            \Log::warning("VIP level data issue: Level {$gold_level} has same or lower exp as next level", [
+                'current_exp' => $current_gold_num,
+                'next_exp' => $nextGoldData['next_exp']
+            ]);
+            return 0.0;
+        }
 
         $data = min(1, max(0, ($senderNum - $current_gold_num) / $sender_div));
         return  $data;
