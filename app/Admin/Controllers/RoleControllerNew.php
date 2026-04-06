@@ -90,7 +90,6 @@ class RoleControllerNew extends MainController
         $roleAuthId = $areaManagerId ?? session('area_manager_id');
 
         $grid = new Grid(new $roleModel());
-        // $grid->model()->where('admin_id', null);
 
         if ($roleAuthId) {
             $grid->model()->where('admin_id', $roleAuthId);
@@ -126,26 +125,13 @@ class RoleControllerNew extends MainController
 
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
-            // $protectedSlugs = ['administrator', 'admin', 'developer', 'agency', 'charger'];
 
-            // if (in_array($actions->row->slug, $protectedSlugs)) {
-            //     $actions->disableDelete();
-            // } else {
             $actions->disableDelete();
             $actions->add(new DeleteRole());
-            // }
-        });
-
-        $grid->tools(function (Grid\Tools $tools) {
-            $tools->batch(function (Grid\Tools\BatchActions $actions) {
-                $actions->disableDelete();
-            });
         });
 
 
         $grid->disableExport();
-        // $this->extendGrid($grid);
-
         Admin::style('
             .box {
                 overflow: auto !important;
