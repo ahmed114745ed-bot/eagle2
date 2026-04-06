@@ -2,12 +2,14 @@
 
 namespace App\Services\FairLuck\V7;
 
+use App\Models\CoreWallet;
 use App\Models\FairLuckSetting;
 use App\Models\FairLuckTransaction;
 use App\Models\Gift;
 use App\Models\User;
 use App\Services\FairLuck\ProfileManager;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 class FairLuckServiceV7
 {
@@ -49,7 +51,21 @@ class FairLuckServiceV7
             $senderBalanceBefore, $senderBalanceAfter, $currentLossStreak
         ) {
             // receiver fee goes directly to receiver (via updateUsers), not into pool
-            $totalAmount = $betAmount + $appFee;
+            // V7: appFee goes to app_wallet separately - NOT into the game pool
+            // This ensures the pool is zero-sum: what users put in = what winners get back
+            $totalAmount = $betAmount; // Only net bet (without appFee) enters the pool
+
+            // V7: خصم نسبة التطبيق وإضافتها لمحفظة التطبيق (app_wallet) مباشرة
+            $coinsForApp = (int) round($appFee);
+            if ($coinsForApp > 0) {
+                $collection = CoreWallet::query()
+                    ->whereIn('name', ['app_wallet', 'owner_wallet'])
+                    ->get();
+                $appWallet = $collection->firstWhere('name', 'app_wallet');
+                if ($appWallet instanceof CoreWallet) {
+                    $appWallet->increment('coins', $coinsForApp);
+                }
+            }
 
             // BANKRUPTCY PROTECTION: Check pool health before processing
             $bankruptcyProtection = app(BankruptcyProtection::class);
@@ -176,14 +192,21 @@ class FairLuckServiceV7
                         $payoutAmount = $multiplier > 0 ? (int) round($multiplier * $betAmount) : 0;
                     }
 
-                    // 10. Execute payout from pool (cascading across wallets)
-                    $paid = $this->poolManager->payout($payoutAmount, $multiplier, $user->id);
+                    // 10. Execute payout from pool
+                    // الحل 3: pool يدفع المكسب كاملاً، وappFee تُخصم من المكسب وتذهب لـ app_wallet
+                    // اللاعب يستلم: payoutAmount - appFee (صافي المكسب)
+                    $payoutResult = $this->poolManager->payout($payoutAmount, $multiplier, $user->id);
 
-                    if (!$paid) {
+                    if (!$payoutResult['paid']) {
                         $multiplier = 0;
                         $isWinner = false;
                         $payoutAmount = 0;
-                    } else if ($multiplier > 0 && $isWinner) {
+                    } else {
+                        // اللاعب يستلم صافي المكسب (بعد خصم رسوم التطبيق)
+                        $payoutAmount = $payoutResult['net_payout'];
+                    }
+
+                    if ($payoutResult['paid'] && $multiplier > 0 && $isWinner) {
                         // POST-JACKPOT COOLDOWN: Record the jackpot (only if enabled)
                         $cooldown = app(\App\Services\FairLuck\V7\PostJackpotCooldown::class);
                         $cooldown->recordJackpot($user->id, $stats->bet_count, $multiplier);

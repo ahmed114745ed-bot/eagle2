@@ -107,7 +107,7 @@ class FairLuckWallet extends Model
                 ->lockForUpdate()
                 ->first();
 
-            $limit = ($walletType === self::TYPE_GLOBAL_VAULT) ? self::getNegativeLimit() : 0;
+            $limit = ($walletType === self::TYPE_GLOBAL_VAULT || $walletType === self::TYPE_UNIFIED_VAULT) ? self::getNegativeLimit() : 0;
 
             if (!$wallet || ($wallet->balance + $limit) < $amount) {
                 return false;
@@ -215,7 +215,7 @@ class FairLuckWallet extends Model
             self::getRedisBalance($walletType);
         }
  
-        $limit = ($walletType === self::TYPE_UNIFIED_VAULT) ? self::getNegativeLimit() : 0;
+        $limit = ($walletType === self::TYPE_UNIFIED_VAULT || $walletType === self::TYPE_GLOBAL_VAULT) ? self::getNegativeLimit() : 0;
 
         $script = '
             local current = redis.call("get", KEYS[1])

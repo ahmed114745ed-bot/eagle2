@@ -7,7 +7,7 @@ use App\Models\FairLuckWallet;
 use Illuminate\Support\Facades\Log;
 
 /**
- * BankruptcyProtection V7: User-First Overhaul
+ * BankruptcyProtection V7: Single Unified Wallet
  * 
  * Key principles:
  * 1. Wallet protection operates in USD (admin-configurable, project-agnostic)
@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Log;
  * 3. Prize SIZE is reduced when wallet is low, not win frequency
  * 4. Users stay engaged — they still win, just smaller amounts
  * 5. Emergency mode only kicks in at true critical levels
+ * 
+ * V7 uses a SINGLE wallet (global_vault) — no more 3-wallet split.
  */
 class BankruptcyProtection
 {
@@ -59,6 +61,7 @@ class BankruptcyProtection
 
     /**
      * Get wallet health status with USD-aware thresholds
+     * V7: Uses single global_vault wallet
      */
     public static function getHealthStatus(): array
     {
@@ -103,13 +106,11 @@ class BankruptcyProtection
     }
 
     /**
-     * Get total pool balance across all wallets
+     * Get total pool balance — V7: single global_vault wallet
      */
     public static function getTotalPoolBalance(): int
     {
-        return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT)
-            + FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET)
-            + FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET);
+        return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
     }
 
     /**
@@ -171,10 +172,10 @@ class BankruptcyProtection
         $totalBalance = self::getTotalPoolBalance();
         $maxPercentage = self::getMaxPayoutPercentage();
         $negativeLimit = self::getNegativeLimit();
-        
+
         // Maximum payout is configurable % of pool balance
         $maxByPercentage = (int) round($totalBalance * $maxPercentage);
-        
+
         // But never exceed the negative limit buffer
         $maxByLimit = $totalBalance + $negativeLimit;
 

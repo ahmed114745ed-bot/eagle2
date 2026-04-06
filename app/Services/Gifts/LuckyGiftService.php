@@ -1279,6 +1279,8 @@ class LuckyGiftService
         $hostPercentage = $receiverFeeRate;
         $total_cashback_percentage = 0;
 
+       
+
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
             ->where('id', $giftId)
@@ -1378,7 +1380,8 @@ class LuckyGiftService
                     // Fixed: use per-receiver room fee instead of total
                     $appFee = $unitPrice * $appFeeRate;
                     $receiverFee = $unitPrice * $receiverFeeRate;
-                    $netBetAmount = $unitPrice - $appFee - $receiverFee - $coinsForOwnerPerReceiver;
+                    //$netBetAmount = $unitPrice - $appFee - $receiverFee - $coinsForOwnerPerReceiver;
+                    $netBetAmount = $unitPrice;
 
                     try {
                         $result = $fairService->processBet(
@@ -1503,6 +1506,8 @@ class LuckyGiftService
 
             $room->session += $coinsForOwnerTotal * $count;
             $room->save();
+
+         
 
             $responseData['session'] = $room->session_string;
             $responseData['user_coins'] = $user->di;

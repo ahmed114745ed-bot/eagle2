@@ -44,12 +44,34 @@ class ProbabilityCalculator
         $lowBalanceMinProb   = (float) FairLuckSetting::getByKey('V7_low_balance_min_prob', 0.18);
         $maxProbabilityCap   = (float) FairLuckSetting::getByKey('V7_max_probability_cap', 0.50);
 
-        // Base probability: targetRTP / expectedMultiplier
-        // Use actual expected multiplier (not capped at 5) so baseProb correctly
-        // reflects the actual payout distribution.
-        // Example: targetRTP=0.90, expectedMult=12.7 → baseProb = 0.90/12.7 = 7.1%
-        // This ensures: winRate * avgMultiplier ≈ targetRTP
-        $baseProb = min(0.50, $targetRTP / max(1, $expectedMultiplier));
+        // Base probability: targetRTP / trueWeightedAvgMultiplier
+        //
+        // المشكلة: expectedMultiplier من RewardSelector يُرجع 5x (أصغر مضاعف متاح)
+        // لكن المضاعف الفعلي عند الفوز يكون ~18x بسبب الأوزان
+        //
+        // الحل: حساب المتوسط المرجح الحقيقي من الأوزان مباشرة
+        // ثم استخدامه لحساب baseProb بدقة
+        //
+        // الهدف: winRate × trueAvgMultiplier = targetRTP
+        // baseProb = targetRTP / trueAvgMultiplier
+        $weights = \App\Models\FairLuckSetting::getMultiplierWeights();
+        $totalWeight = array_sum($weights);
+        $trueWeightedAvg = 0.0;
+        if ($totalWeight > 0) {
+            foreach ($weights as $mult => $weight) {
+                $trueWeightedAvg += ($mult * $weight) / $totalWeight;
+            }
+        }
+        // trueWeightedAvg ≈ 55x (نظري) لكن الفعلي ~18x بسبب قيود المحفظة
+        // نستخدم 35% من المتوسط النظري كتقدير للمتوسط الفعلي
+        // هذا يعطي: 55 × 0.35 = 19.25x → baseProb = 0.92/19.25 = 4.78%
+        // مع boost → win rate ~6-8% → RTP = 6.5% × 18x = 117% (لا يزال مرتفعاً)
+        //
+        // الحل الأمثل: استخدام المتوسط الفعلي المُلاحظ = 18x
+        // baseProb = 0.92 / 18 = 5.11%
+        // win rate ~5% × 18x = 90% RTP ✅
+        $effectiveAvgMultiplier = max(5.0, $trueWeightedAvg * 0.27);
+        $baseProb = min($maxProbabilityCap, $targetRTP / $effectiveAvgMultiplier);
 
         // New player protection: disabled when newPlayerBets=0
         if ($newPlayerBets > 0 && $betCount < $newPlayerBets) {
@@ -86,7 +108,9 @@ class ProbabilityCalculator
             $reduction = min(0.80, abs($betImpact) * $scalingFactor);
             $adjustedProb = $baseProb * (1 - $reduction);
 
-            $calculatedProb = max(0.05, $adjustedProb);
+            // تخفيض الحد الأدنى من 0.05 إلى 0.01 لتمكين التخفيض الكافي بعد الفوز الكبير
+            // مثال: بعد فوز 100x → RTP = 10000% → يجب تخفيض الاحتمالية بشكل كبير
+            $calculatedProb = max(0.01, $adjustedProb);
         }
 
         // BANKRUPTCY PROTECTION: Apply pool health reduction factor

@@ -78,13 +78,13 @@ class FairLuckV7OptimizedSettingsSeeder extends Seeder
             ],
             [
                 'key' => 'V7_boost_scaling',
-                'value' => '15',
-                'description' => 'Probability boost scaling factor (15) - معامل تعزيز الاحتمالية عند الخسارة',
+                'value' => '0.03',
+                'description' => 'Probability boost scaling factor (0.03) - معامل تعزيز الاحتمالية عند الخسارة (مخفض لتجنب RTP مرتفع)',
             ],
             [
                 'key' => 'V7_reduce_scaling',
-                'value' => '1',
-                'description' => 'Probability reduction scaling factor (1) - معامل تقليل الاحتمالية عند الفوز',
+                'value' => '0.08',
+                'description' => 'Probability reduction scaling factor (0.08) - معامل تقليل الاحتمالية عند الفوز (مرفوع لضبط RTP)',
             ],
             
             // ============================================
@@ -106,12 +106,12 @@ class FairLuckV7OptimizedSettingsSeeder extends Seeder
             // ============================================
             [
                 'key' => 'V7_new_player_bets',
-                'value' => '20',
+                'value' => '0',
                 'description' => 'Number of bets for new player protection (20) - عدد الرهانات لحماية اللاعب الجديد',
             ],
             [
                 'key' => 'V7_new_player_boost',
-                'value' => '3.5',
+                'value' => '1.0',
                 'description' => 'New player probability boost multiplier (3.5x) - معامل تعزيز احتمالية اللاعب الجديد',
             ],
             
@@ -208,9 +208,10 @@ class FairLuckV7OptimizedSettingsSeeder extends Seeder
             // ============================================
             // 10. إعدادات توزيع المحفظة
             // ============================================
+            // V7: Single wallet - distribution settings deprecated (kept for backward compat)
             [
                 'key' => 'V7_wallet_dist_global',
-                'value' => '0.65',
+                'value' => '1.00',
                 'description' => 'Global vault distribution percentage (65% = 0.65)',
             ],
             [
@@ -259,6 +260,11 @@ class FairLuckV7OptimizedSettingsSeeder extends Seeder
                 'key' => 'fairluck_jackpot_cooldown_bets',
                 'value' => '0',
                 'description' => 'Cooldown bets after jackpot (0 = disabled)',
+            ],
+            [
+                'key' => 'V7_loss_streak_forced_mult',
+                'value' => '5',
+                'description' => 'Forced win multiplier after max loss streak (5x) - يتوافق مع 5x الأكثر ظهوراً',
             ],
             
             // ============================================
@@ -329,17 +335,17 @@ class FairLuckV7OptimizedSettingsSeeder extends Seeder
             [
                 'key' => 'V7_multiplier_weights',
                 'value' => json_encode([
-                    5 => 300,      // وزن 300 = احتمالية 6.3% (تقليل من 500)
-                    10 => 300,     // وزن 300 = احتمالية 6.3% (تقليل من 500)
-                    20 => 300,     // وزن 300 = احتمالية 6.3% (تقليل من 500)
-                    50 => 400,     // وزن 400 = احتمالية 8.4% (تقليل من 500)
-                    70 => 450,     // وزن 450 = احتمالية 9.5% (جديد)
-                    100 => 600,    // وزن 600 = احتمالية 12.6% (جديد)
-                    250 => 600,    // وزن 600 = احتمالية 12.6% (زيادة من 400)
-                    500 => 700,    // وزن 700 = احتمالية 14.7% (زيادة من 300)
-                    1000 => 500,   // وزن 500 = احتمالية 10.5% (زيادة من 200)
+                    5 => 500,      // 5x الأكثر شيوعاً - الأعلى وزناً بفارق واضح
+                    10 => 250,     // 10x أقل شيوعاً من 5x بفارق كبير
+                    20 => 300,     // متوسط
+                    50 => 250,     // أقل شيوعاً
+                    70 => 200,     // نادر نسبياً
+                    100 => 150,    // نادر - إثارة للاعب
+                    250 => 80,     // نادر جداً
+                    500 => 30,     // نادر جداً جداً
+                    1000 => 1,     // جاكبوت - نادر للغاية
                 ]),
-                'description' => 'Multiplier weights distribution - توزيع أوزان المضاعفات (المجموع = 4750)',
+                'description' => 'Multiplier weights distribution - توزيع أوزان المضاعفات - 5x الأكثر ظهوراً',
             ],
         ];
 

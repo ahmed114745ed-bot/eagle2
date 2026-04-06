@@ -5,6 +5,7 @@
 namespace App\Console\Commands;
 
 
+use App\Models\CoreWallet;
 use App\Models\FairLuckWallet;
 use App\Models\User;
 use App\Models\Gift;
@@ -22,7 +23,7 @@ class DetailedMultiUserReportV7 extends Command
                             {--max_rounds=3000 : الحد الأقصى للأدوار}
                             {--force_completion : إجبار الإكمال حتى انتهاء جميع الأرصدة}
                             {--unit_price=1 : سعر الوحدة}
-                            {--vault=0 : رصيد المحفظة الموحدة الابتدائي}';
+                            {--vault=500000 : رصيد المحفظة الموحدة الابتدائي}';
 
     protected $description = 'تقرير شامل متعدد المستخدمين مع تفاصيل كاملة للمحافظ وفلاتر - الإصدار السابع V7';
 
@@ -31,6 +32,8 @@ class DetailedMultiUserReportV7 extends Command
     private array $walletHistory = [];
     private int $totalRounds = 0;
     private float $totalAppProfit = 0;
+    private int $initialAppWalletBalance = 0;
+    private int $initialVaultBalance = 0;
 
     public function handle()
     {
@@ -80,68 +83,63 @@ class DetailedMultiUserReportV7 extends Command
         $this->info("🔧 تهيئة إعدادات V7...");
         
         $defaultSettings = [
-            // Core RTP Settings - 92% default
+            // Core RTP Settings - 92% target
             'V7_target_rtp' => 0.92,
-            'V7_max_probability_cap' => 0.50,
-            'V7_boost_scaling' => 0.05,
-            'V7_reduce_scaling' => 0.02,
-            'V7_chaos_factor_min' => 0.90,
-            'V7_chaos_factor_max' => 1.10,
+            'V7_max_probability_cap' => 0.50,  // سقف الاحتمالية
+            'V7_boost_scaling' => 0.03,         // تقليل التعزيز عند الخسارة
+            'V7_reduce_scaling' => 0.08,        // رفع التخفيض عند الفوز الزائد
+            'V7_chaos_factor_min' => 0.95,
+            'V7_chaos_factor_max' => 1.05,
             
-            // Multiplier Weights - favor smaller wins to reduce volatility & improve profitability
+            // Multiplier Weights - 5x الأكثر ظهوراً بفارق واضح عن 10x
             'V7_multiplier_weights' => json_encode([
-                5 => 800,      // زيادة الوزن (was 500)
-                10 => 750,     // زيادة الوزن (was 500)
-                20 => 700,     // زيادة الوزن (was 500)
-                50 => 600,     // زيادة الوزن (was 500)
-                70 => 500,     // نفس الوزن
-                100 => 400,    // تقليل الوزن (was 500)
-                250 => 300,    // تقليل الوزن (was 400)
-                500 => 150,    // تقليل الوزن (was 300)
-                1000 => 50,    // تقليل الوزن بشكل كبير (was 200)
+                5    => 500,   // 5x الأكثر شيوعاً - الأعلى وزناً
+                10   => 250,   // 10x أقل شيوعاً من 5x بفارق كبير
+                20   => 300,   // متوسط
+                50   => 250,   // أقل شيوعاً
+                70   => 200,   // نادر نسبياً
+                100  => 150,   // نادر - إثارة للاعب
+                250  => 80,    // نادر جداً
+                500  => 30,    // نادر جداً جداً
+                1000 => 1,     // جاكبوت - نادر للغاية
             ]),
-            
-            // New Player Settings
-            'V7_new_player_bets' => 20,
-            'V7_new_player_boost' => 3.0,
-            
+
+            // New Player Settings - تعطيل boost المستخدم الجديد لتحقيق RTP دقيق
+            'V7_new_player_bets' => 0,     // تعطيل (0 = disabled)
+            'V7_new_player_boost' => 1.0,  // لا boost
+
             // Low Balance Protection
-            'V7_low_balance_threshold' => 15,
-            'V7_low_balance_min_prob' => 0.18,
-            
+            'V7_low_balance_threshold' => 10,
+            'V7_low_balance_min_prob' => 0.30,  // رفع من 0.18 إلى 0.30
+
             // Wallet Protection (USD)
             'coin_to_usd_rate' => 0.01,
             'wallet_healthy_usd' => 1000,
             'wallet_warning_usd' => 500,
             'wallet_critical_usd' => 200,
-            'wallet_max_negative_usd' => 300,
-            
-            // Wallet-based max multipliers (smart wallet behavior)
+            'wallet_max_negative_usd' => 500,  // رفع من 300 إلى 500
+
+            // Wallet-based max multipliers
             'V7_wallet_healthy_max_mult' => 1000,
-            'V7_wallet_moderate_max_mult' => 100,
-            'V7_wallet_low_max_mult' => 50,
+            'V7_wallet_moderate_max_mult' => 250,  // رفع من 100 إلى 250
+            'V7_wallet_low_max_mult' => 100,        // رفع من 50 إلى 100
             'V7_wallet_critical_max_mult' => 50,
-            
+
             // Min probability when wallet low (60% floor)
             'V7_min_prob_when_low' => 0.60,
-            
+
             // Loss Streak Protection - Force win after max streak
-            'V7_max_loss_streak' => 20,
-            'V7_loss_streak_forced_mult' => 5,
-            
-            // Cooldown & Safety - DISABLED by default (0 = disabled)
+            'V7_max_loss_streak' => 15,            // تقليل من 20 إلى 15
+            'V7_loss_streak_forced_mult' => 5,     // 5x بدلاً من 10x - يتوافق مع الأكثر ظهوراً
+
+            // Cooldown & Safety
             'fairluck_jackpot_cooldown_bets' => 0,
-            'V7_min_bets_100x' => 30,
-            'V7_min_bets_500x' => 100,
-            'V7_max_single_win_pct' => 0.10,
-            
-            // Wallet Distribution (65% global, 20% jackpot, 15% medium)
-            'V7_wallet_dist_global' => 0.65,
-            'V7_wallet_dist_jackpot' => 0.20,
-            'V7_wallet_dist_medium' => 0.15,
-            
+            'V7_min_bets_100x' => 10,   // تقليل من 30 إلى 10
+            'V7_min_bets_500x' => 30,   // تقليل من 100 إلى 30
+            'V7_max_single_win_pct' => 0.15,  // رفع من 0.10 إلى 0.15
+
             // Legacy settings
-            'global_vault_negative_limit' => 30000,
+            'global_vault_negative_limit' => 50000,  // رفع من 30000 إلى 50000
             'fair_luck_owner_fee_rate' => 0.10,
         ];
         
@@ -194,14 +192,8 @@ class DetailedMultiUserReportV7 extends Command
         }
         $this->table(['المضاعف', 'الوزن'], $weightRows);
         
-        // Show wallet distribution
-        $this->info("💰 توزيع المحافظ:");
-        $distRows = [
-            ['Global Vault', (\App\Models\FairLuckSetting::getByKey('V7_wallet_dist_global', 0.65) * 100) . '%'],
-            ['Jackpot Wallet', (\App\Models\FairLuckSetting::getByKey('V7_wallet_dist_jackpot', 0.20) * 100) . '%'],
-            ['Medium Wallet', (\App\Models\FairLuckSetting::getByKey('V7_wallet_dist_medium', 0.15) * 100) . '%'],
-        ];
-        $this->table(['المحفظة', 'النسبة'], $distRows);
+        // V7: محفظة واحدة فقط
+        $this->info("💰 المحفظة: محفظة واحدة موحدة (Global Vault) - 100% من الرهانات");
         $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         $this->info("");
     }
@@ -249,35 +241,27 @@ class DetailedMultiUserReportV7 extends Command
         $round = 1;
         $activeUsers = count($this->users);
         
-        // تعيين رصيد المحفظة الموحدة (unified_vault)
+        // تعيين رصيد المحفظة الموحدة (global_vault) - V7: محفظة واحدة فقط
         $initialVault = (int) $this->option('vault');
-        $this->info("🔄 تهيئة المحافظ V7 برصيد " . number_format($initialVault) . "...");
+        $this->info("🔄 تهيئة المحفظة الموحدة V7 برصيد " . number_format($initialVault) . "...");
         
-        // Get wallet distribution from settings (not hardcoded)
-        $globalDist = (float) \App\Models\FairLuckSetting::getByKey('V7_wallet_dist_global', 0.65);
-        $jackpotDist = (float) \App\Models\FairLuckSetting::getByKey('V7_wallet_dist_jackpot', 0.20);
-        $mediumDist = (float) \App\Models\FairLuckSetting::getByKey('V7_wallet_dist_medium', 0.15);
+        // V7: محفظة واحدة فقط - global_vault
+        FairLuckWallet::where('wallet_type', FairLuckWallet::TYPE_GLOBAL_VAULT)->update([
+            'balance' => $initialVault,
+            'last_updated' => now()
+        ]);
+        \Illuminate\Support\Facades\Redis::set('fairluck:wallet:' . FairLuckWallet::TYPE_GLOBAL_VAULT, $initialVault);
         
-        // تهيئة المحافظ الثلاث (global_vault, jackpot_wallet, medium_wallet)
-        $distribution = [
-            FairLuckWallet::TYPE_GLOBAL_VAULT => (int) round($initialVault * $globalDist),
-            FairLuckWallet::TYPE_JACKPOT_WALLET => (int) round($initialVault * $jackpotDist),
-            FairLuckWallet::TYPE_MEDIUM_WALLET => (int) round($initialVault * $mediumDist),
-        ];
-        
-        foreach ($distribution as $walletType => $amount) {
-            FairLuckWallet::where('wallet_type', $walletType)->update([
-                'balance' => $amount,
-                'last_updated' => now()
-            ]);
-            
-            $vaultKey = "fairluck:wallet:{$walletType}";
-            \Illuminate\Support\Facades\Redis::set($vaultKey, $amount);
-        }
+        // حفظ الأرصدة الابتدائية لمحفظة اللعب ومحفظة التطبيق
+        $this->initialVaultBalance = $initialVault;
+        $appWallet = CoreWallet::where('name', 'app_wallet')->first();
+        $this->initialAppWalletBalance = $appWallet ? (int) $appWallet->coins : 0;
         
         // حفظ الحالة الأولية للمحافظ
         $this->walletHistory[0] = $this->getWalletBalances();
-        $this->info("✅ تم تهيئة جميع المحافظ V7");
+        $this->info("✅ تم تهيئة المحفظة الموحدة V7");
+        $this->info("📊 رصيد محفظة اللعب الابتدائي: " . number_format($this->initialVaultBalance));
+        $this->info("📊 رصيد محفظة التطبيق الابتدائي: " . number_format($this->initialAppWalletBalance));
         
         $this->info("🎲 بدء المحاكاة...");
         
@@ -460,10 +444,12 @@ class DetailedMultiUserReportV7 extends Command
 
     private function getWalletBalances(): array
     {
+        // V7: محفظة واحدة فقط - global_vault
+        $balance = FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
         return [
-            'global_vault' => FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT),
-            'jackpot_wallet' => FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_JACKPOT_WALLET),
-            'medium_wallet' => FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_MEDIUM_WALLET),
+            'global_vault' => $balance,
+            'jackpot_wallet' => 0,
+            'medium_wallet' => 0,
         ];
     }
 
@@ -477,7 +463,19 @@ class DetailedMultiUserReportV7 extends Command
         $totalBets = array_sum(array_column($this->users, 'total_bet'));
         $totalWinnings = array_sum(array_column($this->users, 'total_win'));
         $overallRTP = $totalBets > 0 ? ($totalWinnings / $totalBets) * 100 : 0;
+
+        // حساب الأرصدة النهائية لمحفظة اللعب ومحفظة التطبيق
+        $finalVaultBalance = FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
+        $finalAppWallet = CoreWallet::where('name', 'app_wallet')->first();
+        $finalAppWalletBalance = $finalAppWallet ? (int) $finalAppWallet->coins : 0;
+        $vaultChange = $finalVaultBalance - $this->initialVaultBalance;
+        $appWalletChange = $finalAppWalletBalance - $this->initialAppWalletBalance;
+        $vaultChangeSign = $vaultChange >= 0 ? '+' : '';
+        $appWalletChangeSign = $appWalletChange >= 0 ? '+' : '';
         
+        $vaultChangeColor = $vaultChange >= 0 ? '#28a745' : '#dc3545';
+        $appWalletChangeColor = $appWalletChange >= 0 ? '#28a745' : '#dc3545';
+
         $html = "<!DOCTYPE html>
 <html lang='ar' dir='rtl'>
 <head>
@@ -496,14 +494,62 @@ class DetailedMultiUserReportV7 extends Command
         .stats-summary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
         .table small { font-size: 0.85em; }
         .v7-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .wallet-card { border-radius: 12px; padding: 20px; color: white; }
+        .wallet-game { background: linear-gradient(135deg, #1a73e8, #0d47a1); }
+        .wallet-app  { background: linear-gradient(135deg, #e67e22, #c0392b); }
+        .wallet-label { font-size: 0.85rem; opacity: 0.85; }
+        .wallet-value { font-size: 1.5rem; font-weight: 700; }
+        .wallet-change { font-size: 1.1rem; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class='container py-5'>
-        <div class='stats-summary p-4 rounded mb-5'>
+        <div class='stats-summary p-4 rounded mb-4'>
             <h1 class='text-center mb-4'>تقرير FairLuck مفصل - متعدد المستخدمين <span class='badge v7-badge'>V7</span></h1>
             <p class='text-center mb-4'>الهدية: {$gift->name} | مبلغ الرهان: " . number_format($betAmount) . " | الرصيد الابتدائي: " . number_format($initialBalance) . " | إجمالي الأدوار: {$this->totalRounds}</p>
-            <p class='text-center mb-2'><small>ملاحظة: تم تهيئة المحافظ الثلاث (Global Vault 65% | Jackpot Wallet 20% | Medium Wallet 15%)</small></p>
+            <p class='text-center mb-2'><small>ملاحظة: V7 - محفظة واحدة موحدة (Global Vault) - جميع الرهانات والمدفوعات من محفظة واحدة</small></p>
+        </div>
+
+        <!-- بطاقات المحافظ قبل وبعد -->
+        <div class='row mb-4 g-3'>
+            <div class='col-md-6'>
+                <div class='wallet-card wallet-game'>
+                    <div class='wallet-label'>🎮 محفظة اللعب (Global Vault)</div>
+                    <div class='row mt-2'>
+                        <div class='col-4 text-center'>
+                            <div class='wallet-label'>قبل</div>
+                            <div class='wallet-value'>" . number_format($this->initialVaultBalance) . "</div>
+                        </div>
+                        <div class='col-4 text-center'>
+                            <div class='wallet-label'>بعد</div>
+                            <div class='wallet-value'>" . number_format($finalVaultBalance) . "</div>
+                        </div>
+                        <div class='col-4 text-center'>
+                            <div class='wallet-label'>التغيير</div>
+                            <div class='wallet-change' style='color:{$vaultChangeColor};background:#fff;border-radius:8px;padding:4px 8px;display:inline-block;'>{$vaultChangeSign}" . number_format($vaultChange) . "</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class='col-md-6'>
+                <div class='wallet-card wallet-app'>
+                    <div class='wallet-label'>💰 محفظة التطبيق (app_wallet)</div>
+                    <div class='row mt-2'>
+                        <div class='col-4 text-center'>
+                            <div class='wallet-label'>قبل</div>
+                            <div class='wallet-value'>" . number_format($this->initialAppWalletBalance) . "</div>
+                        </div>
+                        <div class='col-4 text-center'>
+                            <div class='wallet-label'>بعد</div>
+                            <div class='wallet-value'>" . number_format($finalAppWalletBalance) . "</div>
+                        </div>
+                        <div class='col-4 text-center'>
+                            <div class='wallet-label'>التغيير</div>
+                            <div class='wallet-change' style='color:{$appWalletChangeColor};background:#fff;border-radius:8px;padding:4px 8px;display:inline-block;'>{$appWalletChangeSign}" . number_format($appWalletChange) . "</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- بطاقات المستخدمين -->
