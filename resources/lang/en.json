@@ -300,6 +300,8 @@
     "pusher_edit_user_desc": "Listens for user-related channel events. Updates user data and status when their dedicated channel is created or removed.",
     "copy": "Copy",
     "event": "Event",
+    
+     "limitChatMessage":"You’ve reached the conversation limit. Add this user as a friend to continue chatting",
     "channel_existence": "Channel existence",
     "presence": "Presence",
     "Enable Vip Auto": "Enable Vip Auto",

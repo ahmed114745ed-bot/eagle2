@@ -76,7 +76,7 @@ class ChatMessagesController extends Controller
         if ($chatRoom->type == 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 429,
-                'message' => 'You have reached the limit for sending messages',
+                'message' => __("limitChatMessage"),
             ], 429);
         }
 
