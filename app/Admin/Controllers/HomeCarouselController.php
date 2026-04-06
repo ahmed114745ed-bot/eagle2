@@ -322,7 +322,7 @@ class HomeCarouselController extends MainController
             transform: translateX(26px);
             }
         ');
-        
+
 
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -332,7 +332,7 @@ class HomeCarouselController extends MainController
         return $grid;
     }
 
-    
+
 
 
     public function toggleStatus(Request $request)
@@ -453,7 +453,6 @@ class HomeCarouselController extends MainController
         $form->imagePath('img', trans('img'))
             /**->setResolution(80)*/
             ->required();
-        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
     }
 
 
@@ -474,8 +473,9 @@ class HomeCarouselController extends MainController
             $form->text('input', trans('input'))
                 ->rules('integer|min:1|max:99');
         })->when('4', function (Form $form) {
-             \Log::info('Adding input field for lifetime duration');
+            \Log::info('Adding input field for lifetime duration');
         });
+        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
     }
 
 
@@ -569,23 +569,23 @@ class HomeCarouselController extends MainController
         $form->ignore(['duration']);
 
 
-     
+
         $form->saving(function (Form $form) {
-        try {
-        if (request()->hasFile('img')) {
+            try {
+                if (request()->hasFile('img')) {
 
-                        $path = WebPHelper::uploadWebp(
-                            request()->file('img'),
-                            'images',
-                            'splash',
+                    $path = WebPHelper::uploadWebp(
+                        request()->file('img'),
+                        'images',
+                        'splash',
 
-                        );
+                    );
 
-                        $form->image_url = $path;
-                    }        } catch (\Exception $e) {
-                    dd($e->getMessage()); 
+                    $form->image_url = $path;
                 }
-            
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+            }
         });
         // dd($form->display_at , $form->model()->display_at ,request('display_at'));
 
