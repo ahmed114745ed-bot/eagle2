@@ -75,8 +75,8 @@ jobs:
           sudo docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
           sudo docker service update \
             --image lumio-octa:${{ github.sha }} \
-            --replicas 2 \
-            --limit-memory 2.0gb \
+            --replicas 3 \
+            --limit-memory 2.5gb \
             --reserve-memory 1.0gb \
             --update-order stop-first \
             --update-parallelism 1 \
@@ -114,10 +114,10 @@ jobs:
 
           sudo docker service update \
             --image lumio-job:${{ github.sha }} \
-            --replicas 4 \
-            --limit-cpu 2.0 \
-            --limit-memory 2gb \
-            --reserve-memory 1gb \
+            --replicas 3 \
+            --limit-cpu 5.0 \
+            --limit-memory 2.5gb \
+            --reserve-memory 1.0gb \
             --update-parallelism 1 \
             --update-delay 10s \
             --update-failure-action rollback \
