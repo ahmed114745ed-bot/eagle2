@@ -8,7 +8,7 @@ use App\Helpers\Common;
 use App\Models\Config;
 use App\Models\Setting;
 use App\Models\User;
-use Database\Seeders\config;
+
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
