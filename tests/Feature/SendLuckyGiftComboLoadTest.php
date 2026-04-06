@@ -27,7 +27,7 @@ class SendLuckyGiftComboLoadTest extends TestCase
     private const ROOM_ID     = 1174;   // toUid (room uid used as owner_id)
     private const NUM         = 1;
     private const USERS_COUNT = 100;
-    private const REQUESTS_PER_USER = 2000; // 20 × 100 = 2000 request
+    private const REQUESTS_PER_USER = 2000; // 2000 × 100 = 200,000 request
     private const INITIAL_COINS = 10000;
 
     // ─── Properties ───────────────────────────────────────────────────────────
@@ -151,7 +151,7 @@ class SendLuckyGiftComboLoadTest extends TestCase
         $mockUpdate->shouldReceive('getSenderLevel')->andReturn(1);
         $this->app->instance(UpdateUserWhenSendGift::class, $mockUpdate);
 
-        // ── Create {$userCount} users with 20000 coins each ───────────────────────────
+        // ── Create {$userCount} users with 10000 coins each ───────────────────────────
         $users = User::factory()->count($userCount)->create([
             'di'                 => self::INITIAL_COINS,
             'total_diamond_send' => 0,
