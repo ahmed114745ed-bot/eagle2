@@ -5377,5 +5377,11 @@
     "When enabled, users can charge themselves": "عند التمكين، يمكن للمستخدمين شحن أنفسهم",
     "When enabled, charging agents can charge users": "عند التمكين، يمكن لوكلاء الشحن شحن المستخدمين",
     "When enabled, charging agents can charge other agents": "عند التمكين، يمكن لوكلاء الشحن شحن الوكلاء الآخرين",
-    "Save Settings": "حفظ الإعدادات"
+    "Save Settings": "حفظ الإعدادات",
+    "api_responses.charge_user_to_user_disabled": "تم تعطيل الشحن من المستخدم إلى مستخدم آخر حاليًا",
+    "api_responses.charge_user_to_agent_disabled": "تم تعطيل الشحن من المستخدم إلى وكيل الشحن حاليًا",
+    "api_responses.charge_to_self_disabled": "تم تعطيل الشحن إلى نفسك حاليًا",
+    "api_responses.charge_agent_to_user_disabled": "تم تعطيل الشحن من وكيل الشحن إلى المستخدم حاليًا",
+    "api_responses.charge_agent_to_agent_disabled": "تم تعطيل الشحن من وكيل الشحن إلى وكيل شحن آخر حاليًا",
+    "api_responses.freeze_charge_settings": "تم تعطيل الشحن حاليًا بواسطة المسؤول."
 }
