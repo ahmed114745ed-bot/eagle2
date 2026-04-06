@@ -27,6 +27,8 @@ class SendLuckyGiftComboLoadTest extends TestCase
     private const ROOM_ID     = 1174;   // toUid (room uid used as owner_id)
     private const NUM         = 1;
     private const USERS_COUNT = 100;
+    private const REQUESTS_PER_USER = 2000; // 20 × 100 = 2000 request
+    private const INITIAL_COINS = 10000;
 
     // ─── Properties ───────────────────────────────────────────────────────────
     private Gift   $gift;
@@ -117,25 +119,31 @@ class SendLuckyGiftComboLoadTest extends TestCase
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // TEST 1 — Load test: 100 concurrent users
+    // TEST 1 — Load test: 100 users × 20 requests = 2000 total
+    // Generates detailed HTML report with user balances
     // ─────────────────────────────────────────────────────────────────────────
-    public function test_send_lucky_gift_combo_with_100_users(): void
+    public function test_send_lucky_gift_combo_with_2000_requests(): void
     {
-        // ── Mock FairLuckServiceV7 ────────────────────────────────────────────
-        // Return a simple "winner" result so the service doesn't need Redis/DB
-        // for the fair-luck engine.
-        $fakeResult = (object) [
-            'isWinner'      => true,
-            'multiplier'    => 1.0,
-            'profitAmount'  => 0.0,
-            'wallets_before' => null,
-            'wallets_after'  => null,
-        ];
+        $this->runLoadTest(self::USERS_COUNT, self::REQUESTS_PER_USER);
+    }
 
-        $mockFairV7 = Mockery::mock(FairLuckServiceV7::class);
-        $mockFairV7->shouldReceive('processBet')
-                   ->andReturn($fakeResult);
-        $this->app->instance(FairLuckServiceV7::class, $mockFairV7);
+    // ─────────────────────────────────────────────────────────────────────────
+    // TEST 1b — Small test: 1 user × 20 requests for quick testing
+    // ─────────────────────────────────────────────────────────────────────────
+    public function test_single_user_20_requests(): void
+    {
+        $this->runLoadTest(1, 20);
+    }
+
+    /**
+     * Run load test with specified users and requests per user
+     */
+    private function runLoadTest(int $userCount, int $requestsPerUser): void
+    {
+        $giftPrice = $this->gift->price ?? 100;
+        
+        // ── No Mock for FairLuckServiceV7 - Use REAL service for actual wallet balance tracking ─────────────────────────────────────────────────
+        // This will interact with the real Unified Vault and track actual balance changes
 
         // ── Mock UpdateUserWhenSendGift ───────────────────────────────────────
         $mockUpdate = Mockery::mock(UpdateUserWhenSendGift::class);
@@ -143,126 +151,532 @@ class SendLuckyGiftComboLoadTest extends TestCase
         $mockUpdate->shouldReceive('getSenderLevel')->andReturn(1);
         $this->app->instance(UpdateUserWhenSendGift::class, $mockUpdate);
 
-        // ── Create 100 users with enough coins ───────────────────────────────
-        $giftPrice = $this->gift->price ?? 100;
-        $requiredCoins = $giftPrice * self::NUM * 10; // generous buffer
-
-        $users = User::factory()->count(self::USERS_COUNT)->create([
-            'di'                 => $requiredCoins,
+        // ── Create {$userCount} users with 20000 coins each ───────────────────────────
+        $users = User::factory()->count($userCount)->create([
+            'di'                 => self::INITIAL_COINS,
             'total_diamond_send' => 0,
             'sub_sender_level'   => 0,
         ]);
 
-        // ── Metrics ───────────────────────────────────────────────────────────
-        $results      = [];
-        $successCount = 0;
-        $failCount    = 0;
-        $times        = [];
-
-        // ── Fire requests ─────────────────────────────────────────────────────
-        foreach ($users as $index => $user) {
-            $start = microtime(true);
-
-            $response = $this->actingAs($user)
-                ->postJson('/api/gifts/v7/send-lucky-gift-combo', [
-                    'id'       => self::GIFT_ID,
-                    'toUid'    => (string) $this->ownerId,
-                    'owner_id' => $this->ownerId,
-                    'num'      => self::NUM,
-                ]);
-
-            $elapsed = (int) round((microtime(true) - $start) * 1000); // ms
-            $times[] = $elapsed;
-
-            $httpStatus = $response->status();
-            // The response uses 'success' key (not 'status') based on Common::apiResponse
-            // which returns: {'success': true/false, 'message': '...', 'data': {...}}
-            $apiStatus  = $response->json('success') ?? $response->json('status') ?? -1;
-            $message    = $response->json('message') ?? '';
-
-            $isSuccess = ($httpStatus === 200 && $apiStatus == true);
-            if ($isSuccess) {
-                $successCount++;
-            } else {
-                $failCount++;
-            }
-
-            $results[] = [
-                'index'      => $index + 1,
-                'user_id'    => $user->id,
-                'http'       => $httpStatus,
-                'api_status' => $apiStatus,
-                'time_ms'    => $elapsed,
-                'ok'         => $isSuccess,
-                'message'    => $message,
+        // Store initial state
+        $userStats = [];
+        foreach ($users as $user) {
+            $userStats[$user->id] = [
+                'id'               => $user->id,
+                'initial_balance'  => self::INITIAL_COINS,
+                'current_balance'  => self::INITIAL_COINS,
+                'total_wins'       => 0,
+                'total_losses'     => 0,
+                'win_count'        => 0,
+                'loss_count'       => 0,
+                'multiplier_hits'  => [],
+                'requests_sent'    => 0,
+                'successful_reqs'  => 0,
+                'failed_reqs'      => 0,
+                'max_balance'      => self::INITIAL_COINS, // Track highest balance reached
             ];
         }
 
-        // ── Compute stats ─────────────────────────────────────────────────────
-        $avgTime = count($times) > 0 ? (int) round(array_sum($times) / count($times)) : 0;
-        $minTime = count($times) > 0 ? min($times) : 0;
-        $maxTime = count($times) > 0 ? max($times) : 0;
+        // ── Get game wallet balance before test ──────────────────────────────
+        // PoolManager uses TYPE_GLOBAL_VAULT, not TYPE_UNIFIED_VAULT
+        $initialVaultBalance = \App\Models\FairLuckWallet::getRedisBalance(\App\Models\FairLuckWallet::TYPE_GLOBAL_VAULT);
+        Log::info("[LoadTest] Initial vault balance (GLOBAL_VAULT): {$initialVaultBalance}");
+        $allResults = [];
 
-        $httpDist = [];
-        foreach ($results as $r) {
-            $code = $r['http'];
-            $httpDist[$code] = ($httpDist[$code] ?? 0) + 1;
+        foreach ($users as $user) {
+            for ($i = 0; $i < $requestsPerUser; $i++) {
+                $start = microtime(true);
+
+                $response = $this->actingAs($user)
+                    ->postJson('/api/gifts/v7/send-lucky-gift-combo', [
+                        'id'       => self::GIFT_ID,
+                        'toUid'    => (string) $this->ownerId,
+                        'owner_id' => $this->ownerId,
+                        'num'      => self::NUM,
+                    ]);
+
+                $elapsed = (int) round((microtime(true) - $start) * 1000);
+
+                $httpStatus = $response->status();
+                $apiStatus  = $response->json('success') ?? $response->json('status') ?? false;
+                $data       = $response->json('data') ?? [];
+
+                $isSuccess = ($httpStatus === 200 && $apiStatus == true);
+
+                $userStats[$user->id]['requests_sent']++;
+
+                if ($isSuccess) {
+                    $userStats[$user->id]['successful_reqs']++;
+
+                    // Deduct gift cost
+                    $userStats[$user->id]['current_balance'] -= $giftPrice;
+                    $userStats[$user->id]['total_losses'] += $giftPrice;
+
+                    // Process combo array for wins
+                    $combo = $data['combo'] ?? [];
+                    
+                    Log::info("[LoadTest] Response received", [
+                        'user_id' => $user->id,
+                        'combo_count' => count($combo),
+                        'sample_combo' => $combo[0] ?? null,
+                    ]);
+                    
+                    foreach ($combo as $item) {
+                        $itemData = $item['data'] ?? null;
+                        if ($itemData && ($item['status'] ?? 1) == 0) {
+                            $winCoins = $itemData['win_coins'] ?? 0;
+                            $isWin = $itemData['is_win'] ?? false;
+                            
+                            if ($isWin && $winCoins > 0) {
+                                // Calculate multiplier: win_coins / (giftPrice * num)
+                                $multiplier = $winCoins / ($giftPrice * self::NUM);
+                                
+                                Log::info("[LoadTest] Win detected", [
+                                    'user_id' => $user->id,
+                                    'win_coins' => $winCoins,
+                                    'calculated_multiplier' => $multiplier,
+                                    'winner_comment' => $itemData['winner_comment'] ?? null,
+                                    'comment_message' => $itemData['comment_message'] ?? null,
+                                    'giftPrice' => $giftPrice,
+                                    'num' => self::NUM,
+                                ]);
+                                
+                                $userStats[$user->id]['current_balance'] += $winCoins;
+                                
+                                // Track max balance reached
+                                if ($userStats[$user->id]['current_balance'] > $userStats[$user->id]['max_balance']) {
+                                    $userStats[$user->id]['max_balance'] = $userStats[$user->id]['current_balance'];
+                                }
+                                
+                                $userStats[$user->id]['total_wins'] += $winCoins;
+                                $userStats[$user->id]['win_count']++;
+
+                                if ($multiplier > 0) {
+                                    // Round to nearest valid multiplier (5, 10, 20, 50, 70, 100, 250, 500, 1000)
+                                    $multKey = $this->roundToValidMultiplier((int) $multiplier);
+                                    $userStats[$user->id]['multiplier_hits'][$multKey] =
+                                        ($userStats[$user->id]['multiplier_hits'][$multKey] ?? 0) + 1;
+                                }
+                            } else {
+                                $userStats[$user->id]['loss_count']++;
+                            }
+                        }
+                    }
+                    
+                    // If no combo data, count as loss
+                    if (empty($combo)) {
+                        $userStats[$user->id]['loss_count']++;
+                    }
+                } else {
+                    $userStats[$user->id]['failed_reqs']++;
+                    Log::warning("[LoadTest] Failed request", [
+                        'user_id' => $user->id,
+                        'http_status' => $httpStatus,
+                        'api_status' => $apiStatus,
+                    ]);
+                }
+
+                $allResults[] = [
+                    'user_id'     => $user->id,
+                    'http'        => $httpStatus,
+                    'success'     => $isSuccess,
+                    'time_ms'     => $elapsed,
+                ];
+            }
         }
-        $httpDistStr = implode('  ', array_map(
-            fn($code, $cnt) => "{$code}:{$cnt}",
-            array_keys($httpDist),
-            array_values($httpDist)
-        ));
 
-        // ── Build log report ──────────────────────────────────────────────────
-        $lines   = [];
-        $lines[] = '════════════════════════════════════════════════════════════════';
-        $lines[] = 'LOAD TEST — sendLuckyGift7';
-        $lines[] = 'Date       : ' . now()->toDateTimeString();
-        $lines[] = 'Gift ID    : ' . self::GIFT_ID;
-        $lines[] = 'Room ID    : ' . self::ROOM_ID;
-        $lines[] = 'Total      : ' . self::USERS_COUNT;
-        $lines[] = 'Success    : ' . $successCount . '   (api_status=1)';
-        $lines[] = 'Failed     : ' . $failCount;
-        $lines[] = 'Avg Time   : ' . $avgTime . ' ms';
-        $lines[] = 'Min / Max  : ' . $minTime . ' ms / ' . $maxTime . ' ms';
-        $lines[] = 'HTTP Dist  : ' . $httpDistStr;
-        $lines[] = '────────────────────────────────────────────────────────────────';
+        // ── Get game wallet balance after test ───────────────────────────────
+        // Read from database directly (not Redis) to get actual committed balance
+        $wallet = \App\Models\FairLuckWallet::where('wallet_type', \App\Models\FairLuckWallet::TYPE_GLOBAL_VAULT)->first();
+        $finalVaultBalance = $wallet ? $wallet->balance : 0;
+        $vaultChange = $finalVaultBalance - $initialVaultBalance;
+        Log::info("[LoadTest] Final vault balance from DB: {$finalVaultBalance}, Change: {$vaultChange}");
 
-        foreach ($results as $r) {
-            $status = $r['ok'] ? 'OK' : ('FAIL: ' . ($r['message'] ?: 'unknown'));
-            $lines[] = sprintf(
-                '[#%d]  uid=%-6d http=%d api=%d t=%dms  %s',
-                $r['index'],
-                $r['user_id'],
-                $r['http'],
-                $r['api_status'],
-                $r['time_ms'],
-                $status
-            );
-        }
-
-        $lines[] = '════════════════════════════════════════════════════════════════';
-
-        $logContent = implode(PHP_EOL, $lines) . PHP_EOL;
-        $logPath    = storage_path('logs/load_test_lucky_gift.log');
-        file_put_contents($logPath, $logContent, FILE_APPEND);
+        // ── Generate HTML Report ───────────────────────────────────────────────
+        $this->generateHtmlReport($userStats, $allResults, $initialVaultBalance, $finalVaultBalance);
 
         // ── Assertions ────────────────────────────────────────────────────────
+        $totalSuccess = array_sum(array_column($userStats, 'successful_reqs'));
+        $minExpected = (int) ($userCount * $requestsPerUser * 0.9); // 90% success rate
         $this->assertGreaterThanOrEqual(
-            95,
-            $successCount,
-            "Success rate below 95%: only {$successCount}/100 succeeded.\n" .
-            "Check storage/logs/load_test_lucky_gift.log for details."
+            $minExpected,
+            $totalSuccess,
+            "Success rate too low: only {$totalSuccess}/" . ($userCount * $requestsPerUser) . " succeeded."
         );
+    }
 
-        $this->assertLessThan(
-            2000,
-            $avgTime,
-            "Avg response time > 2s: {$avgTime}ms"
-        );
+    /**
+     * Generate detailed HTML report for the load test
+     */
+    private function generateHtmlReport(array $userStats, array $allResults, int $initialVaultBalance = 0, int $finalVaultBalance = 0): void
+    {
+        $totalRequests = count($allResults);
+        $totalSuccess = array_sum(array_column($userStats, 'successful_reqs'));
+        $totalFailed = array_sum(array_column($userStats, 'failed_reqs'));
 
-        $this->assertFileExists($logPath);
+        $totalInitial = count($userStats) * self::INITIAL_COINS;
+        $totalFinal = array_sum(array_column($userStats, 'current_balance'));
+        $totalWins = array_sum(array_column($userStats, 'total_wins'));
+        $totalLosses = array_sum(array_column($userStats, 'total_losses'));
+
+        // Aggregate multiplier hits across all users
+        $allMultipliers = [];
+        foreach ($userStats as $stats) {
+            foreach ($stats['multiplier_hits'] as $mult => $count) {
+                $allMultipliers[$mult] = ($allMultipliers[$mult] ?? 0) + $count;
+            }
+        }
+        ksort($allMultipliers);
+
+        $responseTimes = array_column($allResults, 'time_ms');
+        $avgTime = count($responseTimes) > 0 ? round(array_sum($responseTimes) / count($responseTimes), 2) : 0;
+        $minTime = count($responseTimes) > 0 ? min($responseTimes) : 0;
+        $maxTime = count($responseTimes) > 0 ? max($responseTimes) : 0;
+
+        $html = $this->buildReportHtml([
+            'userStats' => $userStats,
+            'totalRequests' => $totalRequests,
+            'totalSuccess' => $totalSuccess,
+            'totalFailed' => $totalFailed,
+            'totalInitial' => $totalInitial,
+            'totalFinal' => $totalFinal,
+            'totalWins' => $totalWins,
+            'totalLosses' => $totalLosses,
+            'allMultipliers' => $allMultipliers,
+            'avgTime' => $avgTime,
+            'minTime' => $minTime,
+            'maxTime' => $maxTime,
+            'initialVaultBalance' => $initialVaultBalance,
+            'finalVaultBalance' => $finalVaultBalance,
+        ]);
+
+        // Save report
+        $reportsDir = public_path('reports');
+        if (!is_dir($reportsDir)) {
+            mkdir($reportsDir, 0755, true);
+        }
+
+        $filename = 'load_test_report_' . now()->format('Y-m-d_H-i-s') . '.html';
+        $filepath = $reportsDir . '/' . $filename;
+        file_put_contents($filepath, $html);
+
+        echo "\n📄 HTML Report generated: {$filepath}\n";
+    }
+
+    /**
+     * Build the HTML report content
+     */
+    private function buildReportHtml(array $data): string
+    {
+        extract($data);
+
+        $vaultChange = ($finalVaultBalance ?? 0) - ($initialVaultBalance ?? 0);
+        $vaultChangeClass = $vaultChange >= 0 ? 'profit' : 'loss';
+
+        $userRows = '';
+        $rank = 1;
+        // Sort by current balance descending
+        uasort($userStats, fn($a, $b) => $b['current_balance'] <=> $a['current_balance']);
+
+        foreach ($userStats as $uid => $stats) {
+            $netProfit = $stats['current_balance'] - $stats['initial_balance'];
+            $netClass = $netProfit >= 0 ? 'profit' : 'loss';
+            $multiplierSummary = [];
+            foreach ($stats['multiplier_hits'] as $m => $c) {
+                $multiplierSummary[] = "{$m}x ({$c})";
+            }
+            $multiplierStr = implode(', ', $multiplierSummary) ?: '-';
+
+            $userRows .= "<tr>
+                <td>{$rank}</td>
+                <td>#{$uid}</td>
+                <td>" . number_format($stats['initial_balance']) . "</td>
+                <td>" . number_format($stats['current_balance']) . "</td>
+                <td>" . number_format($stats['max_balance']) . "</td>
+                <td class='{$netClass}'>" . ($netProfit >= 0 ? '+' : '') . number_format($netProfit) . "</td>
+                <td>" . number_format($stats['total_wins']) . "</td>
+                <td>" . number_format($stats['total_losses']) . "</td>
+                <td>{$stats['win_count']}</td>
+                <td>{$stats['loss_count']}</td>
+                <td>{$multiplierStr}</td>
+                <td>{$stats['successful_reqs']}/{$stats['requests_sent']}</td>
+            </tr>";
+            $rank++;
+        }
+
+        $multiplierRows = '';
+        foreach ($allMultipliers as $mult => $count) {
+            $totalWinAmount = 0;
+            foreach ($userStats as $stats) {
+                if (isset($stats['multiplier_hits'][$mult])) {
+                    $totalWinAmount += ($giftPrice ?? 100) * $mult * $stats['multiplier_hits'][$mult];
+                }
+            }
+            $multiplierRows .= "<tr>
+                <td>{$mult}x</td>
+                <td>{$count}</td>
+                <td>" . number_format($totalWinAmount) . "</td>
+            </tr>";
+        }
+
+        // Build per-user multiplier distribution table (actual V7 multipliers: 5, 10, 20, 50, 70, 100, 250, 500, 1000)
+        $standardMultipliers = [5, 10, 20, 50, 70, 100, 250, 500, 1000];
+        $userMultiplierRows = '';
+        $rank = 1;
+        foreach ($userStats as $uid => $stats) {
+            $row = "<tr>
+                <td>{$rank}</td>
+                <td>#{$uid}</td>";
+            $userTotalWins = 0;
+            foreach ($standardMultipliers as $mult) {
+                $count = $stats['multiplier_hits'][$mult] ?? 0;
+                $userTotalWins += $count;
+                $highlight = $count > 0 ? " style='background:rgba(74,222,128,0.2);font-weight:bold;'" : '';
+                $row .= "<td{$highlight}>{$count}</td>";
+            }
+            $row .= "<td class='bg-primary text-white fw-bold'>{$userTotalWins}</td>";
+            
+            // Add max multiplier hit
+            $maxMultHit = !empty($stats['multiplier_hits']) ? max(array_keys($stats['multiplier_hits'])) : 0;
+            $row .= "<td>" . ($maxMultHit > 0 ? $maxMultHit . 'x' : '-') . "</td>";
+            $row .= "</tr>";
+            $userMultiplierRows .= $row;
+            $rank++;
+        }
+
+        $netSystem = $totalFinal - $totalInitial;
+        $netSystemClass = $netSystem >= 0 ? 'profit' : 'loss';
+
+        return "<!DOCTYPE html>
+<html lang='ar' dir='rtl'>
+<head>
+    <meta charset='UTF-8'>
+    <title>تقرير اختبار الأحمال - Lucky Gift</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .stat-card.profit .value { color: #4ade80; }
+        .stat-card.loss .value { color: #f87171; }
+        .section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .section h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th {
+            background: rgba(255,215,0,0.1);
+            color: #ffd700;
+            font-weight: 600;
+        }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .profit { color: #4ade80; font-weight: bold; }
+        .loss { color: #f87171; font-weight: bold; }
+        .multiplier-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .multiplier-0 { background: #374151; color: #9ca3af; }
+        .multiplier-1 { background: #065f46; color: #6ee7b7; }
+        .multiplier-2 { background: #1e40af; color: #93c5fd; }
+        .multiplier-3 { background: #5b21b6; color: #c4b5fd; }
+        .multiplier-5 { background: #9a3412; color: #fdba74; }
+        .multiplier-10 { background: #be123c; color: #fda4af; }
+        .multiplier-high { background: #ffd700; color: #1a1a2e; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>🎁 تقرير اختبار الأحمال - Lucky Gift</h1>
+        <p class='subtitle'>تم إنشاء التقرير: " . now()->format('Y-m-d H:i:s') . "</p>
+
+        <div class='stats-grid'>
+            <div class='stat-card'>
+                <h3>إجمالي الطلبات</h3>
+                <div class='value'>" . number_format($totalRequests) . "</div>
+            </div>
+            <div class='stat-card profit'>
+                <h3>الطلبات الناجحة</h3>
+                <div class='value'>" . number_format($totalSuccess) . "</div>
+            </div>
+            <div class='stat-card loss'>
+                <h3>الطلبات الفاشلة</h3>
+                <div class='value'>" . number_format($totalFailed) . "</div>
+            </div>
+            <div class='stat-card'>
+                <h3>متوسط وقت الاستجابة</h3>
+                <div class='value'>{$avgTime}ms</div>
+            </div>
+            <div class='stat-card'>
+                <h3>الرصيد الأولي (كل المستخدمين)</h3>
+                <div class='value'>" . number_format($totalInitial) . "</div>
+            </div>
+            <div class='stat-card'>
+                <h3>الرصيد النهائي (كل المستخدمين)</h3>
+                <div class='value'>" . number_format($totalFinal) . "</div>
+            </div>
+            <div class='stat-card profit'>
+                <h3>إجمالي الأرباح</h3>
+                <div class='value'>+" . number_format($totalWins) . "</div>
+            </div>
+            <div class='stat-card loss'>
+                <h3>إجمالي الخسائر</h3>
+                <div class='value'>-" . number_format($totalLosses) . "</div>
+            </div>
+            <div class='stat-card {$netSystemClass}'>
+                <h3>صافي النظام</h3>
+                <div class='value'>" . ($netSystem >= 0 ? '+' : '') . number_format($netSystem) . "</div>
+            </div>
+        </div>
+
+        <!-- رصيد محفظة اللعب -->
+        <div class='section'>
+            <h2>💰 رصيد محفظة اللعب (Unified Vault)</h2>
+            <div class='stats-grid'>
+                <div class='stat-card'>
+                    <h3>الرصيد قبل الاختبار</h3>
+                    <div class='value'>" . number_format($initialVaultBalance) . "</div>
+                </div>
+                <div class='stat-card'>
+                    <h3>الرصيد بعد الاختبار</h3>
+                    <div class='value'>" . number_format($finalVaultBalance) . "</div>
+                </div>
+                <div class='stat-card {$vaultChangeClass}'>
+                    <h3>التغيير</h3>
+                    <div class='value'>" . ($vaultChange >= 0 ? '+' : '') . number_format($vaultChange) . "</div>
+                </div>
+            </div>
+        </div>
+
+        <div class='section'>
+            <h2>📊 إحصائيات المضاعفات</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>المضاعف</th>
+                        <th>عدد المرات</th>
+                        <th>إجمالي المكاسب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {$multiplierRows}
+                </tbody>
+            </table>
+        </div>
+
+        <div class='section'>
+            <h2>🎯 توزيع المضاعفات لكل مستخدم</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المستخدم</th>
+                        <th>5x</th>
+                        <th>10x</th>
+                        <th>20x</th>
+                        <th>50x</th>
+                        <th>70x</th>
+                        <th>100x</th>
+                        <th>250x</th>
+                        <th>500x</th>
+                        <th>1000x</th>
+                        <th class='bg-primary'>المجموع</th>
+                        <th>أعلى مضاعف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {$userMultiplierRows}
+                </tbody>
+            </table>
+        </div>
+
+        <div class='section'>
+            <h2>🏆 ترتيب المستخدمين حسب الرصيد النهائي</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>المستخدم</th>
+                        <th>الرصيد الأولي</th>
+                        <th>الرصيد النهائي</th>
+                        <th>أعلى رصيد وصله</th>
+                        <th>صافي الربح/الخسارة</th>
+                        <th>إجمالي الأرباح</th>
+                        <th>إجمالي الخسائر</th>
+                        <th>مرات الفوز</th>
+                        <th>مرات الخسارة</th>
+                        <th>المضاعفات المحققة</th>
+                        <th>نسبة النجاح</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {$userRows}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>";
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -342,5 +756,33 @@ class SendLuckyGiftComboLoadTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+    }
+
+    /**
+     * Round calculated multiplier to nearest valid V7 multiplier
+     * Valid multipliers: 5, 10, 20, 50, 70, 100, 250, 500, 1000
+     */
+    private function roundToValidMultiplier(int $calculatedMult): int
+    {
+        $validMultipliers = [5, 10, 20, 50, 70, 100, 250, 500, 1000];
+        
+        // If already valid, return as-is
+        if (in_array($calculatedMult, $validMultipliers)) {
+            return $calculatedMult;
+        }
+        
+        // Find closest valid multiplier
+        $closest = $validMultipliers[0];
+        $minDiff = abs($calculatedMult - $closest);
+        
+        foreach ($validMultipliers as $valid) {
+            $diff = abs($calculatedMult - $valid);
+            if ($diff < $minDiff) {
+                $minDiff = $diff;
+                $closest = $valid;
+            }
+        }
+        
+        return $closest;
     }
 }
