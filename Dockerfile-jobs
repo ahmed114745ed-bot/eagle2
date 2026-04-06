@@ -63,8 +63,8 @@ RUN chmod -R 777 /app/storage
 RUN chmod -R 777 /app/bootstrap
 RUN chmod 777 /app/public/settings.json
 
-RUN REDIS_HOST=172.17.0.1 \
-    php artisan migrate --force
+# NOTE: Migrations run via CI/CD step (run_lumio_migrate), NOT during build.
+# This prevents race conditions when both Dockerfiles build in parallel.
 RUN REDIS_HOST=172.17.0.1 \
     php artisan optimize:clear
 

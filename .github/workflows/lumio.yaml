@@ -6,7 +6,7 @@ jobs:
   run_lumio_hub:
     runs-on: [self-hosted]
     steps:
-    - name: Pull latest code
+    - name: Pull latest code and rotate logs
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
@@ -21,17 +21,46 @@ jobs:
           chmod -R 777 storage/jobs-logs
           test -f public/settings.json || echo '{}' > public/settings.json
           test -f gcp.json || echo '{}' > gcp.json
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space high ($current%), cleaning up..."
-            docker system prune -af
-          else
-            echo "Disk space OK ($current%)"
+
+          # Rotate laravel.log if > 100MB
+          LOG_FILE=storage/logs/laravel.log
+          if [ -f "$LOG_FILE" ]; then
+            LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
+            if [ "$LOG_SIZE" -gt 104857600 ]; then
+              echo "Rotating laravel.log ($(du -h $LOG_FILE | cut -f1))"
+              truncate -s 0 "$LOG_FILE"
+            fi
           fi
-  run_lumio_app:
+
+          # Rotate job logs if > 50MB
+          find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
+
+  run_lumio_migrate:
     runs-on: [self-hosted]
     needs: run_lumio_hub
+    steps:
+    - name: Run database migrations once
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.61.136"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          cd /var/www/lumio
+          CONTAINER_ID=$(sudo docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
+          if [ -n "$CONTAINER_ID" ]; then
+            echo "Running migrations in existing octa container..."
+            sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force
+          else
+            echo "No octa container found, running migrations directly..."
+            php artisan migrate --force
+          fi
+
+  run_lumio_app:
+    runs-on: [self-hosted]
+    needs: [run_lumio_hub, run_lumio_migrate]
     steps:
     - name: Build and deploy Lumio Octane
       uses: appleboy/ssh-action@v1.2.1
@@ -67,39 +96,69 @@ jobs:
             exit 1
           fi
 
-          sudo docker image prune -f 2>/dev/null || true
   run_lumio_job:
     runs-on: [self-hosted]
-    needs: run_lumio_hub
+    needs: [run_lumio_hub, run_lumio_migrate]
     steps:
-      - name: Build and deploy Lumio jobs
-        uses: appleboy/ssh-action@v1.2.1
-        with:
-          host: "34.18.61.136"
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.UTDVM }}
-          port: ${{ secrets.PORT }}
-          command_timeout: 20m
-          script: |
-            cd /var/www/lumio
-            sudo docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
-            
-            sudo docker service update \
-              --image lumio-job:${{ github.sha }} \
-              --replicas 4 \
-              --limit-cpu 2.0 \
-              --limit-memory 2gb \
-              --reserve-memory 1gb \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              lumio-job
-              
-            sudo docker service update --image lumio-job:${{ github.sha }} lumio-charizma-worker || \
-            sudo docker service create \
-              --name lumio-charizma-worker \
-              --network app-network \
-              --replicas 1 \
-              --image lumio-job:${{ github.sha }} \
-              sh -c "while true; do php /app/artisan app:handling-room-zigo-requests -v; sleep 10; done"
+    - name: Build and deploy Lumio jobs
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.61.136"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/lumio
+          sudo docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
 
-            sudo docker image prune -f 2>/dev/null || true
+          sudo docker service update \
+            --image lumio-job:${{ github.sha }} \
+            --replicas 4 \
+            --limit-cpu 2.0 \
+            --limit-memory 2gb \
+            --reserve-memory 1gb \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            --update-failure-action rollback \
+            lumio-job
+
+          # NOTE: charizma handler (app:handling-room-zigo-requests) runs inside
+          # lumio-job containers via supervisord (program:room-zigo-handler in
+          # docker/supervisor.conf). No separate Docker service needed.
+
+  run_lumio_cleanup:
+    runs-on: [self-hosted]
+    needs: [run_lumio_app, run_lumio_job]
+    if: always()
+    steps:
+    - name: Cleanup old images and build cache
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.61.136"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          CURRENT=${{ github.sha }}
+
+          # Remove legacy charizma-worker service if it exists
+          # (now handled by supervisord inside lumio-job containers)
+          sudo docker service rm lumio-charizma-worker 2>/dev/null || true
+
+          # Remove old tagged images (keep only current)
+          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'lumio-(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
+            echo "Removing old image: $img"
+            sudo docker rmi "$img" 2>/dev/null || true
+          done
+
+          # Prune dangling images
+          sudo docker image prune -f 2>/dev/null || true
+
+          # Prune build cache older than 24h
+          sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
+
+          # Disk check
+          USAGE=$(df -h / | awk 'NR==2{print $5}')
+          echo "Disk usage after cleanup: $USAGE"
