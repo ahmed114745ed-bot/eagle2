@@ -99,13 +99,13 @@ class ChargeController extends Controller
         if (!$to) return Common::apiResponse(0, __('user not found'), 400);
 
         if ($from->id == $to->id) {
-            $charge_user_to_self = settings()->get("charge_user_to_self") ?? 1;
-            if ($charge_user_to_self != 1) {
+            $charge_user_to_self = (int) (settings()->get("charge_user_to_self") ?? 1);
+            if ($charge_user_to_self !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_to_self_disabled'), 403);
             }
         } else {
-            $charge_user_to_user = settings()->get("charge_user_to_user") ?? 1;
-            if ($charge_user_to_user != 1) {
+            $charge_user_to_user = (int) (settings()->get("charge_user_to_user") ?? 1);
+            if ($charge_user_to_user !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_user_to_user_disabled'), 403);
             }
         }
@@ -177,8 +177,8 @@ class ChargeController extends Controller
         }
 
         // Check if user to charging agent transfer is enabled
-        $charge_user_to_agent = settings()->get("charge_user_to_agent") ?? 1;
-        if ($charge_user_to_agent != 1) {
+        $charge_user_to_agent = (int) (settings()->get("charge_user_to_agent") ?? 1);
+        if ($charge_user_to_agent !== 1) {
             return Common::apiResponse(0, __('api_responses.charge_user_to_agent_disabled'), 403);
         }
 
@@ -480,13 +480,13 @@ class ChargeController extends Controller
         $toUser = User::find($request->id);
         
         if ($toUser) {
-            $charge_agent_to_user = settings()->get("charge_agent_to_user") ?? 1;
-            if ($charge_agent_to_user != 1) {
+            $charge_agent_to_user = (int) (settings()->get("charge_agent_to_user") ?? 1);
+            if ($charge_agent_to_user !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_user_disabled'), 403);
             }
         } elseif ($to) {
-            $charge_agent_to_agent = settings()->get("charge_agent_to_agent") ?? 1;
-            if ($charge_agent_to_agent != 1) {
+            $charge_agent_to_agent = (int) (settings()->get("charge_agent_to_agent") ?? 1);
+            if ($charge_agent_to_agent !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_agent_disabled'), 403);
             }
         }
