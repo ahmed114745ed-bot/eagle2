@@ -150,6 +150,7 @@
 
 .charge-transfer-card {
     background: #222;
+    margin: 18px ;
     border-radius: 8px;
     padding: 20px;
     border: 1px solid #333;
@@ -291,6 +292,7 @@ input:checked + .slider:before {
     border: none;
     padding: 12px 30px;
     font-weight: bold;
+    margin: 16px;
 }
 
 .btn-save:hover {
