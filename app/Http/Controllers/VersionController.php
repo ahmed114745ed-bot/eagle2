@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Helpers\Common;
-use App\Models\Setting;
-use App\Helpers\CacheHelper;
-use Database\Seeders\config;
-use Illuminate\Http\Request;
 use App\Facades\UserHandling;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\CacheHelper;
+use App\Helpers\Common;
+use App\Models\Config;
+use App\Models\Setting;
+use App\Models\User;
+
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class VersionController extends Controller
 {
@@ -73,6 +74,12 @@ class VersionController extends Controller
 
         $default_background =  \DB::table('backgrounds')->where('enable', 1)->orderBy('id')->value('img');
 
+        $maxMessage = \Cache::rememberForever('max_message', function () {
+            $setting =   Config::where('name', 'max_message')->first();
+            return $setting?->value ?? 3;
+        });
+
+
 
         $data = [
             'is_auth'         => $isAuth && !$isBan,
@@ -113,6 +120,7 @@ class VersionController extends Controller
                 && intval($settings['host_level_enabled'] ?? 0) === 1,
             "is_share_with_friends" => (bool)($settings['share_room_with_friends'] ?? true),
             'is_show_grid_view' => (bool) Common::getConf('show_room') ?? false,
+            'limit_chat_message' => (int) $maxMessage,
 
             "room_boom" => [
                 "enabled" => ($settings['enable_room_boom'] ?? 0) && ($settings['room_boom'] ?? 0),
