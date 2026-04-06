@@ -1119,7 +1119,7 @@ class AgencyController extends MainController
         $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->first();
         if ($admin) {
             $admin->delete();
-
+            Cache::forget('agency_' . $user->agency_id);
             return response()->json([
                 'status' => true,
                 'message' => __('Admin role removed from this agency')
@@ -1159,7 +1159,7 @@ class AgencyController extends MainController
         $user->save();
 
         MilestoneHelper::removeReward($user, 'host');
-
+        Cache::forget('agency_' . $user->agency_id);
         return response()->json([
             'status' => true,
             'message' => __('done')
