@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,10 +12,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('vips', function (Blueprint $table) {
-            // Add unique constraint on (type, exp) to prevent duplicate exp values per type
-            $table->unique(['type', 'exp'], 'vips_type_exp_unique');
-        });
+        // Check if there are duplicates
+        $duplicates = DB::select("
+            SELECT type, exp, COUNT(*) as count
+            FROM vips
+            GROUP BY type, exp
+            HAVING COUNT(*) > 1
+        ");
+
+        // Only add unique constraint if no duplicates exist
+        if (empty($duplicates)) {
+            Schema::table('vips', function (Blueprint $table) {
+                $table->unique(['type', 'exp'], 'vips_type_exp_unique');
+            });
+        }
     }
 
     /**
@@ -23,7 +34,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vips', function (Blueprint $table) {
-            // Drop the unique constraint
             $table->dropUnique('vips_type_exp_unique');
         });
     }
