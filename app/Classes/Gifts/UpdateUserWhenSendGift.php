@@ -143,7 +143,7 @@ class UpdateUserWhenSendGift
     public function getLevel(int $type, int $totalCoins)
     {
 
-        return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
+        return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->orderByDesc('level')->limit(1)->first();
     }
 
 
