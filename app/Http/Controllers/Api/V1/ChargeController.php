@@ -88,8 +88,8 @@ class ChargeController extends Controller
 
     public function chargeToUser(Request $request)
     {
-        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
-        if ($stop_all_charge == 1) {
+        $stop_all_charge = (int) (Common::getSettingValue('stop_charge') ?? 0);
+        if ($stop_all_charge === 1) {
             return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
         }
         $toId = $request->to_id;
@@ -99,12 +99,12 @@ class ChargeController extends Controller
         if (!$to) return Common::apiResponse(0, __('user not found'), 400);
 
         if ($from->id == $to->id) {
-            $charge_user_to_self = (int) (settings()->get("charge_user_to_self") ?? 1);
+            $charge_user_to_self = (int) (Common::getSettingValue('charge_user_to_self') ?? 1);
             if ($charge_user_to_self !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_to_self_disabled'), 403);
             }
         } else {
-            $charge_user_to_user = (int) (settings()->get("charge_user_to_user") ?? 1);
+            $charge_user_to_user = (int) (Common::getSettingValue('charge_user_to_user') ?? 1);
             if ($charge_user_to_user !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_user_to_user_disabled'), 403);
             }
@@ -171,13 +171,13 @@ class ChargeController extends Controller
 
     public function chargeToAgency(Request $request)
     {
-        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
-        if ($stop_all_charge == 1) {
+        $stop_all_charge = (int) (Common::getSettingValue('stop_charge') ?? 0);
+        if ($stop_all_charge === 1) {
             return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
         }
 
         // Check if user to charging agent transfer is enabled
-        $charge_user_to_agent = (int) (settings()->get("charge_user_to_agent") ?? 1);
+        $charge_user_to_agent = (int) (Common::getSettingValue('charge_user_to_agent') ?? 1);
         if ($charge_user_to_agent !== 1) {
             return Common::apiResponse(0, __('api_responses.charge_user_to_agent_disabled'), 403);
         }
@@ -296,8 +296,8 @@ class ChargeController extends Controller
         if (!$app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
-        $stop_all_charge = settings()->get("stop_charge") ?? 0;
-        if ($stop_all_charge == 1) {
+        $stop_all_charge = (int) (Common::getSettingValue('stop_charge') ?? 0);
+        if ($stop_all_charge === 1) {
             return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
         }
         $types = [
@@ -480,12 +480,12 @@ class ChargeController extends Controller
         $toUser = User::find($request->id);
         
         if ($toUser) {
-            $charge_agent_to_user = (int) (settings()->get("charge_agent_to_user") ?? 1);
+            $charge_agent_to_user = (int) (Common::getSettingValue('charge_agent_to_user') ?? 1);
             if ($charge_agent_to_user !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_user_disabled'), 403);
             }
         } elseif ($to) {
-            $charge_agent_to_agent = (int) (settings()->get("charge_agent_to_agent") ?? 1);
+            $charge_agent_to_agent = (int) (Common::getSettingValue('charge_agent_to_agent') ?? 1);
             if ($charge_agent_to_agent !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_agent_disabled'), 403);
             }
