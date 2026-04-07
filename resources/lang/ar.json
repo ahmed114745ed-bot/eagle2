@@ -1106,6 +1106,7 @@
     "pusher_edit_user": "تعديل مستخدم بشر",
     "pusher_edit_user_desc": "يستمع لأحداث القنوات المتعلقة بالمستخدم. يحدث بيانات المستخدم وحالته عند إنشاء أو إزالة قناته المخصصة.",
     "copy": "نسخ",
+    "BD report": "تقرير BD",
     "Number of accounts that can be registered with same device": "عدد الحسابات التي يمكن تسجيلها بنفس الجهاز",
     "event": "الحدث",
     "You have reached the maximum number of accounts that can be registered with this device.": "لقد وصلت إلى الحد الأقصى لعدد الحسابات التي يمكن تسجيلها بهذا الجهاز.",
