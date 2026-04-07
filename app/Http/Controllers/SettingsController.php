@@ -93,9 +93,9 @@ class SettingsController extends Controller
         $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
 
         if (
-            ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
-            ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
-            ($request->has('user_coins') && !is_null($request->user_coins) && $request->user_coins != cache()->get('user_coins'))
+            ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('setting_shipping_coins')) ||
+            ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('setting_super_admin_coins')) ||
+            ($request->has('user_coins') && !is_null($request->user_coins) && $request->user_coins != cache()->get('setting_user_coins'))
         ) {
 
             $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
@@ -246,7 +246,11 @@ class SettingsController extends Controller
 
         if ($request->has('user_coins')) {
             Config::query()->where('name', '=', 'one_usd_value_in_coins')->update(['value' => $request->user_coins]);
+            Cache::forget('setting_user_coins');
         }
+        if ($request->has('shipping_coins')) Cache::forget('setting_shipping_coins');
+        if ($request->has('super_admin_coins')) Cache::forget('setting_super_admin_coins');
+        if ($request->has('zones_coins')) Cache::forget('setting_zones_coins');
         if ($request->has('default_language')) {
             Language::query()->update(['is_default' => 0]);
 

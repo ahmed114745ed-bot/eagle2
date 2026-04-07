@@ -93,20 +93,21 @@ class ChargeAction extends Action
         //            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
         //        }
 
-        $shippingCoins = \App\Services\CoinRateService::getAppBaseRate2();
-        if (! $shippingCoins || $shippingCoins == 0) {
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate2();
+        if (! $appBaseRate || $appBaseRate == 0) {
             return $this->response()->error(__('please set agency coins in configs'))->refresh();
         }
 
-        DB::transaction(function () use ($request, $agency, $user, $amount, $shippingCoins) {
-            $coins = $amount * $shippingCoins;
+        $calc = \App\Services\ChargeCalculationService::calculate($request->amount, 'usd', $appBaseRate);
+        $coins = $calc['total_coins'];
 
-            $agency->coins += $coins;
-            if ($agency->coins < 0)  return $this->response()->error(__('agency does not have this coin'))->refresh();
+        DB::transaction(function () use ($request, $agency, $user, $amount, $coins, $calc, $appBaseRate) {
+            $effectiveAmount = $request->charge_type == 'increment' ? $coins : -$coins;
+            $agency->coins += $effectiveAmount;
+            if ($agency->coins < 0)  throw new \Exception(__('agency does not have this coin'));
             $agency->save();
 
-            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
-            $this->createChargeRecord($request, $user, $agency, $amount, $coins, $usdAmount);
+            $this->createChargeRecord($request, $user, $agency, $effectiveAmount, $coins, $request->amount, $calc, $appBaseRate);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -122,15 +123,15 @@ class ChargeAction extends Action
         //        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
         //        $usdAmount = $request->amount / $percentage;
 
-        $shippingCoins = \App\Services\CoinRateService::getAppBaseRate2();
-        //        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
-        $usdAmountRaw = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
-        $usdAmount = $usdAmountRaw * $shippingCoins;
+        $userRate = \App\Services\CoinRateService::getAppBaseRateOrUserCoins();
+        
+        $calc = \App\Services\ChargeCalculationService::calculate($request->amount, 'usd', $userRate);
+        $coins = $calc['total_coins'];
 
-        DB::transaction(function () use ($request, $user, $usdAmount, $usdAmountRaw) {
-            $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
+        DB::transaction(function () use ($request, $user, $coins, $calc, $userRate) {
+            $amount = $request->charge_type == 'increment' ? $coins : -$coins;
             if ($amount < 0 && $user->di < abs($amount)) {
-                return $this->response()->error(__('Insufficient user balance'))->refresh();
+                throw new \Exception(__('Insufficient user balance'));
             }
 
             $user->di += $amount;
@@ -139,7 +140,7 @@ class ChargeAction extends Action
                 $admin = Auth::user()->username ?? 'Admin';
                 CustomNotification::chargeAction($user, $request, $admin);
             }
-            $this->createChargeRecord($request, $user, null, $amount, $usdAmount, $usdAmountRaw);
+            $this->createChargeRecord($request, $user, null, $amount, $coins, $request->amount, $calc, $userRate);
 
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });
@@ -147,14 +148,8 @@ class ChargeAction extends Action
         return $this->response()->success('Success')->refresh();
     }
 
-    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount)
+    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount, $calc, $effectiveRate)
     {
-
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate2();
-        $effectiveRate = $appBaseRate;
-
-        $calc = \App\Services\ChargeCalculationService::calculate($usdAmount, 'usd', $effectiveRate);
-        
         $totalCoins = $calc['total_coins'];
         $baseCoins = $calc['base_coins'];
         $profitCoins = $calc['profit_coins'];
@@ -170,7 +165,7 @@ class ChargeAction extends Action
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
-        $charge->total_coins = $totalCoins;
+        $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
         $charge->transaction_type = $agency ? 'admin_to_agency' : 'admin_to_user';
         
         $charge->rate_source = 'app';

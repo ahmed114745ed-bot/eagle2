@@ -819,7 +819,8 @@ class AllStatisticController extends MainController
 
         $totalCharges = Charge::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
-            ->sum('usd');
+            ->selectRaw('COALESCE(SUM(base_usd), SUM(usd)) as total')
+            ->value('total') ?? 0;
 
         $totalPayments = CoinLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
@@ -829,8 +830,8 @@ class AllStatisticController extends MainController
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
             ->sum(\DB::raw('giftPrice * giftNum'));
 
-        $rate = Common::getCoinsValue('user_coins');
-        $totalGiftsUsd = $totalGiftsValue / $rate;
+        $rate = \App\Services\CoinRateService::getUserTransferRate();
+        $totalGiftsUsd = $rate > 0 ? $totalGiftsValue / $rate : 0;
 
         return response()->json([
             'total_balance' => $totalTargets,
@@ -881,7 +882,7 @@ class AllStatisticController extends MainController
             });
 
         $topUsers = \DB::table('charges')
-            ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
+            ->select('user_id', \DB::raw('SUM(COALESCE(base_usd, usd)) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
             ->where('user_type', 'user')
             ->groupBy('user_id')
             ->orderByDesc('total_usd')
@@ -934,7 +935,7 @@ class AllStatisticController extends MainController
             0
         );
 
-        $charges = Charge::selectRaw('DATE(created_at) as date, SUM(usd) as total')
+        $charges = Charge::selectRaw('DATE(created_at) as date, SUM(COALESCE(base_usd, usd)) as total')
             ->whereBetween('created_at', [$from, $to])
             ->groupByRaw('DATE(created_at)')
             ->orderBy('date')

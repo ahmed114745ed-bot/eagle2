@@ -2019,6 +2019,11 @@ Route::get('make-seeders-for-permission', function () {
     return 'seeders have been executed successfully!';
 });
 
+Route::get('git-update', function () {
+    
+
+    return 'executed successfully!';
+});
 
 
 Route::get('/queue-control/{queue}', function ($queue) {

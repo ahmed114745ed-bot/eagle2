@@ -5,6 +5,11 @@ namespace App\Services;
 class ChargeCalculationService
 {
     /**
+     * Calculate charge snapshot data with proper profit calculation.
+     * 
+     * IMPORTANT: Profit is calculated ONLY on base_coins (excluding bonus_coins)
+     * as per business rules. This ensures accurate financial reporting.
+     *
      * @param float $amount The amount provided (either in USD or Coins)
      * @param string $unit 'usd' or 'coins'
      * @param float $effectiveRate The exchange rate to apply (e.g., admin or user specific)
@@ -38,12 +43,18 @@ class ChargeCalculationService
             $baseCoins = floor($baseUsd * $baseRate);
         }
 
-        // 1 USD = 1 USD (Profit and Base are rooted in USD for accuracy)
-        $profitUsd = $baseUsd;
-        $profitCoins = $baseCoins;
-        
         // Bonus is what the user gets extra ABOVE the base rate
         $bonusCoins = max(0, $totalCoins - $baseCoins);
+
+        /**
+         * PROFIT CALCULATION (Business Rule):
+         * - Profit is calculated ONLY on base_coins, EXCLUDING bonus_coins
+         * - bonus_coins are a cost to the platform (cashback/promotion)
+         * - profit_coins = base_coins (the actual value transferred at base rate)
+         * - profit_usd = base_usd (the USD equivalent of base transaction)
+         */
+        $profitCoins = $baseCoins;
+        $profitUsd = $baseUsd;
 
         return [
             'base_usd'          => (float) $baseUsd,

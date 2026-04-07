@@ -18,8 +18,11 @@ class UserChargeResource extends JsonResource
         $admin =   Admin::where('id', $this->charger_id)->first();
         return [
             'id' => $this->id,
-            'amount' => $this->amount,
-            'usd' => $this->usd,
+            'amount' => $this->total_coins ?? $this->amount,
+            'usd' => $this->base_usd ?? $this->usd,
+            'legacy_amount' => $this->amount,
+            'legacy_usd' => $this->usd,
+            'applied_coin_rate' => $this->applied_coin_rate,
             'charger_type' => $this->charger_type,
             'charger' =>  $this->charger_type != 'dash' ?
                 [

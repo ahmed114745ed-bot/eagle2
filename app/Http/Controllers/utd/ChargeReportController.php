@@ -73,7 +73,7 @@ class ChargeReportController extends Controller
         // Function to calculate receiver value based on conditions
         $calculateReceiverValue = function ($user, $request) use ($isDashboard, $isApp, $isStripe, $isStripeNew, $isInApp) {
             if ($isDashboard || $isApp) {
-                return Charge::where('user_id', $user?->id)->sum('amount');
+                return Charge::where('user_id', $user?->id)->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
             } elseif ($isStripe) {
                 return CoinLog::where('user_id', $user?->id)
                     ->whereNotIn('method', ['huawei_pay', 'google_pay', 'strip', 'apple_pay'])
@@ -107,7 +107,7 @@ class ChargeReportController extends Controller
             if ($name === 'receiver') {
                 $value = $calculateReceiverValue($user, $request);
             } elseif ($name === 'sender') {
-                $value = Charge::where('charger_id', $user?->id)->sum('amount');
+                $value = Charge::where('charger_id', $user?->id)->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
             } elseif ($name === 'gameCoins') {
                 $coinResult = CoinGameUser::select(
                     \DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as sum_type_1"),

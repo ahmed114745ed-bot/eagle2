@@ -276,29 +276,35 @@ class UsersChargeController extends MainController
 
     private function createChargeRecord(User $user, $amount, $coins = 0, $usdAmount)
     {
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
-        $totalCoins = $coins;
+        // Use ChargeSnapshotFactory for consistent snapshot creation
+        $snapshot = \App\Services\ChargeSnapshotFactory::create(
+            (float) $usdAmount,
+            'usd',
+            Auth::user(),
+            'app'
+        );
 
         $charge = new Charge();
         $charge->charger_id = 1;
-        $charge->charger_type =  'dash';
+        $charge->charger_type = 'dash';
         $charge->user_id = $user->id;
-        $charge->agency_id =   null;
+        $charge->agency_id = null;
         $charge->user_type = 'user';
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
-        $charge->balance_before =  $user->di  - $coins;
+        $charge->balance_before = $user->di - $coins;
         $charge->reason_en = self::reason;
 
-        $charge->applied_coin_rate = $appBaseRate;
-        $charge->total_coins = $totalCoins;
+        // Apply snapshot data from factory
+        $charge->applied_coin_rate = $snapshot['applied_coin_rate'];
+        $charge->total_coins = $snapshot['total_coins'];
         $charge->transaction_type = 'admin_bulk_charge_single';
-        $charge->rate_source = 'app';
-        $charge->base_usd = $usdAmount;
-        $charge->base_coins = $usdAmount * $appBaseRate;
-        $charge->bonus_coins = $totalCoins - ($usdAmount * $appBaseRate);
-        $charge->profit_usd = $usdAmount;
-        $charge->profit_coins = $charge->base_coins;
+        $charge->rate_source = $snapshot['rate_source'];
+        $charge->base_usd = $snapshot['base_usd'];
+        $charge->base_coins = $snapshot['base_coins'];
+        $charge->bonus_coins = $snapshot['bonus_coins'];
+        $charge->profit_usd = $snapshot['profit_usd'];
+        $charge->profit_coins = $snapshot['profit_coins'];
         $charge->save();
 
         //        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);

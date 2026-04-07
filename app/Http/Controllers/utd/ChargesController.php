@@ -100,18 +100,16 @@ class ChargesController extends Controller
             return Common::apiResponse(false, __('Insufficient agency balance'));
         }
 
-        DB::transaction(function () use ($request, $agency, $user, $amount) {
-            $agency->coins += $amount;
-            $agency->save();
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $calc = \App\Services\ChargeCalculationService::calculate((float)$amount, 'coins', $appBaseRate);
 
-            $usdAmount = $request->charge_type == 'decrement' ? -$request->amount : $request->amount;
-            $this->createChargeRecord($request, $user, $agency, $amount, $usdAmount);
+        $chargeService = app(\App\Tik\Services\ChargeRepoService::class);
+        $chargeService->chargeAgencyNew($agency->id, $amount, 'dash', $calc);
 
-            if ($request->charge_type == "increment") {
-                $admin = Auth::user()->username ?? 'Admin';
-                CustomNotification::chargeAction($user, $request, $admin);
-            }
-        });
+        if ($request->charge_type == "increment") {
+            $admin = Auth::user()->username ?? 'Admin';
+            CustomNotification::chargeAction($user, $request, $admin);
+        }
 
         return Common::apiResponse(true, 'Success');
     }
@@ -119,67 +117,18 @@ class ChargesController extends Controller
 
     private function handleUserCharge(Request $request, User $user)
     {
-        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
-        $usdAmountRaw = $request->amount / $percentage;
+        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+        $calc = \App\Services\ChargeCalculationService::calculate((float)$request->amount, 'coins', $appBaseRate);
 
-        DB::transaction(function () use ($request, $user, $usdAmountRaw) {
-            $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
-            if ($amount < 0 && $user->di < abs($amount)) {
-                return Common::apiResponse(false, __('Insufficient user balance'));
-            }
-
-            $user->di += $amount;
-            $user->save();
-
-            $usdAmount = $request->charge_type == 'decrement' ? -$usdAmountRaw : $usdAmountRaw;
-            $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
-            (new UserAchievementService())->insertCharging($user, $request->amount);
-        });
+        $chargeService = app(\App\Tik\Services\ChargeRepoService::class);
+        $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
+        
+        $chargeService->chargeTo(Auth::id() ?? $request->charger_id, $user->id, $amount, 'app', 'dash', $calc);
+        (new UserAchievementService())->insertCharging($user, $request->amount);
 
         return Common::apiResponse(true, 'Success');
     }
 
-    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $usdAmount = 0)
-    {
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
-        $effectiveRate = $appBaseRate;
-        
-        $calc = \App\Services\ChargeCalculationService::calculate($amount, 'coins', $effectiveRate);
-        
-        $totalCoins = $calc['total_coins']; // In this controller 'amount' seems to be coins
-        $baseUsd = $usdAmount > 0 ? $usdAmount : $calc['base_usd']; // Use provided USD if available, else inferred
-        
-        // Recalculate base coins if USD was provided explicitly to ensure exact match
-        $baseCoins = $usdAmount > 0 ? $baseUsd * $effectiveRate : $calc['base_coins'];
-        
-        $profitCoins = $baseCoins;
-        $profitUsd = $baseUsd;
-
-        $charge = new Charge();
-        $charge->charger_id = Auth::id() ?? $request->charger_id;
-        $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
-        $charge->user_id = $user->id;
-        $charge->agency_id = $agency->id ?? null;
-        $charge->user_type = $request->user_type ?? 'app';
-        $charge->amount = $amount;
-        $charge->usd = $baseUsd;
-        $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
-        
-        $charge->total_coins = $totalCoins;
-        $charge->transaction_type = $agency ? 'admin_to_agency' : 'admin_to_user';
-        
-        $charge->rate_source = 'app';
-        $charge->applied_coin_rate = $effectiveRate;
-        $charge->base_usd = $baseUsd;
-        $charge->base_coins = $baseCoins;
-        $charge->bonus_coins = 0;
-        $charge->profit_usd = $profitUsd;
-        $charge->profit_coins = $profitCoins;
-
-        $charge->save();
-
-        UserCommon::UserEarnedInvitation($user->id, $amount,$charge->id);
-    }
 
     public function userCharge($id, Request $request)
     {
@@ -197,7 +146,7 @@ class ChargesController extends Controller
         try {
             $year = $request->year ?? date('y');
             $data = Charge::where('user_id', $id)->whereYear('created_at', $year)
-                ->selectRaw('MONTH(created_at) as month, SUM(amount) as total_amount')
+                ->selectRaw('MONTH(created_at) as month, SUM(COALESCE(total_coins, amount)) as total_amount')
                 ->groupBy('month')->orderBy('month')->get();
             return Common::apiResponse(true, 'done',  $data);
         } catch (Exception $exception) {

@@ -176,8 +176,39 @@ class Charge extends Model
     }
 
 
+    /**
+     * Snapshot fields that should be immutable after creation.
+     * These fields are critical for financial audit and reporting accuracy.
+     */
+    protected static array $immutableSnapshotFields = [
+        'applied_coin_rate',
+        'base_usd',
+        'base_coins',
+        'bonus_coins',
+        'profit_usd',
+        'profit_coins',
+        'total_coins',
+        'rate_source',
+    ];
+
     protected static function booted()
     {
+        // Protect snapshot fields from modification after creation
+        static::updating(function (Charge $charge) {
+            foreach (self::$immutableSnapshotFields as $field) {
+                // Only protect if the original value was set (not null)
+                if ($charge->isDirty($field) && $charge->getOriginal($field) !== null) {
+                    throw new \Exception(
+                        __("Snapshot field ':field' cannot be modified after creation. Original: :original, New: :new", [
+                            'field' => $field,
+                            'original' => $charge->getOriginal($field),
+                            'new' => $charge->getAttribute($field),
+                        ])
+                    );
+                }
+            }
+        });
+
         self::saved(function ($model) {
             if ($model->agency_id) {
                 clearAgencyCache($model->agency_id);
@@ -189,5 +220,26 @@ class Charge extends Model
                 clearAgencyCache($model->agency_id);
             }
         });
+    }
+
+    /**
+     * Check if a field is an immutable snapshot field.
+     *
+     * @param string $field
+     * @return bool
+     */
+    public static function isImmutableField(string $field): bool
+    {
+        return in_array($field, self::$immutableSnapshotFields);
+    }
+
+    /**
+     * Get all immutable snapshot field names.
+     *
+     * @return array
+     */
+    public static function getImmutableFields(): array
+    {
+        return self::$immutableSnapshotFields;
     }
 }

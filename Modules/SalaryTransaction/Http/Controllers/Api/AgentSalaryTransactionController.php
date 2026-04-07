@@ -243,15 +243,15 @@ class AgentSalaryTransactionController extends Controller
 
             $agent = $request->user();
             $agency = $agent->ownAgency;
-            $usd = $request->amount;
+            $usd = (float) $request->amount;
 
 
             if ($agency->transfer_salary < $usd) {
                 return Common::apiResponse(0, __('api_responses.balance_not_enough'));
             }
 
-            $coins = Config::where("name", "one_usd_value_in_coins")->first();
-            $coin_usd = $usd * $coins->value ?? 0;
+            $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+            $calc = \App\Services\ChargeCalculationService::calculate($usd, 'usd', $appBaseRate);
 
             AgentSalaryRequest::create([
                 "agency_id"             => $agency->id,
@@ -260,8 +260,15 @@ class AgentSalaryTransactionController extends Controller
                 "type"                  => $request->type,
                 "payment_gateway_id"    => $request->payment_gateway_id ?? 0,
                 "country_id"            => $request->country_id ?? 0,
-                "coins"                 => $coin_usd,
-                "usd"                   => $usd,
+                "coins"                 => $calc['total_coins'],
+                "usd"                   => $calc['base_usd'],
+                "applied_coin_rate"     => $calc['applied_coin_rate'],
+                "base_coins"            => $calc['base_coins'],
+                "bonus_coins"           => $calc['bonus_coins'],
+                "profit_usd"            => $calc['profit_usd'],
+                "profit_coins"          => $calc['profit_coins'],
+                "total_coins"           => $calc['total_coins'],
+                "rate_source"           => 'app'
             ]);
             $this->updatesalaryTransfer($agency->id, $usd);
             // $this->updateAgencySalary($agency->id , $request->usd );

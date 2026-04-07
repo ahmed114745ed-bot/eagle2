@@ -60,8 +60,8 @@ class SalaryTransactionController extends Controller
                 return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
             }
             $agency_owner = $agency->owner;
-            $percentage_value = Common::getConfig('one_usd_value_in_coins')  ?? 10;
-            $coin_usd = $request->usd * $percentage_value;
+            $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
+            $calc = \App\Services\ChargeCalculationService::calculate($request->usd, 'usd', $appBaseRate);
 
             $check_requests = SalaryRequest::where('host_id',$host->id)->whereIn("status",[0,1,2])->first();
             if ($check_requests != null) {
@@ -75,9 +75,17 @@ class SalaryTransactionController extends Controller
                 "status"                => 0,
                 "payment_gateway_id"    => $request->payment_gateway_id,
                 "country_id"            => $request->country_id,
-                "coins"                 => $coin_usd,
-                "usd"                   => $request->usd,
+                "coins"                 => $calc['total_coins'],
+                "usd"                   => $calc['base_usd'],
                 "note"                  => $request->note,
+                "applied_coin_rate"     => $calc['applied_coin_rate'],
+                "base_usd"              => $calc['base_usd'],
+                "base_coins"            => $calc['base_coins'],
+                "bonus_coins"           => $calc['bonus_coins'],
+                "profit_usd"            => $calc['profit_usd'],
+                "profit_coins"          => $calc['profit_coins'],
+                "total_coins"           => $calc['total_coins'],
+                "rate_source"           => 'app'
             ]);
 
             $this->updateUserSalary($host , $request->usd );

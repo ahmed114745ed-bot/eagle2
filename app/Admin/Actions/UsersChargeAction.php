@@ -87,7 +87,8 @@ class UsersChargeAction extends Action
                 UserCoinLogType::ADMIN_CHARGES,
             );
 
-            $user->di += $coins;
+            $effectiveCoins = $request->charge_type == 'increment' ? $coins : -$coins;
+            $user->di += $effectiveCoins;
             if ($user->di < 0) {
                 throw ValidationException::withMessages([
                     'di' => [__('user does not have this coin')],
@@ -136,7 +137,7 @@ class UsersChargeAction extends Action
         $charge->user_type = 'user';
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
-        $charge->balance_before =  $user->di  - $coins;
+        $charge->balance_before = $user->di - ($request->charge_type == 'increment' ? $totalCoins : -$coins);
         $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
         $charge->transaction_type = 'admin_to_user';
 
