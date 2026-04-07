@@ -2861,8 +2861,7 @@ Route::get('test-done', function () {
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
 
-Route::get('/update-user-726-monthly-diamonds', function () {
-    $userId = 726;
+Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $id;
     $month = 4; // April
     $year = 2026;
 
@@ -2890,6 +2889,6 @@ Route::get('/update-user-726-monthly-diamonds', function () {
         'month' => $month,
         'year' => $year,
         'total_diamonds' => $totalDiamonds,
-        'message' => 'تم تحديث مجموع الماسات الشهرية للمستخدم 726 بنجاح'
+        'message' => 'تم تحديث مجموع الماسات الشهرية للمستخدم {$userId} بنجاح'
     ]);
 });

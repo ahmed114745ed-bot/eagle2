@@ -867,16 +867,11 @@ class AgencyController extends MainController
 
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
-           \Log::info('test-----');
-           \Log::info($originalOwnerId);
-           \Log::info($newOwnerId);
-           \Log::info($form->model()->exists);
-           \Log::info('test-----');
+           
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
             
                 $oldOwner   = User::find($originalOwnerId); 
-                \Log::info('oldOwner-----');
-                \Log::info($oldOwner);
+               
 
                 $agencyId = $form->model()->id;
                 UserHandling::kickUserFromAgency($oldOwner, 0, $agencyId);

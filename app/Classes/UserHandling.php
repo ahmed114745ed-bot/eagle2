@@ -115,9 +115,7 @@ class UserHandling
             $currentMonth = now( $timezone)->month;
             $currentYear = now( $timezone)->year;
 
-            \Log::info('handleUserSalaries - user_id: ' . $user->id . ', agency_id: ' . $agencyId);
-            \Log::info('handleUserSalaries - currentMonth: ' . $currentMonth . ', currentYear: ' . $currentYear);
-
+       
             $userSalaries = UserSallary::query()
                 ->where('user_id', $user->id)
                 ->where('user_agency_id', $agencyId)
@@ -126,22 +124,17 @@ class UserHandling
                 ->where('is_finished', 0)
                 ->first();
 
-            \Log::info('handleUserSalaries - userSalaries found: ' . ($userSalaries ? 'YES' : 'NO'));
 
             if (!$userSalaries) {
                 \Log::info('handleUserSalaries - No userSalaries found, returning');
                 return;
             }
 
-            \Log::info('handleUserSalaries - userSalaries month: ' . $userSalaries->month . ', year: ' . $userSalaries->year);
-            \Log::info('handleUserSalaries - condition check: month==' . $currentMonth . ', year==' . $currentYear);
-
+         
             if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
 
                 $userSalaries->update(['is_finished' => 1]);
-                \Log::info('handleUserSalaries - is_finished updated to 1 for id: ' . $userSalaries->id);
             } else {
-                \Log::info('handleUserSalaries - Condition failed, month or year mismatch');
             }
 
     }
