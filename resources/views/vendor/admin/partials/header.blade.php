@@ -924,6 +924,57 @@
             });
         });
 
+        // Handle dynamic content loaded via AJAX/PJAX
+        $(document).on('pjax:complete', function() {
+            // Re-process links in dynamically loaded content
+            document.querySelectorAll('a[target="_blank"]').forEach(function(link) {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('javascript:') && !href.startsWith('#')) {
+                    link.setAttribute('href', preserveLanguageInUrl(href));
+                }
+            });
+        });
+
+        // Also observe DOM changes for dynamically added content
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1) { // Element node
+                        node.querySelectorAll('a[target="_blank"]').forEach(function(link) {
+                            const href = link.getAttribute('href');
+                            if (href && !href.startsWith('javascript:') && !href.startsWith('#')) {
+                                link.setAttribute('href', preserveLanguageInUrl(href));
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+        // Debug: Log language preservation
+        console.log('Enhanced Multi-Language Debug:');
+        console.log('Current Locale:', '{{ app()->getLocale() }}');
+        console.log('Available Languages:', @json(Cache::get('languages', [
+            'ar' => 'العربية', 
+            'en' => 'English', 
+            'tr' => 'Turkish', 
+            'hi' => 'Indian'
+        ])));
+        console.log('Cookie Name: 'locale');
+        
+        // Test the preserveLanguageInUrl function
+        if (typeof preserveLanguageInUrl === 'function') {
+            const testUrl = '/admin/users/1/edit';
+            console.log('Original URL:', testUrl);
+            console.log('Enhanced URL:', preserveLanguageInUrl(testUrl));
+        }
+
+        // Start observing the document body for changes
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
         const originalFetch = window.fetch;
         window.fetch = function (url, options = {}) {
             options.headers = options.headers || {};

@@ -482,7 +482,7 @@ return [
             'enable' => false
         ],
         'multi-language' => [
-            'enable' => false,
+            'enable' => true,
             // the key should be same as var locale in config/app.php
             // the value is used to show
             // 'languages' => [
