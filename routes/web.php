@@ -3647,15 +3647,28 @@ Route::get('test-done', function () {
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
 
-Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $id;
+Route::get('/update-user-monthly-diamonds/{id}', function ($id) {
+    $userId = $id;
     $month = 4; // April
     $year = 2026;
 
-    // Calculate total diamonds received from gift_logs for this month
-    $totalDiamonds = \App\Models\GiftLog::where('receiver_id', $userId)
-        ->whereMonth('created_at', $month)
-        ->whereYear('created_at', $year)
-        ->sum('giftPrice');
+    // Get parameters (same as gift-log query)
+    $giftType = request('gift_type', 'receiver');
+    $start = request('start_at');
+    $end = request('end_at');
+    $agencyId = request('agency_id');
+    $timezone = Common::timeZone();
+
+    // Build query exactly like gift-log tab
+    $giftBaseQuery = GiftLog::query()
+        ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $userId))
+        ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
+            Carbon::parse($start, $timezone)->startOfDay()->utc(),
+            Carbon::parse($end, $timezone)->endOfDay()->utc(),
+        ]));
+
+    // Calculate total diamonds (same as gift-log)
+    $totalDiamonds = $giftBaseQuery->sum('giftPrice');
 
     // Update or create record in monthly_diamond_receives
     \App\Models\MonthlyDiamondReceive::updateOrCreate(
@@ -3672,9 +3685,13 @@ Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $
     return response()->json([
         'status' => 'success',
         'user_id' => $userId,
+        'gift_type' => $giftType,
+        'start_at' => $start,
+        'end_at' => $end,
+        'agency_id' => $agencyId,
         'month' => $month,
         'year' => $year,
         'total_diamonds' => $totalDiamonds,
-        'message' => 'تم تحديث مجموع الماسات الشهرية للمستخدم {$userId} بنجاح'
+        'message' => "تم تحديث مجموع الماسات الشهرية للمستخدم {$userId} بنجاح"
     ]);
 });
