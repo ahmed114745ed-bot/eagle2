@@ -677,7 +677,7 @@ class ReportController extends MainController
         });
 
         $grid->column('id', __('Id'));
-        $grid->column('username', __('name'))->display(function ($name) {
+        $grid->column('username', __('account dashboard'))->display(function ($name) {
             $uid = @$this->id;
             $path = @$this?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -704,7 +704,7 @@ class ReportController extends MainController
 
 
 
-        $grid->column('appUser.name', __('user'))->display(function ($name) {
+        $grid->column('appUser.name', __('account user'))->display(function ($name) {
             $uid = @$this->appUser->uuid;
             $path = @$this?->appUser->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
