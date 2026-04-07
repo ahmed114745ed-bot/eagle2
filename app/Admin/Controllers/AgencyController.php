@@ -869,13 +869,10 @@ class AgencyController extends MainController
             $form->model()->type = 1;
 
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
-                Common::userJoinAgency($originalOwnerId, $newOwnerId, $form->model()->id);
-                User::find($originalOwnerId)->update([
-                    'type_user' => 0,
-                    'agency_id' => 0,
-                    'is_host' => 0,
-                ]);
-                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+            
+                $oldOwner   = User::find($originalOwnerId); 
+                UserHandling::kickUserFromAgency($oldOwner);
+           
             }
 
             User::where('id', intval($appOwnerId))->update([
