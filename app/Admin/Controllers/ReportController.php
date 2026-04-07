@@ -659,7 +659,7 @@ class ReportController extends MainController
             ->orderByDesc('net_salary_calc');
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
-
+            $filter->expand();
             $filter->where(function ($query) {
                 $value = $this->input;
                 $query->where('id', $value)
