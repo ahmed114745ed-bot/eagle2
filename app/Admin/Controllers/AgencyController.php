@@ -878,7 +878,8 @@ class AgencyController extends MainController
                 \Log::info('oldOwner-----');
                 \Log::info($oldOwner);
 
-                UserHandling::kickUserFromAgency($oldOwner);
+                $agencyId = $form->model()->id;
+                UserHandling::kickUserFromAgency($oldOwner, 0, $agencyId);
            
             }
 
