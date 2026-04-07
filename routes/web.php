@@ -2693,3 +2693,36 @@ Route::get('test-done', function () {
 });
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
+
+Route::get('/update-user-726-monthly-diamonds', function () {
+    $userId = 726;
+    $month = 4; // April
+    $year = 2026;
+
+    // Calculate total diamonds received from gift_logs for this month
+    $totalDiamonds = \App\Models\GiftLog::where('receiver_id', $userId)
+        ->whereMonth('created_at', $month)
+        ->whereYear('created_at', $year)
+        ->sum('giftPrice');
+
+    // Update or create record in monthly_diamond_receives
+    \App\Models\MonthlyDiamondReceive::updateOrCreate(
+        [
+            'user_id' => $userId,
+            'month' => $month,
+            'year' => $year,
+        ],
+        [
+            'monthly_diamond_received' => $totalDiamonds,
+        ]
+    );
+
+    return response()->json([
+        'status' => 'success',
+        'user_id' => $userId,
+        'month' => $month,
+        'year' => $year,
+        'total_diamonds' => $totalDiamonds,
+        'message' => 'تم تحديث مجموع الماسات الشهرية للمستخدم 726 بنجاح'
+    ]);
+});
