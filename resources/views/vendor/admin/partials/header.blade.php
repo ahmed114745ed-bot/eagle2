@@ -954,13 +954,13 @@
         // Debug: Log language preservation
         console.log('Enhanced Multi-Language Debug:');
         console.log('Current Locale:', '{{ app()->getLocale() }}');
-        console.log('Available Languages:', @json([
+        console.log('Available Languages:', {!! json_encode([
             'ar' => 'العربية', 
             'en' => 'English', 
             'tr' => 'Turkish', 
             'hi' => 'Indian'
-        ]));
-        console.log('Cookie Name: 'locale');
+        ]) !!});
+        console.log('Cookie Name: locale');
         
         // Test the preserveLanguageInUrl function
         if (typeof preserveLanguageInUrl === 'function') {
