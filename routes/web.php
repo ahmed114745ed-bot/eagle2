@@ -1436,8 +1436,8 @@ Route::get('/users-without-admin', function () {
 
 
 Route::get('/backfill-roomcup-rewards', function () {
-    $startDate = '2026-04-05';
-    $endDate = '2026-04-05';
+    $startDate = '2026-04-06';
+    $endDate = '2026-04-06';
     $tz = getTimezone();
     $results = [];
     $totalProcessed = 0;
