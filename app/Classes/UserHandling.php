@@ -86,6 +86,7 @@ class UserHandling
     }
     public function kickUserFromAgency(User &$user, $isApp = 0): void
     {
+        
         $this->handleUserSalaries($user);
         $this->clearUserAgencyLogs($user);
         $this->updateUserJoinedAgency($user, $isApp);
