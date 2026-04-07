@@ -73,16 +73,39 @@ jobs:
         script: |
           cd /var/www/lumio
           sudo docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
-          sudo docker service update \
-            --image lumio-octa:${{ github.sha }} \
-            --replicas 3 \
-            --limit-memory 2.5gb \
-            --reserve-memory 1.0gb \
-            --update-order stop-first \
-            --update-parallelism 1 \
-            --update-delay 10s \
-            --update-failure-action rollback \
-            lumio-octa
+
+          # Retry docker service update up to 3 times (handles Swarm race conditions)
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating lumio-octa..."
+            if sudo docker service update \
+              --image lumio-octa:${{ github.sha }} \
+              --replicas 3 \
+              --limit-memory 2.5gb \
+              --reserve-memory 1.0gb \
+              --update-order stop-first \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              lumio-octa; then
+              echo "lumio-octa update succeeded on attempt $attempt"
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "ERROR: lumio-octa update failed after 3 attempts"
+              exit 1
+            fi
+            echo "Retrying in 15s..."
+            sleep 15
+          done
+
+          # Verify the running image matches the expected tag
+          RUNNING_IMAGE=$(sudo docker service inspect lumio-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+          EXPECTED_IMAGE="lumio-octa:${{ github.sha }}"
+          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            exit 1
+          fi
+          echo "Verified: lumio-octa is running $RUNNING_IMAGE"
 
           echo "Waiting for container to stabilize..."
           sleep 15
@@ -98,7 +121,7 @@ jobs:
 
   run_lumio_job:
     runs-on: [self-hosted]
-    needs: [run_lumio_hub, run_lumio_migrate]
+    needs: [run_lumio_hub, run_lumio_migrate, run_lumio_app]
     steps:
     - name: Build and deploy Lumio jobs
       uses: appleboy/ssh-action@v1.2.1
@@ -112,16 +135,38 @@ jobs:
           cd /var/www/lumio
           sudo docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
 
-          sudo docker service update \
-            --image lumio-job:${{ github.sha }} \
-            --replicas 3 \
-            --limit-cpu 5.0 \
-            --limit-memory 2.5gb \
-            --reserve-memory 1.0gb \
-            --update-parallelism 1 \
-            --update-delay 10s \
-            --update-failure-action rollback \
-            lumio-job
+          # Retry docker service update up to 3 times (handles Swarm race conditions)
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating lumio-job..."
+            if sudo docker service update \
+              --image lumio-job:${{ github.sha }} \
+              --replicas 3 \
+              --limit-cpu 5.0 \
+              --limit-memory 2.5gb \
+              --reserve-memory 1.0gb \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              lumio-job; then
+              echo "lumio-job update succeeded on attempt $attempt"
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "ERROR: lumio-job update failed after 3 attempts"
+              exit 1
+            fi
+            echo "Retrying in 15s..."
+            sleep 15
+          done
+
+          # Verify the running image matches the expected tag
+          RUNNING_IMAGE=$(sudo docker service inspect lumio-job --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+          EXPECTED_IMAGE="lumio-job:${{ github.sha }}"
+          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            exit 1
+          fi
+          echo "Verified: lumio-job is running $RUNNING_IMAGE"
 
           # NOTE: charizma handler (app:handling-room-zigo-requests) runs inside
           # lumio-job containers via supervisord (program:room-zigo-handler in
