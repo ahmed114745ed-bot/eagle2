@@ -873,6 +873,57 @@
             return name;
         }
 
+        // Preserve language parameter in all links and form submissions
+        function preserveLanguageInUrl(url) {
+            const currentLocale = '{{ app()->getLocale() }}';
+            const urlObj = new URL(url, window.location.origin);
+            
+            // Add locale parameter if not present and different from default
+            if (currentLocale !== 'en' && !urlObj.searchParams.has('locale')) {
+                urlObj.searchParams.set('locale', currentLocale);
+            }
+            
+            return urlObj.toString();
+        }
+
+        // Override window.open to preserve language
+        const originalWindowOpen = window.open;
+        window.open = function(url, target, features) {
+            if (url && typeof url === 'string') {
+                url = preserveLanguageInUrl(url);
+            }
+            return originalWindowOpen.call(this, url, target, features);
+        };
+
+        // Handle all links with target="_blank"
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[target="_blank"]').forEach(function(link) {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('javascript:') && !href.startsWith('#')) {
+                    link.setAttribute('href', preserveLanguageInUrl(href));
+                }
+            });
+
+            // Handle form submissions that might open in new windows
+            document.querySelectorAll('form').forEach(function(form) {
+                const originalSubmit = form.submit;
+                form.submit = function() {
+                    const currentLocale = '{{ app()->getLocale() }}';
+                    if (currentLocale !== 'en') {
+                        // Add hidden input for locale if not present
+                        if (!form.querySelector('input[name="locale"]')) {
+                            const localeInput = document.createElement('input');
+                            localeInput.type = 'hidden';
+                            localeInput.name = 'locale';
+                            localeInput.value = currentLocale;
+                            form.appendChild(localeInput);
+                        }
+                    }
+                    return originalSubmit.call(this);
+                };
+            });
+        });
+
         const originalFetch = window.fetch;
         window.fetch = function (url, options = {}) {
             options.headers = options.headers || {};
@@ -880,6 +931,12 @@
             if (window.enableCountryHeader) {
                 const countryId = $('#country-select').val();
                 options.headers['X-Country-ID'] = countryId ? countryId : 'null';
+            }
+
+            // Add locale header for AJAX requests
+            const currentLocale = '{{ app()->getLocale() }}';
+            if (currentLocale !== 'en') {
+                options.headers['X-Locale'] = currentLocale;
             }
 
             if (!options.headers['Accept'])

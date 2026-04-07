@@ -70,7 +70,7 @@ return [
         'middleware' => [
             'web',
             'admin',
-            'multiLanguage',
+            'enhancedMultiLanguage',
             'admin.permission:deny,agency',
             'production.error'
         ],
@@ -86,7 +86,7 @@ return [
             'admin.pjax',
             'admin.log',
             'admin.bootstrap',
-            'multiLanguage',
+            'enhancedMultiLanguage',
             ],
     ],
 
@@ -99,7 +99,7 @@ return [
             'admin.pjax',
             'admin.log',
             'admin.bootstrap',
-            'multiLanguage',
+            'enhancedMultiLanguage',
         ],
     ],
 
@@ -112,7 +112,7 @@ return [
         'middleware' => [
             'web',
 //            'agency',
-            'multiLanguage',
+            'enhancedMultiLanguage',
         ],
 
     ],
