@@ -2,6 +2,9 @@ name: SSh-lumio-pipline
 on:
   push:
     branches: ["lumio"]
+concurrency:
+  group: lumio-deploy
+  cancel-in-progress: false
 jobs:
   run_lumio_hub:
     runs-on: [self-hosted]
