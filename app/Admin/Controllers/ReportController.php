@@ -2,22 +2,21 @@
 
 namespace App\Admin\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Agency;
-use App\Models\Config;
-use Encore\Admin\Grid;
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\AdminUser;
-use App\Models\UserSallary;
-use Illuminate\Http\Request;
-use App\Facades\ManagerHelper;
-use App\Models\ShippingAgency;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
+use App\Models\Agency;
 use App\Models\AgencyMangerPullingOut;
-use App\Admin\Controllers\MainController;
+use App\Models\Bd;
+use App\Models\Config;
+use App\Models\User;
+use App\Models\UserSallary;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends MainController
 {
@@ -30,7 +29,8 @@ class ReportController extends MainController
         $title = match ($name) {
             'users'     => __('Host reports'),
             'agencies'    => __('agencies report'),
-            'agencies_manger'  => __('admin.manger'),
+            // 'agencies_manger'  => __('admin.manger'),
+            'bd' => __('BD report'),
             default     => __('Host reports'),
         };
 
@@ -53,9 +53,6 @@ class ReportController extends MainController
         );
 
         $grid = $this->{$name}();
-        $grid->disableExport();
-        $grid->disableActions();
-        $grid->disableCreateButton();
 
         return $grid;
     }
@@ -385,6 +382,11 @@ class ReportController extends MainController
             $tools->append('<a href="' . route('custom-export-users', ['month' => request('month'), 'year' => request('year'), 'agency_id' => request('agency_id'), 'id' => request('id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
         });
 
+        $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+
+
         return $grid;
     }
 
@@ -550,6 +552,9 @@ class ReportController extends MainController
             $tools->append('<a href="' . route('agency-export-report') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
 
+        $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
 
         return $grid;
     }
@@ -652,7 +657,92 @@ class ReportController extends MainController
         return $grid;
     }
 
+    protected function bd()
+    {
+        $grid = new Grid(new Bd());
+        $countryID = session('filter_country_id');
 
+        $grid->disableRowSelector();
+
+        $grid->model()->with([
+            'bdSalaries',
+            'appUser',
+            'appUser.profile',
+            'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->where('app_id', '!=', 0);
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            $filter->equal('appUser.id', 'User ID');
+        });
+
+        $grid->column('id', __('Id'));
+        $grid->column('username', __('name'))->display(function ($name) {
+            $uid = @$this->id;
+            $path = @$this?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl =  url("admin/usersBd/{$this->id}");
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>ID: $uid</span>
+                    </div>
+                </div>";
+        });
+
+
+
+
+        $grid->column('appUser.name', __('user'))->display(function ($name) {
+            $uid = @$this->appUser->uuid;
+            $path = @$this?->appUser->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this->appUser ? url("admin/users/{$this->appUser->id}") : 0;
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>";
+        });
+
+
+        $grid->column('due', __('Due'))->display(function () {
+            $image = asset('images/dollar.jpg');
+            $salary = $this->net_sallary;
+            return "<div style='display: flex; align-items: center; '>
+                    <span>{$salary}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
+        });
+
+        $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+        return $grid;
+    }
 
 
     public function momentsReels(Request $request)
