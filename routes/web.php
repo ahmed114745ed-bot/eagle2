@@ -1784,13 +1784,13 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
         $weekStart = \Carbon\Carbon::now($tz)->subWeek()->startOfWeek()->setTimezone('UTC');
         $weekEnd = \Carbon\Carbon::now($tz)->subWeek()->endOfWeek()->setTimezone('UTC');
 
-        $aggregatedGifts = \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$weekStart, $weekEnd])
+        $aggregatedGifts = \App\Models\GiftLog::whereBetween('created_at', [$weekStart, $weekEnd])
             ->select(
                 'room_id',
-                \Illuminate\Support\Facades\DB::raw('SUM(current_total) as current_total'),
-                \Illuminate\Support\Facades\DB::raw('SUM(number_of_visitors) as number_of_visitors'),
-                \Illuminate\Support\Facades\DB::raw('MAX(id) as id')
+                \Illuminate\Support\Facades\DB::raw('SUM(giftPrice) as current_total'),
+                \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT sender_id) as number_of_visitors')
             )
+            ->whereNotNull('room_id')
             ->groupBy('room_id')
             ->orderBy('room_id')
             ->get();
@@ -1807,13 +1807,29 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
             $visitorsCount = $gift->number_of_visitors ?? 0;
 
             $target = \Modules\RoomCup\Entities\RoomCupTarget::where('total', '<=', $gift->current_total)
-                ->where('number_of_visitors', '<=', $visitorsCount)
+                // ->where('number_of_visitors', '<=', $visitorsCount)
                 ->orderByDesc('total')
                 ->first();
 
             if (!$target) {
                 continue;
             }
+
+            // Create or get TotalRoomGift record for foreign key constraint
+            $totalRoomGift = \Modules\RoomBoom\Entities\TotalRoomGift::firstOrCreate(
+                [
+                    'room_id' => $gift->room_id,
+                    'created_at' => $weekStart,
+                ],
+                [
+                    'current_total' => $gift->current_total,
+                    'number_of_visitors' => $visitorsCount,
+                    'updated_at' => now(),
+                ]
+            );
+
+            // Assign the TotalRoomGift id to use in rewards
+            $gift->id = $totalRoomGift->id;
 
             $room->additional_admin = 0;
             $room->save();
