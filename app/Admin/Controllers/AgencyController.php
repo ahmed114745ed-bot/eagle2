@@ -867,7 +867,10 @@ class AgencyController extends MainController
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
-
+           \Log::info('test-----');
+           \Log::info($originalOwnerId);
+           \Log::info($newOwnerId);
+           \Log::info('test-----');
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
             
                 $oldOwner   = User::find($originalOwnerId); 
