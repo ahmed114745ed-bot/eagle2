@@ -4098,6 +4098,8 @@
   "family settings": "परिवार सेटिंग्स",
   "Family Setting": "परिवार सेटिंग",
   "BD report": " BD रिपोर्ट",
+  "account dashboard": "खाता डैशबोर्ड",
+"account user": "उपयोगकर्ता खाता",
   "Browse family setting": "परिवार सेटिंग ब्राउज़ करें",
   "api_responses.charge_user_to_user_disabled": "उपयोगकर्ता से उपयोगकर्ता को चार्ज करना वर्तमान में अक्षम है",
   "api_responses.charge_user_to_agent_disabled": "उपयोगकर्ता से चार्जिंग एजेंट को चार्ज करना वर्तमान में अक्षम है",
