@@ -1590,8 +1590,8 @@ Route::get('/run-roomcup-rewards', function () {
 
 
 Route::get('/backfill-roomcup-rewards', function () {
-    $startDate = '2026-04-04';
-    $endDate = '2026-04-04';
+    $startDate = '2026-04-05';
+    $endDate = '2026-04-05';
     $tz = getTimezone();
     $results = [];
     $totalProcessed = 0;
