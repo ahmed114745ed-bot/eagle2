@@ -825,9 +825,9 @@ class AgencyController extends MainController
     {
 
         $form->saving(function (Form $form) {
+            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
-            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
 
             $currentAgencyId = $form->model()->id ?? null;
 
@@ -872,7 +872,8 @@ class AgencyController extends MainController
            \Log::info($newOwnerId);
            \Log::info($form->model()->exists);
            \Log::info('test-----');
-            if ($form->model()->isDirty('app_owner_id')) {            
+            if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
+            
                 $oldOwner   = User::find($originalOwnerId); 
                 \Log::info('oldOwner-----');
                 \Log::info($oldOwner);
