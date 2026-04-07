@@ -825,6 +825,7 @@ class AgencyController extends MainController
     {
 
         $form->saving(function (Form $form) {
+            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
 
@@ -867,7 +868,10 @@ class AgencyController extends MainController
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
-
+         
+            if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
+            
+                $oldOwner   = User::find($originalOwnerId); 
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $form->model()->id);
                 User::find($originalOwnerId)->update([
