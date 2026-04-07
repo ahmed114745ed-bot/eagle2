@@ -704,7 +704,7 @@ class ReportController extends MainController
 
 
 
-        $grid->column('user.name', __('user'))->display(function ($name) {
+        $grid->column('appUser.name', __('user'))->display(function ($name) {
             $uid = @$this->appUser->uuid;
             $path = @$this?->appUser->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
