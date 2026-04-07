@@ -2971,7 +2971,7 @@
         z-index: 9999;
         width: 520px;
         overflow: hidden;
-        height: 60%;
+        height: 70%;
     }
 
     .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
