@@ -954,12 +954,12 @@
         // Debug: Log language preservation
         console.log('Enhanced Multi-Language Debug:');
         console.log('Current Locale:', '{{ app()->getLocale() }}');
-        console.log('Available Languages:', @json(Cache::get('languages', [
+        console.log('Available Languages:', @json([
             'ar' => 'العربية', 
             'en' => 'English', 
             'tr' => 'Turkish', 
             'hi' => 'Indian'
-        ])));
+        ]));
         console.log('Cookie Name: 'locale');
         
         // Test the preserveLanguageInUrl function
