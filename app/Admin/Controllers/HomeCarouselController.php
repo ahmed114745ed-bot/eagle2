@@ -154,51 +154,6 @@ class HomeCarouselController extends MainController
         }
 
 
-        // Admin::script("
-        //     if (typeof axios === 'undefined') {
-        //         var script = document.createElement('script');
-        //         script.src = 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js';
-        //         document.head.appendChild(script);
-        //     }
-
-        //     function bindDisplaySwitch() {
-        //         document.querySelectorAll('.display-switch').forEach(function(el) {
-
-        //             el.onchange = null;
-
-        //             el.addEventListener('change', function() {
-        //                 let checkbox = this;
-
-        //                 let payload = {
-        //                     home_carousel_id: checkbox.dataset.homeCarouselId,
-        //                     display_type: checkbox.dataset.displayType,
-        //                     status: checkbox.checked ? 1 : 0
-        //                 };
-
-        //                 axios.post('/admin/home-carousel-display-toggle', payload)
-        //                     .then(res => {
-        //                         if (!res.data.success) {
-        //                             checkbox.checked = !payload.status;
-        //                             return;
-        //                         }
-
-        //                         checkbox.dataset.id = res.data.display_id ?? 0;
-        //                          $.pjax.reload('#pjax-container');
-        //                          toastr.success('Done');
-
-        //                         let durationEl = checkbox.closest('div').querySelector('.duration-text');
-        //                         durationEl.textContent = res.data.duration || '';
-        //                     })
-        //                     .catch(() => {
-        //                         checkbox.checked = !payload.status;
-        //                     });
-        //             });
-        //         });
-        //     }
-
-        //     bindDisplaySwitch();
-        //     $(document).on('pjax:complete', bindDisplaySwitch);
-        // ");
 
         Admin::script("
     if (typeof axios === 'undefined') {
@@ -211,11 +166,16 @@ class HomeCarouselController extends MainController
 
         document.querySelectorAll('.display-switch').forEach(function(el) {
 
-            el.onchange = null;
+            // Clone and replace to remove all old event listeners
+            var newEl = el.cloneNode(true);
+            el.parentNode.replaceChild(newEl, el);
 
-            el.addEventListener('change', function() {
+            newEl.addEventListener('change', function() {
 
                 let checkbox = this;
+
+                // Disable all switches while processing to prevent duplicate clicks
+                document.querySelectorAll('.display-switch').forEach(function(sw) { sw.disabled = true; });
 
                 let payload = {
                     home_carousel_id: checkbox.dataset.homeCarouselId,
@@ -228,12 +188,14 @@ class HomeCarouselController extends MainController
 
                         if (!res.data.success) {
                             checkbox.checked = !payload.status;
+                            toastr.clear();
                             toastr.error(res.data.message);
                             return;
                         }
 
                         checkbox.dataset.id = res.data.display_id ?? 0;
 
+                        toastr.clear();
                         toastr.success(res.data.message);
 
                         $.pjax.reload('#pjax-container');
@@ -242,6 +204,8 @@ class HomeCarouselController extends MainController
                     .catch(function(error) {
 
                         checkbox.checked = !payload.status;
+
+                        toastr.clear();
 
                         if (error.response && error.response.data) {
 
@@ -259,13 +223,16 @@ class HomeCarouselController extends MainController
                             toastr.error('Something went wrong');
                         }
 
+                    })
+                    .finally(function() {
+                        document.querySelectorAll('.display-switch').forEach(function(sw) { sw.disabled = false; });
                     });
             });
         });
     }
 
     bindDisplaySwitch();
-    $(document).on('pjax:complete', bindDisplaySwitch);
+    $(document).off('pjax:complete', bindDisplaySwitch).on('pjax:complete', bindDisplaySwitch);
 ");
 
 
