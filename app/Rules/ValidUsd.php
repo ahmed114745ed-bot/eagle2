@@ -14,9 +14,9 @@ class ValidUsd implements Rule
     public function __construct($diamonds)
     {
         $this->diamonds = $diamonds;
-        $this->appTarget = Common::getConf('one_usd_value_in_coins');
-        $this->dollar = ($this->diamonds / $this->appTarget) * 0.6;
-        $this->dollar   =     number_format($this->dollar, 2, '.', '');
+        $this->appTarget = \App\Services\CoinRateService::getUserTransferRate();
+        $this->dollar = $this->appTarget > 0 ? ($this->diamonds / $this->appTarget) * 0.6 : 0;
+        $this->dollar   =     number_format((float)$this->dollar, 2, '.', '');
     }
 
     public function passes($attribute, $value)

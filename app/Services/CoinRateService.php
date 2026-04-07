@@ -122,8 +122,58 @@ class CoinRateService
             return self::getAppBaseRate();
         }
 
+        // Priority 1: User Custom Rate (from AdminCoinRate table)
         $customRate = AdminCoinRate::where('admin_id', $admin->id)->value('rate');
+        if ($customRate && (float) $customRate > 0) {
+            return (float) $customRate;
+        }
 
-        return $customRate ? (float) $customRate : self::getAppBaseRate();
+        // Priority 2: Role Default Rate (from settings table based on admin type/role)
+        $roleRate = self::getRoleDefaultRate($admin);
+        if ($roleRate && $roleRate > 0) {
+            return $roleRate;
+        }
+
+        // Priority 3: Global App Rate (fallback)
+        return self::getAppBaseRate();
+    }
+
+    /**
+     * Get the default rate for an admin's role.
+     * Checks for role-specific rate settings in the format: {role_type}_coin_rate
+     * 
+     * @param mixed $admin The admin user object
+     * @return float|null The role default rate or null if not set
+     */
+    protected static function getRoleDefaultRate($admin): ?float
+    {
+        if (!$admin || !isset($admin->type)) {
+            return null;
+        }
+
+        $roleType = $admin->type;
+        
+        // Map role types to their setting keys
+        $roleSettingKeys = [
+            'superadmin'    => 'super_admin_coin_rate',
+            'super_admin'   => 'super_admin_coin_rate',
+            'area-manager'  => 'area_manager_coin_rate',
+            'area_manager'  => 'area_manager_coin_rate',
+            'sub_admin'     => 'sub_admin_coin_rate',
+            'bd'            => 'bd_coin_rate',
+        ];
+
+        $settingKey = $roleSettingKeys[$roleType] ?? null;
+        
+        if (!$settingKey) {
+            return null;
+        }
+
+        // Try to get the role-specific rate from cache/settings
+        $roleRate = Cache::rememberForever("setting_{$settingKey}", function () use ($settingKey) {
+            return Setting::where('key', $settingKey)->value('value');
+        });
+
+        return $roleRate ? (float) $roleRate : null;
     }
 }

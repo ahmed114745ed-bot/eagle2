@@ -204,8 +204,8 @@ class SuperAdminChargeReportController extends MainController
             ";
         });
         $grid->column('amount_and_usd', __('coins & USD'))->display(function () {
-            $coin = number_format($this->amount); // Assuming 'amount' is the coin value
-            $usd = $this->usd;
+            $coin = number_format($this->total_coins ?? $this->amount);
+            $usd = $this->base_usd ?? $this->usd;
 
             $coinIcon = asset('images/coin.jpg');
             $usdIcon = asset('images/dollar.jpg');
@@ -450,8 +450,26 @@ class SuperAdminChargeReportController extends MainController
             });
         }
 
-        $grid->column('amount', __('Amount'));
-        $grid->column('amount', __('Amount'));
+        $grid->column('amount_and_usd', __('coins & USD'))->display(function () {
+            $coin = number_format($this->total_coins ?? $this->amount);
+            $usd = $this->base_usd ?? $this->usd;
+
+            $coinIcon = asset('images/coin.jpg');
+            $usdIcon = asset('images/dollar.jpg');
+
+            return "
+                    <div style='display: flex; flex-direction: column; gap: 5px;'>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$coin}</span>
+                            <img src='{$coinIcon}' alt='Coin' width='20' height='20'>
+                        </div>
+                        <div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$usd}</span>
+                            <img src='{$usdIcon}' alt='USD' width='20' height='20'>
+                        </div>
+                    </div>
+                ";
+        });
         if ($scope === 'not_dash') {
             // dd(123);
             $grid->column('amount_type', __('status'))->display(function () use ($agency_id) {

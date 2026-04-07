@@ -773,7 +773,8 @@ class HomeController extends  MainController
         $totalCharges = Charge::whereHas('user', fn($q) => $q->where('country_id', $countryID))
             ->when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
-            ->sum('usd');
+            ->selectRaw('COALESCE(SUM(base_usd), SUM(usd)) as total')
+            ->value('total') ?? 0;
 
         $totalPayments = CoinLog::whereHas('user', fn($q) => $q->where('country_id', $countryID))
             ->when($from, fn($q) => $q->where('created_at', '>=', $from))

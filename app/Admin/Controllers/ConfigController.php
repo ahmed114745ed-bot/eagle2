@@ -53,6 +53,13 @@ class ConfigController extends MainController
      */
     public function show($id, Content $content)
     {
+        $config = Config::findOrFail($id);
+        $legacyKeys = ['shipping_coins', 'user_coins', 'super_admin_coins', 'zones_coins', 'one_usd_value_in_coins'];
+        if (in_array($config->name, $legacyKeys)) {
+            admin_warning(__('Warning'), __('These settings have been moved to the new Charges Settings page.'));
+            return redirect()->to(route('charges-settings.index') ?? admin_url('charges-settings'));
+        }
+
         return parent::show($id,$content
             ->title(trans('configs'))
             ->body($this->detail($id)));
@@ -67,6 +74,13 @@ class ConfigController extends MainController
      */
     public function edit($id, Content $content)
     {
+        $config = Config::findOrFail($id);
+        $legacyKeys = ['shipping_coins', 'user_coins', 'super_admin_coins', 'zones_coins', 'one_usd_value_in_coins'];
+        if (in_array($config->name, $legacyKeys)) {
+            admin_warning(__('Warning'), __('These settings have been moved to the new Charges Settings page.'));
+            return redirect()->to(route('charges-settings.index') ?? admin_url('charges-settings'));
+        }
+
         $form = $this->form()->edit($id);
         if ($form->model()->type == 'integer') {
             $form->valueInteger = $form->model()->value;
@@ -107,7 +121,7 @@ class ConfigController extends MainController
             return $this->grid();
         }
 
-        $grid->model()->where('is_hidden', 0);
+        $grid->model()->where('is_hidden', 0)->whereNotIn('name', ['shipping_coins', 'user_coins', 'super_admin_coins', 'zones_coins', 'one_usd_value_in_coins']);
         $grid->id('ID');
         $grid->name(trans('name'));
         $grid->column('value', trans('value'))->display(function ($text) {

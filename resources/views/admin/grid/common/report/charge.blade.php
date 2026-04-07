@@ -60,7 +60,7 @@
                     if ($user) {
                         $query->where('user_id', $user->id);
                     }
-                    return $query->sum('amount');
+                    return $query->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
                 } elseif ($isStripe) {
                     $query = \App\Models\CoinLog::whereNotIn('method', ['huawei_pay', 'google_pay', 'strip', 'apple_pay']);
                     if ($user) {
@@ -115,31 +115,31 @@
 
                     if ($name === 'receiver') {
                         if($isApp) {
-                            $value = \App\Models\Charge::where('user_type', 'agency')->sum('amount');
+                            $value = \App\Models\Charge::where('user_type', 'agency')->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
                         } else {
                             $value = $calculateReceiverValue($user, request());
                         }
                     } elseif ($name === 'sender') {
                         if($isApp) {
-                            $value = \App\Models\Charge::where('charger_type', 'agency')->sum('amount');
+                            $value = \App\Models\Charge::where('charger_type', 'agency')->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
                         } else {
-                            $value = $user ? \App\Models\Charge::where('charger_id', $user->id)->sum('amount') : \App\Models\Charge::sum('amount');
+                            $value = $user ? \App\Models\Charge::where('charger_id', $user->id)->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0 : \App\Models\Charge::selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
                         }
                     } elseif ($name === 'dollar') {
                         if($isDashboard) {
-                            $value = \App\Models\Charge::where('charger_type', 'dash')->sum('usd');
+                            $value = \App\Models\Charge::where('charger_type', 'dash')->selectRaw('SUM(COALESCE(base_usd, usd)) as total')->value('total') ?? 0;
                         } elseif ($isHost) {
-                            $value = \App\Models\Charge::where('charger_type', 'host_agency')->sum('usd');
+                            $value = \App\Models\Charge::where('charger_type', 'host_agency')->selectRaw('SUM(COALESCE(base_usd, usd)) as total')->value('total') ?? 0;
                         } else {
                             $value = DB::table('coin_logs')->join('coins', 'coin_logs.coin_id', '=', 'coins.id')->sum('coins.usd');
                         }
                     } elseif ($name === 'coins') {
                         if($isDashboard) {
-                            $value = \App\Models\Charge::where('charger_type', 'dash')->sum('amount');
+                            $value = \App\Models\Charge::where('charger_type', 'dash')->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
                         } elseif ($isExchange) {
                             $value = \App\Models\ExchangeLog::sum('value');
                         } elseif ($isHost) {
-                            $value = \App\Models\Charge::where('charger_type', 'host_agency')->sum('amount');
+                            $value = \App\Models\Charge::where('charger_type', 'host_agency')->selectRaw('SUM(COALESCE(total_coins, amount)) as total')->value('total') ?? 0;
                         } else {
                             $value = \App\Models\CoinLog::where('status', 1)->sum('obtained_coins');
                         }

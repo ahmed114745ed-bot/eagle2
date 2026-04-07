@@ -70,7 +70,8 @@ class ChargeAction2 extends Action
             $effectiveRate = $appBaseRate;
             $calc = \App\Services\ChargeCalculationService::calculate($request->amount, 'usd', $effectiveRate);
             $coins = $calc['total_coins'];
-            $agency->coins += $coins;
+            $effectiveCoins = $request->charge_type == 'increment' ? $coins : -$coins;
+            $agency->coins += $effectiveCoins;
             if ($agency->coins < 0) {
                 throw ValidationException::withMessages([
                     'coins' => [__('agency does not have this coin')],
@@ -108,8 +109,8 @@ class ChargeAction2 extends Action
         $charge->user_type = 'agency';
         $charge->amount = $coins;
         $charge->usd = $usdAmount;
-        $charge->balance_before =  $agency->coins  -  $calc['total_coins'];
-        $charge->total_coins = $totalCoins;
+        $charge->balance_before = $agency->coins - ($request->charge_type == 'increment' ? $totalCoins : -$coins);
+        $charge->total_coins = $request->charge_type == 'increment' ? $totalCoins : -$coins;
         $charge->transaction_type = 'admin_to_agency';
         
         $charge->rate_source = 'app';

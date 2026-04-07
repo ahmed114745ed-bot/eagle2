@@ -120,7 +120,8 @@ class ChargeController extends Controller
 
         if (!$rate)  return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
         
-        $coins = $usd * $rate;
+        $calc = \App\Services\ChargeCalculationService::calculate($usd, 'usd', $rate);
+        $coins = $calc['total_coins'];
 
         $totalSalary = $from->salary;
         $roomSalary = $from->ownerRoom?->salary;
@@ -132,7 +133,7 @@ class ChargeController extends Controller
         DB::beginTransaction();
         try {
 
-            $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd);
+            $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd, $calc);
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
 
             DB::commit();
@@ -202,7 +203,8 @@ class ChargeController extends Controller
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
         }
-        $coins = $usd * $rate;
+        $calc = \App\Services\ChargeCalculationService::calculate($usd, 'usd', $rate);
+        $coins = $calc['total_coins'];
         $totalSalary = $from->salary;
         $roomSalary = $from->ownerRoom?->salary;
         if ($totalSalary < $usd) {
@@ -212,7 +214,7 @@ class ChargeController extends Controller
         }
         DB::beginTransaction();
         try {
-            $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
+            $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd, $calc);
 
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
 

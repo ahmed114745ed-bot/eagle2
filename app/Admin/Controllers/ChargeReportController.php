@@ -1337,8 +1337,8 @@ class ChargeReportController extends MainController
 
 
         $grid->column('amount_and_usd', __('coins & USD'))->display(function () {
-            $coin = number_format($this->amount); // Assuming 'amount' is the coin value
-            $usd = $this->usd;
+            $coin = number_format($this->total_coins ?? ($this->amount + $this->bonus_coins));
+            $usd = $this->base_usd ?? $this->usd;
 
             $coinIcon = asset('images/coin.jpg');
             $usdIcon = asset('images/dollar.jpg');
@@ -1453,14 +1453,14 @@ class ChargeReportController extends MainController
         $name  = $request->input('name', 'dash');
         $stats = [];
         
-        // Reusable aggregate raw SQL - uses saved applied_coin_rate for historical accuracy
+        // Reusable aggregate raw SQL - uses snapshot fields with fallback to legacy
         $aggregateRaw = '
-            SUM(COALESCE(amount, 0) + COALESCE(bonus_coins, 0))                                                          AS total_coins,
-            SUM(CASE WHEN COALESCE(applied_coin_rate, 0) > 0 THEN (COALESCE(amount, 0) + COALESCE(bonus_coins, 0)) / applied_coin_rate ELSE COALESCE(usd, 0) END) AS total_usd,
-            SUM(COALESCE(profit_coins, amount))                                                                           AS profit_coins,
-            SUM(CASE WHEN COALESCE(applied_coin_rate, 0) > 0 THEN COALESCE(profit_coins, amount) / applied_coin_rate ELSE COALESCE(profit_usd, usd) END)          AS profit_usd,
-            SUM(COALESCE(bonus_coins, 0))                                                                                 AS bonus_coins,
-            SUM(CASE WHEN COALESCE(applied_coin_rate, 0) > 0 THEN COALESCE(bonus_coins, 0) / applied_coin_rate ELSE 0 END)                                        AS bonus_usd
+            SUM(COALESCE(total_coins, amount + bonus_coins)) AS total_coins,
+            SUM(COALESCE(base_usd, usd))                      AS total_usd,
+            SUM(COALESCE(profit_coins, amount))               AS profit_coins,
+            SUM(COALESCE(profit_usd, usd))                    AS profit_usd,
+            SUM(COALESCE(bonus_coins, 0))                     AS bonus_coins,
+            SUM(COALESCE(base_usd, usd) - COALESCE(profit_usd, usd)) AS bonus_usd
         ';
 
         // Helper closure

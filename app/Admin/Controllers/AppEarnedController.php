@@ -39,11 +39,11 @@ class AppEarnedController extends MainController
         $lose = $lose1 + $lose2;
         $first_earned_charge = Charge::where("charger_type", "dash")->when(isset($start_date) && isset($end_date), function ($query) use ($start_date,  $end_date) {
             $query->whereBetween('created_at', [$start_date, $end_date]);
-        })->sum("usd");
+        })->selectRaw('SUM(COALESCE(base_usd, usd)) as total')->value('total') ?? 0;
         $second_earned_charge = CoinLog::where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay')->when(isset($start_date) && isset($end_date), function ($query) use ($start_date,  $end_date) {
             $query->whereBetween('created_at', [$start_date, $end_date]);
         })->where('status', 1)->sum("paid_usd");
-        $first_earned = Charge::where("charger_type", "dash")->sum("usd");
+        $first_earned = Charge::where("charger_type", "dash")->selectRaw('SUM(COALESCE(base_usd, usd)) as total')->value('total') ?? 0;
         $second_earned = CoinLog::where('method', '!=', 'huawei_pay')->where('method', '!=', 'google_pay')->where('method', '!=', 'apple_pay')->where('status', 1)->sum("paid_usd");
         $earned = $first_earned + $second_earned;
         $earned_charge = $first_earned_charge + $second_earned_charge;
