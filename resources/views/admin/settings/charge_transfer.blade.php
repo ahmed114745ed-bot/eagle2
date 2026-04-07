@@ -5,9 +5,8 @@
             <p class="text-muted">{{ __('Control charging permissions for different transfer scenarios') }}</p>
         </div>
 
-        <form action="{{ route('admin.app.settings.update') }}" method="POST" class="settings-form">
+        <form action="{{ route('admin.charge.transfer.settings.save') }}" method="POST" class="settings-form">
             @csrf
-            <input type="hidden" name="current_tab" value="chargeTransferSettings">
 
             <div class="charge-transfer-grid">
                 <!-- User to User Transfer -->

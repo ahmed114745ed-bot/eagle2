@@ -493,6 +493,7 @@ Route::group(
 
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
         Route::get('/charge-transfer-settings', [\App\Admin\Controllers\ChargeTransferController::class, 'index'])->name('charge.transfer.settings');
+        Route::post('/charge-transfer-settings/save', [\App\Admin\Controllers\ChargeTransferController::class, 'saveSettings'])->name('charge.transfer.settings.save');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
         Route::post('/lucky-gift-settings/update', [SettingsController::class, 'settingGift'])->name('lucky.gift.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');

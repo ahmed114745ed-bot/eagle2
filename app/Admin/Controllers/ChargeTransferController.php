@@ -3,6 +3,8 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Setting;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\AdminController;
 
@@ -23,5 +25,35 @@ class ChargeTransferController extends AdminController
             ->title(__('Charge Transfer Settings'))
             ->description(__('Control charging permissions for different transfer scenarios'))
             ->body(view('admin.settings.charge_transfer', compact('settings')));
+    }
+
+    /**
+     * Store charge transfer settings.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function saveSettings(Request $request)
+    {
+        $keys = [
+            'charge_user_to_user',
+            'charge_user_to_agent',
+            'charge_user_to_self',
+            'charge_agent_to_user',
+            'charge_agent_to_agent',
+        ];
+
+        foreach ($keys as $key) {
+            $value = $request->input($key, 0);
+            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            Cache::forget($key);
+            Cache::put($key, $value);
+        }
+
+        Cache::forget('all_settings');
+
+        admin_toastr(__('Settings updated successfully!'), 'success');
+
+        return redirect(url('admin/charge-transfer-settings'));
     }
 }
