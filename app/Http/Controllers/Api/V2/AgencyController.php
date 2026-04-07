@@ -282,7 +282,7 @@ class AgencyController extends Controller
         }
 
         $agency_id = $agency->id;
-        $list_req = AgencyJoinRequest::where('agency_id', $agency_id)->orderByDesc('id');;
+        $list_req = AgencyJoinRequest::where('agency_id', $agency_id)->whereHas('user')->orderByDesc('id');
 
         if ($type == "application") {
             $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10);

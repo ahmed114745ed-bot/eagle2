@@ -537,6 +537,8 @@ Route::group(
         Route::post("transfer-salary-reliable-shipping-agency", [AppearChargerAgencyController::class, "transferSalary"]);
 
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
+        Route::get('/charge-transfer-settings', [\App\Admin\Controllers\ChargeTransferController::class, 'index'])->name('charge.transfer.settings');
+        Route::post('/charge-transfer-settings/save', [\App\Admin\Controllers\ChargeTransferController::class, 'saveSettings'])->name('charge.transfer.settings.save');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('app.settings.update');
         Route::post('/lucky-gift-settings/update', [SettingsController::class, 'settingGift'])->name('lucky.gift.settings.update');
         Route::post('/app-config/update', [SettingsController::class, 'updateAppConfig'])->name('app-config.update');
@@ -1554,9 +1556,204 @@ Route::get('/run-roomcup-rewards', function () {
     ]);
 });
 
+// Route::get('/backfill-roomcup-rewards', function () {
+//     $startDate = '2026-04-04';
+//     $endDate = '2026-04-04'; // أمبارح
+//     $tz = getTimezone();
+//     $results = [];
+//     $totalProcessed = 0;
+//     $totalRewarded = 0;
+
+//     try {
+//         $current = \Carbon\Carbon::parse($startDate, $tz);
+//         $end = \Carbon\Carbon::parse($endDate, $tz);
+
+//         while ($current->lte($end)) {
+//             $dayStart = $current->copy()->startOfDay()->setTimezone('UTC');
+//             $dayEnd = $current->copy()->endOfDay()->setTimezone('UTC');
+
+//             $dayResults = [
+//                 'date' => $current->format('Y-m-d'),
+//                 'gifts_processed' => 0,
+//                 'rewards_given' => 0,
+//                 'rooms' => [],
+//             ];
+
+//             // جيب الـ gifts لليوم ده
+//             $gifts = \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$dayStart, $dayEnd])
+//                 ->orderBy('id')
+//                 ->get();
+
+//             foreach ($gifts as $gift) {
+//                 $dayResults['gifts_processed']++;
+//                 $totalProcessed++;
+
+//                 $room = \App\Models\Room::find($gift->room_id);
+//                 if (!$room) {
+//                     continue;
+//                 }
+
+//                 $adminsCount = $room->admins_v2()->count();
+//                 $visitorsCount = $gift->number_of_visitors ?? 0;
+
+//                 // شيك على الـ target
+//                 $target = \Modules\RoomCup\Entities\RoomCupTarget::where('total', '<=', $gift->current_total)
+//                     ->where('number_of_visitors', '<=', $visitorsCount)
+//                     ->orderByDesc('total')
+//                     ->first();
+
+//                 if (!$target) {
+//                     continue;
+//                 }
+
+//                 // عدل الأدمنز (نفس الـ Command)
+//                 $room->additional_admin = 0;
+//                 $room->save();
+
+//                 $currentTotal = $room->total_admins;
+//                 $targetTotal = (int) $target->number_of_admins;
+//                 $difference = $targetTotal - $currentTotal;
+
+//                 if ($difference !== 0) {
+//                     if ($difference > 0) {
+//                         $room->additional_admin += $difference;
+//                     } else {
+//                         $difference = abs($difference);
+//                         $room->additional_admin = max(0, $room->additional_admin - $difference);
+//                     }
+//                     $room->save();
+
+//                     // Normalize room admins (نفس الـ Command)
+//                     $roomAdmin = $room->room_admin;
+//                     $roomMax = $room->total_admins;
+//                     $configMaxRoom = \App\Helpers\Common::getConfig('max_room_admin') ?? 4;
+
+//                     $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
+//                     $adm_arr = array_filter(array_unique($adm_arr));
+
+//                     $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
+
+//                     if (count($adm_arr) > $allowedMax) {
+//                         $adm_arr = array_slice($adm_arr, 0, $allowedMax);
+//                     }
+//                     $str = implode(",", $adm_arr);
+//                     $room->update(['room_admin' => $str]);
+//                 }
+
+//                 // حضر المكافآت
+//                 \Illuminate\Support\Facades\DB::transaction(function () use ($room, $gift, $target, $adminsCount, $dayStart, $dayEnd, &$dayResults, &$totalRewarded) {
+//                     $rewards = [];
+//                     $targetId = $target->id;
+
+//                     // Owner reward
+//                     if ($target->owner_profit > 0) {
+//                         $rewards[] = [
+//                             'room_id' => $room->id,
+//                             'total_room_gift_id' => $gift->id,
+//                             'target_id' => $targetId,
+//                             'user_id' => $room->uid,
+//                             'type' => 'owner',
+//                             'amount' => $target->owner_profit,
+//                             'created_at' => $dayStart,
+//                             'updated_at' => now(),
+//                         ];
+//                     }
+
+//                     // Admin rewards
+//                     if ($adminsCount > 0 && $target->admin_profit > 0) {
+//                         $share = $target->admin_profit / $adminsCount;
+//                         foreach ($room->admins_v2() as $admin) {
+//                             $rewards[] = [
+//                                 'room_id' => $room->id,
+//                                 'total_room_gift_id' => $gift->id,
+//                                 'target_id' => $targetId,
+//                                 'user_id' => $admin->id,
+//                                 'type' => 'admin',
+//                                 'amount' => $share,
+//                                 'created_at' => $dayStart,
+//                                 'updated_at' => now(),
+//                             ];
+//                         }
+//                     }
+
+//                     foreach ($rewards as $reward) {
+//                         // شيك لو الـ reward موجود قبل كده
+
+
+//                         $nowDate = Carbon::now();
+//                         $exists = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $reward['room_id'])
+//                             ->where('user_id', $reward['user_id'])
+//                             ->where('type', $reward['type'])
+//                             ->whereDate('created_at', $nowDate->toDateString())
+//                             ->exists();
+
+//                         if ($exists) {
+//                             continue; // skip duplicates
+//                         }
+
+//                         // احفظ الـ reward
+//                         \Modules\RoomCup\Entities\RoomCupReward::create($reward);
+//                         $dayResults['rewards_given']++;
+//                         $totalRewarded++;
+
+//                         // زود الفلوس لليوزر
+//                         $amountBefore = \App\Helpers\Common::getCurrentBalance($reward['user_id']);
+
+//                         \App\Helpers\UserCoinLogHelper::logByType(
+//                             $reward['user_id'],
+//                             $reward['amount'],
+//                             $amountBefore,
+//                             \App\Enums\UserCoinLogType::ROOM_CUP,
+//                         );
+
+//                         \App\Models\User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
+//                         \Modules\RoomCup\Helpers\RoomCupHelper::updateRoomCupWallet($reward['amount']);
+
+//                         // ابعت notification
+//                         $user = \App\Models\User::find($reward['user_id']);
+//                         if ($user) {
+//                             \App\Facades\CustomNotification::roomcupReward($user, $reward['amount'], $reward['type']);
+//                         }
+//                     }
+
+//                     if (!empty($rewards)) {
+//                         $room->update(['session' => null]);
+//                         $dayResults['rooms'][] = $room->id;
+//                     }
+//                 });
+//             }
+
+//             $results[] = $dayResults;
+//             $current->addDay();
+//         }
+
+//         return response()->json([
+//             'success' => true,
+//             'message' => 'Backfill completed successfully!',
+//             'summary' => [
+//                 'total_gifts_processed' => $totalProcessed,
+//                 'total_rewards_given' => $totalRewarded,
+//                 'days_processed' => count($results),
+//             ],
+//             'details' => $results,
+//         ]);
+//     } catch (\Exception $e) {
+//         \Illuminate\Support\Facades\Log::error('Backfill RoomCup Error: ' . $e->getMessage(), [
+//             'trace' => $e->getTraceAsString()
+//         ]);
+
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Error during backfill',
+//             'error' => $e->getMessage(),
+//         ], 500);
+//     }
+// });
+
+
 Route::get('/backfill-roomcup-rewards', function () {
-    $startDate = '2026-04-04';
-    $endDate = '2026-04-04'; // أمبارح
+    $startDate = '2026-04-05';
+    $endDate = '2026-04-05';
     $tz = getTimezone();
     $results = [];
     $totalProcessed = 0;
@@ -1577,146 +1774,140 @@ Route::get('/backfill-roomcup-rewards', function () {
                 'rooms' => [],
             ];
 
-            // جيب الـ gifts لليوم ده
-            $gifts = \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$dayStart, $dayEnd])
+            // chunk(50) بدل get() عشان الذاكرة
+            \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$dayStart, $dayEnd])
                 ->orderBy('id')
-                ->get();
+                ->chunk(50, function ($gifts) use (&$dayResults, &$totalProcessed, &$totalRewarded, $dayStart, $dayEnd) {
+                    foreach ($gifts as $gift) {
+                        $dayResults['gifts_processed']++;
+                        $totalProcessed++;
 
-            foreach ($gifts as $gift) {
-                $dayResults['gifts_processed']++;
-                $totalProcessed++;
-
-                $room = \App\Models\Room::find($gift->room_id);
-                if (!$room) {
-                    continue;
-                }
-
-                $adminsCount = $room->admins_v2()->count();
-                $visitorsCount = $gift->number_of_visitors ?? 0;
-
-                // شيك على الـ target
-                $target = \Modules\RoomCup\Entities\RoomCupTarget::where('total', '<=', $gift->current_total)
-                    ->where('number_of_visitors', '<=', $visitorsCount)
-                    ->orderByDesc('total')
-                    ->first();
-
-                if (!$target) {
-                    continue;
-                }
-
-                // عدل الأدمنز (نفس الـ Command)
-                $room->additional_admin = 0;
-                $room->save();
-
-                $currentTotal = $room->total_admins;
-                $targetTotal = (int) $target->number_of_admins;
-                $difference = $targetTotal - $currentTotal;
-
-                if ($difference !== 0) {
-                    if ($difference > 0) {
-                        $room->additional_admin += $difference;
-                    } else {
-                        $difference = abs($difference);
-                        $room->additional_admin = max(0, $room->additional_admin - $difference);
-                    }
-                    $room->save();
-
-                    // Normalize room admins (نفس الـ Command)
-                    $roomAdmin = $room->room_admin;
-                    $roomMax = $room->total_admins;
-                    $configMaxRoom = \App\Helpers\Common::getConfig('max_room_admin') ?? 4;
-
-                    $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
-                    $adm_arr = array_filter(array_unique($adm_arr));
-
-                    $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
-
-                    if (count($adm_arr) > $allowedMax) {
-                        $adm_arr = array_slice($adm_arr, 0, $allowedMax);
-                    }
-                    $str = implode(",", $adm_arr);
-                    $room->update(['room_admin' => $str]);
-                }
-
-                // حضر المكافآت
-                \Illuminate\Support\Facades\DB::transaction(function () use ($room, $gift, $target, $adminsCount, $dayStart, $dayEnd, &$dayResults, &$totalRewarded) {
-                    $rewards = [];
-                    $targetId = $target->id;
-
-                    // Owner reward
-                    if ($target->owner_profit > 0) {
-                        $rewards[] = [
-                            'room_id' => $room->id,
-                            'total_room_gift_id' => $gift->id,
-                            'target_id' => $targetId,
-                            'user_id' => $room->uid,
-                            'type' => 'owner',
-                            'amount' => $target->owner_profit,
-                            'created_at' => $dayStart,
-                            'updated_at' => now(),
-                        ];
-                    }
-
-                    // Admin rewards
-                    if ($adminsCount > 0 && $target->admin_profit > 0) {
-                        $share = $target->admin_profit / $adminsCount;
-                        foreach ($room->admins_v2() as $admin) {
-                            $rewards[] = [
-                                'room_id' => $room->id,
-                                'total_room_gift_id' => $gift->id,
-                                'target_id' => $targetId,
-                                'user_id' => $admin->id,
-                                'type' => 'admin',
-                                'amount' => $share,
-                                'created_at' => $dayStart,
-                                'updated_at' => now(),
-                            ];
-                        }
-                    }
-
-                    foreach ($rewards as $reward) {
-                        // شيك لو الـ reward موجود قبل كده
-                        $exists = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $reward['room_id'])
-                            ->where('user_id', $reward['user_id'])
-                            ->where('type', $reward['type'])
-                            ->whereBetween('created_at', [$dayStart, $dayEnd])
-                            ->exists();
-
-                        if ($exists) {
-                            continue; // skip duplicates
+                        $room = \App\Models\Room::find($gift->room_id);
+                        if (!$room) {
+                            continue;
                         }
 
-                        // احفظ الـ reward
-                        \Modules\RoomCup\Entities\RoomCupReward::create($reward);
-                        $dayResults['rewards_given']++;
-                        $totalRewarded++;
+                        $adminsCount = $room->admins_v2()->count();
+                        $visitorsCount = $gift->number_of_visitors ?? 0;
 
-                        // زود الفلوس لليوزر
-                        $amountBefore = \App\Helpers\Common::getCurrentBalance($reward['user_id']);
+                        $target = \Modules\RoomCup\Entities\RoomCupTarget::where('total', '<=', $gift->current_total)
+                            ->where('number_of_visitors', '<=', $visitorsCount)
+                            ->orderByDesc('total')
+                            ->first();
 
-                        \App\Helpers\UserCoinLogHelper::logByType(
-                            $reward['user_id'],
-                            $reward['amount'],
-                            $amountBefore,
-                            \App\Enums\UserCoinLogType::ROOM_CUP,
-                        );
-
-                        \App\Models\User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
-                        \Modules\RoomCup\Helpers\RoomCupHelper::updateRoomCupWallet($reward['amount']);
-
-                        // ابعت notification
-                        $user = \App\Models\User::find($reward['user_id']);
-                        if ($user) {
-                            \App\Facades\CustomNotification::roomcupReward($user, $reward['amount'], $reward['type']);
+                        if (!$target) {
+                            continue;
                         }
-                    }
 
-                    if (!empty($rewards)) {
-                        $room->update(['session' => null]);
-                        $dayResults['rooms'][] = $room->id;
+                        // عدل الأدمنز
+                        $room->additional_admin = 0;
+                        $room->save();
+
+                        $currentTotal = $room->total_admins;
+                        $targetTotal = (int) $target->number_of_admins;
+                        $difference = $targetTotal - $currentTotal;
+
+                        if ($difference !== 0) {
+                            if ($difference > 0) {
+                                $room->additional_admin += $difference;
+                            } else {
+                                $difference = abs($difference);
+                                $room->additional_admin = max(0, $room->additional_admin - $difference);
+                            }
+                            $room->save();
+
+                            $roomAdmin = $room->room_admin;
+                            $roomMax = $room->total_admins;
+                            $configMaxRoom = \App\Helpers\Common::getConfig('max_room_admin') ?? 4;
+
+                            $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
+                            $adm_arr = array_filter(array_unique($adm_arr));
+
+                            $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
+
+                            if (count($adm_arr) > $allowedMax) {
+                                $adm_arr = array_slice($adm_arr, 0, $allowedMax);
+                            }
+                            $str = implode(",", $adm_arr);
+                            $room->update(['room_admin' => $str]);
+                        }
+
+                        // حضر المكافآت
+                        \Illuminate\Support\Facades\DB::transaction(function () use ($room, $gift, $target, $adminsCount, $dayStart, $dayEnd, &$dayResults, &$totalRewarded) {
+                            $rewards = [];
+                            $targetId = $target->id;
+
+                            if ($target->owner_profit > 0) {
+                                $rewards[] = [
+                                    'room_id' => $room->id,
+                                    'total_room_gift_id' => $gift->id,
+                                    'target_id' => $targetId,
+                                    'user_id' => $room->uid,
+                                    'type' => 'owner',
+                                    'amount' => $target->owner_profit,
+                                    'created_at' => $dayStart,
+                                    'updated_at' => now(),
+                                ];
+                            }
+
+                            if ($adminsCount > 0 && $target->admin_profit > 0) {
+                                $share = $target->admin_profit / $adminsCount;
+                                foreach ($room->admins_v2() as $admin) {
+                                    $rewards[] = [
+                                        'room_id' => $room->id,
+                                        'total_room_gift_id' => $gift->id,
+                                        'target_id' => $targetId,
+                                        'user_id' => $admin->id,
+                                        'type' => 'admin',
+                                        'amount' => $share,
+                                        'created_at' => $dayStart,
+                                        'updated_at' => now(),
+                                    ];
+                                }
+                            }
+
+                            foreach ($rewards as $reward) {
+                                // شيك لو الـ reward موجود قبل كده
+                                $nowDate = \Carbon\Carbon::now();
+                                $exists = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $reward['room_id'])
+                                    ->where('user_id', $reward['user_id'])
+                                    ->where('type', $reward['type'])
+                                    ->whereDate('created_at', $nowDate->toDateString())
+                                    ->exists();
+
+                                if ($exists) {
+                                    continue;
+                                }
+
+                                \Modules\RoomCup\Entities\RoomCupReward::create($reward);
+                                $dayResults['rewards_given']++;
+                                $totalRewarded++;
+
+                                $amountBefore = \App\Helpers\Common::getCurrentBalance($reward['user_id']);
+
+                                \App\Helpers\UserCoinLogHelper::logByType(
+                                    $reward['user_id'],
+                                    $reward['amount'],
+                                    $amountBefore,
+                                    \App\Enums\UserCoinLogType::ROOM_CUP,
+                                );
+
+                                \App\Models\User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
+                                \Modules\RoomCup\Helpers\RoomCupHelper::updateRoomCupWallet($reward['amount']);
+
+                                $user = \App\Models\User::find($reward['user_id']);
+                                if ($user) {
+                                    \App\Facades\CustomNotification::roomcupReward($user, $reward['amount'], $reward['type']);
+                                }
+                            }
+
+                            if (!empty($rewards)) {
+                                $room->update(['session' => null]);
+                                $dayResults['rooms'][] = $room->id;
+                            }
+                        });
                     }
                 });
-            }
 
             $results[] = $dayResults;
             $current->addDay();
@@ -1732,7 +1923,6 @@ Route::get('/backfill-roomcup-rewards', function () {
             ],
             'details' => $results,
         ]);
-
     } catch (\Exception $e) {
         \Illuminate\Support\Facades\Log::error('Backfill RoomCup Error: ' . $e->getMessage(), [
             'trace' => $e->getTraceAsString()
@@ -1746,145 +1936,170 @@ Route::get('/backfill-roomcup-rewards', function () {
     }
 });
 
-Route::get('/check-duplicate-roomcup-rewards', function () {
-    $startDate = '2026-03-28';
-    $endDate = '2026-04-05';
-
-    $duplicates = \Illuminate\Support\Facades\DB::select("
-        SELECT
-            room_id,
-            user_id,
-            type,
-            DATE(created_at) as reward_date,
-            COUNT(*) as duplicate_count,
-            SUM(amount) as total_amount,
-            GROUP_CONCAT(id) as reward_ids
-        FROM room_cup_rewards
-        WHERE DATE(created_at) BETWEEN ? AND ?
-        GROUP BY room_id, user_id, type, DATE(created_at)
-        HAVING COUNT(*) > 1
-        ORDER BY duplicate_count DESC
-    ", [$startDate, $endDate]);
-
-    $totalDuplicateRecords = 0;
-    $totalDuplicateAmount = 0;
-
-    foreach ($duplicates as $dup) {
-        $totalDuplicateRecords += ($dup->duplicate_count - 1);
-        $totalDuplicateAmount += ($dup->total_amount / $dup->duplicate_count) * ($dup->duplicate_count - 1);
-    }
-
-    return response()->json([
-        'total_duplicate_records' => $totalDuplicateRecords,
-        'total_duplicate_amount' => $totalDuplicateAmount,
-        'unique_combinations_duplicated' => count($duplicates),
-        'details' => $duplicates,
-    ]);
-});
-
-Route::get('/fix-duplicate-roomcup-rewards', function () {
-    $startDate = '2026-03-28';
-    $endDate = '2026-04-05';
+Route::get('/backfill-roomcup-weekly-rewards', function () {
+    $tz = getTimezone();
+    $totalProcessed = 0;
+    $totalRewarded = 0;
+    $roomDetails = [];
 
     try {
-        \Illuminate\Support\Facades\DB::beginTransaction();
+        $weekStart = \Carbon\Carbon::now($tz)->subWeek()->startOfWeek()->setTimezone('UTC');
+        $weekEnd = \Carbon\Carbon::now($tz)->subWeek()->endOfWeek()->setTimezone('UTC');
 
-        $duplicates = \Illuminate\Support\Facades\DB::select("
-            SELECT
-                room_id,
-                user_id,
-                type,
-                DATE(created_at) as reward_date,
-                COUNT(*) as duplicate_count,
-                MIN(id) as keep_id,
-                SUM(amount) as total_amount
-            FROM room_cup_rewards
-            WHERE DATE(created_at) BETWEEN ? AND ?
-            GROUP BY room_id, user_id, type, DATE(created_at)
-            HAVING COUNT(*) > 1
-        ", [$startDate, $endDate]);
+        $aggregatedGifts = \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$weekStart, $weekEnd])
+            ->select(
+                'room_id',
+                \Illuminate\Support\Facades\DB::raw('SUM(current_total) as current_total'),
+                \Illuminate\Support\Facades\DB::raw('SUM(number_of_visitors) as number_of_visitors'),
+                \Illuminate\Support\Facades\DB::raw('MAX(id) as id')
+            )
+            ->groupBy('room_id')
+            ->orderBy('room_id')
+            ->get();
 
-        $fixedRecords = 0;
-        $refundedAmount = 0;
-        $details = [];
+        foreach ($aggregatedGifts as $gift) {
+            $totalProcessed++;
 
-        foreach ($duplicates as $dup) {
-            $dayStart = \Carbon\Carbon::parse($dup->reward_date)->startOfDay();
-            $dayEnd = \Carbon\Carbon::parse($dup->reward_date)->endOfDay();
-
-            // جيب كل الـ rewards المكررة
-            $rewards = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $dup->room_id)
-                ->where('user_id', $dup->user_id)
-                ->where('type', $dup->type)
-                ->whereBetween('created_at', [$dayStart, $dayEnd])
-                ->orderBy('id')
-                ->get();
-
-            if ($rewards->count() <= 1) {
+            $room = \App\Models\Room::find($gift->room_id);
+            if (!$room) {
                 continue;
             }
 
-            // احتفظ بأول واحدة بس
-            $keepReward = $rewards->first();
-            $duplicatesToDelete = $rewards->slice(1);
+            $adminsCount = $room->admins_v2()->count();
+            $visitorsCount = $gift->number_of_visitors ?? 0;
 
-            foreach ($duplicatesToDelete as $duplicate) {
-                // ارجع الفلوس من اليوزر
-                $user = \App\Models\User::find($dup->user_id);
-                if ($user && $user->di >= $duplicate->amount) {
-                    \App\Models\User::whereKey($dup->user_id)->decrement('di', $duplicate->amount);
-                    $refundedAmount += $duplicate->amount;
+            $target = \Modules\RoomCup\Entities\RoomCupTarget::where('total', '<=', $gift->current_total)
+                ->where('number_of_visitors', '<=', $visitorsCount)
+                ->orderByDesc('total')
+                ->first();
 
-                    // امسح الـ coin log
-                    $amountBefore = \App\Helpers\Common::getCurrentBalance($dup->user_id);
+            if (!$target) {
+                continue;
+            }
+
+            $room->additional_admin = 0;
+            $room->save();
+
+            $currentTotal = $room->total_admins;
+            $targetTotal = (int) $target->number_of_admins;
+            $difference = $targetTotal - $currentTotal;
+
+            if ($difference !== 0) {
+                if ($difference > 0) {
+                    $room->additional_admin += $difference;
+                } else {
+                    $difference = abs($difference);
+                    $room->additional_admin = max(0, $room->additional_admin - $difference);
+                }
+                $room->save();
+
+                $roomAdmin = $room->room_admin;
+                $roomMax = $room->total_admins;
+                $configMaxRoom = \App\Helpers\Common::getConfig('max_room_admin') ?? 4;
+
+                $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
+                $adm_arr = array_filter(array_unique($adm_arr));
+
+                $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
+
+                if (count($adm_arr) > $allowedMax) {
+                    $adm_arr = array_slice($adm_arr, 0, $allowedMax);
+                }
+                $str = implode(",", $adm_arr);
+                $room->update(['room_admin' => $str]);
+            }
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($room, $gift, $target, $adminsCount, $weekStart, $weekEnd, &$roomDetails, &$totalRewarded) {
+                $rewards = [];
+                $targetId = $target->id;
+
+                if ($target->owner_profit > 0) {
+                    $rewards[] = [
+                        'room_id' => $room->id,
+                        'total_room_gift_id' => $gift->id,
+                        'target_id' => $targetId,
+                        'user_id' => $room->uid,
+                        'type' => 'owner',
+                        'amount' => $target->owner_profit,
+                        'created_at' => $weekStart,
+                        'updated_at' => now(),
+                    ];
+                }
+
+                if ($adminsCount > 0 && $target->admin_profit > 0) {
+                    $share = $target->admin_profit / $adminsCount;
+                    foreach ($room->admins_v2() as $admin) {
+                        $rewards[] = [
+                            'room_id' => $room->id,
+                            'total_room_gift_id' => $gift->id,
+                            'target_id' => $targetId,
+                            'user_id' => $admin->id,
+                            'type' => 'admin',
+                            'amount' => $share,
+                            'created_at' => $weekStart,
+                            'updated_at' => now(),
+                        ];
+                    }
+                }
+
+                foreach ($rewards as $reward) {
+                    $exists = \Modules\RoomCup\Entities\RoomCupReward::where('room_id', $reward['room_id'])
+                        ->where('user_id', $reward['user_id'])
+                        ->where('type', $reward['type'])
+                        ->whereBetween('created_at', [$weekStart, $weekEnd])
+                        ->exists();
+
+                    if ($exists) {
+                        continue;
+                    }
+
+                    \Modules\RoomCup\Entities\RoomCupReward::create($reward);
+                    $totalRewarded++;
+
+                    $amountBefore = \App\Helpers\Common::getCurrentBalance($reward['user_id']);
+
                     \App\Helpers\UserCoinLogHelper::logByType(
-                        $dup->user_id,
-                        -$duplicate->amount,
+                        $reward['user_id'],
+                        $reward['amount'],
                         $amountBefore,
                         \App\Enums\UserCoinLogType::ROOM_CUP,
                     );
 
-                    // ارجع فلوس الـ RoomCup Wallet
-                    \Modules\RoomCup\Helpers\RoomCupHelper::updateRoomCupWallet(-$duplicate->amount);
+                    \App\Models\User::whereKey($reward['user_id'])->increment('di', $reward['amount']);
+                    \Modules\RoomCup\Helpers\RoomCupHelper::updateRoomCupWallet($reward['amount']);
+
+                    $user = \App\Models\User::find($reward['user_id']);
+                    if ($user) {
+                        \App\Facades\CustomNotification::roomcupReward($user, $reward['amount'], $reward['type']);
+                    }
                 }
 
-                // امسح الـ reward
-                $duplicate->delete();
-                $fixedRecords++;
-            }
-
-            $details[] = [
-                'room_id' => $dup->room_id,
-                'user_id' => $dup->user_id,
-                'type' => $dup->type,
-                'date' => $dup->reward_date,
-                'kept_reward_id' => $keepReward->id,
-                'deleted_count' => $duplicatesToDelete->count(),
-                'refunded_amount' => ($duplicate->amount ?? 0) * $duplicatesToDelete->count(),
-            ];
+                if (!empty($rewards)) {
+                    $room->update(['session' => null]);
+                    $roomDetails[] = $room->id;
+                }
+            });
         }
-
-        \Illuminate\Support\Facades\DB::commit();
 
         return response()->json([
             'success' => true,
-            'message' => 'Duplicates fixed successfully!',
+            'message' => 'Weekly backfill completed successfully!',
             'summary' => [
-                'fixed_records' => $fixedRecords,
-                'refunded_amount' => $refundedAmount,
-                'unique_combinations_fixed' => count($details),
+                'week' => $weekStart->toDateString() . ' to ' . $weekEnd->toDateString(),
+                'total_rooms_processed' => $totalProcessed,
+                'total_rewards_given' => $totalRewarded,
+                'rooms_rewarded' => $roomDetails,
             ],
-            'details' => $details,
         ]);
-
     } catch (\Exception $e) {
-        \Illuminate\Support\Facades\DB::rollBack();
+        \Illuminate\Support\Facades\Log::error('Backfill Weekly RoomCup Error: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString()
+        ]);
 
         return response()->json([
             'success' => false,
-            'message' => 'Error fixing duplicates',
+            'message' => 'Error during weekly backfill',
             'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
         ], 500);
     }
 });
@@ -3418,55 +3633,19 @@ Route::get('/test-push-succ', function () {
     ]);
 });
 
-Route::get('remove-bd-rewards', function () {
 
-    $milestone = Milestone::where('slug', 'bd')->first();
-    $users = \App\Models\User::where('is_bd', 1)->get();
-
-    if (!request()->has('confirm')) {
-        $count = 0;
-        foreach ($users as $user) {
-            $dashAccount = Admin::where('app_id', $user->id)->where('type', 'bd')->first();
-            if (!$dashAccount) {
-                $count++;
-            }
-        }
-        return response()->json([
-            'message' => 'عدد المستخدمين اللي عندهم مشكلة',
-            'count'   => $count,
-            'hint'    => 'أضف ?confirm=yes في اللينك عشان تبدأ التصحيح',
-        ]);
-    }
-
-    $fixed = 0;
-    foreach ($users as $user) {
-        $dashAccount = Admin::where('app_id', $user->id)->where('type', 'bd')->first();
-
-        if (!$dashAccount) {
-            $user->is_bd = 0;
-            $user->save();
-
-            if ($milestone) {
-                MilestoneReward::where('milestone_id', $milestone->id)
-                    ->where('rewardable_id', $user->id)
-                    ->delete();
-            }
-            $fixed++;
-        }
-    }
-
-    return response()->json([
-        'message' => 'تم التصحيح بنجاح',
-        'fixed'   => $fixed,
-    ]);
-
-});
 
 //Route::get('load-default-queue', function () {
 //    for ($i = 0; $i < 50000; $i++) {
 //        dispatch((new \App\Jobs\SlowTestJob())->onQueue('default'));
 //    }
 //})->middleware('local');
+
+Route::get('test-done', function () {
+   return 17;
+});
+
+Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
 
 Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $id;
     $month = 4; // April

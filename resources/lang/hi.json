@@ -4094,8 +4094,18 @@
   "Browse invitation code setting": "आमंत्रण कोड सेटिंग ब्राउज़ करें",
   "price family": "परिवार का मूल्य",
   "The price for creating a family.": "परिवार बनाने का मूल्य।",
+  "limitChatMessage": "आपने बातचीत की सीमा तक पहुँच गए हैं। चैट जारी रखने के लिए इस उपयोगकर्ता को मित्र के रूप में जोड़ें",
   "family settings": "परिवार सेटिंग्स",
   "Family Setting": "परिवार सेटिंग",
-  "Browse family setting": "परिवार सेटिंग ब्राउज़ करें"
+  "BD report": " BD रिपोर्ट",
+  "account dashboard": "खाता डैशबोर्ड",
+"account user": "उपयोगकर्ता खाता",
+  "Browse family setting": "परिवार सेटिंग ब्राउज़ करें",
+  "api_responses.charge_user_to_user_disabled": "उपयोगकर्ता से उपयोगकर्ता को चार्ज करना वर्तमान में अक्षम है",
+  "api_responses.charge_user_to_agent_disabled": "उपयोगकर्ता से चार्जिंग एजेंट को चार्ज करना वर्तमान में अक्षम है",
+  "api_responses.charge_to_self_disabled": "अपने आप को चार्ज करना वर्तमान में अक्षम है",
+  "api_responses.charge_agent_to_user_disabled": "चार्जिंग एजेंट से उपयोगकर्ता को चार्ज करना वर्तमान में अक्षम है",
+  "api_responses.charge_agent_to_agent_disabled": "चार्जिंग एजेंट से दूसरे चार्जिंग एजेंट को चार्ज करना वर्तमान में अक्षम है",
+  "api_responses.freeze_charge_settings": "वर्तमान में प्रशासक द्वारा चार्जिंग अक्षम कर दी गई है।"
 
 }

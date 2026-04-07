@@ -96,7 +96,7 @@ class AgencyController extends MainController
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
                 ->with(['admins', 'bd', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone','created_at', 'created_by', 'coins', 'bd_id', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone', 'created_at', 'created_by', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
 
@@ -537,7 +537,7 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-           $creator = $this->creator;
+            $creator = $this->creator;
             return app(\App\Admin\Services\CreatorService::class)->showV2($creator);
         });
         // --- Actions ---
@@ -865,21 +865,17 @@ class AgencyController extends MainController
                 }
             }
 
-            $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
-         
+           
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
             
                 $oldOwner   = User::find($originalOwnerId); 
-            if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
-                Common::userJoinAgency($originalOwnerId, $newOwnerId, $form->model()->id);
-                User::find($originalOwnerId)->update([
-                    'type_user' => 0,
-                    'agency_id' => 0,
-                    'is_host' => 0,
-                ]);
-                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+               
+
+                $agencyId = $form->model()->id;
+                UserHandling::kickUserFromAgency($oldOwner, 0, $agencyId);
+           
             }
 
             User::where('id', intval($appOwnerId))->update([
@@ -936,6 +932,8 @@ class AgencyController extends MainController
                     'status' => 'Joined',
                 ]);
             }
+
+            Cache::forget('agency_' . $form->model()->id);
         });
     }
 
@@ -1121,7 +1119,7 @@ class AgencyController extends MainController
         $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->first();
         if ($admin) {
             $admin->delete();
-
+            Cache::forget('agency_' . $user->agency_id);
             return response()->json([
                 'status' => true,
                 'message' => __('Admin role removed from this agency')
@@ -1133,7 +1131,7 @@ class AgencyController extends MainController
             'type' => "requestManger",
         ];
         AgencyUserJob::create($data);
-
+        Cache::forget('agency_' . $user->agency_id);
         return response()->json([
             'status' => true,
             'message' => __('done')
@@ -1161,7 +1159,7 @@ class AgencyController extends MainController
         $user->save();
 
         MilestoneHelper::removeReward($user, 'host');
-
+        Cache::forget('agency_' . $user->agency_id);
         return response()->json([
             'status' => true,
             'message' => __('done')

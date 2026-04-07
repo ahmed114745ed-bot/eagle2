@@ -60,6 +60,7 @@ class SettingController extends MainController
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
+        $utdGamesSettings = $gameSettings->get('utd_games');
         $isThemeEnabled = Common::getSettingValue('isThemeEnabled') ?? 0;
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
@@ -71,6 +72,7 @@ class SettingController extends MainController
                 'zeroGamesSettings',
                 'bytesunSettings',
                 'quantumNexusSettings',
+                'utdGamesSettings',
                 'pusher_app_secret',
                 'chargeTabType',
                 'zego_token',

@@ -81,7 +81,7 @@ class RoomRepoService
         unset($data['show']);
         $paidRoom = Config::where('name', 'paid_room')->first();
 
-        if ($paidRoom && $paidRoom->value && $request->type === 'audio' ) {
+        if ($paidRoom && $paidRoom->value && $request->type === 'audio') {
             $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
             if ($user->di < $paidRoomAmount->value) {
                 throw new \Exception(__('you do not have enough coins for creating a room'));
@@ -109,11 +109,11 @@ class RoomRepoService
         }
 
         if ($request->hasFile('room_cover')) {
-                $room->room_cover = WebPHelper::uploadWebp(
-                        $request->file('room_cover'),
-                        'rooms',
-                        'room_cover'
-                 );
+            $room->room_cover = WebPHelper::uploadWebp(
+                $request->file('room_cover'),
+                'rooms',
+                'room_cover'
+            );
         } else {
             $room->room_cover = $request->room_cover;
         }
@@ -322,13 +322,13 @@ class RoomRepoService
             $isToZegoCharisma = true;
         }
 
-//        if (isset($room->microphone)) {
-//
-//            $microphones = explode(',', $room->microphone);
-//            if (in_array($user->id, $microphones)) {
-//                UserHandling::calcTime($user->id);
-//            }
-//        }
+        //        if (isset($room->microphone)) {
+        //
+        //            $microphones = explode(',', $room->microphone);
+        //            if (in_array($user->id, $microphones)) {
+        //                UserHandling::calcTime($user->id);
+        //            }
+        //        }
 
         $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
         if (in_array($user->id, $micUserIds, true)) {
@@ -477,6 +477,12 @@ class RoomRepoService
                 $mode = 'party';
             } elseif ($currentMode == '2') {
                 $mode = 'seats12';
+            } elseif ($currentMode == '6') {
+                $mode = 'seats2';
+            } elseif ($currentMode == '7') {
+                $mode = 'seats22';
+            } elseif ($currentMode == '9') {
+                $mode = 'seats8';
             } elseif ($currentMode == '5') {
                 $mode = 'cinema';
                 //            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
@@ -658,11 +664,11 @@ class RoomRepoService
         }
 
         if ($request->hasFile('room_cover')) {
-                $room->room_cover = WebPHelper::uploadWebp(
-                        $request->file('room_cover'),
-                        'rooms',
-                        'room_cover'
-                 );
+            $room->room_cover = WebPHelper::uploadWebp(
+                $request->file('room_cover'),
+                'rooms',
+                'room_cover'
+            );
         }
 
         if ($request->free_mic) {

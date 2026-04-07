@@ -53,9 +53,15 @@
                     <i class="fa fa-arrow-right text-red"></i> {{ __('agencies report') }}
                 </a>
             </li>
-            <li class="{{ request('name') == 'agencies_manger' ? 'active' : '' }}" style="{{ request('name') == 'agencies_manger' ? 'background-color: var(--primary-color);' : '' }}">
+            {{-- <li class="{{ request('name') == 'agencies_manger' ? 'active' : '' }}" style="{{ request('name') == 'agencies_manger' ? 'background-color: var(--primary-color);' : '' }}">
                 <a href="?name=agencies_manger" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('admin.manger') }}
+                </a>
+            </li> --}}
+
+            <li class="{{ request('name') == 'bd' ? 'active' : '' }}" style="{{ request('name') == 'bd' ? 'background-color: var(--primary-color);' : '' }}">
+                <a href="?name=bd" class="charge_action">
+                    <i class="fa fa-arrow-right text-red"></i> {{ __('BD report') }}
                 </a>
             </li>
         </ul>

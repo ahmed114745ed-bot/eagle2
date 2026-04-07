@@ -4,6 +4,7 @@ namespace App\Models;
 
 use DB;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\TaskStream\Entities\PkSession;
 use Modules\TaskStream\Entities\TaskStream;
 use Modules\TaskStream\Entities\TaskStreamRoom;
 use Modules\Vip\Entities\Vip;
@@ -209,6 +210,15 @@ class Room extends Model
     public function lastPk()
     {
         return $this->hasOne(Pk::class, 'room_id', 'id')->where('status', 1)->where('end_at', '>=', now())->orderByDesc('id');
+    }
+    public function lastPkSession()
+    {
+        return $this->hasOneThrough(
+            PkSession::class,
+            TaskStream::class,
+            'room_id',
+            'task_stream_id'
+        )->where('status', 1)->where('ends_at', '>=', now())->orderByDesc('id');
     }
 
     public function getSessionStringAttribute()
