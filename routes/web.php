@@ -2499,7 +2499,7 @@ Route::get('/fix-charges-usd', function () {
 //})->middleware('local');
 
 Route::get('test-done', function () {
-   return 15;
+   return 16;
 });
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
