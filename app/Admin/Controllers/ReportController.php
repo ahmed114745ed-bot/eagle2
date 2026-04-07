@@ -2,21 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Controllers\MainController;
-use App\Facades\ManagerHelper;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Agency;
+use App\Models\Config;
+use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\AdminUser;
-use App\Models\Agency;
-use App\Models\AgencyMangerPullingOut;
-use App\Models\Config;
-use App\Models\User;
 use App\Models\UserSallary;
-use Carbon\Carbon;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use App\Models\AgencyMangerPullingOut;
+use App\Admin\Controllers\MainController;
 
 class ReportController extends MainController
 {
@@ -597,14 +596,14 @@ class ReportController extends MainController
                 </div>";
         });;
 
-        $grid->column('due1', __('due'))->display(function ($_) {
-            $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
-                    <span>{$salary}</span>
-                    <img src='{$image}' alt='USD' width='20' height='20'>
-                </div>";
-        });
+        // $grid->column('due1', __('due'))->display(function ($_) {
+        //     $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
+        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //     return "<div style='display: flex; align-items: center; '>
+        //             <span>{$salary}</span>
+        //             <img src='{$image}' alt='USD' width='20' height='20'>
+        //         </div>";
+        // });
         $grid->column('due', __('Due'))->display(function () {
             $url = admin_url('due-salary') . '?' . http_build_query([
                 'id'     => $this->id,
