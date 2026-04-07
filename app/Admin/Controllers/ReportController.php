@@ -53,10 +53,7 @@ class ReportController extends MainController
         );
 
         $grid = $this->{$name}();
-        $grid->disableExport();
-        $grid->disableActions();
-        $grid->disableCreateButton();
-
+       
         return $grid;
     }
 
@@ -385,6 +382,11 @@ class ReportController extends MainController
             $tools->append('<a href="' . route('custom-export-users', ['month' => request('month'), 'year' => request('year'), 'agency_id' => request('agency_id'), 'id' => request('id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
         });
 
+         $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+
+
         return $grid;
     }
 
@@ -550,6 +552,9 @@ class ReportController extends MainController
             $tools->append('<a href="' . route('agency-export-report') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
 
+ $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
 
         return $grid;
     }
@@ -734,6 +739,9 @@ class ReportController extends MainController
         });
 
         $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+
     }
 
 
