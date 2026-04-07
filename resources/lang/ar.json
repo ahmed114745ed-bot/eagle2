@@ -5385,5 +5385,7 @@
     "api_responses.charge_to_self_disabled": "تم تعطيل الشحن إلى نفسك حاليًا",
     "api_responses.charge_agent_to_user_disabled": "تم تعطيل الشحن من وكيل الشحن إلى المستخدم حاليًا",
     "api_responses.charge_agent_to_agent_disabled": "تم تعطيل الشحن من وكيل الشحن إلى وكيل شحن آخر حاليًا",
-    "api_responses.freeze_charge_settings": "تم تعطيل الشحن حاليًا بواسطة المسؤول."
+    "api_responses.freeze_charge_settings": "تم تعطيل الشحن حاليًا بواسطة المسؤول.",
+    "Charge settings":"اعددات الشحن",
+    "charge settings":"اعددات الشحن"
 }

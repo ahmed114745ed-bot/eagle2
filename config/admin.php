@@ -496,7 +496,7 @@ return [
             // if or not show multi-language login page, optional, default is true
             'show-login-page' => true,
             // if or not show multi-language navbar, optional, default is true
-            'show-navbar' => true,
+            'show-navbar' => false,
             // the cookie name for the multi-language var, optional, default is 'locale'
             'cookie-name' => 'locale'
         ],
