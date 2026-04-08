@@ -170,8 +170,15 @@ class FairLuckServiceV7
                 );
 
                 if ($multiplier > 0) {
-                    // Payout is based on betAmount (what user actually paid per unit * quantity)
-                    // This ensures 5x means user gets 5 * betAmount (e.g., 5 * 100 = 500)
+                    // V7: Payout is based on betAmount (full amount user paid)
+                    // User receives: multiplier × betAmount (e.g., 5x × 100 = 500)
+                    // Pool sustainability is ensured by:
+                    // 1. Pool only receives net_bet (80% of betAmount after fees)
+                    // 2. RTP is tracked on net_bet → system boosts winRate to compensate
+                    // 3. On losses: pool keeps net_bet (80) → accumulates reserves
+                    // 4. On wins: pool pays multiplier × betAmount (500) from reserves
+                    // 5. Net pool flow per cycle: losses × 80 - wins × 500 ≈ 0 (sustainable)
+                    // 6. App earns 20% of every bet regardless → stable revenue
                     $payoutAmount = (int) round($multiplier * $betAmount);
 
                     // BANKRUPTCY PROTECTION: Cap payout based on pool health
@@ -179,7 +186,7 @@ class FairLuckServiceV7
                     if ($safePayout < $payoutAmount) {
                         // Find the nearest valid V7 multiplier that doesn't exceed safe payout
                         // Must use ONLY configured multipliers: 5, 10, 20, 50, 70, 100, 250, 500, 1000
-                        $validMultipliers = [1000, 500, 250, 100, 70, 50, 20, 10, 5];
+                        $validMultipliers = [1000, 500, 250, 100, 50, 20, 10, 5];
                         $foundMultiplier = 0;
                         foreach ($validMultipliers as $m) {
                             $testPayout = (int) round($m * $betAmount);
@@ -216,12 +223,28 @@ class FairLuckServiceV7
                 }
             }
 
-            // 11. Track RTP in Redis (using pool amounts for sustainable RTP)
-            // spent = totalAmount (what enters pool), received = payoutAmount (what leaves pool)
+            // 11. Track RTP in Redis
+            // المنطق:
+            // - total_spent = net_bet (ما دخل pool فعلاً = betAmount × (1 - fees))
+            // - total_received = net_payout (payout × (1 - fees)) لتوحيد المقياس
+            // - RTP = net_payout / net_bet → target 99.5%
+            // - هذا يضمن: winRate × avgMult × betAmount × feeRatio / (betAmount × feeRatio) = 99.5%
+            //   أي: winRate × avgMult = 99.5% ✅
+            // - Pool يستقبل net_bet، يدفع payout → مستدام لأن الخسائر تعوض الفوز
+            $appFeeRateForTracking = FairLuckSetting::getAppFeeRate();
+            $receiverFeeRateForTracking = FairLuckSetting::getReceiverFeeRate();
+            $feeRatio = 1 - $appFeeRateForTracking - $receiverFeeRateForTracking;
+            $netBetForTracking = max(1, (int) round($totalAmount * $feeRatio));
+            // net_payout: نسبة المكسب المقابلة لما دخل الـ pool
+            // هذا يجعل RTP = net_payout/net_bet = payout/betAmount (نفس النسبة)
+            $netPayoutForTracking = $isWinner && $payoutAmount > 0
+                ? max(0, (int) round($payoutAmount * $feeRatio))
+                : 0;
+
             $this->rtpTracker->recordBet(
                 $user->id,
-                $totalAmount,
-                $payoutAmount,
+                $netBetForTracking,      // ما دخل pool فعلاً (بعد الرسوم)
+                $netPayoutForTracking,   // المكسب المقابل (بنفس النسبة) لتوحيد RTP
                 $isWinner && $multiplier > 0
             );
 

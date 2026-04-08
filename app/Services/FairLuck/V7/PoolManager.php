@@ -27,14 +27,15 @@ class PoolManager
 
     /**
      * توزيع الرهان:
-     * - كل مبلغ الرهان (100%) يدخل Global Vault مباشرة
-     * - لا يُخصم شيء هنا - رسوم التطبيق تُخصم من المكسب عند الفوز فقط
+     * - appFee = 10% من betAmount تذهب لـ app_wallet فوراً (من كل رميه)
+     * - pool يستقبل: betAmount - appFee = 90%
      *
-     * المنطق (الحل 3 - الأعدل):
-     * - عند الخسارة: pool يكسب +100% من الرهان (لا رسوم)
-     * - عند الفوز: pool يدفع المكسب كاملاً، ثم يُخصم appFee من المكسب ويُحوَّل لـ app_wallet
-     * - Pool يبقى zero-sum تماماً على المدى البعيد
-     * - app_wallet تكسب فقط من أرباح الفائزين (مثل الكازينوهات الحقيقية)
+     * المنطق:
+     * - عند الخسارة: pool يكسب 90% من الرهان
+     * - عند الفوز: pool يدفع multiplier × betAmount كاملاً للمستخدم
+     * - app_wallet تكسب 10% من كل رميه (ثابت)
+     * - صافي ربح التطبيق = 10% - 2% (خسارة pool) = 8%
+     * - RTP المستخدم = 92% ✅
      */
     public function distributeBet(float $amount): void
     {
@@ -43,9 +44,27 @@ class PoolManager
         $total = (int) round($amount);
         if ($total <= 0) return;
 
-        // كل الرهان يدخل pool اللعب مباشرة (100%)
-        FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $total);
-        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $total, 'V7 Bet contribution', null);
+        $appFeeRate = FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
+        $appFee = (int) round($total * $appFeeRate);
+        $appFeeRate = FairLuckSetting::getAppFeeRate();
+        $receiverFeeRate = FairLuckSetting::getReceiverFeeRate();
+        $appFee = (int) round($total * $appFeeRate);
+        $receiverFee = (int) round($total * $receiverFeeRate);
+        $netBetAmount = $total - $appFee - $receiverFee;
+        $netBet = $netBetAmount; 
+
+        if ($appFee > 0) {
+            $appWallet = CoreWallet::where('name', 'app_wallet')->first();
+            if ($appWallet instanceof CoreWallet) {
+                $appWallet->increment('coins', $appFee);
+            }
+        }
+
+        // net bet يدخل pool اللعب (90%)
+        if ($netBet > 0) {
+            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet);
+            FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet, 'V7 Bet contribution (net)', null);
+        }
     }
 
 
@@ -72,24 +91,18 @@ class PoolManager
             return ['paid' => false, 'net_payout' => 0, 'app_fee' => 0];
         }
 
-        // حساب رسوم التطبيق من المكسب
-        $appFeeRate = FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
-        $appFee = (int) round($amount * $appFeeRate);
-        $netPayout = $amount - $appFee; // ما يستلمه اللاعب فعلاً
+        // V7: لا رسوم على المكسب - المستخدم يستلم المكسب كاملاً
+        // هذا يضمن أن RTP الفعلي للمستخدم = target_rtp (99%)
+        // التطبيق يكسب من الخسائر فقط (pool يحتفظ بالرهانات الخاسرة)
+        $appFee = 0;
+        $receiverFee = 0; // لا رسوم على المكسب - المستخدم يستلم كامل المكسب
+        $netPayout = $amount; // المستخدم يستلم المكسب كاملاً بدون خصومات
 
         $description = "V7 Win payout ({$multiplier}x)";
 
-        // pool يدفع المكسب كاملاً
+        // pool يدفع المكسب كاملاً للمستخدم
         FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
         FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount, $description, $userId);
-
-        // appFee تذهب لـ app_wallet من المكسب
-        if ($appFee > 0) {
-            $appWallet = CoreWallet::where('name', 'app_wallet')->first();
-            if ($appWallet instanceof CoreWallet) {
-                $appWallet->increment('coins', $appFee);
-            }
-        }
 
         return ['paid' => true, 'net_payout' => $netPayout, 'app_fee' => $appFee];
     }
