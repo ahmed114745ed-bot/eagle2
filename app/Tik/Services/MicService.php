@@ -143,10 +143,10 @@ class MicService
         $position = (int) $data['position'];
 
         $modeMaxSeats = [
-            '0' => 9, '1' => 16, '2' => 12, '3' => 9, '4' => 3,
-            '5' => 9, '6' => 2, '7' => 22, '8' => 8, '9' => 8,
+            '0' => 8, '1' => 15, '2' => 11, '3' => 8, '4' => 3,
+            '5' => 7, '6' => 1, '7' => 21, '8' => 7, '9' => 7,
         ];
-        $maxPositions = $modeMaxSeats[$room->mode] ?? 9;
+        $maxPositions = $modeMaxSeats[$room->mode] ?? 8;
         if ($position < 0 || $position > $maxPositions) {
             throw new Exception(__('api_responses.position_error'));
         }
@@ -684,10 +684,10 @@ class MicService
 
         // position validation based on room mode
         $modeMaxSeats = [
-            '0' => 9, '1' => 16, '2' => 12, '3' => 9, '4' => 3,
-            '5' => 9, '6' => 2, '7' => 22, '8' => 8, '9' => 8,
+            '0' => 8, '1' => 15, '2' => 11, '3' => 8, '4' => 3,
+            '5' => 7, '6' => 1, '7' => 21, '8' => 7, '9' => 7,
         ];
-        $maxPositions = $modeMaxSeats[$room->mode] ?? 9;
+        $maxPositions = $modeMaxSeats[$room->mode] ?? 8;
         if ($position < 0 || $position > $maxPositions) {
             throw new Exception(__('api_responses.position_error'));
         }
