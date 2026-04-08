@@ -22,7 +22,8 @@ class DetailedMultiUserReportV7 extends Command
                             {--max_rounds=3000 : Max rounds}
                             {--force_completion : Force completion}
                             {--unit_price=1 : Unit price}
-                            {--vault=500000 : Initial vault balance}';
+                            {--vault=500000 : Initial vault balance}
+                            {--output= : Output HTML file path (optional)}';
 
     protected $description = 'V7 Single-Step Engine — Multi-user simulation with detailed report';
 
@@ -385,16 +386,21 @@ class DetailedMultiUserReportV7 extends Command
             $assertions, $zoneDist, $multDist, $noWinRate
         );
 
-        $dir = storage_path('app/public/reports');
-        if (!file_exists($dir)) mkdir($dir, 0755, true);
-
-        $fullPath = "{$dir}/{$filename}";
-        file_put_contents($fullPath, $html);
-
-        $publicPath = public_path('detailed_fairluck_report_v7.html');
-        copy($fullPath, $publicPath);
-
-        $this->info("Report: {$publicPath}");
+        $outputPath = $this->option('output');
+        if ($outputPath) {
+            $dir = dirname($outputPath);
+            if (!file_exists($dir)) mkdir($dir, 0755, true);
+            file_put_contents($outputPath, $html);
+            $this->info("Report: {$outputPath}");
+        } else {
+            $dir = storage_path('app/public/reports');
+            if (!file_exists($dir)) mkdir($dir, 0755, true);
+            $fullPath = "{$dir}/{$filename}";
+            file_put_contents($fullPath, $html);
+            $publicPath = public_path('detailed_fairluck_report_v7.html');
+            copy($fullPath, $publicPath);
+            $this->info("Report: {$publicPath}");
+        }
     }
 
     private function runAssertions(int $finalAppWallet, int $finalVault): array
