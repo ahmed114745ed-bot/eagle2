@@ -20,8 +20,8 @@ class FairLuckV7SettingsSeeder extends Seeder
             // Core RTP Settings - 99% (User-First Overhaul)
             [
                 'key' => 'V7_target_rtp',
-                'value' => 1.244,
-                'description' => 'Target RTP for V7 - 124.4% على net_bet = 99.5% على betAmount الكامل (fees=20%). Pool تخسر ببطء وتُعوَّض بإيداعات دورية.'
+                'value' => 1.2375,
+                'description' => 'Target RTP for V7 - 123.75% على net_bet = 99% على betAmount الكامل (fees=20%). Pool تخسر ببطء وتُعوَّض بإيداعات دورية.'
             ],
             [
                 'key' => 'V7_max_probability_cap',
@@ -60,11 +60,11 @@ class FairLuckV7SettingsSeeder extends Seeder
                     20   => 300,   // 20x متوسط (~2.7%)
                     50   => 100,   // 50x أقل شيوعاً (~0.9%)
                     100  => 50,    // 100x نادر (~0.45%)
-                    250  => 200,   // 250x قابل للظهور (~1.8% من الفوز)
-                    500  => 80,    // 500x قابل للظهور (~0.7% من الفوز)
+                    250  => 120,   // 250x قابل للظهور - مخفض قليلاً (~1.1% من الفوز)
+                    500  => 40,    // 500x قابل للظهور - مخفض قليلاً (~0.37% من الفوز)
                     1000 => 10,    // 1000x جاكبوت نادر (~0.09%)
                 ]),
-                'description' => 'V7 Multiplier weights - avgMult≈8x, baseProb≈12%, winRate~12%, pool sustainable'
+                'description' => 'V7 Multiplier weights - 250x=120, 500x=40 مخفضة قليلاً لتحقيق RTP=99%'
             ],
 
             // New Player Settings

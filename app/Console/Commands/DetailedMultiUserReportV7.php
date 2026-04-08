@@ -84,24 +84,24 @@ class DetailedMultiUserReportV7 extends Command
         
         $defaultSettings = [
             // Core RTP Settings
-            // 124.4% على net_bet = 99.5% على betAmount الكامل (fees=20%)
+            // 123.75% على net_bet = 99% على betAmount الكامل (fees=20%)
             // Pool تخسر ببطء وتُعوَّض بإيداعات دورية
-            'V7_target_rtp' => 1.244,
+            'V7_target_rtp' => 1.2375,
             'V7_max_probability_cap' => 0.50,  // سقف الاحتمالية
             'V7_boost_scaling' => 0.03,         // تقليل التعزيز عند الخسارة
             'V7_reduce_scaling' => 0.08,        // رفع التخفيض عند الفوز الزائد
             'V7_chaos_factor_min' => 0.95,
             'V7_chaos_factor_max' => 1.05,
             
-            // Multiplier Weights - avgMult≈8x → baseProb≈12% → winRate~12% → pool مستدام
+            // Multiplier Weights - 250x و500x مخفضة قليلاً لتحقيق RTP=99%
             'V7_multiplier_weights' => json_encode([
                     5    => 9000,  // 5x يهيمن → avgMult ≈ 8x → baseProb ≈ 12% → winRate ~12%
                     10   => 1000,  // 10x شائع (~9% من الفوز)
                     20   => 300,   // 20x متوسط (~2.7%)
                     50   => 100,   // 50x أقل شيوعاً (~0.9%)
                     100  => 50,    // 100x نادر (~0.45%)
-                    250  => 200,   // 250x قابل للظهور (~1.8% من الفوز)
-                    500  => 80,    // 500x قابل للظهور (~0.7% من الفوز)
+                    250  => 120,   // 250x قابل للظهور - مخفض قليلاً (~1.1% من الفوز)
+                    500  => 40,    // 500x قابل للظهور - مخفض قليلاً (~0.37% من الفوز)
                     1000 => 10,    // 1000x جاكبوت نادر (~0.09%)
             ]),
 
