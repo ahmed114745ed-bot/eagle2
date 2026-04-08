@@ -78,6 +78,11 @@ class FairLuckSettingsController extends AdminController
             if ($request->has($key)) {
                 $value = (float) $request->input($key) / 100;
                 FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+
+                // Keep V7_app_fee_rate in sync with fair_luck_app_fee_rate
+                if ($key === 'fair_luck_app_fee_rate') {
+                    FairLuckSetting::updateOrCreate(['key' => 'V7_app_fee_rate'], ['value' => $value]);
+                }
             }
         }
 

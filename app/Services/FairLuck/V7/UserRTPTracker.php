@@ -38,6 +38,7 @@ class UserRTPTracker
             'bet_count' => (int) ($data['bet_count'] ?? 0),
             'win_count' => (int) ($data['win_count'] ?? 0),
             'first_bet_ts' => (int) ($data['first_bet_ts'] ?? 0),
+            'consecutive_losses' => (int) ($data['consecutive_losses'] ?? 0),
         ];
     }
 
@@ -68,6 +69,9 @@ class UserRTPTracker
         Redis::hincrby($key, 'bet_count', 1);
         if ($isWinner) {
             Redis::hincrby($key, 'win_count', 1);
+            Redis::hset($key, 'consecutive_losses', 0); // Reset on win
+        } else {
+            Redis::hincrby($key, 'consecutive_losses', 1); // Increment on loss
         }
 
         if (!Redis::hexists($key, 'first_bet_ts')) {

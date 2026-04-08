@@ -56,10 +56,13 @@ class FairLuckServiceV7
     ): object {
         return DB::transaction(function () use (
             $user, $gift, $betAmount, $roomId,
-            $senderBalanceBefore, $senderBalanceAfter
+            $senderBalanceBefore, $senderBalanceAfter, $currentLossStreak
         ) {
             // Read admin-configurable rates
-            $appFeeRate = (float) FairLuckSetting::getByKey('V7_app_fee_rate', MultiplierTable::DEFAULT_APP_FEE_RATE);
+            // Read app fee from admin panel key first, fall back to V7 key
+            $appFeeRate = (float) FairLuckSetting::getByKey('fair_luck_app_fee_rate',
+                FairLuckSetting::getByKey('V7_app_fee_rate', MultiplierTable::DEFAULT_APP_FEE_RATE)
+            );
             $receiverRate = (float) FairLuckSetting::getByKey('fair_luck_receiver_fee_rate', 0.10);
             $ownerRate = (float) FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
             $targetRTP = (float) FairLuckSetting::getByKey('V7_target_rtp', 0.99);
@@ -82,12 +85,16 @@ class FairLuckServiceV7
             // STEP 5: Get user RTP stats
             $stats = $this->rtpTracker->getStats($user->id);
 
-            // STEP 6: Single-step weighted selection (pass GROSS betAmount for correct jackpot gate)
+            // STEP 6: Single-step weighted selection
+            // Read loss streak from Redis if not provided by caller
+            $lossStreak = $currentLossStreak ?? (int) ($stats->consecutive_losses ?? 0);
+
             $selection = $this->multiplierTable->select(
                 $luckyBalanceBefore,
                 (int) $stats->total_spent,
                 (int) $stats->total_received,
-                $betAmount
+                $betAmount,
+                $lossStreak
             );
 
             $multiplier = $selection['multiplier'];

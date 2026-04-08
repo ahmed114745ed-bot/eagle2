@@ -64,7 +64,10 @@ class MultiplierTable
      */
     public static function getAppFeeRate(): float
     {
-        return (float) FairLuckSetting::getByKey('V7_app_fee_rate', self::DEFAULT_APP_FEE_RATE);
+        // Read from admin panel key first, fall back to V7 key
+        return (float) FairLuckSetting::getByKey('fair_luck_app_fee_rate',
+            FairLuckSetting::getByKey('V7_app_fee_rate', self::DEFAULT_APP_FEE_RATE)
+        );
     }
 
     /** Instance-level fee rate (uses cache if preloaded). */

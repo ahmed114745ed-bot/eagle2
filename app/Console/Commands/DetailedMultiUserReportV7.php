@@ -32,6 +32,8 @@ class DetailedMultiUserReportV7 extends Command
     private int $totalRounds = 0;
     private int $initialAppWalletBalance = 0;
     private int $initialVaultBalance = 0;
+    private int $finalVaultBalance = 0;
+    private int $finalAppWalletBalance = 0;
 
     public function handle()
     {
@@ -335,12 +337,11 @@ class DetailedMultiUserReportV7 extends Command
 
         $this->totalRounds = $round - 1;
 
-        // Store final wallet values for report (set Redis/DB for report generator)
-        Redis::set('fairluck:wallet:' . FairLuckWallet::TYPE_GLOBAL_VAULT, $luckyWallet);
-        FairLuckWallet::where('wallet_type', FairLuckWallet::TYPE_GLOBAL_VAULT)->update(['balance' => $luckyWallet]);
-        // Store app wallet change
-        CoreWallet::where('name', 'app_wallet')->increment('coins', $appWallet);
-        $this->initialAppWalletBalance = 0; // We track from 0 since sim is in-memory
+        // Store final state in instance variables for report generation (NO real DB/Redis writes)
+        // This prevents corruption if run on production
+        $this->finalVaultBalance = $luckyWallet;
+        $this->finalAppWalletBalance = $appWallet;
+        $this->initialAppWalletBalance = 0; // Track from 0 since sim is in-memory
     }
 
     private function generateHtmlReport(Gift $gift, int $betAmount, int $initialBalance): void
@@ -354,8 +355,8 @@ class DetailedMultiUserReportV7 extends Command
         $totalWinnings = array_sum(array_column($this->users, 'total_win'));
         $overallRTP = $totalBets > 0 ? ($totalWinnings / $totalBets) * 100 : 0;
 
-        $finalVault = FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
-        $finalAppWallet = CoreWallet::where('name', 'app_wallet')->value('coins') ?? 0;
+        $finalVault = $this->finalVaultBalance;
+        $finalAppWallet = $this->finalAppWalletBalance;
         $vaultChange = $finalVault - $this->initialVaultBalance;
         $appChange = $finalAppWallet - $this->initialAppWalletBalance;
 
@@ -689,8 +690,7 @@ r.style.display=(f==='all'||r.getAttribute('data-p')===f)?'':'none';});});
         $this->info("Win rate: " . number_format(100 - $noWinRate, 2) . "%");
         $this->info("App fee collected: " . number_format($this->allRounds ? end($this->allRounds)['cumulative_app_fee'] : 0));
 
-        $finalVault = FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
-        $this->info("Lucky wallet: " . number_format($this->initialVaultBalance) . " -> " . number_format($finalVault) . " (delta: " . number_format($finalVault - $this->initialVaultBalance) . ")");
+        $this->info("Lucky wallet: " . number_format($this->initialVaultBalance) . " -> " . number_format($this->finalVaultBalance) . " (delta: " . number_format($this->finalVaultBalance - $this->initialVaultBalance) . ")");
         $this->info("===========================");
     }
 }

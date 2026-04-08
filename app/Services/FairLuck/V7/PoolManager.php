@@ -3,14 +3,13 @@
 namespace App\Services\FairLuck\V7;
 
 use App\Models\FairLuckWallet;
+use Illuminate\Support\Facades\Redis;
 
 /**
  * PoolManager V7: Atomic lucky wallet operations.
  *
  * creditBet: adds net_bet to vault (Redis + DB).
- * debitPayout: atomically deducts payout from vault.
- *   Uses FairLuckWallet's Lua script for atomic check-and-debit.
- *   DB write only happens after Redis confirms success.
+ * debitPayout: atomically deducts payout, supports negative vault limit.
  *
  * App wallet is NOT touched here — handled by FairLuckServiceV7.
  */
@@ -32,40 +31,35 @@ class PoolManager
     /**
      * Atomically debit payout from vault.
      * Supports negative vault up to configurable limit.
-     * Relies on FairLuckWallet::decrementRedisBalance() Lua script.
+     * Uses a single Lua script for atomic check-and-debit.
      */
     public function debitPayout(int $amount): bool
     {
         if ($amount <= 0) return true;
 
-        $balance = $this->getBalance();
         $negativeLimit = (int) \App\Models\FairLuckSetting::getByKey('V7_negative_limit', 30_000);
+        $key = 'fairluck:wallet:' . FairLuckWallet::TYPE_GLOBAL_VAULT;
 
-        // Allow vault to go negative up to the limit
-        if (($balance - $amount) < -$negativeLimit) {
+        // Atomic Lua script: check if (balance - amount) >= -negativeLimit, then debit
+        // Redis EVAL is safe — executes Lua on Redis server, not PHP eval()
+        $luaScript = "local bal = tonumber(redis.call('GET', KEYS[1]) or 0) "
+            . "local amt = tonumber(ARGV[1]) "
+            . "local lim = tonumber(ARGV[2]) "
+            . "if (bal - amt) >= -lim then redis.call('DECRBY', KEYS[1], amt) return 1 end "
+            . "return 0";
+
+        $result = Redis::command('eval', [$luaScript, 1, $key, $amount, $negativeLimit]);
+
+        if (!$result) {
             return false;
         }
 
-        // Atomic Redis debit via Lua script
-        $success = FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
-
-        if (!$success) {
-            // Lua script blocked it — force through if within negative limit
-            // (Lua script may have a stricter check, so we handle manually)
-            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, 0); // ensure key exists
-            \Illuminate\Support\Facades\Redis::decrby(
-                'fairluck:wallet:' . FairLuckWallet::TYPE_GLOBAL_VAULT,
-                $amount
-            );
-            $success = true;
-        }
-
-        // Redis confirmed — now persist to DB
+        // Redis confirmed — persist to DB
         try {
             FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount, 'V7 win payout', null);
         } catch (\Throwable $e) {
-            // DB failed but Redis already debited — re-credit Redis to stay in sync
-            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
+            // DB failed — re-credit Redis to stay in sync
+            Redis::incrby($key, $amount);
             return false;
         }
 
