@@ -89,7 +89,23 @@ class FairLuckSettingsController extends AdminController
         // Save numeric fields as-is
         foreach ($numericFields as $key) {
             if ($request->has($key)) {
-                FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                $val = $request->input($key);
+
+                // Validate wallet_weight + rtp_weight <= 1.0
+                if ($key === 'V7_wallet_weight' || $key === 'V7_rtp_weight') {
+                    $otherKey = $key === 'V7_wallet_weight' ? 'V7_rtp_weight' : 'V7_wallet_weight';
+                    $otherVal = $request->has($otherKey) ? (float) $request->input($otherKey) : (float) ($settings[$otherKey] ?? 0.5);
+                    if (((float) $val + $otherVal) > 1.05) { // Small tolerance for float
+                        admin_warning(__('Warning'), __('wallet_weight + rtp_weight should sum to 1.0. Current sum: ') . round((float) $val + $otherVal, 2));
+                    }
+                }
+
+                // Keep global_vault_negative_limit in sync with V7_negative_limit
+                if ($key === 'V7_negative_limit') {
+                    FairLuckSetting::updateOrCreate(['key' => 'global_vault_negative_limit'], ['value' => $val]);
+                }
+
+                FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $val]);
             }
         }
 
