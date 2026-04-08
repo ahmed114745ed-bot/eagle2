@@ -32,6 +32,7 @@
         <button onclick="showSection('gamesSettings')" class="position-relative">
             {{ __('Games') }}
         </button>
+       
         <button onclick="showSection('notificationSettings')" class="position-relative">
             {{ __('Notifications') }}
             <div class="ribbon-banner">

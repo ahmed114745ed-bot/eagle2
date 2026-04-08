@@ -16,6 +16,7 @@ class RoomCupReward extends Model
         'room_id',
         'user_id',
         'total_room_gift_id',
+        'target_id',
         'amount',
         'type',
     ];
