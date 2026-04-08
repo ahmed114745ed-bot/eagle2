@@ -2,85 +2,87 @@ name: SSh-luvmug-pipline
 on:
   push:
     branches: ["LuvMug"]
+
 jobs:
   run_luvmug_hub:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: [self-hosted]
     steps:
-    - name: print out luvmug
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.71.45"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 7m
-        script: |
-          cd /var/www/luvmug
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
+      - name: Pre-Deploy Cleanup & Disk Check
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: "34.18.71.45"
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.UTDVM }}
+          port: ${{ secrets.PORT }}
+          command_timeout: 10m
+          script: |
+            cd /var/www/luvmug
+
+            sudo pkill -9 -f "php" || true
+            sudo pkill -9 -f "swoole" || true
+            sudo pkill -9 -f "artisan schedule:run" || true
+
+            if [ -f storage/logs/laravel.log ]; then
+              sudo truncate -s 0 storage/logs/laravel.log
+            fi
+
+            sudo mkdir -p storage/jobs-logs
+            sudo chmod -R 777 storage/bootstrap/cache storage/logs storage/jobs-logs
+
+            threshold=80
+            current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+            if [ $current -gt $threshold ]; then
+              docker system prune -af && echo "Docker system cleaned"
+            fi
+
   run_luvmug_app:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: [self-hosted]
     needs: run_luvmug_hub
     steps:
-    - name: print out luvmug
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.71.45"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 20m
-        script: |
-          cd /var/www/luvmug
-          pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t luvmug-octa:${{ github.sha }} -f Dockerfile-octana .
-          docker service update --image luvmug-octa:${{ github.sha }} luvmug-octa
+      - name: Build & Deploy Web (Octane)
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: "34.18.71.45"
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.UTDVM }}
+          port: ${{ secrets.PORT }}
+          command_timeout: 20m
+          script: |
+            cd /var/www/luvmug
 
-          # Get container ID of task luvmug-octa
-          CONTAINER_ID=$(docker ps --filter "name=luvmug-octa.1" --format "{{.ID}}" | head -n 1)
+            docker build -t luvmug-octa:${{ github.sha }} -f Dockerfile-octana .
 
-          # Run artisan command inside that container
-          if [ -n "$CONTAINER_ID" ]; then
-            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
-          else
-            echo "No running container found for luvmug-octa.1 service task"
-            exit 1
-          fi
+            docker service update --image luvmug-octa:${{ github.sha }} --force luvmug-octa
 
-          # check again
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
+            sleep 15
+
+            CONTAINER_ID=$(docker ps --filter "name=luvmug-octa.1" --format "{{.ID}}" | head -n 1)
+            if [ -n "$CONTAINER_ID" ]; then
+              docker exec $CONTAINER_ID php artisan config:clear
+              docker exec $CONTAINER_ID php artisan cache:clear
+              docker exec $CONTAINER_ID rm -f bootstrap/cache/config.php
+              docker exec $CONTAINER_ID php artisan octane:reload
+
+              docker exec $CONTAINER_ID php artisan whatsapp:change-token
+            fi
+
   run_luvmug_job:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: [self-hosted]
     needs: run_luvmug_app
     steps:
-    - name: print out luvmug Job
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.71.45"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 30m
-        script: |
-          cd /var/www/luvmug
-          pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t luvmug-job:${{ github.sha }} -f Dockerfile-jobs .
-          docker service update --image luvmug-job:${{ github.sha }} luvmug-job
+      - name: Build & Deploy Workers (Cron & Queues)
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: "34.18.71.45"
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.UTDVM }}
+          port: ${{ secrets.PORT }}
+          command_timeout: 20m
+          script: |
+            cd /var/www/luvmug
+
+            docker build -t luvmug-job:${{ github.sha }} -f Dockerfile-jobs .
+
+            docker service update --image luvmug-job:${{ github.sha }} --replicas 1 --force luvmug-job
+
+            sudo find storage/jobs-logs/ -name "*.log" -exec truncate -s 0 {} +
