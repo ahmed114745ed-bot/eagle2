@@ -35,103 +35,106 @@ class FairLuckMonitorController extends Controller
             'high' => (int) ($settings['V7_wallet_high'] ?? 500000),
         ];
 
-        // Overall stats
-        $allTime = DB::selectOne("
-            SELECT COUNT(*) as total, SUM(CASE WHEN is_winner=1 THEN 1 ELSE 0 END) as wins,
-                   SUM(bet_amount) as total_bet,
-                   SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won,
-                   SUM(profit_amount) as net_profit
-            FROM fair_luck_transactions
-        ");
+        // ALL STATS CACHED — the heavy queries were causing 504s on 200k+ row table
+        // Cache all-time stats for 5 min (full table scan is expensive)
+        $allTime = \Cache::remember('v7_monitor_alltime', 300, function () {
+            return DB::selectOne("
+                SELECT COUNT(*) as total, SUM(is_winner) as wins,
+                       SUM(bet_amount) as total_bet,
+                       SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won,
+                       SUM(profit_amount) as net_profit
+                FROM fair_luck_transactions
+            ");
+        });
 
-        // Today stats
-        $today = DB::selectOne("
-            SELECT COUNT(*) as total, SUM(CASE WHEN is_winner=1 THEN 1 ELSE 0 END) as wins,
-                   SUM(bet_amount) as total_bet,
-                   SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won,
-                   SUM(profit_amount) as net_profit,
-                   COUNT(DISTINCT user_id) as unique_users
-            FROM fair_luck_transactions WHERE created_at >= CURDATE()
-        ");
+        // Cache today stats for 30 sec
+        $today = \Cache::remember('v7_monitor_today_' . date('Ymd'), 30, function () {
+            return DB::selectOne("
+                SELECT COUNT(*) as total, SUM(is_winner) as wins,
+                       SUM(bet_amount) as total_bet,
+                       SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won,
+                       SUM(profit_amount) as net_profit,
+                       COUNT(DISTINCT user_id) as unique_users
+                FROM fair_luck_transactions WHERE created_at >= CURDATE()
+            ");
+        });
 
-        // Last hour
-        $lastHour = DB::selectOne("
-            SELECT COUNT(*) as total, SUM(CASE WHEN is_winner=1 THEN 1 ELSE 0 END) as wins,
-                   SUM(bet_amount) as total_bet,
-                   SUM(profit_amount) as net_profit,
-                   COUNT(DISTINCT user_id) as unique_users
-            FROM fair_luck_transactions WHERE created_at >= NOW() - INTERVAL 1 HOUR
-        ");
+        // Cache last hour for 15 sec
+        $lastHour = \Cache::remember('v7_monitor_hour_' . date('YmdH'), 15, function () {
+            return DB::selectOne("
+                SELECT COUNT(*) as total, SUM(is_winner) as wins,
+                       SUM(bet_amount) as total_bet,
+                       SUM(profit_amount) as net_profit,
+                       COUNT(DISTINCT user_id) as unique_users
+                FROM fair_luck_transactions WHERE created_at >= NOW() - INTERVAL 1 HOUR
+            ");
+        });
 
-        // Top winners today
-        $topWinnersToday = DB::select("
-            SELECT user_id, COUNT(*) as spins,
-                   SUM(CASE WHEN is_winner=1 THEN 1 ELSE 0 END) as wins,
-                   SUM(bet_amount) as total_bet,
-                   SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won,
-                   MAX(multiplier) as max_mult
-            FROM fair_luck_transactions WHERE created_at >= CURDATE()
-            GROUP BY user_id ORDER BY total_won DESC LIMIT 10
-        ");
+        // Cache grouped queries for 30 sec
+        $topWinnersToday = \Cache::remember('v7_monitor_winners_' . date('YmdHi'), 30, function () {
+            return DB::select("
+                SELECT user_id, COUNT(*) as spins, SUM(is_winner) as wins,
+                       SUM(bet_amount) as total_bet,
+                       SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won,
+                       MAX(multiplier) as max_mult
+                FROM fair_luck_transactions WHERE created_at >= CURDATE()
+                GROUP BY user_id ORDER BY total_won DESC LIMIT 10
+            ");
+        });
 
-        // Biggest wins today
-        $bigWinsToday = DB::select("
-            SELECT user_id, bet_amount, multiplier, profit_amount, created_at
-            FROM fair_luck_transactions
-            WHERE is_winner=1 AND created_at >= CURDATE()
-            ORDER BY profit_amount DESC LIMIT 15
-        ");
+        $bigWinsToday = \Cache::remember('v7_monitor_bigwins_' . date('YmdHi'), 30, function () {
+            return DB::select("
+                SELECT user_id, bet_amount, multiplier, profit_amount, created_at
+                FROM fair_luck_transactions
+                WHERE is_winner=1 AND created_at >= CURDATE()
+                ORDER BY profit_amount DESC LIMIT 15
+            ");
+        });
 
-        // Multiplier distribution today
-        $multDist = DB::select("
-            SELECT COALESCE(multiplier, 0) as mult,
-                   COUNT(*) as cnt,
-                   SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_payout
-            FROM fair_luck_transactions WHERE created_at >= CURDATE()
-            GROUP BY mult ORDER BY mult
-        ");
+        $multDist = \Cache::remember('v7_monitor_multdist_' . date('YmdHi'), 30, function () {
+            return DB::select("
+                SELECT COALESCE(multiplier, 0) as mult, COUNT(*) as cnt,
+                       SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_payout
+                FROM fair_luck_transactions WHERE created_at >= CURDATE()
+                GROUP BY mult ORDER BY mult
+            ");
+        });
 
-        // Vault history — aggregated by minute for wider time view
+        // Vault history — light query on small table
         $vaultHistory = DB::select("
             SELECT DATE_FORMAT(created_at, '%m-%d %H:%i') as period,
-                   MIN(balance_before) as min_bal,
-                   MAX(balance_after) as last_bal,
-                   SUM(amount) as net_change,
-                   COUNT(*) as txn_count
+                   MIN(balance_before) as min_bal, MAX(balance_after) as last_bal,
+                   SUM(amount) as net_change, COUNT(*) as txn_count
             FROM fair_luck_wallet_histories
             WHERE wallet_type='global_vault' AND created_at >= NOW() - INTERVAL 24 HOUR
-            GROUP BY period
-            ORDER BY period
-            LIMIT 500
+            GROUP BY period ORDER BY period LIMIT 500
         ");
         $vaultHistory = collect($vaultHistory)->map(function ($h) {
             return [
-                'time' => $h->period,
-                'date' => $h->period,
-                'after' => (int) $h->last_bal,
-                'change' => (int) $h->net_change,
+                'time' => $h->period, 'date' => $h->period,
+                'after' => (int) $h->last_bal, 'change' => (int) $h->net_change,
                 'count' => (int) $h->txn_count,
             ];
         });
 
-        // Hourly breakdown today
-        $hourly = DB::select("
-            SELECT HOUR(created_at) as hr, COUNT(*) as spins,
-                   SUM(CASE WHEN is_winner=1 THEN 1 ELSE 0 END) as wins,
-                   SUM(bet_amount) as bet, SUM(profit_amount) as profit
-            FROM fair_luck_transactions WHERE created_at >= CURDATE()
-            GROUP BY hr ORDER BY hr
-        ");
+        $hourly = \Cache::remember('v7_monitor_hourly_' . date('YmdH'), 30, function () {
+            return DB::select("
+                SELECT HOUR(created_at) as hr, COUNT(*) as spins, SUM(is_winner) as wins,
+                       SUM(bet_amount) as bet, SUM(profit_amount) as profit
+                FROM fair_luck_transactions WHERE created_at >= CURDATE()
+                GROUP BY hr ORDER BY hr
+            ");
+        });
 
-        // Per-user RTP for active users today
-        $userRtps = DB::select("
-            SELECT user_id, COUNT(*) as spins,
-                   SUM(bet_amount) as total_bet,
-                   SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won
-            FROM fair_luck_transactions WHERE created_at >= CURDATE()
-            GROUP BY user_id HAVING spins >= 10
-            ORDER BY spins DESC LIMIT 20
-        ");
+        $userRtps = \Cache::remember('v7_monitor_rtps_' . date('YmdHi'), 30, function () {
+            return DB::select("
+                SELECT user_id, COUNT(*) as spins, SUM(bet_amount) as total_bet,
+                       SUM(CASE WHEN is_winner=1 THEN profit_amount+bet_amount ELSE 0 END) as total_won
+                FROM fair_luck_transactions WHERE created_at >= CURDATE()
+                GROUP BY user_id HAVING spins >= 10
+                ORDER BY spins DESC LIMIT 20
+            ");
+        });
 
         return response(
             $this->renderHtml(
