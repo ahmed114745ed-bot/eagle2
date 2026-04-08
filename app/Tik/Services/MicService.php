@@ -142,7 +142,7 @@ class MicService
 
         $position = (int) $data['position'];
 
-        $maxPositions = $room->mode == 0 ? 9 : 17;
+        $maxPositions = $room->mode == 0 ? 9 : 23;
         if ($position < 0 || $position > $maxPositions) {
             throw new Exception(__('api_responses.position_error'));
         }
