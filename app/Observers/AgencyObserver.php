@@ -9,6 +9,7 @@ use App\Models\AgencyJoinRequest;
 use App\Models\MonthlyDiamondReceive;
 use App\Models\User;
 use App\Models\UsersJoinedAgency;
+use Illuminate\Support\Facades\Auth;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AgencyObserver

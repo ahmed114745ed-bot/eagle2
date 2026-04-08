@@ -594,11 +594,12 @@ class CustomNotification
     }
 
 
-    public function chargeAction(User $user, $request, $admin = "Admin")
+    public function chargeAction(User $user, $request, $admin = "Admin", $agency = null)
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
-        $body = __('api.got_coin', ['coins' => $request->amount, 'name' => $user->name, 'admin' => $admin], $lang);
+        $name = $agency ? $agency->name : $user->name;
+        $body = __('api.got_coin', ['coins' => $request->amount, 'name' => $name, 'admin' => $admin], $lang);
 
         $data['coins'] = $request->amount;
         if (!$user->is_logout)
@@ -820,7 +821,7 @@ class CustomNotification
         $icon = $data['image'];
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data, messageType: 'text');
-        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body, );
+        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body,);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
@@ -835,7 +836,7 @@ class CustomNotification
         $icon = $data['image'];
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data, messageType: 'action-cp');
-        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body, );
+        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body,);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
@@ -850,7 +851,7 @@ class CustomNotification
         $icon = $data['image'];
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data, messageType: 'lucky_box');
-        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body, );
+        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body,);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
@@ -865,7 +866,7 @@ class CustomNotification
         $icon = $data['image'];
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data, messageType: 'close_lucky_box');
-        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body, );
+        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body,);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
@@ -884,7 +885,7 @@ class CustomNotification
         $icon = $data['image'];
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data, messageType: 'return_coins_lucky_box');
-        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body, );
+        Common::sendOfficialMessage($user->id, title: $body, content: $content, titleAr: $body,);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
@@ -982,7 +983,7 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-        public function formRequestApproved(User $user, string $type, array $details = [])
+    public function formRequestApproved(User $user, string $type, array $details = [])
     {
         $tokens_notification = $user?->notification_id;
         $lang = $user?->lan ?? 'en';
@@ -991,10 +992,8 @@ class CustomNotification
             $body = __('api.agencyOwner', [
                 'userName' => $details['username'] ?? '',
             ], $lang);
-        
         } else {
             $body = __("api.acceptYourAgency", [], $lang);
-          
         }
 
         if (!$user->is_logout) {
@@ -1027,6 +1026,30 @@ class CustomNotification
                 $this->appName($user->lan),
                 $body,
                 messageType: 'form-request-rejected'
+            );
+        }
+
+        Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    public function roomcupReward(User $user, float $amount, string $rewardType = 'owner')
+    {
+        $tokens_notification = $user?->notification_id;
+        $lang = $user?->lan ?? 'en';
+        $body = __('api.roomcup_reward', ['amount' => $amount, 'reward_type' => $rewardType], $lang);
+
+        $data['user_id'] = $user?->id;
+        $data['amount'] = $amount;
+        $data['reward_type'] = $rewardType;
+
+        if (!$user->is_logout) {
+            Common::send_firebase_notification(
+                $tokens_notification,
+                $this->appName($user->lan),
+                $body,
+                data: $data,
+                messageType: 'roomcup-reward'
             );
         }
 

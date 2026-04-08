@@ -180,8 +180,8 @@ class GiftLogService
             $realPrice = (int) ($number * $gift->price);
 
             $price = ceil($realPrice);
-
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType, type: $type);
+            $pk = (!is_null($room->lastPk) || !is_null($room->lastPkSession)) ? 1 : 0;
+            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds, sourceType: $sourceType, type: $type);
 
             $settings = CacheHelper::cacheSettings();
             /** @var Collection $rememberForever*/
@@ -371,7 +371,8 @@ class GiftLogService
 
             $price = ceil($realPrice);
 
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType, type: $type);
+            $pk = (!is_null($room->lastPk) || !is_null($room->lastPkSession)) ? 1 : 0;
+            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds, sourceType: $sourceType, type: $type);
 
             $settings = CacheHelper::cacheSettings();
             /** @var Collection $rememberForever*/

@@ -357,19 +357,23 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        // $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+          $luckyStatus = Common::getSettingValue('lucky_gifts_action');
 
-        // if ($luckyStatus == 1) {
-        //     $version = Common::getSettingValue('lucky_gift_version');
-        //     if ($version == 3) {
-        //         return $this->sendLuckyGift6($request, $updateUserWhenSendGift);
-        //     }
-        //     if ($version == 2) {
-        //         return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
-        //     }
-        //     return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
-        // }
-        return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
+         if ($luckyStatus == 1) {
+             $version = Common::getSettingValue('lucky_gift_version');
+
+             if ($version == 4) {
+                 return $this->sendLuckyGift7($request, $updateUserWhenSendGift);
+             }
+             if ($version == 3) {
+                 return $this->sendLuckyGift6($request, $updateUserWhenSendGift);
+             }
+             if ($version == 2) {
+                 return $this->sendLuckyGift4($request, $updateUserWhenSendGift);
+             }
+             return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
+         }
+         return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
     }
 
     public function sendLuckyGift2(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
@@ -550,6 +554,38 @@ class GiftLogController extends Controller
 
         try {
             $data = $this->luckyGiftService->sendLuckyGift6($data, $user, $updateUserWhenSendGift);
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+        return Common::apiResponse(1, __('api_responses.success'), $data);
+    }
+
+
+
+    public function sendLuckyGift7(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+        $stopLucky = settings()->get('stop_luckyGift');
+        if ($stopLucky == 1) {
+            return Common::apiResponse(0, __('api_responses.try_again'));
+        }
+
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'owner_id' => 'nullable',
+            'toUid' => 'required',
+            'num' => 'required|integer|min:1',
+            'count' => 'sometimes|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        $data = $request->all();
+        $user = $request->user();
+
+        try {
+            $data = $this->luckyGiftService->sendLuckyGift7($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }

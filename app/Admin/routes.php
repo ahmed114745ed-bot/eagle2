@@ -98,6 +98,7 @@ use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
+use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
@@ -244,6 +245,9 @@ Route::group(
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
         Route::post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
+
+        Route::get('utd-pay-gateways', [UtdPayGatewayController::class, 'index']);
+        Route::post('utd-pay-gateways/toggle', [UtdPayGatewayController::class, 'toggle']);
         Route::resource('users-settings', UserSettingController::class);
 
 

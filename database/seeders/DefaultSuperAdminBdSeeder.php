@@ -19,17 +19,24 @@ class DefaultSuperAdminBdSeeder extends Seeder
         })->first();
 
         if (!$defaultSuperAdmin){
-            $defaultSuperAdmin = SuperAdmin::create([
-                'username' => 'defaultSuperAdmin',
-                'password' => Hash::make('defaultSuperAdmin'),
-                'name' => 'default Super Admin',
-                'type' => 'superadmin',
-                'default' => 1,
-                'country_id' => 0,
-            ]);
-        } else {
-            if (is_null($defaultSuperAdmin->country_id)) {
+            try {
+                $defaultSuperAdmin = SuperAdmin::create([
+                    'username' => 'defaultSuperAdmin',
+                    'password' => Hash::make('defaultSuperAdmin'),
+                    'name' => 'default Super Admin',
+                    'type' => 'superadmin',
+                    'default' => 1,
+                    'country_id' => 0,
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Error creating default SuperAdmin: ' . $e->getMessage());
+            }
+        }
+        if ($defaultSuperAdmin && is_null($defaultSuperAdmin->country_id)) {
+            try {
                 $defaultSuperAdmin->update(['country_id' => 0]);
+            } catch (\Exception $e) {
+                \Log::error('Error updating default SuperAdmin: ' . $e->getMessage());
             }
         }
 
@@ -37,23 +44,38 @@ class DefaultSuperAdminBdSeeder extends Seeder
             $q->where('country_id', 0)
                 ->orWhereNull('country_id');
         })->first();
-
+            \Log::info('Default Super Admin ID: ' . $defaultSuperAdmin->id);
+            \Log::info('Default Bd ID: ' . ($defaultBd ? $defaultBd->id : 'No default Bd found'));
         if ($defaultBd){
             if (is_null($defaultBd->country_id)) {
-                $defaultBd->update(['country_id' => 0]);
+                try {
+                  $defaultBd->update(['country_id' => 0]);
+                } catch (\Exception $e) {
+                    \Log::error('Error updating default Bd: ' . $e->getMessage());
+                }
             }
 
-            $defaultBd->update(['parent_id' => $defaultSuperAdmin->id]);
+            try {
+              $defaultBd->update(['parent_id' => $defaultSuperAdmin->id]);
+            } catch (\Exception $e) {
+                \Log::error('Error updating default Bd parent_id: ' . $e->getMessage());
+            }
+
         }else {
-            Bd::create([
-                'parent_id' => $defaultSuperAdmin->id,
-                'username' => 'defaultBd',
-                'password' => Hash::make('defaultBd'),
-                'name' => 'default Bd',
-                'type' => 'bd',
-                'default' => 1,
-                'country_id' => 0,
-            ]);
+            try {
+              Bd::create([
+                  'parent_id' => $defaultSuperAdmin->id,
+                  'username' => 'defaultBd',
+                  'password' => Hash::make('defaultBd'),
+                  'name' => 'default Bd',
+                  'type' => 'bd',
+                  'default' => 1,
+                  'country_id' => 0,
+              ]);
+            } catch (\Exception $e) {
+                \Log::error('Error creating default Bd: ' . $e->getMessage());
+            }
+
         }
     }
 }
