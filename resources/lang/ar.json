@@ -18,6 +18,7 @@
     "top_users_shipping": "المستخدمين الاكثر شحنا",
     "available_balance": "اجمالي عمليات بوابات الدفع",
   "Super Roles": "الأدوار",
+  "Operator":"المسؤول",
 "Browse super roles": "تصفح الأدوار",
 "The percentage that the inviter takes from each recharge of the invited person.": "النسبة التي يأخذها الداعي من كل شحن للشخص المدعو.",
 "Instant reward (coins) for the inviter at the moment the invitation is accepted.": "مكافأة فورية (عملات) للداعي في لحظة قبول الدعوة.",
