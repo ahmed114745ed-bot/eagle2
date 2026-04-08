@@ -522,6 +522,8 @@ class RoomRepoService
         // }
 
         $room->microphones()->where('user_id', '!=', $room->uid)->delete();
+        $room->microphones()->where('user_id',  $room->uid)->update(['position' => 0]);
+
         return Common::apiResponse(1, 'done', null, 201);
     }
     public function getRoomBackground(?Room $room)
@@ -589,6 +591,7 @@ class RoomRepoService
         $room->save();
 
         $room->microphones()->where('user_id', '!=', $room->uid)->delete();
+        $room->microphones()->where('user_id',  $room->uid)->update(['position' => 0]);
 
         // $jsons = [];
         // $map = [];
