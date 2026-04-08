@@ -73,7 +73,7 @@
                     </div>
                 </div>
             </div>
-            @if(isset($errors) && $errors->any())
+           @if(isset($errors) && $errors instanceof \Illuminate\Support\ViewErrorBag && $errors->any())
                 <div class="alert alert-danger">
                     <ul>
                         @foreach ($errors->all() as $error)
