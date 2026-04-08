@@ -2,28 +2,27 @@
 
 namespace Utd\Gifts\Console;
 
-use App\Models\Gift;
 use Illuminate\Console\Command;
+use Utd\Gifts\Entities\Gift;
 
 class GiftUpdateUsedCountMonthly extends Command
 {
     protected $signature = 'update-gift-monthly:cron';
 
-    protected $description = 'Command description';
+    protected $description = 'Disable least-used gifts at the end of each month';
 
-    public function __construct()
+    public function handle(): void
     {
-        parent::__construct();
-    }
+        $gifts = Gift::orderBy('use_count', 'asc')
+            ->where('enable', 1)
+            ->take(5)
+            ->get();
 
-    public function handle()
-    {
-        $gifts = Gift::orderBy('use_count', 'asc')->where('enable', 1)->take(5)->get();
-        if ($gifts) {
-            foreach ($gifts as $gift) {
-                $gift->enable = 2;
-                $gift->save();
-            }
+        foreach ($gifts as $gift) {
+            $gift->enable = 2;
+            $gift->save();
         }
+
+        $this->info('Monthly gift usage processed successfully.');
     }
 }

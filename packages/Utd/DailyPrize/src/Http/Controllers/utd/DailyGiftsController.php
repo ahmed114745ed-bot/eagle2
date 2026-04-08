@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\DailyPrize\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\DailyGiftResource;
 use App\Models\Ware;
 use Illuminate\Http\Request;
 use Utd\DailyPrize\Entities\DailyGift;
+use Utd\DailyPrize\Transformers\DailyGiftResource;
 
 class DailyGiftsController extends Controller
 {

@@ -1,30 +1,33 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Utd\Gifts\Http\Controllers\Api\GiftController;
+use Utd\Gifts\Http\Controllers\Api\GiftCategoryController;
+use Utd\Gifts\Http\Controllers\Api\GiftLogController;
 
 Route::prefix('api/')->middleware(['api', 'auth:sanctum'])->group(function () {
 
     // Gift Routes
     Route::prefix('gifts')->group(function () {
-        Route::get('/', 'Utd\Gifts\Http\Controllers\Api\GiftController@index');
-        Route::get('/v2', 'Utd\Gifts\Http\Controllers\Api\GiftController@getByCategory');
-        Route::get('/images', 'Utd\Gifts\Http\Controllers\Api\GiftController@get_images');
-        Route::post('/send', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@gift_queue_cp');
-        Route::post('/send2', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@gift_queue_cp');
-        Route::post('/send-lucky-gift-combo', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@sendLuckyGift2')
+        Route::get('/', [GiftController::class, 'index']);
+        Route::get('/v2', [GiftController::class, 'getByCategory']);
+        Route::get('/images', [GiftController::class, 'get_images']);
+        Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
+        Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
+        Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])
             ->middleware(['checkCpu']);
-        Route::post('/v2/send-lucky-gift-combo', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@sendLuckyGift2V2')
+        Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V2'])
             ->middleware(['checkCpu']);
     });
 
     // Gift Categories Routes
     Route::prefix('gift-categories')->group(function () {
-        Route::get('/', 'Utd\Gifts\Http\Controllers\Api\GiftCategoryController@index');
+        Route::get('/', [GiftCategoryController::class, 'index']);
     });
 
     // Gift Logs Routes
     Route::prefix('gift-logs')->group(function () {
-        Route::get('/', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@index');
-        Route::get('/report', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@report');
+        Route::get('/', [GiftLogController::class, 'index']);
+        Route::get('/report', [GiftLogController::class, 'report']);
     });
 });

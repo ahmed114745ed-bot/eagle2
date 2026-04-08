@@ -2,11 +2,15 @@
 
 namespace Utd\Gifts\Entities;
 
+use App\Models\Agency;
+use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\HostLevelTrait;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Utd\Gifts\Support\ModelResolver;
+use Utd\Moments\Entities\Moment;
+use Utd\Room\Entities\Room;
 
 /**
  * GiftLog Model
@@ -31,81 +35,33 @@ class GiftLog extends Model
 
     public function sender()
     {
-        $userModel = ModelResolver::getUserModel();
-
-        if (! $userModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsTo($userModel, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function receiver()
     {
-        $userModel = ModelResolver::getUserModel();
-
-        if (! $userModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsTo($userModel, 'receiver_id');
+        return $this->belongsTo(User::class, 'receiver_id');
     }
 
     public function roomOwner()
     {
-        $userModel = ModelResolver::getUserModel();
-
-        if (! $userModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsTo($userModel, 'roomowner_id');
+        return $this->belongsTo(User::class, 'roomowner_id');
     }
 
     public function room()
     {
-        // محاولة استخدام PackageHelper إذا كان موجوداً
-        $packageHelperRelation = ModelResolver::checkRelation($this, 'room', 'belongsTo');
-        if ($packageHelperRelation !== null) {
-            return $packageHelperRelation;
-        }
-
-        $roomModel = ModelResolver::getRoomModel();
-
-        if (! $roomModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsTo($roomModel, 'room_id');
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo')
+            ?? $this->belongsTo(Room::class, 'room_id');
     }
 
     public function moment(): BelongsTo
     {
-        $momentModel = ModelResolver::getMomentModel();
-
-        if (! $momentModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsTo($momentModel, 'moent_id');
+        return PackageHelper::checkRelation($this, 'moment', 'belongsTo')
+            ?? $this->belongsTo(Moment::class, 'moent_id');
     }
 
     public function agency()
     {
-        $agencyModel = ModelResolver::getAgencyModel();
-
-        if (! $agencyModel) {
-            $nullAgencyModel = ModelResolver::getNullAgencyModel();
-
-            return $this->belongsTo($nullAgencyModel, 'agency_id', 'id')->whereRaw('1 = 0');
-        }
-
-        return $this->belongsTo($agencyModel, 'agency_id');
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
+        return $this->belongsTo(Agency::class, 'agency_id');
     }
 }

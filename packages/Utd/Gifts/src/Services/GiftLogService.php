@@ -2,19 +2,34 @@
 
 namespace Utd\Gifts\Services;
 
-use Utd\Gifts\Support\ModelResolver;
-use Utd\Gifts\Support\ClassResolver;
-use Utd\Gifts\Entities\UserGift;
-use Utd\Gifts\Services\SendGiftService;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\RoomRepositoryContract;
+use App\Contracts\RoomTopUsersRepositoryContract;
+use App\Contracts\UserRepositoryContract;
+use App\Enums\GiftSourceType;
+use App\Enums\UserCoinLogType;
+use App\Events\GiftBannerEvent;
+use App\Helpers\CacheHelper;
+use App\Helpers\Common;
+use App\Helpers\UserCoinLogHelper;
+use App\Models\Cp;
+use App\Tik\DTO\ReceiverGiftDTO;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\Utils;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Utd\Gifts\Repositories\GiftRepository;
+use App\Models\User;
+use App\Support\PackageHelper;
+use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
+use Modules\CP\Http\Services\CpService;
+use Modules\RoomBoom\Services\NewRoomBoomGiftService;
+use Utd\Agency\Repositories\UserRepository as AgencyUserRepository;
+use Utd\Gifts\Entities\UserGift;
 use Utd\Gifts\Repositories\GiftLogRepository;
-use GuzzleHttp\Exception\BadResponseException;
+use Utd\Gifts\Repositories\GiftRepository;
+use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
+use Utd\Room\Repositories\RoomRepoInterface;
 
 
 class GiftLogService
@@ -27,53 +42,47 @@ class GiftLogService
 
     private function getRoomTopUsersRepository()
     {
-        $class = 'App\\Contracts\\RoomTopUsersRepositoryContract';
-        if (app()->bound($class)) {
-            return app($class);
+        if (app()->bound(RoomTopUsersRepositoryContract::class)) {
+            return app(RoomTopUsersRepositoryContract::class);
         }
-        return (interface_exists($class) || class_exists($class)) ? app($class) : null;
+        return (interface_exists(RoomTopUsersRepositoryContract::class) || class_exists(RoomTopUsersRepositoryContract::class)) ? app(RoomTopUsersRepositoryContract::class) : null;
     }
 
     private function getRoomRepository()
     {
-        $class = 'App\\Contracts\\RoomRepositoryContract';
-        
         // Try bound contract first
-        if (app()->bound($class)) {
-            return app($class);
+        if (app()->bound(RoomRepositoryContract::class)) {
+            return app(RoomRepositoryContract::class);
         }
 
         // Try if it exists
-        if (interface_exists($class) || class_exists($class)) {
+        if (interface_exists(RoomRepositoryContract::class) || class_exists(RoomRepositoryContract::class)) {
             try {
-                return app($class);
+                return app(RoomRepositoryContract::class);
             } catch (\Exception $e) {
                 Log::warning("GiftLogService: Could not resolve RoomRepositoryContract even though it exists. Error: " . $e->getMessage());
             }
         }
 
         // Fallback to internal package interface if the contract is missing
-        $fallbackClass = 'Utd\\Room\\Repositories\\RoomRepoInterface';
-        if (app()->bound($fallbackClass)) {
-            return app($fallbackClass);
+        if (app()->bound(RoomRepoInterface::class)) {
+            return app(RoomRepoInterface::class);
         }
 
-        Log::error("GiftLogService: Room repository not found. Checked: $class, $fallbackClass");
+        Log::error("GiftLogService: Room repository not found. Checked: " . RoomRepositoryContract::class . ", " . RoomRepoInterface::class);
         return null;
     }
 
     private function getUserRepository()
     {
         // 1. Try resolving via agency package (most common)
-        $class = 'Utd\\Agency\\Repositories\\UserRepository';
-        if (class_exists($class)) {
-            return app($class);
+        if (class_exists(AgencyUserRepository::class)) {
+            return app(AgencyUserRepository::class);
         }
 
         // 2. Try contract if exists
-        $contract = 'App\\Contracts\\UserRepositoryContract';
-        if (app()->bound($contract)) {
-            return app($contract);
+        if (app()->bound(UserRepositoryContract::class)) {
+            return app(UserRepositoryContract::class);
         }
 
         return null;
@@ -341,12 +350,7 @@ class GiftLogService
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
             $data    = $request;
-            // استخدام ModelResolver بدلاً من User مباشرة
-            $userModel = ModelResolver::getUserModel();
-            if (!$userModel) {
-                throw new \Exception('User model not configured');
-            }
-            $user    = $userModel::orderByDesc('di')->first();
+            $user    = User::orderByDesc('di')->first();
             $userId  = $user->id;
             $ownerId = $data['owner_id'];
             $giftId  = $data['id'];
@@ -814,38 +818,32 @@ class GiftLogService
      */
     private function getGiftSourceTypeClass()
     {
-        $class = 'App\\Enums\\GiftSourceType';
-        return class_exists($class) ? $class : null;
+        return GiftSourceType::class;
     }
 
     private function getUserCoinLogTypeClass()
     {
-        $class = 'App\\Enums\\UserCoinLogType';
-        return class_exists($class) ? $class : null;
+        return UserCoinLogType::class;
     }
 
     private function getCacheHelperClass()
     {
-        $class = 'App\\Helpers\\CacheHelper';
-        return class_exists($class) ? $class : null;
+        return CacheHelper::class;
     }
 
     private function getUserCoinLogHelperClass()
     {
-        $class = 'App\\Helpers\\UserCoinLogHelper';
-        return class_exists($class) ? $class : null;
+        return UserCoinLogHelper::class;
     }
 
     private function getCommonHelperClass()
     {
-        $class = 'App\\Helpers\\Common';
-        return class_exists($class) ? $class : null;
+        return Common::class;
     }
 
     private function getUpdatePkJobClass()
     {
-        $class = 'Utd\\Room\\Jobs\\UpdatePkAndSendToZigoJob';
-        return class_exists($class) ? $class : null;
+        return PackageHelper::isInstalled('pk') ? UpdatePkAndSendToZigoJob::class : null;
     }
 
     private function getSendGiftServiceInstance()
@@ -860,22 +858,17 @@ class GiftLogService
 
     private function getCpModelClass()
     {
-        $class = 'App\\Models\\Cp';
-        return class_exists($class) ? $class : null;
+        return PackageHelper::isInstalled('cp') ? Cp::class : null;
     }
 
     private function getReceiverGiftDTOClass()
     {
-        $class = 'App\\Tik\\DTO\\ReceiverGiftDTO';
-        return class_exists($class) ? $class : null;
+        return ReceiverGiftDTO::class;
     }
 
     private function fireGiftBannerEvent($data)
     {
-        $class = 'App\\Events\\GiftBannerEvent';
-        if (class_exists($class)) {
-            event(new $class($data));
-        }
+        event(new GiftBannerEvent($data));
     }
 
     /**
@@ -883,39 +876,39 @@ class GiftLogService
      */
     private function hasCpService(): bool
     {
-        return class_exists('\\Modules\\CP\\Http\\Services\\CpService');
+        return PackageHelper::isInstalled('cp');
     }
 
     private function getCpService()
     {
         if ($this->hasCpService()) {
-            return ClassResolver::getService('cp_service') ?? new \Modules\CP\Http\Services\CpService();
+            return new CpService();
         }
         return null;
     }
 
     private function hasCharizmaJob(): bool
     {
-        return class_exists('\\Modules\\Charizma\\Jobs\\UpdateSendCharismaToZigo');
+        return PackageHelper::isInstalled('charisma');
     }
 
     private function getCharizmaJob($roomId, $userIds, $amount, $senderId)
     {
         if ($this->hasCharizmaJob()) {
-            return new \Modules\Charizma\Jobs\UpdateSendCharismaToZigo($roomId, $userIds, $amount, $senderId);
+            return new UpdateSendCharismaToZigo($roomId, $userIds, $amount, $senderId);
         }
         return null;
     }
 
     private function hasRoomBoomService(): bool
     {
-        return class_exists('\\Modules\\RoomBoom\\Services\\NewRoomBoomGiftService');
+        return PackageHelper::isInstalled('roomBoom');
     }
 
     private function getRoomBoomService()
     {
         if ($this->hasRoomBoomService()) {
-            return ClassResolver::getService('room_boom_gift_service') ?? new \Modules\RoomBoom\Services\NewRoomBoomGiftService();
+            return new NewRoomBoomGiftService();
         }
         return null;
     }

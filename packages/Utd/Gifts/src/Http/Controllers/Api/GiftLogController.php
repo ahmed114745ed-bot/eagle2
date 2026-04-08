@@ -2,25 +2,46 @@
 
 namespace Utd\Gifts\Http\Controllers\Api;
 
+use App\Contracts\RoomTopUsersRepositoryContract;
+use App\Events\GiftBannerEvent;
+use App\Exceptions\NotInfMoneyException;
+use App\Facades\CustomNotification;
+use App\Facades\UserHandling;
+use App\Helpers\Common;
+use App\Helpers\UserCommon;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\GiftLogResource;
+use App\Http\Resources\GiftLogUtdResource;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Jobs\CleanGiftLogsJob;
+use App\Jobs\UpdateUserDataWhenSendGift;
+use App\Models\Agency;
+use App\Models\AppFeature;
+use App\Models\CoreWallet;
+use App\Models\Cp;
+use App\Models\MonthlyDiamondReceive;
+use App\Models\RemainingDiamond;
+use App\Models\Setting;
+use App\Models\User;
+use App\Models\UserSallary;
+use App\Services\RoomLevelServices;
 use Carbon\Carbon;
-use Utd\Gifts\Entities\Gift;
-use Illuminate\Http\Request;
 use GuzzleHttp\Promise\Utils;
-use Utd\Gifts\Entities\GiftLog;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Collection;
-use Utd\Gifts\Support\ClassResolver;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Gifts\Services\GiftLogService;
 use Utd\Gifts\Services\GiftService;
-use Utd\Gifts\Services\SendGiftService;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use Utd\Gifts\Services\LuckyGiftService;
 use Utd\Gifts\Services\LuckyGiftV2Service;
+use Utd\Gifts\Services\SendGiftService;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
 
 class GiftLogController extends Controller
 {
@@ -60,32 +81,32 @@ class GiftLogController extends Controller
                 'GiftService' => app(GiftService::class),
 
                 // External components
-                'Common' => ClassResolver::helper('common'),
-                'UserCommon' => ClassResolver::helper('user_common'),
-                'UserHandling' => ClassResolver::facade('user_handling'),
-                'CustomNotification' => ClassResolver::facade('custom_notification'),
-                'GiftLogResource' => ClassResolver::resource('gift_log'),
-                'GiftLogUtdResource' => ClassResolver::resource('gift_log_utd'),
-                'User' => ClassResolver::model('user'),
-                'Agency' => ClassResolver::model('agency'),
-                'Cp' => ClassResolver::model('cp'),
-                'AppFeature' => ClassResolver::model('app_feature'),
-                'CoreWallet' => ClassResolver::model('core_wallet'),
-                'UserSallary' => ClassResolver::model('user_salary'),
-                'RemainingDiamond' => ClassResolver::model('remaining_diamond'),
-                'MonthlyDiamondReceive' => ClassResolver::model('monthly_diamond_receive'),
+                'Common' => Common::class,
+                'UserCommon' => UserCommon::class,
+                'UserHandling' => UserHandling::class,
+                'CustomNotification' => CustomNotification::class,
+                'GiftLogResource' => GiftLogResource::class,
+                'GiftLogUtdResource' => GiftLogUtdResource::class,
+                'User' => User::class,
+                'Agency' => Agency::class,
+                'Cp' => Cp::class,
+                'AppFeature' => AppFeature::class,
+                'CoreWallet' => CoreWallet::class,
+                'UserSallary' => UserSallary::class,
+                'RemainingDiamond' => RemainingDiamond::class,
+                'MonthlyDiamondReceive' => MonthlyDiamondReceive::class,
                 'LuckyGiftService' => app(LuckyGiftService::class),
                 'LuckyGiftV2Service' => app(LuckyGiftV2Service::class),
                 'SendGiftService' => app(SendGiftService::class),
-                'RoomLevelServices' => ClassResolver::getService('room_level'),
+                'RoomLevelServices' => app(RoomLevelServices::class),
                 'UpdateUserWhenSendGift' => app(UpdateUserWhenSendGift::class),
-                'CleanGiftLogsJob' => ClassResolver::job('clean_gift_logs'),
-                'AllOpeningRoomsZegoRequest' => ClassResolver::job('all_opening_rooms_zego_request'),
-                'UpdateUserDataWhenSendGift' => ClassResolver::job('update_user_data_when_send_gift'),
-                'UpdatePkAndSendToZigoJob' => ClassResolver::job('update_pk_and_send_to_zigo'),
-                'GiftBannerEvent' => ClassResolver::event('gift_banner'),
-                'NotInfMoneyException' => ClassResolver::exception('not_inf_money'),
-                'roomTopUsersRepository' => app(ClassResolver::contract('room_top_users_repository')),
+                'CleanGiftLogsJob' => CleanGiftLogsJob::class,
+                'AllOpeningRoomsZegoRequest' => AllOpeningRoomsZegoRequest::class,
+                'UpdateUserDataWhenSendGift' => UpdateUserDataWhenSendGift::class,
+                'UpdatePkAndSendToZigoJob' => UpdatePkAndSendToZigoJob::class,
+                'GiftBannerEvent' => GiftBannerEvent::class,
+                'NotInfMoneyException' => NotInfMoneyException::class,
+                'roomTopUsersRepository' => app(RoomTopUsersRepositoryContract::class),
                 default => null,
             };
         }
@@ -288,8 +309,7 @@ class GiftLogController extends Controller
 
                 //                $this->Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
 
-                $AllOpeningRoomsZegoRequestClass = ClassResolver::job('all_opening_rooms_zego_request');
-                dispatchJobToQueue(new $AllOpeningRoomsZegoRequestClass($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
+                dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
             }
         }
         return @$jsons ?? [];
@@ -318,7 +338,7 @@ class GiftLogController extends Controller
         }
 
         if (!$this->giftLogService) {
-            $this->giftLogService = app(\Utd\Gifts\Services\GiftLogService::class);
+            $this->giftLogService = app(GiftLogService::class);
         }
 
         try {

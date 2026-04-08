@@ -6,6 +6,7 @@ use App\Contracts\GiftsContract;
 use App\Enums\UserDiamondLogType;
 use App\Exceptions\NotInfMoneyException;
 use App\Support\PackageHelper;
+use Utd\Gifts\Entities\Gift;
 use Utd\Moments\Services\MomentsNotification;
 use App\Helpers\Common;
 use App\Helpers\UserDiamondLogHelper;
@@ -209,7 +210,7 @@ class MomentUserGiftsController extends Controller
             return Common::apiResponse(0, 'Moment does not exist or has been removed', null, 404);
         }
 
-        $giftModel = config('moments.models.gift', 'Utd\Gifts\Entities\Gift');
+        $giftModel = config('moments.models.gift', Gift::class);
         $giftsTable = 'gifts'; // Default table name
 
         if (class_exists($giftModel)) {

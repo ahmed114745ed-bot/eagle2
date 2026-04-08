@@ -38,8 +38,6 @@ use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\ChargesController;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\CountryController;
-use App\Http\Controllers\utd\DailyGiftsController;
-use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\EmojiController;
 use App\Http\Controllers\utd\ExchangeController;
@@ -365,21 +363,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete-all', [SallariesHistoryController::class, 'delete_all']);
     });
 
-    Route::prefix('daily-gift-types')->group(function () {
-        Route::get('/', [DailyGiftTypesController::class, 'index']);
-        Route::get('/{id}', [DailyGiftTypesController::class, 'show']);
-        Route::post('/create', [DailyGiftTypesController::class, 'store']);
-        Route::post('/update/{id}', [DailyGiftTypesController::class, 'update']);
-        Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
-    });
-
-    Route::prefix('daily-gifts/{type}')->group(function () {
-        Route::get('/', [DailyGiftsController::class, 'index']);
-        Route::get('/{id}', [DailyGiftsController::class, 'show']);
-        Route::post('/create', [DailyGiftsController::class, 'store']);
-        Route::post('/update/{id}', [DailyGiftsController::class, 'update']);
-        Route::post('/delete/{id}', [DailyGiftsController::class, 'delete']);
-    });
+    // daily-gift routes moved to packages/Utd/DailyPrize/routes/utd.php
 
     //games
     Route::prefix('games')->group(function () {

@@ -3,6 +3,7 @@
 namespace Utd\Gifts\Services;
 
 use App\Contracts\GiftsContract as AppGiftsContract;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Utd\Gifts\Contracts\GiftsContract;
@@ -10,7 +11,6 @@ use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 use Utd\Gifts\Entities\GiftLog;
 use Utd\Gifts\Entities\GiftRanking;
-use Utd\Gifts\Support\ModelResolver;
 
 /**
  * GiftsService
@@ -23,13 +23,7 @@ class GiftsService implements AppGiftsContract, GiftsContract
      */
     public function getUserGifts($userId)
     {
-        $userModel = ModelResolver::getUserModel();
-
-        if (! $userModel) {
-            return collect();
-        }
-
-        $user = $userModel::find($userId);
+        $user = User::find($userId);
 
         if (! $user) {
             return collect();
@@ -163,13 +157,7 @@ class GiftsService implements AppGiftsContract, GiftsContract
      */
     public function canSendGift($userId, $giftId, $quantity = 1)
     {
-        $userModel = ModelResolver::getUserModel();
-
-        if (! $userModel) {
-            return false;
-        }
-
-        $user = $userModel::find($userId);
+        $user = User::find($userId);
         $gift = Gift::find($giftId);
 
         if (! $user || ! $gift) {
@@ -177,7 +165,6 @@ class GiftsService implements AppGiftsContract, GiftsContract
         }
 
         $totalPrice = $gift->price * $quantity;
-        // استخدام di بدلاً من coins
         if (! isset($user->di) || $user->di < $totalPrice) {
             return false;
         }
@@ -188,13 +175,8 @@ class GiftsService implements AppGiftsContract, GiftsContract
         }
 
         if ($gift->vip_level > 0) {
-            $vipTrait = ModelResolver::getTrait('vip_level');
-
-            if ($vipTrait && in_array($vipTrait, class_uses($user))) {
-                if ($user->vip_level < $gift->vip_level) {
-                    return false;
-                }
-            } else {
+            $userVipLevel = $user->UserVip?->level ?? 0;
+            if ($userVipLevel < $gift->vip_level) {
                 return false;
             }
         }

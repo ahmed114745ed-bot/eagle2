@@ -2,9 +2,10 @@
 
 namespace Utd\Gifts\Listeners;
 
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Utd\Agency\Services\AgencySalaryService;
 use Utd\Gifts\Events\GiftSent;
-use Utd\Gifts\Support\ModelResolver;
 
 class UpdateAgencySalary implements ShouldQueue
 {
@@ -17,16 +18,10 @@ class UpdateAgencySalary implements ShouldQueue
             return;
         }
 
-        $userModel = ModelResolver::getUserModel();
-        if (! $userModel) {
-            return;
-        }
-
         foreach ($event->getReceiverIds() as $receiverId) {
-            $user = $userModel::find($receiverId);
+            $user = User::find($receiverId);
 
             if ($user && ($user->agency_id ?? null)) {
-                // Update agency salary logic
                 $this->updateSalary($user, $event->getPricePerReceiver());
             }
         }
@@ -34,11 +29,7 @@ class UpdateAgencySalary implements ShouldQueue
 
     private function updateSalary($user, int $amount): void
     {
-        // Agency salary update logic
-        // يمكن استدعاء Agency package service إذا كان موجود
-        if (class_exists('\Utd\Agency\Services\AgencySalaryService')) {
-            $salaryService = app('\Utd\Agency\Services\AgencySalaryService');
-            $salaryService->updateFromGift($user, $amount);
-        }
+        $salaryService = app(AgencySalaryService::class);
+        $salaryService->updateFromGift($user, $amount);
     }
 }

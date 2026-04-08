@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\DailyPrize\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;

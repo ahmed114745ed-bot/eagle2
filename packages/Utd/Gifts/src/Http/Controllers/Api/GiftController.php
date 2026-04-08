@@ -2,32 +2,21 @@
 
 namespace Utd\Gifts\Http\Controllers\Api;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\GiftResource;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Utd\Gifts\Support\ClassResolver;
+use Utd\Gifts\Services\GiftService;
 
 class GiftController extends Controller
 {
-    protected $giftService;
+    protected GiftService $giftService;
 
-    protected $Common;
-
-    protected $GiftResource;
-
-    protected $commonClass;
-
-    protected $resourceClass;
-
-    public function __construct()
+    public function __construct(GiftService $giftService)
     {
-        $giftServiceClass = ClassResolver::service('gift');
-        $this->giftService = app($giftServiceClass);
-        $this->Common = ClassResolver::helper('common');
-        $this->GiftResource = ClassResolver::resource('gift');
-        $this->commonClass = $this->Common;
-        $this->resourceClass = $this->GiftResource;
+        $this->giftService = $giftService;
     }
 
     public function index(Request $request)
@@ -35,7 +24,7 @@ class GiftController extends Controller
         $type = $request->type;
         $gifts = $this->giftService->index($type);
 
-        return $this->commonClass::apiResponse(true, '', $this->resourceClass::collection($gifts), 200);
+        return Common::apiResponse(true, '', GiftResource::collection($gifts), 200);
     }
 
     public function getByCategory(Request $request)
@@ -45,7 +34,7 @@ class GiftController extends Controller
         $type = $request->input('type');
         $gifts = $this->giftService->getByCategory($categoryId, $type);
 
-        return $this->commonClass::apiResponse(true, '', $this->resourceClass::collection($gifts), 200);
+        return Common::apiResponse(true, '', GiftResource::collection($gifts), 200);
     }
 
     public function get_images(Request $request)
@@ -53,14 +42,14 @@ class GiftController extends Controller
 
         $gifts = $this->giftService->get_images();
 
-        return $this->commonClass::apiResponse(true, '', $gifts, 200);
+        return Common::apiResponse(true, '', $gifts, 200);
     }
 
     public function allGifts(Request $request)
     {
         $gifts = $this->giftService->allGift($request->page, $request->per_page);
 
-        return $this->commonClass::apiResponse(1, '', $gifts);
+        return Common::apiResponse(1, '', $gifts);
     }
 
     public function store(Request $request)
@@ -85,14 +74,14 @@ class GiftController extends Controller
 
         ]);
         if ($validator->fails()) {
-            return $this->commonClass::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) !== 100) && ($request->type === 6)) {
-            return $this->commonClass::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
+            return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
         }
         $this->giftService->create($request);
 
-        return $this->commonClass::apiResponse(1, 'created successfully');
+        return Common::apiResponse(1, 'created successfully');
     }
 
     public function storeList(Request $request)
@@ -117,18 +106,18 @@ class GiftController extends Controller
 
         ]);
         if ($validator->fails()) {
-            return $this->commonClass::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) !== 100) && ($request->type === 6)) {
-            return $this->commonClass::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
+            return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
         }
         try {
             $this->giftService->create($request);
 
-            return $this->commonClass::apiResponse(1, 'created successfully');
+            return Common::apiResponse(1, 'created successfully');
         } catch (Exception $exception) {
 
-            return $this->commonClass::apiResponse(0, $exception->getMessage(), null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
 
@@ -138,11 +127,11 @@ class GiftController extends Controller
             'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
-            return $this->commonClass::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
         }
         $data = $this->giftService->show($request->gift_id);
 
-        return $this->commonClass::apiResponse(1, '', $data);
+        return Common::apiResponse(1, '', $data);
     }
 
     public function update(Request $request)
@@ -168,19 +157,19 @@ class GiftController extends Controller
 
         ]);
         if ($validator->fails()) {
-            return $this->commonClass::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) !== 100) && ($request->type === 6)) {
-            return $this->commonClass::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
+            return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
         }
         try {
             $this->giftService->update($request);
         } catch (Exception $exception) {
 
-            return $this->commonClass::apiResponse(0, $exception->getMessage(), null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
 
-        return $this->commonClass::apiResponse(1, 'updated successfully');
+        return Common::apiResponse(1, 'updated successfully');
     }
 
     public function musicSwitchUpdate(Request $request)
@@ -190,14 +179,14 @@ class GiftController extends Controller
             'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
-            return $this->commonClass::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         $value = $this->giftService->updateSwitch($request->music_gift, $request->gift_id, 'music_gift');
         if (! $value) {
-            return $this->commonClass::apiResponse(1, 'failed');
+            return Common::apiResponse(1, 'failed');
         }
 
-        return $this->commonClass::apiResponse(1, 'updated successfully');
+        return Common::apiResponse(1, 'updated successfully');
     }
 
     public function enableSwitchUpdate(Request $request)
@@ -207,14 +196,14 @@ class GiftController extends Controller
             'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
-            return $this->commonClass::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         $value = $this->giftService->updateSwitch($request->enable, $request->gift_id, 'enable');
         if (! $value) {
-            return $this->commonClass::apiResponse(1, 'failed');
+            return Common::apiResponse(1, 'failed');
         }
 
-        return $this->commonClass::apiResponse(1, 'updated successfully');
+        return Common::apiResponse(1, 'updated successfully');
     }
 
     public function isPlaySwitchUpdate(Request $request)
@@ -224,14 +213,14 @@ class GiftController extends Controller
             'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
-            return $this->commonClass::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         $value = $this->giftService->updateSwitch($request->is_play, $request->gift_id, 'is_play');
         if (! $value) {
-            return $this->commonClass::apiResponse(1, 'failed');
+            return Common::apiResponse(1, 'failed');
         }
 
-        return $this->commonClass::apiResponse(1, 'updated successfully');
+        return Common::apiResponse(1, 'updated successfully');
     }
 
     public function typeGift(Request $request)

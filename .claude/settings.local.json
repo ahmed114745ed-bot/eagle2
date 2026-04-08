@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /d/projects/eagle/packages/Utd/Gifts/src -name \"*.php\" -exec grep -l \"config\\('gift\\\\|app\\('\" {} \\\\;)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -rn \"\\\\\\\\\\\\\\\\App\\\\\\\\\\\\\\\\\" /d/projects/eagle/packages/Utd/Reals/src --include=\"*.php\")",
+      "Bash(find /d/projects/eagle/packages/Utd/Moments -name \"*.php\" -type f -exec grep -l \"config\\(\" {} \\\\;)",
+      "Bash(grep -rn \"new\\\\s\\\\+\\\\\\\\\\\\\\\\\" /d/projects/eagle/packages/Utd/Reals/src --include=\"*.php\")",
+      "Bash(grep -rn \"\\\\\\\\$.*=\\\\s*['\\\\\"][\\\\\\\\\\\\\\\\]*Utd\" /d/projects/eagle/packages/Utd/Reals/src --include=\"*.php\")",
+      "Bash(grep -r \"= *'[A-Z][^']*\\\\\\\\\\\\\\\\[A-Z]\" packages/Utd/Moments --include=\"*.php\")",
+      "Bash(grep -r \"use Utd\\\\\\\\\\\\\\\\Gifts\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\ClassResolver\\\\|use Utd\\\\\\\\\\\\\\\\Gifts\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\ModelResolver\" /d/projects/eagle/app /d/projects/eagle/Modules)"
+    ]
+  }
+}

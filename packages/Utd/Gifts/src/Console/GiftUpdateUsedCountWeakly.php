@@ -2,44 +2,40 @@
 
 namespace Utd\Gifts\Console;
 
-use App\Models\Gift;
-use App\Models\GiftLog;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\GiftLog;
 
 class GiftUpdateUsedCountWeakly extends Command
 {
     protected $signature = 'update-gift-weakly:cron';
 
-    protected $description = 'Command description';
+    protected $description = 'Reset and recalculate weekly gift usage counts';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function handle()
+    public function handle(): void
     {
         Gift::query()->update(['use_count' => 0]);
-        $currentDateTime = \Carbon\Carbon::now();
-        $oneMonthFromNow = $currentDateTime->subMonth();
-        $gift_logs = GiftLog::query()->with('gift')->select(['giftId', DB::raw('sum(giftNum) as total')])
+
+        $oneMonthAgo = Carbon::now()->subMonth();
+        $giftLogs = GiftLog::query()
+            ->with('gift')
+            ->select(['giftId', DB::raw('sum(giftNum) as total')])
             ->whereDate('created_at', '<=', date('Y-m-d'))
-            ->whereDate('created_at', '>=', $oneMonthFromNow)
+            ->whereDate('created_at', '>=', $oneMonthAgo)
             ->groupBy('giftId')
             ->get();
 
-        //        if ($gift_logs) {
-        foreach ($gift_logs as $gift_log) {
-            $gift = Gift::find($gift_log?->giftId);
+        foreach ($giftLogs as $log) {
+            $gift = Gift::find($log->giftId);
             if (! $gift) {
                 continue;
             }
-            $gift->use_count = $gift_log?->total ?? 0;
+            $gift->use_count = $log->total ?? 0;
             $gift->save();
         }
-        //        }
 
-        //        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+        $this->info('Weekly gift use_count updated successfully.');
     }
 }

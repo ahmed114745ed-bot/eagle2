@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Utd\DailyPrize\Transformers;
 
 use Utd\Vip\Entities\OVip;
 use App\Models\Ware;

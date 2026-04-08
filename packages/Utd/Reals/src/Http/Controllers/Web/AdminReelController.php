@@ -7,6 +7,7 @@ use Encore\Admin\Layout\Content;
 use Exception;
 use Illuminate\Http\Request;
 use Log;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Reals\Entities\Real;
 
 class AdminReelController extends MainController
@@ -160,11 +161,11 @@ class AdminReelController extends MainController
     {
         try {
             // Check if GiftLog class exists (from Gifts package)
-            if (! class_exists('Utd\Gifts\Entities\GiftLog')) {
+            if (! class_exists(GiftLog::class)) {
                 return response()->json(['gifts' => []]);
             }
 
-            $GiftLogClass = 'Utd\Gifts\Entities\GiftLog';
+            $GiftLogClass = GiftLog::class;
 
             // Get gifts for this reel from gift_logs where type='reel'
             $gifts = $GiftLogClass::where('real_id', $id)
@@ -214,9 +215,9 @@ class AdminReelController extends MainController
 
             // Get gifts counts if GiftLog exists
             $giftsCounts = [];
-            if (class_exists('Utd\Gifts\Entities\GiftLog')) {
+            if (class_exists(GiftLog::class)) {
                 try {
-                    $GiftLogClass = 'Utd\Gifts\Entities\GiftLog';
+                    $GiftLogClass = GiftLog::class;
                     $giftsCountsQuery = $GiftLogClass::selectRaw('real_id, COUNT(*) as count')
                         ->whereIn('real_id', $reelIds)
                         ->groupBy('real_id')
@@ -364,12 +365,12 @@ class AdminReelController extends MainController
         }
 
         // Check if GiftLog class exists (from Gifts package)
-        if (! class_exists('Utd\Gifts\Entities\GiftLog')) {
+        if (! class_exists(GiftLog::class)) {
             return [];
         }
 
         try {
-            $GiftLogClass = 'Utd\Gifts\Entities\GiftLog';
+            $GiftLogClass = GiftLog::class;
             $giftsCountsQuery = $GiftLogClass::selectRaw('real_id, COUNT(*) as count')
                 ->whereIn('real_id', $reelIds)
                 ->whereNotNull('real_id')

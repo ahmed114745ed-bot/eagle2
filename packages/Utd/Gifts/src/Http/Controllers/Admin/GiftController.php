@@ -2,6 +2,9 @@
 
 namespace Utd\Gifts\Http\Controllers\Admin;
 
+use App\Admin\Forms\TabsFrom;
+use App\Helpers\Common;
+use App\Models\Setting;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
@@ -12,10 +15,11 @@ use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
+use Utd\Gifts\Actions\MoveGiftCategory;
+use Utd\Gifts\Actions\MoveGroupsGifts;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 use Utd\Gifts\Entities\LuckyGift;
-use Utd\Gifts\Support\ClassResolver;
 
 /**
  * GiftController
@@ -76,8 +80,7 @@ class GiftController
         if (! Admin::user()->can('*')) {
             Permission::check('browse-lucky-gift-setting');
         }
-        $SettingModel = ClassResolver::model('setting');
-        $config = $SettingModel::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
 
         return $content->view('lucky_gift', compact('config'));
     }
@@ -119,17 +122,14 @@ class GiftController
         $grid->header(function () use ($filterType) {
             $locale = App::getLocale();
 
-            // الأساس
             $tabs = ['all' => __('All')];
 
-            // هات كل الكاتيجوري وطلع الترجمة حسب اللغة الحالية
             $categories = GiftCategory::all();
             foreach ($categories as $category) {
                 $title = $category->title[$locale] ?? $category->title['en'] ?? '';
                 $tabs[$category->id] = $title;
             }
 
-            // بناء HTML
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
                 $active = $filterType === (string) $key ? 'active' : '';
@@ -156,10 +156,7 @@ class GiftController
         }
 
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
-            $CommonHelperClass = ClassResolver::helper('common');
-            if ($CommonHelperClass) {
-                $grid->column('enable', trans('enable'))->switch($CommonHelperClass::getSwitchStates());
-            }
+            $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         }
 
         $grid->column('price', __('price'))->display(function ($coin) {
@@ -209,18 +206,12 @@ class GiftController
             if ((Admin::user()->can('move-switch-'.$permission) || Admin::user()->can('*'))
                 && $model->category?->type !== null
             ) {
-                $MoveGiftCategoryAction = ClassResolver::action('move_gift_category');
-                if ($MoveGiftCategoryAction && class_exists($MoveGiftCategoryAction)) {
-                    $actions->add(new $MoveGiftCategoryAction());
-                }
+                $actions->add(new MoveGiftCategory());
             }
         });
         $grid->batchActions(function ($batch) {
             $batch->disableDelete();
-            $MoveGroupsGiftsAction = ClassResolver::action('move_groups_gifts');
-            if ($MoveGroupsGiftsAction && class_exists($MoveGroupsGiftsAction)) {
-                $batch->add(new $MoveGroupsGiftsAction());
-            }
+            $batch->add(new MoveGroupsGifts());
         });
 
         return $grid;
@@ -233,7 +224,6 @@ class GiftController
     {
         $show = new Show(Gift::findOrFail($id));
 
-        // Extended show fields can be added here
         return $show;
     }
 
@@ -242,8 +232,7 @@ class GiftController
      */
     protected function form($id = null)
     {
-        $TabsFromClass = ClassResolver::form('tabs_from');
-        $form = new $TabsFromClass(new Gift);
+        $form = new TabsFrom(new Gift);
 
         // Disable default form tools
         $form->tools(function ($tools) {
@@ -267,10 +256,7 @@ class GiftController
         ]));
 
         $form->currency('price', __('price'))->symbol('💎');
-        $CommonHelperClass = ClassResolver::helper('common');
-        if ($CommonHelperClass) {
-            $form->switch('enable', __('enable'))->states($CommonHelperClass::getSwitchStates());
-        }
+        $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
         $form->file('img', __('img'));
         $form->file('show_img', __('show_img'))->name(function ($file) {
@@ -285,10 +271,7 @@ class GiftController
             ]
         )->required();
 
-        $CommonHelperClass = ClassResolver::helper('common');
-        if ($CommonHelperClass) {
-            $form->switch('music_gift', trans('music_gift'))->states($CommonHelperClass::getSwitchStatesGiftMucic());
-        }
+        $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
 
         // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
@@ -317,7 +300,6 @@ class GiftController
                     return back()->with(compact('error'))->withInput();
                 }
 
-                // Save these to the form instance for use in saved()
                 $form->winProbability = $form->input('luckyGift.win_probability') ?? 0;
                 $form->percentagesString = implode(',', [$minPercentag, $midPercentag, $maxPercentag]);
             }

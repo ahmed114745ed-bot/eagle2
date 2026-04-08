@@ -2,6 +2,7 @@
 
 namespace Utd\Gifts\Services;
 
+use App\Helpers\Common;
 use App\Models\User;
 use DB;
 use Exception;
@@ -168,24 +169,13 @@ class GiftSenderService implements GiftSenderInterface
 
     private function getSender(int $userId)
     {
-        $userModel = ModelResolver::getUserModel();
-        if (! $userModel) {
-            return null;
-        }
-
-        return $userModel::find($userId);
+        return User::find($userId);
     }
 
     private function getUserVipLevel($user): int
     {
-        // Check if Common helper exists
-        if (class_exists('\App\Helpers\Common')) {
-            $vipData = \App\Helpers\Common::ovip_center($user);
+        $vipData = Common::ovip_center($user);
 
-            return $vipData?->level ?? 0;
-        }
-
-        // Fallback to user property if exists
-        return $user->vip_level ?? 0;
+        return $vipData?->level ?? 0;
     }
 }

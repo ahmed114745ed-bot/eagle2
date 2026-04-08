@@ -2,9 +2,12 @@
 
 namespace Utd\Gifts\Entities;
 
+use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Utd\Gifts\Support\ModelResolver;
+use Utd\Moments\Entities\Moment;
+use Utd\Vip\Entities\OVip;
 
 class Gift extends Model
 {
@@ -26,15 +29,10 @@ class Gift extends Model
 
     public function moments()
     {
-        $momentModel = ModelResolver::getMomentModel();
-
-        if (! $momentModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsToMany($momentModel, 'moment_user_gifts')
-            ->withPivot('num', 'created_at', 'updated_at')
-            ->withTimestamps();
+        return PackageHelper::checkRelation($this, 'moment', 'belongsToMany')
+            ?? $this->belongsToMany(Moment::class, 'moment_user_gifts')
+                ->withPivot('num', 'created_at', 'updated_at')
+                ->withTimestamps();
     }
 
     public function lucky_gift()
@@ -44,24 +42,13 @@ class Gift extends Model
 
     public function vip()
     {
-        $vipModel = ModelResolver::getVipModel();
-
-        if (! $vipModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->hasOne($vipModel, 'id', 'vip_level');
+        return PackageHelper::checkRelation($this, 'vip', 'hasOne')
+            ?? $this->hasOne(OVip::class, 'id', 'vip_level');
     }
 
     public function users()
     {
-        $userModel = ModelResolver::getUserModel();
-
-        if (! $userModel) {
-            return ModelResolver::emptyRelation($this);
-        }
-
-        return $this->belongsToMany($userModel, 'user_gifts')
+        return $this->belongsToMany(User::class, 'user_gifts')
             ->withPivot('quantity', 'expire')
             ->withTimestamps();
     }
@@ -98,15 +85,5 @@ class Gift extends Model
         return $query->whereHas('category', function ($q) {
             $q->where('type', 'cp');
         });
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        $achievementTrait = ModelResolver::getTrait('achievement_gift');
-        if ($achievementTrait) {
-            static::addGlobalScope(function ($builder) {});
-        }
     }
 }

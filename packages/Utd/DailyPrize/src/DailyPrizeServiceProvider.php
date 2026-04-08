@@ -12,8 +12,6 @@ class DailyPrizeServiceProvider extends ServiceProvider
 
     protected string $moduleNameLower = 'dailyprize';
 
-    protected string $namespace = 'Utd\\DailyPrize\\Http\\Controllers';
-
     public function boot(): void
     {
         $this->registerRoutes();
@@ -60,12 +58,14 @@ class DailyPrizeServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware('api')
-            ->namespace($this->namespace)
             ->group(__DIR__.'/../routes/api.php');
 
         Route::middleware('web')
-            ->namespace($this->namespace)
             ->group(__DIR__.'/../routes/web.php');
+
+        Route::prefix('api/utd')
+            ->middleware(['api', 'localization'])
+            ->group(__DIR__.'/../routes/utd.php');
     }
 
     protected function registerConfig(): void
