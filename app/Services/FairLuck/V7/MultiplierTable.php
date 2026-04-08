@@ -279,18 +279,22 @@ class MultiplierTable
     }
 
     /**
-     * Hard jackpot gate: block tiers that would breach wallet floor.
+     * Hard jackpot gate: block tiers that would breach the negative vault limit.
+     * Small tiers (5x, 10x) are allowed to push vault slightly negative.
+     * Large tiers are blocked if they'd breach the negative limit.
      */
     public function applyJackpotGate(array &$weights, int $luckyBalance, int $netBet, int $walletMin = 10_000): bool
     {
         $gateFired = false;
+        $negativeLimit = (int) FairLuckSetting::getByKey('V7_negative_limit', 30_000);
 
         foreach (self::WIN_TIERS as $mult) {
             if (!isset($weights[$mult]) || $weights[$mult] <= 0) continue;
 
             $worstCasePayout = $netBet * $mult;
-            if (($luckyBalance - $worstCasePayout) < $walletMin) {
-                $weights[$mult] = 1;
+            // Block if payout would push vault beyond negative limit
+            if (($luckyBalance - $worstCasePayout) < -$negativeLimit) {
+                $weights[$mult] = 1; // Near-zero weight, not fully blocked
                 $gateFired = true;
             }
         }
