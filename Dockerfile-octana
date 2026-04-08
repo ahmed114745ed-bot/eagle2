@@ -2,7 +2,7 @@ FROM php:8.2-cli AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-#    cron \
+    cron \
     supervisor \
     zip \
     unzip \
@@ -45,8 +45,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 RUN printenv | grep -v "no_proxy" >> /etc/environment
 # Setup Laravel Cron Job
-#RUN echo "* * * * * . /etc/environment; cd /app && /usr/local/bin/php artisan schedule:run >> /var/log/cron.out.log 2>&1" > /etc/cron.d/laravel-scheduler
-#RUN chmod 0644 /etc/cron.d/laravel-scheduler && crontab /etc/cron.d/laravel-scheduler
+RUN echo "* * * * * . /etc/environment; cd /app && /usr/local/bin/php artisan schedule:run >> /var/log/cron.out.log 2>&1" > /etc/cron.d/laravel-scheduler
+RUN chmod 0644 /etc/cron.d/laravel-scheduler && crontab /etc/cron.d/laravel-scheduler
 
 # Copy application files
 COPY . /app
@@ -102,7 +102,6 @@ RUN REDIS_HOST=172.17.0.1 \
 
 # Expose port 9000
 EXPOSE 8000
-RUN php artisan optimize:clear
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
