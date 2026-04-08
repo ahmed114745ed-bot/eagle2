@@ -63,6 +63,11 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
+        // Redirect to default tab if no tab is specified
+        if (!request()->has('tab')) {
+            return redirect()->to(request()->url() . '?tab=admins');
+        }
+
         $room = Room::with(['owner.profile', 'roomLevel', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
