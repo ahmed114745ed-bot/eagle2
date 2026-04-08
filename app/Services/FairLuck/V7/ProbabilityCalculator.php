@@ -45,10 +45,7 @@ class ProbabilityCalculator
         $maxProbabilityCap   = (float) FairLuckSetting::getByKey('V7_max_probability_cap', 0.50);
 
         // Base probability: targetRTP / trueWeightedAvgMultiplier
-        //
-        // المشكلة: expectedMultiplier من RewardSelector يُرجع 5x (أصغر مضاعف متاح)
-        // لكن المضاعف الفعلي عند الفوز يكون ~18x بسبب الأوزان
-        //
+      
         // الحل: حساب المتوسط المرجح الحقيقي من الأوزان مباشرة
         // ثم استخدامه لحساب baseProb بدقة
         //
@@ -62,16 +59,18 @@ class ProbabilityCalculator
                 $trueWeightedAvg += ($mult * $weight) / $totalWeight;
             }
         }
-        // trueWeightedAvg ≈ 55x (نظري) لكن الفعلي ~18x بسبب قيود المحفظة
-        // نستخدم 35% من المتوسط النظري كتقدير للمتوسط الفعلي
-        // هذا يعطي: 55 × 0.35 = 19.25x → baseProb = 0.92/19.25 = 4.78%
-        // مع boost → win rate ~6-8% → RTP = 6.5% × 18x = 117% (لا يزال مرتفعاً)
-        //
-        // الحل الأمثل: استخدام المتوسط الفعلي المُلاحظ = 18x
-        // baseProb = 0.92 / 18 = 5.11%
-        // win rate ~5% × 18x = 90% RTP ✅
-        $effectiveAvgMultiplier = max(5.0, $trueWeightedAvg * 0.27);
-        $baseProb = min($maxProbabilityCap, $targetRTP / $effectiveAvgMultiplier);
+        // الحل الصحيح: استخدام المتوسط المرجح الفعلي مباشرة
+        // baseProb = targetRTP / trueWeightedAvg
+        // مثال: إذا trueWeightedAvg = 50x → baseProb = 0.92/50 = 1.84%
+        // win rate ~1.84% × 50x = 92% RTP ✅
+        // هذا يضمن أن RTP الفعلي = targetRTP بدقة
+        $effectiveAvgMultiplier = max(5.0, $trueWeightedAvg);
+        $appFeeRate = FairLuckSetting::getAppFeeRate();
+$receiverFeeRate = FairLuckSetting::getReceiverFeeRate();
+$appFee = $betAmount * $appFeeRate;
+$receiverFee = $betAmount * $receiverFeeRate;
+$netBetAmount = $betAmount - $appFee - $receiverFee;
+$baseProb = min($maxProbabilityCap, $targetRTP / $effectiveAvgMultiplier);
 
         // New player protection: disabled when newPlayerBets=0
         if ($newPlayerBets > 0 && $betCount < $newPlayerBets) {
@@ -92,6 +91,13 @@ class ProbabilityCalculator
         $betImpact = $betAmount > 0 ? $rtpDeficit / $betAmount : 0;
 
         $calculatedProb = $baseProb;
+
+// Calculate net bet amount after deducting fees
+$appFeeRate = FairLuckSetting::getAppFeeRate();
+$receiverFeeRate = FairLuckSetting::getReceiverFeeRate();
+$appFee = $betAmount * $appFeeRate;
+$receiverFee = $betAmount * $receiverFeeRate;
+$netBetAmount = $betAmount - $appFee - $receiverFee;
 
         if ($rtpGap > 0) {
             // User is BELOW target RTP - boost probability

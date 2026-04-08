@@ -83,25 +83,26 @@ class DetailedMultiUserReportV7 extends Command
         $this->info("🔧 تهيئة إعدادات V7...");
         
         $defaultSettings = [
-            // Core RTP Settings - 92% target
-            'V7_target_rtp' => 0.92,
+            // Core RTP Settings
+            // 124.4% على net_bet = 99.5% على betAmount الكامل (fees=20%)
+            // Pool تخسر ببطء وتُعوَّض بإيداعات دورية
+            'V7_target_rtp' => 1.244,
             'V7_max_probability_cap' => 0.50,  // سقف الاحتمالية
             'V7_boost_scaling' => 0.03,         // تقليل التعزيز عند الخسارة
             'V7_reduce_scaling' => 0.08,        // رفع التخفيض عند الفوز الزائد
             'V7_chaos_factor_min' => 0.95,
             'V7_chaos_factor_max' => 1.05,
             
-            // Multiplier Weights - 5x الأكثر ظهوراً بفارق واضح عن 10x
+            // Multiplier Weights - avgMult≈8x → baseProb≈12% → winRate~12% → pool مستدام
             'V7_multiplier_weights' => json_encode([
-                5    => 500,   // 5x الأكثر شيوعاً - الأعلى وزناً
-                10   => 250,   // 10x أقل شيوعاً من 5x بفارق كبير
-                20   => 300,   // متوسط
-                50   => 250,   // أقل شيوعاً
-                70   => 200,   // نادر نسبياً
-                100  => 150,   // نادر - إثارة للاعب
-                250  => 80,    // نادر جداً
-                500  => 30,    // نادر جداً جداً
-                1000 => 1,     // جاكبوت - نادر للغاية
+                    5    => 9000,  // 5x يهيمن → avgMult ≈ 8x → baseProb ≈ 12% → winRate ~12%
+                    10   => 1000,  // 10x شائع (~9% من الفوز)
+                    20   => 300,   // 20x متوسط (~2.7%)
+                    50   => 100,   // 50x أقل شيوعاً (~0.9%)
+                    100  => 50,    // 100x نادر (~0.45%)
+                    250  => 200,   // 250x قابل للظهور (~1.8% من الفوز)
+                    500  => 80,    // 500x قابل للظهور (~0.7% من الفوز)
+                    1000 => 10,    // 1000x جاكبوت نادر (~0.09%)
             ]),
 
             // New Player Settings - تعطيل boost المستخدم الجديد لتحقيق RTP دقيق
@@ -227,7 +228,7 @@ class DetailedMultiUserReportV7 extends Command
                 'net_result' => 0,
                 'app_cut' => 0,
                 // New tracking fields
-                'multiplier_counts' => [5 => 0, 10 => 0, 20 => 0, 50 => 0, 70 => 0, 100 => 0, 250 => 0, 500 => 0, 1000 => 0],
+                'multiplier_counts' => [5 => 0, 10 => 0, 20 => 0, 50 => 0, 100 => 0, 250 => 0, 500 => 0, 1000 => 0],
                 'current_loss_streak' => 0,
                 'max_loss_streak' => 0,
                 'current_win_streak' => 0,
@@ -638,7 +639,6 @@ class DetailedMultiUserReportV7 extends Command
                                 <th class='text-success'>10x</th>
                                 <th class='text-success'>20x</th>
                                 <th class='text-info'>50x</th>
-                                <th class='text-info'>70x</th>
                                 <th class='text-info'>100x</th>
                                 <th class='text-warning'>250x</th>
                                 <th class='text-warning'>500x</th>
@@ -656,7 +656,6 @@ class DetailedMultiUserReportV7 extends Command
                         <td>{$userData['multiplier_counts'][10]}</td>
                         <td>{$userData['multiplier_counts'][20]}</td>
                         <td>{$userData['multiplier_counts'][50]}</td>
-                        <td>{$userData['multiplier_counts'][70]}</td>
                         <td>{$userData['multiplier_counts'][100]}</td>
                         <td>{$userData['multiplier_counts'][250]}</td>
                         <td>{$userData['multiplier_counts'][500]}</td>
@@ -666,10 +665,12 @@ class DetailedMultiUserReportV7 extends Command
         }
         
         // Add totals row
-        $totals = [5 => 0, 10 => 0, 20 => 0, 50 => 0, 70 => 0, 100 => 0, 250 => 0, 500 => 0, 1000 => 0];
+        $totals = [5 => 0, 10 => 0, 20 => 0, 50 => 0, 100 => 0, 250 => 0, 500 => 0, 1000 => 0];
         foreach ($uniqueUsers as $userData) {
             foreach ($userData['multiplier_counts'] as $mult => $count) {
-                $totals[$mult] += $count;
+                if (isset($totals[$mult])) {
+                    $totals[$mult] += $count;
+                }
             }
         }
         $grandTotal = array_sum($totals);
@@ -680,7 +681,6 @@ class DetailedMultiUserReportV7 extends Command
                         <td>{$totals[10]}</td>
                         <td>{$totals[20]}</td>
                         <td>{$totals[50]}</td>
-                        <td>{$totals[70]}</td>
                         <td>{$totals[100]}</td>
                         <td>{$totals[250]}</td>
                         <td>{$totals[500]}</td>

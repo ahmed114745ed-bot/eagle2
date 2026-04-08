@@ -24,7 +24,7 @@ class RewardSelector
         int $totalPoolBalance,
         int $betCount
     ): int {
-        $multipliers = [5, 10, 20, 50, 70, 100, 250, 500, 1000];
+        $multipliers = [5, 10, 20, 50, 100, 250, 500, 1000];
         $weights = [];
         
         // Get configurable weights
@@ -50,7 +50,7 @@ class RewardSelector
                 $m >= 500  => 0.40,  // pool needs only 40% of payout (jackpot: rare, pool recovers)
                 $m >= 250  => 0.50,  // pool needs 50% of payout
                 $m >= 100  => 0.67,  // pool needs 67% of payout
-                default    => 1.05,  // pool needs 105% of payout (small wins: strict)
+                default    => 0.50,  // pool needs 50% of payout (small wins: lenient to allow 10x, 20x)
             };
             
             if ($payout > $totalPoolBalance / $solvencyFactor) {
@@ -142,7 +142,7 @@ class RewardSelector
      */
     public function getExpectedMultiplier(float $betAmount = 100, int $totalPoolBalance = 10000): float
     {
-        $multipliers = [5, 10, 20, 50, 70, 100, 250, 500, 1000];
+        $multipliers = [5, 10, 20, 50, 100, 250, 500, 1000];
         $totalWeight = 0;
         $totalValue = 0;
 
@@ -165,7 +165,7 @@ class RewardSelector
                 $m >= 500  => 0.40,
                 $m >= 250  => 0.50,
                 $m >= 100  => 0.67,
-                default    => 1.05,
+                default    => 0.50,
             };
             
             if ($payout > $totalPoolBalance / $solvencyFactor) {
@@ -188,7 +188,7 @@ class RewardSelector
      */
     public function validateAndFallback(int $selectedMultiplier, float $betAmount, int $totalPoolBalance, int $userId = null, int $betCount = null): int
     {
-        $allMultipliers = [1000, 500, 250, 100, 70, 50, 20, 10, 5];
+        $allMultipliers = [1000, 500, 250, 100, 50, 20, 10, 5];
         $negativeLimit = BankruptcyProtection::getNegativeLimit();
         $effectiveBalance = $totalPoolBalance + $negativeLimit;
         
