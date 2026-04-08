@@ -698,7 +698,7 @@ class GiftController extends MainController
     public function saveLuckyGiftVersion(Request $request)
     {
         $version = $request->input('lucky_gift_version');
-        if (in_array($version, [1, 2, 3])) {
+        if (in_array($version, [1, 2, 3, 4])) {
             Setting::updateOrCreate(['key' => 'lucky_gift_version'], ['value' => $version]);
             Cache::forget('lucky_gift_version');
             Cache::put('lucky_gift_version', $version);
@@ -739,6 +739,59 @@ class GiftController extends MainController
                 Cache::put($key, $request->input($key));
             }
         }
+
+        // Handle V7 FairLuck settings
+        $v7_keys = [
+            'V7_target_rtp',
+            'V7_max_probability_cap',
+            'V7_boost_scaling',
+            'V7_reduce_scaling',
+            'V7_chaos_factor_min',
+            'V7_chaos_factor_max',
+            'V7_new_player_bets',
+            'V7_new_player_boost',
+            'V7_low_balance_threshold',
+            'V7_low_balance_min_prob',
+            'coin_to_usd_rate',
+            'wallet_healthy_usd',
+            'wallet_warning_usd',
+            'wallet_critical_usd',
+            'wallet_max_negative_usd',
+            'V7_wallet_healthy_max_mult',
+            'V7_wallet_moderate_max_mult',
+            'V7_wallet_low_max_mult',
+            'V7_wallet_critical_max_mult',
+            'V7_min_prob_when_low',
+            'fairluck_jackpot_cooldown_bets',
+            'V7_min_bets_100x',
+            'V7_min_bets_500x',
+            'V7_max_single_win_pct',
+            'global_vault_negative_limit',
+            'fair_luck_owner_fee_rate',
+            'fair_luck_app_fee_rate',
+            'fair_luck_receiver_fee_rate',
+        ];
+        foreach ($v7_keys as $key) {
+            if ($request->has($key)) {
+                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                Cache::forget($key);
+                Cache::put($key, $request->input($key));
+            }
+        }
+
+        // Handle V7 multiplier weights (JSON array)
+        if ($request->has('V7_multiplier_weights')) {
+            $weights = $request->input('V7_multiplier_weights');
+            \App\Models\FairLuckSetting::updateOrCreate(
+                ['key' => 'V7_multiplier_weights'],
+                ['value' => json_encode($weights)]
+            );
+            Cache::forget('V7_multiplier_weights');
+            Cache::put('V7_multiplier_weights', json_encode($weights));
+        }
+
+        // Clear FairLuck settings cache so changes take effect immediately
+        \Illuminate\Support\Facades\Cache::forget('fair_luck:settings');
 
         admin_toastr(__('Settings updated successfully.'), 'success');
         return back();

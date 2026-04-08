@@ -1,5 +1,5 @@
 @php
-    $luckyStatus = $config['lucky_gifts_action'] ?? 0;
+    $luckyStatus = $config['lucky_gifts_action'] ?? 1;
     $currentVersion = $config['lucky_gift_version'] ?? 1;
 @endphp
 
@@ -57,6 +57,11 @@
                                     style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 3 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
                                     <input type="radio" name="lucky_gift_version" value="3" {{ $currentVersion == 3 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
                                     <strong>{{ __('Version 3 (FairLuck V6)') }}</strong>
+                                </label>
+                                <label
+                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 4 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
+                                    <input type="radio" name="lucky_gift_version" value="4" {{ $currentVersion == 4 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
+                                    <strong>{{ __('Version 4 (FairLuck V7)') }}</strong>
                                 </label>
                             </div>
                         </form>
@@ -299,6 +304,79 @@
                         </div>
                     </div>
                 </div>
+            @elseif($currentVersion == 4)
+                {{-- Version 4 Content (FairLuck V7 - Simplified) --}}
+                @php $settings = $fairLuckSettings; @endphp
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{ __('FairLuck V7 Settings') }} / {{ __('إعدادات FairLuck V7') }}</h3>
+                    </div>
+                    <form action="{{ route('admin.lucky-gift.version.update') }}" method="post" class="form-horizontal">
+                        @csrf
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('App Profit Percentage') }} / {{ __('نسبة ربح التطبيق') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0" max="100" name="fair_luck_app_fee_rate" class="form-control"
+                                            value="{{ isset($settings['fair_luck_app_fee_rate']) ? (float)$settings['fair_luck_app_fee_rate'] * 100 : 1 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">
+                                        {{ __('ينصح ان تكون (1%)') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Gift Receiver Percentage') }} / {{ __('نسبة مستقبل الهدية من الهدية') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0" max="100" name="fair_luck_receiver_fee_rate" class="form-control"
+                                            value="{{ isset($settings['fair_luck_receiver_fee_rate']) ? (float)$settings['fair_luck_receiver_fee_rate'] * 100 : 10 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">
+                                        {{ __('ينصح ان تكون (10%)') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Player RTP') }} / {{ __('نسبة RTP للاعب') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.01" min="0" max="100" name="V7_target_rtp" class="form-control"
+                                            value="{{ isset($settings['V7_target_rtp']) ? (float)$settings['V7_target_rtp'] * 100 : 99.5 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">
+                                        {{ __('ينصح ان تكون (99.5%)') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-success btn-lg pull-right">{{ __('Save V7 Settings') }} / {{ __('حفظ إعدادات V7') }}</button>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Old V7 sections (Core RTP, Multiplier Weights, New Player, Wallet Protection, Cooldown, Wallet Distribution, Fee Settings) removed --}}
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-success">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">{{ __('Global Vault Balance History') }} / {{ __('سجل رصيد الخزينة العام') }}</h3>
+                            </div>
+                            <div class="box-body">
+                                <canvas id="vaultChartV7" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
         </div>
 
@@ -335,6 +413,85 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(function () {
+            // Live Preview Bar Chart for Multiplier Weights (V7 only)
+            @if($currentVersion == 4)
+            var weightChart = null;
+            function updateWeightChart() {
+                var labels = [];
+                var data = [];
+                var totalWeight = 0;
+                var colors = [
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(231, 76, 60, 0.8)',
+                    'rgba(142, 68, 173, 0.8)',
+                    'rgba(39, 174, 96, 0.8)'
+                ];
+
+                $('.weight-input').each(function() {
+                    var val = parseInt($(this).val()) || 0;
+                    totalWeight += val;
+                });
+
+                $('.weight-input').each(function() {
+                    var mult = $(this).data('multiplier');
+                    var val = parseInt($(this).val()) || 0;
+                    var pct = totalWeight > 0 ? ((val / totalWeight) * 100).toFixed(1) : 0;
+                    labels.push(mult + 'x (' + pct + '%)');
+                    data.push(val);
+                });
+
+                var canvas = document.getElementById('weightPreviewChart');
+                if (!canvas) return;
+
+                if (weightChart) {
+                    weightChart.destroy();
+                }
+
+                weightChart = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Weight',
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: colors.map(function(c) { return c.replace('0.8', '1'); }),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        var total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                        var pct = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+                                        return 'Weight: ' + context.raw + ' (' + pct + '%)';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: 'Weight' } }
+                        }
+                    }
+                });
+            }
+
+            // Initialize chart and update on input change
+            updateWeightChart();
+            $(document).on('input change', '.weight-input', function() {
+                updateWeightChart();
+            });
+            @endif
+
             var historyData = {!! json_encode($history->map(function ($h) {
             return [
                 'date' => $h->created_at ? $h->created_at->format('m-d H:i:s') : '',
@@ -348,7 +505,7 @@
             var labels = historyData.map(function (d) { return d.date; });
             var dataPoints = historyData.map(function (d) { return d.after; });
 
-            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : 'vaultChart' }}';
+            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : ($currentVersion == 4 ? 'vaultChartV7' : 'vaultChart') }}';
             var ctx = document.getElementById(chartId).getContext('2d');
             var chart = new Chart(ctx, {
                 type: 'line',

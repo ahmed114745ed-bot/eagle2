@@ -1264,27 +1264,25 @@ class UserService
         $progress     = 0;
         $exactlyValue = 0;
 
-        if ($secondLevel) {
-            $exactlyValue    = $secondLevel->exp;
-            $remaining       = max(0, $exactlyValue - $expLevel);
+      if ($secondLevel) {
+            $exactlyValue = $secondLevel->exp;
+            $remaining    = max(0, $exactlyValue - $expLevel);
 
-            // Calculate progress based on thresholds between levels
             $currentThreshold = $currentLevel ? $currentLevel->exp : 0;
             $nextThreshold    = $secondLevel->exp;
 
-            $progressNext     = $nextThreshold - $currentThreshold;
-            $progressCurrent  = $expLevel - $currentThreshold;
+            $progressNext    = $nextThreshold - $currentThreshold;
+            $progressCurrent = $expLevel - $currentThreshold;
 
             if ($progressNext > 0) {
-                $prog = $progressCurrent / $progressNext;
-                $progress = max(0, min(1, $prog));
+                $progress = $progressCurrent / $progressNext;
+                $progress = max(0, min(1, $progress)); // من 0 لـ 1
             } else {
                 $progress = 1;
             }
         } elseif ($currentLevel) {
-            // Max level reached
-            $progress  = 1;
-            $remaining = 0;
+            $progress     = 1;
+            $remaining    = 0;
             $exactlyValue = $currentLevel->exp;
         }
 
@@ -1341,20 +1339,20 @@ class UserService
             $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
 
             if ($prog >= 1) {
-                $bar = 1;
+                $bar = 100;
             } else {
-                $bar = round($prog, 1);
+                $bar = round($prog * 100, 1);
             }
-            $progress = $exactlyValue == 0 ? 1 : $bar;
+            $progress = $exactlyValue == 0 ? 100 : $bar;
         } elseif ($currentLevel != null) {
             $exactlyValue    = $secondLevel?->exp ?? 0;
             $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
             $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
 
-            $progress  = 1;
+            $progress  = 100;
             $remaining = 0;
         } else {
-            $progress  = 1;
+            $progress  = 100;
             $remaining = 0;
         }
 
