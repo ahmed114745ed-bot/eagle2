@@ -95,16 +95,12 @@ class FairLuckMonitorController extends Controller
         $vaultHistory = DB::select("
             SELECT DATE_FORMAT(created_at, '%m-%d %H:%i') as period,
                    MIN(balance_before) as min_bal,
-                   MAX(balance_after) as max_bal,
-                   (SELECT balance_after FROM fair_luck_wallet_histories w2
-                    WHERE w2.wallet_type='global_vault'
-                    AND DATE_FORMAT(w2.created_at, '%Y-%m-%d %H:%i') = DATE_FORMAT(w1.created_at, '%Y-%m-%d %H:%i')
-                    ORDER BY w2.created_at DESC LIMIT 1) as last_bal,
+                   MAX(balance_after) as last_bal,
                    SUM(amount) as net_change,
                    COUNT(*) as txn_count
-            FROM fair_luck_wallet_histories w1
+            FROM fair_luck_wallet_histories
             WHERE wallet_type='global_vault' AND created_at >= NOW() - INTERVAL 24 HOUR
-            GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d %H:%i')
+            GROUP BY period
             ORDER BY period
             LIMIT 500
         ");
@@ -160,14 +156,10 @@ class FairLuckMonitorController extends Controller
         ");
         $history = collect(DB::select("
             SELECT DATE_FORMAT(created_at, '%H:%i') as t,
-                   (SELECT balance_after FROM fair_luck_wallet_histories w2
-                    WHERE w2.wallet_type='global_vault'
-                    AND DATE_FORMAT(w2.created_at, '%Y-%m-%d %H:%i') = DATE_FORMAT(w1.created_at, '%Y-%m-%d %H:%i')
-                    ORDER BY w2.created_at DESC LIMIT 1) as v
-            FROM fair_luck_wallet_histories w1
+                   MAX(balance_after) as v
+            FROM fair_luck_wallet_histories
             WHERE wallet_type='global_vault' AND created_at >= NOW() - INTERVAL 24 HOUR
-            GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d %H:%i')
-            ORDER BY t LIMIT 200
+            GROUP BY t ORDER BY t LIMIT 200
         "))->map(fn($h) => ['t' => $h->t, 'v' => (int) $h->v]);
 
         return response()->json(compact('vault', 'app', 'lastHour', 'history'));
