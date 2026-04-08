@@ -1454,13 +1454,15 @@ class ChargeReportController extends MainController
         $stats = [];
         
         // Reusable aggregate raw SQL - uses snapshot fields with fallback to legacy
+        // Note: bonus_coins can be NULL, so we use COALESCE(bonus_coins, 0) inside the fallback
+        // to avoid: COALESCE(NULL, amount + NULL) = NULL which makes total_coins always NULL
         $aggregateRaw = '
-            SUM(COALESCE(total_coins, amount + bonus_coins)) AS total_coins,
-            SUM(COALESCE(base_usd, usd))                      AS total_usd,
-            SUM(COALESCE(profit_coins, amount))               AS profit_coins,
-            SUM(COALESCE(profit_usd, usd))                    AS profit_usd,
-            SUM(COALESCE(bonus_coins, 0))                     AS bonus_coins,
-            SUM(COALESCE(base_usd, usd) - COALESCE(profit_usd, usd)) AS bonus_usd
+            SUM(COALESCE(total_coins, amount + COALESCE(bonus_coins, 0))) AS total_coins,
+            SUM(COALESCE(base_usd, usd))                                  AS total_usd,
+            SUM(COALESCE(profit_coins, amount))                           AS profit_coins,
+            SUM(COALESCE(profit_usd, usd))                                AS profit_usd,
+            SUM(COALESCE(bonus_coins, 0))                                 AS bonus_coins,
+            SUM(COALESCE(base_usd, usd) - COALESCE(profit_usd, usd))     AS bonus_usd
         ';
 
         // Helper closure
