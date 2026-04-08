@@ -18,7 +18,7 @@ use Encore\Admin\Widgets\Box;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-
+use Illuminate\Support\ViewErrorBag;
 use Encore\Admin\Facades\Admin;
 use App\Models\Admin as AdminModel;
 use Encore\Admin\Layout\Content;
@@ -213,7 +213,7 @@ class RoomController extends MainController
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
                 'roomModes'     => $roomModes,
-                'errors'        => session('errors') ?: new \Illuminate\Support\MessageBag()
+                'errors' => new ViewErrorBag(), 
             ])));
     }
     /**

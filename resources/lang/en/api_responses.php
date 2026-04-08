@@ -121,6 +121,11 @@ return [
     'freez_charge' => 'Your wallet has been frozen. Contact the administration!',
 
     'freeze_charge_settings' => 'Charging is currently disabled by the administrator.',
+    'charge_user_to_user_disabled' => 'Charging from user to user is currently disabled',
+    'charge_user_to_agent_disabled' => 'Charging from user to charging agent is currently disabled',
+    'charge_to_self_disabled' => 'Charging to yourself is currently disabled',
+    'charge_agent_to_user_disabled' => 'Charging from charging agent to user is currently disabled',
+    'charge_agent_to_agent_disabled' => 'Charging from charging agent to another charging agent is currently disabled',
     'freeze_transfer_charger' => 'Your transfers has been frozen. Contact the administration!',
     'freeze_transfer_receiver' => 'The receiver transfers has been frozen. he cannot receive transfers at this time.',
 

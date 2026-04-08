@@ -72,7 +72,13 @@ trait PaymentTrait
             info('in paypal');
             $coinLog = $this->findCoinLogTrx($orderId, $method);
         } else {
+            // First attempt: find by coinlog id
             $coinLog = $this->findCoinLog($orderId, $method);
+            // Fallback: find by trx if id doesn't exist (UTD generates orderId as trx)
+            if (!$coinLog) {
+                info('webhookPayment: fallback to trx lookup for orderId', ['orderId' => $orderId, 'method' => $method]);
+                $coinLog = $this->findCoinLogTrx($orderId, $method);
+            }
         }
 
         info($coinLog);

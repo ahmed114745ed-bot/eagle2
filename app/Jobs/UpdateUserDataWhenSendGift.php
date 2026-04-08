@@ -44,9 +44,10 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $receiverFeeRate =null;
         if ($luckyStatus == 1) {
             $version = Common::getSettingValue('lucky_gift_version');
-           if (in_array($version, [2, 3])) {
+           if (in_array($version, [2, 3, 4])) {
                 $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
             }
+            
            $hostPercentage  = $receiverFeeRate ?? getGiftPercentage('host_lucky_gift')  / 10;
         }else {
             $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
@@ -58,7 +59,9 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                 ->with([
                            'owner' => function ($query) {
                                $query->withoutAppends();
-                           }
+                           },
+                           'lastPk',
+                           'lastPkSession'
                        ])->first(); 
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
@@ -94,7 +97,8 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         }
 
         $sendGiftServices = new SendGiftService();
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0 , cpIds: $cpIds);
+        $pk = (!is_null($room->lastPk) || !is_null($room->lastPkSession)) ? 1 : 0;
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds);
 
     }
 

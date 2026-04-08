@@ -33,6 +33,15 @@ class WebhookGamesSeeder extends Seeder
                     'change_balance' => config('app.url') . '/api/leader-cc-game/change-balance',
                 ],
             ],
+            [
+                'provider_code' => 'utd_games',
+                'provider_name' => 'UTD Games',
+                'webhook_routes' => [
+                    'get_user_info'  => config('app.url') . '/api/utd-game/get-user-info',
+                    'change_balance' => config('app.url') . '/api/utd-game/change-balance',
+                    'make_up_orders' => config('app.url') . '/api/utd-game/make-up-orders',
+                ],
+            ],
         ];
 
         foreach ($providers as $provider) {

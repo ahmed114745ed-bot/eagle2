@@ -4494,7 +4494,18 @@
   "price family": "Aile fiyatı",
   "The price for creating a family.": "Bir aile oluşturmanın fiyatı.",
    "family settings": "Aile ayarları",
+    "BD report": "BD raporu",
+    "account dashboard": "Hesap Kontrol Paneli",
+"account user": "Kullanıcı Hesabı",
+"Send more gifts to become top 1 and set mic": "En iyi 1 olmak ve mikrofonu kurmak için daha fazla hediye gönderin",
+   "limitChatMessage": "Sohbet sınırına ulaştınız. Sohbete devam etmek için bu kullanıcıyı arkadaş olarak ekleyin",
   "Family Setting": "Aile ayarı",
-  "Browse family setting": "Aile ayarlarını görüntüle"
+  "Browse family setting": "Aile ayarlarını görüntüle",
+  "api_responses.charge_user_to_user_disabled": "Kullanıcıdan kullanıcıya şarj etme şu anda devre dışı bırakıldı",
+  "api_responses.charge_user_to_agent_disabled": "Kullanıcıdan şarj ajanına şarj etme şu anda devre dışı bırakıldı",
+  "api_responses.charge_to_self_disabled": "Kendinize şarj etme şu anda devre dışı bırakıldı",
+  "api_responses.charge_agent_to_user_disabled": "Şarj ajanından kullanıcıya şarj etme şu anda devre dışı bırakıldı",
+  "api_responses.charge_agent_to_agent_disabled": "Şarj ajanından başka bir şarj ajanına şarj etme şu anda devre dışı bırakıldı",
+  "api_responses.freeze_charge_settings": "Şarj işlemi şu anda yönetici tarafından devre dışı bırakıldı."
 
 }

@@ -60,6 +60,7 @@ class SettingController extends MainController
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
+        $utdGamesSettings = $gameSettings->get('utd_games');
         $isThemeEnabled = Common::getSettingValue('isThemeEnabled') ?? 0;
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
@@ -71,6 +72,7 @@ class SettingController extends MainController
                 'zeroGamesSettings',
                 'bytesunSettings',
                 'quantumNexusSettings',
+                'utdGamesSettings',
                 'pusher_app_secret',
                 'chargeTabType',
                 'zego_token',
@@ -258,6 +260,24 @@ class SettingController extends MainController
 
             Cache::forget('isThemeEnabled');
             Cache::put('isThemeEnabled', $request->value, now()->addYear());
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+
+    public function updateRoomMode(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => $request->field],
+                ['value' => $request->value]
+            );
+
+            Cache::forget($request->field);
+            Cache::put($request->field, $request->value, now()->addYear());
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
