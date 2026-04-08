@@ -70,8 +70,9 @@ class HandlingRoomZigoRequests extends Command
                 $allData[$item->type][] = $data_ne;
                 echo 'Done ' . $item->type . ' to room ' . $item->room_id . PHP_EOL;
             } catch (\Throwable $e) {
-                echo 'Fail ' . $item->type . ' to room ' . $item->room_id . PHP_EOL;
-
+                $type = is_object($item) ? ($item->type ?? '?') : 'unknown';
+                $room = is_object($item) ? ($item->room_id ?? '?') : 'unknown';
+                echo 'Fail ' . $type . ' to room ' . $room . ': ' . $e->getMessage() . PHP_EOL;
             }
             Redis::del($cleanKey);
 
