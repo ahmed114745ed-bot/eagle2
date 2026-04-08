@@ -73,7 +73,7 @@
                     </div>
                 </div>
             </div>
-            @if($errors->any())
+           @if(isset($errors) && $errors instanceof \Illuminate\Support\ViewErrorBag && $errors->any())
                 <div class="alert alert-danger">
                     <ul>
                         @foreach ($errors->all() as $error)
@@ -250,7 +250,7 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>{{ __('Admin') }}</th>
+                    <th>{{ __('Operator') }}</th>
                     <th>{{ __('Actions') }}</th>
                 </tr>
                 </thead>

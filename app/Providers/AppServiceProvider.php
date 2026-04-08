@@ -427,7 +427,8 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerFairLuckService(): void
     {
-        $this->app->singleton(\App\Services\FairLuck\FairLuckService3::class, function ($app) {
+        // Octane-safe: bind() not singleton() — fresh instance per request
+        $this->app->bind(\App\Services\FairLuck\FairLuckService3::class, function ($app) {
             return new \App\Services\FairLuck\FairLuckService3(
                 new \App\Services\FairLuck\ProfileManager(),
                 new \App\Services\FairLuck\DeviationCalculator(),
@@ -438,5 +439,11 @@ class AppServiceProvider extends ServiceProvider
                 new \App\Services\FairLuck\LossLedger()
             );
         });
+
+        // V7 engine: all bind() for Octane safety
+        $this->app->bind(\App\Services\FairLuck\V7\FairLuckServiceV7::class);
+        $this->app->bind(\App\Services\FairLuck\V7\MultiplierTable::class);
+        $this->app->bind(\App\Services\FairLuck\V7\PoolManager::class);
+        $this->app->bind(\App\Services\FairLuck\V7\UserRTPTracker::class);
     }
 }

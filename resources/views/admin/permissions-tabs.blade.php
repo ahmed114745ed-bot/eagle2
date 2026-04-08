@@ -134,12 +134,56 @@
     .rtl .fields-group .form-group {
     display: block !important;
 }
+
+    /* Global Select All Bar */
+    .global-select-all-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 12px 20px;
+        margin-bottom: 15px;
+    }
+    .global-select-left { display: flex; align-items: center; }
+    .global-toggle-label {
+        display: flex; align-items: center; gap: 10px;
+        cursor: pointer; margin: 0; user-select: none;
+    }
+    .global-toggle-text { font-size: 15px; font-weight: 600; color: #333; }
+    .global-toggle-input { width: 18px; height: 18px; cursor: pointer; }
+    .permissions-counter {
+        display: inline-flex; align-items: center; gap: 4px;
+        background: #fff; border: 1px solid #dee2e6; border-radius: 20px;
+        padding: 6px 14px; font-size: 14px; font-weight: 600; color: #555;
+    }
+    .permissions-counter #selected-count { color: var(--primary-color, #4CAF50); font-weight: 700; }
+    .permissions-counter small { color: #999; font-weight: 400; }
 </style>
 
 
 
 
 <input type="hidden" name="permissions_all" id="permissions_all">
+
+{{-- Global Select All --}}
+<div class="global-select-all-bar">
+    <div class="global-select-left">
+        <label class="global-toggle-label" for="global-select-all">
+            <input type="checkbox" id="global-select-all" class="global-toggle-input">
+            <span class="global-toggle-switch"></span>
+            <span class="global-toggle-text">{{ __('Select All Permissions') }}</span>
+        </label>
+    </div>
+    <div class="global-select-right">
+        <span class="permissions-counter">
+            <span id="selected-count">0</span> / <span id="total-count">0</span>
+            <small>{{ __('selected') }}</small>
+        </span>
+    </div>
+</div>
+
 <ul class="nav nav-tabs mb-3" role="tablist" id="permission-tabs">
     @foreach($categories as $category)
         <li class="nav-item">
@@ -215,6 +259,22 @@
 
         function updateHiddenInput() {
             $('#permissions_all').val([...selectedPermissions].join(','));
+            updateCounter();
+            updateGlobalCheckboxState();
+        }
+
+        function updateCounter() {
+            const total = $('.permission-checkbox').length;
+            const selected = $('.permission-checkbox:checked').length;
+            $('#selected-count').text(selected);
+            $('#total-count').text(total);
+        }
+
+        function updateGlobalCheckboxState() {
+            const allCheckboxes = $('.permission-checkbox');
+            const total = allCheckboxes.length;
+            const checked = allCheckboxes.filter(':checked').length;
+            $('#global-select-all').prop('checked', checked === total && total > 0).prop('indeterminate', false);
         }
 
         function getBrowsePermissionId(currentCheckbox) {
@@ -376,6 +436,31 @@
                 updateCategoryCheckboxState(category);
             });
         }
+
+        // Global Select All handler
+        $('#global-select-all').on('change', function() {
+            const isChecked = $(this).is(':checked');
+
+            // Select/deselect ALL permission checkboxes across ALL categories
+            $('.permission-checkbox').each(function() {
+                const id = parseInt($(this).val());
+                if (isChecked) {
+                    selectedPermissions.add(id);
+                    $(this).prop('checked', true);
+                } else {
+                    selectedPermissions.delete(id);
+                    $(this).prop('checked', false);
+                }
+            });
+
+            // Update all group checkboxes
+            $('.group-select-all').prop('checked', isChecked).prop('indeterminate', false);
+
+            // Update all category checkboxes
+            $('.category-select-all').prop('checked', isChecked).prop('indeterminate', false);
+
+            updateHiddenInput();
+        });
 
         bindPermissionCheckboxes();
         bindGroupSelectAll();
