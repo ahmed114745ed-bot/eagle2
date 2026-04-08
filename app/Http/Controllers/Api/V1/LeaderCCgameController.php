@@ -174,14 +174,36 @@ class LeaderCCgameController extends Controller
                 return $this->json(4005, 'Missing or invalid parameters', $validator->errors());
             }
 
-            Cache::put("order_{$request->orderId}", true, now()->addHour());
+            if (Cache::has("order_{$request->orderId}")) {
+                $user = User::find($request->uid);
+                return $this->json(0, 'success', ['coin' => $user->di ?? 0]);
+            }
 
-            $user = User::find($request->uid);
-            if (!$user) return $this->json(4005, 'user not found');
+            return DB::transaction(function () use ($request) {
+                $user = User::lockForUpdate()->find($request->uid);
+                if (!$user) return $this->json(4005, 'user not found');
 
-            return $this->json(0, 'success', [
-                'coin' => $user->di
-            ]);
+                $coin = abs((int)$request->coin);
+                $user->di += $coin;
+                $user->save();
+
+                DB::table('coin_game_users')->insert([
+                    'user_id'    => $user->id,
+                    'coins'      => $coin,
+                    'app_profit_coins' => $coin,
+                    'type'       => 1, 
+                    'game_id'    => $request->gameId,
+                    'round_id'   => $request->roundId,
+                    'order_id'   => $request->orderId,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                Cache::put("order_{$request->orderId}", true, now()->addHour());
+                dispatch(new \App\Jobs\GameWalletJop($coin));
+
+                return $this->json(0, 'success', ['coin' => $user->di]);
+            });
         });
     }
 

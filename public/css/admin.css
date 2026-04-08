@@ -75,3 +75,33 @@ input:checked+.slider {
     background: #FF9428!important;
     /* background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important; */
 }
+
+/* ===== Form: Labels above inputs (stacked layout) ===== */
+.form-horizontal .form-group .control-label {
+    text-align: left !important;
+    width: 100% !important;
+    float: none !important;
+    padding-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-horizontal .form-group > .col-sm-8,
+.form-horizontal .form-group > .col-sm-6,
+.form-horizontal .form-group > .col-sm-4,
+.form-horizontal .form-group > .col-sm-10,
+.form-horizontal .form-group > .col-sm-12 {
+    width: 100% !important;
+    float: none !important;
+}
+
+.form-horizontal .form-group > .col-sm-2,
+.form-horizontal .form-group > .col-sm-3,
+.form-horizontal .form-group > .col-sm-4.control-label {
+    width: 100% !important;
+    float: none !important;
+}
+
+/* RTL support */
+.rtl .form-horizontal .form-group .control-label {
+    text-align: right !important;
+}

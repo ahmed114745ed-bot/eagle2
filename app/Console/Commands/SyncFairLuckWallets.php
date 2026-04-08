@@ -19,24 +19,17 @@ class SyncFairLuckWallets extends Command
      *
      * @var string
      */
-    protected $description = 'Sync FairLuck wallet balances from Redis to Database for durability';
+    protected $description = 'Sync FairLuck wallet balance from Redis to Database for durability (V7: single wallet)';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $walletTypes = [
-            FairLuckWallet::TYPE_GLOBAL_VAULT,
-            FairLuckWallet::TYPE_JACKPOT_WALLET,
-            FairLuckWallet::TYPE_MEDIUM_WALLET
-        ];
+        // V7: Single unified wallet — only sync global_vault
+        $this->info("Syncing global_vault...");
+        FairLuckWallet::syncToDatabase(FairLuckWallet::TYPE_GLOBAL_VAULT);
 
-        foreach ($walletTypes as $type) {
-            $this->info("Syncing {$type}...");
-            FairLuckWallet::syncToDatabase($type);
-        }
-
-        $this->info("FairLuck wallets synced successfully at " . now()->toDateTimeString());
+        $this->info("FairLuck wallet synced successfully at " . now()->toDateTimeString());
     }
 }

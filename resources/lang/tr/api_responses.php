@@ -19,7 +19,6 @@ return [
     'unfollow_done'                                              => 'Bu kullanıcıyı başarıyla takipten çıkardınız',
     'owner_id_required'                                          => 'Sahip ID\'si gereklidir',
     'room_not_found'                                             => 'Oda bulunamadı',
-    'freeze_charge_settings' => 'Şarj işlemi şu anda yönetici tarafından devre dışı bırakıldı.',
     'insufficient_balance'                                       => 'Yetersiz bakiye, lütfen bakiye yüklemeye gidin!',
     'image_is_required'                                          => 'Resim gereklidir',
     'background_image_request_done'                              => 'Arka plan resim değişikliği talebi başarıyla yapıldı',
