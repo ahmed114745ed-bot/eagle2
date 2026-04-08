@@ -31,7 +31,7 @@ class MomentUserCommentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Renderable
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index($moment_id)
     {
@@ -55,7 +55,7 @@ class MomentUserCommentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Renderable
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store($moment_id, Request $request)
     {

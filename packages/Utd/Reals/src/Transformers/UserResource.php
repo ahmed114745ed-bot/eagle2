@@ -4,8 +4,8 @@ namespace Utd\Reals\Transformers;
 
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use App\Support\PackageHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Utd\Room\Entities\Room;
 
 class UserResource extends JsonResource
 {
@@ -18,9 +18,10 @@ class UserResource extends JsonResource
     public function toArray($request)
     {
         $pass_status = false;
-        $now_room = Room::query()->where('uid', $this->id)->first();
-        if ($now_room) {
-            if ($now_room->room_pass) {
+        if (PackageHelper::isInstalled('room')) {
+            $roomClass = PackageHelper::getEntity('room');
+            $now_room = $roomClass::query()->where('uid', $this->id)->first();
+            if ($now_room && $now_room->room_pass) {
                 $pass_status = true;
             }
         }

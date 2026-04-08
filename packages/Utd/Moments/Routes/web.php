@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Utd\Moments\Http\Controllers\web\MomentController;
 use Utd\Moments\Http\Controllers\web\MomentSettingsController;
 use Utd\Moments\Http\Controllers\web\MomentViewerController;
@@ -17,10 +18,10 @@ use Utd\Moments\Http\Controllers\web\ReportMomentController;
 */
 
 Route::prefix('moment')->group(function () {
-    Route::get('/', 'MomentController@index');
+    Route::get('/', [MomentController::class, 'index']);
 });
 
-Route::get('delete-moment/{moment_id}/{id}', 'MomentController@destroy_dash')->name('delete-moment');
+Route::get('delete-moment/{moment_id}/{id}', [MomentController::class, 'destroy_dash'])->name('delete-moment');
 
 Route::group(
     [

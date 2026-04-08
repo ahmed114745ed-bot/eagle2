@@ -53,14 +53,13 @@ class MomentUserGiftsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Renderable
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request, $moment_id, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $data = $request;
         $user = $request->user();
         // $userId  = $user->id;
-        $moment_id = $moment_id;
         $giftId = $data['gift_id'];
         $number = $data['num'];
         $moment = Moment::find($moment_id);

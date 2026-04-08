@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Utd\Moments\Http\Controllers\MomentController;
+use Utd\Moments\Http\Controllers\MomentUserCommentController;
 use Utd\Moments\Http\Controllers\MomentUserGiftsController;
+use Utd\Moments\Http\Controllers\MomentUserLikesController;
 use Utd\Moments\Http\Controllers\ReportController;
 
 /*
@@ -17,13 +20,13 @@ use Utd\Moments\Http\Controllers\ReportController;
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])->group(
     function () {
-        Route::apiResource('/moment', 'MomentController')->middleware('ban.user.actions:moment');
-        Route::get('moments/users/{id}/gifts', [MomentUserGiftsController::class, 'userGift']);
-        Route::apiResource('moment/{moment_id}/comment', 'MomentUserCommentController');
-        Route::apiResource('moment/{moment_id}/like', 'MomentUserLikesController');
-        Route::apiResource('moment/{moment_id}/gift/', 'MomentUserGiftsController');
+        Route::apiResource('/moment', MomentController::class)->middleware('ban.user.actions:moment');
+//        Route::get('moments/users/{id}/gifts', [MomentUserGiftsController::class, 'userGift']);
+        Route::apiResource('moment/{moment_id}/comment', MomentUserCommentController::class);
+        Route::apiResource('moment/{moment_id}/like', MomentUserLikesController::class);
+        Route::apiResource('moment/{moment_id}/gift/', MomentUserGiftsController::class);
         //            Route::apiResource('moment/{moment_id}/users/gifts/', 'MomentUserGiftsController');
         Route::post('moment/{moment_id}/report', [ReportController::class, 'store']);
-        Route::get('moments/{id}/gifts', [MomentUserGiftsController::class, 'getGifts']);
+//        Route::get('moments/{id}/gifts', [MomentUserGiftsController::class, 'getGifts']);
     }
 );

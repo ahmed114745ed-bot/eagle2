@@ -17,7 +17,7 @@ return new class extends Migration
             Schema::create('reals', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->string('description')->default('');
+                $table->string('description', 500)->nullable();
                 $table->string('url')->nullable();
                 $table->string('sub_video')->nullable();
                 $table->string('thumbnail')->nullable();

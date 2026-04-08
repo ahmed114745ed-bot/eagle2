@@ -2,7 +2,9 @@
 
 namespace Utd\Moments\Entities;
 
+use App\Models\Gift;
 use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,14 +30,8 @@ class Moment extends Model
 
     public function gifts()
     {
-        $giftModel = config('moments.models.gift', 'Utd\Gifts\Entities\Gift');
-
-        if (class_exists($giftModel)) {
-            return $this->belongsToMany($giftModel, 'moment_user_gifts');
-        }
-
-        return $this->belongsToMany(get_class($this), 'moment_user_gifts', 'moment_id', 'gift_id')
-            ->whereRaw('1 = 0');
+        return PackageHelper::checkRelation($this, 'gift', 'belongsTo') ??
+            $this->belongsToMany(Gift::class, 'moment_user_gifts');
     }
 
     public function images()

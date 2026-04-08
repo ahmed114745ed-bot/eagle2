@@ -37,10 +37,12 @@ class MomentRepository
             ->likeExists($userId)->with('images')
             ->with('user')
             ->withCount(['likes', 'comments'])
-            ->with(['gifts' => function ($query) {
-                $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
-                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-            }])
+            ->when(PackageHelper::isInstalled('gift'), function ($query) {
+                $query->with(['gifts' => function ($query) {
+                    $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                        ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                }]);
+            })
             ->first();
     }
 
@@ -57,10 +59,12 @@ class MomentRepository
             ->whereHas('user')->with('images')
             ->likeExists($userId)
             ->withCount(['likes', 'comments'])
-            ->with(['gifts' => function ($query) {
-                $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
-                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-            }]);
+            ->when(PackageHelper::isInstalled('gift'), function ($query) {
+                $query->with(['gifts' => function ($query) {
+                    $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                        ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                }]);
+            });
 
         if (PackageHelper::isInstalled('chat')) {
             $query->with(['user.chatRoomsAsUser' => function ($q) use ($authUserId) {
@@ -88,10 +92,12 @@ class MomentRepository
             'moment' => function ($query) use ($userId) {
                 $query->likeExists($userId)->with('images')
                     ->withCount(['likes', 'comments'])
-                    ->with(['gifts' => function ($query) {
-                        $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
-                            ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-                    }]);
+                    ->when(PackageHelper::isInstalled('gift'), function ($query) {
+                        $query->with(['gifts' => function ($query) {
+                            $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                                ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                        }]);
+                    });
             },
         ])
             ->where('user_id', $userId)
@@ -140,7 +146,7 @@ class MomentRepository
                     }]);
             }, 'user.chatRoomsAsUser2' => function ($q) use ($authUserId) {
                 $q->where('user_id', $authUserId)
-                    ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                    ->withCount(['messages as unread_messaxges_count' => function ($query) use ($authUserId) {
                         $query->where('user_id', '<>', $authUserId)
                             ->where('status', '<>', 'seen');
                     }]);
@@ -148,10 +154,12 @@ class MomentRepository
         }
 
         return $query->withCount(['likes', 'comments'])
-            ->with(['gifts' => function ($query) {
-                $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
-                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-            }])
+            ->when(PackageHelper::isInstalled('gift'), function ($query) {
+                $query->with(['gifts' => function ($query) {
+                    $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                        ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                }]);
+            })
             ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")
             ->when($page === 1, function ($query) {
                 $seed = rand(1000, 2000);
@@ -183,10 +191,12 @@ class MomentRepository
 
         return $query->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
-            ->with(['gifts' => function ($query) {
-                $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
-                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-            }])
+            ->when(PackageHelper::isInstalled('gift'), function ($query) {
+                $query->with(['gifts' => function ($query) {
+                    $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                        ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                }]);
+            })
             ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")
             ->take(10)->orderByDesc('id')->paginate(10);
     }
@@ -216,11 +226,14 @@ class MomentRepository
             }]);
         }
 
-        return $query->with(['gifts' => function ($query) {
+        if (PackageHelper::isInstalled('gift')) {
+            $query->with(['gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-            }])
-            ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")->paginate(10);
+            }]);
+        }
+
+        return $query->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")->paginate(10);
     }
 
     /**
@@ -273,10 +286,12 @@ class MomentRepository
         $query->whereHas('user', function ($query) use ($user_id) {
             $query->where('id', trim($user_id));
         })->with(['comments', 'likes'])
-            ->with(['gifts' => function ($query) {
-                $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
-                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-            }]);
+            ->when(PackageHelper::isInstalled('gift'), function ($query) {
+                $query->with(['gifts' => function ($query) {
+                    $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                        ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                }]);
+            });
 
         $result = $query->paginate(10);
 
