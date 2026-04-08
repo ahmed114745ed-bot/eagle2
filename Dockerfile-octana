@@ -55,6 +55,8 @@ COPY . /app
 
 # Setup supervisord configuration
 COPY docker/octana-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/octane-start.sh /app/docker/octane-start.sh
+RUN chmod +x /app/docker/octane-start.sh
 
 
 
