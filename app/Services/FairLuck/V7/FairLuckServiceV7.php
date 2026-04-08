@@ -1,0 +1,307 @@
+<?php
+
+namespace App\Services\FairLuck\V7;
+
+use App\Models\CoreWallet;
+use App\Models\FairLuckSetting;
+use App\Models\FairLuckTransaction;
+use App\Models\Gift;
+use App\Models\User;
+use App\Services\FairLuck\ProfileManager;
+use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
+
+class FairLuckServiceV7
+{
+    public function __construct(
+        private UserRTPTracker $rtpTracker,
+        private ProbabilityCalculator $probabilityCalculator,
+        private RewardSelector $rewardSelector,
+        private PoolManager $poolManager,
+        private ProfileManager $profileManager,
+    ) {}
+
+    /**
+     * Process a single bet using the V7 RTP-based algorithm.
+     *
+     * V7 User-First Overhaul:
+     * 1. Target RTP = 92% by default (admin configurable 70-99%)
+     * 2. Prize SIZE reduced when wallet is low, not win frequency
+     * 3. Cooldown disabled by default - users can win big back-to-back
+     * 4. Multiplier weights are configurable and flattened
+     * 5. Wallet protection operates in USD (project-agnostic)
+     * 6. Probability never goes below 60% of normal
+     * 7. Unified pool - never cancels a win, always falls back
+     */
+    public function processBet(
+        User $user,
+        Gift $gift,
+        float $betAmount,
+        float $unitPrice,
+        ?int $roomId = null,
+        $receiverId = null,
+        float $appFee = 0,
+        float $receiverFee = 0,
+        float $senderBalanceBefore = 0,
+        float $senderBalanceAfter = 0,
+        ?int $currentLossStreak = null  // For loss streak protection tracking
+    ): object {
+        return DB::transaction(function () use (
+            $user, $gift, $betAmount, $unitPrice, $roomId, $appFee, $receiverFee,
+            $senderBalanceBefore, $senderBalanceAfter, $currentLossStreak
+        ) {
+            // receiver fee goes directly to receiver (via updateUsers), not into pool
+            // V7: appFee goes to app_wallet separately - NOT into the game pool
+            // This ensures the pool is zero-sum: what users put in = what winners get back
+            $totalAmount = $betAmount; // Only net bet (without appFee) enters the pool
+
+            // V7: خصم نسبة التطبيق وإضافتها لمحفظة التطبيق (app_wallet) مباشرة
+            $coinsForApp = (int) round($appFee);
+            if ($coinsForApp > 0) {
+                $collection = CoreWallet::query()
+                    ->whereIn('name', ['app_wallet', 'owner_wallet'])
+                    ->get();
+                $appWallet = $collection->firstWhere('name', 'app_wallet');
+                if ($appWallet instanceof CoreWallet) {
+                    $appWallet->increment('coins', $coinsForApp);
+                }
+            }
+
+            // BANKRUPTCY PROTECTION: Check pool health before processing
+            $bankruptcyProtection = app(BankruptcyProtection::class);
+            $poolHealth = $bankruptcyProtection->getHealthStatus();
+            
+            if ($poolHealth['status'] === 'critical') {
+                $bankruptcyProtection->logCriticalEvent('BET_PROCESSED_IN_CRITICAL_STATE', [
+                    'user_id' => $user->id,
+                    'bet_amount' => $totalAmount,
+                ]);
+            }
+
+            // 1. Get user's RTP stats from Redis
+            $stats = $this->rtpTracker->getStats($user->id);
+            $actualRTP = $stats->total_spent > 0
+                ? $stats->total_received / $stats->total_spent
+                : 0.0;
+
+            // V7: Target RTP from settings (default 92%, admin configurable 70-99%)
+            $targetRTP = FairLuckSetting::getTargetRTP();
+            $rtpGap = $targetRTP - $actualRTP;
+
+            // 2. Get pool balances (before)
+            $walletsBefore = $this->poolManager->getWalletBalances();
+
+            // 3. Distribute bet contribution to pool
+            $this->poolManager->distributeBet($totalAmount);
+
+            // 4. Get updated pool balance for probability calculation
+            $updatedPool = $this->poolManager->getTotalBalance();
+
+            // 5. Calculate win probability based on RTP gap
+            // RTP is tracked on totalAmount (what enters pool), so probability uses totalAmount too
+            $expectedMultiplier = $this->rewardSelector->getExpectedMultiplier($totalAmount, $updatedPool);
+
+            $finalProbability = $this->probabilityCalculator->calculate(
+                $actualRTP,
+                $targetRTP,
+                $stats->total_spent,
+                $totalAmount,
+                $stats->bet_count,
+                $expectedMultiplier
+            );
+
+            // 5. Chaos factor & low balance protection are already applied inside
+            // ProbabilityCalculator::calculate() — no need to duplicate here.
+
+            // LOSS STREAK PROTECTION: Check if user has exceeded max consecutive losses
+            $maxLossStreak = FairLuckSetting::getMaxLossStreak();
+            $forcedWinMultiplier = FairLuckSetting::getLossStreakForcedMultiplier();
+            $isForcedWin = false;
+            
+            // DEBUG: Log loss streak values
+            \Log::debug("Loss Streak Check", [
+                'currentLossStreak' => $currentLossStreak,
+                'maxLossStreak' => $maxLossStreak,
+                'forcedMultiplier' => $forcedWinMultiplier,
+                'shouldForce' => ($currentLossStreak !== null && $currentLossStreak >= $maxLossStreak)
+            ]);
+            
+            if ($currentLossStreak !== null && $currentLossStreak >= $maxLossStreak) {
+                // Force a win - user has suffered too many consecutive losses
+                $isForcedWin = true;
+                $isWinner = true;
+                $finalProbability = 1.0; // 100% probability
+                \Log::info("FORCED WIN triggered for user {$user->id} after {$currentLossStreak} losses");
+            }
+
+            // 6. Roll the dice (or force win if loss streak protection triggered)
+            if (!$isForcedWin) {
+                $random = mt_rand(0, 10000) / 10000;
+                $isWinner = $random <= $finalProbability;
+            }
+
+            $multiplier = 0;
+            $payoutAmount = 0;
+
+            if ($isWinner) {
+                // 8. Select multiplier based on RTP gap and wallet health
+                $updatedPool = $this->poolManager->getTotalBalance();
+                
+                if ($isForcedWin) {
+                    // Use forced multiplier for loss streak protection
+                    $multiplier = $forcedWinMultiplier;
+                } else {
+                    $multiplier = $this->rewardSelector->select(
+                        $rtpGap,
+                        $totalAmount,
+                        $updatedPool,
+                        $stats->bet_count
+                    );
+                }
+
+                // 9. Validate pool can afford - NEVER cancel, always fallback to lower
+                // This also applies wallet health limits (prize size reduction, not frequency)
+                $multiplier = $this->rewardSelector->validateAndFallback(
+                    $multiplier,
+                    $totalAmount,
+                    $updatedPool,
+                    $user->id,
+                    $stats->bet_count
+                );
+
+                if ($multiplier > 0) {
+                    // V7: Payout is based on betAmount (full amount user paid)
+                    // User receives: multiplier × betAmount (e.g., 5x × 100 = 500)
+                    // Pool sustainability is ensured by:
+                    // 1. Pool only receives net_bet (80% of betAmount after fees)
+                    // 2. RTP is tracked on net_bet → system boosts winRate to compensate
+                    // 3. On losses: pool keeps net_bet (80) → accumulates reserves
+                    // 4. On wins: pool pays multiplier × betAmount (500) from reserves
+                    // 5. Net pool flow per cycle: losses × 80 - wins × 500 ≈ 0 (sustainable)
+                    // 6. App earns 20% of every bet regardless → stable revenue
+                    $payoutAmount = (int) round($multiplier * $betAmount);
+
+                    // BANKRUPTCY PROTECTION: Cap payout based on pool health
+                    $safePayout = $bankruptcyProtection->validateAndCapPayout($payoutAmount);
+                    if ($safePayout < $payoutAmount) {
+                        // Find the nearest valid V7 multiplier that doesn't exceed safe payout
+                        // Must use ONLY configured multipliers: 5, 10, 20, 50, 70, 100, 250, 500, 1000
+                        $validMultipliers = [1000, 500, 250, 100, 50, 20, 10, 5];
+                        $foundMultiplier = 0;
+                        foreach ($validMultipliers as $m) {
+                            $testPayout = (int) round($m * $betAmount);
+                            if ($testPayout <= $safePayout) {
+                                $foundMultiplier = $m;
+                                break;
+                            }
+                        }
+                        $multiplier = $foundMultiplier;
+                        $payoutAmount = $multiplier > 0 ? (int) round($multiplier * $betAmount) : 0;
+                    }
+
+                    // 10. Execute payout from pool
+                    // الحل 3: pool يدفع المكسب كاملاً، وappFee تُخصم من المكسب وتذهب لـ app_wallet
+                    // اللاعب يستلم: payoutAmount - appFee (صافي المكسب)
+                    $payoutResult = $this->poolManager->payout($payoutAmount, $multiplier, $user->id);
+
+                    if (!$payoutResult['paid']) {
+                        $multiplier = 0;
+                        $isWinner = false;
+                        $payoutAmount = 0;
+                    } else {
+                        // اللاعب يستلم صافي المكسب (بعد خصم رسوم التطبيق)
+                        $payoutAmount = $payoutResult['net_payout'];
+                    }
+
+                    if ($payoutResult['paid'] && $multiplier > 0 && $isWinner) {
+                        // POST-JACKPOT COOLDOWN: Record the jackpot (only if enabled)
+                        $cooldown = app(\App\Services\FairLuck\V7\PostJackpotCooldown::class);
+                        $cooldown->recordJackpot($user->id, $stats->bet_count, $multiplier);
+                    }
+                } else {
+                    $isWinner = false;
+                }
+            }
+
+            // 11. Track RTP in Redis
+            // المنطق:
+            // - total_spent = net_bet (ما دخل pool فعلاً = betAmount × (1 - fees))
+            // - total_received = net_payout (payout × (1 - fees)) لتوحيد المقياس
+            // - RTP = net_payout / net_bet → target 99.5%
+            // - هذا يضمن: winRate × avgMult × betAmount × feeRatio / (betAmount × feeRatio) = 99.5%
+            //   أي: winRate × avgMult = 99.5% ✅
+            // - Pool يستقبل net_bet، يدفع payout → مستدام لأن الخسائر تعوض الفوز
+            $appFeeRateForTracking = FairLuckSetting::getAppFeeRate();
+            $receiverFeeRateForTracking = FairLuckSetting::getReceiverFeeRate();
+            $feeRatio = 1 - $appFeeRateForTracking - $receiverFeeRateForTracking;
+            $netBetForTracking = max(1, (int) round($totalAmount * $feeRatio));
+            // net_payout: نسبة المكسب المقابلة لما دخل الـ pool
+            // هذا يجعل RTP = net_payout/net_bet = payout/betAmount (نفس النسبة)
+            $netPayoutForTracking = $isWinner && $payoutAmount > 0
+                ? max(0, (int) round($payoutAmount * $feeRatio))
+                : 0;
+
+            $this->rtpTracker->recordBet(
+                $user->id,
+                $netBetForTracking,      // ما دخل pool فعلاً (بعد الرسوم)
+                $netPayoutForTracking,   // المكسب المقابل (بنفس النسبة) لتوحيد RTP
+                $isWinner && $multiplier > 0
+            );
+
+            // 12. Update legacy profile for compatibility
+            $profile = $this->profileManager->getProfile($user->id);
+            $netProfit = $isWinner ? $payoutAmount : -$totalAmount;
+
+            $newStats = $this->rtpTracker->getStats($user->id);
+            $newRTP = $newStats->total_spent > 0
+                ? $newStats->total_received / $newStats->total_spent
+                : 0.0;
+            $newDeviation = $targetRTP - $newRTP;
+
+            $this->profileManager->updateStats(
+                $profile,
+                $totalAmount,
+                $netProfit,
+                $isWinner,
+                $newDeviation
+            );
+
+            // 13. Wallet balances after
+            $walletsAfter = $this->poolManager->getWalletBalances();
+
+            // 14. Log transaction
+            FairLuckTransaction::create([
+                'user_id' => $user->id,
+                'gift_id' => $gift->id,
+                'bet_amount' => $totalAmount,
+                'app_fee' => $appFee,
+                'receiver_fee' => $receiverFee,
+                'is_winner' => $isWinner,
+                'multiplier' => $isWinner ? $multiplier : null,
+                'profit_amount' => $netProfit,
+                'deviation_before' => $rtpGap,
+                'calculated_probability' => $finalProbability,
+                'is_beginner_protected' => ($stats->bet_count < FairLuckSetting::getByKey('V7_new_player_bets', 20)),
+                'protection_multiplier' => 1.0,
+                'room_id' => $roomId,
+                'sender_balance_before' => $senderBalanceBefore,
+                'sender_balance_after' => $senderBalanceAfter,
+                'wallets_before' => $walletsBefore,
+                'wallets_after' => $walletsAfter,
+                'pool_health_status' => $poolHealth['status'],
+            ]);
+
+            return (object) [
+                'isWinner' => $isWinner,
+                'multiplier' => $multiplier,
+                'profitAmount' => $payoutAmount,
+                'newDeviation' => $newDeviation,
+                'actualRTP' => $newRTP,
+                'targetRTP' => $targetRTP,
+                'wallets_before' => $walletsBefore,
+                'wallets_after' => $walletsAfter,
+                'pool_health' => $poolHealth,
+            ];
+        });
+    }
+}

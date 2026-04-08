@@ -39,7 +39,10 @@
             _token: $('meta[name="csrf-token"]').attr('content'),
             locale: id
         }, function () {
-            location.reload();
+            // Update all links on the page to include the new locale
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('locale', id);
+            window.location.href = currentUrl.toString();
         });
     });
 </script>

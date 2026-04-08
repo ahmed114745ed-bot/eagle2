@@ -33,7 +33,6 @@ return [
     'missing_params'                                            => 'خطأ في المدخلات',
     'position_error'                                            => 'خطأ في المقعد',
     'you_dont_have_permission'                                  => 'ليس لديك إذن الوصول',
-    'freeze_charge_settings' => 'تم تعطيل الشحن حاليًا بواسطة المسؤول.',
     'Successfully_unlocked_the_microphone'                      => 'تم إلغاء قفل الميكروفون بنجاح',
     'Failed_to_unlock_microphone'                               => 'فشل إلغاء قفل الميكروفون',
     'require_user_id_and_owner_id'                              => 'يجب ادخال معرف مستخدم ومعرف مالك',

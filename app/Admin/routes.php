@@ -95,6 +95,7 @@ use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
+use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
@@ -241,6 +242,9 @@ Route::group(
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
         Route::post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
+
+        Route::get('utd-pay-gateways', [UtdPayGatewayController::class, 'index']);
+        Route::post('utd-pay-gateways/toggle', [UtdPayGatewayController::class, 'toggle']);
         Route::resource('users-settings', UserSettingController::class);
 
 
@@ -391,6 +395,8 @@ Route::group(
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
         Route::resource('families', 'FamilyController');
+        Route::post('families/kick/{id}', [FamilyController::class, 'kickMember']);
+        Route::post('families/toggle-admin/{id}', [FamilyController::class, 'toggleAdmin']);
         Route::get('families-settings', [FamilyController::class, 'familySettings']);
         Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
         Route::get('/targets-confirm', [TargetController::class, 'confirm'])->name('targets.confirm');
