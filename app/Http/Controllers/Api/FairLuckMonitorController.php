@@ -91,19 +91,32 @@ class FairLuckMonitorController extends Controller
             GROUP BY mult ORDER BY mult
         ");
 
-        // Vault history (last 200)
-        $vaultHistory = FairLuckWalletHistory::where('wallet_type', 'global_vault')
-            ->orderBy('created_at', 'desc')
-            ->limit(200)
-            ->get()->reverse()->values()
-            ->map(fn($h) => [
-                'time' => $h->created_at ? $h->created_at->format('H:i:s') : '',
-                'date' => $h->created_at ? $h->created_at->format('m-d H:i') : '',
-                'before' => (int) $h->balance_before,
-                'after' => (int) $h->balance_after,
-                'change' => (int) $h->amount,
-                'desc' => $h->description ?? '',
-            ]);
+        // Vault history — aggregated by minute for wider time view
+        $vaultHistory = DB::select("
+            SELECT DATE_FORMAT(created_at, '%m-%d %H:%i') as period,
+                   MIN(balance_before) as min_bal,
+                   MAX(balance_after) as max_bal,
+                   (SELECT balance_after FROM fair_luck_wallet_histories w2
+                    WHERE w2.wallet_type='global_vault'
+                    AND DATE_FORMAT(w2.created_at, '%Y-%m-%d %H:%i') = DATE_FORMAT(w1.created_at, '%Y-%m-%d %H:%i')
+                    ORDER BY w2.created_at DESC LIMIT 1) as last_bal,
+                   SUM(amount) as net_change,
+                   COUNT(*) as txn_count
+            FROM fair_luck_wallet_histories w1
+            WHERE wallet_type='global_vault' AND created_at >= NOW() - INTERVAL 24 HOUR
+            GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d %H:%i')
+            ORDER BY period
+            LIMIT 500
+        ");
+        $vaultHistory = collect($vaultHistory)->map(function ($h) {
+            return [
+                'time' => $h->period,
+                'date' => $h->period,
+                'after' => (int) $h->last_bal,
+                'change' => (int) $h->net_change,
+                'count' => (int) $h->txn_count,
+            ];
+        });
 
         // Hourly breakdown today
         $hourly = DB::select("
@@ -145,12 +158,17 @@ class FairLuckMonitorController extends Controller
                    SUM(bet_amount) as bet, SUM(profit_amount) as profit
             FROM fair_luck_transactions WHERE created_at >= NOW() - INTERVAL 1 HOUR
         ");
-        $history = FairLuckWalletHistory::where('wallet_type', 'global_vault')
-            ->orderBy('created_at', 'desc')->limit(200)
-            ->get()->reverse()->values()
-            ->map(function ($h) {
-                return ['t' => $h->created_at ? $h->created_at->format('H:i:s') : '', 'v' => (int) $h->balance_after];
-            });
+        $history = collect(DB::select("
+            SELECT DATE_FORMAT(created_at, '%H:%i') as t,
+                   (SELECT balance_after FROM fair_luck_wallet_histories w2
+                    WHERE w2.wallet_type='global_vault'
+                    AND DATE_FORMAT(w2.created_at, '%Y-%m-%d %H:%i') = DATE_FORMAT(w1.created_at, '%Y-%m-%d %H:%i')
+                    ORDER BY w2.created_at DESC LIMIT 1) as v
+            FROM fair_luck_wallet_histories w1
+            WHERE wallet_type='global_vault' AND created_at >= NOW() - INTERVAL 24 HOUR
+            GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d %H:%i')
+            ORDER BY t LIMIT 200
+        "))->map(fn($h) => ['t' => $h->t, 'v' => (int) $h->v]);
 
         return response()->json(compact('vault', 'app', 'lastHour', 'history'));
     }
@@ -233,16 +251,16 @@ class FairLuckMonitorController extends Controller
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px}
+body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px}
 .card{background:#161b22;border:1px solid #30363d;border-radius:8px}
-.card-header{border-bottom:1px solid #30363d;font-weight:600}
-.table{color:#c9d1d9;font-size:12px}.table th{border-color:#30363d;color:#8b949e}.table td{border-color:#21262d}
+.card-header{border-bottom:1px solid #30363d;font-weight:600;color:#e6edf3}
+.table{color:#e6edf3;font-size:12px}.table th{border-color:#30363d;color:#b1bac4;font-weight:600}.table td{border-color:#21262d;color:#e6edf3}
 .stat-box{text-align:center;padding:16px;border-radius:8px}
-.stat-value{font-size:1.8rem;font-weight:700}.stat-label{font-size:.75rem;color:#8b949e;text-transform:uppercase}
-.badge-zone{font-size:1rem;padding:6px 16px;border-radius:6px}
-.text-success{color:#3fb950!important}.text-danger{color:#f85149!important}.text-warning{color:#d29922!important}
+.stat-value{font-size:1.6rem;font-weight:700}.stat-label{font-size:.7rem;color:#b1bac4;text-transform:uppercase;letter-spacing:.5px}
+.text-success{color:#3fb950!important}.text-danger{color:#f85149!important}.text-warning{color:#f0b429!important}
 .pulse{animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-#lastUpdate{color:#8b949e;font-size:11px}
+#lastUpdate{color:#b1bac4;font-size:11px}
+@media(max-width:768px){.stat-value{font-size:1.2rem}.stat-label{font-size:.6rem}.container-fluid{padding:8px}h4{font-size:1.1rem}}
 </style></head><body>
 <div class="container-fluid py-3">
 
