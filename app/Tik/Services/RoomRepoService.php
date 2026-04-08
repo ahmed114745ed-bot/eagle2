@@ -504,25 +504,23 @@ class RoomRepoService
         } catch (\Throwable $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
-        // $ms   = [
-        //     'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
-        // ];
-        // $json = json_encode($ms);
-        // $jsons[] = $json;
+        $ms   = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
 
 
-        //  $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
+        $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
         // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
-        //  $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
-        // try {
-        //     Utils::unwrap($promises);
-        // } catch (\Throwable $e) {
-        //     // \Log::error("changeMode: Zego send failed - " . $e->getMessage());
-        // }
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+            // \Log::error("changeMode: Zego send failed - " . $e->getMessage());
+        }
 
-        $room->microphones()->where('user_id', '!=', $room->uid)->delete();
-        $room->microphones()->where('user_id',  $room->uid)->update(['position' => 0]);
 
         return Common::apiResponse(1, 'done', null, 201);
     }
@@ -589,25 +587,21 @@ class RoomRepoService
         $lastMode = $room->mode;
         $room->mode = $currentMode;
         $room->save();
+        $jsons = [];
+        $map = [];
+        $mode = $currentMode;
+        $ms   = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
 
-        $room->microphones()->where('user_id', '!=', $room->uid)->delete();
-        $room->microphones()->where('user_id',  $room->uid)->update(['position' => 0]);
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
-        // $jsons = [];
-        // $map = [];
-        // $mode = $currentMode;
-        // $ms   = [
-        //     'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
-        // ];
-        // $json = json_encode($ms);
-        // $jsons[] = $json;
-
-        // $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
-
-        // try {
-        //     Utils::unwrap($promises);
-        // } catch (\Throwable $e) {
-        // }
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
         return Common::apiResponse(1, 'done', null, 201);
     }
 
