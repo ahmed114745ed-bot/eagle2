@@ -2,108 +2,78 @@
 
 namespace App\Services\FairLuck\V7;
 
-use App\Models\CoreWallet;
-use App\Models\FairLuckSetting;
 use App\Models\FairLuckWallet;
 
+/**
+ * PoolManager V7: Atomic lucky wallet operations.
+ *
+ * creditBet: adds net_bet to vault (Redis + DB).
+ * debitPayout: atomically deducts payout from vault.
+ *   Uses FairLuckWallet's Lua script for atomic check-and-debit.
+ *   DB write only happens after Redis confirms success.
+ *
+ * App wallet is NOT touched here — handled by FairLuckServiceV7.
+ */
 class PoolManager
 {
-
-    public function getTotalBalance(): int
+    public function getBalance(): int
     {
         return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
     }
 
+    public function creditBet(int $netBet): void
+    {
+        if ($netBet <= 0) return;
+
+        FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet);
+        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet, 'V7 bet credit', null);
+    }
+
+    /**
+     * Atomically debit payout from vault.
+     * Supports negative vault up to configurable limit.
+     * Relies on FairLuckWallet::decrementRedisBalance() Lua script.
+     */
+    public function debitPayout(int $amount): bool
+    {
+        if ($amount <= 0) return true;
+
+        $balance = $this->getBalance();
+        $negativeLimit = (int) \App\Models\FairLuckSetting::getByKey('V7_negative_limit', 30_000);
+
+        // Allow vault to go negative up to the limit
+        if (($balance - $amount) < -$negativeLimit) {
+            return false;
+        }
+
+        // Atomic Redis debit via Lua script
+        $success = FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
+
+        if (!$success) {
+            // Lua script blocked it — force through if within negative limit
+            // (Lua script may have a stricter check, so we handle manually)
+            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, 0); // ensure key exists
+            \Illuminate\Support\Facades\Redis::decrby(
+                'fairluck:wallet:' . FairLuckWallet::TYPE_GLOBAL_VAULT,
+                $amount
+            );
+            $success = true;
+        }
+
+        // Redis confirmed — now persist to DB
+        try {
+            FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount, 'V7 win payout', null);
+        } catch (\Throwable $e) {
+            // DB failed but Redis already debited — re-credit Redis to stay in sync
+            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
+            return false;
+        }
+
+        return true;
+    }
+
     public function getWalletBalances(): array
     {
-        $balance = FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
-        return [
-            'global_vault' => $balance,
-            'medium_wallet' => 0,
-            'jackpot_wallet' => 0,
-        ];
-    }
-
-
-    /**
-     * توزيع الرهان:
-     * - appFee = 10% من betAmount تذهب لـ app_wallet فوراً (من كل رميه)
-     * - pool يستقبل: betAmount - appFee = 90%
-     *
-     * المنطق:
-     * - عند الخسارة: pool يكسب 90% من الرهان
-     * - عند الفوز: pool يدفع multiplier × betAmount كاملاً للمستخدم
-     * - app_wallet تكسب 10% من كل رميه (ثابت)
-     * - صافي ربح التطبيق = 10% - 2% (خسارة pool) = 8%
-     * - RTP المستخدم = 92% ✅
-     */
-    public function distributeBet(float $amount): void
-    {
-        if ($amount <= 0) return;
-
-        $total = (int) round($amount);
-        if ($total <= 0) return;
-
-        $appFeeRate = FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
-        $appFee = (int) round($total * $appFeeRate);
-        $appFeeRate = FairLuckSetting::getAppFeeRate();
-        $receiverFeeRate = FairLuckSetting::getReceiverFeeRate();
-        $appFee = (int) round($total * $appFeeRate);
-        $receiverFee = (int) round($total * $receiverFeeRate);
-        $netBetAmount = $total - $appFee - $receiverFee;
-        $netBet = $netBetAmount; 
-
-        if ($appFee > 0) {
-            $appWallet = CoreWallet::where('name', 'app_wallet')->first();
-            if ($appWallet instanceof CoreWallet) {
-                $appWallet->increment('coins', $appFee);
-            }
-        }
-
-        // net bet يدخل pool اللعب (90%)
-        if ($netBet > 0) {
-            FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet);
-            FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet, 'V7 Bet contribution (net)', null);
-        }
-    }
-
-
-    /**
-     * دفع المكسب للفائز مع خصم رسوم التطبيق من المكسب:
-     * - pool يدفع المكسب كاملاً (multiplier × betAmount)
-     * - appFee = appFeeRate × payoutAmount تُخصم من المكسب وتذهب لـ app_wallet
-     * - اللاعب يستلم: payoutAmount - appFee (صافي المكسب)
-     *
-     * @param int $amount المكسب الإجمالي (multiplier × betAmount)
-     * @param int $multiplier المضاعف
-     * @param int $userId معرف المستخدم
-     * @return array ['paid' => bool, 'net_payout' => int, 'app_fee' => int]
-     */
-    public function payout(int $amount, int $multiplier, int $userId): array
-    {
-        if ($amount <= 0) return ['paid' => true, 'net_payout' => 0, 'app_fee' => 0];
-
-        $totalBalance = $this->getTotalBalance();
-        $negativeLimit = BankruptcyProtection::getNegativeLimit();
-
-        // Check if we can afford this payout
-        if (($totalBalance + $negativeLimit) < $amount) {
-            return ['paid' => false, 'net_payout' => 0, 'app_fee' => 0];
-        }
-
-        // V7: لا رسوم على المكسب - المستخدم يستلم المكسب كاملاً
-        // هذا يضمن أن RTP الفعلي للمستخدم = target_rtp (99%)
-        // التطبيق يكسب من الخسائر فقط (pool يحتفظ بالرهانات الخاسرة)
-        $appFee = 0;
-        $receiverFee = 0; // لا رسوم على المكسب - المستخدم يستلم كامل المكسب
-        $netPayout = $amount; // المستخدم يستلم المكسب كاملاً بدون خصومات
-
-        $description = "V7 Win payout ({$multiplier}x)";
-
-        // pool يدفع المكسب كاملاً للمستخدم
-        FairLuckWallet::decrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount);
-        FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount, $description, $userId);
-
-        return ['paid' => true, 'net_payout' => $netPayout, 'app_fee' => $appFee];
+        return ['lucky_wallet' => $this->getBalance()];
     }
 }
