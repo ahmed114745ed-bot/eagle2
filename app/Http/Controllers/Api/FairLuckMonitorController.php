@@ -15,6 +15,13 @@ class FairLuckMonitorController extends Controller
 {
     public function dashboard()
     {
+        // Set a strict 10s query timeout so heavy queries fail fast instead of 504
+        try {
+            DB::statement("SET SESSION MAX_EXECUTION_TIME=10000");
+        } catch (\Throwable $e) {
+            // MySQL < 5.7.8 doesn't support this, ignore
+        }
+
         // Settings
         $settings = FairLuckSetting::pluck('value', 'key')->toArray();
         $appFee = (float) ($settings['fair_luck_app_fee_rate'] ?? 0.015);
