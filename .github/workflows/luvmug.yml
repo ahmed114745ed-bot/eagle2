@@ -18,8 +18,6 @@ jobs:
           script: |
             cd /var/www/luvmug
 
-            sudo pkill -9 -f "php" || true
-            sudo pkill -9 -f "swoole" || true
             sudo pkill -9 -f "artisan schedule:run" || true
 
             if [ -f storage/logs/laravel.log ]; then
@@ -32,7 +30,7 @@ jobs:
             threshold=80
             current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
             if [ $current -gt $threshold ]; then
-              docker system prune -af && echo "Docker system cleaned"
+              docker image prune -f && echo "Docker system cleaned"
             fi
 
   run_luvmug_app:
