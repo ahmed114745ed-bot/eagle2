@@ -97,8 +97,8 @@ class FairLuckMonitorController extends Controller
             ->limit(200)
             ->get()->reverse()->values()
             ->map(fn($h) => [
-                'time' => $h->created_at?->format('H:i:s') ?? '',
-                'date' => $h->created_at?->format('m-d H:i') ?? '',
+                'time' => $h->created_at ? $h->created_at->format('H:i:s') : '',
+                'date' => $h->created_at ? $h->created_at->format('m-d H:i') : '',
                 'before' => (int) $h->balance_before,
                 'after' => (int) $h->balance_after,
                 'change' => (int) $h->amount,
@@ -148,7 +148,9 @@ class FairLuckMonitorController extends Controller
         $history = FairLuckWalletHistory::where('wallet_type', 'global_vault')
             ->orderBy('created_at', 'desc')->limit(200)
             ->get()->reverse()->values()
-            ->map(fn($h) => ['t' => $h->created_at?->format('H:i:s'), 'v' => (int) $h->balance_after]);
+            ->map(function ($h) {
+                return ['t' => $h->created_at ? $h->created_at->format('H:i:s') : '', 'v' => (int) $h->balance_after];
+            });
 
         return response()->json(compact('vault', 'app', 'lastHour', 'history'));
     }
@@ -157,11 +159,29 @@ class FairLuckMonitorController extends Controller
     {
         $zone = $vault <= $t['min'] ? 'CRITICAL' : ($vault <= $t['tight'] ? 'TIGHT' : ($vault <= $t['target'] ? 'NORMAL' : ($vault <= $t['high'] ? 'GENEROUS' : 'DRAIN')));
         $zc = ['CRITICAL'=>'#dc3545','TIGHT'=>'#e67e22','NORMAL'=>'#3498db','GENEROUS'=>'#28a745','DRAIN'=>'#8e44ad'][$zone];
-        $allRtp = ($all->total_bet ?? 0) > 0 ? round(($all->total_won ?? 0) / $all->total_bet * 100, 2) : 0;
-        $todayRtp = ($today->total_bet ?? 0) > 0 ? round(($today->total_won ?? 0) / $today->total_bet * 100, 2) : 0;
-        $hourRtp = ($hour->total_bet ?? 0) > 0 ? round((($hour->wins ?? 0) > 0 ? (($hour->net_profit ?? 0) + ($hour->total_bet ?? 0)) : 0) / max(1, $hour->total_bet) * 100, 2) : 0;
-        $todayWinRate = ($today->total ?? 0) > 0 ? round(($today->wins ?? 0) / $today->total * 100, 1) : 0;
-        $allWinRate = ($all->total ?? 0) > 0 ? round(($all->wins ?? 0) / $all->total * 100, 1) : 0;
+
+        // Pre-compute all nullable values to avoid ?? in heredoc
+        $allTotal = (int) ($all->total ?? 0);
+        $allWins = (int) ($all->wins ?? 0);
+        $allTotalBet = (float) ($all->total_bet ?? 0);
+        $allTotalWon = (float) ($all->total_won ?? 0);
+        $allNetProfit = (float) ($all->net_profit ?? 0);
+        $todayTotal = (int) ($today->total ?? 0);
+        $todayWins = (int) ($today->wins ?? 0);
+        $todayTotalBet = (float) ($today->total_bet ?? 0);
+        $todayTotalWon = (float) ($today->total_won ?? 0);
+        $todayNetProfit = (float) ($today->net_profit ?? 0);
+        $todayUsers = (int) ($today->unique_users ?? 0);
+        $hourTotal = (int) ($hour->total ?? 0);
+        $hourWins = (int) ($hour->wins ?? 0);
+        $hourUsers = (int) ($hour->unique_users ?? 0);
+        $hourTotalBet = (float) ($hour->total_bet ?? 0);
+        $hourNetProfit = (float) ($hour->net_profit ?? 0);
+
+        $allRtp = $allTotalBet > 0 ? round($allTotalWon / $allTotalBet * 100, 2) : 0;
+        $todayRtp = $todayTotalBet > 0 ? round($todayTotalWon / $todayTotalBet * 100, 2) : 0;
+        $todayWinRate = $todayTotal > 0 ? round($todayWins / $todayTotal * 100, 1) : 0;
+        $allWinRate = $allTotal > 0 ? round($allWins / $allTotal * 100, 1) : 0;
 
         $vhJson = json_encode($vaultHistory);
         $zonesJson = json_encode($t);
@@ -253,7 +273,7 @@ body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFo
 <div class="stat-label">Win Rate Today</div>
 </div></div>
 <div class="col-md-2"><div class="stat-box" style="background:#bc8cff20;border:1px solid #bc8cff">
-<div class="stat-value" style="color:#bc8cff">{$this->fmt($today->total ?? 0)}</div>
+<div class="stat-value" style="color:#bc8cff">{$this->fmt($todayTotal)}</div>
 <div class="stat-label">Spins Today</div>
 </div></div>
 </div>
@@ -271,19 +291,19 @@ body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFo
 </table></div></div></div>
 <div class="col-md-4"><div class="card"><div class="card-header">Last Hour</div><div class="card-body p-2">
 <table class="table table-sm mb-0">
-<tr><td>Spins</td><td><strong>{$this->fmt($hour->total ?? 0)}</strong></td></tr>
-<tr><td>Wins</td><td>{$this->fmt($hour->wins ?? 0)}</td></tr>
-<tr><td>Unique Users</td><td>{$hour->unique_users ?? 0}</td></tr>
-<tr><td>Total Bet</td><td>{$this->fmt($hour->total_bet ?? 0)}</td></tr>
-<tr><td>Net P&L</td><td class="text-danger">{$this->fmt($hour->net_profit ?? 0)}</td></tr>
+<tr><td>Spins</td><td><strong>{$this->fmt($hourTotal)}</strong></td></tr>
+<tr><td>Wins</td><td>{$this->fmt($hourWins)}</td></tr>
+<tr><td>Unique Users</td><td>{$hourUsers}</td></tr>
+<tr><td>Total Bet</td><td>{$this->fmt($hourTotalBet)}</td></tr>
+<tr><td>Net P&L</td><td class="text-danger">{$this->fmt($hourNetProfit)}</td></tr>
 </table></div></div></div>
 <div class="col-md-4"><div class="card"><div class="card-header">All Time</div><div class="card-body p-2">
 <table class="table table-sm mb-0">
-<tr><td>Total Spins</td><td><strong>{$this->fmt($all->total ?? 0)}</strong></td></tr>
+<tr><td>Total Spins</td><td><strong>{$this->fmt($allTotal)}</strong></td></tr>
 <tr><td>Win Rate</td><td>{$allWinRate}%</td></tr>
 <tr><td>RTP</td><td><strong>{$allRtp}%</strong></td></tr>
-<tr><td>Total Bet</td><td>{$this->fmt($all->total_bet ?? 0)}</td></tr>
-<tr><td>System Net</td><td>{$this->fmt($all->net_profit ?? 0)}</td></tr>
+<tr><td>Total Bet</td><td>{$this->fmt($allTotalBet)}</td></tr>
+<tr><td>System Net</td><td>{$this->fmt($allNetProfit)}</td></tr>
 </table></div></div></div>
 </div>
 
