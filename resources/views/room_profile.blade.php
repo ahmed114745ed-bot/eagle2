@@ -243,7 +243,7 @@
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>{{ __('Admin') }}</th>
+                    <th>{{ __('Operator') }}</th>
                     <th>{{ __('Actions') }}</th>
                 </tr>
                 </thead>
