@@ -246,7 +246,7 @@ class FairLuckMonitorController extends Controller
 body{background:#0d1117;color:#e6edf3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px}
 .card{background:#161b22;border:1px solid #30363d;border-radius:8px}
 .card-header{border-bottom:1px solid #30363d;font-weight:600;color:#e6edf3}
-.table{color:#e6edf3;font-size:12px;--bs-table-bg:transparent;--bs-table-striped-bg:rgba(255,255,255,0.03);--bs-table-hover-bg:rgba(255,255,255,0.05);--bs-table-color:#e6edf3;--bs-table-striped-color:#e6edf3;--bs-table-hover-color:#fff}.table th{border-color:#30363d;color:#b1bac4;font-weight:600;background:#1c2128}.table td{border-color:#21262d;color:#e6edf3}
+.table,.table>thead>tr>th,.table>tbody>tr>td,.table>tbody>tr>th{color:#e6edf3!important;background-color:transparent!important;border-color:#21262d!important;font-size:12px}.table>thead>tr>th{color:#b1bac4!important;background:#1c2128!important;font-weight:600}.table>tbody>tr:nth-child(odd)>td{background:rgba(255,255,255,0.02)!important}.table>tbody>tr:nth-child(even)>td{background:transparent!important}
 .stat-box{text-align:center;padding:16px;border-radius:8px}
 .stat-value{font-size:1.6rem;font-weight:700}.stat-label{font-size:.7rem;color:#b1bac4;text-transform:uppercase;letter-spacing:.5px}
 .text-success{color:#3fb950!important}.text-danger{color:#f85149!important}.text-warning{color:#f0b429!important}
