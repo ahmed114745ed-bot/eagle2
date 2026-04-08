@@ -1784,16 +1784,27 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
         $weekStart = \Carbon\Carbon::now($tz)->subWeek()->startOfWeek()->setTimezone('UTC');
         $weekEnd = \Carbon\Carbon::now($tz)->subWeek()->endOfWeek()->setTimezone('UTC');
 
+        $minTarget = \Modules\RoomCup\Entities\RoomCupTarget::min('total');
+
         $aggregatedGifts = \App\Models\GiftLog::whereBetween('created_at', [$weekStart, $weekEnd])
             ->select(
                 'room_id',
                 \Illuminate\Support\Facades\DB::raw('SUM(giftPrice) as current_total'),
-                \Illuminate\Support\Facades\DB::raw('COUNT(DISTINCT sender_id) as number_of_visitors')
             )
             ->whereNotNull('room_id')
             ->groupBy('room_id')
+            ->having('current_total', '>=', $minTarget)
             ->orderBy('room_id')
             ->get();
+
+        // Get number_of_visitors from TotalRoomGift per room
+        $visitorsMap = \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$weekStart, $weekEnd])
+            ->select(
+                'room_id',
+                \Illuminate\Support\Facades\DB::raw('SUM(number_of_visitors) as number_of_visitors')
+            )
+            ->groupBy('room_id')
+            ->pluck('number_of_visitors', 'room_id');
 
         foreach ($aggregatedGifts as $gift) {
             $totalProcessed++;
@@ -1804,7 +1815,7 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
             }
 
             $adminsCount = $room->admins_v2()->count();
-            $visitorsCount = $gift->number_of_visitors ?? 0;
+            $visitorsCount = $visitorsMap[$gift->room_id] ?? 0;
 
             $target = \Modules\RoomCup\Entities\RoomCupTarget::where('total', '<=', $gift->current_total)
                 // ->where('number_of_visitors', '<=', $visitorsCount)
