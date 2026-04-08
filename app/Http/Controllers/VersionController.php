@@ -121,6 +121,12 @@ class VersionController extends Controller
             "is_share_with_friends" => (bool)($settings['share_room_with_friends'] ?? true),
             'is_show_grid_view' => (bool) Common::getConf('show_room') ?? false,
             'limit_chat_message' => (int) $maxMessage,
+            'active_mode' => collect([
+                6 => $settings['room_mode_6'] ?? 0,
+                7 => $settings['room_mode_7'] ?? 0,
+                8 => $settings['room_mode_8'] ?? 0,
+                9 => $settings['room_mode_9'] ?? 0,
+            ])->filter(fn($value) => $value == 1)->keys()->values()->toArray(),
 
             "room_boom" => [
                 "enabled" => ($settings['enable_room_boom'] ?? 0) && ($settings['room_boom'] ?? 0),
@@ -240,7 +246,7 @@ class VersionController extends Controller
             return [];
         }
 
-        return $settings->whereIn('key', ['reel_status', 'audio_room', 'default_screen', 'youtube_status', 'share_room_with_friends', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'room_boom', 'enable_room_boom', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
+        return $settings->whereIn('key', ['reel_status', 'audio_room', 'default_screen', 'youtube_status', 'share_room_with_friends', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'room_boom', 'enable_room_boom', 'pk_live_action', 'room_mode_9', 'room_mode_7', 'room_mode_6', 'room_mode_8', 'moment_status'])->pluck('value', 'key')->toArray();
     }
 
 

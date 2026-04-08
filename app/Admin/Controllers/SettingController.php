@@ -266,4 +266,22 @@ class SettingController extends MainController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+
+    public function updateRoomMode(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => $request->field],
+                ['value' => $request->value]
+            );
+
+            Cache::forget($request->field);
+            Cache::put($request->field, $request->value, now()->addYear());
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }
