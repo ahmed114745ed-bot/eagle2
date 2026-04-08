@@ -201,14 +201,15 @@ class FairLuckMonitorController extends Controller
         $winnersHtml = '';
         foreach ($topWinners as $w) {
             $rtp = $w->total_bet > 0 ? round($w->total_won / $w->total_bet * 100, 1) : 0;
-            $rtpClass = $rtp > 100 ? 'text-success' : ($rtp > 80 ? 'text-warning' : 'text-danger');
-            $winnersHtml .= "<tr><td>{$w->user_id}</td><td>{$w->spins}</td><td>{$w->wins}</td><td>" . number_format($w->total_bet) . "</td><td class='text-success'>" . number_format($w->total_won) . "</td><td>{$w->max_mult}x</td><td class='{$rtpClass}'>{$rtp}%</td></tr>";
+            $rtpColor = $rtp >= 95 ? '#3fb950' : ($rtp >= 80 ? '#f0b429' : '#f85149');
+            $winnersHtml .= "<tr><td>{$w->user_id}</td><td>{$w->spins}</td><td>{$w->wins}</td><td>" . number_format($w->total_bet) . "</td><td style='color:#3fb950'>" . number_format($w->total_won) . "</td><td>{$w->max_mult}x</td><td style='color:{$rtpColor};font-weight:700'>{$rtp}%</td></tr>";
         }
 
         // Big wins rows
         $bigWinsHtml = '';
         foreach ($bigWinsToday ?? $bigWins as $b) {
-            $bigWinsHtml .= "<tr><td>{$b->user_id}</td><td>" . number_format($b->bet_amount) . "</td><td><strong>{$b->multiplier}x</strong></td><td class='text-success'>" . number_format($b->profit_amount) . "</td><td>{$b->created_at}</td></tr>";
+            $multColor = $b->multiplier >= 250 ? '#f85149' : ($b->multiplier >= 50 ? '#f0b429' : '#3fb950');
+            $bigWinsHtml .= "<tr><td>{$b->user_id}</td><td>" . number_format($b->bet_amount) . "</td><td style='color:{$multColor};font-weight:700'>{$b->multiplier}x</td><td style='color:#3fb950'>" . number_format($b->profit_amount) . "</td><td>{$b->created_at}</td></tr>";
         }
 
         // Multiplier dist rows
@@ -224,8 +225,8 @@ class FairLuckMonitorController extends Controller
         $userRtpHtml = '';
         foreach ($userRtps as $u) {
             $rtp = $u->total_bet > 0 ? round($u->total_won / $u->total_bet * 100, 1) : 0;
-            $cls = $rtp > 100 ? 'text-success' : ($rtp > 80 ? '' : 'text-danger');
-            $userRtpHtml .= "<tr><td>{$u->user_id}</td><td>{$u->spins}</td><td>" . number_format($u->total_bet) . "</td><td>" . number_format($u->total_won) . "</td><td class='{$cls}'><strong>{$rtp}%</strong></td></tr>";
+            $cls = $rtp >= 95 ? 'color:#3fb950' : ($rtp >= 80 ? 'color:#f0b429' : 'color:#f85149');
+            $userRtpHtml .= "<tr><td>{$u->user_id}</td><td>{$u->spins}</td><td>" . number_format($u->total_bet) . "</td><td>" . number_format($u->total_won) . "</td><td style='{$cls};font-weight:700'>{$rtp}%</td></tr>";
         }
 
         // Hourly rows
