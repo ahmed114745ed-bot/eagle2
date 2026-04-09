@@ -142,6 +142,12 @@ return [
             'path' => storage_path('logs/paypal.log'),
             'level' => 'info',
         ],
+        'zego' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/zego.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];
