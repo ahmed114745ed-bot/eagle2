@@ -893,9 +893,12 @@ class Common
 
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
+            $payload['android']['notification']['image'] = $data['image'];
         } else {
             $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
-        }
+            $payload['android']['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg'; // ✅ زود السطر ده
+
+          }
 
         $headers = [
             'Authorization' => 'Bearer ' . $api_access_key,
