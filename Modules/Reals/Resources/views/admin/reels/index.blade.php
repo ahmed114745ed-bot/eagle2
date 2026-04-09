@@ -1048,19 +1048,57 @@
 <script data-exec-on-popstate>
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
-    // Force re-register reelsManager on PJAX navigation
-    window.reelsManager = null;
 </script>
     <script data-exec-on-popstate>
         (function () {
+            // تحميل Alpine.js ديناميكياً إذا لم يكن محملاً
+            const ensureAlpineLoaded = (callback) => {
+                if (window.Alpine) {
+                    callback();
+                    return;
+                }
+                
+                console.log('🔄 Loading Alpine.js dynamically...');
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js';
+                script.defer = true;
+                script.onload = () => {
+                    console.log('✅ Alpine.js loaded dynamically');
+                    // انتظار قليلاً حتى يتم تهيئة Alpine
+                    setTimeout(callback, 100);
+                };
+                document.head.appendChild(script);
+            };
+            
+            // تحميل reels-manager.js ديناميكياً إذا لم يكن محملاً
+            const ensureReelsManagerLoaded = (callback) => {
+                if (window.reelsManager && typeof window.reelsManager === 'function') {
+                    callback();
+                    return;
+                }
+                
+                console.log('🔄 Loading reels-manager.js dynamically...');
+                const existingScript = document.querySelector('script[data-reels-manager]');
+                if (existingScript) {
+                    // إعادة تحميل السكريبت
+                    const script = document.createElement('script');
+                    script.src = existingScript.src;
+                    script.onload = () => {
+                        console.log('✅ reels-manager.js loaded dynamically');
+                        callback();
+                    };
+                    document.head.appendChild(script);
+                } else {
+                    callback();
+                }
+            };
+
             const initAlpineInsideContainer = () => {
                 if (!window.Alpine) {
-                    console.log('⏳ Alpine not loaded yet...');
                     return false;
                 }
                 
-                if (!window.reelsManager) {
-                    console.log('⏳ reelsManager not loaded yet...');
+                if (!window.reelsManager || typeof window.reelsManager !== 'function') {
                     return false;
                 }
 
@@ -1069,17 +1107,21 @@
                     return false;
                 }
 
-                // التحقق من وجود البيانات
+                // التحقق من وجود الـ component في الصفحة
+                const reelsContainer = container.querySelector('.reels-main-container[x-data]');
+                if (!reelsContainer) {
+                    return false;
+                }
+
                 console.log('📊 initialReelsData:', window.initialReelsData ? window.initialReelsData.length + ' reels' : 'EMPTY');
 
                 try {
-                    if (window.Alpine.destroyTree) {
-                        const oldRoot = container.querySelector('.reels-main-container[x-data]');
-                        if (oldRoot && oldRoot._x_dataStack) {
-                            window.Alpine.destroyTree(oldRoot);
-                        }
+                    // تدمير الشجرة القديمة إذا كانت موجودة
+                    if (window.Alpine.destroyTree && reelsContainer._x_dataStack) {
+                        window.Alpine.destroyTree(reelsContainer);
                     }
 
+                    // تهيئة الشجرة الجديدة
                     if (window.Alpine.initTree) {
                         window.Alpine.initTree(container);
                     } else if (window.Alpine.start) {
@@ -1097,18 +1139,30 @@
             };
 
             const scheduleInit = () => {
-                let attempts = 0;
-                const attempt = () => {
-                    if (initAlpineInsideContainer()) {
-                        return;
-                    }
-                    if (attempts++ < 60) {
-                        setTimeout(attempt, 100);
-                    } else {
-                        console.error('❌ Failed to initialize Alpine after 60 attempts');
-                    }
-                };
-                attempt();
+                // أولاً: تأكد من تحميل Alpine
+                ensureAlpineLoaded(() => {
+                    // ثانياً: تأكد من تحميل reelsManager
+                    ensureReelsManagerLoaded(() => {
+                        // ثالثاً: حاول تهيئة Alpine
+                        let attempts = 0;
+                        const attempt = () => {
+                            if (initAlpineInsideContainer()) {
+                                return;
+                            }
+                            if (attempts++ < 30) {
+                                setTimeout(attempt, 150);
+                            } else {
+                                console.error('❌ Failed to initialize Alpine after attempts');
+                                // محاولة أخيرة: إعادة تحميل كل شيء
+                                console.log('🔄 Final attempt: reloading scripts...');
+                                ensureReelsManagerLoaded(() => {
+                                    setTimeout(() => initAlpineInsideContainer(), 200);
+                                });
+                            }
+                        };
+                        attempt();
+                    });
+                });
             };
 
             if (document.readyState === 'loading') {
@@ -1122,7 +1176,7 @@
                     window['__reelsEvent_' + eventName] = true;
                     document.addEventListener(eventName, () => {
                         console.log('🔄 PJAX event:', eventName);
-                        setTimeout(scheduleInit, 50);
+                        setTimeout(scheduleInit, 100);
                     });
                 }
             });
