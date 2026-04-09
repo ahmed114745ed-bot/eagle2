@@ -388,10 +388,9 @@ class UserCommon
     }
 
     // public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null, $sendNotification = 1, $vip_gift_message = null)
-    {
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null, $sendNotification = 1, $vip_gift_message = null , $vip_img = null){
         DB::beginTransaction();
-        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification,$vip_gift_message);
+        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification,$vip_gift_message,$vip_img);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -505,6 +504,7 @@ class UserCommon
 
         if ($message) {
             $body = $message;
+             $data['image'] =$ware->show_img;
         }
 
         DB::beginTransaction();
@@ -539,7 +539,7 @@ class UserCommon
                 ->where('id', $user->id)
                 ->value('notification_id');
 
-            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+            Common::send_firebase_notification($tokens_notfacion, $title, $body ,'' , $data );
         } catch (\Exception $exception) {
             DB::rollBack();
             \Log::error("حدث خطأ أثناء منح مكافأة الإنجاز: " . $exception->getMessage(), [
