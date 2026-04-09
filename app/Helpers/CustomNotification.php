@@ -596,17 +596,6 @@ class CustomNotification
 
     public function chargeAction(User $user, $request, $admin = "Admin", $agency = null ,$coins = 0)
     {
-        // Log initial parameters
-        Log::info('ChargeAction - Started', [
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'request_amount' => $request->amount ?? null,
-            'coins_param' => $coins,
-            'admin' => $admin,
-            'agency_id' => $agency?->id,
-            'agency_name' => $agency?->name,
-        ]);
-
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
         $name = $agency ? $agency->name : $user->name;
@@ -614,32 +603,22 @@ class CustomNotification
         // Use actual coins if provided, otherwise fallback to request amount
         $displayCoins = $coins ?: $request->amount;
 
-        Log::info('ChargeAction - Calculated', [
-            'user_id' => $user->id,
-            'display_coins' => $displayCoins,
-            'is_agency' => $agency ? true : false,
-            'recipient_name' => $name,
-        ]);
+        // Always use 'coins' as unit
+        $unit = 'coins';
 
-        $body = __('api.got_coin', ['coins' => $displayCoins, 'name' => $name, 'admin' => $admin], $lang);
+        $body = __('api.got_coin', [
+            'coins' => $displayCoins,
+            'name' => $name,
+            'admin' => $admin,
+            'unit' => $unit
+        ], $lang);
         $data['coins'] = $displayCoins;
-
-        Log::info('ChargeAction - Notification prepared', [
-            'user_id' => $user->id,
-            'notification_body' => $body,
-            'data_coins' => $data['coins'],
-            'is_logout' => $user->is_logout,
-            'has_token' => !empty($tokens_notification[0]),
-        ]);
+        $data['unit'] = $unit;
 
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, data: $data, messageType: 'charge-action-notifaction');
             Common::sendOfficialMessage($user->id, title: $body, titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
-
-        Log::info('ChargeAction - Completed', [
-            'user_id' => $user->id,
-        ]);
     }
 
     public function UserEarnedInvitation(User $user, $amount)
