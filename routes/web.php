@@ -1,5 +1,8 @@
 <?php
 
+// V7 FairLuck Monitor (temp, public, obscured path)
+Route::get('monitor/v7/3305d927f49322e0', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'dashboard']);
+Route::get('monitor/v7/3305d927f49322e0/api', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'apiStats']);
 
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;

@@ -42,7 +42,7 @@ class FairLuckSetting extends Model
 
     public static function getAppFeeRate(): float
     {
-        return (float) static::getByKey('fair_luck_app_fee_rate', 0.10);
+        return (float) static::getByKey('fair_luck_app_fee_rate', 0.015);
     }
 
     public static function getReceiverFeeRate(): float
@@ -109,11 +109,11 @@ class FairLuckSetting extends Model
     }
 
     /**
-     * Get V7 Target RTP (default 92%)
+     * Get V7 Target RTP (default 99%)
      */
     public static function getTargetRTP(): float
     {
-        return (float) static::getByKey('V7_target_rtp', 0.92);
+        return (float) static::getByKey('V7_target_rtp', 0.99);
     }
 
     /**

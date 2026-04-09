@@ -4,19 +4,25 @@ namespace App\Services\FairLuck\V7;
 
 use Illuminate\Support\Facades\Redis;
 
+/**
+ * UserRTPTracker V7: Integer-based RTP tracking in Redis.
+ *
+ * Uses HINCRBY (integer) instead of HINCRBYFLOAT to prevent float drift.
+ * All coin values are integers.
+ */
 class UserRTPTracker
 {
     private const KEY_PREFIX = 'fairluck:V7:user:';
 
     public function getStats(int $userId): object
     {
-        // TTL PROTECTION: Validate and reset expired data
+        // Validate TTL without refreshing activity timestamp
+        // (activity is only recorded in recordBet, not on reads)
         $ttlManager = app(UserDataTTLManager::class);
         if (!$ttlManager->validateUserData($userId)) {
-            // Data was expired and reset, return fresh stats
             return (object) [
-                'total_spent' => 0.0,
-                'total_received' => 0.0,
+                'total_spent' => 0,
+                'total_received' => 0,
                 'bet_count' => 0,
                 'win_count' => 0,
                 'first_bet_ts' => 0,
@@ -27,11 +33,12 @@ class UserRTPTracker
         $data = Redis::hgetall($key);
 
         return (object) [
-            'total_spent' => (float) ($data['total_spent'] ?? 0),
-            'total_received' => (float) ($data['total_received'] ?? 0),
+            'total_spent' => (int) ($data['total_spent'] ?? 0),
+            'total_received' => (int) ($data['total_received'] ?? 0),
             'bet_count' => (int) ($data['bet_count'] ?? 0),
             'win_count' => (int) ($data['win_count'] ?? 0),
             'first_bet_ts' => (int) ($data['first_bet_ts'] ?? 0),
+            'consecutive_losses' => (int) ($data['consecutive_losses'] ?? 0),
         ];
     }
 
@@ -44,24 +51,33 @@ class UserRTPTracker
         return $stats->total_received / $stats->total_spent;
     }
 
-    public function recordBet(int $userId, float $spent, float $received, bool $isWinner): void
+    /**
+     * Record a bet result using integer arithmetic.
+     *
+     * @param int  $spent    Gross bet amount (what user paid)
+     * @param int  $received Sender payout (what user got back)
+     * @param bool $isWinner Whether user won
+     */
+    public function recordBet(int $userId, int $spent, int $received, bool $isWinner): void
     {
         $key = self::KEY_PREFIX . $userId;
 
-        Redis::hincrbyfloat($key, 'total_spent', $spent);
+        Redis::hincrby($key, 'total_spent', $spent);
         if ($received > 0) {
-            Redis::hincrbyfloat($key, 'total_received', $received);
+            Redis::hincrby($key, 'total_received', $received);
         }
         Redis::hincrby($key, 'bet_count', 1);
         if ($isWinner) {
             Redis::hincrby($key, 'win_count', 1);
+            Redis::hset($key, 'consecutive_losses', 0); // Reset on win
+        } else {
+            Redis::hincrby($key, 'consecutive_losses', 1); // Increment on loss
         }
 
         if (!Redis::hexists($key, 'first_bet_ts')) {
             Redis::hset($key, 'first_bet_ts', time());
         }
 
-        // TTL PROTECTION: Record activity timestamp
         $ttlManager = app(UserDataTTLManager::class);
         $ttlManager->recordActivity($userId);
     }

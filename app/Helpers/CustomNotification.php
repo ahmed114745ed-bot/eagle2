@@ -594,17 +594,21 @@ class CustomNotification
     }
 
 
-    public function chargeAction(User $user, $request, $admin = "Admin", $agency = null)
+    public function chargeAction(User $user, $request, $admin = "Admin", $agency = null ,$coins = 0)
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
         $name = $agency ? $agency->name : $user->name;
-        $body = __('api.got_coin', ['coins' => $request->amount, 'name' => $name, 'admin' => $admin], $lang);
 
-        $data['coins'] = $request->amount;
+        // Use actual coins if provided, otherwise fallback to request amount
+        $displayCoins = $coins ?: $request->amount;
+
+        $body = __('api.got_coin', ['coins' => $displayCoins, 'name' => $name, 'admin' => $admin], $lang);
+        $data['coins'] = $displayCoins;
+
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, data: $data, messageType: 'charge-action-notifaction');
-        Common::sendOfficialMessage($user->id, title: $body, titleAr: $body);
+            Common::sendOfficialMessage($user->id, title: $body, titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
