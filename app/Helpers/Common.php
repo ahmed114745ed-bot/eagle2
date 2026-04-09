@@ -824,6 +824,7 @@ class Common
     }
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
+  
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
         $isGroup = false;
@@ -909,7 +910,11 @@ class Common
         ]);
 
         $result = json_decode($result);
-
+      \Log::info('VIP notification image', [
+    'data_image' => $data['image'] ?? 'NOT SET',
+    'payload_image' => $payload['notification']['image'] ?? 'NOT SET',
+    'result' => $result ?? 'NOT SET',
+]);
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);
