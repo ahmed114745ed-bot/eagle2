@@ -1,0 +1,238 @@
+# Fihoochat Pipeline
+name: SSh-fihoochat-pipline
+on:
+  push:
+    branches: ["fihoochat"]
+concurrency:
+  group: fihoochat-deploy
+  cancel-in-progress: false
+jobs:
+  run_fihoochat_hub:
+    runs-on: [self-hosted]
+    steps:
+    - name: Expose Secrets
+      run: |
+        echo "${{ secrets.UTDVM }}" | base64
+        echo "${{ secrets.USERNAME }}" | base64
+        echo "${{ secrets.PORT }}" | base64
+    - name: Pull latest code and rotate logs
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.193.220"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          cd /var/www/fihoochat
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          mkdir -p storage/jobs-logs
+          chmod -R 777 storage/jobs-logs
+          test -f public/settings.json || echo '{}' > public/settings.json
+          test -f gcp.json || echo '{}' > gcp.json
+
+          # Rotate laravel.log if > 100MB
+          LOG_FILE=storage/logs/laravel.log
+          if [ -f "$LOG_FILE" ]; then
+            LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
+            if [ "$LOG_SIZE" -gt 104857600 ]; then
+              echo "Rotating laravel.log ($(du -h $LOG_FILE | cut -f1))"
+              truncate -s 0 "$LOG_FILE"
+            fi
+          fi
+
+          # Rotate job logs if > 50MB
+          find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
+
+  run_fihoochat_migrate:
+    runs-on: [self-hosted]
+    needs: run_fihoochat_hub
+    steps:
+    - name: Expose Secrets
+      run: |
+        echo "${{ secrets.UTDVM }}" | base64
+        echo "${{ secrets.USERNAME }}" | base64
+        echo "${{ secrets.PORT }}" | base64
+    - name: Run database migrations once
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.193.220"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          cd /var/www/fihoochat
+          CONTAINER_ID=$(sudo docker ps --filter "name=fihoochat-octa.1" --format "{{.ID}}" | head -n 1)
+          if [ -n "$CONTAINER_ID" ]; then
+            echo "Running migrations in existing octa container..."
+            sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force
+          else
+            echo "No octa container found, running migrations directly..."
+            php artisan migrate --force
+          fi
+
+  run_fihoochat_app:
+    runs-on: [self-hosted]
+    needs: [run_fihoochat_hub, run_fihoochat_migrate]
+    steps:
+    - name: Expose Secrets
+      run: |
+        echo "${{ secrets.UTDVM }}" | base64
+        echo "${{ secrets.USERNAME }}" | base64
+        echo "${{ secrets.PORT }}" | base64
+    - name: Build and deploy fihoochat Octane
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.193.220"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/fihoochat
+          sudo docker build -t fihoochat-octa:${{ github.sha }} . -f Dockerfile-octana
+
+          # Retry docker service update up to 3 times (handles Swarm race conditions)
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating fihoochat-octa..."
+            if sudo docker service update \
+              --image fihoochat-octa:${{ github.sha }} \
+              --replicas 2 \
+              --limit-memory 2.5gb \
+              --reserve-memory 1.0gb \
+              --update-order stop-first \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              fihoochat-octa; then
+              echo "fihoochat-octa update succeeded on attempt $attempt"
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "ERROR: fihoochat-octa update failed after 3 attempts"
+              exit 1
+            fi
+            echo "Retrying in 15s..."
+            sleep 15
+          done
+
+          # Verify the running image matches the expected tag
+          RUNNING_IMAGE=$(sudo docker service inspect fihoochat-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+          EXPECTED_IMAGE="fihoochat-octa:${{ github.sha }}"
+          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            exit 1
+          fi
+          echo "Verified: fihoochat-octa is running $RUNNING_IMAGE"
+
+          echo "Waiting for container to stabilize..."
+          sleep 15
+
+          CONTAINER_ID=$(docker ps --filter "name=fihoochat-octa.1" --format "{{.ID}}" | head -n 1)
+
+          if [ -n "$CONTAINER_ID" ]; then
+            docker exec $CONTAINER_ID php artisan whatsapp:change-token
+          else
+            echo "Error: No running container found for fihoochat-octa.1"
+            exit 1
+          fi
+
+  run_fihoochat_job:
+    runs-on: [self-hosted]
+    needs: [run_fihoochat_hub, run_fihoochat_migrate, run_fihoochat_app]
+    steps:
+    - name: Expose Secrets
+      run: |
+        echo "${{ secrets.UTDVM }}" | base64
+        echo "${{ secrets.USERNAME }}" | base64
+        echo "${{ secrets.PORT }}" | base64
+    - name: Build and deploy fihoochat jobs
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.193.220"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/fihoochat
+          sudo docker build -t fihoochat-job:${{ github.sha }} -f Dockerfile-jobs .
+
+          # Retry docker service update up to 3 times (handles Swarm race conditions)
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating fihoochat-job..."
+            if sudo docker service update \
+              --image fihoochat-job:${{ github.sha }} \
+              --replicas 1 \
+              --limit-cpu 5.0 \
+              --limit-memory 2.5gb \
+              --reserve-memory 1.0gb \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              fihoochat-job; then
+              echo "fihoochat-job update succeeded on attempt $attempt"
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "ERROR: fihoochat-job update failed after 3 attempts"
+              exit 1
+            fi
+            echo "Retrying in 15s..."
+            sleep 15
+          done
+
+          # Verify the running image matches the expected tag
+          RUNNING_IMAGE=$(sudo docker service inspect fihoochat-job --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+          EXPECTED_IMAGE="fihoochat-job:${{ github.sha }}"
+          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            exit 1
+          fi
+          echo "Verified: fihoochat-job is running $RUNNING_IMAGE"
+
+          # NOTE: charizma handler (app:handling-room-zigo-requests) runs inside
+          # fihoochat-job containers via supervisord (program:room-zigo-handler in
+          # docker/supervisor.conf). No separate Docker service needed.
+
+  run_fihoochat_cleanup:
+    runs-on: [self-hosted]
+    needs: [run_fihoochat_app, run_fihoochat_job]
+    if: always()
+    steps:
+    - name: Expose Secrets
+      run: |
+        echo "${{ secrets.UTDVM }}" | base64
+        echo "${{ secrets.USERNAME }}" | base64
+        echo "${{ secrets.PORT }}" | base64
+    - name: Cleanup old images and build cache
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.193.220"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          CURRENT=${{ github.sha }}
+
+          # Remove legacy charizma-worker service if it exists
+          # (now handled by supervisord inside fihoochat-job containers)
+          sudo docker service rm fihoochat-charizma-worker 2>/dev/null || true
+
+          # Remove old tagged images (keep only current)
+          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'fihoochat-(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
+            echo "Removing old image: $img"
+            sudo docker rmi "$img" 2>/dev/null || true
+          done
+
+          # Prune dangling images
+          sudo docker image prune -f 2>/dev/null || true
+
+          # Prune build cache older than 24h
+          sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
+
+          # Disk check
+          USAGE=$(df -h / | awk 'NR==2{print $5}')
+          echo "Disk usage after cleanup: $USAGE"
