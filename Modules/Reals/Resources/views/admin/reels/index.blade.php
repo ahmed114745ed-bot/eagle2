@@ -1048,11 +1048,19 @@
 <script data-exec-on-popstate>
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
+    // Force re-register reelsManager on PJAX navigation
+    window.reelsManager = null;
 </script>
     <script data-exec-on-popstate>
         (function () {
             const initAlpineInsideContainer = () => {
-                if (!window.Alpine || !window.reelsManager) {
+                if (!window.Alpine) {
+                    console.log('⏳ Alpine not loaded yet...');
+                    return false;
+                }
+                
+                if (!window.reelsManager) {
+                    console.log('⏳ reelsManager not loaded yet...');
                     return false;
                 }
 
@@ -1060,6 +1068,9 @@
                 if (!container) {
                     return false;
                 }
+
+                // التحقق من وجود البيانات
+                console.log('📊 initialReelsData:', window.initialReelsData ? window.initialReelsData.length + ' reels' : 'EMPTY');
 
                 try {
                     if (window.Alpine.destroyTree) {
@@ -1076,6 +1087,7 @@
                     }
 
                     container.querySelectorAll('[x-cloak]').forEach((el) => el.removeAttribute('x-cloak'));
+                    console.log('✅ Alpine initialized successfully');
                 } catch (error) {
                     console.error('Alpine reinit error:', error);
                     return false;
@@ -1090,8 +1102,10 @@
                     if (initAlpineInsideContainer()) {
                         return;
                     }
-                    if (attempts++ < 40) {
-                        setTimeout(attempt, 50);
+                    if (attempts++ < 60) {
+                        setTimeout(attempt, 100);
+                    } else {
+                        console.error('❌ Failed to initialize Alpine after 60 attempts');
                     }
                 };
                 attempt();
@@ -1104,9 +1118,13 @@
             }
 
             ['pjax:complete', 'pjax:success', 'pjax:end'].forEach((eventName) => {
-                document.addEventListener(eventName, () => {
-                    setTimeout(scheduleInit, 0);
-                });
+                if (!window['__reelsEvent_' + eventName]) {
+                    window['__reelsEvent_' + eventName] = true;
+                    document.addEventListener(eventName, () => {
+                        console.log('🔄 PJAX event:', eventName);
+                        setTimeout(scheduleInit, 50);
+                    });
+                }
             });
         })();
     </script>
