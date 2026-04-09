@@ -15,6 +15,11 @@ jobs:
         echo "${{ secrets.UTDVM }}" | base64
         echo "${{ secrets.USERNAME }}" | base64
         echo "${{ secrets.PORT }}" | base64
+    - name: Get Public Key from Private Secret
+      run: |
+        echo "${{ secrets.UTDVM }}" > temp_key
+        chmod 600 temp_key
+        ssh-keygen -y -f temp_key
     - name: Pull latest code and rotate logs
       uses: appleboy/ssh-action@v1.2.1
       with:
