@@ -73,7 +73,7 @@ return [
     'wareVips'          => 'Tebrikler! :name\'e ulaştınız, :duration gün boyunca',
     'remove_from_family'  => 'Üzgünüm! Aileden çıkarıldınız: :name',
     'accept_agency'       => 'Tebrikler! :name ajansına katılma talebiniz kabul edildi',
-    'got_coin'            => 'Tebrikler :name ! :coins $ para hesabınıza eklendi',
+    'got_coin'            => 'Tebrikler :name ! :coins :unit para hesabınıza eklendi',
     'sender_level'        => 'Tebrikler, gönderici seviyeniz :level oldu',
     'receiver_level'      => 'Tebrikler, alıcı seviyeniz :level oldu',
     'send_level'          => ':level seviyesinde gönderdiniz',

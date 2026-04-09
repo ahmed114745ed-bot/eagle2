@@ -603,8 +603,17 @@ class CustomNotification
         // Use actual coins if provided, otherwise fallback to request amount
         $displayCoins = $coins ?: $request->amount;
 
-        $body = __('api.got_coin', ['coins' => $displayCoins, 'name' => $name, 'admin' => $admin], $lang);
+        // Always use 'coins' as unit
+        $unit = 'coins';
+
+        $body = __('api.got_coin', [
+            'coins' => $displayCoins,
+            'name' => $name,
+            'admin' => $admin,
+            'unit' => $unit
+        ], $lang);
         $data['coins'] = $displayCoins;
+        $data['unit'] = $unit;
 
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, data: $data, messageType: 'charge-action-notifaction');
