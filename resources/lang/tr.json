@@ -4507,8 +4507,8 @@
   "api_responses.charge_agent_to_user_disabled": "Şarj ajanından kullanıcıya şarj etme şu anda devre dışı bırakıldı",
   "api_responses.charge_agent_to_agent_disabled": "Şarj ajanından başka bir şarj ajanına şarj etme şu anda devre dışı bırakıldı",
   "api_responses.freeze_charge_settings": "Şarj işlemi şu anda yönetici tarafından devre dışı bırakıldı.",
-  "milestone_vip_reward_message": "{{milestone}} tamamladığınız için VIP üyeliği kazandınız",
-  "milestone_ware_reward_message": "{{milestone}} tamamladığınız için {{ware}} kazandınız"
+  "milestone_vip_reward_message": ":milestone tamamlama ödülü olarak :vip kazandınız",
+  "milestone_ware_reward_message": ":milestone tamamlama ödülü olarak :ware kazandınız"
  
 
 }

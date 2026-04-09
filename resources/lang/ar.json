@@ -5393,6 +5393,6 @@
     "api_responses.freeze_charge_settings": "تم تعطيل الشحن حاليًا بواسطة المسؤول.",
     "Charge settings":"اعددات الشحن",
     "charge settings":"اعددات الشحن",
-    "milestone_vip_reward_message": "لقد حصلت على عضوية VIP كمكافأة لإنجاز {{milestone}}",
-    "milestone_ware_reward_message": "لقد حصلت على {{ware}} كمكافأة لإنجاز {{milestone}}"
+  "milestone_vip_reward_message": "لقد حصلت على :vip كمكافأة على إتمام :milestone",
+  "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone"
 }

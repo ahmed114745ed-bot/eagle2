@@ -4108,8 +4108,8 @@
   "api_responses.charge_agent_to_user_disabled": "चार्जिंग एजेंट से उपयोगकर्ता को चार्ज करना वर्तमान में अक्षम है",
   "api_responses.charge_agent_to_agent_disabled": "चार्जिंग एजेंट से दूसरे चार्जिंग एजेंट को चार्ज करना वर्तमान में अक्षम है",
   "api_responses.freeze_charge_settings": "वर्तमान में प्रशासक द्वारा चार्जिंग अक्षम कर दी गई है।",
-  "milestone_vip_reward_message": "आपको {{milestone}} पूरा करने पर VIP सदस्यता पुरस्कार के रूप में मिली है",
-  "milestone_ware_reward_message": "आपको {{milestone}} पूरा करने पर {{ware}} पुरस्कार के रूप में मिला है"
+"milestone_ware_reward_message": ":milestone पूरा करने के पुरस्कार के रूप में आपको :ware प्राप्त हुआ है",
+   "milestone_vip_reward_message": ":milestone पूरा करने के पुरस्कार के रूप में आपको :vip प्राप्त हुआ है"
  
 
 }
