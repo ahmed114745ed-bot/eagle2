@@ -13,7 +13,7 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending', $isUsed = null, $sendNotification = 1): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending', $isUsed = null, $sendNotification = 1 , $vip_gift_message = null): bool
     {
         try {
             DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType, $isUsed) {
@@ -39,10 +39,13 @@ class VipCommon
             });
 
             if ($sendNotification) {
+               
+           $vip_gift_message = $vip_gift_message ?? __('vip_gift_message') ;
+                
                 Common::sendOfficialMessage(
                     $user->id,
                     __('congratulations'),
-                    __('vip_gift_message')
+                    $vip_gift_message
                 );
 
                 $tokens_notification = [
@@ -52,7 +55,7 @@ class VipCommon
                 Common::send_firebase_notification(
                     $tokens_notification,
                     config('app.name_ar'),
-                    __('vip_gift_message') . $user->name
+                  $vip_gift_message .' : '. $user->name
                 );
             }
 

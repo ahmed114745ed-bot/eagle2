@@ -388,11 +388,10 @@ class UserCommon
     }
 
     // public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null, $sendNotification = 1)
-
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null, $sendNotification = 1, $vip_gift_message = null)
     {
         DB::beginTransaction();
-        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification);
+        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification,$vip_gift_message);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -491,7 +490,7 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null, $feature = null)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null, $feature = null,$message = null)
     {
         $title = __('congratulations');
         $body = $user->name . ':' . __('You have received a gift: :ware', [
@@ -502,14 +501,11 @@ class UserCommon
                 'wareName' => $ware->name,
                 'type'     => $feature->name
             ]);
-
-            // Log::info('Adding event ware to user', [
-            //     'user_id' => $user->id,
-            //     'ware_id' => $ware->id,
-            //     'feature' => $feature->name,
-            // ]);
         }
 
+        if ($message) {
+            $body = $message;
+        }
 
         DB::beginTransaction();
         try {
