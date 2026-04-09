@@ -106,7 +106,7 @@ class MilestoneHelper
 
             case 'vip':
                 $vip = OVip::find($mr->rewardable_id);
-                UserCommon::addVipToUser($user, $vip, $mr->expire, 0, $receiveType, 1);
+                UserCommon::addVipToUser($user, $vip, $mr->expire, 0, $receiveType, 1,1, $milestone ? __('milestone_vip_reward_message', ['milestone' => $milestone->name]) : null);
                 break;
 
             case 'ware':
@@ -114,7 +114,7 @@ class MilestoneHelper
                 if (!$ware) {
                     break;
                 }
-                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature: $milestone);
+                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature: $milestone ,message: $milestone ? __('milestone_ware_reward_message', ['milestone' => $milestone->name, 'ware' => $ware->name]) : null);
                 break;
 
             case 'badge':

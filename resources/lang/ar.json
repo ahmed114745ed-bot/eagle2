@@ -5392,5 +5392,7 @@
     "api_responses.charge_agent_to_agent_disabled": "تم تعطيل الشحن من وكيل الشحن إلى وكيل شحن آخر حاليًا",
     "api_responses.freeze_charge_settings": "تم تعطيل الشحن حاليًا بواسطة المسؤول.",
     "Charge settings":"اعددات الشحن",
-    "charge settings":"اعددات الشحن"
+    "charge settings":"اعددات الشحن",
+    "milestone_vip_reward_message": "لقد حصلت على عضوية VIP كمكافأة لإنجاز {{milestone}}",
+    "milestone_ware_reward_message": "لقد حصلت على {{ware}} كمكافأة لإنجاز {{milestone}}"
 }
