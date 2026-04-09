@@ -896,7 +896,7 @@ class Common
             $payload['android']['notification']['image'] = $data['image'];
         } else {
             $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
-            $payload['android']['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg'; // ✅ زود السطر ده
+            $payload['android']['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg'; 
 
           }
 
@@ -913,11 +913,7 @@ class Common
         ]);
 
         $result = json_decode($result);
-      \Log::info('VIP notification image', [
-    'data_image' => $data['image'] ?? 'NOT SET',
-    'payload_image' => $payload['notification']['image'] ?? 'NOT SET',
-    'result' => $result ?? 'NOT SET',
-]);
+ 
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);
