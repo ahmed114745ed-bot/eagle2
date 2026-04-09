@@ -34,7 +34,10 @@ class AdminReelController extends MainController
                 return [
                     'id' => $reel->id,
                     'user_id' => $reel->user_id,
-                    'user' => $reel->user,
+                    'user' => $reel->user ? [
+                        'id' => $reel->user->id,
+                        'name' => $reel->user->name ?? 'Unknown',
+                    ] : null,
                     'title' => $reel->description ?: 'بدون عنوان',
                     'description' => $reel->description,
                     'video_url' => $videoUrl,
@@ -94,7 +97,10 @@ class AdminReelController extends MainController
                 return [
                     'id' => $reel->id,
                     'user_id' => $reel->user_id,
-                    'user' => $reel->user,
+                    'user' => $reel->user ? [
+                        'id' => $reel->user->id,
+                        'name' => $reel->user->name ?? 'Unknown',
+                    ] : null,
                     'title' => $reel->description ?: 'بدون عنوان',
                     'description' => $reel->description,
                     'video_url' => $videoUrl,
