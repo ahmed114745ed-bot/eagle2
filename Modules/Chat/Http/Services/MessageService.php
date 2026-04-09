@@ -162,7 +162,6 @@ class MessageService
         if ($request->message_id) {
             $this->messageRepo->createMessageReplay($message->id, $request->message_id);
         }
-//        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
 
         // Return the message and chat room resources
         return [
@@ -173,11 +172,9 @@ class MessageService
 
     private function updateMessageStatus(ChatMessage $message, User $user2, EntitiesChatRoom $chatRoom)
     {
-        // \Log::info('updateMessageStatus: ', ['user2' =>  $user2->id]);
 
         if ($user2->online == 1) {
             $condition = ($user2->current_room_chat == $chatRoom->id);
-            // \Log::info('current_room_chat: ', ['$user2->current_room_chat' =>  $user2->current_room_chat]);
 
             $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);

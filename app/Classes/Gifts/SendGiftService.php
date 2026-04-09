@@ -340,7 +340,6 @@ class SendGiftService
         ];
         $json = json_encode($ms);
 
-        \Illuminate\Support\Facades\Log::info("RTM Test (updatePk) roomId: $roomId", ['data' => $ms['messageContent']]);
 
         Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
     }

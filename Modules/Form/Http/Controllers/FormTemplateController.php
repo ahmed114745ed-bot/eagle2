@@ -59,7 +59,6 @@ class FormTemplateController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('Creating Form Template', ['request' => $request->all()]);
 
         $validated = $request->validate([
             'title' => 'required|array',
@@ -138,7 +137,6 @@ class FormTemplateController extends Controller
 
     public function edit($id, Content $content)
     {
-        \Log::info('Updating Form Template ID: ' . $id);
     
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);

@@ -286,11 +286,6 @@ class VipCommon
 
     public static function  removeVipFromUser($user, $id, $receive_type)
     {
-        // \Log::info("Start removeVipFromUser", [
-        //     'user_id' => $user->id,
-        //     'vip_id' => $id,
-        //     'receive_type' => $receive_type,
-        // ]);
         $vip = UserVip::where('receive_type', $receive_type)
             ->where('user_id', $user->id)
             ->where('vip_id', $id)
@@ -301,10 +296,6 @@ class VipCommon
 
 
         $vipReceiveType = $receive_type . '-' . $vip->level;
-        // \Log::info("Deleted Packs", [
-        //     'vip_user_id' => $vip->id,
-        //     'count_deleted' => $vipReceiveType,
-        // ]);
         Pack::where('vip_user_id',  $vip->id)
             ->where('receive_type', $vipReceiveType)
             ->where('user_id', $user->id)

@@ -66,7 +66,6 @@ class CustomNotification
         if (!$user) {
             return 0;
         }
-        //  \Log::info('room level Job", ', ['user_id' => $user->id, 'level' => $level, 'reward' => $reward]);
 
         $lang = $user->lan ?? 'en';
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
@@ -1027,11 +1026,6 @@ class CustomNotification
         $tokens_notification = $user?->notification_id;
         $lang = $user?->lan ?? 'en';
         $body = __("api.rejectYourAgency", [], $lang);
-        Log::info('Form request rejected', [
-            'user_id' => $user->id,
-            'type' => $type,
-            'message' => $body
-        ]);
 
         if (!$user->is_logout) {
             Common::send_firebase_notification(

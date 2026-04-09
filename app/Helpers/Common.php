@@ -1031,7 +1031,7 @@ class Common
 
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
 
-        //        logger()->info('✅ Kreait Topic Subscribe', [
+
         //            'topic' => $topic,
         //            'result' => $result,
         //        ]);
@@ -1048,7 +1048,7 @@ class Common
 
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-            //            logger()->info('✅ Unsubscribe from FCM topic result', [
+
             //                'topic'          => $topic,
             //                'tokensCount'    => count($registrationTokens),
             //                'response'       => $response,
@@ -1312,14 +1312,14 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
-            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+
             //                'id' => $id,
             //            ]);
         }
 
         if (!empty($data)) {
             OfficialMessage::insert($data);
-            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+
             //                'user_ids' => $userIds,
             //            ]);
         }

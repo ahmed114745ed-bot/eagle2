@@ -59,6 +59,5 @@ class WalletManager
             'status' => 'CONSOLIDATED'
         ];
         
-        Log::info("FairLuck Wallets Status Report (UNIFIED)", $report);
     }
 }

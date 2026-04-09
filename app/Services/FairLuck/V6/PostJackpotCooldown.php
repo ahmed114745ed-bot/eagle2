@@ -45,11 +45,6 @@ class PostJackpotCooldown
         Redis::set($key, $currentBetCount);
         Redis::expire($key, 86400 * 30); // Keep for 30 days
 
-        Log::info("JACKPOT_COOLDOWN: Recorded jackpot for user {$userId}", [
-            'multiplier' => $multiplier,
-            'bet_count' => $currentBetCount,
-            'timestamp' => now()->toIso8601String(),
-        ]);
     }
 
     /**
@@ -152,7 +147,6 @@ class PostJackpotCooldown
         $key = self::REDIS_KEY_PREFIX . $userId;
         Redis::del($key);
 
-        Log::info("JACKPOT_COOLDOWN: Cooldown cleared for user {$userId}");
     }
 
     /**

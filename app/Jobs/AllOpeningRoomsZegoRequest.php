@@ -50,7 +50,6 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
      */
     public function handle()
     {
-        // Log::info("event is running banner event");
         event(new BannerEvent(json_decode($this->json, true)));
     }
 

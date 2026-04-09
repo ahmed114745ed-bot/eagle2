@@ -577,7 +577,6 @@ class UserCommon
 
 
             $pack = Pack::query()->create($arr);
-            //  \Log::info('Created Pack:', $pack->toArray());
 
             if ($sender) {
                 $pack->senderable()->associate($sender);

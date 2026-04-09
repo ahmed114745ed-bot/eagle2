@@ -76,7 +76,6 @@ class EnhancedMultiLanguage
             
             // Log for debugging (only in local environment)
             if (app()->environment('local')) {
-                Log::info("EnhancedMultiLanguage: Locale '{$locale}' set from {$source}");
             }
         }
         
