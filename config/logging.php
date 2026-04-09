@@ -143,10 +143,9 @@ return [
             'level' => 'info',
         ],
         'zego' => [
-            'driver' => 'daily',
+            'driver' => 'single',
             'path' => storage_path('logs/zego.log'),
             'level' => 'debug',
-            'days' => 14,
         ],
     ],
 
