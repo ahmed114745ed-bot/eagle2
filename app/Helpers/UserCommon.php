@@ -504,7 +504,13 @@ class UserCommon
 
         if ($message) {
             $body = $message;
-             $data['image'] =$ware->show_img;
+            $img =$ware->show_img;
+            if ($img && !str_starts_with($img, 'http')) {
+                $data['image'] = 'https://storage.googleapis.com/' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/' . $img;
+            } else {
+                $data['image'] = $img;
+            }
+             
         }
 
         DB::beginTransaction();
