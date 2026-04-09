@@ -44,7 +44,6 @@ class AuthController extends Controller
         
         // Check device account limit BEFORE registration
         $deviceToken = $request->input('device_token');
-        ]);
         
         if (!empty($deviceToken)) {
             try {
