@@ -1026,7 +1026,7 @@ function reelsManager() {
                     const titleMatch = reel.title.toLowerCase().includes(query);
                     const userNameMatch = reel.user?.name?.toLowerCase().includes(query);
                     const idMatch = reel.id.toString().includes(query);
-                    const userIdMatch = reel.user?.id.toString().includes(query);
+                    const userIdMatch = reel.user?.id?.toString().includes(query);
                     return titleMatch || userNameMatch || idMatch || userIdMatch;
                 });
 
