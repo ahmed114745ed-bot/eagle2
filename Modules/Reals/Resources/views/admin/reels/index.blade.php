@@ -1044,119 +1044,81 @@
     </div>
 </div>
 
-<!-- Reels Data -->
+<!-- Reels Data - stored in a hidden div to survive PJAX -->
+<div id="reels-initial-data" style="display:none" data-reels='@json($reels)' data-seed="{{ $seed ?? '' }}"></div>
 <script data-exec-on-popstate>
-    window.initialReelsData = @json($reels);
-    window.randomSeed = {{ $seed ?? 'null' }};
-    console.log('📦 Reels data injected:', window.initialReelsData ? window.initialReelsData.length : 0, 'reels');
-</script>
-<script data-exec-on-popstate>
-    (function () {
-        // تحميل Alpine.js ديناميكياً إذا لم يكن محملاً
-        const ensureAlpineLoaded = (callback) => {
-            if (window.Alpine) {
-                callback();
-                return;
+    (function() {
+        // قراءة البيانات من الـ hidden div (يعمل مع PJAX لأن الـ div موجود في الـ DOM)
+        var dataEl = document.getElementById('reels-initial-data');
+        if (dataEl) {
+            try {
+                window.initialReelsData = JSON.parse(dataEl.getAttribute('data-reels') || '[]');
+                window.randomSeed = parseInt(dataEl.getAttribute('data-seed')) || null;
+                console.log('📦 [DATA] Reels loaded from DOM:', window.initialReelsData.length, 'reels');
+            } catch(e) {
+                console.error('❌ [DATA] Error parsing reels data:', e);
+                window.initialReelsData = [];
+                window.randomSeed = null;
             }
-            
-            console.log('🔄 Loading Alpine.js dynamically...');
-            const script = document.createElement('script');
+        } else {
+            console.warn('⚠️ [DATA] reels-initial-data element not found');
+            window.initialReelsData = window.initialReelsData || [];
+        }
+        
+        // تحميل Alpine.js ديناميكياً إذا لم يكن محملاً
+        var ensureAlpineLoaded = function(callback) {
+            if (window.Alpine) { callback(); return; }
+            var script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js';
             script.defer = true;
-            script.onload = () => {
-                console.log('✅ Alpine.js loaded dynamically');
-                setTimeout(callback, 100);
-            };
+            script.onload = function() { setTimeout(callback, 100); };
             document.head.appendChild(script);
         };
         
         // تحميل reels-manager.js ديناميكياً إذا لم يكن محملاً
-        const ensureReelsManagerLoaded = (callback) => {
-            if (window.reelsManager && typeof window.reelsManager === 'function') {
-                callback();
-                return;
-            }
-            
-            console.log('🔄 Loading reels-manager.js dynamically...');
-            const existingScript = document.querySelector('script[data-reels-manager]');
-            if (existingScript) {
-                const script = document.createElement('script');
-                script.src = existingScript.src;
-                script.onload = () => {
-                    console.log('✅ reels-manager.js loaded dynamically');
-                    callback();
-                };
-                document.head.appendChild(script);
-            } else {
-                // تحميل من المسار المعروف
-                const script = document.createElement('script');
-                script.src = '/modules/reals/js/reels-manager.js?v=' + Date.now();
-                script.onload = () => {
-                    console.log('✅ reels-manager.js loaded from known path');
-                    callback();
-                };
-                document.head.appendChild(script);
-            }
+        var ensureReelsManagerLoaded = function(callback) {
+            if (window.reelsManager && typeof window.reelsManager === 'function') { callback(); return; }
+            var existingScript = document.querySelector('script[data-reels-manager]');
+            var script = document.createElement('script');
+            script.src = existingScript ? existingScript.src : '/modules/reals/js/reels-manager.js?v=' + Date.now();
+            script.onload = function() { callback(); };
+            document.head.appendChild(script);
         };
 
-        const initAlpineInsideContainer = () => {
-            if (!window.Alpine) return false;
-            if (!window.reelsManager || typeof window.reelsManager !== 'function') return false;
+        var initAlpine = function() {
+            if (!window.Alpine || !window.reelsManager || typeof window.reelsManager !== 'function') return false;
+            var container = document.querySelector('#pjax-container') || document.body;
+            var reelsEl = container ? container.querySelector('.reels-main-container[x-data]') : null;
+            if (!reelsEl) return false;
 
-            const container = document.querySelector('#pjax-container') || document.body;
-            if (!container) return false;
-
-            const reelsContainer = container.querySelector('.reels-main-container[x-data]');
-            if (!reelsContainer) return false;
-
-            // التحقق من البيانات - إذا كانت فارغة، حاول قراءتها من الـ script tag
-            if (!window.initialReelsData || window.initialReelsData.length === 0) {
-                const dataScripts = container.querySelectorAll('script[data-exec-on-popstate]');
-                dataScripts.forEach(s => {
-                    if (s.textContent.includes('initialReelsData')) {
-                        try {
-                            eval(s.textContent);
-                            console.log('🔄 Re-evaluated data script, reels:', window.initialReelsData ? window.initialReelsData.length : 0);
-                        } catch(e) {
-                            console.error('Error re-evaluating data script:', e);
-                        }
-                    }
-                });
-            }
-
-            console.log('📊 initialReelsData:', window.initialReelsData ? window.initialReelsData.length + ' reels' : 'EMPTY');
+            console.log('📊 [INIT] initialReelsData:', window.initialReelsData ? window.initialReelsData.length + ' reels' : 'EMPTY');
 
             try {
-                if (window.Alpine.destroyTree && reelsContainer._x_dataStack) {
-                    window.Alpine.destroyTree(reelsContainer);
+                if (window.Alpine.destroyTree && reelsEl._x_dataStack) {
+                    window.Alpine.destroyTree(reelsEl);
                 }
-
                 if (window.Alpine.initTree) {
                     window.Alpine.initTree(container);
                 } else if (window.Alpine.start) {
                     window.Alpine.start();
                 }
-
-                container.querySelectorAll('[x-cloak]').forEach((el) => el.removeAttribute('x-cloak'));
-                console.log('✅ Alpine initialized successfully');
+                container.querySelectorAll('[x-cloak]').forEach(function(el) { el.removeAttribute('x-cloak'); });
+                console.log('✅ [INIT] Alpine initialized successfully');
+                return true;
             } catch (error) {
-                console.error('Alpine reinit error:', error);
+                console.error('❌ [INIT] Alpine reinit error:', error);
                 return false;
             }
-
-            return true;
         };
 
-        const scheduleInit = () => {
-            ensureAlpineLoaded(() => {
-                ensureReelsManagerLoaded(() => {
-                    let attempts = 0;
-                    const attempt = () => {
-                        if (initAlpineInsideContainer()) return;
+        var scheduleInit = function() {
+            ensureAlpineLoaded(function() {
+                ensureReelsManagerLoaded(function() {
+                    var attempts = 0;
+                    var attempt = function() {
+                        if (initAlpine()) return;
                         if (attempts++ < 30) {
                             setTimeout(attempt, 150);
-                        } else {
-                            console.error('❌ Failed to initialize Alpine after attempts');
                         }
                     };
                     attempt();
@@ -1170,14 +1132,21 @@
             scheduleInit();
         }
 
-        ['pjax:complete', 'pjax:success', 'pjax:end'].forEach((eventName) => {
-            if (!window['__reelsEvent_' + eventName]) {
-                window['__reelsEvent_' + eventName] = true;
-                document.addEventListener(eventName, () => {
-                    console.log('🔄 PJAX event:', eventName);
-                    setTimeout(scheduleInit, 100);
-                });
-            }
-        });
+        // PJAX events - only listen once, no duplicates
+        if (!window.__reelsPjaxBound) {
+            window.__reelsPjaxBound = true;
+            document.addEventListener('pjax:complete', function() {
+                // Re-read data from DOM after PJAX replaces content
+                var dataEl2 = document.getElementById('reels-initial-data');
+                if (dataEl2) {
+                    try {
+                        window.initialReelsData = JSON.parse(dataEl2.getAttribute('data-reels') || '[]');
+                        window.randomSeed = parseInt(dataEl2.getAttribute('data-seed')) || null;
+                        console.log('🔄 [PJAX] Re-loaded data from DOM:', window.initialReelsData.length, 'reels');
+                    } catch(e) { /* ignore */ }
+                }
+                setTimeout(scheduleInit, 200);
+            });
+        }
     })();
 </script>
