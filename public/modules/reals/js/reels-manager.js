@@ -39,6 +39,13 @@ function reelsManager() {
         batchCache: [],
         
         init() {
+            console.log('🚀 [REELS] init() called');
+            console.log('🚀 [REELS] window.initialReelsData exists:', !!window.initialReelsData);
+            console.log('🚀 [REELS] window.initialReelsData length:', window.initialReelsData ? window.initialReelsData.length : 'N/A');
+            console.log('🚀 [REELS] window.Alpine exists:', !!window.Alpine);
+            console.log('🚀 [REELS] window.reelsManager exists:', !!window.reelsManager);
+            console.log('🚀 [REELS] this.$el exists:', !!this.$el);
+            
             this.isGlobalMuted = false;
             this.isMobile = window.innerWidth <= 768;
             
@@ -49,6 +56,7 @@ function reelsManager() {
             this.setupEventDelegation();
             
             this.$nextTick(() => {
+                console.log('🚀 [REELS] $nextTick - about to loadInitialData');
                 if (window.requestIdleCallback) {
                     requestIdleCallback(() => this.loadInitialData());
                 } else {
@@ -116,7 +124,14 @@ function reelsManager() {
         },
         
         loadInitialData() {
-            const reelsData = window.initialReelsData || [];
+            let reelsData = window.initialReelsData || [];
+            
+            // إذا كانت البيانات فارغة، حاول تحميلها من الـ API مباشرة
+            if (reelsData.length === 0) {
+                console.log('⚠️ No initial data found, fetching from API...');
+                this.fetchInitialReels();
+                return;
+            }
             
             // فلترة البيانات الأولية لتجنب أي تكرار
             const uniqueReels = [];
@@ -1231,6 +1246,42 @@ function reelsManager() {
             if (reel) {
                 this.deletingReel = reel;
                 this.showDeleteModal = true;
+            }
+        },
+        
+        async fetchInitialReels() {
+            console.log('🔄 Fetching initial reels from API...');
+            this.loading = true;
+            
+            try {
+                const response = await fetch(`/admin/view/reels/load-more?limit=15`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        exclude_ids: []
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.reels && data.reels.length > 0) {
+                    console.log(`✅ Fetched ${data.reels.length} reels from API`);
+                    window.initialReelsData = data.reels;
+                    this.loadInitialData();
+                } else {
+                    console.log('⚠️ No reels found from API');
+                    this.reelsLoaded = true;
+                    this.hasMore = false;
+                }
+            } catch (error) {
+                console.error('❌ Error fetching initial reels:', error);
+                this.reelsLoaded = true;
+                this.hasMore = false;
+            } finally {
+                this.loading = false;
             }
         },
         
