@@ -1,71 +1,43 @@
-# Rixo-Chat Pipeline
-name: SSh-rixochat-pipeline
+name: SSh-rixo-chat-pipline
 on:
   push:
     branches: ["rixo-chat"]
-concurrency:
-  group: rixochat-deploy
-  cancel-in-progress: false
 
 jobs:
-  run_rixo_hub:
+  run_rixo_chat_hub:
     runs-on: [self-hosted]
     environment: rixo-prod
     steps:
-    - name: Pull latest code and rotate logs
+    - name: pull latest code
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.162.251"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 5m
+        command_timeout: 3m
         script: |
           cd /var/www/rixo-chat
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          mkdir -p storage/jobs-logs
-          chmod -R 777 storage/jobs-logs
-          test -f public/settings.json || echo '{}' > public/settings.json
-          test -f gcp.json || echo '{}' > gcp.json
-
-          LOG_FILE=storage/logs/laravel.log
-          if [ -f "$LOG_FILE" ]; then
-            LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
-            if [ "$LOG_SIZE" -gt 104857600 ]; then
-              echo "Rotating laravel.log ($(du -h $LOG_FILE | cut -f1))"
-              truncate -s 0 "$LOG_FILE"
-            fi
-          fi
-          find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
-
-  run_rixo_migrate:
-    runs-on: [self-hosted]
-    needs: run_rixo_hub
-    environment: rixo-prod
-    steps:
-    - name: Run database migrations once
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.162.251"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 5m
-        script: |
-          cd /var/www/rixo-chat
-          CONTAINER_ID=$(sudo docker ps --filter "name=rixo-chat-octa.1" --format "{{.ID}}" | head -n 1)
-          if [ -n "$CONTAINER_ID" ]; then
-            sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force
+          sudo git branch --set-upstream-to=origin/rixo-chat rixo-chat || true
+          sudo git pull origin rixo-chat
+          
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh || source /home/${{ secrets.USERNAME }}/hub.sh
+          
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+            sudo docker system prune -a -f && echo "Docker system cleaned successfully"
           else
-            php artisan migrate --force
+            echo "Disk space is within acceptable limits $current% "
           fi
 
-  run_rixo_app:
+  run_rixo_chat_app:
     runs-on: [self-hosted]
-    needs: [run_rixo_hub, run_rixo_migrate]
+    needs: run_rixo_chat_hub
     environment: rixo-prod
     steps:
-    - name: Build and deploy Rixo Octane
+    - name: build and deploy rixo-chat app
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.162.251"
@@ -75,41 +47,21 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/rixo-chat
-          sudo docker build -t rixo-chat-octa:${{ github.sha }} . -f Dockerfile-octana
-
-          for attempt in 1 2 3; do
-            echo "Attempt $attempt: updating rixo-chat-octa..."
-            if sudo docker service update \
-              --image rixo-chat-octa:${{ github.sha }} \
-              --replicas 2 \
-              --limit-memory 2.5gb \
-              --reserve-memory 1.0gb \
-              --update-order stop-first \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              --update-failure-action rollback \
-              rixo-chat-octa; then
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then exit 1; fi
-            sleep 15
-          done
-
-          RUNNING_IMAGE=$(sudo docker service inspect rixo-chat-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
-          if [ "$RUNNING_IMAGE" != "rixo-chat-octa:${{ github.sha }}" ]; then exit 1; fi
-
-          sleep 15
-          CONTAINER_ID=$(docker ps --filter "name=rixo-chat-octa.1" --format "{{.ID}}" | head -n 1)
-          if [ -n "$CONTAINER_ID" ]; then
-            docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "Token change failed but deployment continues"
+          sudo docker build -t rixo-chat-octa:${{ github.sha }} -f Dockerfile-octana .
+          sudo docker service update --image rixo-chat-octa:${{ github.sha }} rixo-chat-octa
+          
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            sudo docker system prune -a -f
           fi
 
-  run_rixo_job:
+  run_rixo_chat_job:
     runs-on: [self-hosted]
-    needs: [run_rixo_hub, run_rixo_migrate, run_rixo_app]
+    needs: run_rixo_chat_hub
     environment: rixo-prod
     steps:
-    - name: Build and deploy Rixo jobs
+    - name: build and deploy rixo-chat job
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.162.251"
@@ -120,43 +72,4 @@ jobs:
         script: |
           cd /var/www/rixo-chat
           sudo docker build -t rixo-chat-job:${{ github.sha }} -f Dockerfile-jobs .
-
-          for attempt in 1 2 3; do
-            echo "Attempt $attempt: updating rixo-chat-job..."
-            if sudo docker service update \
-              --image rixo-chat-job:${{ github.sha }} \
-              --replicas 1 \
-              --limit-cpu 5.0 \
-              --limit-memory 2.5gb \
-              --reserve-memory 1.0gb \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              --update-failure-action rollback \
-              rixo-chat-job; then
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then exit 1; fi
-            sleep 15
-          done
-
-  run_rixo_cleanup:
-    runs-on: [self-hosted]
-    needs: [run_rixo_app, run_rixo_job]
-    if: always()
-    environment: rixo-prod
-    steps:
-    - name: Cleanup old images
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.162.251"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        script: |
-          CURRENT=${{ github.sha }}
-          sudo docker container prune -f 2>/dev/null || true
-          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'rixo-chat-(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
-            sudo docker rmi "$img" 2>/dev/null || true
-          done
-          sudo docker image prune -f 2>/dev/null || true
-          sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
+          sudo docker service update --image rixo-chat-job:${{ github.sha }} rixo-chat-job
