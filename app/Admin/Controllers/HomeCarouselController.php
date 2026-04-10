@@ -440,7 +440,6 @@ class HomeCarouselController extends MainController
             $form->text('input', trans('input'))
                 ->rules('integer|min:1|max:99');
         })->when('4', function (Form $form) {
-            \Log::info('Adding input field for lifetime duration');
         });
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
     }

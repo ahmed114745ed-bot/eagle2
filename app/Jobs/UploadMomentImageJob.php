@@ -35,11 +35,6 @@ class UploadMomentImageJob implements ShouldQueue
      */
     public function handle()
     {
-        Log::info('UploadMomentImageJob attempt', [
-            'moment_id' => $this->momentId,
-            'attempt' => $this->attempts(),
-            'max_tries' => $this->tries,
-        ]);
 
         $moment = Moment::find($this->momentId);
 

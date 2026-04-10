@@ -201,7 +201,6 @@ class PaytabsController extends Controller
         $request_url = 'payment/query';
         $data = ["tran_ref" => $transRef];
         $verify_result = $plugin->send_api_request($request_url, $data);
-         \Log::info('Paytabs verification result: ' . json_encode($verify_result));
         $is_valid = $plugin->is_valid_redirect($request);
 
         if (!$is_valid) {
@@ -246,7 +245,6 @@ class PaytabsController extends Controller
 
     public function onPaymentSuccess($payment_data)
     {
-        \Log::info("تم الدفع بنجاح للطلب رقم: " . $payment_data->id);
     }
 
         public function onPaymentFailure($payment_data)
