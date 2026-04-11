@@ -55,29 +55,58 @@ class ImageConverter
     }
 
     /**
-     * Convert to WebP synchronously, then upload (using Intervention Image).
+     * Convert to WebP synchronously, then upload.
+     * Tries Intervention Image first, falls back to ffmpeg if needed.
      */
     private static function convertAndUploadSync(UploadedFile $file, string $folder, int $qScale): false|string
     {
+        $tempInput = $file->getPathname();
         $tempOutput = sys_get_temp_dir().'/'.uniqid('webp_', true).'.webp';
+        $conversionMethod = 'unknown';
 
         try {
-            // Initialize Intervention Image Manager with GD driver
-            $manager = new ImageManager(new Driver());
+            // Try Intervention Image first
+            try {
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($tempInput);
+                $encoded = $image->toWebp($qScale);
+                file_put_contents($tempOutput, $encoded->toString());
+                $conversionMethod = 'intervention';
 
-            // Read image from uploaded file path (not binary data)
-            $image = $manager->read($file->getPathname());
+            } catch (\Exception $interventionError) {
+                // Intervention failed - try ffmpeg as fallback
+                \Log::info('WebP sync: Intervention failed, trying ffmpeg', [
+                    'error' => $interventionError->getMessage()
+                ]);
 
-            // Encode to WebP with quality setting
-            $encoded = $image->toWebp($qScale);
+                // Check if ffmpeg is available
+                exec('which ffmpeg 2>&1', $ffmpegCheck, $ffmpegExists);
 
-            // Save to temp file
-            file_put_contents($tempOutput, $encoded->toString());
+                if ($ffmpegExists !== 0) {
+                    \Log::error('WebP sync: Neither Intervention nor ffmpeg available');
+                    return false;
+                }
+
+                // Use ffmpeg
+                $cmd = sprintf(
+                    'ffmpeg -y -i %s -c:v libwebp -lossless 0 -q:v %d -preset picture %s 2>&1',
+                    escapeshellarg($tempInput),
+                    $qScale,
+                    escapeshellarg($tempOutput)
+                );
+
+                exec($cmd, $output, $returnCode);
+
+                if ($returnCode !== 0) {
+                    \Log::error('WebP sync: ffmpeg failed', ['output' => implode("\n", $output)]);
+                    return false;
+                }
+
+                $conversionMethod = 'ffmpeg';
+            }
 
             if (!file_exists($tempOutput)) {
-                \Log::error('WebP sync conversion failed - output file not created', [
-                    'file' => $file->getClientOriginalName(),
-                ]);
+                \Log::error('WebP sync conversion failed - output file not created');
                 return false;
             }
 
@@ -99,6 +128,11 @@ class ImageConverter
             // Delete temp file
             @unlink($tempOutput);
 
+            \Log::info('WebP sync conversion successful', [
+                'file' => $file->getClientOriginalName(),
+                'method' => $conversionMethod
+            ]);
+
             // Return public URL
             return $path;
 
@@ -107,7 +141,6 @@ class ImageConverter
             \Log::error('WebP sync conversion failed', [
                 'file' => $file->getClientOriginalName(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
             ]);
             return false;
         }
