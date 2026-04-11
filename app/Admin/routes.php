@@ -84,6 +84,7 @@ use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\RoleControllerNew;
+use App\Admin\Controllers\RoomBackgroundManagerController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Admin\Controllers\RoomMicController;
@@ -373,6 +374,7 @@ Route::group(
         Route::post("accept-change-country", [ChangeCountryRequestController::class, "changeCountry"]);
 
         Route::resource('backgrounds', 'BackgroundController');
+        Route::resource('room-background-manager', RoomBackgroundManagerController::class);
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
 
