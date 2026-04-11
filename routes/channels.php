@@ -62,20 +62,29 @@ Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
 });
 
 Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
-    $chatRoomService = app(ChatRoomService::class);
-    $checkRoom = $chatRoomService->getCreateChatRoomId($chatRoomId);
-    if (!$checkRoom){
+    try {
+        $chatRoomService = app(ChatRoomService::class);
+        $checkRoom = $chatRoomService->getCreateChatRoomId($chatRoomId);
+        if (!$checkRoom){
+            return false;
+        }
+        $user->update(['current_room_chat' => $checkRoom->id]);
+        $chatRoomService->markMessagesAsSeen($checkRoom, $user);
+        $user2 = $chatRoomService->getUserInChatRoom($checkRoom, $user);
+        $chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
+
+        return [
+            'id'   => $user->id,
+            'name' => $user->name,
+        ];
+    } catch (\Exception $e) {
+        \Log::error('Broadcasting auth failed for chat.room', [
+            'chat_room_id' => $chatRoomId,
+            'user_id' => $user->id,
+            'error' => $e->getMessage()
+        ]);
         return false;
     }
-    $user->update(['current_room_chat' => $checkRoom->id]);
-    $chatRoomService->markMessagesAsSeen($checkRoom, $user);
-    $user2 = $chatRoomService->getUserInChatRoom($checkRoom, $user);
-    $chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
-
-    return [
-        'id'   => $user->id,
-        'name' => $user->name,
-    ];
 });
 
 Broadcast::channel('pk.battle.{creatorId}', function ($user, $creatorId) {
