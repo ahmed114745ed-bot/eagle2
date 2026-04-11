@@ -11,6 +11,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class ConvertImageToWebPJob implements ShouldQueue
 {
@@ -58,26 +60,26 @@ class ConvertImageToWebPJob implements ShouldQueue
             return;
         }
 
-        // Download file to temp location
-        $tempInput = sys_get_temp_dir() . '/' . uniqid('webp_input_', true) . '.tmp';
         $tempOutput = sys_get_temp_dir() . '/' . uniqid('webp_output_', true) . '.webp';
 
         try {
-            // Download original from storage
-            file_put_contents($tempInput, $storage->get($this->originalPath));
+            // Get original image from storage
+            $imageContent = $storage->get($this->originalPath);
 
-            // Run ffmpeg command
-            $cmd = sprintf(
-                'ffmpeg -y -i %s -c:v libwebp -lossless 0 -qscale %d -preset picture %s 2>&1',
-                escapeshellarg($tempInput),
-                $this->quality,
-                escapeshellarg($tempOutput)
-            );
+            // Initialize Intervention Image Manager
+            $manager = new ImageManager(new Driver());
 
-            exec($cmd, $output, $returnCode);
+            // Load and convert image to WebP using Intervention Image
+            $image = $manager->read($imageContent);
 
-            if ($returnCode !== 0 || !file_exists($tempOutput)) {
-                throw new \Exception('FFmpeg conversion failed: ' . implode("\n", $output));
+            // Encode to WebP with quality setting
+            $encoded = $image->toWebp($this->quality);
+
+            // Save to temp file
+            file_put_contents($tempOutput, $encoded);
+
+            if (!file_exists($tempOutput)) {
+                throw new \Exception('WebP conversion failed');
             }
 
             // Upload WebP version
@@ -116,8 +118,7 @@ class ConvertImageToWebPJob implements ShouldQueue
             ]);
 
         } finally {
-            // Cleanup temp files
-            @unlink($tempInput);
+            // Cleanup temp file
             @unlink($tempOutput);
         }
     }
