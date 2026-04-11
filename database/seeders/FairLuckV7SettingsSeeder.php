@@ -6,238 +6,83 @@ use App\Models\FairLuckSetting;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * V7 Single-Step Engine Settings Seeder.
+ *
+ * This is the AUTHORITATIVE seeder for production V7 settings.
+ * Run: php artisan db:seed --class=FairLuckV7SettingsSeeder
+ */
 class FairLuckV7SettingsSeeder extends Seeder
 {
-    /**
-     * Seed the application's V7 FairLuck settings.
-     * Run with: php artisan db:seed --class=FairLuckV7SettingsSeeder
-     */
     public function run(): void
     {
-        $this->command->info('Seeding FairLuck V7 settings...');
+        $this->command->info('Seeding FairLuck V7 Single-Step Engine settings...');
 
         $settings = [
-            // Core RTP Settings - 92% default (User-First Overhaul)
-            [
-                'key' => 'V7_target_rtp',
-                'value' => 0.92,
-                'description' => 'Target RTP for V7 - Default 92% (range 70-99%)'
-            ],
-            [
-                'key' => 'V7_max_probability_cap',
-                'value' => 0.50,
-                'description' => 'Hard cap on win probability (50% default)'
-            ],
-            [
-                'key' => 'V7_boost_scaling',
-                'value' => 0.05,
-                'description' => 'Boost scaling factor for probability when RTP is below target'
-            ],
-            [
-                'key' => 'V7_reduce_scaling',
-                'value' => 0.02,
-                'description' => 'Reduce scaling factor for probability when RTP is above target'
-            ],
-            [
-                'key' => 'V7_chaos_factor_min',
-                'value' => 0.90,
-                'description' => 'Minimum chaos factor for unpredictability'
-            ],
-            [
-                'key' => 'V7_chaos_factor_max',
-                'value' => 1.10,
-                'description' => 'Maximum chaos factor for unpredictability'
-            ],
+            // === Fee Rates ===
+            ['key' => 'V7_app_fee_rate', 'value' => 0.015, 'description' => 'App fee rate (1.5%). Deducted before game.'],
+            ['key' => 'fair_luck_app_fee_rate', 'value' => 0.015, 'description' => 'App fee rate (legacy key, mirrors V7_app_fee_rate)'],
+            ['key' => 'fair_luck_receiver_fee_rate', 'value' => 0.10, 'description' => 'Receiver payout rate (10% of total payout)'],
+            ['key' => 'fair_luck_owner_fee_rate', 'value' => 0.10, 'description' => 'Host/owner payout rate (10% of total payout)'],
 
-            // Multiplier Weights - favor smaller wins to reduce volatility & improve profitability
-            // الحفاظ على نفس المضاعفات: 5, 10, 20, 50, 70, 100, 250, 500, 1000
-            // تغيير الأوزان فقط لصالح المضاعفات الأصغر
-            [
-                'key' => 'V7_multiplier_weights',
-                'value' => json_encode([
-                    5 => 800,      // زيادة الوزن (was 500)
-                    10 => 750,     // زيادة الوزن (was 500)
-                    20 => 700,     // زيادة الوزن (was 500)
-                    50 => 600,     // زيادة الوزن (was 500)
-                    70 => 500,     // نفس الوزن
-                    100 => 400,    // تقليل الوزن (was 500)
-                    250 => 300,    // تقليل الوزن (was 400)
-                    500 => 150,    // تقليل الوزن (was 300)
-                    1000 => 50,    // تقليل الوزن بشكل كبير (was 200)
-                ]),
-                'description' => 'V7 Multiplier weights - favoring smaller multipliers (5x-70x) to reduce volatility while maintaining 92% RTP'
-            ],
+            // === Target RTP ===
+            ['key' => 'V7_target_rtp', 'value' => 0.99, 'description' => 'Target RTP (99%). Per-user RTP correction aims for this.'],
 
-            // New Player Settings
-            [
-                'key' => 'V7_new_player_bets',
-                'value' => 20,
-                'description' => 'Number of bets for new player protection/boost'
-            ],
-            [
-                'key' => 'V7_new_player_boost',
-                'value' => 3.0,
-                'description' => 'Probability boost multiplier for new players (3x)'
-            ],
+            // === Wallet Zone Thresholds (coins) ===
+            ['key' => 'V7_wallet_min', 'value' => 10000, 'description' => 'CRITICAL floor. Jackpot gate blocks payouts that would breach this.'],
+            ['key' => 'V7_wallet_tight', 'value' => 50000, 'description' => 'TIGHT zone threshold. Wins suppressed.'],
+            ['key' => 'V7_wallet_target', 'value' => 200000, 'description' => 'NORMAL zone target. Engine equilibrium point.'],
+            ['key' => 'V7_wallet_high', 'value' => 500000, 'description' => 'GENEROUS zone threshold. Wins boosted.'],
+            ['key' => 'V7_wallet_drain', 'value' => 1000000, 'description' => 'DRAIN zone threshold. Maximum win boosting.'],
 
-            // Low Balance Protection
-            [
-                'key' => 'V7_low_balance_threshold',
-                'value' => 15,
-                'description' => 'Balance threshold (in gift units) for low balance protection'
-            ],
-            [
-                'key' => 'V7_low_balance_min_prob',
-                'value' => 0.18,
-                'description' => 'Minimum probability when balance is low (18%)'
-            ],
+            // === Negative Vault ===
+            ['key' => 'V7_negative_limit', 'value' => 30000, 'description' => 'How far negative the vault can go. Default: 30,000 coins.'],
+            ['key' => 'global_vault_negative_limit', 'value' => 30000, 'description' => 'Legacy negative limit (mirrors V7_negative_limit)'],
 
-            // Wallet Protection (USD-based - Project Agnostic)
-            [
-                'key' => 'coin_to_usd_rate',
-                'value' => 0.01,
-                'description' => 'Coin to USD conversion rate (0.01 = 1 coin = $0.01 USD)'
-            ],
-            [
-                'key' => 'wallet_healthy_usd',
-                'value' => 1000.00,
-                'description' => 'Healthy wallet threshold in USD ($1,000)'
-            ],
-            [
-                'key' => 'wallet_warning_usd',
-                'value' => 500.00,
-                'description' => 'Warning wallet threshold in USD ($500)'
-            ],
-            [
-                'key' => 'wallet_critical_usd',
-                'value' => 200.00,
-                'description' => 'Critical wallet threshold in USD ($200)'
-            ],
-            [
-                'key' => 'wallet_max_negative_usd',
-                'value' => 300.00,
-                'description' => 'Maximum negative wallet (credit line) in USD ($300)'
-            ],
+            // === Base Weights ===
+            ['key' => 'V7_base_weights', 'value' => json_encode([
+                '0'    => 93445,
+                '5'    => 4000,
+                '10'   => 1500,
+                '20'   => 600,
+                '50'   => 220,
+                '100'  => 110,
+                '250'  => 65,
+                '500'  => 38,
+                '1000' => 22,
+            ]), 'description' => 'Base probability weights. Sum ~100,000. E[M]=1.2625.'],
 
-            // Smart Wallet Behavior - Prize Size Reduction (not frequency)
-            [
-                'key' => 'V7_wallet_healthy_max_mult',
-                'value' => 500,  // Reduced from 1000
-                'description' => 'Max multiplier when wallet is healthy ($1000+)'
-            ],
-            [
-                'key' => 'V7_wallet_moderate_max_mult',
-                'value' => 100,
-                'description' => 'Max multiplier when wallet is moderate ($500-$1000)'
-            ],
-            [
-                'key' => 'V7_wallet_low_max_mult',
-                'value' => 50,
-                'description' => 'Max multiplier when wallet is low ($200-$500)'
-            ],
-            [
-                'key' => 'V7_wallet_critical_max_mult',
-                'value' => 20,
-                'description' => 'Max multiplier when wallet is critical (<$200)'
-            ],
+            // === Weight Adjustment Sensitivity ===
+            ['key' => 'V7_nowin_sensitivity', 'value' => 0.15, 'description' => 'How much 0x weight adjusts. Higher = more aggressive.'],
+            ['key' => 'V7_win_base_sensitivity', 'value' => 0.7, 'description' => 'Base suppression factor when vault is low.'],
+            ['key' => 'V7_win_position_sensitivity', 'value' => 2.0, 'description' => 'Extra suppression for high-tier multipliers.'],
+            ['key' => 'V7_boost_base_sensitivity', 'value' => 0.5, 'description' => 'Base boost factor when vault is generous.'],
+            ['key' => 'V7_boost_position_sensitivity', 'value' => 1.8, 'description' => 'Extra boost for high-tier multipliers when generous.'],
+            ['key' => 'V7_wallet_weight', 'value' => 0.70, 'description' => 'Weight of wallet health in combined factor (0-1).'],
+            ['key' => 'V7_rtp_weight', 'value' => 0.30, 'description' => 'Weight of user RTP correction in combined factor (0-1).'],
+            ['key' => 'V7_nowin_floor', 'value' => 50000, 'description' => 'Minimum weight for 0x tier. Ensures wins never guaranteed.'],
+            ['key' => 'V7_rtp_activation', 'value' => 500, 'description' => 'Min total bet before per-user RTP correction activates.'],
 
-            // Probability Floor (User-First)
-            [
-                'key' => 'V7_min_prob_when_low',
-                'value' => 0.60,
-                'description' => 'Minimum probability factor when wallet is low (60% floor - never below this)'
-            ],
+            // === Loss Streak Protection ===
+            ['key' => 'V7_max_loss_streak', 'value' => 20, 'description' => 'Force a win after this many consecutive losses. 0=disabled.'],
+            ['key' => 'V7_forced_win_mult', 'value' => 5, 'description' => 'Multiplier used for forced loss-streak wins (5x).'],
 
-            // Single Win Protection - prevent massive single payouts
-            [
-                'key' => 'V7_max_single_win_pct',
-                'value' => 0.10,
-                'description' => 'Max single win as percentage of wallet balance (10% = $50 win from $500 wallet)'
-            ],
-
-            // Loss Streak Protection - Force win after max streak
-            [
-                'key' => 'V7_max_loss_streak',
-                'value' => 20,
-                'description' => 'Maximum consecutive losses before forced win (default 20)'
-            ],
-            [
-                'key' => 'V7_loss_streak_forced_mult',
-                'value' => 5,
-                'description' => 'Multiplier for forced win after max loss streak (default 5x - better recovery)'
-            ],
-
-            // Cooldown & Safety - DISABLED by default (0 = disabled)
-            [
-                'key' => 'fairluck_jackpot_cooldown_bets',
-                'value' => 0,
-                'description' => 'Jackpot cooldown in bets (0 = disabled - users can win back-to-back)'
-            ],
-            [
-                'key' => 'V7_min_bets_100x',
-                'value' => 30,
-                'description' => 'Minimum bets required before 100x+ multiplier can be won'
-            ],
-            [
-                'key' => 'V7_min_bets_500x',
-                'value' => 100,
-                'description' => 'Minimum bets required before 500x+ multiplier can be won'
-            ],
-            [
-                'key' => 'V7_max_single_win_pct',
-                'value' => 0.10,  // Reduced from 0.15 (15%) to 0.10 (10%)
-                'description' => 'Maximum single win as percentage of wallet (10% default)'
-            ],
-
-            // Wallet Distribution (Configurable)
-            [
-                'key' => 'V7_wallet_dist_global',
-                'value' => 0.65,
-                'description' => 'Global vault distribution percentage (65%)'
-            ],
-            [
-                'key' => 'V7_wallet_dist_jackpot',
-                'value' => 0.20,
-                'description' => 'Jackpot wallet distribution percentage (20%)'
-            ],
-            [
-                'key' => 'V7_wallet_dist_medium',
-                'value' => 0.15,
-                'description' => 'Medium wallet distribution percentage (15%)'
-            ],
-
-            // Legacy settings (for backward compatibility)
-            [
-                'key' => 'global_vault_negative_limit',
-                'value' => 30000,
-                'description' => 'Global vault negative limit in coins (legacy, USD preferred)'
-            ],
-            [
-                'key' => 'fair_luck_owner_fee_rate',
-                'value' => 0.10,
-                'description' => 'Owner fee rate (10%)'
-            ],
+            // === Other ===
+            ['key' => 'coin_to_usd_rate', 'value' => 0.01, 'description' => 'Coin to USD conversion rate for display.'],
         ];
 
-        foreach ($settings as $setting) {
-            FairLuckSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                [
-                    'value' => $setting['value'],
-                    'description' => $setting['description']
-                ]
-            );
-            $this->command->info("  ✓ {$setting['key']}");
+        foreach ($settings as $s) {
+            FairLuckSetting::updateOrCreate(['key' => $s['key']], [
+                'value' => $s['value'],
+                'description' => $s['description'],
+            ]);
+            $this->command->info("  + {$s['key']}");
         }
 
-        // Clear cache
         Cache::forget('fair_luck:settings');
 
         $this->command->info('');
-        $this->command->info("✅ Seeded " . count($settings) . " FairLuck V7 settings");
-        $this->command->info("🎯 Target RTP: 92% (users win frequently but within limits)");
-        $this->command->info("🧠 Smart Wallet: Prize size reduction (not frequency)");
-        $this->command->info("⏱️ Cooldown: Disabled (back-to-back wins allowed)");
-        $this->command->info("🛡️ Protection: 60% min probability floor");
+        $this->command->info("Seeded " . count($settings) . " V7 settings.");
+        $this->command->info("Engine: Single-step weighted selection | Target RTP: 99%");
     }
 }

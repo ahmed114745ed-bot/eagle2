@@ -20,6 +20,5 @@ class SendGiftBanner
      */
     public function handle(object $event): void
     {
-        // \Log::info('GiftBannerEvent triggered', ['data' => $event->gift]);
     }
 }

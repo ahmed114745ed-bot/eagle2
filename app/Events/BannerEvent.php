@@ -28,25 +28,16 @@ class BannerEvent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        // \Log::info('📡 BannerEvent broadcastOn called', [
-        //     'channel' => $this->channel,
-        // ]);
         return new Channel($this->channel);
     }
 
     public function broadcastAs()
     {
-        // \Log::info('📡 BannerEvent broadcastAs called', [
-        //     'alias' => $this->channel,
-        // ]);
         return $this->channel;
     }
 
     public function broadcastWith()
     {
-        // \Log::info('📦 BannerEvent broadcastWith called', [
-        //     'payload' => $this->data,
-        // ]);
         return $this->data;
     }
 }

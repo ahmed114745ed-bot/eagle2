@@ -95,7 +95,6 @@ class GooglePaymentController extends Controller
             $body = $response->getBody()->getContents();
 
             $data = json_decode($body);
-            \Log::info('Google Pay verification result: ' . json_encode($data));
 
             $bodyData = @$data->data ?? null;
             if (@$data->valid && $bodyData) {

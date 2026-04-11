@@ -100,7 +100,6 @@ class SearchRepository implements SearchRepositoryInterface
 
         $rooms = $query->get();
 
-        // \Log::info('Room Results:', $rooms->toArray());
 
         return $rooms;
     }

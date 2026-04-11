@@ -80,7 +80,6 @@ class UserSallaryObserver
             'agency_sallary' => $userSalary->getOriginal('agency_sallary') ?? 0,
             'dB' => $originalDbValue ?? 0,
         ];
-      //  \Log::info($userSalary->target_id,);
         UpdateUserWalletBalances::dispatch(
             $userSalary->user_id,
             $newData,

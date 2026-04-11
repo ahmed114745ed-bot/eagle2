@@ -82,7 +82,7 @@ return [
     'remove_from_family'  => 'Sorry! You are removed from family :name ',
     'accept_agency'       => 'Congrats! Your request to join :name agency is accepted',
     'agencyJoinRequest'       => ':name want to join your agency :agencyName',
-    'got_coin'            => 'Congrats :name !   :coins $ are added to your account by :admin from dashboard',
+    'got_coin'            => 'Congrats :name !   :coins :unit are added to your account by :admin from dashboard',
     'got_earned_coin' => 'Through the invitation code 🎉 Congratulations :name, :coins coins have been added to your account',
     'code_invitation_uses' => '🎉 Congratulations :name, your invitation code has been used!',
     'sender_level'        => 'Congratulations :user you reach sender level :level',

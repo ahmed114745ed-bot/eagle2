@@ -70,7 +70,6 @@ class UpdateSendCharismaToZigo implements ShouldQueue
         ];
         $json = json_encode($ms);
 
-        \Illuminate\Support\Facades\Log::info("RTM Test (updateCharisma) roomId: {$room->id}", ['data' => $data]);
 
         $response = Common::sendToZego('SendCustomCommand', $room->id, $this->userId, $json);
 

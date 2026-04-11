@@ -182,10 +182,6 @@ class ConfigController extends Controller
                 ['name' => $key],
                 ['value' => $value]
             );
-            Log::info('key config', [
-                'updated_keys' => $value,
-                'config' => Config::where('name', $key)->first(),
-            ]);
 
             $updatedKeys[] = $key;
             Cache::forget($key);
@@ -269,9 +265,6 @@ class ConfigController extends Controller
 
         // Confirm the update in DB
         $afterValue = \DB::table('configs')->where('name', 'live_library')->value('value');
-        Log::info('Live Library - After update (raw DB)', [
-            'after_value' => $afterValue,
-        ]);
 
         // Now clear ALL caches and re-cache with fresh data
         Cache::forget('live_library');
@@ -287,9 +280,6 @@ class ConfigController extends Controller
         $freshConfigs = \DB::table('configs')->pluck('value', 'name')->toArray();
         Cache::forever('all_configs', $freshConfigs);
 
-        Log::info('Live Library - Re-cached all_configs', [
-            'live_library_in_cache' => $freshConfigs['live_library'] ?? 'NOT SET',
-        ]);
 
         try {
             if (method_exists(Cache::store('octane'), 'flush')) {
