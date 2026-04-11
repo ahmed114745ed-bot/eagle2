@@ -20,22 +20,22 @@ class RoomBackgroundManagerController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title('Room Backgrounds')
-            ->description('Manage room cover images and backgrounds')
+            ->title(trans('room_backgrounds_title'))
+            ->description(trans('room_backgrounds_desc'))
             ->body($this->grid()));
     }
 
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title('Room Background')
+            ->title(trans('room_background'))
             ->body($this->detail($id)));
     }
 
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
-            ->title('Edit Room Background')
+            ->title(trans('edit_room_background'))
             ->body($this->form()->edit($id)));
     }
 
@@ -50,25 +50,24 @@ class RoomBackgroundManagerController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
-            $filter->like('room_name', 'Room Name');
-            $filter->equal('id', 'Room ID');
-            $filter->equal('numid', 'Room NumID');
+            $filter->like('room_name', trans('room_name'));
+            $filter->equal('id', trans('room_id'));
+            $filter->equal('numid', trans('room_numid'));
         });
 
-        $grid->column('id', 'ID')->sortable();
-        $grid->column('numid', 'NumID');
-        $grid->column('room_name', 'Room Name');
+        $grid->column('id', trans('ID'))->sortable();
+        $grid->column('numid', trans('room_numid'));
+        $grid->column('room_name', trans('room_name'))->limit(20);
 
-        $grid->column('room_cover', 'Cover')->display(function ($cover) {
+        $grid->column('room_cover', trans('room_cover'))->display(function ($cover) {
             if (empty($cover)) {
-                return '<span style="color:#999;">No cover</span>';
+                return '<span style="color:#999;">' . trans('no_cover') . '</span>';
             }
             $url = getImagePath($cover);
-            return "<img src='{$url}' style='width:60px; height:60px; border-radius:5px; cursor:pointer; object-fit:cover;' onclick='openBgModal(\"{$url}\")' />";
+            return "<img src='{$url}' style='width:50px; height:50px; border-radius:4px; cursor:pointer; object-fit:cover;' onclick='openBgModal(\"{$url}\")' />";
         });
 
-        $grid->column('final_room_image', 'Background')->display(function () {
-            // Check custom background first (highest priority)
+        $grid->column('final_room_image', trans('background'))->display(function () {
             $customBg = DB::table('request_background_images')
                 ->where('room_id', $this->id)
                 ->where('status', 1)
@@ -79,20 +78,17 @@ class RoomBackgroundManagerController extends MainController
                 ->first();
 
             $bgImg = $customBg->img ?? $this->background?->img ?? null;
-            $source = $customBg ? 'Custom' : ($this->room_background ? 'Preset #' . $this->room_background : 'Default');
+            $label = $customBg
+                ? '<span class="label label-warning">' . trans('custom') . '</span>'
+                : ($this->room_background ? '<span class="label label-info">' . trans('preset') . '</span>' : '<span class="label label-default">' . trans('default') . '</span>');
 
             if (empty($bgImg)) {
-                return '<span style="color:#999;">Default</span>';
+                return $label;
             }
 
             $url = getImagePath($bgImg);
-            return "<div>
-                <img src='{$url}' style='width:60px; height:60px; border-radius:5px; cursor:pointer; object-fit:cover;' onclick='openBgModal(\"{$url}\")' />
-                <br><small style='color:#888;'>{$source}</small>
-            </div>";
+            return "<img src='{$url}' style='width:50px; height:50px; border-radius:4px; cursor:pointer; object-fit:cover;' onclick='openBgModal(\"{$url}\")' /><br>{$label}";
         });
-
-        $grid->column('room_background', 'BG ID');
 
         $grid->actions(function ($actions) {
             $actions->disableView();
@@ -101,7 +97,7 @@ class RoomBackgroundManagerController extends MainController
 
         $grid->header(function () {
             return "
-                <div id='bgModalOverlay' style='display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.8); text-align:center; cursor:pointer;' onclick='closeBgModal()'>
+                <div id='bgModalOverlay' style='display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.85); text-align:center; cursor:pointer;' onclick='closeBgModal()'>
                     <span style='position:absolute; top:15px; right:25px; font-size:35px; color:white; cursor:pointer;'>&times;</span>
                     <img id='bgModalImg' style='max-width:90%; max-height:90%; margin-top:50px; border-radius:8px;' />
                 </div>
@@ -126,9 +122,9 @@ class RoomBackgroundManagerController extends MainController
     {
         $show = new Show(Room::findOrFail($id));
         $show->field('id', 'ID');
-        $show->field('room_name', 'Room Name');
-        $show->field('room_cover', 'Room Cover');
-        $show->field('room_background', 'Background ID');
+        $show->field('room_name', trans('room_name'));
+        $show->field('room_cover', trans('room_cover'));
+        $show->field('room_background', trans('background_id'));
         return $show;
     }
 
@@ -137,20 +133,11 @@ class RoomBackgroundManagerController extends MainController
         $form = new Form(new Room);
         $this->disableFormTools($form);
 
-        $form->display('id', 'ID');
-        $form->display('room_name', 'Room Name');
+        $roomId = request()->route('room_background_manager');
+        $room = $roomId ? Room::find($roomId) : null;
 
-        // Current state preview
-        $form->divider('Current State');
-
-        $form->html(function () {
-            $roomId = request()->route('room_background_manager');
-            $room = Room::find($roomId);
-            if (!$room) return '';
-
-            $coverUrl = $room->room_cover ? getImagePath($room->room_cover) : null;
-
-            // Get custom background
+        $customBg = null;
+        if ($room) {
             $customBg = DB::table('request_background_images')
                 ->where('room_id', $room->id)
                 ->where('status', 1)
@@ -159,91 +146,106 @@ class RoomBackgroundManagerController extends MainController
                 })
                 ->orderByDesc('id')
                 ->first();
+        }
 
-            $presetBg = $room->background;
-            $activeImg = $customBg->img ?? $presetBg?->img ?? null;
-            $activeUrl = $activeImg ? getImagePath($activeImg) : null;
-            $source = $customBg ? "Custom (request_background_images #{$customBg->id})" : ($presetBg ? "Preset Background #{$presetBg->id}" : "Default");
+        $form->display('id', 'ID');
+        $form->display('room_name', trans('room_name'));
 
-            $coverHtml = $coverUrl
-                ? "<img src='{$coverUrl}' style='max-width:200px; max-height:200px; border-radius:8px; border:2px solid #ddd;' />"
-                : '<span style="color:#999;">No cover image</span>';
+        if ($room) {
+            $form->divider(trans('current_state'));
+            $form->html($this->buildPreviewHtml($room, $customBg), '');
+            $form->divider(trans('edit'));
+        }
 
-            $bgHtml = $activeUrl
-                ? "<img src='{$activeUrl}' style='max-width:200px; max-height:200px; border-radius:8px; border:2px solid #ddd;' />"
-                : '<span style="color:#999;">Default background</span>';
-
-            $customNote = $customBg
-                ? "<div style='margin-top:10px; padding:10px; background:#fff3cd; border:1px solid #ffc107; border-radius:5px;'>
-                       <strong>Note:</strong> This room has an active custom background (ID: {$customBg->id}).
-                       Check the <b>'Remove Custom Background'</b> checkbox below to remove it.
-                       Otherwise, changing the preset background will have no visible effect.
-                   </div>"
-                : '';
-
-            return "
-                <div style='display:flex; gap:30px; align-items:flex-start;'>
-                    <div style='text-align:center;'>
-                        <h5>Room Cover</h5>
-                        {$coverHtml}
-                    </div>
-                    <div style='text-align:center;'>
-                        <h5>Active Background ({$source})</h5>
-                        {$bgHtml}
-                    </div>
-                </div>
-                {$customNote}
-            ";
-        });
-
-        $form->divider('Edit');
-
-        $form->image('room_cover', 'Room Cover')
+        $form->image('room_cover', trans('room_cover'))
             ->disk('gcs')
             ->dir('rooms')
             ->uniqueName()
-            ->removable();
+            ->removable()
+            ->help(trans('upload_cover_help'));
 
-        $form->select('room_background', 'Preset Background')
+        $form->select('room_background', trans('preset_background'))
             ->options(function () {
-                $options = ['' => '-- No preset --'];
+                $options = ['' => '-- ' . trans('default') . ' --'];
                 $backgrounds = Background::where('enable', 1)->get();
                 foreach ($backgrounds as $bg) {
-                    $options[$bg->id] = "Background #{$bg->id}";
+                    $options[$bg->id] = trans('background') . " #{$bg->id}";
                 }
                 return $options;
-            });
+            })
+            ->help(trans('preset_bg_help'));
 
-        // Check if room has custom background
-        $roomId = request()->route('room_background_manager');
-        if ($roomId) {
-            $hasCustom = DB::table('request_background_images')
-                ->where('room_id', $roomId)
-                ->where('status', 1)
-                ->where(function ($q) {
-                    $q->where('expair', '>=', now()->timestamp)->orWhere('expair', 0);
-                })
-                ->exists();
-
-            if ($hasCustom) {
-                $form->checkbox('_remove_custom_bg', 'Remove Custom Background')
-                    ->options([1 => 'Yes, remove the custom background so the preset one is used instead']);
-            }
+        if ($customBg) {
+            $form->radio('_remove_custom_bg', trans('custom_background'))
+                ->options([
+                    0 => trans('keep_custom_bg'),
+                    1 => trans('remove_custom_bg'),
+                ])
+                ->default(0)
+                ->help(trans('custom_bg_help'));
         }
 
         $form->saving(function (Form $form) {
-            // Handle custom background removal
-            if (request()->input('_remove_custom_bg') && in_array('1', request()->input('_remove_custom_bg', []))) {
+            if (request()->input('_remove_custom_bg') === '1') {
                 DB::table('request_background_images')
                     ->where('room_id', $form->model()->id)
                     ->where('status', 1)
                     ->update(['status' => 0]);
             }
-
-            // Remove the virtual field so it doesn't try to save to rooms table
             $form->ignore('_remove_custom_bg');
         });
 
         return $form;
+    }
+
+    private function buildPreviewHtml($room, $customBg)
+    {
+        $coverUrl = $room->room_cover ? getImagePath($room->room_cover) : null;
+        $presetBg = $room->background;
+
+        $coverCard = $this->previewCard(trans('room_cover'), $coverUrl);
+
+        if ($customBg) {
+            $customUrl = getImagePath($customBg->img);
+            $bgCard = $this->previewCard(
+                trans('custom_background'),
+                $customUrl,
+                'border-color:#f0ad4e;',
+                "<span class='label label-warning' style='font-size:11px;'>" . trans('active_overrides_preset') . "</span>"
+            );
+        } elseif ($presetBg) {
+            $presetUrl = getImagePath($presetBg->img);
+            $bgCard = $this->previewCard(
+                trans('preset_background') . " #{$presetBg->id}",
+                $presetUrl,
+                'border-color:#5bc0de;',
+                "<span class='label label-info' style='font-size:11px;'>" . trans('active') . "</span>"
+            );
+        } else {
+            $bgCard = $this->previewCard(
+                trans('background'),
+                null,
+                '',
+                "<span class='label label-default' style='font-size:11px;'>" . trans('using_default') . "</span>"
+            );
+        }
+
+        return "<div style='display:flex; gap:24px; flex-wrap:wrap;'>{$coverCard}{$bgCard}</div>";
+    }
+
+    private function previewCard($title, $imgUrl, $style = '', $badge = '')
+    {
+        $noImage = trans('no_image');
+        $img = $imgUrl
+            ? "<img src='{$imgUrl}' style='width:100%; max-width:220px; border-radius:6px; cursor:pointer;' onclick='openBgModal(\"{$imgUrl}\")' />"
+            : "<div style='width:220px; height:140px; background:#f5f5f5; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#aaa;'>{$noImage}</div>";
+
+        return "
+            <div style='border:2px solid #ddd; border-radius:8px; padding:12px; text-align:center; min-width:240px; {$style}'>
+                <div style='font-weight:600; margin-bottom:8px; font-size:13px;'>{$title}</div>
+                {$img}
+                <div style='margin-top:8px;'>{$badge}</div>
+            </div>
+        ";
     }
 }
