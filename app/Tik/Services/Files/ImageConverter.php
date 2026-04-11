@@ -73,8 +73,8 @@ class ImageConverter
                 file_put_contents($tempOutput, $encoded->toString());
                 $conversionMethod = 'intervention';
 
-            } catch (\Exception $interventionError) {
-                // Intervention failed - try ffmpeg as fallback
+            } catch (\Throwable $interventionError) {
+                // Intervention failed (Error or Exception) - try ffmpeg as fallback
                 \Log::info('WebP sync: Intervention failed, trying ffmpeg', [
                     'error' => $interventionError->getMessage()
                 ]);
