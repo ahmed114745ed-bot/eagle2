@@ -209,12 +209,14 @@ class Kernel extends ConsoleKernel
         $type = $settings['type'] ?? 'daily';
         $time = '00:00';
 
+        $weekStartDay = \App\helper\TimeHelper::startOfWeekConst();
+
         $command = $schedule->command('roomcup:calculate-rewards')
             ->timezone(getTimezone());
 
         match ($type) {
             'daily' => $command->dailyAt($time),
-            'weekly' => $command->weeklyOn(1, $time),
+            'weekly' => $command->weeklyOn($weekStartDay, $time),
             'monthly' => $command->monthlyOn(1, $time),
             default => $command->dailyAt($time),
         };

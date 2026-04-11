@@ -46,21 +46,21 @@ class GiftLogSummaryController extends MainController
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $timezone = getTimezone();
-                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
-                            ->setTimezone('UTC');
-                        $query->where('created_at', '>=', $start);
-                    }
-                }, __('From Date'), 'from_date')->datetime();
-            });
-            $filter->column(1 / 4, function ($filter) {
-                $filter->where(function ($query) {
-                    if ($this->input) {
-                        $timezone = getTimezone();
                         $end = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
                             ->setTimezone('UTC');
                         $query->where('created_at', '<=', $end);
                     }
                 }, __('To Date'), 'to_date')->datetime();
+            });
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $timezone = getTimezone();
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->datetime();
             });
         });
 
@@ -69,7 +69,7 @@ class GiftLogSummaryController extends MainController
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
-        $grid->disableRowSelector(); 
+        $grid->disableRowSelector();
 
         return $grid;
     }
