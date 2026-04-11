@@ -5,6 +5,8 @@ namespace App\Tik\Services\Files;
 use App\Helpers\Common;
 use App\Jobs\ConvertImageToWebPJob;
 use Illuminate\Http\UploadedFile;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class ImageConverter
 {
@@ -53,42 +55,53 @@ class ImageConverter
     }
 
     /**
-     * Convert to WebP synchronously, then upload (original behavior).
+     * Convert to WebP synchronously, then upload (using Intervention Image).
      */
     private static function convertAndUploadSync(UploadedFile $file, string $folder, int $qScale): false|string
     {
-        $inputFile = $file->getPathname(); // Temporary uploaded file
         $tempOutput = sys_get_temp_dir().'/'.uniqid('webp_', true).'.webp';
 
-        // Run ffmpeg command
-        $cmd = sprintf(
-            'ffmpeg -y -i %s -c:v libwebp -lossless 0 -qscale %d -preset picture %s 2>&1',
-            escapeshellarg($inputFile),
-            $qScale,
-            escapeshellarg($tempOutput)
-        );
+        try {
+            // Initialize Intervention Image Manager
+            $manager = new ImageManager(new Driver());
 
-        exec($cmd, $output, $returnCode);
+            // Load and convert image to WebP
+            $image = $manager->read($file->getPathname());
 
-        if ($returnCode !== 0 || ! file_exists($tempOutput)) {
+            // Encode to WebP with quality setting
+            $encoded = $image->toWebp($qScale);
+
+            // Save to temp file
+            file_put_contents($tempOutput, $encoded);
+
+            if (!file_exists($tempOutput)) {
+                return false;
+            }
+
+            // Convert file path into UploadedFile
+            $uploadedFile = new UploadedFile(
+                $tempOutput,                     // Absolute path
+                basename($tempOutput),           // Original file name
+                'image/webp',                    // Mime type
+                null,                            // Size (null = auto)
+                true                             // Test mode (skip file upload checks)
+            );
+
+            $path = Common::upload($folder, $uploadedFile);
+
+            // Delete temp file
+            @unlink($tempOutput);
+
+            // Return public URL
+            return $path;
+
+        } catch (\Exception $e) {
+            @unlink($tempOutput);
+            \Log::error('WebP conversion failed', [
+                'file' => $file->getClientOriginalName(),
+                'error' => $e->getMessage()
+            ]);
             return false;
         }
-
-        // Convert file path into UploadedFile
-        $uploadedFile = new UploadedFile(
-            $tempOutput,                     // Absolute path
-            basename($tempOutput),           // Original file name
-            'image/webp',                    // Mime type
-            null,                            // Size (null = auto)
-            true                             // Test mode (skip file upload checks)
-        );
-
-        $path = Common::upload($folder, $uploadedFile);
-
-        // Delete temp file
-        @unlink($tempOutput);
-
-        // Return public URL
-        return $path;
     }
 }
