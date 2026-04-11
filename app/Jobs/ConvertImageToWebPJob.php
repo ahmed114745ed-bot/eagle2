@@ -65,24 +65,52 @@ class ConvertImageToWebPJob implements ShouldQueue
 
         try {
             // Download original file to temp location first
-            // This avoids binary corruption issues with Redis queue serialization
             file_put_contents($tempInput, $storage->get($this->originalPath));
 
             if (!file_exists($tempInput)) {
                 throw new \Exception('Failed to download original file from storage');
             }
 
-            // Initialize Intervention Image Manager with GD driver
-            $manager = new ImageManager(new Driver());
+            // Try Intervention Image first, fallback to ffmpeg if it fails
+            $conversionMethod = 'unknown';
 
-            // Read image from temp file (not from binary data)
-            $image = $manager->read($tempInput);
+            try {
+                // Try using Intervention Image (requires GD/Imagick with proper support)
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($tempInput);
+                $encoded = $image->toWebp($this->quality);
+                file_put_contents($tempOutput, $encoded->toString());
+                $conversionMethod = 'intervention';
 
-            // Encode to WebP with quality setting
-            $encoded = $image->toWebp($this->quality);
+            } catch (\Exception $interventionError) {
+                // Intervention failed - try ffmpeg as fallback
+                Log::info('ConvertImageToWebPJob: Intervention failed, trying ffmpeg', [
+                    'error' => $interventionError->getMessage()
+                ]);
 
-            // Save WebP to temp file
-            file_put_contents($tempOutput, $encoded->toString());
+                // Check if ffmpeg is available
+                exec('which ffmpeg 2>&1', $ffmpegCheck, $ffmpegExists);
+
+                if ($ffmpegExists !== 0) {
+                    throw new \Exception('Neither Intervention Image nor ffmpeg is available for conversion');
+                }
+
+                // Use ffmpeg
+                $cmd = sprintf(
+                    'ffmpeg -y -i %s -c:v libwebp -lossless 0 -q:v %d -preset picture %s 2>&1',
+                    escapeshellarg($tempInput),
+                    $this->quality,
+                    escapeshellarg($tempOutput)
+                );
+
+                exec($cmd, $output, $returnCode);
+
+                if ($returnCode !== 0) {
+                    throw new \Exception('FFmpeg conversion failed: ' . implode("\n", $output));
+                }
+
+                $conversionMethod = 'ffmpeg';
+            }
 
             if (!file_exists($tempOutput)) {
                 throw new \Exception('WebP conversion failed - output file not created');
@@ -114,6 +142,7 @@ class ConvertImageToWebPJob implements ShouldQueue
                 'original' => $this->originalPath,
                 'webp' => $webpPath,
                 'quality' => $this->quality,
+                'method' => $conversionMethod,
                 'size_before' => filesize($tempInput),
                 'size_after' => filesize($tempOutput),
             ]);
