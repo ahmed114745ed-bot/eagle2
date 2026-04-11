@@ -62,29 +62,36 @@ class ImageConverter
         $tempOutput = sys_get_temp_dir().'/'.uniqid('webp_', true).'.webp';
 
         try {
-            // Initialize Intervention Image Manager
+            // Initialize Intervention Image Manager with GD driver
             $manager = new ImageManager(new Driver());
 
-            // Load and convert image to WebP
+            // Read image from uploaded file path (not binary data)
             $image = $manager->read($file->getPathname());
 
             // Encode to WebP with quality setting
             $encoded = $image->toWebp($qScale);
 
             // Save to temp file
-            file_put_contents($tempOutput, $encoded);
+            file_put_contents($tempOutput, $encoded->toString());
 
             if (!file_exists($tempOutput)) {
+                \Log::error('WebP sync conversion failed - output file not created', [
+                    'file' => $file->getClientOriginalName(),
+                ]);
                 return false;
             }
 
+            // Prepare filename
+            $pathInfo = pathinfo($file->getClientOriginalName());
+            $webpFilename = $pathInfo['filename'] . '.webp';
+
             // Convert file path into UploadedFile
             $uploadedFile = new UploadedFile(
-                $tempOutput,                     // Absolute path
-                basename($tempOutput),           // Original file name
-                'image/webp',                    // Mime type
-                null,                            // Size (null = auto)
-                true                             // Test mode (skip file upload checks)
+                $tempOutput,
+                $webpFilename,
+                'image/webp',
+                null,
+                true
             );
 
             $path = Common::upload($folder, $uploadedFile);
@@ -97,9 +104,10 @@ class ImageConverter
 
         } catch (\Exception $e) {
             @unlink($tempOutput);
-            \Log::error('WebP conversion failed', [
+            \Log::error('WebP sync conversion failed', [
                 'file' => $file->getClientOriginalName(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return false;
         }
