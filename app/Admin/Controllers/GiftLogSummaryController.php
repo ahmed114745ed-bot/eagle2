@@ -4,7 +4,7 @@ namespace App\Admin\Controllers;
 
 use Carbon\Carbon;
 use Encore\Admin\Grid;
-use Utd\Gifts\Entities\GiftLog;
+use App\Models\GiftLog;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -35,24 +35,11 @@ class GiftLogSummaryController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            
+
             // Disable default ID filter to reorder it
             $filter->disableIdFilter();
 
             // Date range filters - From Date (column 1)
-            // From Date (column 1)
-            $filter->column(1 / 3, function ($filter) {
-                $filter->where(function ($query) {
-                    if ($this->input) {
-                        $timezone = getTimezone();
-                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
-                            ->setTimezone('UTC');
-                        $query->where('created_at', '>=', $start);
-                    }
-                }, __('From Date'), 'from_date')->datetime(['format' => 'YYYY-MM-DD HH:mm']);
-            });
-
-            // To Date (column 2)
             $filter->column(1 / 3, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
@@ -61,7 +48,19 @@ class GiftLogSummaryController extends MainController
                             ->setTimezone('UTC');
                         $query->where('created_at', '<=', $end);
                     }
-                }, __('To Date'), 'to_date')->datetime(['format' => 'YYYY-MM-DD HH:mm']);
+                }, __('To Date'), 'to_date')->datetime();
+            });
+
+            // To Date (column 2)
+            $filter->column(1 / 3, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $timezone = getTimezone();
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->datetime();
             });
 
             // Room filter (only for rooms tab) - column 3
@@ -72,7 +71,7 @@ class GiftLogSummaryController extends MainController
                         ->ajax(route('admin.filter-rooms'));
                 });
             }
-            
+
             // ID filter at the end (last column)
             $filter->column(1 / 3, function ($filter) {
                 $filter->equal('id', __('ID'))->placeholder(__('ID'));
