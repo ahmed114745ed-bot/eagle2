@@ -9,6 +9,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Support\Facades\DB;
 
 class RoomBackgroundManagerController extends MainController
 {
@@ -58,39 +59,40 @@ class RoomBackgroundManagerController extends MainController
         $grid->column('numid', 'NumID');
         $grid->column('room_name', 'Room Name');
 
-        $grid->column('room_cover', 'Room Cover')->display(function ($cover) {
+        $grid->column('room_cover', 'Cover')->display(function ($cover) {
             if (empty($cover)) {
                 return '<span style="color:#999;">No cover</span>';
             }
             $url = getImagePath($cover);
-            return "
-                <img src='{$url}' style='width:60px; height:60px; border-radius:5px; cursor:pointer; object-fit:cover;'
-                     onclick='openBgModal(\"{$url}\")' />
-            ";
+            return "<img src='{$url}' style='width:60px; height:60px; border-radius:5px; cursor:pointer; object-fit:cover;' onclick='openBgModal(\"{$url}\")' />";
         });
 
         $grid->column('final_room_image', 'Background')->display(function () {
-            $bgImg = $this->backgroundImage?->img
-                ?? $this->background?->img
-                ?? null;
+            // Check custom background first (highest priority)
+            $customBg = DB::table('request_background_images')
+                ->where('room_id', $this->id)
+                ->where('status', 1)
+                ->where(function ($q) {
+                    $q->where('expair', '>=', now()->timestamp)->orWhere('expair', 0);
+                })
+                ->orderByDesc('id')
+                ->first();
+
+            $bgImg = $customBg->img ?? $this->background?->img ?? null;
+            $source = $customBg ? 'Custom' : ($this->room_background ? 'Preset #' . $this->room_background : 'Default');
 
             if (empty($bgImg)) {
                 return '<span style="color:#999;">Default</span>';
             }
 
             $url = getImagePath($bgImg);
-            return "
-                <img src='{$url}' style='width:60px; height:60px; border-radius:5px; cursor:pointer; object-fit:cover;'
-                     onclick='openBgModal(\"{$url}\")' />
-            ";
+            return "<div>
+                <img src='{$url}' style='width:60px; height:60px; border-radius:5px; cursor:pointer; object-fit:cover;' onclick='openBgModal(\"{$url}\")' />
+                <br><small style='color:#888;'>{$source}</small>
+            </div>";
         });
 
         $grid->column('room_background', 'BG ID');
-
-        $grid->column('uid', 'Owner')->display(function ($uid) {
-            $user = \App\Models\User::find($uid);
-            return $user ? ($user->name ?? $user->uuid) : $uid;
-        });
 
         $grid->actions(function ($actions) {
             $actions->disableView();
@@ -138,39 +140,46 @@ class RoomBackgroundManagerController extends MainController
         $form->display('id', 'ID');
         $form->display('room_name', 'Room Name');
 
-        $form->image('room_cover', 'Room Cover')
-            ->disk('gcs')
-            ->dir('rooms')
-            ->uniqueName()
-            ->removable();
+        // Current state preview
+        $form->divider('Current State');
 
-        $form->select('room_background', 'Preset Background')
-            ->options(function () {
-                return Background::where('enable', 1)
-                    ->pluck('id', 'id')
-                    ->mapWithKeys(function ($id) {
-                        return [$id => "Background #{$id}"];
-                    });
-            })
-            ->default(null);
-
-        $form->divider('Current Background Preview');
-
-        $form->html(function () use ($form) {
-            $room = Room::find(request()->route('room_background_manager'));
+        $form->html(function () {
+            $roomId = request()->route('room_background_manager');
+            $room = Room::find($roomId);
             if (!$room) return '';
 
             $coverUrl = $room->room_cover ? getImagePath($room->room_cover) : null;
-            $bgImg = $room->backgroundImage?->img ?? $room->background?->img ?? null;
-            $bgUrl = $bgImg ? getImagePath($bgImg) : null;
+
+            // Get custom background
+            $customBg = DB::table('request_background_images')
+                ->where('room_id', $room->id)
+                ->where('status', 1)
+                ->where(function ($q) {
+                    $q->where('expair', '>=', now()->timestamp)->orWhere('expair', 0);
+                })
+                ->orderByDesc('id')
+                ->first();
+
+            $presetBg = $room->background;
+            $activeImg = $customBg->img ?? $presetBg?->img ?? null;
+            $activeUrl = $activeImg ? getImagePath($activeImg) : null;
+            $source = $customBg ? "Custom (request_background_images #{$customBg->id})" : ($presetBg ? "Preset Background #{$presetBg->id}" : "Default");
 
             $coverHtml = $coverUrl
                 ? "<img src='{$coverUrl}' style='max-width:200px; max-height:200px; border-radius:8px; border:2px solid #ddd;' />"
                 : '<span style="color:#999;">No cover image</span>';
 
-            $bgHtml = $bgUrl
-                ? "<img src='{$bgUrl}' style='max-width:200px; max-height:200px; border-radius:8px; border:2px solid #ddd;' />"
+            $bgHtml = $activeUrl
+                ? "<img src='{$activeUrl}' style='max-width:200px; max-height:200px; border-radius:8px; border:2px solid #ddd;' />"
                 : '<span style="color:#999;">Default background</span>';
+
+            $customNote = $customBg
+                ? "<div style='margin-top:10px; padding:10px; background:#fff3cd; border:1px solid #ffc107; border-radius:5px;'>
+                       <strong>Note:</strong> This room has an active custom background (ID: {$customBg->id}).
+                       Check the <b>'Remove Custom Background'</b> checkbox below to remove it.
+                       Otherwise, changing the preset background will have no visible effect.
+                   </div>"
+                : '';
 
             return "
                 <div style='display:flex; gap:30px; align-items:flex-start;'>
@@ -179,17 +188,60 @@ class RoomBackgroundManagerController extends MainController
                         {$coverHtml}
                     </div>
                     <div style='text-align:center;'>
-                        <h5>Room Background</h5>
+                        <h5>Active Background ({$source})</h5>
                         {$bgHtml}
                     </div>
                 </div>
+                {$customNote}
             ";
         });
 
-        $form->saving(function (Form $form) {
-            if ($form->room_cover === null && $form->model()->room_cover) {
-                // Cover was removed
+        $form->divider('Edit');
+
+        $form->image('room_cover', 'Room Cover')
+            ->disk('gcs')
+            ->dir('rooms')
+            ->uniqueName()
+            ->removable();
+
+        $form->select('room_background', 'Preset Background')
+            ->options(function () {
+                $options = ['' => '-- No preset --'];
+                $backgrounds = Background::where('enable', 1)->get();
+                foreach ($backgrounds as $bg) {
+                    $options[$bg->id] = "Background #{$bg->id}";
+                }
+                return $options;
+            });
+
+        // Check if room has custom background
+        $roomId = request()->route('room_background_manager');
+        if ($roomId) {
+            $hasCustom = DB::table('request_background_images')
+                ->where('room_id', $roomId)
+                ->where('status', 1)
+                ->where(function ($q) {
+                    $q->where('expair', '>=', now()->timestamp)->orWhere('expair', 0);
+                })
+                ->exists();
+
+            if ($hasCustom) {
+                $form->checkbox('_remove_custom_bg', 'Remove Custom Background')
+                    ->options([1 => 'Yes, remove the custom background so the preset one is used instead']);
             }
+        }
+
+        $form->saving(function (Form $form) {
+            // Handle custom background removal
+            if (request()->input('_remove_custom_bg') && in_array('1', request()->input('_remove_custom_bg', []))) {
+                DB::table('request_background_images')
+                    ->where('room_id', $form->model()->id)
+                    ->where('status', 1)
+                    ->update(['status' => 0]);
+            }
+
+            // Remove the virtual field so it doesn't try to save to rooms table
+            $form->ignore('_remove_custom_bg');
         });
 
         return $form;
