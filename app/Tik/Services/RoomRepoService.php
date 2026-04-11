@@ -112,7 +112,8 @@ class RoomRepoService
             $room->room_cover = WebPHelper::uploadWebp(
                 $request->file('room_cover'),
                 'rooms',
-                'room_cover'
+                'room_cover',
+                async: true  // Convert to WebP asynchronously
             );
         } else {
             $room->room_cover = $request->room_cover;
@@ -665,7 +666,8 @@ class RoomRepoService
             $room->room_cover = WebPHelper::uploadWebp(
                 $request->file('room_cover'),
                 'rooms',
-                'room_cover'
+                'room_cover',
+                async: true  // Convert to WebP asynchronously
             );
         }
 
