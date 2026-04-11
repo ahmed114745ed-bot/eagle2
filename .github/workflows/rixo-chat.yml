@@ -11,7 +11,7 @@ jobs:
     - name: pull latest code
       uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.162.251"
+        host: "34.18.96.67"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
@@ -40,7 +40,7 @@ jobs:
     - name: build and deploy rixo-chat app
       uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.162.251"
+        host: "34.18.96.67"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
@@ -64,7 +64,7 @@ jobs:
     - name: build and deploy rixo-chat job
       uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.162.251"
+        host: "34.18.96.67"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
