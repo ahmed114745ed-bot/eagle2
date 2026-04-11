@@ -60,32 +60,42 @@ class ConvertImageToWebPJob implements ShouldQueue
             return;
         }
 
+        $tempInput = sys_get_temp_dir() . '/' . uniqid('webp_input_', true);
         $tempOutput = sys_get_temp_dir() . '/' . uniqid('webp_output_', true) . '.webp';
 
         try {
-            // Get original image from storage
-            $imageContent = $storage->get($this->originalPath);
+            // Download original file to temp location first
+            // This avoids binary corruption issues with Redis queue serialization
+            file_put_contents($tempInput, $storage->get($this->originalPath));
 
-            // Initialize Intervention Image Manager
+            if (!file_exists($tempInput)) {
+                throw new \Exception('Failed to download original file from storage');
+            }
+
+            // Initialize Intervention Image Manager with GD driver
             $manager = new ImageManager(new Driver());
 
-            // Load and convert image to WebP using Intervention Image
-            $image = $manager->read($imageContent);
+            // Read image from temp file (not from binary data)
+            $image = $manager->read($tempInput);
 
             // Encode to WebP with quality setting
             $encoded = $image->toWebp($this->quality);
 
-            // Save to temp file
-            file_put_contents($tempOutput, $encoded);
+            // Save WebP to temp file
+            file_put_contents($tempOutput, $encoded->toString());
 
             if (!file_exists($tempOutput)) {
-                throw new \Exception('WebP conversion failed');
+                throw new \Exception('WebP conversion failed - output file not created');
             }
+
+            // Prepare for upload
+            $pathInfo = pathinfo($this->originalPath);
+            $webpFilename = $pathInfo['filename'] . '.webp';
 
             // Upload WebP version
             $uploadedFile = new UploadedFile(
                 $tempOutput,
-                basename($tempOutput),
+                $webpFilename,
                 'image/webp',
                 null,
                 true
@@ -94,31 +104,31 @@ class ConvertImageToWebPJob implements ShouldQueue
             $webpPath = Common::upload($this->folder, $uploadedFile);
 
             if (!$webpPath) {
-                throw new \Exception('Failed to upload WebP file');
+                throw new \Exception('Failed to upload WebP file to storage');
             }
 
-            // Delete original file and replace with WebP
+            // Delete original file (already converted to WebP)
             $storage->delete($this->originalPath);
-
-            // If paths are different, move WebP to original path location
-            if ($webpPath !== $this->originalPath) {
-                // Copy WebP to original path with .webp extension
-                $pathInfo = pathinfo($this->originalPath);
-                $newPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
-
-                if ($storage->exists($webpPath)) {
-                    $storage->move($webpPath, $newPath);
-                }
-            }
 
             Log::info('ConvertImageToWebPJob: Successfully converted image', [
                 'original' => $this->originalPath,
                 'webp' => $webpPath,
                 'quality' => $this->quality,
+                'size_before' => filesize($tempInput),
+                'size_after' => filesize($tempOutput),
             ]);
 
+        } catch (\Exception $e) {
+            Log::error('ConvertImageToWebPJob: Conversion failed', [
+                'path' => $this->originalPath,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+
         } finally {
-            // Cleanup temp file
+            // Cleanup temp files
+            @unlink($tempInput);
             @unlink($tempOutput);
         }
     }
