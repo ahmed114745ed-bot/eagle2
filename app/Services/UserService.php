@@ -420,7 +420,7 @@ class UserService
                 'status' => 1
             ]);
           //  $this->handleFollowBack($request->user(), $receiver);
-            dispatch(new FollowJob($request->user(), $receiver))->onQueue('follow-user-job');
+            dispatch(new FollowJob($request->user(), $receiver))->onQueue('default');
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);
         }

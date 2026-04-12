@@ -544,6 +544,7 @@ class HomeCarouselController extends MainController
                         request()->file('img'),
                         'images',
                         'splash',
+                        async: false  // Admin: keep sync for immediate feedback
 
                     );
 

@@ -357,13 +357,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -371,6 +365,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
@@ -668,13 +663,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -682,6 +671,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
@@ -974,13 +964,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -988,6 +972,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
@@ -1290,13 +1275,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -1304,6 +1283,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
