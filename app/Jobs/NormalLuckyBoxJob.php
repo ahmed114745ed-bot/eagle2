@@ -44,6 +44,7 @@ class NormalLuckyBoxJob implements ShouldQueue
 
         foreach ($userBoxes as $userBox) {
             $user = User::where('id', $userBox->user_id)->first();
+            if (!$user) continue;
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
                 $user->id ,
@@ -58,7 +59,7 @@ class NormalLuckyBoxJob implements ShouldQueue
             $room = Room::withoutAppends()->where('id', $userBox->room_id)->select('id')->first();
             $c = BoxUse::query()->where('room_id', $userBox->room_id)->where('not_used_num', '>', 0)->count();
             $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
-            $userWinner = UserBoxGift::where('box_uses_id', $userBox)->pluck('user_id')->toArray();
+            $userWinner = UserBoxGift::where('box_uses_id', $userBox->id)->pluck('user_id')->toArray();
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
 
             $winnerBox = UserBoxGift::where('box_uses_id', $userBox->id)->exists();
@@ -81,7 +82,7 @@ class NormalLuckyBoxJob implements ShouldQueue
                     ]
                 ];
                 $json = json_encode($m);
-                Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
+                Common::sendToZego('SendCustomCommand', @$room->id, $userRoomVisit, $json);
             }
         }
     }
