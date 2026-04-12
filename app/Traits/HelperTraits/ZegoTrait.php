@@ -95,7 +95,7 @@ trait ZegoTrait
             $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
 
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
-                Log::warning('ZegoTrait::sendToZego failed', [
+                Log::channel('zego')->warning('ZegoTrait::sendToZego failed', [
                     'action' => $Action,
                     'roomId' => $roomId,
                     'fromUserId' => $FromUserId,
@@ -105,7 +105,7 @@ trait ZegoTrait
             
             return $response;
         } catch (\Exception $exception) {
-            Log::error('ZegoTrait::sendToZego exception', [
+            Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
                 'action' => $Action,
                 'roomId' => $RoomId,
                 'fromUserId' => $FromUserId,
@@ -144,8 +144,24 @@ trait ZegoTrait
         $headers = [];
         try {
 
-            Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
+            $response = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
+            if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
+                Log::channel('zego')->warning('ZegoTrait::sendToZego failed', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $UserId,
+                    'response' => $response,
+                ]);
+            }
+            
+            return $response;
         } catch (\Exception $exception) {
+            Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
+                'action' => $Action,
+                'roomId' => $RoomId,
+                'fromUserId' => $UserId,
+                'error' => $exception->getMessage(),
+            ]);
         }
         return;
     }
@@ -175,9 +191,22 @@ trait ZegoTrait
         ];
         $headers = [];
         try {
-
-            $res = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
-        } catch (\Exception $exception) {
+           $res = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
+            if ($res === null || (isset($res['Code']) && $res['Code'] != 0)) {
+                Log::channel('zego')->warning('ZegoTrait::sendToZego_3 failed', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $UserId,
+                    'response' => $res,
+                ]);
+            }
+           } catch (\Exception $exception) {
+            Log::channel('zego')->error('ZegoTrait::sendToZego_3 exception', [
+                'action' => $Action,
+                'roomId' => $RoomId,
+                'fromUserId' => $UserId,
+                'error' => $exception->getMessage(),
+            ]);
         }
 
         return $res;
@@ -210,8 +239,27 @@ trait ZegoTrait
         $headers = [];
         try {
             $res = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
-        } catch (\Exception $exception) {
-        }
+            if ($res === null || (isset($res['Code']) && $res['Code'] != 0)) {
+                Log::channel('zego')->warning('ZegoTrait::sendToZego_4 failed', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $fromUserId,
+                    'toUserId' => $toUserId,
+                    'response' => $res,
+                ]);
+                }
+
+            } catch (\Exception $exception) {
+                Log::channel('zego')->error('ZegoTrait::sendToZego_4 exception', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $fromUserId,
+                    'toUserId' => $toUserId,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+
+        
 
         return $res;
     }

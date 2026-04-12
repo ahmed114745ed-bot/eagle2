@@ -23,7 +23,8 @@ class WebPHelper
     public static function uploadWebp(
         UploadedFile $file,
         string $folder,
-        string $type = 'profile_image'
+        string $type = 'profile_image',
+        bool $async = true
     ): false|string {
 
         if (! $file->isValid()) {
@@ -35,7 +36,8 @@ class WebPHelper
         return ImageConverter::toWebpAndUpload(
             $file,
             $folder,
-            $quality
+            $quality,
+            $async
         );
     }
 }

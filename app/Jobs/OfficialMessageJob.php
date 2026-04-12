@@ -42,7 +42,6 @@ class OfficialMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // Log::info('OfficialMessageJob raw request', $this->request);
         $feature = $this->request['feature'] ?? null;
         $subFeature = $this->request['sub_feature'] ?? null;
         $memberTitle = $this->request['member_title'] ?? 'owner';
@@ -57,7 +56,6 @@ class OfficialMessageJob implements ShouldQueue
         $FamilyUsersId = [];
         $BdUsersId = [];
 
-        // Log::info($featureIds);
 
         // ✅ Always make $featureIds an array safely
         if (!is_array($featureIds)) {
@@ -163,12 +161,6 @@ class OfficialMessageJob implements ShouldQueue
         }
 
 
-        // Log::info('OfficialMessageJob started', [
-        //     'feature'      => $feature,
-        //     'sub_feature'  => $subFeature,
-        //     'member_title' => $memberTitle,
-        //     'feature_ids'  => $featureIds,
-        // ]);
 
         $countriesIds = Common::areaCountriesV2($this->admin->id);
 
@@ -186,7 +178,6 @@ class OfficialMessageJob implements ShouldQueue
                 if ($memberTitle === 'owner') {
                     $usersId = $agencies->pluck('app_owner_id')->toArray();
                    
-                    // Log::info($usersId);
                 } elseif ($memberTitle === 'admin') {
                     $usersId = array_merge($usersId, $agency->admins->pluck('user_id')->toArray());
                 } elseif ($memberTitle === 'members') {
@@ -240,13 +231,6 @@ class OfficialMessageJob implements ShouldQueue
 
             $usersId = $agencies->pluck('app_owner_id')->toArray();
         }
-        // Log::info('OfficialMessageJob raw usersId', [
-        //     'usersId'      => $usersId,
-        //     'feature'      => $feature,
-        //     'subFeature' => $subFeature,
-        //     'countriesIds' => $countriesIds,
-        //     'admin' => $this->admin,
-        // ]);
         
         // Call your custom notification logic
         CustomNotification::officialMsg($this->model, $usersId);

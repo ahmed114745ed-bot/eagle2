@@ -151,11 +151,6 @@ class PaymentMethodController extends Controller
 
         $coinLog = CoinLog::where('trx', $merchantOrderId)->first();
         $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
-           \Log::info('Looking up records', [
-            'merchantOrderId' => $merchantOrderId,
-            'coinLog_found' => (bool) $coinLog,
-            'paymentMethod_found' => (bool) $paymentMethod,
-        ]);
         if (!$coinLog && !$paymentMethod) {
             return response()->json(['status' => 'error', 'message' => 'Payment not found'], 404);
         }

@@ -143,8 +143,6 @@ class WeeklyRankingCommand extends Command
         $results = $query->get()->values();
         //dd($results);
         // Log the results count
-        // Log::info("Charge results count", [
-        //     'count' => $results->count()
         // ]);
 
         return $results;
@@ -229,12 +227,6 @@ class WeeklyRankingCommand extends Command
 
         if (!empty($tokens)) {
             // Log that the job is being dispatched
-            // Log::info('Dispatching SendFirebaseNotificationIndividualUserJob', [
-            //     'tokens_count' => count($tokens),
-            //     'range_min'    => $min,
-            //     'range_max'    => $max,
-            //     'image'        => $image
-            // ]);
 
             SendFirebaseNotificationIndividualUserJob::dispatch(
                 tokens: $tokens,

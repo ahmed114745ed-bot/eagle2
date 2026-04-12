@@ -106,7 +106,6 @@ class RoomBoomMediaSeeder extends Seeder
         if ($this->command) {
             $this->command->info($message);
         } else {
-            Log::info($message);
         }
     }
 
