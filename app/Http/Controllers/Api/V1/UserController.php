@@ -1010,16 +1010,34 @@ class UserController extends Controller
             return Common::apiResponse(false, __('invitation.already_registered'), $existing, 409);
         }
 
-        $this->createInvitation($userParent->id, $userId);
+        // Use transaction to prevent race condition
+        try {
+            DB::transaction(function () use ($userId, $userParent) {
+                // Lock for update to prevent concurrent requests
+                $existingInvitation = UserCodeInvitation::where('invited_id', $userId)
+                    ->lockForUpdate()
+                    ->first();
+                    
+                if ($existingInvitation) {
+                    throw new \Exception('already_invited');
+                }
 
+                $invitation = $this->createInvitation($userParent->id, $userId);
+                
+                $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
+                    'invited_id' => $userId
+                ]);
 
-        $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
-            'invited_id' => $userId
-        ]);
-
-        $this->rewardUser(Auth::user(), $this->getValue('invitation_invitee_reward'), 'invitation_invitee_reward', [
-            'parent_id' => $userParent->id
-        ]);
+                $this->rewardUser(Auth::user(), $this->getValue('invitation_invitee_reward'), 'invitation_invitee_reward', [
+                    'parent_id' => $userParent->id
+                ]);
+            });
+        } catch (\Exception $e) {
+            if ($e->getMessage() === 'already_invited') {
+                return Common::apiResponse(false, __('invitation.already_registered'), null, 409);
+            }
+            throw $e;
+        }
 
         CustomNotification::codeInvitationUses($userParent, Auth::user());
 
@@ -1081,7 +1099,7 @@ class UserController extends Controller
 
     private function rewardUser(User $user, int $reward, string $type, array $meta = []): void
     {
-        $amountBefore =  Common::getCurrentBalance($user->id);
+        $amountBefore = Common::getCurrentBalance($user->id);
 
         if ($reward > 0) {
             $user->increment('di', $reward);
@@ -1091,6 +1109,14 @@ class UserController extends Controller
                 $amountBefore,
                 UserCoinLogType::INVITATION_CODE,
             );
+            
+         
+        } else {
+            \Log::warning('Invitation reward is 0', [
+                'user_id' => $user->id,
+                'type' => $type,
+                'reward_value' => $reward
+            ]);
         }
     }
 
