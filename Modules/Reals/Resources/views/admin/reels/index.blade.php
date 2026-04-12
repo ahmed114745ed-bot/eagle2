@@ -1044,69 +1044,109 @@
     </div>
 </div>
 
-<!-- Reels Data -->
+<!-- Reels Data - stored in a hidden div to survive PJAX -->
+<div id="reels-initial-data" style="display:none" data-reels='@json($reels)' data-seed="{{ $seed ?? '' }}"></div>
 <script data-exec-on-popstate>
-    window.initialReelsData = @json($reels);
-    window.randomSeed = {{ $seed ?? 'null' }};
-</script>
-    <script data-exec-on-popstate>
-        (function () {
-            const initAlpineInsideContainer = () => {
-                if (!window.Alpine || !window.reelsManager) {
-                    return false;
-                }
-
-                const container = document.querySelector('#pjax-container') || document.body;
-                if (!container) {
-                    return false;
-                }
-
-                try {
-                    if (window.Alpine.destroyTree) {
-                        const oldRoot = container.querySelector('.reels-main-container[x-data]');
-                        if (oldRoot && oldRoot._x_dataStack) {
-                            window.Alpine.destroyTree(oldRoot);
-                        }
-                    }
-
-                    if (window.Alpine.initTree) {
-                        window.Alpine.initTree(container);
-                    } else if (window.Alpine.start) {
-                        window.Alpine.start();
-                    }
-
-                    container.querySelectorAll('[x-cloak]').forEach((el) => el.removeAttribute('x-cloak'));
-                } catch (error) {
-                    console.error('Alpine reinit error:', error);
-                    return false;
-                }
-
-                return true;
-            };
-
-            const scheduleInit = () => {
-                let attempts = 0;
-                const attempt = () => {
-                    if (initAlpineInsideContainer()) {
-                        return;
-                    }
-                    if (attempts++ < 40) {
-                        setTimeout(attempt, 50);
-                    }
-                };
-                attempt();
-            };
-
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', scheduleInit, { once: true });
-            } else {
-                scheduleInit();
+    (function() {
+        // قراءة البيانات من الـ hidden div (يعمل مع PJAX لأن الـ div موجود في الـ DOM)
+        var dataEl = document.getElementById('reels-initial-data');
+        if (dataEl) {
+            try {
+                window.initialReelsData = JSON.parse(dataEl.getAttribute('data-reels') || '[]');
+                window.randomSeed = parseInt(dataEl.getAttribute('data-seed')) || null;
+                console.log('📦 [DATA] Reels loaded from DOM:', window.initialReelsData.length, 'reels');
+            } catch(e) {
+                console.error('❌ [DATA] Error parsing reels data:', e);
+                window.initialReelsData = [];
+                window.randomSeed = null;
             }
+        } else {
+            console.warn('⚠️ [DATA] reels-initial-data element not found');
+            window.initialReelsData = window.initialReelsData || [];
+        }
+        
+        // تحميل Alpine.js ديناميكياً إذا لم يكن محملاً
+        var ensureAlpineLoaded = function(callback) {
+            if (window.Alpine) { callback(); return; }
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js';
+            script.defer = true;
+            script.onload = function() { setTimeout(callback, 100); };
+            document.head.appendChild(script);
+        };
+        
+        // تحميل reels-manager.js ديناميكياً إذا لم يكن محملاً
+        var ensureReelsManagerLoaded = function(callback) {
+            if (window.reelsManager && typeof window.reelsManager === 'function') { callback(); return; }
+            var existingScript = document.querySelector('script[data-reels-manager]');
+            var script = document.createElement('script');
+            script.src = existingScript ? existingScript.src : '/modules/reals/js/reels-manager.js?v=' + Date.now();
+            script.onload = function() { callback(); };
+            document.head.appendChild(script);
+        };
 
-            ['pjax:complete', 'pjax:success', 'pjax:end'].forEach((eventName) => {
-                document.addEventListener(eventName, () => {
-                    setTimeout(scheduleInit, 0);
+        var initAlpine = function() {
+            if (!window.Alpine || !window.reelsManager || typeof window.reelsManager !== 'function') return false;
+            var container = document.querySelector('#pjax-container') || document.body;
+            var reelsEl = container ? container.querySelector('.reels-main-container[x-data]') : null;
+            if (!reelsEl) return false;
+
+            console.log('📊 [INIT] initialReelsData:', window.initialReelsData ? window.initialReelsData.length + ' reels' : 'EMPTY');
+
+            try {
+                if (window.Alpine.destroyTree && reelsEl._x_dataStack) {
+                    window.Alpine.destroyTree(reelsEl);
+                }
+                if (window.Alpine.initTree) {
+                    window.Alpine.initTree(container);
+                } else if (window.Alpine.start) {
+                    window.Alpine.start();
+                }
+                container.querySelectorAll('[x-cloak]').forEach(function(el) { el.removeAttribute('x-cloak'); });
+                console.log('✅ [INIT] Alpine initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('❌ [INIT] Alpine reinit error:', error);
+                return false;
+            }
+        };
+
+        var scheduleInit = function() {
+            ensureAlpineLoaded(function() {
+                ensureReelsManagerLoaded(function() {
+                    var attempts = 0;
+                    var attempt = function() {
+                        if (initAlpine()) return;
+                        if (attempts++ < 30) {
+                            setTimeout(attempt, 150);
+                        }
+                    };
+                    attempt();
                 });
             });
-        })();
-    </script>
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', scheduleInit, { once: true });
+        } else {
+            scheduleInit();
+        }
+
+        // PJAX events - only listen once, no duplicates
+        if (!window.__reelsPjaxBound) {
+            window.__reelsPjaxBound = true;
+            document.addEventListener('pjax:complete', function() {
+                // Re-read data from DOM after PJAX replaces content
+                var dataEl2 = document.getElementById('reels-initial-data');
+                if (dataEl2) {
+                    try {
+                        window.initialReelsData = JSON.parse(dataEl2.getAttribute('data-reels') || '[]');
+                        window.randomSeed = parseInt(dataEl2.getAttribute('data-seed')) || null;
+                        console.log('🔄 [PJAX] Re-loaded data from DOM:', window.initialReelsData.length, 'reels');
+                    } catch(e) { /* ignore */ }
+                }
+                setTimeout(scheduleInit, 200);
+            });
+        }
+    })();
+</script>

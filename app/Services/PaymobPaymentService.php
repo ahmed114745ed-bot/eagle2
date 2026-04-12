@@ -67,7 +67,6 @@ class PaymobPaymentService
         
         if (empty($utdUrl)) {
             $utdUrl = config("services.utd_paymob.utd_paymob_url");
-            Log::info('Trying alternative URL config:', ['alternative_url' => $utdUrl]);
         }
         
         if (empty($utdUrl)) {

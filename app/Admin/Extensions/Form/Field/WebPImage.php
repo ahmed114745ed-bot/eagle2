@@ -28,7 +28,7 @@ class WebPImage extends File
                 Storage::delete($this->model()->{$this->column});
             }
 
-            $path = WebPHelper::uploadWebp($file, $this->getFolder(), $this->imageType);
+            $path = WebPHelper::uploadWebp($file, $this->getFolder(), $this->imageType, async: false);
 
             return $path ?: $file;
         }

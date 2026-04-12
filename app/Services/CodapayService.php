@@ -55,11 +55,6 @@ class CodapayService
             'Content-Type' => 'application/json',
         ])->post($url, $body);
 
-        // Log::info('Codapay Payment Response', [
-        //     'trx' => $trx,
-        //     'body' => $body,
-        //     'response' => $response->json(),
-        // ]);
 
         $json = $response->json();
         $txnId = $json['initResult']['txnId'];
@@ -110,7 +105,6 @@ class CodapayService
         $resultCode = $request->input('ResultCode');
         $checksum = $request->input('Checksum');
 
-        // \Log::info('Codapay Callback Received', $request->all());
 
         $secretKey = config('codapay.api_key');
         $computedChecksum = md5($txnId . $secretKey . $orderId . $resultCode);
@@ -133,17 +127,10 @@ class CodapayService
             ]);
         }
 
-        // \Log::info('Codapay callback verified', [
-        //     'TxnId' => $txnId,
-        //     'OrderId' => $orderId,
-        //     'ResultCode' => $resultCode,
-        // ]);
 
         if ($resultCode === "0") {
-            // Log::info("✅ Codapay Payment Success", compact('orderId', 'txnId'));
             return $this->webhookPayment($orderId, method: 'codapay', newTrx: $txnId);
         } else {
-            // Log::info("❌ Codapay Payment Failed", compact('orderId', 'txnId', 'resultCode'));
             $coinLog->update(['status' => PaymentStatus::CANCELED, 'trx' => $txnId]);
             return response()->json(['status'  => false, 'trx' => $txnId, 'message' => 'Transaction declined.',]);
         }
@@ -173,7 +160,6 @@ class CodapayService
         ])->post($url, $body);
 
         $json = $response->json();
-        // \Log::info('Codapay Inquiry Response', ['txnId' => $coinLog->trx, 'response' => $json]);
 
         $paymentResult = $json['paymentResult'] ?? null;
         $entries = $paymentResult['profile']['entry'] ?? [];

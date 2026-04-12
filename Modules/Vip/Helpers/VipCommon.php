@@ -13,7 +13,7 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending', $isUsed = null, $sendNotification = 1): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending', $isUsed = null, $sendNotification = 1 , $vip_gift_message = null, $vip_img = null): bool
     {
         try {
             DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType, $isUsed) {
@@ -39,10 +39,15 @@ class VipCommon
             });
 
             if ($sendNotification) {
+               
+                $vip_gift_message = $vip_gift_message ?? __('vip_gift_message') ;
+                $data['image'] = $vip_img ?? $vip->img;
+
+                
                 Common::sendOfficialMessage(
                     $user->id,
                     __('congratulations'),
-                    __('vip_gift_message')
+                    $vip_gift_message
                 );
 
                 $tokens_notification = [
@@ -52,7 +57,9 @@ class VipCommon
                 Common::send_firebase_notification(
                     $tokens_notification,
                     config('app.name_ar'),
-                    __('vip_gift_message') . $user->name
+                  $vip_gift_message .' : '. $user->name,
+                    '',
+                    $data
                 );
             }
 
@@ -279,11 +286,6 @@ class VipCommon
 
     public static function  removeVipFromUser($user, $id, $receive_type)
     {
-        // \Log::info("Start removeVipFromUser", [
-        //     'user_id' => $user->id,
-        //     'vip_id' => $id,
-        //     'receive_type' => $receive_type,
-        // ]);
         $vip = UserVip::where('receive_type', $receive_type)
             ->where('user_id', $user->id)
             ->where('vip_id', $id)
@@ -294,10 +296,6 @@ class VipCommon
 
 
         $vipReceiveType = $receive_type . '-' . $vip->level;
-        // \Log::info("Deleted Packs", [
-        //     'vip_user_id' => $vip->id,
-        //     'count_deleted' => $vipReceiveType,
-        // ]);
         Pack::where('vip_user_id',  $vip->id)
             ->where('receive_type', $vipReceiveType)
             ->where('user_id', $user->id)
