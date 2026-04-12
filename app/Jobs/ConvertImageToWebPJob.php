@@ -54,9 +54,6 @@ class ConvertImageToWebPJob implements ShouldQueue
 
         // Check if original file exists
         if (!$storage->exists($this->originalPath)) {
-            Log::warning('ConvertImageToWebPJob: Original file not found', [
-                'path' => $this->originalPath,
-            ]);
             return;
         }
 
@@ -135,21 +132,7 @@ class ConvertImageToWebPJob implements ShouldQueue
             // Delete original file (already converted to WebP)
             $storage->delete($this->originalPath);
 
-            Log::info('ConvertImageToWebPJob: Successfully converted image', [
-                'original' => $this->originalPath,
-                'webp' => $webpPath,
-                'quality' => $this->quality,
-                'method' => $conversionMethod,
-                'size_before' => filesize($tempInput),
-                'size_after' => filesize($tempOutput),
-            ]);
-
         } catch (\Exception $e) {
-            Log::error('ConvertImageToWebPJob: Conversion failed', [
-                'path' => $this->originalPath,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             throw $e;
 
         } finally {
@@ -164,14 +147,6 @@ class ConvertImageToWebPJob implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error('ConvertImageToWebPJob failed permanently', [
-            'original_path' => $this->originalPath,
-            'folder' => $this->folder,
-            'quality' => $this->quality,
-            'attempts' => $this->attempts(),
-            'error' => $exception->getMessage(),
-        ]);
-
         // Keep original file if conversion fails - better to have original than nothing
     }
 }

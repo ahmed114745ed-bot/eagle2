@@ -95,7 +95,6 @@ class ImageConverter
                 exec($cmd, $output, $returnCode);
 
                 if ($returnCode !== 0) {
-                    \Log::error('WebP sync: ffmpeg failed', ['output' => implode("\n", $output)]);
                     return false;
                 }
 
@@ -103,7 +102,6 @@ class ImageConverter
             }
 
             if (!file_exists($tempOutput)) {
-                \Log::error('WebP sync conversion failed - output file not created');
                 return false;
             }
 
@@ -125,20 +123,11 @@ class ImageConverter
             // Delete temp file
             @unlink($tempOutput);
 
-            \Log::info('WebP sync conversion successful', [
-                'file' => $file->getClientOriginalName(),
-                'method' => $conversionMethod
-            ]);
-
             // Return public URL
             return $path;
 
         } catch (\Exception $e) {
             @unlink($tempOutput);
-            \Log::error('WebP sync conversion failed', [
-                'file' => $file->getClientOriginalName(),
-                'error' => $e->getMessage(),
-            ]);
             return false;
         }
     }
