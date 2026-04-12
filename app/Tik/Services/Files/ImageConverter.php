@@ -74,10 +74,7 @@ class ImageConverter
                 $conversionMethod = 'intervention';
 
             } catch (\Throwable $interventionError) {
-                // Intervention failed (Error or Exception) - try ffmpeg as fallback
-                \Log::info('WebP sync: Intervention failed, trying ffmpeg', [
-                    'error' => $interventionError->getMessage()
-                ]);
+                // Intervention failed (Error or Exception) - try ffmpeg as fallback silently
 
                 // Check if ffmpeg is available
                 exec('which ffmpeg 2>&1', $ffmpegCheck, $ffmpegExists);
