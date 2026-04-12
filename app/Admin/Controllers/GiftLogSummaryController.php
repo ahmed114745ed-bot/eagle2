@@ -35,14 +35,18 @@ class GiftLogSummaryController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
+
+            // Room filter (only for rooms tab)
             if (request('filter') === 'rooms') {
-                $filter->column(1 / 2, function ($filter) {
+                $filter->column(1 / 3, function ($filter) {
                     $filter->equal('room_id', __('room'))
                         ->select()
                         ->ajax(route('admin.filter-rooms'));
                 });
             }
-            $filter->column(1 / 4, function ($filter) {
+
+            // Date range filters side by side
+            $filter->column(1 / 3, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $timezone = getTimezone();
@@ -50,9 +54,10 @@ class GiftLogSummaryController extends MainController
                             ->setTimezone('UTC');
                         $query->where('created_at', '>=', $start);
                     }
-                }, __('From Date'), 'from_date')->datetime();
+                }, __('From Date'), 'from_date')->datetime(['format' => 'YYYY-MM-DD HH:mm']);
             });
-            $filter->column(1 / 4, function ($filter) {
+
+            $filter->column(1 / 3, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $timezone = getTimezone();
@@ -60,9 +65,42 @@ class GiftLogSummaryController extends MainController
                             ->setTimezone('UTC');
                         $query->where('created_at', '<=', $end);
                     }
-                }, __('To Date'), 'to_date')->datetime();
+                }, __('To Date'), 'to_date')->datetime(['format' => 'YYYY-MM-DD HH:mm']);
             });
         });
+
+        // Add custom filter styling
+        \Encore\Admin\Facades\Admin::style('
+            .filter-box {
+                border: 1px solid var(--gray-600) !important;
+                border-radius: var(--border-radius) !important;
+                box-shadow: var(--shadow-md) !important;
+                padding: 20px !important;
+            }
+            .filter-box .form-group {
+                margin-bottom: 15px !important;
+            }
+            .filter-box label {
+                font-weight: 600 !important;
+                margin-bottom: 8px !important;
+            }
+            .filter-box .form-control {
+                border: 1px solid var(--gray-300) !important;
+                border-radius: var(--border-radius) !important;
+            }
+            .filter-box .select2-container--default .select2-selection--single {
+                border: 1px solid var(--gray-300) !important;
+                border-radius: var(--border-radius) !important;
+            }
+            .filter-box .btn-primary {
+                border: none !important;
+                border-radius: var(--border-radius) !important;
+            }
+            .filter-box .btn-default {
+                border: none !important;
+                border-radius: var(--border-radius) !important;
+            }
+        ');
 
 
 

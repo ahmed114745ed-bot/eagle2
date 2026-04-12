@@ -180,7 +180,6 @@ class SendLuckyGiftComboLoadTest extends TestCase
         // ── Get game wallet balance before test ──────────────────────────────
         // PoolManager uses TYPE_GLOBAL_VAULT, not TYPE_UNIFIED_VAULT
         $initialVaultBalance = \App\Models\FairLuckWallet::getRedisBalance(\App\Models\FairLuckWallet::TYPE_GLOBAL_VAULT);
-        Log::info("[LoadTest] Initial vault balance (GLOBAL_VAULT): {$initialVaultBalance}");
         $allResults = [];
 
         foreach ($users as $user) {
@@ -215,11 +214,6 @@ class SendLuckyGiftComboLoadTest extends TestCase
                     // Process combo array for wins
                     $combo = $data['combo'] ?? [];
                     
-                    Log::info("[LoadTest] Response received", [
-                        'user_id' => $user->id,
-                        'combo_count' => count($combo),
-                        'sample_combo' => $combo[0] ?? null,
-                    ]);
                     
                     foreach ($combo as $item) {
                         $itemData = $item['data'] ?? null;
@@ -231,15 +225,6 @@ class SendLuckyGiftComboLoadTest extends TestCase
                                 // Calculate multiplier: win_coins / (giftPrice * num)
                                 $multiplier = $winCoins / ($giftPrice * self::NUM);
                                 
-                                Log::info("[LoadTest] Win detected", [
-                                    'user_id' => $user->id,
-                                    'win_coins' => $winCoins,
-                                    'calculated_multiplier' => $multiplier,
-                                    'winner_comment' => $itemData['winner_comment'] ?? null,
-                                    'comment_message' => $itemData['comment_message'] ?? null,
-                                    'giftPrice' => $giftPrice,
-                                    'num' => self::NUM,
-                                ]);
                                 
                                 $userStats[$user->id]['current_balance'] += $winCoins;
                                 
@@ -290,7 +275,6 @@ class SendLuckyGiftComboLoadTest extends TestCase
         $wallet = \App\Models\FairLuckWallet::where('wallet_type', \App\Models\FairLuckWallet::TYPE_GLOBAL_VAULT)->first();
         $finalVaultBalance = $wallet ? $wallet->balance : 0;
         $vaultChange = $finalVaultBalance - $initialVaultBalance;
-        Log::info("[LoadTest] Final vault balance from DB: {$finalVaultBalance}, Change: {$vaultChange}");
 
         // ── Generate HTML Report ───────────────────────────────────────────────
         $this->generateHtmlReport($userStats, $allResults, $initialVaultBalance, $finalVaultBalance);

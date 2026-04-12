@@ -142,6 +142,11 @@ return [
             'path' => storage_path('logs/paypal.log'),
             'level' => 'info',
         ],
+        'zego' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/zego.log'),
+            'level' => 'debug',
+        ],
     ],
 
 ];

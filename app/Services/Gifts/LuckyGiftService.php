@@ -83,7 +83,6 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -306,12 +305,6 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
-        // \Log::info('sendLuckyGift2 - Room Type Check', [
-        //     'room_id' => $room->id,
-        //     'room_type' => $room->type,
-        //     'total_diamond' => $room->total_diamond,
-        //     'totalPrice' => $totalPrice,
-        // ]);
         $responseData['total_pk'] = $coinsForReceiver;
 
         if ($room->type == 'audio') {
@@ -347,7 +340,6 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -363,13 +355,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -377,6 +363,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
@@ -659,7 +646,6 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -674,13 +660,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -688,6 +668,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
@@ -966,7 +947,6 @@ class LuckyGiftService
         $total_cashback_percentage = 0;
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -980,13 +960,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -994,6 +968,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
@@ -1282,7 +1257,6 @@ class LuckyGiftService
        
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -1296,13 +1270,7 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $count;
 
-        $userCoins = $user->di;
-        $oldUserCoin = $userCoins;
-
-        if ($userCoins < $totalPriceFull) {
-            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-        }
-
+        // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
         try {
             $user->refresh();
@@ -1310,6 +1278,7 @@ class LuckyGiftService
             $oldUserCoin = $userCoins;
             $amountBefore = $user->di;
 
+            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
             if ($userCoins < $totalPriceFull) {
                 throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
             }
@@ -1816,12 +1785,6 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
-        // \Log::info('sendLuckyGift2V2 - Room Type Check', [
-        //     'room_id' => $room->id,
-        //     'room_type' => $room->type,
-        //     'total_diamond' => $room->total_diamond,
-        //     'totalPrice' => $totalPrice,
-        // ]);
 
         // Upgrade room level for audio rooms
         if ($room->type == 'audio') {
@@ -2114,7 +2077,6 @@ class LuckyGiftService
         $count = $data['count'] ?? 1;
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();

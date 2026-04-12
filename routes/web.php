@@ -1,5 +1,8 @@
 <?php
 
+// V7 FairLuck Monitor (temp, public, obscured path)
+Route::get('monitor/v7/3305d927f49322e0', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'dashboard']);
+Route::get('monitor/v7/3305d927f49322e0/api', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'apiStats']);
 
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
@@ -740,7 +743,6 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
         ->havingRaw('COUNT(*) > 1')
         ->get();
 
-    Log::info("Found " . $affected->count() . " affected bag gift transactions.");
 
     if ($affected->isEmpty()) {
         return response()->json([
@@ -1224,7 +1226,6 @@ Route::get('/codapay/create-payment', function () {
     $url = 'https://airtime.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
 
     try {
-        // Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
 
         $response = Http::timeout(15)
             ->withHeaders(['Content-Type' => 'application/json'])
@@ -1248,7 +1249,6 @@ Route::get('/codapay/create-payment', function () {
 
         $result = $response->json();
 
-        // Log::info("✅ Codapay Response Received", ['result' => $result]);
 
         // ✅ تحقق من النجاح
         if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
@@ -2507,13 +2507,11 @@ use Illuminate\Support\Facades\Log;
 
 Route::get('/fix-paid-usd', function () {
 
-    Log::info('Fix paid_usd process started');
 
     $logs = CoinLog::whereNull('paid_usd')
         ->orWhere('paid_usd', 0)
         ->get();
 
-    Log::info('Total logs fetched', ['count' => $logs->count()]);
 
     $updated = 0;
     $skipped = 0;
@@ -2523,11 +2521,6 @@ Route::get('/fix-paid-usd', function () {
 
         try {
 
-            Log::info('Processing log', [
-                'log_id' => $log->id,
-                'obtained_coins' => $log->obtained_coins,
-                'current_paid_usd' => $log->paid_usd
-            ]);
 
             $coin = Coin::where('coin', $log->obtained_coins)->first();
 
@@ -2539,11 +2532,6 @@ Route::get('/fix-paid-usd', function () {
                 $saved = $log->save();
 
                 if ($saved) {
-                    Log::info('Log updated successfully', [
-                        'log_id' => $log->id,
-                        'old_paid_usd' => $oldValue,
-                        'new_paid_usd' => $coin->usd
-                    ]);
                 } else {
                     Log::warning('Log save returned false', [
                         'log_id' => $log->id
@@ -2571,11 +2559,6 @@ Route::get('/fix-paid-usd', function () {
         }
     }
 
-    Log::info('Fix paid_usd process finished', [
-        'updated' => $updated,
-        'skipped' => $skipped,
-        'errors' => $errors
-    ]);
 
     return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
 });

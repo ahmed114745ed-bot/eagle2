@@ -83,7 +83,7 @@ return [
     'remove_from_family'               => 'Anda diblokir dari keluarga :name',
     'accept_agency'                    => 'Selamat, permintaan bergabung dengan agen :name diterima',
     'agencyJoinRequest'       => ':name ingin bergabung dengan agen Anda :agencyName',
-    'got_coin' => 'Selamat :name, :coins koin telah ditambahkan ke akun Anda oleh :admin dari dashboard',
+    'got_coin' => 'Selamat :name, :coins :unit telah ditambahkan ke akun Anda oleh :admin dari dashboard',
     'got_earned_coin' => 'Melalui kode undangan 🎉 Selamat :name, :coins koin telah ditambahkan ke akun Anda',
     'code_invitation_uses' => '🎉 Selamat :name, kode undangan Anda telah digunakan!',
     'send_level'                       => 'Anda mengirim level :level',
