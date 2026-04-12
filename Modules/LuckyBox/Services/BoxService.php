@@ -11,7 +11,7 @@ use App\Events\SuperLuckyBox;
 use App\Facades\RedisService;
 use App\Helpers\UserCoinLogHelper;
 use App\Jobs\SuperLuckyBoxJob;
-use App\Jobs\NormalLuckyBoxJop;
+use App\Jobs\NormalLuckyBoxJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\LuckyBox\Entities\BoxUse;
@@ -110,7 +110,7 @@ class BoxService
         );
         $key  = 'BoxUse_' . $boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
-        dispatch(new NormalLuckyBoxJop())->delay(now()->addHours($normalDuration))->onQueue('test-super-lucky-box');
+        dispatch(new NormalLuckyBoxJob())->delay(now()->addHours($normalDuration))->onQueue('test-super-lucky-box');
         return $boxUser;
     }
 

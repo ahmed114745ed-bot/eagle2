@@ -172,6 +172,9 @@ class MessageService
 
     private function updateMessageStatus(ChatMessage $message, User $user2, EntitiesChatRoom $chatRoom)
     {
+        if (!$user2) {
+            return;
+        }
 
         if ($user2->online == 1) {
             $condition = ($user2->current_room_chat == $chatRoom->id);

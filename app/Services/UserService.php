@@ -1322,11 +1322,14 @@ class UserService
                 'progress'      => 0,
             ];
         }
+        // Refresh room data to get latest total_diamond from database
+        $room->refresh();
         $expLevel = $room->total_diamond;
         $currentLevel = $this->vipRepository->findByLevel(@$room->roomLevel->level, 4);
         if ($currentLevel) {
             $secondLevel = $this->vipRepository->nextLevel($room->roomLevel->level, 4);
         } else {
+            // Level 0: get first level (level 1) as next level
             $secondLevel = $this->vipRepository->findByType(4);
         }
 
@@ -1352,8 +1355,9 @@ class UserService
             $progress  = 100;
             $remaining = 0;
         } else {
-            $progress  = 100;
-            $remaining = 0;
+            // Level 0: calculate remaining to reach level 1
+            $progress  = 0;
+            $remaining = $secondLevel ? $secondLevel->exp - $expLevel : 0;
         }
 
         return   [

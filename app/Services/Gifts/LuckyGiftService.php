@@ -83,7 +83,6 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -341,7 +340,6 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -648,7 +646,6 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -950,7 +947,6 @@ class LuckyGiftService
         $total_cashback_percentage = 0;
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -1261,7 +1257,6 @@ class LuckyGiftService
        
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -2082,7 +2077,6 @@ class LuckyGiftService
         $count = $data['count'] ?? 1;
 
         $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
