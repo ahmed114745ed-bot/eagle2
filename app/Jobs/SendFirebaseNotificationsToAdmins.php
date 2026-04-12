@@ -43,7 +43,7 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
         $accessToken = $client->getAccessToken()['access_token'];
 
         $admins = Admin::whereNull('type')->whereNotNull('fcm_token')->get();
-        logger()->info('Firebase Response', ['response' => $admins]);
+
 
         foreach ($admins as $admin) {
             $token = $admin->fcm_token;

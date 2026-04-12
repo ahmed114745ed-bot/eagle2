@@ -741,53 +741,33 @@ class GiftController extends MainController
         }
 
         // Handle V7 FairLuck settings
-        $v7_keys = [
-            'V7_target_rtp',
-            'V7_max_probability_cap',
-            'V7_boost_scaling',
-            'V7_reduce_scaling',
-            'V7_chaos_factor_min',
-            'V7_chaos_factor_max',
-            'V7_new_player_bets',
-            'V7_new_player_boost',
-            'V7_low_balance_threshold',
-            'V7_low_balance_min_prob',
-            'coin_to_usd_rate',
-            'wallet_healthy_usd',
-            'wallet_warning_usd',
-            'wallet_critical_usd',
-            'wallet_max_negative_usd',
-            'V7_wallet_healthy_max_mult',
-            'V7_wallet_moderate_max_mult',
-            'V7_wallet_low_max_mult',
-            'V7_wallet_critical_max_mult',
-            'V7_min_prob_when_low',
-            'fairluck_jackpot_cooldown_bets',
-            'V7_min_bets_100x',
-            'V7_min_bets_500x',
-            'V7_max_single_win_pct',
-            'global_vault_negative_limit',
-            'fair_luck_owner_fee_rate',
-            'fair_luck_app_fee_rate',
-            'fair_luck_receiver_fee_rate',
-        ];
-        foreach ($v7_keys as $key) {
+        // Percentage fields submitted as 0-100, stored as 0-1
+        $v7_pct_keys = ['V7_target_rtp', 'fair_luck_app_fee_rate', 'fair_luck_receiver_fee_rate', 'fair_luck_owner_fee_rate'];
+        foreach ($v7_pct_keys as $key) {
             if ($request->has($key)) {
-                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                $value = (float) $request->input($key) / 100;
+                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
                 Cache::forget($key);
-                Cache::put($key, $request->input($key));
+                // Sync V7_app_fee_rate with fair_luck_app_fee_rate
+                if ($key === 'fair_luck_app_fee_rate') {
+                    \App\Models\FairLuckSetting::updateOrCreate(['key' => 'V7_app_fee_rate'], ['value' => $value]);
+                }
             }
         }
 
-        // Handle V7 multiplier weights (JSON array)
-        if ($request->has('V7_multiplier_weights')) {
-            $weights = $request->input('V7_multiplier_weights');
-            \App\Models\FairLuckSetting::updateOrCreate(
-                ['key' => 'V7_multiplier_weights'],
-                ['value' => json_encode($weights)]
-            );
-            Cache::forget('V7_multiplier_weights');
-            Cache::put('V7_multiplier_weights', json_encode($weights));
+        // Direct numeric V7 keys (stored as-is)
+        $v7_direct_keys = [
+            'V7_wallet_min', 'V7_wallet_tight', 'V7_wallet_target', 'V7_wallet_high', 'V7_wallet_drain',
+            'V7_negative_limit', 'V7_nowin_sensitivity', 'V7_win_base_sensitivity', 'V7_win_position_sensitivity',
+            'V7_boost_base_sensitivity', 'V7_boost_position_sensitivity', 'V7_wallet_weight', 'V7_rtp_weight',
+            'V7_nowin_floor', 'V7_rtp_activation', 'V7_max_loss_streak', 'V7_forced_win_mult',
+            'global_vault_negative_limit', 'coin_to_usd_rate',
+        ];
+        foreach ($v7_direct_keys as $key) {
+            if ($request->has($key)) {
+                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                Cache::forget($key);
+            }
         }
 
         // Clear FairLuck settings cache so changes take effect immediately

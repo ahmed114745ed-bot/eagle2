@@ -475,21 +475,36 @@ class ChargeController extends Controller
         $from = $request->user();
         if (!$request->id || !$request->amount) return Common::apiResponse(false, 'missing_params');
         if ($request->amount < 0) return Common::apiResponse(false, 'value not allow');
+      
+        $toUser = null;
+        $to = null;
 
-        $to = Common::searchAgency($request->id);
-        $toUser = User::find($request->id);
-        
-        if ($toUser) {
+        if ($request->type == 'user') {
+            $toUser = User::find($request->id);
+            if (!$toUser) {
+                return Common::apiResponse(false, 'user_not_found');
+            }
+        }
+
+        if ($request->type == 'agency') {
+            $to = Common::searchAgency($request->id);
+            if (!$to) {
+                return Common::apiResponse(false, 'agency_not_found');
+            }
+        }
+
+        if ($request->type == 'user') {
             $charge_agent_to_user = (int) (Common::getSettingValue('charge_agent_to_user') ?? 1);
             if ($charge_agent_to_user !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_user_disabled'), 403);
             }
-        } elseif ($to) {
+        } elseif ($request->type == 'agency') {
             $charge_agent_to_agent = (int) (Common::getSettingValue('charge_agent_to_agent') ?? 1);
             if ($charge_agent_to_agent !== 1) {
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_agent_disabled'), 403);
             }
         }
+        
 
         try {
             $this->chargeService->chargeAgencyToAnother($from, $request);

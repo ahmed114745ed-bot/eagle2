@@ -17,9 +17,6 @@ class VerifyLeaderCCMiddleWare
 {
     public function handle(Request $request, Closure $next)
     {
-           \Log::info('LeaderCC Request ', [
-                'body'     => $request->all(),
-            ]);
         $start = microtime(true);
 
         try {
@@ -27,13 +24,6 @@ class VerifyLeaderCCMiddleWare
             $path = ltrim(str_replace('api/', '', $request->path()), '/');
             $gameSetting =  Common::getByCode('quantum_nexus');
             $key =  @$gameSetting->app_key ?? '';
-            \Log::info('LeaderCC Request Timing', [
-                'url'      => $request->fullUrl(),
-                'method'   => $request->method(),
-                'body'     => $request->all(),
-                'path' => $path,
-                'key' => $key,
-            ]);
             if (!$gameSetting->is_active) {
                 return response()->json([
                     'errorCode' => 4005,
@@ -67,9 +57,6 @@ class VerifyLeaderCCMiddleWare
                     ]);
                 }
                 if (!$userId && !\App\Models\User::where('id', $request->uid)->exists()) {
-                    \Log::info('LeaderCC Request User Not Found', [
-                        'body' => $request->all(),
-                    ]);
                     return response()->json([
                         'errorCode' => 10003,
                         'errorMsg' => 'user not found'

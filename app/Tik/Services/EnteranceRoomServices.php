@@ -505,8 +505,13 @@ class EnteranceRoomServices
         // if owner id not path throw error
         if (!$owner_id) return Common::apiResponse(0, 'not found', null, 404);
         //check if this user in black-list
-        $black_list = Common::getUserBlackListInRoom($owner_id, $user->id);
-        if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 422);
+        try {
+            $black_list = Common::getUserBlackListInRoom($owner_id, $user->id);
+            if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 422);
+        } catch (\Exception $e) {
+            Log::error('Failed to check black list', ['user_id' => $user->id, 'owner_id' => $owner_id, 'error' => $e->getMessage()]);
+            // Continue even if black list check fails
+        }
 
 
         if (!$room) return Common::apiResponse(false, 'No room yet, please create first', null, 404);
@@ -572,10 +577,15 @@ class EnteranceRoomServices
         $user->save();
 
         if (config('app.env') != "production") {
-            RoomVisitor::firstOrCreate([
-                'user_id' => $user->id,
-                'room_id' => $room->id,
-            ]);
+            try {
+                RoomVisitor::firstOrCreate([
+                    'user_id' => $user->id,
+                    'room_id' => $room->id,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create room visitor', ['user_id' => $user->id, 'room_id' => $room->id, 'error' => $e->getMessage()]);
+                // Continue even if visitor creation fails
+            }
         }
 
         return Common::apiResponse(true, '', $room_info);
@@ -754,7 +764,12 @@ class EnteranceRoomServices
 
     private function isUserBlocked(int $ownerId, int $userId): bool
     {
-        return Common::getUserBlackListInRoom($ownerId, $userId);
+        try {
+            return Common::getUserBlackListInRoom($ownerId, $userId);
+        } catch (\Exception $e) {
+            Log::error('Failed to check if user is blocked', ['owner_id' => $ownerId, 'user_id' => $userId, 'error' => $e->getMessage()]);
+            return false; // If check fails, assume not blocked to avoid blocking legitimate users
+        }
     }
 
     private function validateRoomStatus(Room $room, $user)

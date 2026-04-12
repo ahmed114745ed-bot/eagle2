@@ -104,10 +104,6 @@ class UserDataTTLManager
         $key = self::KEY_PREFIX . $userId;
         
         // Log the reset
-        Log::info("USER_DATA_TTL: Reset user {$userId} RTP data due to expiration", [
-            'user_id' => $userId,
-            'timestamp' => now()->toIso8601String(),
-        ]);
 
         // Delete the entire hash
         Redis::del($key);
@@ -142,7 +138,6 @@ class UserDataTTLManager
             }
         }
 
-        Log::info("USER_DATA_TTL: Cleanup completed", $stats);
 
         return $stats;
     }

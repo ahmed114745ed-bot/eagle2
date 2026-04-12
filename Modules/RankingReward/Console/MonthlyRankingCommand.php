@@ -208,12 +208,6 @@ class MonthlyRankingCommand extends Command
 
         if (!empty($tokens)) {
             // Log that the job is being dispatched
-            // Log::info('Dispatching SendFirebaseNotificationIndividualUserJob', [
-            //     'tokens_count' => count($tokens),
-            //     'range_min'    => $min,
-            //     'range_max'    => $max,
-            //     'image'        => $image
-            // ]);
 
             SendFirebaseNotificationIndividualUserJob::dispatch(
                 tokens: $tokens,

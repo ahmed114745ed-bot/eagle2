@@ -66,7 +66,6 @@ class CustomNotification
         if (!$user) {
             return 0;
         }
-        //  \Log::info('room level Job", ', ['user_id' => $user->id, 'level' => $level, 'reward' => $reward]);
 
         $lang = $user->lan ?? 'en';
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
@@ -594,17 +593,30 @@ class CustomNotification
     }
 
 
-    public function chargeAction(User $user, $request, $admin = "Admin", $agency = null)
+    public function chargeAction(User $user, $request, $admin = "Admin", $agency = null ,$coins = 0)
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
         $name = $agency ? $agency->name : $user->name;
-        $body = __('api.got_coin', ['coins' => $request->amount, 'name' => $name, 'admin' => $admin], $lang);
 
-        $data['coins'] = $request->amount;
+        // Use actual coins if provided, otherwise fallback to request amount
+        $displayCoins = $coins ?: $request->amount;
+
+        // Always use 'coins' as unit
+        $unit = 'coins';
+
+        $body = __('api.got_coin', [
+            'coins' => $displayCoins,
+            'name' => $name,
+            'admin' => $admin,
+            'unit' => $unit
+        ], $lang);
+        $data['coins'] = $displayCoins;
+        $data['unit'] = $unit;
+
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, data: $data, messageType: 'charge-action-notifaction');
-        Common::sendOfficialMessage($user->id, title: $body, titleAr: $body);
+            Common::sendOfficialMessage($user->id, title: $body, titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
@@ -1014,11 +1026,6 @@ class CustomNotification
         $tokens_notification = $user?->notification_id;
         $lang = $user?->lan ?? 'en';
         $body = __("api.rejectYourAgency", [], $lang);
-        Log::info('Form request rejected', [
-            'user_id' => $user->id,
-            'type' => $type,
-            'message' => $body
-        ]);
 
         if (!$user->is_logout) {
             Common::send_firebase_notification(

@@ -126,7 +126,6 @@ class UserHandling
 
 
             if (!$userSalaries) {
-                \Log::info('handleUserSalaries - No userSalaries found, returning');
                 return;
             }
 

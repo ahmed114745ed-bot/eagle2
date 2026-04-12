@@ -109,10 +109,6 @@ class AuthService
                 if ($countryId) {
                     $data['country_id'] = $countryId;
                 }
-                Log::info('Registration attempt', [
-                    'device_token' => $request['device_token'] ?? null,
-
-                ]);
                // if (!empty($request['device_token']))  $this->devicesTokenHistory($request['device_token']);
 
                 try {
@@ -323,10 +319,6 @@ class AuthService
 
     //         $newImagePass = Common::uploadProfileUser('profile', $img, $profile->id, $user->profile_count);
 
-    //         Log::info('Uploaded profile image', [
-    //             'imageType' => $imageType,
-    //             'image_path' => $newImagePass,
-    //         ]);
     //         $profile->avatar = $newImagePass;
     //         $profile->save();
 
@@ -383,11 +375,6 @@ class AuthService
     //             // Store the image directly
     //             Storage::put($filePath, $imageContent, config('filesystems.default'));
 
-    //             Log::info('Downloaded and stored profile image from URL', [
-    //                 'imageUrl' => $imageUrl,
-    //                 'extension' => $extension,
-    //                 'image_path' => $filePath,
-    //             ]);
 
     //             $profile->avatar = $filePath;
     //             $profile->save();
@@ -739,25 +726,10 @@ class AuthService
     {
         $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
-        \Log::info('=== devicesTokenHistory called ===', [
-            'device_token' => $deviceToken,
-            'register_account_limit' => $register_account
-        ]);
         
         $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
-        \Log::info('Device token history lookup', [
-            'device_token' => $deviceToken,
-            'record_exists' => $record ? true : false,
-            'record_count' => $record?->count ?? 0
-        ]);
         
         if ($record) {
-            \Log::info('Record found, checking limit', [
-                'device_token' => $deviceToken,
-                'current_count' => $record->count,
-                'limit' => $register_account,
-                'exceeds_limit' => $record->count >= $register_account
-            ]);
             
             if ($record->count >= $register_account) {
                 \Log::warning('Device account limit exceeded in devicesTokenHistory', [
@@ -768,14 +740,7 @@ class AuthService
                 throw new CValidationException(__('max_accounts_reached'));
             }
             $record->increment('count');
-            \Log::info('Device token count incremented', [
-                'device_token' => $deviceToken,
-                'new_count' => $record->count
-            ]);
         } else {
-            \Log::info('Creating new device token record', [
-                'device_token' => $deviceToken
-            ]);
             DevicesTokenHistory::create(['device_token' => $deviceToken, 'count' => 1]);
         }
     }
