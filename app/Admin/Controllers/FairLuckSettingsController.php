@@ -16,12 +16,29 @@ class FairLuckSettingsController extends AdminController
 
     public function index(Content $content)
     {
+        // AJAX endpoint for chart auto-refresh
+        if (request()->has('ajax') && request('ajax') === 'history') {
+            $limit = (int) request('limit', 500);
+            $history = FairLuckWalletHistory::where('wallet_type', 'global_vault')
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get()->reverse()->values()
+                ->map(fn($h) => [
+                    'date' => $h->created_at?->format('m-d H:i:s') ?? '',
+                    'before' => (int) $h->balance_before,
+                    'change' => (int) $h->amount,
+                    'after' => (int) $h->balance_after,
+                    'desc' => $h->description ?? 'Transaction',
+                ]);
+            return response()->json($history);
+        }
+
         $settings = FairLuckSetting::pluck('value', 'key')->toArray();
         $wallets = FairLuckWallet::all();
 
         $history = FairLuckWalletHistory::where('wallet_type', 'global_vault')
             ->orderBy('created_at', 'desc')
-            ->limit(100)
+            ->limit(500)
             ->get()->reverse()->values();
 
         $transactions = FairLuckTransaction::with(['user', 'gift'])

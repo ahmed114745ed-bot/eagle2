@@ -37,10 +37,8 @@ class CountriesInPolygonController extends Controller
         
         $gridSize = $areaSize > 1000 ? 50 : ($areaSize > 100 ? 40 : 30);
         
-        // Log::info("Area size: {$areaSize}, Grid size: {$gridSize}");
         
         $testPoints = $this->generateOptimizedGrid($polygon, $bounds, $gridSize);
-        // Log::info('Generated ' . count($testPoints) . ' test points');
         
         $countryCodes = $this->fetchCountriesParallel($testPoints, $apiKey);
         
@@ -159,7 +157,6 @@ class CountriesInPolygonController extends Controller
                             $data = $response->json();
                             Cache::put($cacheKey, $data, 3600);
                             $this->extractCountryCodes($data, $countryCodes, $index);
-                            // Log::info("Point {$index}: ({$point['lat']}, {$point['lng']})");
                         }
                     })
                     ->otherwise(function ($exception) use ($index) {

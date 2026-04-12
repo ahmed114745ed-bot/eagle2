@@ -112,7 +112,8 @@ class RoomRepoService
             $room->room_cover = WebPHelper::uploadWebp(
                 $request->file('room_cover'),
                 'rooms',
-                'room_cover'
+                'room_cover',
+                async: true  // Convert to WebP asynchronously
             );
         } else {
             $room->room_cover = $request->room_cover;
@@ -459,7 +460,6 @@ class RoomRepoService
         $room = $roomId
             ? $this->repository->findById($roomId)
             : $this->repository->findRoomUserEnableAudio($request->owner_id);
-        // \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
 
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
@@ -512,7 +512,6 @@ class RoomRepoService
 
 
         $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
-        // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
@@ -667,7 +666,8 @@ class RoomRepoService
             $room->room_cover = WebPHelper::uploadWebp(
                 $request->file('room_cover'),
                 'rooms',
-                'room_cover'
+                'room_cover',
+                async: true  // Convert to WebP asynchronously
             );
         }
 
