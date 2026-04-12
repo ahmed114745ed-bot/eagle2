@@ -1329,7 +1329,8 @@ class UserService
         if ($currentLevel) {
             $secondLevel = $this->vipRepository->nextLevel($room->roomLevel->level, 4);
         } else {
-            $secondLevel = null;
+            // Level 0: get first level (level 1) as next level
+            $secondLevel = $this->vipRepository->findByType(4);
         }
 
         if ($secondLevel != null && $currentLevel != null) {
@@ -1354,8 +1355,9 @@ class UserService
             $progress  = 100;
             $remaining = 0;
         } else {
-            $progress  = 100;
-            $remaining = 0;
+            // Level 0: calculate remaining to reach level 1
+            $progress  = 0;
+            $remaining = $secondLevel ? $secondLevel->exp - $expLevel : 0;
         }
 
         return   [
