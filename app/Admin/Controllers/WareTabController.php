@@ -465,12 +465,6 @@ class WareTabController extends MainController
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
-                    /*Log::info('🖼 img2 uploaded - BEFORE PROCESSING', [
-                        'original_name' => $img2->getClientOriginalName(),
-                        'original_extension' => $img2->getClientOriginalExtension(),
-                        'mime_type' => $img2->getMimeType(),
-                        'client_mime' => $img2->getClientMimeType(),
-                    ]);
 
                     // الحصول على الامتداد الحقيقي من الاسم الأصلي
                     $originalExt = strtolower($img2->getClientOriginalExtension());
@@ -484,11 +478,6 @@ class WareTabController extends MainController
                         $ext = 'svg';
                     }
 
-                    Log::info('🖼 img2 uploaded - AFTER PROCESSING', [
-                        'original_extension' => $originalExt,
-                        'guessed_extension' => $guessedExt,
-                        'final_extension' => $ext,
-                    ]);
 
                     $form->input('detected_profile_frame_type', $ext);
                     $form->profile_frame_type = $ext;
@@ -497,7 +486,6 @@ class WareTabController extends MainController
                     // /** @var FileService $fileService*/
                     // $fileService = app(FileService::class);
                     // $extFromService = $fileService->getExtension($img2, $wareId, getFromService: true);
-                    // Log::info('🖼 FileService returned extension', ['extension' => $extFromService]);*/
                 }
             });
         }

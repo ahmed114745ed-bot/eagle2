@@ -100,7 +100,8 @@ class RoomController extends Controller
               $data['room_cover'] = WebPHelper::uploadWebp(
                         $request->file('room_cover'),
                         'images',
-                        'room_cover'
+                        'room_cover',
+                        async: true  // Convert to WebP asynchronously
                  );
         }
 
@@ -155,7 +156,8 @@ class RoomController extends Controller
             $data['room_cover'] = WebPHelper::uploadWebp(
                         $request->file('room_cover'),
                         'images',
-                        'room_cover'
+                        'room_cover',
+                        async: true  // Convert to WebP asynchronously
                  );
         }
 
