@@ -19,7 +19,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Facades\CustomNotification;
 
-class NormalLuckyBoxJop implements ShouldQueue
+class NormalLuckyBoxJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -40,7 +40,7 @@ class NormalLuckyBoxJop implements ShouldQueue
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes = BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
-        if (!$userBoxes) return;
+        if ($userBoxes->isEmpty()) return;
 
         foreach ($userBoxes as $userBox) {
             $user = User::where('id', $userBox->user_id)->first();
@@ -61,7 +61,7 @@ class NormalLuckyBoxJop implements ShouldQueue
             $userWinner = UserBoxGift::where('box_uses_id', $userBox)->pluck('user_id')->toArray();
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
 
-            $winnerBox = UserBoxGift::where('box_uses_id', $userBox->box_id)->exists();
+            $winnerBox = UserBoxGift::where('box_uses_id', $userBox->id)->exists();
             if (!$winnerBox) {
                 CustomNotification::closedLuckyBosWithReturnCoins($user, $userBox->unused_coins, @$userBox?->image, 0);
             } else {

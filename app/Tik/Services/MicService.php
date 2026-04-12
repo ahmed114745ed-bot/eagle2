@@ -292,7 +292,6 @@ class MicService
                 return true;
             }
         }
-        //        Log::info("📩 [CP] No nearby CPs found, sending lovely message anyway", []);
 
         $this->sendCpLovelyMessage($room, $user);
 

@@ -13,11 +13,6 @@ class VerifyUtdSignature
     public function handle(Request $request, Closure $next)
     {
         try {
-            Log::info('UTD Game Request', [
-                'url'    => $request->fullUrl(),
-                'method' => $request->method(),
-                'body'   => $request->all(),
-            ]);
 
             $gameSetting = Common::getByCode('utd_games');
 

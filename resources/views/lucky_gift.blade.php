@@ -309,72 +309,121 @@
                 @php $settings = $fairLuckSettings; @endphp
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">{{ __('FairLuck V7 Settings') }} / {{ __('إعدادات FairLuck V7') }}</h3>
+                        <h3 class="box-title"><i class="fa fa-sliders"></i> {{ __('FairLuck V7 Quick Settings') }}</h3>
+                        <div class="box-tools">
+                            <a href="{{ admin_url('fairluck') }}" class="btn btn-sm btn-default" title="{{ __('Advanced Settings') }}">
+                                <i class="fa fa-cogs"></i> {{ __('Advanced Settings') }}
+                            </a>
+                        </div>
                     </div>
-                    <form action="{{ route('admin.lucky-gift.version.update') }}" method="post" class="form-horizontal">
+                    <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
                         @csrf
                         <div class="box-body">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('App Profit Percentage') }} / {{ __('نسبة ربح التطبيق') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('App Profit') }} / {{ __('نسبة ربح التطبيق') }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
-                                        <input type="number" step="0.01" min="0" max="100" name="fair_luck_app_fee_rate" class="form-control"
-                                            value="{{ isset($settings['fair_luck_app_fee_rate']) ? (float)$settings['fair_luck_app_fee_rate'] * 100 : 1 }}">
+                                        <input type="number" step="0.01" min="0" max="50" name="fair_luck_app_fee_rate" class="form-control"
+                                            value="{{ isset($settings['fair_luck_app_fee_rate']) ? round((float)$settings['fair_luck_app_fee_rate'] * 100, 2) : 1.5 }}">
                                         <span class="input-group-addon">%</span>
                                     </div>
-                                    <span class="help-block">
-                                        {{ __('ينصح ان تكون (1%)') }}
-                                    </span>
+                                    <span class="help-block">{{ __('Recommended: 1.5%') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Gift Receiver Percentage') }} / {{ __('نسبة مستقبل الهدية من الهدية') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Receiver Share') }} / {{ __('نسبة المستقبل') }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
-                                        <input type="number" step="0.01" min="0" max="100" name="fair_luck_receiver_fee_rate" class="form-control"
-                                            value="{{ isset($settings['fair_luck_receiver_fee_rate']) ? (float)$settings['fair_luck_receiver_fee_rate'] * 100 : 10 }}">
+                                        <input type="number" step="0.01" min="0" max="50" name="fair_luck_receiver_fee_rate" class="form-control"
+                                            value="{{ isset($settings['fair_luck_receiver_fee_rate']) ? round((float)$settings['fair_luck_receiver_fee_rate'] * 100, 2) : 10 }}">
                                         <span class="input-group-addon">%</span>
                                     </div>
-                                    <span class="help-block">
-                                        {{ __('ينصح ان تكون (10%)') }}
-                                    </span>
+                                    <span class="help-block">{{ __('Recommended: 10%') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Player RTP') }} / {{ __('نسبة RTP للاعب') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Host Share') }} / {{ __('نسبة المالك') }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
-                                        <input type="number" step="0.01" min="0" max="100" name="V7_target_rtp" class="form-control"
-                                            value="{{ isset($settings['V7_target_rtp']) ? (float)$settings['V7_target_rtp'] * 100 : 99.5 }}">
+                                        <input type="number" step="0.01" min="0" max="50" name="fair_luck_owner_fee_rate" class="form-control"
+                                            value="{{ isset($settings['fair_luck_owner_fee_rate']) ? round((float)$settings['fair_luck_owner_fee_rate'] * 100, 2) : 10 }}">
                                         <span class="input-group-addon">%</span>
                                     </div>
-                                    <span class="help-block">
-                                        {{ __('ينصح ان تكون (99.5%)') }}
-                                    </span>
+                                    <span class="help-block">{{ __('Recommended: 10%') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ __('Target RTP') }} / {{ __('نسبة RTP') }}</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input type="number" step="0.1" min="70" max="100" name="V7_target_rtp" class="form-control"
+                                            value="{{ isset($settings['V7_target_rtp']) ? round((float)$settings['V7_target_rtp'] * 100, 1) : 99 }}">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
+                                    <span class="help-block">{{ __('Recommended: 99%') }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="box-footer">
-                            <button type="submit" class="btn btn-success btn-lg pull-right">{{ __('Save V7 Settings') }} / {{ __('حفظ إعدادات V7') }}</button>
+                            <a href="{{ admin_url('fairluck') }}" class="btn btn-default"><i class="fa fa-cogs"></i> {{ __('All Settings') }}</a>
+                            <button type="submit" class="btn btn-success pull-right"><i class="fa fa-save"></i> {{ __('Save') }}</button>
                         </div>
                     </form>
                 </div>
 
-                {{-- Old V7 sections (Core RTP, Multiplier Weights, New Player, Wallet Protection, Cooldown, Wallet Distribution, Fee Settings) removed --}}
-
+                {{-- Vault Status Card --}}
+                @php
+                    $vaultBalance = \App\Models\FairLuckWallet::where('wallet_type', 'global_vault')->value('balance') ?? 0;
+                    $walletMin = (int)($settings['V7_wallet_min'] ?? 10000);
+                    $walletTight = (int)($settings['V7_wallet_tight'] ?? 50000);
+                    $walletTarget = (int)($settings['V7_wallet_target'] ?? 200000);
+                    $walletHigh = (int)($settings['V7_wallet_high'] ?? 500000);
+                    $walletDrain = (int)($settings['V7_wallet_drain'] ?? 1000000);
+                    $zone = $vaultBalance <= $walletMin ? 'CRITICAL' : ($vaultBalance <= $walletTight ? 'TIGHT' : ($vaultBalance <= $walletTarget ? 'NORMAL' : ($vaultBalance <= $walletHigh ? 'GENEROUS' : 'DRAIN')));
+                    $zoneColor = ['CRITICAL' => '#dc3545', 'TIGHT' => '#e67e22', 'NORMAL' => '#3498db', 'GENEROUS' => '#28a745', 'DRAIN' => '#8e44ad'][$zone];
+                    $appWallet = \App\Models\CoreWallet::where('name', 'app_wallet')->value('coins') ?? 0;
+                @endphp
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="box box-success">
-                            <div class="box-header with-border">
-                                <h3 class="box-title">{{ __('Global Vault Balance History') }} / {{ __('سجل رصيد الخزينة العام') }}</h3>
+                    <div class="col-md-6">
+                        <div class="small-box" style="background: {{ $zoneColor }}; color: #fff;">
+                            <div class="inner">
+                                <h3>{{ number_format($vaultBalance) }}</h3>
+                                <p>{{ __('Lucky Wallet') }} — {{ $zone }}</p>
                             </div>
-                            <div class="box-body">
-                                <canvas id="vaultChartV7" style="height: 300px;"></canvas>
-                            </div>
+                            <div class="icon"><i class="fa fa-diamond"></i></div>
                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="small-box bg-orange" style="color: #fff;">
+                            <div class="inner">
+                                <h3>{{ number_format($appWallet) }}</h3>
+                                <p>{{ __('App Wallet') }}</p>
+                            </div>
+                            <div class="icon"><i class="fa fa-money"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Live Vault Chart --}}
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-line-chart"></i> {{ __('Vault Balance — Live') }}</h3>
+                        <div class="box-tools">
+                            <div class="btn-group btn-group-sm" id="chartRange">
+                                <button class="btn btn-default" data-range="50">{{ __('Last 50') }}</button>
+                                <button class="btn btn-default active" data-range="100">{{ __('Last 100') }}</button>
+                                <button class="btn btn-default" data-range="500">{{ __('Last 500') }}</button>
+                                <button class="btn btn-default" data-range="all">{{ __('All') }}</button>
+                            </div>
+                            <span id="autoRefreshLabel" class="label label-success" style="margin-left:10px;">{{ __('Auto-refresh: 30s') }}</span>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <canvas id="vaultChartV7" style="height: 350px;"></canvas>
                     </div>
                 </div>
             @endif
@@ -505,65 +554,158 @@
             var labels = historyData.map(function (d) { return d.date; });
             var dataPoints = historyData.map(function (d) { return d.after; });
 
-            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : ($currentVersion == 4 ? 'vaultChartV7' : 'vaultChart') }}';
-            var ctx = document.getElementById(chartId).getContext('2d');
-            var chart = new Chart(ctx, {
+            var chartId = '{{ $currentVersion == 3 ? "vaultChartV6" : ($currentVersion == 4 ? "vaultChartV7" : "vaultChart") }}';
+            var canvas = document.getElementById(chartId);
+            if (!canvas) return;
+
+            @if($currentVersion == 4)
+            // V7: Enhanced chart with zone lines, time ranges, auto-refresh
+            var ZONES = {
+                min: {{ $settings['V7_wallet_min'] ?? 10000 }},
+                tight: {{ $settings['V7_wallet_tight'] ?? 50000 }},
+                target: {{ $settings['V7_wallet_target'] ?? 200000 }},
+                high: {{ $settings['V7_wallet_high'] ?? 500000 }},
+                drain: {{ $settings['V7_wallet_drain'] ?? 1000000 }}
+            };
+            var allData = historyData;
+            var currentRange = 100;
+            var vaultChart = null;
+
+            function getZone(val) {
+                if (val <= ZONES.min) return 'CRITICAL';
+                if (val <= ZONES.tight) return 'TIGHT';
+                if (val <= ZONES.target) return 'NORMAL';
+                if (val <= ZONES.high) return 'GENEROUS';
+                return 'DRAIN';
+            }
+
+            function getZoneColor(val) {
+                var z = getZone(val);
+                return {CRITICAL:'#dc3545',TIGHT:'#e67e22',NORMAL:'#3498db',GENEROUS:'#28a745',DRAIN:'#8e44ad'}[z];
+            }
+
+            function renderChart(range) {
+                currentRange = range;
+                var data = range === 'all' ? allData : allData.slice(-range);
+                var labs = data.map(function(d) { return d.date; });
+                var pts = data.map(function(d) { return d.after; });
+
+                if (vaultChart) vaultChart.destroy();
+
+                // Zone threshold datasets
+                var zoneLines = [
+                    { label: 'CRITICAL (' + ZONES.min.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.min), borderColor: '#dc3545', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
+                    { label: 'TIGHT (' + ZONES.tight.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.tight), borderColor: '#e67e22', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
+                    { label: 'TARGET (' + ZONES.target.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.target), borderColor: '#3498db', borderDash: [8,4], borderWidth: 2, pointRadius: 0, fill: false },
+                    { label: 'GENEROUS (' + ZONES.high.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.high), borderColor: '#28a745', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
+                ];
+
+                vaultChart = new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labs,
+                        datasets: [{
+                            label: '{{ __("Vault Balance") }}',
+                            data: pts,
+                            borderColor: 'rgba(60,141,188,1)',
+                            backgroundColor: 'rgba(60,141,188,0.15)',
+                            fill: true, tension: 0.2, borderWidth: 2,
+                            pointBackgroundColor: function(ctx) { return getZoneColor(pts[ctx.dataIndex] || 0); },
+                            pointRadius: pts.length > 200 ? 0 : 3,
+                            pointHoverRadius: 6
+                        }].concat(zoneLines)
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'nearest', intersect: false },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, font: { size: 11 } } },
+                            tooltip: {
+                                padding: 12, titleFont: { size: 13 }, bodyFont: { size: 12 },
+                                callbacks: {
+                                    title: function(items) {
+                                        var d = data[items[0].dataIndex];
+                                        return d ? d.date : '';
+                                    },
+                                    label: function(ctx) {
+                                        if (ctx.datasetIndex > 0) return null; // skip zone lines
+                                        var d = data[ctx.dataIndex];
+                                        if (!d) return '';
+                                        var zone = getZone(d.after);
+                                        return [
+                                            'Balance: ' + d.after.toLocaleString() + ' [' + zone + ']',
+                                            'Change: ' + (d.change >= 0 ? '+' : '') + d.change.toLocaleString(),
+                                            'Before: ' + d.before.toLocaleString(),
+                                            d.desc.replace('V7 bet credit','Bet').replace('V7 win payout','Win Payout')
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { maxTicksLimit: 15, font: { size: 10 } } },
+                            y: {
+                                beginAtZero: false,
+                                ticks: { callback: function(v) { return v >= 1000 ? (v/1000).toFixed(0) + 'k' : v; } },
+                                title: { display: true, text: '{{ __("Coins") }}' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderChart(100);
+
+            // Time range buttons
+            $('#chartRange button').on('click', function() {
+                $('#chartRange button').removeClass('active');
+                $(this).addClass('active');
+                var r = $(this).data('range');
+                renderChart(r === 'all' ? 'all' : parseInt(r));
+            });
+
+            // Auto-refresh every 30s
+            setInterval(function() {
+                $.getJSON('{{ admin_url("fairluck") }}?ajax=history', function(resp) {
+                    if (resp && resp.length) {
+                        allData = resp;
+                        renderChart(currentRange);
+                    }
+                }).fail(function() {}); // silent fail
+            }, 30000);
+
+            @else
+            // V2/V3: Simple chart
+            var chart = new Chart(canvas.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: "{{ __('Global Vault Balance') }} / {{ __('رصيد الخزينة العام') }}",
+                        label: "{{ __('Vault Balance') }}",
                         data: dataPoints,
                         borderColor: 'rgba(60,141,188,0.8)',
                         backgroundColor: 'rgba(60,141,188,0.2)',
-                        fill: true,
-                        tension: 0.1,
-                        pointBackgroundColor: function (context) {
-                            var val = dataPoints[context.dataIndex] || 0;
-                            return val < 0 ? 'rgba(255,99,132,1)' : 'rgba(60,141,188,1)';
-                        },
-                        pointBorderColor: '#fff',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        fill: true, tension: 0.1,
+                        pointBackgroundColor: function(ctx) { return (dataPoints[ctx.dataIndex]||0) < 0 ? '#e74c3c' : '#3c8dbc'; },
+                        pointRadius: 4, pointHoverRadius: 6
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'nearest',
-                        intersect: false,
-                    },
                     plugins: {
                         tooltip: {
-                            padding: 10,
                             callbacks: {
-                                label: function (context) {
-                                    var data = historyData[context.dataIndex];
-                                    var lines = [];
-                                    lines.push("{{ __('🎯 Balance After:  ') }}" + data.after.toLocaleString());
-                                    lines.push("{{ __('💰 Change Amt:  ') }}" + (data.change > 0 ? '+' : '') + data.change.toLocaleString());
-                                    lines.push("{{ __('⏳ Balance Before: ') }}" + data.before.toLocaleString());
-
-                                    var desc = data.desc;
-                                    desc = desc.replace('Win payout', "{{ __('🏆 Win') }}")
-                                        .replace('Loss bet', "{{ __('💔 Loss') }}")
-                                        .replace('Bet contribution', "{{ __('💸 Bet') }}");
-
-                                    lines.push("{{ __('📝 Info: ') }}" + desc);
-
-                                    if (data.after < 0) {
-                                        lines.push("{{ __('⚠️ Status: Wallet is Negative!') }}");
-                                    }
-                                    return lines;
+                                label: function(ctx) {
+                                    var d = historyData[ctx.dataIndex];
+                                    return ['Balance: ' + d.after.toLocaleString(), 'Change: ' + (d.change>0?'+':'') + d.change.toLocaleString(), d.desc];
                                 }
                             }
                         }
                     },
-                    scales: {
-                        y: { beginAtZero: false }
-                    }
+                    scales: { y: { beginAtZero: false } }
                 }
             });
+            @endif
         });
     </script>
 @endif
