@@ -1110,7 +1110,12 @@ class UserController extends Controller
                 UserCoinLogType::INVITATION_CODE,
             );
             
-         
+            \Log::info('Invitation reward added', [
+                'user_id' => $user->id,
+                'reward' => $reward,
+                'amount_before' => $amountBefore,
+                'type' => $type
+            ]);
         } else {
             \Log::warning('Invitation reward is 0', [
                 'user_id' => $user->id,
