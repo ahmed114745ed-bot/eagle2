@@ -21,21 +21,8 @@ class GameDuplicateCheckController extends Controller
     public function status(Request $request)
     {
         try {
-            // Count duplicates
-            $duplicates = DB::select('
-                SELECT COUNT(*) as count
-                FROM (
-                    SELECT order_id, COUNT(*) as cnt
-                    FROM coin_game_users
-                    WHERE order_id IS NOT NULL
-                    GROUP BY order_id
-                    HAVING cnt > 1
-                ) as dups
-            ')[0]->count ?? 0;
-
-            // Total orders
+            // Quick check - just return basic info first
             $totalOrders = DB::table('coin_game_users')->whereNotNull('order_id')->count();
-            $uniqueOrders = DB::table('coin_game_users')->whereNotNull('order_id')->distinct('order_id')->count('order_id');
 
             // Check if unique index exists
             $hasUniqueIndex = DB::select("
@@ -49,30 +36,15 @@ class GameDuplicateCheckController extends Controller
             // Check if backup table exists
             $hasBackup = DB::select("SHOW TABLES LIKE 'coin_game_users_duplicates_backup'");
 
-            // Get sample duplicates
-            $sampleDuplicates = DB::select('
-                SELECT order_id, COUNT(*) as count, MIN(created_at) as first, MAX(created_at) as last
-                FROM coin_game_users
-                WHERE order_id IS NOT NULL
-                GROUP BY order_id
-                HAVING COUNT(*) > 1
-                ORDER BY count DESC
-                LIMIT 5
-            ');
-
             return response()->json([
                 'status' => 'success',
                 'data' => [
                     'total_orders' => $totalOrders,
-                    'unique_orders' => $uniqueOrders,
-                    'duplicate_orders' => $duplicates,
-                    'duplicate_percentage' => $totalOrders > 0 ? round(($duplicates / $totalOrders) * 100, 4) : 0,
                     'has_unique_index' => $hasUniqueIndex > 0,
                     'has_backup_table' => count($hasBackup) > 0,
                     'backup_count' => count($hasBackup) > 0 ? DB::table('coin_game_users_duplicates_backup')->count() : 0,
-                    'sample_duplicates' => $sampleDuplicates,
-                    'migrations_pending' => $this->checkPendingMigrations(),
                     'timestamp' => now()->toDateTimeString(),
+                    'note' => 'Simplified version - duplicate check removed to avoid timeout'
                 ]
             ]);
         } catch (\Exception $e) {
