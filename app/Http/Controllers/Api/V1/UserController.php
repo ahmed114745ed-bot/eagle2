@@ -1533,7 +1533,7 @@ class UserController extends Controller
 
     public function dataUser(Request $request)
     {
-        $id = $request->id;
+        $id = (int) $request->id;
         if (!$id) return Common::apiResponse(0, __('api_responses.validation_error'), 400);
 
         return Cache::remember("data_user_{$id}", 600, function () use ($id) {

@@ -89,6 +89,20 @@ class UtdGameController extends Controller
 
             $type = (int) $request->type;
 
+            // Idempotency check — prevent duplicate orders from retry after network timeout
+            $existingOrder = DB::table('coin_game_users')
+                ->where('order_id', $request->orderId)
+                ->first();
+
+            if ($existingOrder) {
+                Log::info("UTD changeBalance: Order already processed", [
+                    'orderId' => $request->orderId,
+                    'userId' => $request->uid
+                ]);
+                $user = User::find($request->uid);
+                return $this->json(0, 'success', ['coin' => $user->di ?? 0]);
+            }
+
             if ($type == 1 && $this->checkLoseWallet($request->coin)) {
                 return $this->json(4005, 'Game not available');
             }
@@ -172,7 +186,20 @@ class UtdGameController extends Controller
                 return $this->json(4005, 'Invalid params', $validator->errors());
             }
 
-            // Idempotency — if order already processed, return current balance
+            // Idempotency — check database first, then cache
+            $existingOrder = DB::table('coin_game_users')
+                ->where('order_id', $request->orderId)
+                ->first();
+
+            if ($existingOrder) {
+                Log::info("UTD makeUpOrders: Order already exists in database", [
+                    'orderId' => $request->orderId,
+                    'userId' => $request->uid
+                ]);
+                $user = User::find($request->uid);
+                return $this->json(0, 'success', ['coin' => $user->di ?? 0]);
+            }
+
             if (Cache::has("utd_order_{$request->orderId}")) {
                 $user = User::find($request->uid);
                 return $this->json(0, 'success', ['coin' => $user->di ?? 0]);

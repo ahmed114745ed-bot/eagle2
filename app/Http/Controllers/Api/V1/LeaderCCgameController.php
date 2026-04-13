@@ -91,6 +91,19 @@ class LeaderCCgameController extends Controller
                 return $this->json(4005, 'Invalid type');
             }
 
+            // Idempotency check — prevent duplicate orders from retry after network timeout
+            $existingOrder = DB::table('coin_game_users')
+                ->where('order_id', $request->orderId)
+                ->first();
+
+            if ($existingOrder) {
+                Log::info("LeaderCC updateGameCoin: Order already processed", [
+                    'orderId' => $request->orderId,
+                    'userId' => $request->uid
+                ]);
+                $user = User::find($request->uid);
+                return $this->json(0, 'success', ['coin' => $user->di ?? 0]);
+            }
 
             return DB::transaction(function () use ($request, $type) {
 
@@ -172,6 +185,20 @@ class LeaderCCgameController extends Controller
 
             if ($validator->fails()) {
                 return $this->json(4005, 'Missing or invalid parameters', $validator->errors());
+            }
+
+            // Idempotency — check database first, then cache
+            $existingOrder = DB::table('coin_game_users')
+                ->where('order_id', $request->orderId)
+                ->first();
+
+            if ($existingOrder) {
+                Log::info("LeaderCC makeUpOrders: Order already exists in database", [
+                    'orderId' => $request->orderId,
+                    'userId' => $request->uid
+                ]);
+                $user = User::find($request->uid);
+                return $this->json(0, 'success', ['coin' => $user->di ?? 0]);
             }
 
             if (Cache::has("order_{$request->orderId}")) {
