@@ -20,11 +20,6 @@ class GameDuplicateCheckController extends Controller
      */
     public function status(Request $request)
     {
-        // Security: Only allow specific secret key
-        if ($request->header('X-Admin-Secret') !== config('app.key')) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
         try {
             // Count duplicates
             $duplicates = DB::select('
@@ -94,11 +89,6 @@ class GameDuplicateCheckController extends Controller
      */
     public function runMigrations(Request $request)
     {
-        // Security: Only allow specific secret key
-        if ($request->header('X-Admin-Secret') !== config('app.key')) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
         try {
             // Enable the migrations to run
             config(['app.allow_duplicate_cleanup_migration' => true]);
@@ -160,11 +150,6 @@ class GameDuplicateCheckController extends Controller
      */
     public function logs(Request $request)
     {
-        // Security: Only allow specific secret key
-        if ($request->header('X-Admin-Secret') !== config('app.key')) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
         try {
             $logFile = storage_path('logs/laravel.log');
 
