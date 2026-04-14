@@ -208,17 +208,18 @@ class SuperAdminRewardController extends MainController
 
     protected function badge($grid)
     {
+        $lang = app()->getLocale();
         $grid->model()->whereHas('images', function ($query) use ($lang) {
-                $query->where('language', $lang);
-            })->with('images')->orderBy('priority', 'desc');
+            $query->where('language', $lang);
+        })->with('images')->orderBy('priority', 'desc');
         $grid->column('name', __('name'))->sortable();
         $grid->column('priority', __('Priority'))->sortable();
-         $grid->column('images.image', __('image'))->display(function ($path) {
-                $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
-                /** @var Ware $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
-            });
+        $grid->column('images.image', __('image'))->display(function ($path) {
+            $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
+        });
         $grid->filter(function ($filter) {
             $filter->like('name', 'Name');
             $filter->equal('priority', 'Priority');
