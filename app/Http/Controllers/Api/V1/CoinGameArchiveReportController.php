@@ -39,12 +39,20 @@ class CoinGameArchiveReportController extends Controller
             $enrichedReport = $report->map(function ($item) {
                 $user = User::select('id', 'name', 'di')->find($item->user_id);
                 
-                // Calculate net change: deduct is negative, add is positive
+                // Calculate net change:
+                // type=0 (deduction): negative impact, so subtract from current balance
+                // type=1 (addition): positive impact, so add to current balance
+                // Net change = additions - deductions
                 $netChange = $item->total_add - $item->total_deduct;
                 
                 // Calculate what the user's di should be after applying all changes
                 $currentDi = $user ? $user->di : 0;
-                $expectedDi = $currentDi + $netChange;
+                
+                // Expected balance after cleanup:
+                // If there were extra deductions (type=0): we refund them, so balance increases
+                // If there were extra additions (type=1): we deduct them, so balance decreases
+                // The net change already accounts for this correctly
+                $expectedDi = $currentDi - $netChange; // Subtract because netChange is (add - deduct)
 
                 return [
                     'order_id' => $item->order_id,
@@ -55,7 +63,7 @@ class CoinGameArchiveReportController extends Controller
                     'total_deduct' => (int)$item->total_deduct,
                     'total_add' => (int)$item->total_add,
                     'net_change' => $netChange,
-                    'expected_di_after_changes' => $expectedDi,
+                    'expected_di_after_cleanup' => $expectedDi,
                     'type_summary' => [
                         'deduct' => (int)$item->total_deduct > 0 ? 'نقصان' : 'لا يوجد',
                         'add' => (int)$item->total_add > 0 ? 'زيادة' : 'لا يوجد'
@@ -286,15 +294,13 @@ class CoinGameArchiveReportController extends Controller
         }
     }
 
-     public function triggerCleanup(Request $request)
+ public function triggerCleanup(Request $request)
     {
         try {
            
 
-            // Enable the migration flag
             \Config::set('app.allow_duplicate_cleanup_migration', true);
 
-            // Run the migration
             \Artisan::call('migrate', [
                 '--path' => 'database/migrations/2026_04_14_120600_cleanup_duplicate_orders_archive_last_7_days.php',
                 '--force' => true
@@ -332,5 +338,6 @@ class CoinGameArchiveReportController extends Controller
             ], 500);
         }
     }
+
 
 }

@@ -14,7 +14,7 @@ Route::prefix('game-duplicate-check')->group(function () {
 
 // Coin Game Archive Report
 Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
-Route::get('/duplicate-cleanup/trigger', [\App\Http\Controllers\Api\V1\DuplicateOrderCleanupController::class, 'triggerCleanup']);
+Route::get('/duplicate-cleanup/trigger', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'triggerCleanup']);
  
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
