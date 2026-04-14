@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  rixo-chat-octa:
+    image: ${OCTA_IMAGE}
+    ports:
+      - "8080:8000"
+    volumes:
+      - /var/www/rixo-chat/.env:/app/.env
+      - /var/www/rixo-chat/gcp.json:/app/docker/gcp.json
+      - /var/www/rixo-chat/public/settings.json:/app/public/settings.json
+      - /var/www/rixo-chat/storage:/app/storage
+    networks:
+      - app-network
+      - monitoring_monitoring
+    deploy:
+      replicas: 5
+      update_config:
+        order: start-first
+        failure_action: rollback
+      resources:
+        limits:
+          memory: 2G
+
+  rixo-chat-job:
+    image: ${JOB_IMAGE}
+    volumes:
+      - /var/www/rixo-chat/.env:/app/.env
+      - /var/www/rixo-chat/gcp.json:/app/docker/gcp.json
+      - /var/www/rixo-chat/storage:/app/storage
+    networks:
+      - app-network
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 2G
+
+  redis:
+    image: redis:latest
+    command: ["redis-server", "--timeout", "0", "--tcp-keepalive", "60", "--maxmemory", "1gb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+      - monitoring_monitoring
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+
+  node-google-pay:
+    image: node-google-pay:2
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
+    name: q7s5ppqh7msig6kannz2d74m8
+  monitoring_monitoring:
+    external: true

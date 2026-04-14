@@ -8,68 +8,50 @@ jobs:
     runs-on: [self-hosted]
     environment: rixo-prod
     steps:
-    - name: pull latest code
+    - name: pull latest code and sync env
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.96.67"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 3m
+        command_timeout: 5m
         script: |
           cd /var/www/rixo-chat
           sudo git branch --set-upstream-to=origin/rixo-chat rixo-chat || true
           sudo git pull origin rixo-chat
-          
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh || source /home/${{ secrets.USERNAME }}/hub.sh
-          
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-            sudo docker system prune -a -f && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
 
-  run_rixo_chat_app:
-    runs-on: [self-hosted]
-    needs: run_rixo_chat_hub
-    environment: rixo-prod
-    steps:
-    - name: build and deploy rixo-chat app
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.96.67"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 20m
-        script: |
-          cd /var/www/rixo-chat
-          sudo docker build -t rixo-chat-octa:${{ github.sha }} -f Dockerfile-octana .
-          sudo docker service update --image rixo-chat-octa:${{ github.sha }} rixo-chat-octa
-          
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh || source /home/${{ secrets.USERNAME }}/hub.sh
+
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
+            echo "Disk space high ($current%), pruning docker assets..."
             sudo docker system prune -a -f
           fi
 
-  run_rixo_chat_job:
+  deploy_rixo_stack:
     runs-on: [self-hosted]
     needs: run_rixo_chat_hub
     environment: rixo-prod
     steps:
-    - name: build and deploy rixo-chat job
+    - name: build and deploy unified stack
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.96.67"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 20m
+        command_timeout: 30m
         script: |
           cd /var/www/rixo-chat
+          
+          sudo docker build -t rixo-chat-octa:${{ github.sha }} -f Dockerfile-octana .
           sudo docker build -t rixo-chat-job:${{ github.sha }} -f Dockerfile-jobs .
-          sudo docker service update --image rixo-chat-job:${{ github.sha }} rixo-chat-job
+          
+          export OCTA_IMAGE=rixo-chat-octa:${{ github.sha }}
+          export JOB_IMAGE=rixo-chat-job:${{ github.sha }}
+          
+          sudo -E docker stack deploy -c rixo-deployment.yml rixo
+
+          sudo docker image prune -f
