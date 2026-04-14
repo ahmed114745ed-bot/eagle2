@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 
 class GiftObserver
 {

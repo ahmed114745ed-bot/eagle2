@@ -20,7 +20,7 @@ use Carbon\Carbon;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Room\Entities\Room;
 use App\Models\Agency;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use Encore\Admin\Layout\Row;

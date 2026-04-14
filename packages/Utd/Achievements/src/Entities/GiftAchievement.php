@@ -2,11 +2,12 @@
 
 namespace Utd\Achievements\Entities;
 
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Gifts\Entities\Gift;
 
 class GiftAchievement extends Model
 {
@@ -21,7 +22,8 @@ class GiftAchievement extends Model
 
     public function gift()
     {
-        return $this->belongsTo(Gift::class, 'gift_id');
+        return PackageHelper::checkRelation($this, 'gift', 'belongsTo')
+            ?? $this->belongsTo(Gift::class, 'gift_id');
     }
 
     public function Achievement()

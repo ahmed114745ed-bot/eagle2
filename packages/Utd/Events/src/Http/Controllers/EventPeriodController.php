@@ -4,7 +4,7 @@ namespace Utd\Events\Http\Controllers;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

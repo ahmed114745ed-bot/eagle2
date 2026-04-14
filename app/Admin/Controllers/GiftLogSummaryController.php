@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use Encore\Admin\Grid;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;

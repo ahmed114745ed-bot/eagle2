@@ -3,7 +3,7 @@
 namespace App\Traits\HelperTraits;
 
 use App\Helpers\Common;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\OfficialMessage;
 use App\Support\FamilyPackage;
 use Illuminate\Http\Resources\Json\JsonResource;

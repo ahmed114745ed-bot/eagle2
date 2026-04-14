@@ -3,7 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Agency;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Room\Entities\Room;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;

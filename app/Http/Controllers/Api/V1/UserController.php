@@ -6,7 +6,7 @@ use App\Support\PackageHelper;
 use Auth;
 use Exception;
 use App\Models\Ban;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;

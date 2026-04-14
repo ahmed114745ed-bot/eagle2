@@ -3,7 +3,7 @@
 namespace Utd\TaskStream\Services;
 
 use App\Exceptions\CValidationException;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

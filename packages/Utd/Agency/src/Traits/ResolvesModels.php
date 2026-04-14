@@ -126,7 +126,7 @@ trait ResolvesModels
      */
     protected function getGiftLogModel(): ?string
     {
-        return $this->resolveModel('gift_log', \App\Models\GiftLog::class);
+        return $this->resolveModel('gift_log', \Utd\Gifts\Entities\GiftLog::class);
     }
 
     /**
@@ -166,7 +166,7 @@ trait ResolvesModels
      */
     protected function getGiftModel(): ?string
     {
-        return $this->resolveModel('gift', \App\Models\Gift::class);
+        return $this->resolveModel('gift', \Utd\Gifts\Entities\Gift::class);
     }
 
     /**
@@ -198,7 +198,7 @@ trait ResolvesModels
      */
     protected function getUserGiftModel(): ?string
     {
-        return $this->resolveModel('user_gift', \App\Models\UserGift::class);
+        return $this->resolveModel('user_gift', \Utd\Gifts\Entities\UserGift::class);
     }
 
     /**

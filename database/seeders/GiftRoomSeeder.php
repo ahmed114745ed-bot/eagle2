@@ -7,7 +7,7 @@ use App\Models\Pack;
 use Utd\Room\Entities\Room;
 use App\Models\Agency;
 
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Vip\Entities\UserVip;
 use App\Models\ExchangeLog;
 use App\Models\AgencySallary;

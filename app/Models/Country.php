@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\AreaManager\Entities\AreaManager;
@@ -9,6 +10,7 @@ use Modules\AreaManager\Entities\Region;
 use Modules\SalaryTransaction\Entities\ChargeCountry;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Room\Entities\Room;
 
 class Country extends Model
@@ -34,18 +36,19 @@ class Country extends Model
 
     public function supporters()
     {
-        return $this->hasManyThrough(
-            GiftLog::class,
-            User::class,
-            'country_id',
-            'sender_id',
-            'id',
-            'id'
-        )
-        ->selectRaw('sender_id, users.country_id, SUM(giftPrice) as total_sent')
-        ->groupBy('sender_id', 'users.country_id')
-        ->with('sender')
-        ->orderByDesc('total_sent');
+        return PackageHelper::checkRelation($this, 'gift', 'hasManyThrough')
+            ?? $this->hasManyThrough(
+                GiftLog::class,
+                User::class,
+                'country_id',
+                'sender_id',
+                'id',
+                'id'
+            )
+            ->selectRaw('sender_id, users.country_id, SUM(giftPrice) as total_sent')
+            ->groupBy('sender_id', 'users.country_id')
+            ->with('sender')
+            ->orderByDesc('total_sent');
     }
 
     public function rooms(): HasManyThrough

@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Utd\Gifts\Console\GiftUpdateUsedCountMonthly;
 use Utd\Gifts\Console\GiftUpdateUsedCountWeakly;
-use Utd\Gifts\Contracts\GiftSenderInterface;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 use Utd\Gifts\Events\GiftSent;
@@ -43,8 +42,8 @@ class GiftsServiceProvider extends ServiceProvider
         $this->app->singleton(Repositories\GiftRepository::class);
         $this->app->singleton(Repositories\GiftLogRepository::class);
 
-        // Bind GiftSenderInterface
-        $this->app->singleton(GiftSenderInterface::class, GiftSenderService::class);
+        // Bind GiftSenderService
+        $this->app->singleton(GiftSenderService::class);
 
         // Bind GiftsContract
         $this->app->bind(GiftsContract::class, function ($app) {

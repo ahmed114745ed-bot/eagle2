@@ -3,7 +3,7 @@
 namespace Utd\CP\Console;
 
 use App\Helpers\UserRewardsWeeklyCp;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\Ware;
 use App\Support\PackageHelper;
 use Illuminate\Console\Command;

@@ -4,7 +4,7 @@ namespace App\Admin\Actions;
 
 
 use App\Models\AgencyUserJob;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\UserSallary;

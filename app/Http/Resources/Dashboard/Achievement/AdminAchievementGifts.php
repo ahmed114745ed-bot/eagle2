@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Dashboard\Achievement;
 
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

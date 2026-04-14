@@ -7,11 +7,12 @@ use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use App\Models\UserGift;
+use Utd\Gifts\Entities\UserGift;
+use App\Support\PackageHelper;
 use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
@@ -328,7 +329,7 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
     public function bulkInsertGiftsAchievements(): void
     {
-        if (!empty($this->giftInsertData)) {
+        if (!empty($this->giftInsertData) && PackageHelper::isInstalled('gifts')) {
             UserGift::insert($this->giftInsertData);
         }
         if (!empty($this->achievementInsertData) && class_exists(UserAchievementLevel::class)) {

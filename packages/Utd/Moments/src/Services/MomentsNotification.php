@@ -4,7 +4,7 @@ namespace Utd\Moments\Services;
 
 use App\Helpers\Common;
 use App\Helpers\CustomNotification;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Modules\Public\Http\Services\UserCounterServices;

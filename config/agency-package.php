@@ -158,7 +158,7 @@ return [
         'country' => \App\Models\Country::class,
         'charge' => \App\Models\Charge::class,
         'coin_log' => \App\Models\CoinLog::class,
-        'gift_log' => \App\Models\GiftLog::class,
+        'gift_log' => \Utd\Gifts\Entities\GiftLog::class,
         'user_salary' => \App\Models\UserSallary::class,
         'user_target' => \App\Models\UserTarget::class,
         'target' => \App\Models\Target::class,

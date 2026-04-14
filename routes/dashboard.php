@@ -20,7 +20,7 @@ use App\Http\Controllers\Dashboard\OfficalMssages\AdminOfficalMssagesController;
 use App\Http\Controllers\Dashboard\Profile\ProfileDashboardController;
 use App\Http\Controllers\Dashboard\Room\AdminBackgroundRequestController;
 use App\Http\Controllers\Dashboard\Room\AdminEmojeRoomController;
-use App\Http\Controllers\Dashboard\Room\AdminGiftRoomController;
+use Utd\Gifts\Http\Controllers\Dashboard\AdminGiftRoomController;
 use App\Http\Controllers\Dashboard\Room\AdminRoomCategoriesController;
 use Utd\Room\Http\Controllers\Dashboard\AdminRoomsController;
 use App\Http\Controllers\Dashboard\Users\UsersDashboard;

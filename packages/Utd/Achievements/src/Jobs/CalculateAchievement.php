@@ -8,7 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Utd\Achievements\Services\UserAchievementService;
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 class CalculateAchievement implements ShouldQueue
 {

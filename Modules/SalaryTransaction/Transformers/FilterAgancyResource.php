@@ -5,7 +5,7 @@ namespace Modules\SalaryTransaction\Transformers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\AdminsAgencyResource;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;

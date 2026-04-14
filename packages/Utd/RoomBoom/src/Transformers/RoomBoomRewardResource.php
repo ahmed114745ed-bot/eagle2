@@ -2,7 +2,7 @@
 
 namespace Utd\RoomBoom\Transformers;
 
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
+use Utd\Gifts\Entities\Gift;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 

@@ -2,9 +2,9 @@
 
 namespace Utd\Moments\Entities;
 
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\User;
 use App\Support\PackageHelper;
+use Utd\Gifts\Entities\Gift;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 

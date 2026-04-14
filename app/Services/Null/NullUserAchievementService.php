@@ -3,7 +3,7 @@
 namespace App\Services\Null;
 
 use App\Contracts\UserAchievementContract;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 
 class NullUserAchievementService implements UserAchievementContract

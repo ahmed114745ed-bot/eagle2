@@ -12,7 +12,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
 use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\CoreWallet;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Traits\Gifts\LuckyGiftProbability;

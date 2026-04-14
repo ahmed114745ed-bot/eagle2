@@ -14,7 +14,7 @@ use App\Models\Config;
 use App\Models\Follow;
 use App\Models\Target;
 use GuzzleHttp\Client;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\Setting;
 use Utd\Room\Entities\RoomVisitor;
 use App\Models\UserCoinLog;

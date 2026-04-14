@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use Carbon\Carbon;
 use Utd\Vip\Entities\Vip;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;

@@ -17,7 +17,7 @@ use App\Models\Config;
 use App\Models\Follow;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 class Ranking
 {

@@ -2,9 +2,9 @@
 
 namespace Utd\Events\Entities;
 
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\User;
 use App\Support\PackageHelper;
+use Utd\Gifts\Entities\Gift;
 use App\Traits\CpWeeklyStar;
 use App\Traits\EventModel;
 use App\Traits\TimestampsWithTimezone;
@@ -37,7 +37,8 @@ class WeeklyStar extends Model
 
     public function gifts()
     {
-        return $this->belongsToMany(Gift::class, 'weekly_star_gifts', 'weekly_star_id', 'gift_id');
+        return PackageHelper::checkRelation($this, 'gift', 'belongsToMany')
+            ?? $this->belongsToMany(Gift::class, 'weekly_star_gifts', 'weekly_star_id', 'gift_id');
     }
 
     public function rewards()

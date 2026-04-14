@@ -5,7 +5,7 @@ namespace App\Services\Gifts;
 
 
 use App\Facades\RedisService;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use Redis;
 

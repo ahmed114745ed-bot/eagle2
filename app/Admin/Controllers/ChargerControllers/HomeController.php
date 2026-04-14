@@ -5,7 +5,7 @@ namespace App\Admin\Controllers\ChargerControllers;
 use App\Admin\Customization\Dashboard\CustomDashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\UserTarget;

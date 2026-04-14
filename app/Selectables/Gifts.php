@@ -2,7 +2,7 @@
 
 namespace App\Selectables;
 
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
 

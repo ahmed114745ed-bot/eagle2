@@ -2,8 +2,8 @@
 
 namespace Utd\CP\Database\Seeders;
 
-use App\Models\Gift;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Utd\CP\Entities\Cp;

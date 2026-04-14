@@ -3,7 +3,7 @@
 namespace Modules\FixedTarget\Services;
 
 use App\Helpers\Common;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\UsersJoinedAgency;
 use Carbon\Carbon;
 use App\Models\User;

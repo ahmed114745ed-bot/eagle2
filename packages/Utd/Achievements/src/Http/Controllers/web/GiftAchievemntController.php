@@ -3,7 +3,7 @@
 namespace Utd\Achievements\Http\Controllers\web;
 
 
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
+use Utd\Gifts\Entities\Gift;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;

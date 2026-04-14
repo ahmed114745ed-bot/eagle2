@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Helpers\Common;
 use App\Models\CoinGameUser;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\UserCoinLog;
 use Utd\LuckyBox\Entities\UserLuckyGift;
 use App\Support\PackageHelper;

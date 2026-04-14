@@ -7,8 +7,8 @@ use Carbon\Carbon;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Models\GiftRanking;
+use Utd\Gifts\Entities\GiftLog;
+use Utd\Gifts\Entities\GiftRanking;
 use App\Models\CoinGameUser;
 use App\Models\CoinGameUserMerged;
 use Illuminate\Support\Facades\DB;
@@ -139,6 +139,9 @@ class RankingRepository
 
     public function getGiftLogs($class, $rel, $type, $limit, $keywords)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         $query = GiftLog::query()->whereHas($rel)
             ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
             ->when($class != 3, fn($q) => $q->with($rel));
@@ -185,6 +188,9 @@ class RankingRepository
 
     public function getUserRanking(string $role, string $rankingType, int $perPage = 10, $type = 1)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         $query = GiftRanking::query();
         $this->applyDateFiltersV2($query, $type);
 
@@ -211,6 +217,9 @@ class RankingRepository
 
     public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10, $type  = 1)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         // Return empty if agency package not installed
         $agencyClass = AgencyPackageHelper::getAgencyClass();
         if (!$agencyClass) {
@@ -234,6 +243,9 @@ class RankingRepository
 
     public function getUserRankingImages(string $role, string $rankingType, int $limit = 3)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         $query = GiftRanking::query()
             ->where('role', $role)
             ->where('ranker_type', User::class)
@@ -256,6 +268,9 @@ class RankingRepository
 
     public function getGiftLogsV2($class, $rel, $type, $limit, $keywords)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         $query = GiftLog::query()->whereHas($rel)
             ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
             ->when($class != 3, fn($q) => $q->with($rel));
@@ -272,6 +287,9 @@ class RankingRepository
 
     public function getGiftLogsForRoomOwnerId($class, $rel, $type, $limit, $room_id, $keywords)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
 
             ->when($class != 3, fn($q) => $q->with($rel));
@@ -287,6 +305,9 @@ class RankingRepository
 
     public function getGiftLogsUserForRoomOwnerId($class, $rel, $type, $userId, $room_id, $keywords)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return null;
+        }
         $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
 
             ->when($class != 3, fn($q) => $q->with($rel));

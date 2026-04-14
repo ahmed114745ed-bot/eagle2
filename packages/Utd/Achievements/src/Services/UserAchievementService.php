@@ -3,7 +3,7 @@
 namespace Utd\Achievements\Services;
 
 use App\Contracts\UserAchievementContract;
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Achievements\Entities\UserAchievement;

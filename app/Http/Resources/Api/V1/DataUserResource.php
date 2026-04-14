@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 
 use App\Support\PackageHelper;
 use Illuminate\Support\Facades\DB;

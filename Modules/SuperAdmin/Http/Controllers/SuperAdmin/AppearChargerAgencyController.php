@@ -10,7 +10,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\CoinLog;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use App\Models\AgencySallary;

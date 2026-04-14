@@ -3,7 +3,7 @@
 namespace Modules\SalaryTransaction\Helpers;
 
 use Utd\Vip\Entities\Vip;
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;

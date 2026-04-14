@@ -14,7 +14,7 @@ use App\Helpers\RoomHelper;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\Emoji;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\Language;
 use App\Models\Setting;
 use App\Models\User;

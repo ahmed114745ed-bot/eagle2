@@ -2,11 +2,10 @@
 
 namespace Utd\Gifts\Services;
 
-use App\Contracts\GiftsContract as AppGiftsContract;
+use App\Contracts\GiftsContract;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Utd\Gifts\Contracts\GiftsContract;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 use Utd\Gifts\Entities\GiftLog;
@@ -15,7 +14,7 @@ use Utd\Gifts\Entities\GiftRanking;
 /**
  * GiftsService
  */
-class GiftsService implements AppGiftsContract, GiftsContract
+class GiftsService implements GiftsContract
 {
     /**
      * @param  int  $userId

@@ -83,7 +83,7 @@ return [
         'country' => App\Models\Country::class,
         'charge' => App\Models\Charge::class,
         'coin_log' => App\Models\CoinLog::class,
-        'gift_log' => App\Models\GiftLog::class,
+        'gift_log' => Utd\Gifts\Entities\GiftLog::class,
         'user_salary' => App\Models\UserSallary::class,
         'user_target' => App\Models\UserTarget::class,
         'bd' => App\Models\Bd::class,
@@ -92,11 +92,11 @@ return [
         'language' => App\Models\Language::class,
         'setting' => App\Models\Setting::class,
         'country_rate' => App\Models\CountryRate::class,
-        'gift' => App\Models\Gift::class,
+        'gift' => Utd\Gifts\Entities\Gift::class,
         'room' => Utd\Room\Entities\Room::class,
         'chat' => App\Models\Chat::class,
         'notification' => App\Models\Notification::class,
-        'user_gift' => App\Models\UserGift::class,
+        'user_gift' => Utd\Gifts\Entities\UserGift::class,
 
         // Agency Package Models
         'agency' => Utd\Agency\Entities\Agency::class,

@@ -3,7 +3,7 @@
 namespace Utd\Room\Entities;
 
 use App\Models\AllGame;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
@@ -214,16 +214,18 @@ class Room extends Model
 
     public function gifts()
     {
-        return $this->hasMany(GiftLog::class, 'roomowner_id', 'uid');
+        return PackageHelper::checkRelation($this, 'gift', 'hasMany')
+            ?? $this->hasMany(GiftLog::class, 'roomowner_id', 'uid');
     }
 
     public function topUserGift()
     {
-        return $this->hasOne(GiftLog::class, 'roomowner_id', 'id')
-            ->selectRaw('SUM(giftPrice) as exp, sender_id, roomowner_id')
-            ->whereHas('sender')
-            ->groupBy('sender_id', 'roomowner_id')
-            ->orderByDesc('exp');
+        return PackageHelper::checkRelation($this, 'gift', 'hasOne')
+            ?? $this->hasOne(GiftLog::class, 'roomowner_id', 'id')
+                ->selectRaw('SUM(giftPrice) as exp, sender_id, roomowner_id')
+                ->whereHas('sender')
+                ->groupBy('sender_id', 'roomowner_id')
+                ->orderByDesc('exp');
     }
 
     public function roomCategory()

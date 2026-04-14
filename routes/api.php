@@ -555,7 +555,7 @@ Route::get('/public-official-test/{ids}', function ($ids) {
 });
 
 Route::get('gifts-by-id', function (Request $request) {
-    $gift = \App\Models\Gift::find($request->get('id'));
+    $gift = \Utd\Gifts\Entities\Gift::find($request->get('id'));
     if (!$gift) {
         return response()->json([]);
     }

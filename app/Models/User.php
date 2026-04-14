@@ -45,6 +45,7 @@ use Utd\Vip\Entities\Vip;
 use Utd\Moments\Entities\Moment;
 use Utd\Room\Entities\RequestBackgroundImage;
 use Utd\Room\Entities\Room;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Room\Entities\RoomSalary;
 use Utd\Room\Entities\RoomVisitor;
 
@@ -464,7 +465,8 @@ class User extends Authenticatable
 
     public function giftLogsSender()
     {
-        return $this->hasMany(GiftLog::class, 'sender_id');
+        return PackageHelper::checkRelation($this, 'gift', 'hasMany')
+            ?? $this->hasMany(GiftLog::class, 'sender_id');
     }
 
     public function luckyGifts()
@@ -2265,7 +2267,8 @@ class User extends Authenticatable
 
     public function giftLogs()
     {
-        return $this->hasMany(GiftLog::class, 'receiver_id');
+        return PackageHelper::checkRelation($this, 'gift', 'hasMany')
+            ?? $this->hasMany(GiftLog::class, 'receiver_id');
     }
 
 

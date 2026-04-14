@@ -4,7 +4,7 @@ namespace Modules\TribeReward\Jobs;
 
 use App\Helpers\Common;
 use App\Models\Agency;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Bus\Queueable;

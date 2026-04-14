@@ -11,7 +11,7 @@ use App\Models\Agency;
 use App\Models\Charge;
 use App\Helpers\Common;
 use App\Models\Country;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Content;

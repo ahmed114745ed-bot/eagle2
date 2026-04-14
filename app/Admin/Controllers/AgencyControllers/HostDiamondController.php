@@ -6,7 +6,7 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Services\AgencyService;
 use App\Admin\Services\UserService;
 use App\Helpers\UserCommon;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Grid;

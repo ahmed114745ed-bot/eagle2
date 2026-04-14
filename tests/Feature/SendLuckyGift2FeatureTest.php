@@ -7,7 +7,7 @@ use Utd\Room\Entities\Room;
 use Tests\TestCase;
 use Mockery;
 use App\Models\User;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\MonthlyDiamondReceive;
 use App\Services\Gifts\LuckyGiftService;
 use App\Services\Gifts\UpdateUserWhenSendGift;

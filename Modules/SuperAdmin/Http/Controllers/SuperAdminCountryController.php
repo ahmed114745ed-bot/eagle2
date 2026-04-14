@@ -12,8 +12,8 @@ use App\Models\Charge;
 use App\Models\CoinGameUser;
 use App\Models\CoinGameUserMergedMonthly;
 use App\Models\Country;
-use App\Models\GiftLog;
-use App\Models\GiftRanking;
+use Utd\Gifts\Entities\GiftLog;
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Room;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\User;
@@ -49,39 +49,43 @@ class SuperAdminCountryController extends Controller
             ->take(3)
             ->get(['id', 'name', 'uid']);
 
-        $topSenders = GiftLog::whereHas(
-            'sender',
-            fn($q) =>
-            $q->where('country_id', $countryID)
-        )
-            ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
-            ->groupBy('sender_id')
-            ->orderByDesc('total_sent')
-            ->take(3)
-            ->with([
-                'sender:id,name,country_id',
-                'sender.profile:id,user_id,avatar'
-            ])
-            ->get()
-            ->filter(fn($s) => $s->total_sent > 0);
+        $topSenders = collect();
+        $topReceivers = collect();
+        if (PackageHelper::isInstalled('gifts')) {
+            $topSenders = GiftLog::whereHas(
+                'sender',
+                fn($q) =>
+                $q->where('country_id', $countryID)
+            )
+                ->whereBetween('created_at', [$from, $to])
+                ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+                ->groupBy('sender_id')
+                ->orderByDesc('total_sent')
+                ->take(3)
+                ->with([
+                    'sender:id,name,country_id',
+                    'sender.profile:id,user_id,avatar'
+                ])
+                ->get()
+                ->filter(fn($s) => $s->total_sent > 0);
 
-        $topReceivers = GiftLog::whereHas(
-            'receiver',
-            fn($q) =>
-            $q->where('country_id', $countryID)
-        )
-            ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_sent')
-            ->groupBy('receiver_id')
-            ->orderByDesc('total_sent')
-            ->take(3)
-            ->with([
-                'receiver:id,name,country_id',
-                'receiver.profile:id,user_id,avatar'
-            ])
-            ->get()
-            ->filter(fn($s) => $s->total_sent > 0);
+            $topReceivers = GiftLog::whereHas(
+                'receiver',
+                fn($q) =>
+                $q->where('country_id', $countryID)
+            )
+                ->whereBetween('created_at', [$from, $to])
+                ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_sent')
+                ->groupBy('receiver_id')
+                ->orderByDesc('total_sent')
+                ->take(3)
+                ->with([
+                    'receiver:id,name,country_id',
+                    'receiver.profile:id,user_id,avatar'
+                ])
+                ->get()
+                ->filter(fn($s) => $s->total_sent > 0);
+        }
 
         $topAgencies = Agency::where('country_id', $countryID)
             ->withCount('members')
@@ -235,6 +239,9 @@ class SuperAdminCountryController extends Controller
 
     private function getTopSenders($countryID, $from, $to)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         return GiftLog::select('sender_id')
             ->selectRaw('SUM(giftPrice * giftNum) as total_sent')
             ->join('users', 'gift_logs.sender_id', '=', 'users.id')
@@ -253,6 +260,9 @@ class SuperAdminCountryController extends Controller
 
     private function getTopReceivers($countryID, $from, $to)
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return collect();
+        }
         return GiftLog::select('receiver_id')
             ->selectRaw('SUM(giftPrice * giftNum) as total_sent')
             ->join('users', 'gift_logs.receiver_id', '=', 'users.id')

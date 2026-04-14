@@ -12,7 +12,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\Country;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use Utd\Agency\Entities\ShippingAgency;

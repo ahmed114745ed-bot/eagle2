@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Emoji;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Modules\SpecialId\Entities\UserWare;

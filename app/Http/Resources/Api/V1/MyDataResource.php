@@ -10,7 +10,7 @@ use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Family\Entities\FamilyUser;
 use Utd\Family\Entities\FamilyLevel;
 use App\Models\UserSetting;

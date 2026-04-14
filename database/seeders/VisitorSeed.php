@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Utd\CP\Entities\Cp;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;

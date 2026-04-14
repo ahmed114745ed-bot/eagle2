@@ -4,7 +4,7 @@ namespace Utd\Moments\Helpers;
 
 use App\Helpers\Common;
 use App\Helpers\CustomNotification as BaseCustomNotification;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use App\Services\UserCounterServices;
 use Utd\Moments\Entities\Moment;

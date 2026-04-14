@@ -2,7 +2,7 @@
 
 namespace App\Contracts;
 
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 
 interface UserAchievementContract

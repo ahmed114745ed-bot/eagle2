@@ -13,7 +13,7 @@ use App\Models\Agency;
 use App\Models\Charge;
 use App\Helpers\Common;
 use App\Models\Country;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Models\UserSallary;

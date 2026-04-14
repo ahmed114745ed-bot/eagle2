@@ -6,7 +6,7 @@ use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\Ware;
 use App\Support\PackageHelper;
 use Exception;

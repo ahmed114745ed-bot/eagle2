@@ -15,7 +15,7 @@ use App\Models\User;
 use App\Models\Charge;
 use App\Helpers\Common;
 use App\Models\Country;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

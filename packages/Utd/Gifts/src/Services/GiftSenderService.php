@@ -8,7 +8,6 @@ use DB;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Utd\Gifts\Contracts\GiftSenderInterface;
 use Utd\Gifts\DTOs\SendGiftDTO;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftLog;
@@ -19,7 +18,7 @@ use Utd\Gifts\Exceptions\InsufficientBalanceException;
 use Utd\Gifts\Exceptions\VipLevelRequiredException;
 use Utd\Gifts\Repositories\GiftRepository;
 
-class GiftSenderService implements GiftSenderInterface
+class GiftSenderService
 {
     public function __construct(
         private GiftRepository $giftRepository,

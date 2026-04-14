@@ -8,7 +8,11 @@
       "Bash(grep -rn \"new\\\\s\\\\+\\\\\\\\\\\\\\\\\" /d/projects/eagle/packages/Utd/Reals/src --include=\"*.php\")",
       "Bash(grep -rn \"\\\\\\\\$.*=\\\\s*['\\\\\"][\\\\\\\\\\\\\\\\]*Utd\" /d/projects/eagle/packages/Utd/Reals/src --include=\"*.php\")",
       "Bash(grep -r \"= *'[A-Z][^']*\\\\\\\\\\\\\\\\[A-Z]\" packages/Utd/Moments --include=\"*.php\")",
-      "Bash(grep -r \"use Utd\\\\\\\\\\\\\\\\Gifts\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\ClassResolver\\\\|use Utd\\\\\\\\\\\\\\\\Gifts\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\ModelResolver\" /d/projects/eagle/app /d/projects/eagle/Modules)"
+      "Bash(grep -r \"use Utd\\\\\\\\\\\\\\\\Gifts\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\ClassResolver\\\\|use Utd\\\\\\\\\\\\\\\\Gifts\\\\\\\\\\\\\\\\Support\\\\\\\\\\\\\\\\ModelResolver\" /d/projects/eagle/app /d/projects/eagle/Modules)",
+      "Bash(grep -rl \"use App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\Gift;\" --include=\"*.php\")",
+      "Bash(xargs sed:*)",
+      "Bash(find . -name \"*.php\" -not -path \"./app/Models/Gift.php\" -not -name \"*.backup\" -not -name \"*.md\" -exec grep -l \"App.Models.Gift\" {} \\\\;)",
+      "Bash(php -r ':*)"
     ]
   }
 }

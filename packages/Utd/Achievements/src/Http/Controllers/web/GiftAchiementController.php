@@ -4,7 +4,7 @@ namespace Utd\Achievements\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
+use Utd\Gifts\Entities\Gift;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

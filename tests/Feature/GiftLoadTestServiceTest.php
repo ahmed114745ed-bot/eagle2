@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use App\Services\GiftLoadTestService;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;

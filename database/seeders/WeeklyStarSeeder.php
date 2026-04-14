@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Gift;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;

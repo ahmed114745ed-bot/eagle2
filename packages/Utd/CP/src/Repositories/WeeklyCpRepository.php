@@ -2,7 +2,7 @@
 
 namespace Utd\CP\Repositories;
 
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Support\PackageHelper;
 use Illuminate\Support\Facades\DB;
 use Utd\CP\Entities\Cp;

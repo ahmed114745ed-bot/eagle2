@@ -8,7 +8,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Jobs\SendFirebaseNotificationIndividualUserJob;
 use App\Models\CoinGameUser;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use App\Models\Ware;
 use App\Support\PackageHelper;

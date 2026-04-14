@@ -1905,7 +1905,7 @@
                                                         $month = request('month') ?? now()->month;
                                                         $year = request('year') ?? now()->year;
 
-                                                        $giftLogs = \App\Models\GiftLog::where('agency_id', $memberTarget->agency_id)
+                                                        $giftLogs = \Utd\Gifts\Entities\GiftLog::where('agency_id', $memberTarget->agency_id)
                                                             ->where('receiver_id', $memberTarget->id)
                                                             ->whereHas('sender')
                                                             ->with('sender.profile') // assuming sender has a 'profile' with 'avatar'

@@ -3,7 +3,7 @@
 namespace Modules\TribeReward\Services;
 
 use App\Helpers\UserCommon;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use App\Models\Ware;
 use Carbon\Carbon;

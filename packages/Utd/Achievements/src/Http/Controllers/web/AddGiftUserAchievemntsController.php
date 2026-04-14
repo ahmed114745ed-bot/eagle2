@@ -2,7 +2,7 @@
 
 namespace Utd\Achievements\Http\Controllers\web;
 
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
+use Utd\Gifts\Entities\Gift;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

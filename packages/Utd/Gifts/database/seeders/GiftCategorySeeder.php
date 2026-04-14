@@ -1,14 +1,10 @@
 <?php
 
-namespace Database\Seeders;
+namespace Utd\Gifts\Database\Seeders;
 
-use App\Models\Gift;
-use App\Models\User;
-use App\Models\Follow;
-use Utd\Room\Entities\RoomGame;
-use App\Models\GiftCategory;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\GiftCategory;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class GiftCategorySeeder extends Seeder
 {

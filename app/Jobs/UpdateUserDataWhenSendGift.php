@@ -6,7 +6,7 @@ use App\Support\PackageHelper;
 use Utd\Gifts\Services\SendGiftService;
 use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use App\Helpers\UserCommon;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Contracts\RoomTopUsersRepositoryContract;

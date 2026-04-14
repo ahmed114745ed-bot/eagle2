@@ -3,7 +3,7 @@
 namespace Utd\CP\Repositories;
 
 use App\Contracts\CpRepositoryContract;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\Ware;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

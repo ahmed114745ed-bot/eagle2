@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Room;
+namespace Utd\Gifts\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Room\AdminGiftsResource;
 use Illuminate\Http\Request;
-use App\Models\Gift;
-use App\Models\LuckyGift;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\LuckyGift;
 use App\Traits\Dashboard\DashBoardTrait;
 
 class AdminGiftRoomController extends Controller

@@ -6,7 +6,7 @@ use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\AppFeature;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\User;
 use Utd\Room\Entities\Room;
 use Utd\Room\Entities\RoomGiftTarget;

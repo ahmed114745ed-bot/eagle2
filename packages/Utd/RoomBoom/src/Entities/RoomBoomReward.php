@@ -3,13 +3,14 @@
 namespace Utd\RoomBoom\Entities;
 
 use App\Helpers\Common;
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Utd\Gifts\Entities\Gift;
 
 class RoomBoomReward extends Model
 {
@@ -24,7 +25,8 @@ class RoomBoomReward extends Model
 
     public function gift(): HasOne
     {
-        return $this->hasOne(Gift::class, 'id', 'target');
+        return PackageHelper::checkRelation($this, 'gift', 'hasOne')
+            ?? $this->hasOne(Gift::class, 'id', 'target');
     }
 
     public function ware_target(): BelongsTo
@@ -34,7 +36,8 @@ class RoomBoomReward extends Model
 
     public function gift_target(): BelongsTo
     {
-        return $this->belongsTo(Gift::class, 'target');
+        return PackageHelper::checkRelation($this, 'gift', 'belongsTo')
+            ?? $this->belongsTo(Gift::class, 'target');
     }
 
     protected static function boot(): void

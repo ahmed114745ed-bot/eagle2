@@ -9,7 +9,7 @@ use App\Helpers\CacheHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\UserGift;
+use Utd\Gifts\Entities\UserGift;
 use App\Support\PackageHelper;
 use App\Tik\DTO\ReceiverGiftDTO;
 use Carbon\Carbon;

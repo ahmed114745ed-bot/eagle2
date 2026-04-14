@@ -13,7 +13,7 @@ use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\Country;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Jobs\UserVisitJob;
 use App\Facades\UserHandling;
 use App\Enums\UserCoinLogType;

@@ -5,11 +5,12 @@ namespace Utd\RoomBoom\Jobs;
 use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\Gift; // App\Models\Gift safely aliases Utd\Gifts\Entities\Gift when package is installed
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\Gift;
+use Utd\Gifts\Entities\GiftLog;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use App\Models\UserGift;
+use Utd\Gifts\Entities\UserGift;
+use App\Support\PackageHelper;
 use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
@@ -64,7 +65,9 @@ class RoomBoomRewardJob implements ShouldQueue
 
         $topContributorIds = $this->getTopContributorIds($roomId, $level->level);
 
-        $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
+        $lastTriggerSenderId = PackageHelper::isInstalled('gifts')
+            ? GiftLog::where('id', $boom->final_gift_id)->value('sender_id')
+            : null;
 
         $room = Room::select('id')->with('roomVisitors:id,user_id,room_id')->find($roomId);
 
@@ -244,6 +247,9 @@ class RoomBoomRewardJob implements ShouldQueue
 
     public function getTopContributorIds($roomId, $levelColumn): array
     {
+        if (!PackageHelper::isInstalled('gifts')) {
+            return [];
+        }
         return GiftLog::query()
             ->select('sender_id',
                 DB::raw('SUM(giftPrice) as total_gift'),
@@ -287,7 +293,7 @@ class RoomBoomRewardJob implements ShouldQueue
 
     public function bulkInsertGiftsAchievements(): void
     {
-        if (!empty($this->giftInsertData)) {
+        if (!empty($this->giftInsertData) && PackageHelper::isInstalled('gifts')) {
             UserGift::insert($this->giftInsertData);
         }
         if (!empty($this->achievementInsertData) && class_exists(UserAchievementLevel::class)) {

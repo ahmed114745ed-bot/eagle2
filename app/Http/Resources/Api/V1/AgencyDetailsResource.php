@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use Carbon\Carbon;
 use App\Models\Agency;
 use App\Models\Target;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\UserSallary;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\JsonResource;

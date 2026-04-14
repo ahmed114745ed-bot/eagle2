@@ -1436,7 +1436,7 @@ Route::get('/debug/test-user-online', function () {
 });
 
 Route::get('/fix-room-morph', function () {
-    $updated = \App\Models\GiftRanking::query()
+    $updated = \Utd\Gifts\Entities\GiftRanking::query()
         ->where('ranker_type', 'App\\Models\\Room')
         ->update([
             'ranker_type' => 'Utd\\Room\\Entities\\Room',
