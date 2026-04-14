@@ -24,8 +24,8 @@ class CoinGameArchiveReportController extends Controller
                     'order_id',
                     'user_id',
                     DB::raw('COUNT(*) as record_count'),
-                    DB::raw('SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_deduct'),
-                    DB::raw('SUM(CASE WHEN type = 2 THEN coins ELSE 0 END) as total_add'),
+                    DB::raw('SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_deduct'),
+                    DB::raw('SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_add'),
                     DB::raw('MIN(created_at) as first_created_at'),
                     DB::raw('MAX(created_at) as last_created_at')
                 )
@@ -285,4 +285,52 @@ class CoinGameArchiveReportController extends Controller
             ], 500);
         }
     }
+
+     public function triggerCleanup(Request $request)
+    {
+        try {
+           
+
+            // Enable the migration flag
+            \Config::set('app.allow_duplicate_cleanup_migration', true);
+
+            // Run the migration
+            \Artisan::call('migrate', [
+                '--path' => 'database/migrations/2026_04_14_120600_cleanup_duplicate_orders_archive_last_7_days.php',
+                '--force' => true
+            ]);
+
+            $output = \Artisan::output();
+
+            Log::info('Duplicate cleanup migration triggered successfully', [
+                'triggered_by' => $request->user()?->id ?? 'unknown',
+                'timestamp' => now()
+            ]);
+
+            return response()->json([
+                'errorCode' => 0,
+                'errorMsg' => 'Cleanup process completed successfully',
+                'data' => [
+                    'status' => 'completed',
+                    'timestamp' => now(),
+                    'output' => $output
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Duplicate cleanup migration failed: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'errorCode' => 5000,
+                'errorMsg' => 'Cleanup process failed',
+                'data' => [
+                    'error' => $e->getMessage()
+                ]
+            ], 500);
+        }
+    }
+
 }
