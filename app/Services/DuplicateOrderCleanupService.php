@@ -1,78 +1,58 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+namespace App\Services;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-return new class extends Migration
+class DuplicateOrderCleanupService
 {
-    /**
-     * Batch size per delete cycle — tune based on server capacity
-     */
     private int $batchSize = 1000;
-
-    /**
-     * Only clean duplicates within this many days back
-     */
     private int $daysBack = 7;
 
     /**
-     * Run the migrations.
-     *
-     * IMPORTANT: This migration is controlled via API endpoint only.
-     * It will NOT run automatically to prevent accidental execution.
-     *
-     * This migration cleans duplicate orders from coin_game_users_archive table
-     * for the last 7 days only, using partition-aware batch processing.
-     * 
-     * It also refunds users for extra deductions caused by duplicate orders.
+     * Execute the cleanup process
      */
-    public function up(): void
+    public function cleanup(): array
     {
-        // Skip if not triggered via API endpoint
-        if (!config('app.allow_duplicate_cleanup_migration', false)) {
-            Log::warning('Archive Cleanup migration skipped - not triggered via API endpoint');
-            return;
-        }
-
         $fromDate = now()->subDays($this->daysBack)->format('Y-m-d H:i:s');
 
-        Log::info('=== Starting Duplicate Orders Cleanup (Archive - Last 7 Days) ===');
+        Log::info('=== Starting Duplicate Orders Cleanup ===');
         Log::info("Date filter: created_at >= {$fromDate}");
 
-        // Step 1: Calculate refunds for users affected by duplicate deductions
+        // Step 1: Calculate refunds
         $refundData = $this->calculateRefunds($fromDate);
         Log::info('Refund calculation complete', [
             'affected_users' => count($refundData),
             'total_refund_amount' => array_sum(array_column($refundData, 'refund_amount'))
         ]);
 
-        // Step 2: Get only relevant partitions (last 7 days = current month + maybe previous month)
+        // Step 2: Get partitions
         $partitions = $this->getRelevantPartitions($fromDate);
-
         Log::info('Relevant partitions found: ' . count($partitions));
 
         if (empty($partitions)) {
             Log::warning('No relevant partitions found for the last 7 days');
-            return;
+            return [
+                'status' => 'no_partitions',
+                'message' => 'No relevant partitions found'
+            ];
         }
 
         $totalRemoved = 0;
 
-        // Step 3: Process each relevant partition separately
+        // Step 3: Clean partitions
         foreach ($partitions as $partitionName) {
             Log::info("Processing partition: {$partitionName}");
-
             $removedInPartition = $this->cleanPartition($partitionName, $fromDate);
             $totalRemoved += $removedInPartition;
-
             Log::info("Partition {$partitionName} done — removed: {$removedInPartition}");
         }
 
-        // Step 4: Apply refunds to users
+        // Step 4: Apply refunds
         $refundsSummary = $this->applyRefunds($refundData);
 
-        // Step 5: Final verification (scoped to last 7 days only)
+        // Step 5: Verify
         $remainingDuplicates = $this->countDuplicates($fromDate);
 
         if ($remainingDuplicates > 0) {
@@ -81,18 +61,26 @@ return new class extends Migration
             Log::info("SUCCESS: All duplicates in last {$this->daysBack} days cleaned successfully!");
         }
 
-        Log::info('=== Cleanup Summary (Archive - Last 7 Days) ===', [
+        Log::info('=== Cleanup Summary ===', [
             'from_date'             => $fromDate,
             'total_removed'         => $totalRemoved,
             'remaining_duplicates'  => $remainingDuplicates,
             'users_refunded'        => $refundsSummary['users_refunded'],
             'total_refunded'        => $refundsSummary['total_refunded'],
         ]);
+
+        return [
+            'status' => 'completed',
+            'from_date' => $fromDate,
+            'total_removed' => $totalRemoved,
+            'remaining_duplicates' => $remainingDuplicates,
+            'users_refunded' => $refundsSummary['users_refunded'],
+            'total_refunded' => $refundsSummary['total_refunded'],
+        ];
     }
 
     /**
-     * Get only partitions that contain data from the last 7 days
-     * (current month + previous month to be safe)
+     * Get relevant partitions
      */
     private function getRelevantPartitions(string $fromDate): array
     {
@@ -113,18 +101,15 @@ return new class extends Migration
     }
 
     /**
-     * Clean duplicates inside a single partition using batches,
-     * scoped to the last 7 days only
-     * 
-     * Only deletes from coin_game_users_archive, keeping the original record
+     * Clean partition - delete ALL duplicates regardless of date
      */
     private function cleanPartition(string $partitionName, string $fromDate): int
     {
         $totalRemoved = 0;
 
         do {
-            // Find duplicate IDs to delete within the date range (keep MIN id per order_id)
-            // Only delete from coin_game_users_archive, not from coin_game_users
+            // Delete ALL duplicates (not just those from last 7 days)
+            // This ensures we clean up all historical duplicates
             $idsToDelete = DB::select("
                 SELECT t1.id
                 FROM coin_game_users_archive PARTITION ({$partitionName}) t1
@@ -132,20 +117,31 @@ return new class extends Migration
                     SELECT order_id, MIN(id) as keep_id
                     FROM coin_game_users_archive PARTITION ({$partitionName})
                     WHERE order_id IS NOT NULL
-                      AND created_at >= '{$fromDate}'
                     GROUP BY order_id
                     HAVING COUNT(*) > 1
                 ) t2 ON t1.order_id = t2.order_id
                 WHERE t1.id != t2.keep_id
-                  AND t1.created_at >= '{$fromDate}'
                 LIMIT {$this->batchSize}
             ");
 
             if (empty($idsToDelete)) {
+                Log::info("Partition {$partitionName} — no more duplicates to delete");
                 break;
             }
 
             $ids = array_column($idsToDelete, 'id');
+            Log::info("Partition {$partitionName} — found " . count($ids) . " duplicate IDs to delete: " . implode(',', $ids));
+
+            // Get the records before deleting to log them
+            $recordsToDelete = DB::select("
+                SELECT id, order_id, user_id, coins, type
+                FROM coin_game_users_archive PARTITION ({$partitionName})
+                WHERE id IN (" . implode(',', $ids) . ")
+            ");
+
+            foreach ($recordsToDelete as $record) {
+                Log::info("Deleting duplicate record: id={$record->id}, order_id={$record->order_id}, user_id={$record->user_id}, coins={$record->coins}, type={$record->type}");
+            }
 
             DB::statement("
                 DELETE FROM coin_game_users_archive PARTITION ({$partitionName})
@@ -157,16 +153,16 @@ return new class extends Migration
 
             Log::info("Partition {$partitionName} — batch deleted: {$removed}");
 
-            // Small sleep to reduce DB pressure
             usleep(50000); // 50ms
 
         } while (true);
 
+        Log::info("Partition {$partitionName} — total removed: {$totalRemoved}");
         return $totalRemoved;
     }
 
     /**
-     * Count remaining duplicates scoped to last 7 days only
+     * Count duplicates
      */
     private function countDuplicates(string $fromDate): int
     {
@@ -186,19 +182,13 @@ return new class extends Migration
     }
 
     /**
-     * Calculate refunds needed for users affected by duplicate deductions
-     * 
-     * For each order_id with duplicates in coin_game_users_archive:
-     * - Keep only the first (original) deduction
-     * - Calculate refund for extra deductions
+     * Calculate refunds - process ALL duplicates regardless of date
      */
     private function calculateRefunds(string $fromDate): array
     {
         $refundData = [];
 
-        // Get all duplicate orders from coin_game_users_archive only
-        // (since we're only cleaning up duplicates in the archive table)
-        // Note: type = 1 means addition (user gained coins)
+        // Get ALL duplicates (not filtered by date) to refund all historical duplicates
         $duplicateOrders = DB::select("
             SELECT 
                 order_id,
@@ -206,18 +196,25 @@ return new class extends Migration
                 COUNT(*) as record_count,
                 SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_add,
                 SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_deduct,
-                MIN(id) as first_id
+                MIN(id) as first_id,
+                MIN(created_at) as min_created_at,
+                MAX(created_at) as max_created_at
             FROM coin_game_users_archive
             WHERE order_id IS NOT NULL
-              AND created_at >= '{$fromDate}'
             GROUP BY order_id, user_id
             HAVING COUNT(*) > 1
         ");
 
+        Log::info('Found total duplicate orders (all time): ' . count($duplicateOrders));
+        foreach ($duplicateOrders as $dup) {
+            Log::info("Duplicate order: {$dup->order_id}, user: {$dup->user_id}, count: {$dup->record_count}, created: {$dup->min_created_at} to {$dup->max_created_at}, add: {$dup->total_add}, deduct: {$dup->total_deduct}");
+        }
+
         foreach ($duplicateOrders as $order) {
+            Log::info("Processing order: {$order->order_id}, user: {$order->user_id}, total_add: {$order->total_add}, total_deduct: {$order->total_deduct}");
+
             // For type=1 (additions): Calculate extra additions
             if ($order->total_add > 0) {
-                // Get the first (original) addition amount from archive
                 $firstRecord = DB::selectOne("
                     SELECT coins
                     FROM coin_game_users_archive
@@ -227,35 +224,34 @@ return new class extends Migration
                     LIMIT 1
                 ", [$order->order_id]);
 
-                if (!$firstRecord) {
-                    continue;
-                }
+                if ($firstRecord) {
+                    $originalAddition = $firstRecord->coins;
+                    $totalAdded = $order->total_add;
+                    $extraAddition = $totalAdded - $originalAddition;
 
-                $originalAddition = $firstRecord->coins;
-                $totalAdded = $order->total_add;
-                $extraAddition = $totalAdded - $originalAddition;
+                    Log::info("Type=1 (addition): original={$originalAddition}, total={$totalAdded}, extra={$extraAddition}");
 
-                if ($extraAddition > 0) {
-                    if (!isset($refundData[$order->user_id])) {
-                        $refundData[$order->user_id] = [
-                            'user_id' => $order->user_id,
-                            'refund_amount' => 0,
-                            'affected_orders' => []
+                    if ($extraAddition > 0) {
+                        if (!isset($refundData[$order->user_id])) {
+                            $refundData[$order->user_id] = [
+                                'user_id' => $order->user_id,
+                                'refund_amount' => 0,
+                                'affected_orders' => []
+                            ];
+                        }
+
+                        $refundData[$order->user_id]['refund_amount'] += $extraAddition;
+                        $refundData[$order->user_id]['affected_orders'][] = [
+                            'order_id' => $order->order_id,
+                            'extra_deduction' => $extraAddition,
+                            'type' => 1
                         ];
                     }
-
-                    $refundData[$order->user_id]['refund_amount'] += $extraAddition;
-                    $refundData[$order->user_id]['affected_orders'][] = [
-                        'order_id' => $order->order_id,
-                        'extra_deduction' => $extraAddition,
-                        'type' => 1 // type=1 means addition
-                    ];
                 }
             }
 
             // For type=0 (deductions): Calculate extra deductions
             if ($order->total_deduct > 0) {
-                // Get the first (original) deduction amount from archive
                 $firstRecord = DB::selectOne("
                     SELECT coins
                     FROM coin_game_users_archive
@@ -265,41 +261,43 @@ return new class extends Migration
                     LIMIT 1
                 ", [$order->order_id]);
 
-                if (!$firstRecord) {
-                    continue;
-                }
+                if ($firstRecord) {
+                    $originalDeduction = $firstRecord->coins;
+                    $totalDeducted = $order->total_deduct;
+                    $extraDeduction = $totalDeducted - $originalDeduction;
 
-                $originalDeduction = $firstRecord->coins;
-                $totalDeducted = $order->total_deduct;
-                $extraDeduction = $totalDeducted - $originalDeduction;
+                    Log::info("Type=0 (deduction): original={$originalDeduction}, total={$totalDeducted}, extra={$extraDeduction}");
 
-                if ($extraDeduction > 0) {
-                    if (!isset($refundData[$order->user_id])) {
-                        $refundData[$order->user_id] = [
-                            'user_id' => $order->user_id,
-                            'refund_amount' => 0,
-                            'affected_orders' => []
+                    if ($extraDeduction > 0) {
+                        if (!isset($refundData[$order->user_id])) {
+                            $refundData[$order->user_id] = [
+                                'user_id' => $order->user_id,
+                                'refund_amount' => 0,
+                                'affected_orders' => []
+                            ];
+                        }
+
+                        $refundData[$order->user_id]['refund_amount'] += $extraDeduction;
+                        $refundData[$order->user_id]['affected_orders'][] = [
+                            'order_id' => $order->order_id,
+                            'extra_deduction' => $extraDeduction,
+                            'type' => 0
                         ];
                     }
-
-                    $refundData[$order->user_id]['refund_amount'] += $extraDeduction;
-                    $refundData[$order->user_id]['affected_orders'][] = [
-                        'order_id' => $order->order_id,
-                        'extra_deduction' => $extraDeduction,
-                        'type' => 0 // type=0 means deduction
-                    ];
                 }
             }
+        }
+
+        Log::info('Refund data prepared for users: ' . count($refundData));
+        foreach ($refundData as $userId => $data) {
+            Log::info("User {$userId}: refund_amount={$data['refund_amount']}, orders=" . count($data['affected_orders']));
         }
 
         return $refundData;
     }
 
     /**
-     * Apply refunds to users' accounts
-     * 
-     * For type=1 (deductions): Refund the extra amount that was deducted
-     * For type=2 (additions): Deduct the extra amount that was added
+     * Apply refunds
      */
     private function applyRefunds(array $refundData): array
     {
@@ -309,7 +307,6 @@ return new class extends Migration
         foreach ($refundData as $userId => $data) {
             try {
                 DB::transaction(function () use ($userId, $data, &$usersRefunded, &$totalRefunded) {
-                    // Lock user row for update
                     $user = DB::table('users')
                         ->where('id', $userId)
                         ->lockForUpdate()
@@ -320,53 +317,27 @@ return new class extends Migration
                         return;
                     }
 
-                    // Process each affected order
                     foreach ($data['affected_orders'] as $orderInfo) {
                         $orderId = $orderInfo['order_id'];
                         $extraAmount = $orderInfo['extra_deduction'];
+                        $orderType = $orderInfo['type'];
 
-                        // Get the type of the original transaction
-                        $originalRecord = DB::selectOne("
-                            SELECT type
-                            FROM (
-                                SELECT type FROM coin_game_users WHERE order_id = ? LIMIT 1
-                                UNION ALL
-                                SELECT type FROM coin_game_users_archive WHERE order_id = ? LIMIT 1
-                            ) t
-                            LIMIT 1
-                        ", [$orderId, $orderId]);
+                        Log::info("Applying refund for user {$userId}, order {$orderId}, type={$orderType}, amount={$extraAmount}");
 
-                        if (!$originalRecord) {
-                            Log::warning("Could not find original record for order {$orderId}");
-                            continue;
-                        }
-
-                        $transactionType = (int)$originalRecord->type;
-
-                        // type = 0 means user lost coins (deduction)
-                        // type = 1 means user gained coins (addition)
-                        // For type=0 (deductions): Refund the extra amount (add coins back)
-                        // For type=1 (additions): Deduct the extra amount (remove coins)
-                        if ($transactionType == 0) {
+                        if ($orderType == 0) {
                             // Type 0: Deduction - refund by adding coins back
                             DB::table('users')
                                 ->where('id', $userId)
                                 ->increment('di', $extraAmount);
 
-                            Log::info("Refund (type=0 deduction) applied to user {$userId}", [
-                                'order_id' => $orderId,
-                                'refund_amount' => $extraAmount
-                            ]);
-                        } elseif ($transactionType == 1) {
+                            Log::info("Refund (type=0 deduction) applied to user {$userId}: +{$extraAmount}");
+                        } elseif ($orderType == 1) {
                             // Type 1: Addition - deduct the extra amount (remove coins)
                             DB::table('users')
                                 ->where('id', $userId)
                                 ->decrement('di', $extraAmount);
 
-                            Log::info("Deduction (type=1 addition) applied to user {$userId}", [
-                                'order_id' => $orderId,
-                                'deduction_amount' => $extraAmount
-                            ]);
+                            Log::info("Deduction (type=1 addition) applied to user {$userId}: -{$extraAmount}");
                         }
 
                         $usersRefunded++;
@@ -383,13 +354,4 @@ return new class extends Migration
             'total_refunded' => $totalRefunded
         ];
     }
-
-    /**
-     * Reverse the migrations — no automatic rollback due to table size
-     */
-    public function down(): void
-    {
-        Log::warning('Archive cleanup migration has no automatic rollback due to table size.');
-        Log::warning('If rollback is needed, restore from database backup.');
-    }
-};
+}
