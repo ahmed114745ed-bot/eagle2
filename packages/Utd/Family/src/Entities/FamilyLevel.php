@@ -4,7 +4,7 @@ namespace Utd\Family\Entities;
 
 use Cache;
 use Illuminate\Database\Eloquent\Model;
-use Utd\Family\Traits\TimestampsWithTimezone;
+use App\Traits\TimestampsWithTimezone;
 
 class FamilyLevel extends Model
 {

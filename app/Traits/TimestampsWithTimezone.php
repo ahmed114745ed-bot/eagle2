@@ -2,52 +2,44 @@
 
 namespace App\Traits;
 
-/**
- * Alias for backward compatibility
- * @deprecated Use Utd\Gifts\Traits\TimestampsWithTimezone instead
- */
+use Illuminate\Support\Carbon;
+
 trait TimestampsWithTimezone
 {
     /**
-     * Use the package trait if available, otherwise define basic logic
+     * @param  mixed  $value
+     * @return string
      */
     public function getCreatedAtAttribute($value)
     {
-        if ($formatted = $this->formatUsingPackageTrait(__FUNCTION__, $value)) {
-            return $formatted;
-        }
+        $tz = $this->getTimezone();
 
-        return \Illuminate\Support\Carbon::parse($value)->format('Y-m-d H:i:s');
+        return Carbon::parse($value)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
 
+    /**
+     * @param  mixed  $value
+     * @return string
+     */
     public function getUpdatedAtAttribute($value)
     {
-        if ($formatted = $this->formatUsingPackageTrait(__FUNCTION__, $value)) {
-            return $formatted;
-        }
+        $tz = $this->getTimezone();
 
-        return \Illuminate\Support\Carbon::parse($value)->format('Y-m-d H:i:s');
+        return Carbon::parse($value)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
 
-    protected function formatUsingPackageTrait(string $method, $value)
+    protected function getTimezone(): string
     {
-        if (! trait_exists(\Utd\Gifts\Traits\TimestampsWithTimezone::class)) {
-            return null;
+        $tz = request()->header('tz', 'UTC');
+
+        if (function_exists('isValidTimezone') && ! isValidTimezone($tz)) {
+            return 'UTC';
         }
 
-        static $proxy = null;
-
-        if ($proxy === null) {
-            $proxy = new class {
-                use \Utd\Gifts\Traits\TimestampsWithTimezone;
-
-                public function format(string $method, $value)
-                {
-                    return $this->{$method}($value);
-                }
-            };
+        if (! in_array($tz, timezone_identifiers_list())) {
+            return 'UTC';
         }
 
-        return $proxy->format($method, $value);
+        return $tz;
     }
 }

@@ -4,7 +4,7 @@ namespace Utd\Family\Entities;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Utd\Family\Traits\TimestampsWithTimezone;
+use App\Traits\TimestampsWithTimezone;
 
 class FamilyUser extends Model
 {

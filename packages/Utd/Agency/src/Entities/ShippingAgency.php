@@ -11,7 +11,7 @@ use Utd\Agency\Scopes\ShippingAgencyScope;
 use Utd\Agency\Traits\ConfigurableModelsTrait;
 use Utd\Agency\Traits\CreatedByTrait;
 use Utd\Agency\Traits\PaymentGetWayTrait;
-use Utd\Agency\Traits\TimestampsWithTimezone;
+use App\Traits\TimestampsWithTimezone;
 
 class ShippingAgency extends Model
 {

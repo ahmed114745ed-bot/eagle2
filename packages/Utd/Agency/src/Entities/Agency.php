@@ -11,7 +11,7 @@ use Utd\Agency\Traits\ConfigurableModelsTrait;
 use Utd\Agency\Traits\CreatedByTrait;
 use Utd\Agency\Traits\DefaultBdAssignmentTrait;
 use Utd\Agency\Traits\PaymentGetWayTrait;
-use Utd\Agency\Traits\TimestampsWithTimezone;
+use App\Traits\TimestampsWithTimezone;
 
 class Agency extends Model
 {

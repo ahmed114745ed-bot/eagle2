@@ -5,7 +5,7 @@ namespace Utd\Agency\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Utd\Agency\Traits\ConfigurableModelsTrait;
-use Utd\Agency\Traits\TimestampsWithTimezone;
+use App\Traits\TimestampsWithTimezone;
 
 class UsersJoinedAgency extends Model
 {

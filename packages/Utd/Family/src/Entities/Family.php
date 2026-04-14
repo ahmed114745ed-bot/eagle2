@@ -6,7 +6,7 @@ use Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Utd\Family\Traits\ResourceTrait;
-use Utd\Family\Traits\TimestampsWithTimezone;
+use App\Traits\TimestampsWithTimezone;
 
 use function request;
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Gifts\Observers\GiftCategoryObserver as PackageGiftCategoryObserver;
 use App\Observers\GiftCategoryObserver as AppGiftCategoryObserver;
-use Utd\Gifts\Traits\TimestampsWithTimezone;
+use App\Traits\TimestampsWithTimezone;
 
 class GiftCategory extends Model
 {
