@@ -12,6 +12,9 @@ Route::prefix('game-duplicate-check')->group(function () {
     Route::get('/logs', [\App\Http\Controllers\Api\V1\GameDuplicateCheckController::class, 'logs']);
 });
 
+// Coin Game Archive Report
+Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
+
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
