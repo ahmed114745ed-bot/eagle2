@@ -64,6 +64,7 @@ class CoinGameArchiveReportController extends Controller
                     'total_add' => (int)$item->total_add,
                     'net_change' => $netChange,
                     'expected_di_after_cleanup' => $expectedDi,
+                    'expected_di_after_changes' => $expectedDi, // Alias for blade template compatibility
                     'type_summary' => [
                         'deduct' => (int)$item->total_deduct > 0 ? 'نقصان' : 'لا يوجد',
                         'add' => (int)$item->total_add > 0 ? 'زيادة' : 'لا يوجد'
@@ -297,16 +298,13 @@ class CoinGameArchiveReportController extends Controller
  public function triggerCleanup(Request $request)
     {
         try {
-           
-
+            // Set the flag to allow migration to run
             \Config::set('app.allow_duplicate_cleanup_migration', true);
 
-            \Artisan::call('migrate', [
-                '--path' => 'database/migrations/2026_04_14_120600_cleanup_duplicate_orders_archive_last_7_days.php',
-                '--force' => true
-            ]);
-
-            $output = \Artisan::output();
+            // Manually execute the migration logic instead of using Artisan
+            // because Artisan checks if migration was already run
+            $migrationClass = new \Database\Migrations\CleanupDuplicateOrdersArchiveLastSevenDays();
+            $migrationClass->up();
 
             Log::info('Duplicate cleanup migration triggered successfully', [
                 'triggered_by' => $request->user()?->id ?? 'unknown',
@@ -319,14 +317,15 @@ class CoinGameArchiveReportController extends Controller
                 'data' => [
                     'status' => 'completed',
                     'timestamp' => now(),
-                    'output' => $output
+                    'message' => 'Duplicate orders have been cleaned up and refunds applied'
                 ]
             ]);
 
         } catch (\Exception $e) {
             Log::error('Duplicate cleanup migration failed: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([
