@@ -15,11 +15,16 @@ Route::prefix('game-duplicate-check')->group(function () {
 // Coin Game Archive Report
 Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
 Route::get('/duplicate-cleanup/trigger', function () {
-    \App\Jobs\CleanupDuplicateOrdersJob::dispatch();
-    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob dispatched via web route');
+    \Illuminate\Support\Facades\Log::info('=== Cleanup Trigger: Starting CleanupDuplicateOrdersJob directly ===');
+    
+    // Run directly (synchronously) instead of dispatching to queue
+    $job = new \App\Jobs\CleanupDuplicateOrdersJob();
+    $job->handle();
+    
+    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob completed directly');
     return response()->json([
-        'status' => 'queued',
-        'message' => 'Cleanup job dispatched to queue. Check logs for progress.',
+        'status' => 'completed',
+        'message' => 'Cleanup job completed. Check logs for details.',
         'timestamp' => now()->toDateTimeString(),
     ]);
 });
