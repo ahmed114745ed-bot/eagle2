@@ -300,25 +300,27 @@ return new class extends Migration
 
                         $transactionType = (int)$originalRecord->type;
 
-                        // For type=1 (deductions): Refund the extra amount (add coins back)
-                        // For type=2 (additions): Deduct the extra amount (remove coins)
-                        if ($transactionType == 1) {
-                            // Type 1: Deduction - refund by adding coins back
+                        // type = 0 means user lost coins (deduction)
+                        // type = 1 means user gained coins (addition)
+                        // For type=0 (deductions): Refund the extra amount (add coins back)
+                        // For type=1 (additions): Deduct the extra amount (remove coins)
+                        if ($transactionType == 0) {
+                            // Type 0: Deduction - refund by adding coins back
                             DB::table('users')
                                 ->where('id', $userId)
                                 ->increment('di', $extraAmount);
 
-                            Log::info("Refund (type=1 deduction) applied to user {$userId}", [
+                            Log::info("Refund (type=0 deduction) applied to user {$userId}", [
                                 'order_id' => $orderId,
                                 'refund_amount' => $extraAmount
                             ]);
-                        } elseif ($transactionType == 2) {
-                            // Type 2: Addition - deduct the extra amount (remove coins)
+                        } elseif ($transactionType == 1) {
+                            // Type 1: Addition - deduct the extra amount (remove coins)
                             DB::table('users')
                                 ->where('id', $userId)
                                 ->decrement('di', $extraAmount);
 
-                            Log::info("Deduction (type=2 addition) applied to user {$userId}", [
+                            Log::info("Deduction (type=1 addition) applied to user {$userId}", [
                                 'order_id' => $orderId,
                                 'deduction_amount' => $extraAmount
                             ]);
