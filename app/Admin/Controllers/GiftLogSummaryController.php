@@ -8,7 +8,6 @@ use App\Models\GiftLog;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use App\Admin\Controllers\MainController;
 
 class GiftLogSummaryController extends MainController
 {
