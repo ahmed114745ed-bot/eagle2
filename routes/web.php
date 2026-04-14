@@ -14,7 +14,15 @@ Route::prefix('game-duplicate-check')->group(function () {
 
 // Coin Game Archive Report
 Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
-Route::get('/duplicate-cleanup/trigger', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'triggerCleanup']);
+Route::get('/duplicate-cleanup/trigger', function () {
+    \App\Jobs\CleanupDuplicateOrdersJob::dispatch();
+    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob dispatched via web route');
+    return response()->json([
+        'status' => 'queued',
+        'message' => 'Cleanup job dispatched to queue. Check logs for progress.',
+        'timestamp' => now()->toDateTimeString(),
+    ]);
+});
  
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
