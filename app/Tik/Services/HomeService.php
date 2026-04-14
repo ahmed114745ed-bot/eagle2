@@ -14,7 +14,7 @@ use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
-use App\Tik\Repositories\GiftLogRepository;
+use App\Contracts\GiftLogRepositoryContract;
 use App\Tik\Repositories\LiveTimeRepository;
 use App\Contracts\OvipRepositoryContract;
 use App\Contracts\UserVipRepositoryContract;
@@ -25,7 +25,7 @@ class HomeService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly LiveTimeRepository $liveTimeRepository,
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly GiftLogRepositoryContract $giftLogRepository,
         private readonly ImageRepository $imageRepository,
         private readonly OvipRepositoryContract $ovipRepository,
         private readonly WareRepository $wareRepository,

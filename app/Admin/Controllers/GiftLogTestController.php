@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\DataUserResource;
@@ -48,7 +48,7 @@ class GiftLogTestController extends Controller
         return view('test.gifts-test');
     }
 
-    public function gift_queue_cp_view(\Illuminate\Http\Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function gift_queue_cp_view(\Illuminate\Http\Request $request, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         $close_open_gifts = settings()->get('close_open_gifts');
 

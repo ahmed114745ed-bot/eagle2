@@ -23,10 +23,10 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use Str;
 
-class SendGiftService
+class SendGiftService implements \App\Contracts\SendGiftServiceContract
 {
 
-    public function sendGift($number, Room $room, Gift $gift, User $senderUser, User $receivedUser, $isPlay = 0, $isPK = 0, $totalPrice = null, $platformObtain = null,)
+    public function sendGift($number, $room, $gift, $senderUser, $receivedUser, $isPlay = 0, $isPK = 0, $totalPrice = null, $platformObtain = null)
     {
 
         if ($totalPrice == null) $totalPrice = $gift->price * $number;
@@ -49,7 +49,7 @@ class SendGiftService
         DB::table('gift_logs')->insert($data);
     }
 
-    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null , $sourceType = null,$type = null)
+    public function sendGift3($number, $room, $gift, $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null, $sourceType = null, $type = null)
     {
         if ($totalPrice == null) $totalPrice = $gift->price * $number;
         $roomBoomUuid = (string) Str::uuid();

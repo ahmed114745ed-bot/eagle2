@@ -14,7 +14,6 @@ use Modules\Public\Entities\UserCounter;
 use Utd\Chat\Entities\ChatMessage;
 use Modules\Public\Entities\levelInterval;
 use Modules\Public\Jobs\RewardWinnerLevel;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use Modules\Public\Events\UnreadCounterGroup;
 use Modules\Public\Events\UnreadCounterIndividual;
 use App\Support\PackageHelper;

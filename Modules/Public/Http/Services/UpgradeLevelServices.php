@@ -14,7 +14,7 @@ use App\Models\EarnedDiamond;
 use Illuminate\Support\Facades\DB;
 use Modules\Public\Entities\levelInterval;
 use Modules\Public\Jobs\RewardWinnerLevel;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Public\Jobs\RewardWinnerLevelInterval;
@@ -82,7 +82,7 @@ class UpgradeLevelServices
         $oldSenderLevel = $user->sender_level;
         $subSenderLevel = $user->sub_sender_level;
 
-        $senderLevel = (new UpdateUserWhenSendGift())->getSenderLevel($user->total_sender_diamonds, 0, $subSenderLevel);
+        $senderLevel = app(UpdateUserWhenSendGiftContract::class)->getSenderLevel($user->total_sender_diamonds, 0, $subSenderLevel);
         $user->sender_level = $senderLevel;
         $user->save();
         if ($senderLevel > $oldSenderLevel) {

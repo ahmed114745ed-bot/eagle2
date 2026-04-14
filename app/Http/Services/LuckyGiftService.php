@@ -9,8 +9,8 @@ use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Utd\Gifts\Services\SendGiftService;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\SendGiftServiceContract;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use App\Contracts\RoomTopUsersRepositoryContract;
 use Utd\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
@@ -96,7 +96,7 @@ class LuckyGiftService
         $this->updateRoomCoinsToUser($userId, $room, $coins);
         $receivedUsers = User::withoutAppends()->with(['agency', 'profile'])->whereIn('id', $receiversIds)->get();
 
-        $sendGiftServices = new SendGiftService();
+        $sendGiftServices = app(SendGiftServiceContract::class);
         $price = $number * ($gift->price * 0.1);
 
         $user = User::withoutAppends()->find($userId);
@@ -106,7 +106,7 @@ class LuckyGiftService
         }else if ($room->charizma_status && PackageHelper::isInstalled('charisma')){
             dispatch(new UpdateUsersAndSendCharismaToZigo($room, $receiversIds, $price, $userId))->onQueue('default');
         }
-        $updateUserWhenSendGift = new UpdateUserWhenSendGift();
+        $updateUserWhenSendGift = app(UpdateUserWhenSendGiftContract::class);
         foreach ($receivedUsers as $receivedUser) {
             // Lucky gift code
             $sendGiftServices->sendGift($number, $room, $gift, $user, $receivedUser, totalPrice: $price);

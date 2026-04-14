@@ -2,8 +2,7 @@
 
 namespace App\Services\Gifts;
 
-use Utd\Gifts\Services\SendGiftService;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\UpdateUserWhenSendGiftContractContract;
 use App\Enums\UserCoinLogType;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\RedisService;
@@ -28,11 +27,11 @@ class LuckyGiftService
     use LuckyGiftProbability;
     use WinLuckyGift;
 
-    private UpdateUserWhenSendGift $updateUserWhenSendGift;
+    private UpdateUserWhenSendGiftContract $updateUserWhenSendGift;
 
     public function send($data) {}
 
-    public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift2(array $data, User $user, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
@@ -266,7 +265,7 @@ class LuckyGiftService
 
 
 
-    public function sendLuckyGift2V2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift2V2(array $data, User $user, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
@@ -504,7 +503,7 @@ class LuckyGiftService
         return  $responseData;
     }
 
-     public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+     public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
@@ -761,7 +760,7 @@ class LuckyGiftService
     //                     ]);
         return  $responseData;
     }
-    public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;

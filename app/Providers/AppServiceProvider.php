@@ -91,8 +91,26 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('ManagerHelper', fn($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
         
-        // Bind Tik repositories for AgencyService dependencies
-        $this->app->bind(\App\Tik\Repositories\GiftLogRepository::class, \App\Tik\Repositories\GiftLogRepository::class);
+        // Bind GiftLogRepository contract
+        if (PackageHelper::isInstalled('gifts')) {
+            $this->app->bind(\App\Contracts\GiftLogRepositoryContract::class, \Utd\Gifts\Repositories\GiftLogRepository::class);
+        } else {
+            $this->app->bind(\App\Contracts\GiftLogRepositoryContract::class, \App\Contracts\NullGiftLogRepository::class);
+        }
+
+        // Bind SendGiftService contract
+        if (PackageHelper::isInstalled('gifts')) {
+            $this->app->bind(\App\Contracts\SendGiftServiceContract::class, \Utd\Gifts\Services\SendGiftService::class);
+        } else {
+            $this->app->bind(\App\Contracts\SendGiftServiceContract::class, \App\Contracts\NullSendGiftService::class);
+        }
+
+        // Bind UpdateUserWhenSendGift contract
+        if (PackageHelper::isInstalled('gifts')) {
+            $this->app->bind(\App\Contracts\UpdateUserWhenSendGiftContract::class, \Utd\Gifts\Services\UpdateUserWhenSendGift::class);
+        } else {
+            $this->app->bind(\App\Contracts\UpdateUserWhenSendGiftContract::class, \App\Contracts\NullUpdateUserWhenSendGift::class);
+        }
         
         if (class_exists('Utd\\Agency\\Repositories\\ShippingAgencyRepository')) {
             $this->app->bind(ShippingAgencyRepositoryInterface::class, \Utd\Agency\Repositories\ShippingAgencyRepository::class);

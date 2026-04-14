@@ -15,7 +15,7 @@ use DB;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use Utd\Moments\Entities\Moment;
 use Utd\Moments\Entities\MomentUserGift;
 
@@ -56,7 +56,7 @@ class MomentUserGiftsController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $moment_id, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function store(Request $request, $moment_id, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         $data = $request;
         $user = $request->user();

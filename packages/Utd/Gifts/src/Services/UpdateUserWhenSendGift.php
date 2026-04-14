@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
 
-class UpdateUserWhenSendGift
+class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftContract
 {
 
     private array $expPercentages;
@@ -231,6 +231,11 @@ class UpdateUserWhenSendGift
         // $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages[0] ;
         $levelVip                 = $this->getLevel(4, $total);
         return $levelVip != null ? @$levelVip->level ?? 0 : 0;
+    }
+
+    public function getRoomLevelDetails($total)
+    {
+        return $this->getLevel(4, $total);
     }
 
     public function getReceiverLevel($totalDiamondReceived, $totalDiamond, int $subReceiverLevel)

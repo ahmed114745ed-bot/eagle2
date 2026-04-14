@@ -10,7 +10,7 @@ use App\Models\User;
 use Utd\Gifts\Entities\Gift;
 use App\Models\MonthlyDiamondReceive;
 use App\Services\Gifts\LuckyGiftService;
-use App\Services\Gifts\UpdateUserWhenSendGift;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -74,11 +74,11 @@ class SendLuckyGift2FeatureTest extends TestCase
         $this->app->instance(LuckyGiftService::class, $mockGift);
 
         // Mock UpdateUserWhenSendGift
-        $mockUpdate = Mockery::mock(UpdateUserWhenSendGift::class);
+        $mockUpdate = Mockery::mock(UpdateUserWhenSendGiftContract::class);
         $mockUpdate->shouldReceive('update')
                    ->once()
                    ->andReturnTrue();
-        $this->app->instance(UpdateUserWhenSendGift::class, $mockUpdate);
+        $this->app->instance(UpdateUserWhenSendGiftContract::class, $mockUpdate);
 
         // إرسال الطلب مع التحقق من التوثيق
         $token = $user->createToken('test-token')->plainTextToken;

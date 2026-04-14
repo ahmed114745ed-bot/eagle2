@@ -5,15 +5,9 @@ namespace Utd\Gifts\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Utd\Gifts\Entities\GiftLog;
+use App\Contracts\GiftLogRepositoryContract;
 
-interface GiftLogRepositoryContract
-{
-    public function getRoomRankingData($roomOwnerId, $type, $limit);
-
-    public function userGiftInfo($id, $type, $startDate, $endDate, $perPage, $page);
-}
-
-class GiftLogRepository extends AbstractRepository implements \App\Contracts\GiftLogRepositoryContract, GiftLogRepositoryContract
+class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryContract
 {
     public function __construct()
     {
@@ -88,7 +82,7 @@ class GiftLogRepository extends AbstractRepository implements \App\Contracts\Gif
             ->whereBetween('created_at', [$start, $end])
             ->where('receiver_id', $userId)
             ->where('agency_id', $agencyId)
-            ->groupBy(\DB::raw('date(created_at)'))
+            ->groupBy(DB::raw('date(created_at)'))
             ->orderBy('date', 'asc')
             ->get();
     }
@@ -102,7 +96,7 @@ class GiftLogRepository extends AbstractRepository implements \App\Contracts\Gif
             ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
             ->whereBetween('created_at', [$start_at, $end_at]) // Applying whereBetween
             ->where('receiver_id', $userId)
-            ->where('agency_id', $agencyId)->groupBy(\DB::raw('date(created_at)'))
+            ->where('agency_id', $agencyId)->groupBy(DB::raw('date(created_at)'))
             ->limit(31)->get();
 
         return $data;

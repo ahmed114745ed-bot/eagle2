@@ -10,4 +10,8 @@ interface GiftLogRepositoryContract
     public function getSumOfReceiverObtain($userId);
     public function getByUserId($userId);
     public function topUser($withRelation, $actionId);
+    public function sumGiftPriceByReceiver($receiverId, $startDate, $endDate, $date);
+    public function totalUsersGiftPrice($receiverIds);
+    public function getByDaily($userId, $agencyId, $start, $end);
+    public function getByDate($userId, $date);
 }

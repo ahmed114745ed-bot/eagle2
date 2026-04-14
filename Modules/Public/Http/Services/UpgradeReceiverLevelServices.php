@@ -2,7 +2,7 @@
 
 namespace Modules\Public\Http\Services;
 
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use App\Helpers\Common;
 use App\Models\EarnedDiamond;
 use App\Models\User;
@@ -46,7 +46,7 @@ class UpgradeReceiverLevelServices
         $oldReceiverLevel = $user->received_level;
         $subReceivedLevel = $user->sub_receiver_level;
 
-        $receiverLevel = (new UpdateUserWhenSendGift())->getReceiverLevel($user->total_received_diamonds, 0, $subReceivedLevel);
+        $receiverLevel = app(UpdateUserWhenSendGiftContract::class)->getReceiverLevel($user->total_received_diamonds, 0, $subReceivedLevel);
    
        
         $user->received_level = $receiverLevel;

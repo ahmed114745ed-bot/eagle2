@@ -16,7 +16,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
-use Utd\Gifts\Services\SendGiftService;
+use App\Contracts\SendGiftServiceContract;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -25,8 +25,8 @@ use App\Contracts\CpServiceContract;
 use App\Tik\Repositories\GiftRepository;
 use App\Contracts\RoomRepositoryContract;
 use Utd\Agency\Repositories\UserRepository;
-use App\Tik\Repositories\GiftLogRepository;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\GiftLogRepositoryContract;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
@@ -40,14 +40,15 @@ class GiftLogService
         private readonly RoomTopUsersRepository $roomTopUsersRepository,
         private readonly RoomRepositoryContract $repository,
         private readonly UserRepository $UserRepository,
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly GiftLogRepositoryContract $giftLogRepository,
+        private readonly SendGiftServiceContract $sendGiftService,
     ) {}
 
 
     /**
      * @throws \Throwable
      */
-    public function sendGift($request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendGift($request, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
@@ -142,7 +143,7 @@ class GiftLogService
             }
 
             $fromName = $user->name;
-            $sendGiftServices = new SendGiftService();
+            $sendGiftServices = $this->sendGiftService;
 
             $cpId = null;
             if (PackageHelper::isInstalled('cp')){
@@ -269,7 +270,7 @@ class GiftLogService
     }
 
 
-    public function sendTestGift($request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendTestGift($request, UpdateUserWhenSendGiftContract $updateUserWhenSendGift)
     {
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
@@ -349,7 +350,7 @@ class GiftLogService
             }
 
             $fromName = $user->name;
-            $sendGiftServices = new SendGiftService();
+            $sendGiftServices = $this->sendGiftService;
 
             $jsonSendGiftData =
                 $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));

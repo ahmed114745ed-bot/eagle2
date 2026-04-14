@@ -2,7 +2,7 @@
 
 namespace Utd\Pk\Jobs;
 
-use Utd\Gifts\Services\SendGiftService;
+use App\Contracts\SendGiftServiceContract;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Illuminate\Bus\Queueable;
@@ -44,6 +44,6 @@ class UpdatePkAndSendToZigoJob implements ShouldQueue
     public function handle()
     {
         $lastPk = Room::select(['id'])->where('id', $this->roomId)->first()?->lastPk;
-        (new SendGiftService())->updatePkScoresAndSendToZegoJob($lastPk, $this->userId, $this->roomId, $this->receivedIds, $this->totalPrice, $this->room);
+        app(SendGiftServiceContract::class)->updatePkScoresAndSendToZegoJob($lastPk, $this->userId, $this->roomId, $this->receivedIds, $this->totalPrice, $this->room);
     }
 }

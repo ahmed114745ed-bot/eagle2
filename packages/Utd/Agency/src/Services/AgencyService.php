@@ -19,7 +19,7 @@ use App\Models\UsersJoinedAgency;
 use App\Notifications\AcceptAgency;
 use App\Notifications\RefuseAgency;
 use App\Tik\Repositories\FollowRepository;
-use App\Tik\Repositories\GiftLogRepository;
+use App\Contracts\GiftLogRepositoryContract;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
@@ -62,7 +62,7 @@ class AgencyService implements AgencyServiceInterface
         private readonly HistoryRepository $historyRepository,
         private readonly AdditionalInfoRepository $additionalInfoRepository,
         private readonly LiveTimeRepository $liveTimeRepository,
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly GiftLogRepositoryContract $giftLogRepository,
         private readonly ProfileVisitorRepository $profileVisitorRepository,
         private readonly FollowRepository $followRepository,
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,

@@ -3,7 +3,7 @@
 namespace Modules\Public\Http\Services;
 
 use Modules\Public\Jobs\RewardWinnerLevel;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\UpdateUserWhenSendGiftContract;
 use Utd\Room\Entities\Room;
 use Modules\Public\Entities\WinnerLevelInterval;
 
@@ -39,7 +39,7 @@ class UpgradeRoomLevelServices
         $user = $room->owner;
         $oldroomLevel = $room->level;
 
-        $roomLevel = (new UpdateUserWhenSendGift())->getRoomLevelDetails($room->total_diamond);
+        $roomLevel = app(UpdateUserWhenSendGiftContract::class)->getRoomLevelDetails($room->total_diamond);
         if ($roomLevel && $roomLevel->level > $oldroomLevel) {
             $room->level_id = $roomLevel->id;
             $room->level =  $roomLevel->level;

@@ -3,8 +3,7 @@
 namespace App\Jobs;
 
 use App\Support\PackageHelper;
-use Utd\Gifts\Services\SendGiftService;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use App\Contracts\SendGiftServiceContract;
 use App\Helpers\UserCommon;
 use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
@@ -85,7 +84,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
             }
         }
 
-        $sendGiftServices = new SendGiftService();
+        $sendGiftServices = app(SendGiftServiceContract::class);
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
     }
