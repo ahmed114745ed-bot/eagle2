@@ -43,7 +43,7 @@ class NormalLuckyBoxJob implements ShouldQueue
         if ($userBoxes->isEmpty()) return;
 
         foreach ($userBoxes as $userBox) {
-            $user = User::where('id', $userBox->user_id)->first();
+            $user = User::withoutAppends()->select('id', 'di')->find($userBox->user_id);
             if (!$user) continue;
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
@@ -57,6 +57,7 @@ class NormalLuckyBoxJob implements ShouldQueue
             $userBox->save();
 
             $room = Room::withoutAppends()->where('id', $userBox->room_id)->select('id')->first();
+            if (!$room) continue;
             $c = BoxUse::query()->where('room_id', $userBox->room_id)->where('not_used_num', '>', 0)->count();
             $owner = User::withoutAppends()->select('id', 'name')->find($userBox->user_id);
             $userWinner = UserBoxGift::where('box_uses_id', $userBox->id)->pluck('user_id')->toArray();

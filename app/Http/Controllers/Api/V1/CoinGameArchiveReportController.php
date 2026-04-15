@@ -18,33 +18,84 @@ class CoinGameArchiveReportController extends Controller
     public function htmlReport(Request $request)
     {
         try {
-            // Get all records grouped by order_id that have duplicates
-            $report = DB::table('coin_game_users_archive')
-                ->select(
-                    'order_id',
-                    'user_id',
-                    DB::raw('COUNT(*) as record_count'),
-                    DB::raw('SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_deduct'),
-                    DB::raw('SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_add'),
-                    DB::raw('MIN(created_at) as first_created_at'),
-                    DB::raw('MAX(created_at) as last_created_at')
-                )
-                ->whereNotNull('order_id')
-                ->groupBy('order_id', 'user_id')
-                ->having(DB::raw('COUNT(*)'), '>', 1)
-                ->orderBy('order_id', 'DESC')
-                ->get();
+            $page = (int) $request->get('page', 1);
+            $perPage = 50;
+            $offset = ($page - 1) * $perPage;
 
-            // Enrich the report with user information and calculated values
-            $enrichedReport = $report->map(function ($item) {
-                $user = User::select('id', 'name', 'di')->find($item->user_id);
-                
-                // Calculate net change: deduct is negative, add is positive
+            // Get total count first (fast query)
+            $totalCount = DB::selectOne("
+                SELECT COUNT(*) as count
+                FROM (
+                    SELECT order_id
+                    FROM coin_game_users_archive
+                    WHERE order_id IS NOT NULL
+                    GROUP BY order_id, user_id
+                    HAVING COUNT(*) > 1
+                ) as dups
+            ")->count ?? 0;
+
+            // Get summary stats (fast aggregation)
+            $summaryRaw = DB::selectOne("
+                SELECT 
+                    COUNT(DISTINCT order_id) as total_duplicate_orders,
+                    SUM(record_count) as total_records_affected,
+                    SUM(total_deduct) as total_coins_deducted,
+                    SUM(total_add) as total_coins_added,
+                    COUNT(DISTINCT user_id) as affected_users_count
+                FROM (
+                    SELECT 
+                        order_id,
+                        user_id,
+                        COUNT(*) as record_count,
+                        SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_deduct,
+                        SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_add
+                    FROM coin_game_users_archive
+                    WHERE order_id IS NOT NULL
+                    GROUP BY order_id, user_id
+                    HAVING COUNT(*) > 1
+                ) as sub
+            ");
+
+            $summary = [
+                'total_duplicate_orders' => $summaryRaw->total_duplicate_orders ?? 0,
+                'total_records_affected' => $summaryRaw->total_records_affected ?? 0,
+                'total_coins_deducted' => $summaryRaw->total_coins_deducted ?? 0,
+                'total_coins_added' => $summaryRaw->total_coins_added ?? 0,
+                'total_net_change' => ($summaryRaw->total_coins_added ?? 0) - ($summaryRaw->total_coins_deducted ?? 0),
+                'affected_users_count' => $summaryRaw->affected_users_count ?? 0,
+            ];
+
+            // Get paginated records
+            $report = DB::select("
+                SELECT 
+                    order_id,
+                    user_id,
+                    COUNT(*) as record_count,
+                    SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_deduct,
+                    SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_add,
+                    MIN(created_at) as first_created_at,
+                    MAX(created_at) as last_created_at
+                FROM coin_game_users_archive
+                WHERE order_id IS NOT NULL
+                GROUP BY order_id, user_id
+                HAVING COUNT(*) > 1
+                ORDER BY order_id DESC
+                LIMIT {$perPage} OFFSET {$offset}
+            ");
+
+            // Get user IDs to batch load
+            $userIds = array_unique(array_column($report, 'user_id'));
+            $users = DB::table('users')
+                ->whereIn('id', $userIds)
+                ->select('id', 'name', 'di')
+                ->get()
+                ->keyBy('id');
+
+            $enrichedReport = collect($report)->map(function ($item) use ($users) {
+                $user = $users[$item->user_id] ?? null;
                 $netChange = $item->total_add - $item->total_deduct;
-                
-                // Calculate what the user's di should be after applying all changes
                 $currentDi = $user ? $user->di : 0;
-                $expectedDi = $currentDi + $netChange;
+                $expectedDi = $currentDi - $netChange;
 
                 return [
                     'order_id' => $item->order_id,
@@ -55,6 +106,7 @@ class CoinGameArchiveReportController extends Controller
                     'total_deduct' => (int)$item->total_deduct,
                     'total_add' => (int)$item->total_add,
                     'net_change' => $netChange,
+                    'expected_di_after_cleanup' => $expectedDi,
                     'expected_di_after_changes' => $expectedDi,
                     'type_summary' => [
                         'deduct' => (int)$item->total_deduct > 0 ? 'نقصان' : 'لا يوجد',
@@ -65,20 +117,20 @@ class CoinGameArchiveReportController extends Controller
                 ];
             });
 
-            // Calculate summary statistics
-            $summary = [
-                'total_duplicate_orders' => count($enrichedReport),
-                'total_records_affected' => $enrichedReport->sum('record_count'),
-                'total_coins_deducted' => $enrichedReport->sum('total_deduct'),
-                'total_coins_added' => $enrichedReport->sum('total_add'),
-                'total_net_change' => $enrichedReport->sum('net_change'),
-                'affected_users_count' => $enrichedReport->pluck('user_id')->unique()->count()
-            ];
+            $totalPages = (int) ceil($totalCount / $perPage);
 
             return view('coin_game_archive_report', [
                 'summary' => $summary,
                 'records' => $enrichedReport->values(),
-                'timestamp' => now()
+                'timestamp' => now(),
+                'pagination' => [
+                    'current_page' => $page,
+                    'per_page' => $perPage,
+                    'total' => $totalCount,
+                    'total_pages' => $totalPages,
+                    'has_next' => $page < $totalPages,
+                    'has_prev' => $page > 1,
+                ]
             ]);
 
         } catch (\Throwable $e) {
@@ -286,51 +338,45 @@ class CoinGameArchiveReportController extends Controller
         }
     }
 
-     public function triggerCleanup(Request $request)
+ public function triggerCleanup(Request $request)
     {
         try {
-           
-
-            // Enable the migration flag
-            \Config::set('app.allow_duplicate_cleanup_migration', true);
-
-            // Run the migration
-            \Artisan::call('migrate', [
-                '--path' => 'database/migrations/2026_04_14_120600_cleanup_duplicate_orders_archive_last_7_days.php',
-                '--force' => true
-            ]);
-
-            $output = \Artisan::output();
-
-            Log::info('Duplicate cleanup migration triggered successfully', [
+            Log::info('=== Cleanup Trigger Started ===', [
                 'triggered_by' => $request->user()?->id ?? 'unknown',
                 'timestamp' => now()
             ]);
 
+            // Dispatch the job to handle large data asynchronously
+            \App\Jobs\CleanupDuplicateOrdersJob::dispatch();
+
+            Log::info('CleanupDuplicateOrdersJob dispatched to queue');
+
             return response()->json([
                 'errorCode' => 0,
-                'errorMsg' => 'Cleanup process completed successfully',
+                'errorMsg' => 'Cleanup job dispatched successfully',
                 'data' => [
-                    'status' => 'completed',
+                    'status' => 'queued',
                     'timestamp' => now(),
-                    'output' => $output
+                    'message' => 'Cleanup job has been dispatched to the queue. Check logs for progress.'
                 ]
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Duplicate cleanup migration failed: ' . $e->getMessage(), [
+            Log::error('Duplicate cleanup dispatch failed: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([
                 'errorCode' => 5000,
-                'errorMsg' => 'Cleanup process failed',
+                'errorMsg' => 'Cleanup dispatch failed',
                 'data' => [
                     'error' => $e->getMessage()
                 ]
             ], 500);
         }
     }
+
 
 }
