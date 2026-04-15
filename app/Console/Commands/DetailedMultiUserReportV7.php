@@ -230,15 +230,12 @@ class DetailedMultiUserReportV7 extends Command
                 $totalPayout = 0;
                 $senderPayout = 0;
                 $receiverPayout = 0;
-                $hostPayout = 0;
 
                 if ($isWinner) {
                     $totalPayout = $netBet * $mult;
                     $receiverRate = (float) \App\Models\FairLuckSetting::getByKey('fair_luck_receiver_fee_rate', 0.10);
-                    $ownerRate = (float) \App\Models\FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
                     $receiverPayout = (int) round($totalPayout * $receiverRate);
-                    $hostPayout = (int) round($totalPayout * $ownerRate);
-                    $senderPayout = $totalPayout - $receiverPayout - $hostPayout;
+                    $senderPayout = $totalPayout - $receiverPayout ;
 
                     // Allow vault to go negative up to the limit
                     if (($luckyWallet - $totalPayout) >= -$negativeLimit) {
@@ -247,7 +244,7 @@ class DetailedMultiUserReportV7 extends Command
                         // Beyond negative limit — force no-win
                         $mult = 0;
                         $isWinner = false;
-                        $totalPayout = $senderPayout = $receiverPayout = $hostPayout = 0;
+                        $totalPayout = $senderPayout = $receiverPayout  = 0;
                     }
                 }
 
@@ -305,7 +302,6 @@ class DetailedMultiUserReportV7 extends Command
                     'wallet_zone' => $selection['walletZone'],
                     'jackpot_gate_fired' => $selection['jackpotGateFired'],
                     'receiver_payout' => $receiverPayout,
-                    'host_payout' => $hostPayout,
                     'net_bet' => $netBet,
                     'total_payout' => $totalPayout,
                 ];
