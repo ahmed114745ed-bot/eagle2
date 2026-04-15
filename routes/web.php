@@ -4,6 +4,31 @@
 Route::get('monitor/v7/3305d927f49322e0', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'dashboard']);
 Route::get('monitor/v7/3305d927f49322e0/api', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'apiStats']);
 
+// TEMPORARY: Game duplicate orders check and fix endpoints
+// DELETE these routes after the issue is resolved on production
+Route::prefix('game-duplicate-check')->group(function () {
+    Route::get('/status', [\App\Http\Controllers\Api\V1\GameDuplicateCheckController::class, 'status']);
+    Route::post('/migrate', [\App\Http\Controllers\Api\V1\GameDuplicateCheckController::class, 'runMigrations']);
+    Route::get('/logs', [\App\Http\Controllers\Api\V1\GameDuplicateCheckController::class, 'logs']);
+});
+
+// Coin Game Archive Report
+Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
+Route::get('/duplicate-cleanup/trigger', function () {
+    \Illuminate\Support\Facades\Log::info('=== Cleanup Trigger: Starting CleanupDuplicateOrdersJob directly ===');
+    
+    // Run directly (synchronously) instead of dispatching to queue
+    $job = new \App\Jobs\CleanupDuplicateOrdersJob();
+    $job->handle();
+    
+    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob completed directly');
+    return response()->json([
+        'status' => 'completed',
+        'message' => 'Cleanup job completed. Check logs for details.',
+        'timestamp' => now()->toDateTimeString(),
+    ]);
+});
+ 
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -1968,6 +1993,40 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
     }
 });
 
+Route::get('/update-reward-dates', function () {
+
+    $rewards = \Modules\RoomCup\Entities\RoomCupReward::all();
+
+    $results = [];
+
+    foreach ($rewards as $reward) {
+        $oldDate = $reward->created_at->copy();
+
+        if ($oldDate->isSaturday()) {
+            $newDate = $oldDate->copy()->subWeek();
+        } else {
+            $newDate = $oldDate->copy()->previous(Carbon::SATURDAY);
+        }
+
+        \Illuminate\Support\Facades\DB::table('room_cup_rewards')
+            ->where('id', $reward->id)
+            ->update([
+                'created_at' => $newDate,
+                'updated_at' => $newDate,
+            ]);
+
+        $results[] = [
+            'id'       => $reward->id,
+            'old_date' => $oldDate->toDateTimeString(),
+            'new_date' => $newDate->toDateTimeString(),
+        ];
+    }
+
+    return response()->json([
+        'total_updated' => count($results),
+        'details'       => $results,
+    ]);
+});
 
 Route::get('/fix-pack-expire', function () {
     $packs = \App\Models\Pack::where('is_used', 1)

@@ -163,7 +163,7 @@ class GroupChatController extends MainController
         $grid->column('parent_id', __('Parent ID'));
         $grid->column('created_at', __('Created at'))->sortable();
         $grid->column('updated_at', __('Updated at'))->sortable();
-
+        $grid->disableCreateButton();
 //        $grid->filter(function($filter){
 //            $filter->like('text', 'Message');
 //            $filter->equal('user_id', 'User ID');
