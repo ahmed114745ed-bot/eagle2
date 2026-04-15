@@ -168,6 +168,7 @@ class ReportMomentController extends MainController
             });
         }
         $this->extendGrid($grid);
+        $grid->disableCreateButton();
         return $grid;
     }
 
