@@ -33,8 +33,11 @@ class SetDataFromJob extends Command
                     $unserializedValue = @unserialize($value);
                     $value = $unserializedValue;
                 }
-                dispatchJobToQueue((new UpdateUserDataWhenSendGift($value['user_id'], $value['room_id'], $value['receiversIds'], $value['giftId'], $value['number'], $value['price'], $value['user_coin_after'],$value['total_num_win'],$value['total_user_win'])), 'luckyGift');
-                Redis::del($cleanKey);
+                // Check if $value is an array before accessing array keys
+                if (is_array($value)) {
+                    dispatchJobToQueue((new UpdateUserDataWhenSendGift($value['user_id'], $value['room_id'], $value['receiversIds'], $value['giftId'], $value['number'], $value['price'], $value['user_coin_after'],$value['total_num_win'],$value['total_user_win'])), 'luckyGift');
+                    Redis::del($cleanKey);
+                }
             }
         }
 
