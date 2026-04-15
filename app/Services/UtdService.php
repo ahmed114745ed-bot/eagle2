@@ -94,9 +94,7 @@ class UtdService
 
 
         try {
-            $response = $this->webhookPayment($orderId);
-
-            return response()->json(['success' => true, 'orderId' => $orderId, 'updated' => true], 200);
+            return $this->webhookPayment($orderId);
         } catch (\Exception $ex) {
             Log::error('utd-callback error', ['orderId' => $orderId, 'error' => $ex->getMessage()]);
             return response()->json(['success' => false, 'message' => $ex->getMessage()], 500);
