@@ -10,6 +10,7 @@ class VerifyUtdPayWebhook
 {
     public function handle(Request $request, Closure $next): Response
     {
+        info('utd pay webhook middleware');
         $secret = config('utd.webhook_secret');
 
         if ($secret) {
