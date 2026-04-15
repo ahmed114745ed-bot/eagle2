@@ -116,7 +116,7 @@ jobs:
           CONTAINER_ID=$(docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
 
           if [ -n "$CONTAINER_ID" ]; then
-            docker exec $CONTAINER_ID php artisan whatsapp:change-token
+            docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "Warning: Command failed but continuing deployment"
           else
             echo "Error: No running container found for lumio-octa.1"
             exit 1
