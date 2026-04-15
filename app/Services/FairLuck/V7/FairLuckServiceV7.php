@@ -64,7 +64,6 @@ class FairLuckServiceV7
                 FairLuckSetting::getByKey('V7_app_fee_rate', MultiplierTable::DEFAULT_APP_FEE_RATE)
             );
             $receiverRate = (float) FairLuckSetting::getByKey('fair_luck_receiver_fee_rate', 0.10);
-//$ownerRate = (float) FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
             $targetRTP = (float) FairLuckSetting::getByKey('V7_target_rtp', 0.99);
 
             // STEP 1: Compute fees (integer arithmetic)
