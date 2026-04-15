@@ -64,7 +64,7 @@ class FairLuckServiceV7
                 FairLuckSetting::getByKey('V7_app_fee_rate', MultiplierTable::DEFAULT_APP_FEE_RATE)
             );
             $receiverRate = (float) FairLuckSetting::getByKey('fair_luck_receiver_fee_rate', 0.10);
-            $ownerRate = (float) FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
+//$ownerRate = (float) FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
             $targetRTP = (float) FairLuckSetting::getByKey('V7_target_rtp', 0.99);
 
             // STEP 1: Compute fees (integer arithmetic)
@@ -103,21 +103,19 @@ class FairLuckServiceV7
             // STEP 7: Compute payouts using admin-configurable rates
             $TOTAL_PAYOUT = 0;
             $RECEIVER_PAYOUT = 0;
-            $HOST_PAYOUT = 0;
             $SENDER_PAYOUT = 0;
 
             if ($isWinner) {
                 $TOTAL_PAYOUT = $NET_BET * $multiplier;
                 $RECEIVER_PAYOUT = (int) round($TOTAL_PAYOUT * $receiverRate);
-                $HOST_PAYOUT = (int) round($TOTAL_PAYOUT * $ownerRate);
-                $SENDER_PAYOUT = $TOTAL_PAYOUT - $RECEIVER_PAYOUT - $HOST_PAYOUT;
+                $SENDER_PAYOUT = $TOTAL_PAYOUT - $RECEIVER_PAYOUT ;
 
                 // STEP 8: Debit lucky_wallet (atomic via Lua script)
                 $paid = $this->poolManager->debitPayout($TOTAL_PAYOUT);
                 if (!$paid) {
                     $multiplier = 0;
                     $isWinner = false;
-                    $TOTAL_PAYOUT = $SENDER_PAYOUT = $RECEIVER_PAYOUT = $HOST_PAYOUT = 0;
+                    $TOTAL_PAYOUT = $SENDER_PAYOUT = $RECEIVER_PAYOUT =  0;
                 }
             }
 
@@ -174,7 +172,6 @@ class FairLuckServiceV7
                 'multiplier'       => $multiplier,
                 'profitAmount'     => $SENDER_PAYOUT,
                 'receiverPayout'   => $RECEIVER_PAYOUT,
-                'hostPayout'       => $HOST_PAYOUT,
                 'totalPayout'      => $TOTAL_PAYOUT,
                 'appFee'           => $APP_FEE,
                 'netBet'           => $NET_BET,
