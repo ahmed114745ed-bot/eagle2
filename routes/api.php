@@ -113,7 +113,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
     Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
 
-    Route::get('utd-success/{trx}', [UtdService::class, 'success'])->name('utd.success');
+    Route::get('utd-success/{orderId}', [UtdService::class, 'success'])->name('utd.success');
     Route::post('utd-callback', [UtdService::class, 'callback'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
