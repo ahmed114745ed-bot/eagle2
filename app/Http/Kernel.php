@@ -113,6 +113,7 @@ class Kernel extends HttpKernel
         'verify.utdFawry.signature' => \App\Http\Middleware\VerifyUtdFawrySignature::class,
         'verify.payMob.signature' => \App\Http\Middleware\VerifyPayMobSignature::class,
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
+        'verify.utdpay.webhook' => \App\Http\Middleware\VerifyUtdPayWebhook::class,
         'verify.codapay.webhook' => \App\Http\Middleware\VerifyCodapayWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
         //        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
