@@ -85,7 +85,6 @@ class LuckyGiftService
 
         $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
         $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
-        $roomPercentage = \App\Models\FairLuckSetting::getOwnerFeeRate();
         $hostPercentage = $receiverFeeRate;
         $total_cashback_percentage = 0;
 
@@ -151,7 +150,7 @@ class LuckyGiftService
             $throwNumber = 0;
 
             //Fixed: per-receiver room owner fee (was using total for all receivers before)
-            $coinsForOwnerPerReceiver = $unitPrice * $roomPercentage;
+            $coinsForOwnerPerReceiver = $unitPrice * $receiverFeeRate;
             $coinsForOwnerTotal = $coinsForOwnerPerReceiver * $receiversCount;
 
             $senderBalanceBefore = $user->di;

@@ -235,7 +235,7 @@
                 @php $settings = $fairLuckSettings; @endphp
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title"><i class="fa fa-sliders"></i> {{ __('FairLuck V7 Quick Settings') }}</h3>
+                        <h3 class="box-title"><i class="fa fa-sliders"></i> {{ __('FairLuck V2 Quick Settings') }}</h3>
                         <div class="box-tools">
                             <a href="{{ admin_url('fairluck') }}" class="btn btn-sm btn-default" title="{{ __('Advanced Settings') }}">
                                 <i class="fa fa-cogs"></i> {{ __('Advanced Settings') }}
