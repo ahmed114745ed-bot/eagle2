@@ -103,17 +103,17 @@ class UtdService
         }
     }
 
-    public function success($trx, Request $request): JsonResponse
+    public function success($orderId, Request $request): JsonResponse
     {
         $paymentStatus = $request->query('status', 'success');
-        $orderId = $request->query('orderId');
+//        $orderId = $request->query('orderId');
 
-        $coinLog = CoinLog::where('trx', $trx)->whereMethod('utd')->first();
+        $coinLog = CoinLog::where('id', $orderId)->whereMethod('utd')->first();
 
         if (!$coinLog) {
             return response()->json([
                 'status'  => false,
-                'trx'     => $trx,
+                'trx'     => $orderId,
                 'message' => 'Transaction not found.',
             ], 404);
         }
