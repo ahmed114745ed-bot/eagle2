@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use App\Services\Gifts\LuckyGiftService;
-use App\Services\FairLuck\V5\FairLuckServiceV5;
 use App\Services\FairLuck\V5\GlobalStabilityManager;
 use App\Models\Gift;
 
@@ -40,8 +39,7 @@ class GiftLogController extends Controller
         RoomTopUsersRepository $roomTopUsersRepository,
         private GiftLogService $giftLogService,
         LuckyGiftService $luckyGiftService,
-        private FairLuckServiceV5 $fairLuckService,
-        private GlobalStabilityManager $stabilityManager,
+  
     ) {
 
         $this->roomTopUsersRepository = $roomTopUsersRepository;
