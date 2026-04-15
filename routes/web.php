@@ -2962,6 +2962,7 @@ Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $
     ]);
 });
 
+use App\Models\Setting;
 
 
 Route::get('/set-lucky-version-7', function () {
