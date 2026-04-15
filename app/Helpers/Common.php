@@ -1890,7 +1890,7 @@ class Common
         $value = Cache::rememberForever($key, function () use ($key) {
             return Setting::where('key', $key)->value('value');
         });
-        return $value;
+        return $value ?? null;
     }
 
     public  static function getDiamondsPercentage()
@@ -2049,7 +2049,7 @@ class Common
         Pk::where('room_id', $room->id)->where('status', 1)->update(['status' => 0]);
     }
 
-    private function handleCharismaStatusOnLogout($room, $users, $ownerId)
+    private static function handleCharismaStatusOnLogout($room, $users, $ownerId)
     {
         $userCharismaService = new UserCharismaService();
         $userCharismaService->removeRoomCharisma($room->id);
