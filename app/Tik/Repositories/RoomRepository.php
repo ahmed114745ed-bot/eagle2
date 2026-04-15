@@ -398,6 +398,16 @@ class RoomRepository extends AbstractRepository
     public function getUserRooms($req, $id)
     {
         $user     = User::find($id);
+        
+        // Handle case where user is not found
+        if (!$user) {
+            return [
+                'audio'     => null,
+                'live'      => null,
+                'nowRooms'  => [],
+            ];
+        }
+        
         $query = $this->baseRoomQueryMine($user);
 
 

@@ -56,7 +56,7 @@ class FairLuckSetting extends Model
     }
     public static function getOwnerFeeRate(): float
     {
-        return (float) static::getByKey('fair_luck_owner_fee_rate', 0.10);
+        return (float)  0.00 ;
     }
 
     /**

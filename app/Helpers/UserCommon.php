@@ -495,6 +495,8 @@ class UserCommon
         $body = $user->name . ':' . __('You have received a gift: :ware', [
             'ware' => $ware->name
         ]);
+        $data = []; // Initialize $data array
+        
         if ($feature) {
             $body = $user->name . ':' . __('wareGiftNotification', [
                 'wareName' => $ware->name,
