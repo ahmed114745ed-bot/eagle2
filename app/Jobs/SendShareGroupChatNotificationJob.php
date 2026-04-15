@@ -22,6 +22,9 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     protected $text;
     protected $groupChatResource;
 
+    // ⏱️ زيادة timeout للـ job لأنه قد يستغرق وقتاً طويلاً عند معالجة آلاف الإشعارات
+    public $timeout = 300; // 5 دقائق
+
     public function __construct(User $user, ?string $text, array $groupChatResource)
     {
         $this->user = $user;
@@ -81,13 +84,13 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             
             // ✅ تحسين الأداء: استخدام cursor بدلاً من get() لتقليل استهلاك الذاكرة
             $notificationsIdsChunks = User::withoutAppends()
-                ->where('notification_id', '!=', null)
-                ->select(['id', 'notification_id', 'lan'])
-                ->orderByDesc('online')
+                ->whereNotNull('notification_id')
                 ->where('id', '!=', $this->user->id)
+                ->select(['id', 'notification_id', 'lan'])
+                ->groupBy('notification_id') // ✅ استخدام groupBy للتأكد من uniqueness على مستوى الـ database
+                ->orderByDesc('online')
                 ->limit(5000)
-                ->cursor() // ✅ استخدام cursor بدلاً من get()
-                ->unique('notification_id')
+                ->cursor()
                 ->chunk(800);
 
             $totalSent = 0;
@@ -113,7 +116,6 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
      */
     protected function sendNotificationBatch($notificationsIds, $roomId, $roomImage, $translatedMessage, &$totalSent, &$totalFailed): void
     {
-        // ✅ جمع notification_ids للإرسال الجماعي
         $notificationIds = $notificationsIds->pluck('notification_id')->toArray();
         
         if (empty($notificationIds)) {
@@ -123,8 +125,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
         try {
             $title = ($this->user->name ?? '') . ' (' . config('app.name_en') . ')';
             
-            // ✅ إرسال دفعة واحدة بدلاً من إرسال واحد تلو الآخر
-            $result = Common::send_firebase_notification_batch(
+            $result = Common::send_firebase_notification_with_room_image(
                 $notificationIds,
                 $title,
                 $translatedMessage,
