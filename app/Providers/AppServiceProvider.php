@@ -345,6 +345,7 @@ class AppServiceProvider extends ServiceProvider
                 'base_url' => $settings['utd_base_url'] ?? '',
                 'api_key' => $settings['utd_api_key'] ?? '',
                 'project_id' => $settings['utd_project_id'] ?? '',
+                'webhook_secret' => $settings['utd_webhook_secret'] ?? '',
             ],
 
             'googlePay' => [

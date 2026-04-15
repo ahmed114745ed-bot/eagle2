@@ -2961,3 +2961,26 @@ Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $
         'message' => 'تم تحديث مجموع الماسات الشهرية للمستخدم {$userId} بنجاح'
     ]);
 });
+
+use App\Models\Setting;
+
+
+Route::get('/set-lucky-version-7', function () {
+
+    $version = 4;
+
+    Setting::updateOrCreate(
+        ['key' => 'lucky_gift_version'],
+        ['value' => $version]
+    );
+
+    Cache::forget('lucky_gift_version');
+    Cache::put('lucky_gift_version', $version);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Version updated successfully',
+        'current_version' => $version,
+        'cached_version' => Cache::get('lucky_gift_version')
+    ]);
+});

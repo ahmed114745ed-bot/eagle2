@@ -41,6 +41,11 @@ class ProcessRoomBoomGiftJob implements ShouldQueue
      */
     public function handle()
     {
+        // ✅ التحقق من أن الـ room موجود
+        if (!$this->room) {
+            return;
+        }
+
         if ($this->roomBoomSettings) {
             (new NewRoomBoomGiftService())->sendGift($this->room, $this->totalPrice, $this->userId);
         } else {
@@ -49,7 +54,10 @@ class ProcessRoomBoomGiftJob implements ShouldQueue
 
             $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($this->room->id, $todayStart);
 
-            $totalRoomGift->increment('current_total', $this->totalPrice);
+            // ✅ التحقق من أن الـ totalRoomGift موجود قبل استخدامه
+            if ($totalRoomGift) {
+                $totalRoomGift->increment('current_total', $this->totalPrice);
+            }
         }
     }
 }

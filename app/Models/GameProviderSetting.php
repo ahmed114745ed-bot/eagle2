@@ -29,6 +29,14 @@ class GameProviderSetting extends Model
 
     public function getAppKeyAttribute($value)
     {
-        return $value ? Crypt::decryptString($value) : null;
+            if (!$value) {
+                return null;
+            }
+
+            try {
+                return Crypt::decryptString($value);
+            } catch (\Exception $e) {
+                return $value;
+            }
     }
 }
