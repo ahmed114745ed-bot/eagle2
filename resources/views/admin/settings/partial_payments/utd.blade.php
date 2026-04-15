@@ -32,3 +32,11 @@
         </div>
     </div>
 </div>
+
+<div class="col-md-6">
+    <div class="form-group">
+        <label for="utd_webhook_secret">Webhook Secret:</label>
+        <input type="text" id="utd_webhook_secret" name="utd_webhook_secret" placeholder="utd_webhook_secret"
+               value="{{ $settings['utd_webhook_secret'] ?? '' }}" class="form-control">
+    </div>
+</div>
