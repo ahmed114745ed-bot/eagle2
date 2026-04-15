@@ -88,80 +88,55 @@ class UtdService
             return response()->json(['success' => false, 'message' => 'Missing orderId'], 200);
         }
 
-        if (isset($payload['signature']) || isset($payload['Signature'])) {
-            // TODO: Implement signature verification with shared secret if available
+        if ($status !== 'success') {
+            Log::info('utd-callback payment not successful', ['orderId' => $orderId, 'status' => $status]);
+            return response()->json(['success' => false, 'message' => 'Payment not successful', 'status' => $status], 200);
         }
 
-
         try {
-            $response = $this->webhookPayment($orderId);
-
-            return response()->json(['success' => true, 'orderId' => $orderId, 'updated' => true], 200);
+            return $this->webhookPayment($orderId);
         } catch (\Exception $ex) {
             Log::error('utd-callback error', ['orderId' => $orderId, 'error' => $ex->getMessage()]);
             return response()->json(['success' => false, 'message' => $ex->getMessage()], 500);
         }
     }
 
-    public function success($trx): JsonResponse
+    public function success($orderId, Request $request): JsonResponse
     {
-        info($trx);
-        info('success');
-        return response()->json(['status' => 'ok']);
+        $paymentStatus = $request->query('status', 'success');
+//        $orderId = $request->query('orderId');
 
-//        die();
-//        $coinLog = CoinLog::where('trx', $trx)->whereMethod('utd')->firstOrFail();
-//
-//        if (!$trx) {
-//            return response()->json(['status' => 'error', 'message' => 'Missing transaction ID'], 400);
-//        }
-//
-//        $url = $this->baseUrl . '/api/restful/v2.0/Payment/inquiryPaymentResult.json';
-//        $body = [
-//            'inquiryPaymentRequest' => [
-//                'txnId' => $coinLog->trx,
-//                'apiKey' => $this->apiKey,
-//                'projectId' => $this->projectId,
-//                'needStatusFinal' => true,
-//            ],
-//        ];
-//
-//        $response = Http::withHeaders([
-//            'Content-Type' => 'application/json',
-//        ])->post($url, $body);
-//
-//        $json = $response->json();
-//
-//        $paymentResult = $json['paymentResult'] ?? null;
-//        $entries = $paymentResult['profile']['entry'] ?? [];
-//
-//        $statusValue = null;
-//
-//        foreach ($entries as $entry) {
-//            if ($entry['key'] === 'status') {
-//                $statusValue = strtolower($entry['value']);
-//            }
-//        }
-//
-//        switch ($statusValue) {
-//            case 'success':
-//                $status = true;
-//                $message = 'Payment completed successfully!';
-//                break;
-//            case 'pending':
-//                $status = true;
-//                $message = 'pending';
-//                break;
-//            default:
-//                $status = false;
-//                $message = 'Payment failed or was cancelled.';
-//                break;
-//        }
-//
-//        return response()->json([
-//            'status' => $status,
-//            'trx' => $coinLog->trx,
-//            'message' => $message,
-//        ]);
+        $coinLog = CoinLog::where('id', $orderId)->whereMethod('utd')->first();
+
+        if (!$coinLog) {
+            return response()->json([
+                'status'  => false,
+                'trx'     => $orderId,
+                'message' => 'Transaction not found.',
+            ], 404);
+        }
+
+        return match ($paymentStatus) {
+            'success' => response()->json([
+                'status'  => true,
+                'trx'     => $coinLog->trx,
+                'message' => 'Transaction completed successfully.',
+            ]),
+            'failed' => response()->json([
+                'status'  => false,
+                'trx'     => $coinLog->trx,
+                'message' => 'Transaction failed.',
+            ]),
+            'cancelled' => response()->json([
+                'status'  => false,
+                'trx'     => $coinLog->trx,
+                'message' => 'Transaction cancelled by user.',
+            ]),
+            default => response()->json([
+                'status'  => false,
+                'trx'     => $coinLog->trx,
+                'message' => 'Unknown payment status.',
+            ]),
+        };
     }
 }

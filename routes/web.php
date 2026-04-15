@@ -14,7 +14,20 @@ Route::prefix('game-duplicate-check')->group(function () {
 
 // Coin Game Archive Report
 Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
-Route::get('/duplicate-cleanup/trigger', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'triggerCleanup']);
+Route::get('/duplicate-cleanup/trigger', function () {
+    \Illuminate\Support\Facades\Log::info('=== Cleanup Trigger: Starting CleanupDuplicateOrdersJob directly ===');
+    
+    // Run directly (synchronously) instead of dispatching to queue
+    $job = new \App\Jobs\CleanupDuplicateOrdersJob();
+    $job->handle();
+    
+    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob completed directly');
+    return response()->json([
+        'status' => 'completed',
+        'message' => 'Cleanup job completed. Check logs for details.',
+        'timestamp' => now()->toDateTimeString(),
+    ]);
+});
  
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
@@ -1981,6 +1994,40 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
     }
 });
 
+Route::get('/update-reward-dates', function () {
+
+    $rewards = \Modules\RoomCup\Entities\RoomCupReward::all();
+
+    $results = [];
+
+    foreach ($rewards as $reward) {
+        $oldDate = $reward->created_at->copy();
+
+        if ($oldDate->isSaturday()) {
+            $newDate = $oldDate->copy()->subWeek();
+        } else {
+            $newDate = $oldDate->copy()->previous(Carbon::SATURDAY);
+        }
+
+        \Illuminate\Support\Facades\DB::table('room_cup_rewards')
+            ->where('id', $reward->id)
+            ->update([
+                'created_at' => $newDate,
+                'updated_at' => $newDate,
+            ]);
+
+        $results[] = [
+            'id'       => $reward->id,
+            'old_date' => $oldDate->toDateTimeString(),
+            'new_date' => $newDate->toDateTimeString(),
+        ];
+    }
+
+    return response()->json([
+        'total_updated' => count($results),
+        'details'       => $results,
+    ]);
+});
 
 Route::get('/fix-pack-expire', function () {
     $packs = \App\Models\Pack::where('is_used', 1)
@@ -3104,5 +3151,28 @@ Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $
         'year' => $year,
         'total_diamonds' => $totalDiamonds,
         'message' => 'تم تحديث مجموع الماسات الشهرية للمستخدم {$userId} بنجاح'
+    ]);
+});
+
+use App\Models\Setting;
+
+
+Route::get('/set-lucky-version-7', function () {
+
+    $version = 4;
+
+    Setting::updateOrCreate(
+        ['key' => 'lucky_gift_version'],
+        ['value' => $version]
+    );
+
+    Cache::forget('lucky_gift_version');
+    Cache::put('lucky_gift_version', $version);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Version updated successfully',
+        'current_version' => $version,
+        'cached_version' => Cache::get('lucky_gift_version')
     ]);
 });

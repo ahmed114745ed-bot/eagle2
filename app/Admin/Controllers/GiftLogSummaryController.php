@@ -8,7 +8,6 @@ use App\Models\GiftLog;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use App\Admin\Controllers\MainController;
 
 class GiftLogSummaryController extends MainController
 {
@@ -36,27 +35,10 @@ class GiftLogSummaryController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
-            // Room filter (only for rooms tab)
-            if (request('filter') === 'rooms') {
-                $filter->column(1 / 3, function ($filter) {
-                    $filter->equal('room_id', __('room'))
-                        ->select()
-                        ->ajax(route('admin.filter-rooms'));
-                });
-            }
+            // Disable default ID filter to reorder it
+            $filter->disableIdFilter();
 
-            // Date range filters side by side
-            $filter->column(1 / 3, function ($filter) {
-                $filter->where(function ($query) {
-                    if ($this->input) {
-                        $timezone = getTimezone();
-                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
-                            ->setTimezone('UTC');
-                        $query->where('created_at', '>=', $start);
-                    }
-                }, __('From Date'), 'from_date')->datetime(['format' => 'YYYY-MM-DD HH:mm']);
-            });
-
+            // Date range filters - From Date (column 1)
             $filter->column(1 / 3, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
@@ -65,7 +47,33 @@ class GiftLogSummaryController extends MainController
                             ->setTimezone('UTC');
                         $query->where('created_at', '<=', $end);
                     }
-                }, __('To Date'), 'to_date')->datetime(['format' => 'YYYY-MM-DD HH:mm']);
+                }, __('To Date'), 'to_date')->datetime();
+            });
+
+            // To Date (column 2)
+            $filter->column(1 / 3, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $timezone = getTimezone();
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->datetime();
+            });
+
+            // Room filter (only for rooms tab) - column 3
+            if (request('filter') === 'rooms') {
+                $filter->column(1 / 3, function ($filter) {
+                    $filter->equal('room_id', __('room'))
+                        ->select()
+                        ->ajax(route('admin.filter-rooms'));
+                });
+            }
+
+            // ID filter at the end (last column)
+            $filter->column(1 / 3, function ($filter) {
+                $filter->equal('id', __('ID'))->placeholder(__('ID'));
             });
         });
 
@@ -107,7 +115,7 @@ class GiftLogSummaryController extends MainController
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
-        $grid->disableRowSelector(); 
+        $grid->disableRowSelector();
 
         return $grid;
     }
