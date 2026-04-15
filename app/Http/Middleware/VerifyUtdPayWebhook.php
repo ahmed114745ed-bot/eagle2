@@ -14,6 +14,7 @@ class VerifyUtdPayWebhook
         $secret = config('utd.webhook_secret');
 
         if (empty($secret)) {
+            info('no secret');
             return response()->json(['error' => 'Webhook secret not configured'], 500);
         }
 
