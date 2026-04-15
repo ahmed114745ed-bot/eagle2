@@ -234,7 +234,6 @@ class DetailedMultiUserReportV7 extends Command
                 if ($isWinner) {
                     $totalPayout = $netBet * $mult;
                     $receiverRate = (float) \App\Models\FairLuckSetting::getByKey('fair_luck_receiver_fee_rate', 0.10);
-                    $ownerRate = (float) \App\Models\FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
                     $receiverPayout = (int) round($totalPayout * $receiverRate);
                     $senderPayout = $totalPayout - $receiverPayout ;
 

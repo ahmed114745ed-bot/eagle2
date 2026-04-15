@@ -88,10 +88,10 @@ class UtdService
             return response()->json(['success' => false, 'message' => 'Missing orderId'], 200);
         }
 
-        if (isset($payload['signature']) || isset($payload['Signature'])) {
-            // TODO: Implement signature verification with shared secret if available
+        if ($status !== 'success') {
+            Log::info('utd-callback payment not successful', ['orderId' => $orderId, 'status' => $status]);
+            return response()->json(['success' => false, 'message' => 'Payment not successful', 'status' => $status], 200);
         }
-
 
         try {
             return $this->webhookPayment($orderId);
