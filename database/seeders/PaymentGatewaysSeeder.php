@@ -1323,6 +1323,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => "/payWebhook"
             ],
+            'new_5' => [
+                "name" => "utd_webhook_secret",
+                "type" => "input",
+                "value" => ""
+            ],
         ];
 
         foreach ($utdFields as $key => $value) {
