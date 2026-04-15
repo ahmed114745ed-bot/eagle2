@@ -113,8 +113,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
     Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
 
-    Route::get('utd-success/{trx}', [UtdService::class, 'success'])->name('utd.success');
-    Route::post('utd-callback', [UtdService::class, 'callback'])->name('utd.callback');
+    Route::get('utd-success/{orderId}', [UtdService::class, 'success'])->name('utd.success');
+    Route::post('utd-callback', [UtdService::class, 'callback'])->middleware('verify.utdpay.webhook')->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -400,16 +400,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 //todo
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
-                // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
-                Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                // Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift6'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post('/v5/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGiftV5'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                // Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V3'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                // Route::post('/v4/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift4'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post('/v6/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift6'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post('/v7/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift7'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post( '/v7/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);
