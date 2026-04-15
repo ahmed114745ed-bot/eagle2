@@ -1,69 +1,110 @@
 <style>
-    .nav-pills .active {
-        background-color: var(--primary-color) !important;
+    /* Dark theme colors matching dashboard */
+    :root {
+        --dash-dark: #1e2632;
+        --dash-darker: #161d27;
+        --dash-primary: #3c8dbc;
+        --dash-text: #a8b5c4;
+        --dash-text-light: #ffffff;
+    }
+    
+    .modern-tabs {
+        background: var(--dash-dark);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    .modern-tabs ul {
+        display: flex;
+        gap: 12px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        flex-wrap: wrap;
+    }
+    .modern-tabs li {
+        flex: 1;
+        min-width: 114px;
+        display: flex;
+    }
+    .modern-tabs a {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--dash-text);
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        background: var(--dash-darker);
+        border: 2px solid transparent;
+        min-height: 56px;
+        box-sizing: border-box;
+    }
+    .modern-tabs a:hover {
+        background: rgba(60, 141, 188, 0.15);
+        color: var(--dash-text-light);
+    }
+    .modern-tabs li.active a {
+        background: var(--dash-primary) !important;
         color: white !important;
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
+        box-shadow: 0 4px 15px rgba(60, 141, 188, 0.4);
+        border-color: rgba(255,255,255,0.15);
     }
-
-    .nav-pills .active::before {
-        content: none !important;
+    .modern-tabs .tab-icon {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.08);
+        font-size: 13px;
     }
-
-    .nav-pills > li.active > a {
-        border-left: none !important;
+    .modern-tabs li.active .tab-icon {
+        background: rgba(255,255,255,0.2);
     }
-
-    [dir="rtl"] .fa-arrow-right {
-        transform: rotate(180deg);
+    
+    [dir="rtl"] .modern-tabs ul {
+        flex-direction: row-reverse;
     }
-
-    [dir="rtl"] .nav-pills > li > a {
-        text-align: right;
+    [dir="rtl"] .modern-tabs a {
+        flex-direction: row-reverse;
     }
-
-    [dir="rtl"] .fa {
-        float: left;
-        margin-left: 5px;
-    }
-
-    [dir="ltr"] .fa {
-        float: right;
-        margin-right: 5px;
+    
+    @media (max-width: 768px) {
+        .modern-tabs li {
+            min-width: 100%;
+        }
     }
 </style>
 
-<div class="box box-solid" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
-    <div class="box-header with-border">
-        <h3 class="box-title">{{ __('admin.fields') }}</h3>
-        <div class="box-tools">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-        </div>
-    </div>
-    <div class="box-body no-padding">
-        <ul class="nav nav-pills nav-stacked">
-            <li class="{{ request('name') == 'users' ? 'active' : '' }}" style="{{ request('name') == 'users' || empty(request('name')) ? 'background-color: var(--primary-color);' : '' }}">
-                <a href="?name=users" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('Host reports') }}
-                </a>
-            </li>
-            <li class="{{ request('name') == 'agencies' ? 'active' : '' }}" style="{{ request('name') == 'agencies' ? 'background-color: var(--primary-color);' : '' }}">
-                <a href="?name=agencies" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('agencies report') }}
-                </a>
-            </li>
-            {{-- <li class="{{ request('name') == 'agencies_manger' ? 'active' : '' }}" style="{{ request('name') == 'agencies_manger' ? 'background-color: var(--primary-color);' : '' }}">
-                <a href="?name=agencies_manger" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('admin.manger') }}
-                </a>
-            </li> --}}
-
-            <li class="{{ request('name') == 'bd' ? 'active' : '' }}" style="{{ request('name') == 'bd' ? 'background-color: var(--primary-color);' : '' }}">
-                <a href="?name=bd" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('BD report') }}
-                </a>
-            </li>
-        </ul>
-    </div>
+<div class="modern-tabs" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+    <ul>
+        <li class="{{ request('name') == 'users' || empty(request('name')) ? 'active' : '' }}">
+            <a href="?name=users">
+                <span class="tab-icon"><i class="fa fa-users"></i></span>
+                <span>{{ __('Host reports') }}</span>
+            </a>
+        </li>
+        <li class="{{ request('name') == 'agencies' ? 'active' : '' }}">
+            <a href="?name=agencies">
+                <span class="tab-icon"><i class="fa fa-building"></i></span>
+                <span>{{ __('agencies report') }}</span>
+            </a>
+        </li>
+        <li class="{{ request('name') == 'bd' ? 'active' : '' }}">
+            <a href="?name=bd">
+                <span class="tab-icon"><i class="fa fa-briefcase"></i></span>
+                <span>{{ __('BD report') }}</span>
+            </a>
+        </li>
+    </ul>
 </div>
