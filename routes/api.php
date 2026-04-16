@@ -179,6 +179,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('/payment/success', [StripeController::class, 'success']);
     Route::get('/payment/cancel', [StripeController::class, 'cancel']);
 
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/broadcasting/auth', function (Request $request) {
+            return Broadcast::auth($request);
+        });
+    });
 
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen', 'localization'])->group(
