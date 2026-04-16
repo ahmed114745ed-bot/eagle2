@@ -446,7 +446,7 @@ class DetailedMultiUserReportV7 extends Command
         $splitErrors = 0;
         foreach ($this->allRounds as $r) {
             if ($r['is_winner']) {
-                $sum = ($r['profit_amount'] ?? 0) + ($r['receiver_payout'] ?? 0) + ($r['host_payout'] ?? 0);
+                $sum = ($r['profit_amount'] ?? 0) + ($r['receiver_payout'] ?? 0);
                 if ($sum != ($r['total_payout'] ?? 0)) $splitErrors++;
             }
         }
@@ -623,7 +623,7 @@ body{background:#f8f9fb;font-family:'Segoe UI',sans-serif}
 <td>" . number_format($r['user_balance_after']) . "</td>
 <td>" . number_format($r['wallet_factor'], 4) . "</td><td>" . number_format($r['rtp_factor'], 4) . "</td>
 <td>{$r['wallet_zone']}</td><td>" . number_format($r['lucky_wallet_after']) . "</td>
-<td>" . number_format($r['receiver_payout']) . "</td><td>" . number_format($r['host_payout']) . "</td>
+<td>" . number_format($r['receiver_payout']) . "</td>
 <td>" . number_format($r['app_fee']) . "</td><td>" . number_format($r['cumulative_app_fee']) . "</td>
 <td>" . number_format($r['app_wallet']) . "</td><td>{$gate}</td>
 </tr>";
