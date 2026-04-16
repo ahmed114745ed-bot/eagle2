@@ -1,7 +1,6 @@
 {
     "Id": "Id",
-      "total_diamonds_sent": "Total diamonds sent",
-
+    "total_diamonds_sent": "Total coins sent",
     "ID": "ID",
     "Name": "Name",
     "User": "User",
