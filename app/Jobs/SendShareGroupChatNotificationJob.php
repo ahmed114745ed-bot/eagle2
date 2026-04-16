@@ -23,7 +23,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     protected $groupChatResource;
 
     // ⏱️ زيادة timeout للـ job لأنه قد يستغرق وقتاً طويلاً عند معالجة آلاف الإشعارات
-    public $timeout = 600; // 10 دقائق
+    public $timeout = 300; // 5 دقائق
 
     public function __construct(User $user, ?string $text, array $groupChatResource)
     {
@@ -83,16 +83,14 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             }
             
             // ✅ تحسين الأداء: استخدام cursor بدلاً من get() لتقليل استهلاك الذاكرة
-            // ⚠️ تم نقل unique() قبل limit() لتجنب تحميل البيانات في الذاكرة
-            // ⚠️ تم استبدال where('!=', null) بـ whereNotNull() للأداء الأفضل
             $notificationsIdsChunks = User::withoutAppends()
                 ->whereNotNull('notification_id')
-                ->select(['id', 'notification_id', 'lan'])
-                ->orderByDesc('online')
                 ->where('id', '!=', $this->user->id)
-                ->distinct('notification_id') // ✅ استخدام distinct في الـ query بدلاً من unique() بعد cursor()
+                ->select(['id', 'notification_id', 'lan'])
+                ->groupBy('notification_id') // ✅ استخدام groupBy للتأكد من uniqueness على مستوى الـ database
+                ->orderByDesc('online')
                 ->limit(5000)
-                ->cursor() // ✅ استخدام cursor بدلاً من get()
+                ->cursor()
                 ->chunk(800);
 
             $totalSent = 0;
