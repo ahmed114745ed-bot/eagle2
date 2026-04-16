@@ -1,5 +1,1 @@
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-
-* * * * * . /etc/environment; cd /app && php artisan schedule:run >> /app/storage/jobs-logs/schedule-crons.log 2>&1
-
-
+# Scheduler runs from host crontab, not inside container
