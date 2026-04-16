@@ -31,9 +31,9 @@ class UtdService
         return url("/api/utd-success/$trx");
     }
 
-    public function initiatePayment($trx, $amount, $userId = null)
+    public function initiatePayment($trx, $amount, $user)
     {
-        $body = $this->getBodyForutd($trx, $amount, $userId);
+        $body = $this->getBodyForutd($trx, $amount, $user);
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
@@ -48,13 +48,13 @@ class UtdService
         return $json['error'];
     }
 
-    protected function getBodyForutd($trx, $amount, $userId): array
+    protected function getBodyForutd($trx, $amount, $user): array
     {
         return [
             'apiKey' => $this->apiKey,
             'amount' => $amount,
             'currency' => 'USD',
-            'userId' => "$userId" ?? (string)($user?->id ?? 'guest'),
+            'userId' => (string)($user?->id ?? 'guest'),
             'userName' => $user?->name ?? 'Guest User',
             'userPhone' => $user?->phone ?? '',
             'userEmail' => $user?->email ?? '',
