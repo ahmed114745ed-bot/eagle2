@@ -341,7 +341,7 @@ class LuckyGiftService
             ];
 
             // Update user coins and diamond
-            $totalDiamond = $totalPrice;
+            $totalDiamond = $totalActualSpent;
             $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_diamond_send, $totalDiamond, $user->sub_sender_level);
             $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
