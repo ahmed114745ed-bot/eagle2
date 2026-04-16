@@ -14,13 +14,15 @@ services:
       - app-network
       - monitoring_monitoring
     deploy:
-      replicas: 5
+      replicas: 4
       update_config:
         order: start-first
         failure_action: rollback
       resources:
         limits:
           memory: 2G
+        reservations:
+          memory: 1200M
 
   rixo-chat-job:
     image: ${JOB_IMAGE}
@@ -31,10 +33,12 @@ services:
     networks:
       - app-network
     deploy:
-      replicas: 3
+      replicas: 2
       resources:
         limits:
           memory: 2G
+        reservations:
+          memory: 1500M
 
   redis:
     image: redis:latest
@@ -47,7 +51,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1536M
+          memory: 1G
 
   node-google-pay:
     image: node-google-pay:2
