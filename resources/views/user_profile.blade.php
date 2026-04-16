@@ -2461,14 +2461,28 @@
                 <!-- Sender Gift Summary Cards - 2 per row -->
                 <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px;">
 
-                    <!-- Actual Gift Price Card -->
+                    <!-- Total Diamond Send from Users Table Card -->
+                    <div style="flex: 1 1 calc(50% - 20px); min-width: 280px; max-width: 500px;">
+                        <div class="diamond-summary-box" style="background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%); margin: 0;">
+                            <div class="diamond-title">
+                                {{ __('Total Diamond Send') }}
+                            </div>
+                            <div class="diamond-count">
+                                <span>{{ number_format(@$user->total_diamond_send ?? 0) }}</span>
+                                <div class="diamond-icon-container">
+                                    <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div style="flex: 1 1 calc(50% - 20px); min-width: 280px; max-width: 500px;">
                         <div class="diamond-summary-box" style="background: linear-gradient(90deg, #27ae60 0%, #229954 100%); margin: 0;">
                             <div class="diamond-title">
-                                {{ __('Actual Gift Price') }}
+                                {{ __('total_diamonds_sent') }}
                             </div>
                             <div class="diamond-count">
-                                <span>{{ number_format(@$actualGiftPrice ?? 0) }}</span>
+                                <span>{{ number_format(@$totalGiftPrice ?? 0) }}</span>
                                 <div class="diamond-icon-container">
                                     <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
                                 </div>
@@ -2476,35 +2490,7 @@
                         </div>
                     </div>
 
-                    <!-- Lucky Gift Total Card -->
-                    <div style="flex: 1 1 calc(50% - 20px); min-width: 280px; max-width: 500px;">
-                        <div class="diamond-summary-box" style="background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%); margin: 0;">
-                            <div class="diamond-title">
-                                {{ __('Lucky Gift Total') }}
-                            </div>
-                            <div class="diamond-count">
-                                <span>{{ number_format(@$luckyGiftTotal ?? 0) }}</span>
-                                <div class="diamond-icon-container">
-                                    <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Regular Gift Total Card -->
-                    <div style="flex: 1 1 calc(50% - 20px); min-width: 280px; max-width: 500px;">
-                        <div class="diamond-summary-box" style="background: linear-gradient(90deg, #3498db 0%, #2980b9 100%); margin: 0;">
-                            <div class="diamond-title">
-                                {{ __('Regular Gift Total') }}
-                            </div>
-                            <div class="diamond-count">
-                                <span>{{ number_format(@$regularGiftTotal ?? 0) }}</span>
-                                <div class="diamond-icon-container">
-                                    <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  
 
                 </div>
                 @endif

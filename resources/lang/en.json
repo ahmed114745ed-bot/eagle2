@@ -1,5 +1,6 @@
 {
     "Id": "Id",
+    "total_diamonds_sent": "Total coins sent",
     "ID": "ID",
     "Name": "Name",
     "User": "User",
@@ -64,6 +65,7 @@
     "filter_month": "Month",
     "filter_year": "Year",
     "latest_withdrawals": "Latest Withdrawals",
+    "Total Diamond Send": "Total Diamond Send",
     "latest_payments": "Latest Payments",
     "table_header_index": "#",
     "table_header_account": "Account",
@@ -1762,7 +1764,5 @@
     "active": "Active",
     "using_default": "Using default",
     "no_image": "No image",
-    "Actual Gift Price from Database": "Actual Gift Price from Database",
-    "Lucky Gift Total": "Lucky Gift Total",
-    "Regular Gift Total": "Regular Gift Total"
+    "Total Diamonds Sent": "Total Diamonds Sent"
 }

@@ -1,5 +1,6 @@
 {
-    "Laravel": "سبسيب",
+    "Laravel": "سبسيب", 
+    "total_diamonds_sent": "إجمالي الكوينزات المرسلة",
     "Save order": "حفظ الترتيب",
     "Select All Permissions": "تحديد جميع الصلاحيات",
     "selected": "محدد",
@@ -98,6 +99,7 @@
     "room in home screen layer": "الغرف في واجهة الشاشة الرئيسية",
     "show rooms": "عرض الغرف",
     "latest_withdrawals": "آخر المسحوبات",
+    "Total Diamond Send": "إجمالي الماسات المرسلة",
     "latest_payments": "آخر عمليات الدفع",
     "table_header_index": "#",
     "table_header_account": "الحساب",
@@ -5076,7 +5078,7 @@
     "active_overrides_preset": "نشطة - تتجاوز الافتراضية",
     "using_default": "الافتراضية",
     "no_image": "لا توجد صورة",
-    "Actual Gift Price from Database": "إجمالي سعر الهدايا الفعلي من قاعدة البيانات",
     "Lucky Gift Total": "إجمالي هدايا الحظ",
-    "Regular Gift Total": "إجمالي الهدايا العادية"
+    "Regular Gift Total": "إجمالي الهدايا العادية",
+    "Total Diamonds Sent": "إجمالي الماسات المرسلة"
 }
