@@ -235,83 +235,11 @@
         </div>
 
         <div class="card">
-            <h2><span class="icon">🔐</span> Webhook Signature Verification (HMAC-SHA256)</h2>
-            <p style="margin-bottom:16px;">الـ webhook بين UTD و Eagle محمي بـ HMAC-SHA256 signature عشان نتأكد إن الريكوست جاي فعلا من UTD مش من حد تاني.</p>
-
-            <h3 style="color:#fbbf24;font-size:14px;margin-bottom:10px;">كيف بيشتغل:</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الخطوة</th>
-                        <th>التفاصيل</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1. التوليد</td>
-                        <td>الأدمن بيولد <strong>Webhook Secret</strong> من داشبورد UTD (صفحة تفاصيل المشروع)</td>
-                    </tr>
-                    <tr>
-                        <td>2. التسجيل</td>
-                        <td>نفس الـ Secret بيتحط في إعدادات Eagle من<br><code style="color:#38bdf8;">Admin &rarr; Settings &rarr; Payment &rarr; UTD &rarr; Webhook Secret</code></td>
-                    </tr>
-                    <tr>
-                        <td>3. التوقيع</td>
-                        <td>
-                            UTD بيبعت هيدرز مع كل webhook request:
-                            <div class="response-block" style="margin-top:8px;">
-X-UTD-Signature: hmac_sha256(timestamp + '.' + body, secret)<br>
-X-UTD-Timestamp: unix_timestamp
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4. التحقق</td>
-                        <td>
-                            Middleware <code style="color:#38bdf8;">VerifyUtdPayWebhook</code> في Eagle بيتحقق من:
-                            <ul style="list-style:none;margin-top:6px;line-height:2;">
-                                <li><span class="green">&#10004;</span> وجود الهيدرز <code>X-UTD-Signature</code> و <code>X-UTD-Timestamp</code></li>
-                                <li><span class="green">&#10004;</span> الـ timestamp في آخر <strong>5 دقايق</strong> (حماية من Replay)</li>
-                                <li><span class="green">&#10004;</span> الـ signature صحيح (HMAC-SHA256 match)</li>
-                            </ul>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3 style="color:#fbbf24;font-size:14px;margin:16px 0 10px;">الإعداد:</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>المكان</th>
-                        <th>الإجراء</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="white-space:nowrap;">UTD Dashboard<br><span style="color:#94a3b8;font-size:11px;">(Admin)</span></td>
-                        <td>اضغط <strong>"توليد Webhook Secret"</strong> في كارت API Keys جوا تفاصيل المشروع</td>
-                    </tr>
-                    <tr>
-                        <td style="white-space:nowrap;">Eagle Admin</td>
-                        <td>انسخ الـ Secret وحطه في <strong>Settings &rarr; Payment &rarr; UTD &rarr; Webhook Secret</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-top:16px;font-size:13px;">
-                <span class="yellow">&#9888;</span> <strong>ملاحظة:</strong> لو الـ Webhook Secret فاضي في Eagle، الميدل وير بيعدي الريكوست من غير تحقق (عشان مش يكسر حاجة قبل ما يتظبط).
-            </div>
-        </div>
-
-        <div class="card">
             <h2><span class="icon">✅</span> الخلاصة</h2>
             <ul style="list-style: none; line-height: 2;">
                 <li><span class="green">&#10004;</span> تكرار الضرب على نفس الـ order <strong>مش بيزود فلوس</strong></li>
                 <li><span class="green">&#10004;</span> الـ orders الوهمية بترجع <strong>"Transaction not found"</strong></li>
                 <li><span class="green">&#10004;</span> الـ endpoint <strong>آمن</strong> ضد الـ Replay Attacks</li>
-                <li><span class="green">&#10004;</span> الـ Webhook محمي بـ <strong>HMAC-SHA256 Signature</strong></li>
-                <li><span class="green">&#10004;</span> حماية من Replay عبر <strong>Timestamp Validation (5 دقايق)</strong></li>
             </ul>
         </div>
 

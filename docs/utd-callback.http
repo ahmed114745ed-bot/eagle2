@@ -1,0 +1,32 @@
+### UTD Callback - Success
+POST https://eagle.utdsoftware.com/api/utd-callback
+Content-Type: application/json
+
+{
+    "event": "payment.completed",
+    "status": "success",
+    "gateway": "paysky",
+    "orderId": "UTD1234567890",
+    "userId": "1208",
+    "amount": 100,
+    "currency": "EGP",
+    "reference": "1498",
+    "paidAt": "2026-04-16T06:30:00Z"
+}
+
+### UTD Callback - Failed
+POST https://eagle.utdsoftware.com/api/utd-callback
+Content-Type: application/json
+
+{
+    "event": "payment.failed",
+    "status": "failed",
+    "gateway": "paysky",
+    "orderId": "UTD1234567890",
+    "userId": "1208",
+    "amount": 100,
+    "currency": "EGP",
+    "reference": "1498",
+    "failedAt": "2026-04-16T06:30:00Z",
+    "reason": "insufficient_funds"
+}

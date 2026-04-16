@@ -2,16 +2,12 @@
 
 namespace App\Services;
 
-use App\Enums\Payments\PaymentStatus;
 use App\Models\CoinLog;
-use App\Models\Country;
-use App\Models\Setting;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use function Laravel\Prompts\info;
 
 class UtdService
 {
