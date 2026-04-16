@@ -160,15 +160,10 @@ class LuckyGiftService
             $totalPriceFull = $giftPrice * $number * $receiversCount;
 
             $senderBalanceBefore = $user->di;
+            $totalActualSpent = 0;
             while ($user->di >= $totalPriceFull && $index > 0) {
                 $balanceBeforeIteration = $user->di;
-                UserCoinLogHelper::logByType(
-                    $user->id,
-                    -abs($totalPriceFull),
-                    $balanceBeforeIteration,
-                    UserCoinLogType::LUCKY_GIFT,
-                    $gift?->name,
-                );
+                $totalActualSpent += $totalPriceFull;
 
                 foreach ($receiversIds as $receiverId) {
 
@@ -286,6 +281,15 @@ class LuckyGiftService
 
                 $index--;
             }
+
+            // Log the actual amount sent (without any additional fees)
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($totalActualSpent),
+                $senderBalanceBefore,
+                UserCoinLogType::LUCKY_GIFT,
+                $gift?->name,
+            );
 
             if ($total_user_win > 0) {
                 UserCoinLogHelper::logByType(
