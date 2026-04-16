@@ -71,6 +71,7 @@ class UtdService
     public function callback(Request $request)
     {
         info('utd service callback');
+
         $payload = $request->all();
 
         $orderId = $payload['reference'] ?? $payload['orderId'] ?? null;
