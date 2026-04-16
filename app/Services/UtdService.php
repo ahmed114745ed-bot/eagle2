@@ -66,13 +66,12 @@ class UtdService
 
     public function callback(Request $request)
     {
-        info('utd service callback');
+        $utdLog = Log::channel('utd');
+        $utdLog->info('callback received', ['payload' => $request->all()]);
 
         $payload = $request->all();
 
         $orderId = $payload['reference'] ?? $payload['orderId'] ?? null;
-
-//        $orderId = $payload['orderId'] ?? $payload['reference'] ?? $payload['MerchantReference'] ?? $payload['OrderId'] ?? null;
         $event = $payload['event'] ?? null;
         $status = $payload['status'] ?? $payload['resultCode'] ?? $payload['TransactionStatus'] ?? null;
         $gateway = $payload['gateway'] ?? $payload['gatewayName'] ?? null;
@@ -82,19 +81,20 @@ class UtdService
 
 
         if (!$orderId) {
-            Log::warning('utd-callback missing orderId', $payload);
+            $utdLog->warning('callback missing orderId', $payload);
             return response()->json(['success' => false, 'message' => 'Missing orderId'], 200);
         }
 
         if ($status !== 'success') {
-            Log::info('utd-callback payment not successful', ['orderId' => $orderId, 'status' => $status]);
+            $utdLog->info('callback payment not successful', ['orderId' => $orderId, 'status' => $status]);
             return response()->json(['success' => false, 'message' => 'Payment not successful', 'status' => $status], 200);
         }
 
         try {
+            $utdLog->info('callback processing payment', ['orderId' => $orderId]);
             return $this->webhookPayment($orderId);
         } catch (\Exception $ex) {
-            Log::error('utd-callback error', ['orderId' => $orderId, 'error' => $ex->getMessage()]);
+            $utdLog->error('callback error', ['orderId' => $orderId, 'error' => $ex->getMessage()]);
             return response()->json(['success' => false, 'message' => $ex->getMessage()], 500);
         }
     }

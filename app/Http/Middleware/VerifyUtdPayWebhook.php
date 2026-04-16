@@ -4,17 +4,18 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyUtdPayWebhook
 {
     public function handle(Request $request, Closure $next): Response
     {
-        info('utd pay webhook middleware');
+        Log::channel('utd')->info('webhook middleware hit', ['ip' => $request->ip()]);
         $secret = config('utd.webhook_secret');
 
         if (empty($secret)) {
-            info('no secret');
+            Log::channel('utd')->error('webhook secret not configured');
             return response()->json(['error' => 'Webhook secret not configured'], 500);
         }
 
@@ -22,12 +23,12 @@ class VerifyUtdPayWebhook
         $timestamp = $request->header('X-UTD-Timestamp');
 
         if (!$signature || !$timestamp) {
-            info('Missing signature headers');
+            Log::channel('utd')->warning('missing signature headers', ['ip' => $request->ip()]);
             return response()->json(['error' => 'Missing signature headers'], 401);
         }
 
         if (abs(time() - (int) $timestamp) > 300) {
-            info('Signature timestamp expired');
+            Log::channel('utd')->warning('signature timestamp expired', ['timestamp' => $timestamp]);
             return response()->json(['error' => 'Signature timestamp expired'], 401);
         }
 
@@ -38,10 +39,11 @@ class VerifyUtdPayWebhook
         $expectedSignature = hash_hmac('sha256', $signData, $secret);
 
         if (!hash_equals($expectedSignature, $signature)) {
-            info('Invalid signature');
+            Log::channel('utd')->warning('invalid signature', ['ip' => $request->ip()]);
             return response()->json(['error' => 'Invalid signature'], 401);
         }
 
+        Log::channel('utd')->info('webhook signature verified', ['projectId' => $projectId]);
         return $next($request);
     }
 }
