@@ -5394,5 +5394,8 @@
     "Charge settings":"اعددات الشحن",
     "charge settings":"اعددات الشحن",
   "milestone_vip_reward_message": "لقد حصلت على :vip كمكافأة على إتمام :milestone",
-  "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone"
+  "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone",
+  "Actual Gift Price from Database": "إجمالي سعر الهدايا الفعلي من قاعدة البيانات",
+  "Lucky Gift Total": "إجمالي هدايا الحظ",
+  "Regular Gift Total": "إجمالي الهدايا العادية"
 }
