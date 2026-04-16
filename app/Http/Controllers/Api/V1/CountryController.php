@@ -24,51 +24,31 @@ class CountryController extends Controller
     public function allCountries(Request $request): JsonResponse
     {
         try {
-            // Log the incoming request
-            Log::info('allCountries request received', [
-                'category_id' => $request->category_id,
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
+  
 
             $categoryId = $request->category_id;
 
-            // Log before fetching countries
-            Log::debug('Fetching countries with category_id', ['category_id' => $categoryId]);
 
             $countries = $this->countryService->indexByHotAndSupporters($categoryId);
 
-            // Check if countries data is null
             if ($countries === null) {
-                Log::warning('Countries service returned null', ['category_id' => $categoryId]);
                 return Common::apiResponse(0, __('Failed to fetch countries data'), null, 500);
             }
 
-            // Check if countries is empty
             if (empty($countries)) {
-                Log::info('No countries found', ['category_id' => $categoryId]);
                 return Common::apiResponse(1, __('No countries available'), CountrySupportersResource::collection($countries));
             }
 
-            // Log successful retrieval
-            Log::info('Countries fetched successfully', [
-                'category_id' => $categoryId,
-                'count' => count($countries),
-            ]);
+      
 
             // Transform to resource collection
             $resourceCollection = CountrySupportersResource::collection($countries);
 
             // Verify resource collection is not empty
             if ($resourceCollection->isEmpty()) {
-                Log::warning('Resource collection is empty after transformation', ['category_id' => $categoryId]);
                 return Common::apiResponse(1, __('No countries available'), $resourceCollection);
             }
 
-            Log::debug('Resource collection created successfully', [
-                'category_id' => $categoryId,
-                'resource_count' => count($resourceCollection),
-            ]);
 
             return Common::apiResponse(1, '', $resourceCollection);
 

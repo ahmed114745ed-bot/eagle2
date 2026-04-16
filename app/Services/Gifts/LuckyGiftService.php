@@ -159,6 +159,7 @@ class LuckyGiftService
 
             $totalPriceFull = $giftPrice * $number * $receiversCount;
 
+            $senderBalanceBefore = $user->di;
             while ($user->di >= $totalPriceFull && $index > 0) {
                 $balanceBeforeIteration = $user->di;
                 UserCoinLogHelper::logByType(
@@ -336,7 +337,7 @@ class LuckyGiftService
             ];
 
             // Update user coins and diamond
-            $totalDiamond = $totalPrice * $count;
+            $totalDiamond = $totalPrice;
             $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_diamond_send, $totalDiamond, $user->sub_sender_level);
             $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
 
