@@ -1761,5 +1761,8 @@
     "active_overrides_preset": "Active - overrides preset",
     "active": "Active",
     "using_default": "Using default",
-    "no_image": "No image"
+    "no_image": "No image",
+    "Actual Gift Price from Database": "Actual Gift Price from Database",
+    "Lucky Gift Total": "Lucky Gift Total",
+    "Regular Gift Total": "Regular Gift Total"
 }

@@ -5075,5 +5075,8 @@
     "custom_bg_help": "هذه الغرفة لديها خلفية مخصصة تتجاوز الخلفية الافتراضية",
     "active_overrides_preset": "نشطة - تتجاوز الافتراضية",
     "using_default": "الافتراضية",
-    "no_image": "لا توجد صورة"
+    "no_image": "لا توجد صورة",
+    "Actual Gift Price from Database": "إجمالي سعر الهدايا الفعلي من قاعدة البيانات",
+    "Lucky Gift Total": "إجمالي هدايا الحظ",
+    "Regular Gift Total": "إجمالي الهدايا العادية"
 }

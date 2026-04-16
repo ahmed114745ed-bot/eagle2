@@ -466,6 +466,7 @@ class UserController extends MainController
         $salaries = null;
         $charges = null;
         $giftSLogs = $diamonds = null;
+        $actualGiftPrice = $luckyGiftTotal = $regularGiftTotal = 0;
         $userJoinAgencies = null;
         $usersCoins = null;
         $badges = null;
@@ -572,18 +573,6 @@ class UserController extends MainController
                     ->with([
                         'receiver:id,name,uuid,special_id',
                         'sender:id,name,uuid,special_id',
-                        // 'sender.packs' => function ($q) {
-                        //     $q->whereIn('type', [25])
-                        //         ->where('is_used', true)
-                        //         ->with('ware:id,value');
-                        // },
-                        // 'receiver.packs' => function ($q) {
-                        //     $q->whereIn('type', [25])
-                        //         ->where('is_used', true)
-                        //         ->with('ware:id,value');
-                        // },
-                        // 'receiver.profile',
-                        // 'sender.profile',
                         'gift:id,name,price,e_name,img,type',
                         'room:id,room_name,room_cover',
                         'agency:id,name',
@@ -592,6 +581,33 @@ class UserController extends MainController
                     ->paginate(10, ['*'], 'gift_page');
 
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
+
+                $actualGiftPrice = 0;
+                $luckyGiftTotal = 0;
+                $regularGiftTotal = 0;
+
+                if ($giftType === 'sender') {
+                    $senderLogsWithGift = GiftLog::where('sender_id', $id)
+                        ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
+                            Carbon::parse($start, $timezone)->startOfDay()->utc(),
+                            Carbon::parse($end, $timezone)->endOfDay()->utc(),
+                        ]))
+                        ->with('gift:id,price,type')
+                        ->get();
+
+                    foreach ($senderLogsWithGift as $log) {
+                        if ($log->gift) {
+                            $price = $log->gift->price * $log->giftNum;
+                            $actualGiftPrice += $price;
+                            if ($log->gift->type == 6) {
+                                $luckyGiftTotal += $price;
+                            } else {
+                                $regularGiftTotal += $price;
+                            }
+                        }
+                    }
+                }
+
                 break;
 
             case 'user-agency':
@@ -650,6 +666,9 @@ class UserController extends MainController
             'charges',
             'giftSLogs',
             'diamonds',
+            'actualGiftPrice',
+            'luckyGiftTotal',
+            'regularGiftTotal',
             'userJoinAgencies',
             'usersCoins',
             'badges',
