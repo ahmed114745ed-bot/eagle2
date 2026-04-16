@@ -189,17 +189,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen', 'localization'])->group(
         function () {
             Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
-            // Route::post('/broadcasting/auth', function (Request $request) {
-            //     return Broadcast::auth($request);
-            // });
-            Route::post('/broadcasting/auth', function (Request $request) {
-                try {
-                    $authResponse = Broadcast::auth($request);
-                    return $authResponse;
-                } catch (\Exception $e) {
-                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-                }
-            });
 
             Route::get('/user-gifts', [UserController::class, 'userGifts']);
 
