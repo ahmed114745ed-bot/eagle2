@@ -79,7 +79,6 @@ class UtdService
         $currency = $payload['currency'] ?? $payload['currencyCode'] ?? null;
         $reference = $payload['reference'] ?? null;
 
-
         if (!$orderId) {
             $utdLog->warning('callback missing orderId', $payload);
             return response()->json(['success' => false, 'message' => 'Missing  Parameters'], 200);

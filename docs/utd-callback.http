@@ -1,32 +1,51 @@
-### UTD Callback - Success
+### UTD Callback - Success (with signature)
+< {%
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const apiKey = "upk_038d0c0d88895b65c048332c278354656778782a90f737bb";
+    const projectId = "yet94XI8gdwBLk0WZWdm";
+    const secret = "30a5a37e75176d583dcd12b00168036e62cecedcb0d8701d679e853b324090a9";
+    const body = request.body.tryGetSubstituted();
+    const signData = timestamp + "." + apiKey + "." + projectId + "." + body;
+    const signature = crypto.hmac.sha256().withTextSecret(secret).updateWithText(signData).digest().toHex();
+    request.variables.set("timestamp", timestamp);
+    request.variables.set("signature", signature);
+    request.variables.set("apiKey", apiKey);
+    request.variables.set("projectId", projectId);
+%}
+POST https://eagle.utdsoftware.com/api/utd-callback
+Content-Type: application/json
+X-UTD-Signature: {{signature}}
+X-UTD-Timestamp: {{timestamp}}
+X-UTD-Api-Key: {{apiKey}}
+X-UTD-Project-Id: {{projectId}}
+
+{"event":"payment.completed","status":"success","gateway":"paysky","orderId":"UTD1234567890","idempotencyKey":"UTD1234567890","userId":"1208","amount":100,"currency":"EGP","amountEGP":100,"amountUSD":2,"reference":"1498","paidAt":"2026-04-16T06:30:00Z"}
+
+### UTD Callback - Failed (with signature)
+< {%
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const apiKey = "upk_038d0c0d88895b65c048332c278354656778782a90f737bb";
+    const projectId = "yet94XI8gdwBLk0WZWdm";
+    const secret = "30a5a37e75176d583dcd12b00168036e62cecedcb0d8701d679e853b324090a9";
+    const body = request.body.tryGetSubstituted();
+    const signData = timestamp + "." + apiKey + "." + projectId + "." + body;
+    const signature = crypto.hmac.sha256().withTextSecret(secret).updateWithText(signData).digest().toHex();
+    request.variables.set("timestamp", timestamp);
+    request.variables.set("signature", signature);
+    request.variables.set("apiKey", apiKey);
+    request.variables.set("projectId", projectId);
+%}
+POST https://eagle.utdsoftware.com/api/utd-callback
+Content-Type: application/json
+X-UTD-Signature: {{signature}}
+X-UTD-Timestamp: {{timestamp}}
+X-UTD-Api-Key: {{apiKey}}
+X-UTD-Project-Id: {{projectId}}
+
+{"event":"payment.failed","status":"failed","gateway":"paysky","orderId":"UTD1234567890","userId":"1208","amount":100,"currency":"EGP","amountEGP":100,"amountUSD":2,"reference":"1498","failedAt":"2026-04-16T06:30:00Z","reason":"insufficient_funds"}
+
+### UTD Callback - Without signature (should return 401)
 POST https://eagle.utdsoftware.com/api/utd-callback
 Content-Type: application/json
 
-{
-    "event": "payment.completed",
-    "status": "success",
-    "gateway": "paysky",
-    "orderId": "UTD1234567890",
-    "userId": "1208",
-    "amount": 100,
-    "currency": "EGP",
-    "reference": "1498",
-    "paidAt": "2026-04-16T06:30:00Z"
-}
-
-### UTD Callback - Failed
-POST https://eagle.utdsoftware.com/api/utd-callback
-Content-Type: application/json
-
-{
-    "event": "payment.failed",
-    "status": "failed",
-    "gateway": "paysky",
-    "orderId": "UTD1234567890",
-    "userId": "1208",
-    "amount": 100,
-    "currency": "EGP",
-    "reference": "1498",
-    "failedAt": "2026-04-16T06:30:00Z",
-    "reason": "insufficient_funds"
-}
+{"event":"payment.completed","status":"success","gateway":"paysky","orderId":"UTD1234567890","userId":"1208","amount":100,"currency":"EGP","reference":"1498","paidAt":"2026-04-16T06:30:00Z"}
