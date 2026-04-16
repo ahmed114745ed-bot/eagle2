@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use function Psy\info;
 
 class VerifyUtdPayWebhook
 {
@@ -21,12 +22,14 @@ class VerifyUtdPayWebhook
         $signature = $request->header('X-UTD-Signature');
         $timestamp = $request->header('X-UTD-Timestamp');
 
+
         if (!$signature || !$timestamp) {
             info('Missing signature headers');
             return response()->json(['error' => 'Missing signature headers'], 401);
         }
 
         if (abs(time() - (int) $timestamp) > 300) {
+            info('Signature timestamp expired');
             return response()->json(['error' => 'Signature timestamp expired'], 401);
         }
 

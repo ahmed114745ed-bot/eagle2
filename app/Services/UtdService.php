@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use function Laravel\Prompts\info;
 
 class UtdService
 {
@@ -69,7 +70,7 @@ class UtdService
 
     public function callback(Request $request)
     {
-
+        info('utd service callback');
         $payload = $request->all();
 
         $orderId = $payload['reference'] ?? $payload['orderId'] ?? null;
