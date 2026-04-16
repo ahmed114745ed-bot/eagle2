@@ -21,7 +21,6 @@ class VerifyUtdPayWebhook
         $signature = $request->header('X-UTD-Signature');
         $timestamp = $request->header('X-UTD-Timestamp');
 
-
         if (!$signature || !$timestamp) {
             info('Missing signature headers');
             return response()->json(['error' => 'Missing signature headers'], 401);
@@ -32,7 +31,11 @@ class VerifyUtdPayWebhook
             return response()->json(['error' => 'Signature timestamp expired'], 401);
         }
 
-        $expectedSignature = hash_hmac('sha256', $timestamp . '.' . $request->getContent(), $secret);
+        $apiKey = $request->header('X-UTD-Api-Key', '');
+        $projectId = $request->header('X-UTD-Project-Id', '');
+
+        $signData = $timestamp . '.' . $apiKey . '.' . $projectId . '.' . $request->getContent();
+        $expectedSignature = hash_hmac('sha256', $signData, $secret);
 
         if (!hash_equals($expectedSignature, $signature)) {
             info('Invalid signature');
