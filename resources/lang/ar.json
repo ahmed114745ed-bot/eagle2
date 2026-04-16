@@ -1,5 +1,6 @@
 {
-    "Laravel": "سبسيب",
+    "Laravel": "سبسيب", 
+    "total_diamonds_sent": "إجمالي الماسات المرسلة",
     "Save order": "حفظ الترتيب",
     "Select All Permissions": "تحديد جميع الصلاحيات",
     "selected": "محدد",
@@ -5398,5 +5399,6 @@
   "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone",
   "Actual Gift Price from Database": "إجمالي سعر الهدايا الفعلي من قاعدة البيانات",
   "Lucky Gift Total": "إجمالي هدايا الحظ",
-  "Regular Gift Total": "إجمالي الهدايا العادية"
+  "Regular Gift Total": "إجمالي الهدايا العادية",
+  "Total Diamonds Sent": "إجمالي الماسات المرسلة"
 }

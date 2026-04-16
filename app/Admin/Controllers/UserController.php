@@ -582,31 +582,7 @@ class UserController extends MainController
 
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
 
-                $actualGiftPrice = 0;
-                $luckyGiftTotal = 0;
-                $regularGiftTotal = 0;
-
-                if ($giftType === 'sender') {
-                    $senderLogsWithGift = GiftLog::where('sender_id', $id)
-                        ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
-                            Carbon::parse($start, $timezone)->startOfDay()->utc(),
-                            Carbon::parse($end, $timezone)->endOfDay()->utc(),
-                        ]))
-                        ->with('gift:id,price,type')
-                        ->get();
-
-                    foreach ($senderLogsWithGift as $log) {
-                        if ($log->gift) {
-                            $price = $log->gift->price * $log->giftNum;
-                            $actualGiftPrice += $price;
-                            if ($log->gift->type == 6) {
-                                $luckyGiftTotal += $price;
-                            } else {
-                                $regularGiftTotal += $price;
-                            }
-                        }
-                    }
-                }
+                $totalGiftPrice = (clone $giftBaseQuery)->sum('total');
 
                 break;
 
@@ -666,9 +642,7 @@ class UserController extends MainController
             'charges',
             'giftSLogs',
             'diamonds',
-            'actualGiftPrice',
-            'luckyGiftTotal',
-            'regularGiftTotal',
+            'totalGiftPrice',
             'userJoinAgencies',
             'usersCoins',
             'badges',

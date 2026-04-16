@@ -1,6 +1,8 @@
 {
     "Laravel": "लारावेल",
     "Id": "पहचान",
+      "total_diamonds_sent": "कुल भेजे गए हीरे",
+
     "ID": "आईडी",
     "Name": "नाम",
     "User": "उपयोगकर्ता",
@@ -4113,7 +4115,9 @@
   "milestone_vip_reward_message": ":milestone पूरा करने के पुरस्कार के रूप में आपको :vip प्राप्त हुआ है",
   "Actual Gift Price from Database": "डेटाबेस से वास्तविक उपहार मूल्य",
   "Lucky Gift Total": "लकी गिफ्ट कुल",
-  "Regular Gift Total": "सामान्य उपहार कुल"
- 
-
+    "Regular Gift Total": "सामान्य उपहार कुल",
+    "Total Diamond Send": "कुल हीरा भेजा गया",
+    "Total Gift Logs": "कुल उपहार लॉग",
+    "Actual Gift Price": "वास्तविक उपहार मूल्य",
+    "Total Diamonds Sent": "कुल भेजे गए हीरे"
 }

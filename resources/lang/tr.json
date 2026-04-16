@@ -1,5 +1,8 @@
 {
-    "Users": "Kullanıcılar",
+    "Users": "Kullanıcılar", 
+    
+    "total_diamonds_sent": "Gönderilen toplam elmas",
+
     "URI": "URI",
     "Id": "Kimlik",
     "ID": "ID",
@@ -4511,7 +4514,6 @@
   "milestone_ware_reward_message": ":milestone tamamlama ödülü olarak :ware kazandınız",
   "Actual Gift Price from Database": "Veritabanından Gerçek Hediye Fiyatı",
   "Lucky Gift Total": "Şans Hediyesi Toplamı",
-  "Regular Gift Total": "Normal Hediye Toplamı"
- 
-
+  "Regular Gift Total": "Normal Hediye Toplamı",
+  "Total Diamonds Sent": "Gönderilen Toplam Elmas"
 }
