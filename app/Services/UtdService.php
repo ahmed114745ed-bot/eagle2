@@ -82,7 +82,7 @@ class UtdService
 
         if (!$orderId) {
             $utdLog->warning('callback missing orderId', $payload);
-            return response()->json(['success' => false, 'message' => 'Missing orderId'], 200);
+            return response()->json(['success' => false, 'message' => 'Missing  Parameters'], 200);
         }
 
         if ($status !== 'success') {

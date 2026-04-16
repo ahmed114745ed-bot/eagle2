@@ -16,7 +16,7 @@ class VerifyUtdPayWebhook
 
         if (empty($secret)) {
             Log::channel('utd')->error('webhook secret not configured');
-            return response()->json(['error' => 'Webhook secret not configured'], 500);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $signature = $request->header('X-UTD-Signature');
@@ -24,12 +24,12 @@ class VerifyUtdPayWebhook
 
         if (!$signature || !$timestamp) {
             Log::channel('utd')->warning('missing signature headers', ['ip' => $request->ip()]);
-            return response()->json(['error' => 'Missing signature headers'], 401);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         if (abs(time() - (int) $timestamp) > 300) {
             Log::channel('utd')->warning('signature timestamp expired', ['timestamp' => $timestamp]);
-            return response()->json(['error' => 'Signature timestamp expired'], 401);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $apiKey = $request->header('X-UTD-Api-Key', '');
@@ -40,7 +40,7 @@ class VerifyUtdPayWebhook
 
         if (!hash_equals($expectedSignature, $signature)) {
             Log::channel('utd')->warning('invalid signature', ['ip' => $request->ip()]);
-            return response()->json(['error' => 'Invalid signature'], 401);
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         Log::channel('utd')->info('webhook signature verified', ['projectId' => $projectId]);
