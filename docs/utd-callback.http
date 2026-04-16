@@ -1,16 +1,31 @@
+# UTD Pay Webhook - Eagle Callback Test Requests
+# Signature: HMAC-SHA256(timestamp.apiKey.projectId.body, secret)
+
 ### UTD Callback - Success (with signature)
 < {%
-    const timestamp = Math.floor(Date.now() / 1000).toString();
     const apiKey = "upk_038d0c0d88895b65c048332c278354656778782a90f737bb";
     const projectId = "yet94XI8gdwBLk0WZWdm";
     const secret = "30a5a37e75176d583dcd12b00168036e62cecedcb0d8701d679e853b324090a9";
-    const body = request.body.tryGetSubstituted();
+    const orderId = "UTD1234567890";
+    const userId = "1206";
+    const reference = "1498";
+    const gateway = "paysky";
+    const amount = 100;
+    const currency = "EGP";
+    const amountEGP = 100;
+    const amountUSD = 2;
+
+    const bodyObj = {"event":"payment.completed","status":"success","gateway":gateway,"orderId":orderId,"idempotencyKey":orderId,"userId":userId,"amount":amount,"currency":currency,"amountEGP":amountEGP,"amountUSD":amountUSD,"reference":reference,"paidAt":"2026-04-16T06:30:00Z"};
+    const body = JSON.stringify(bodyObj);
+    const timestamp = Math.floor(Date.now() / 1000).toString();
     const signData = timestamp + "." + apiKey + "." + projectId + "." + body;
     const signature = crypto.hmac.sha256().withTextSecret(secret).updateWithText(signData).digest().toHex();
+
     request.variables.set("timestamp", timestamp);
     request.variables.set("signature", signature);
     request.variables.set("apiKey", apiKey);
     request.variables.set("projectId", projectId);
+    request.variables.set("body", body);
 %}
 POST https://eagle.utdsoftware.com/api/utd-callback
 Content-Type: application/json
@@ -19,21 +34,33 @@ X-UTD-Timestamp: {{timestamp}}
 X-UTD-Api-Key: {{apiKey}}
 X-UTD-Project-Id: {{projectId}}
 
-{"event":"payment.completed","status":"success","gateway":"paysky","orderId":"UTD1234567890","idempotencyKey":"UTD1234567890","userId":"1208","amount":100,"currency":"EGP","amountEGP":100,"amountUSD":2,"reference":"1498","paidAt":"2026-04-16T06:30:00Z"}
+{{body}}
 
 ### UTD Callback - Failed (with signature)
 < {%
-    const timestamp = Math.floor(Date.now() / 1000).toString();
     const apiKey = "upk_038d0c0d88895b65c048332c278354656778782a90f737bb";
     const projectId = "yet94XI8gdwBLk0WZWdm";
     const secret = "30a5a37e75176d583dcd12b00168036e62cecedcb0d8701d679e853b324090a9";
-    const body = request.body.tryGetSubstituted();
+    const orderId = "UTD1234567890";
+    const userId = "1206";
+    const reference = "1498";
+    const gateway = "paysky";
+    const amount = 100;
+    const currency = "EGP";
+    const amountEGP = 100;
+    const amountUSD = 2;
+
+    const bodyObj = {"event":"payment.failed","status":"failed","gateway":gateway,"orderId":orderId,"userId":userId,"amount":amount,"currency":currency,"amountEGP":amountEGP,"amountUSD":amountUSD,"reference":reference,"failedAt":"2026-04-16T06:30:00Z","reason":"insufficient_funds"};
+    const body = JSON.stringify(bodyObj);
+    const timestamp = Math.floor(Date.now() / 1000).toString();
     const signData = timestamp + "." + apiKey + "." + projectId + "." + body;
     const signature = crypto.hmac.sha256().withTextSecret(secret).updateWithText(signData).digest().toHex();
+
     request.variables.set("timestamp", timestamp);
     request.variables.set("signature", signature);
     request.variables.set("apiKey", apiKey);
     request.variables.set("projectId", projectId);
+    request.variables.set("body", body);
 %}
 POST https://eagle.utdsoftware.com/api/utd-callback
 Content-Type: application/json
@@ -42,10 +69,10 @@ X-UTD-Timestamp: {{timestamp}}
 X-UTD-Api-Key: {{apiKey}}
 X-UTD-Project-Id: {{projectId}}
 
-{"event":"payment.failed","status":"failed","gateway":"paysky","orderId":"UTD1234567890","userId":"1208","amount":100,"currency":"EGP","amountEGP":100,"amountUSD":2,"reference":"1498","failedAt":"2026-04-16T06:30:00Z","reason":"insufficient_funds"}
+{{body}}
 
 ### UTD Callback - Without signature (should return 401)
 POST https://eagle.utdsoftware.com/api/utd-callback
 Content-Type: application/json
 
-{"event":"payment.completed","status":"success","gateway":"paysky","orderId":"UTD1234567890","userId":"1208","amount":100,"currency":"EGP","reference":"1498","paidAt":"2026-04-16T06:30:00Z"}
+{"event":"payment.completed","status":"success","gateway":"paysky","orderId":"UTD1234567890","userId":"1206","amount":100,"currency":"EGP","reference":"1498","paidAt":"2026-04-16T06:30:00Z"}
