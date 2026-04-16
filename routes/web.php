@@ -977,6 +977,37 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
 
 Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
+// Gift Logs: fill total column from gifts table (seeder via web)
+Route::get('/gift-logs-fill-total', function () {
+    Artisan::call('db:seed', ['--class' => \Database\Seeders\FillGiftLogsTotalSeeder::class]);
+    return response()->json([
+        'status'  => 'success',
+        'message' => '✅ FillGiftLogsTotalSeeder executed successfully.',
+        'output'  => Artisan::output(),
+    ]);
+});
+
+// Gift Logs: fix total diff (dry-run preview)
+Route::get('/gift-logs-fix-total-diff/preview', function () {
+    Artisan::call('gift-logs:fix-total-diff', ['--dry-run' => true]);
+    return response()->json([
+        'status'  => 'success',
+        'message' => '✅ Dry-run completed.',
+        'output'  => Artisan::output(),
+    ]);
+});
+
+// Gift Logs: fix total diff (actual run)
+Route::get('/gift-logs-fix-total-diff/run', function (\Illuminate\Http\Request $request) {
+    $chunk = (int) $request->query('chunk', 500);
+    Artisan::call('gift-logs:fix-total-diff', ['--chunk' => $chunk]);
+    return response()->json([
+        'status'  => 'success',
+        'message' => '✅ gift-logs:fix-total-diff executed successfully.',
+        'output'  => Artisan::output(),
+    ]);
+});
+
 
 Route::get('/test-games', function () {
 

@@ -2,10 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\Payments\PaymentStatus;
 use App\Models\CoinLog;
-use App\Models\Country;
-use App\Models\Setting;
 use App\Traits\User\PaymentTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,9 +31,9 @@ class UtdService
         return url("/api/utd-success/$trx");
     }
 
-    public function initiatePayment($trx, $amount, $userId = null)
+    public function initiatePayment($trx, $amount, $user)
     {
-        $body = $this->getBodyForutd($trx, $amount, $userId);
+        $body = $this->getBodyForutd($trx, $amount, $user);
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
@@ -51,13 +48,13 @@ class UtdService
         return $json['error'];
     }
 
-    protected function getBodyForutd($trx, $amount, $userId): array
+    protected function getBodyForutd($trx, $amount, $user): array
     {
         return [
             'apiKey' => $this->apiKey,
             'amount' => $amount,
             'currency' => 'USD',
-            'userId' => "$userId" ?? (string)($user?->id ?? 'guest'),
+            'userId' => (string)($user?->id ?? 'guest'),
             'userName' => $user?->name ?? 'Guest User',
             'userPhone' => $user?->phone ?? '',
             'userEmail' => $user?->email ?? '',
@@ -69,12 +66,12 @@ class UtdService
 
     public function callback(Request $request)
     {
+        $utdLog = Log::channel('utd');
+        $utdLog->info('callback received', ['payload' => $request->all()]);
 
         $payload = $request->all();
 
         $orderId = $payload['reference'] ?? $payload['orderId'] ?? null;
-
-//        $orderId = $payload['orderId'] ?? $payload['reference'] ?? $payload['MerchantReference'] ?? $payload['OrderId'] ?? null;
         $event = $payload['event'] ?? null;
         $status = $payload['status'] ?? $payload['resultCode'] ?? $payload['TransactionStatus'] ?? null;
         $gateway = $payload['gateway'] ?? $payload['gatewayName'] ?? null;
@@ -82,21 +79,21 @@ class UtdService
         $currency = $payload['currency'] ?? $payload['currencyCode'] ?? null;
         $reference = $payload['reference'] ?? null;
 
-
         if (!$orderId) {
-            Log::warning('utd-callback missing orderId', $payload);
-            return response()->json(['success' => false, 'message' => 'Missing orderId'], 200);
+            $utdLog->warning('callback missing orderId', $payload);
+            return response()->json(['success' => false, 'message' => 'Missing  Parameters'], 200);
         }
 
         if ($status !== 'success') {
-            Log::info('utd-callback payment not successful', ['orderId' => $orderId, 'status' => $status]);
+            $utdLog->info('callback payment not successful', ['orderId' => $orderId, 'status' => $status]);
             return response()->json(['success' => false, 'message' => 'Payment not successful', 'status' => $status], 200);
         }
 
         try {
+            $utdLog->info('callback processing payment', ['orderId' => $orderId]);
             return $this->webhookPayment($orderId);
         } catch (\Exception $ex) {
-            Log::error('utd-callback error', ['orderId' => $orderId, 'error' => $ex->getMessage()]);
+            $utdLog->error('callback error', ['orderId' => $orderId, 'error' => $ex->getMessage()]);
             return response()->json(['success' => false, 'message' => $ex->getMessage()], 500);
         }
     }

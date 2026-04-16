@@ -147,6 +147,11 @@ return [
             'path' => storage_path('logs/zego.log'),
             'level' => 'debug',
         ],
+        'utd' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/utd.log'),
+            'level' => 'debug',
+        ],
     ],
 
 ];

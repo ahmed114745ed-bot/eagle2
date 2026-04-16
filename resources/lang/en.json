@@ -1,5 +1,6 @@
 {
     "Id": "Id",
+    "total_diamonds_sent": "Total coins sent",
     "ID": "ID",
     "Name": "Name",
     "User": "User",
@@ -66,6 +67,7 @@
     "filter_month": "Month",
     "filter_year": "Year",
     "latest_withdrawals": "Latest Withdrawals",
+    "Total Diamond Send": "Total Diamond Send",
     "latest_payments": "Latest Payments",
     "table_header_index": "#",
     "table_header_account": "Account",
@@ -1738,7 +1740,10 @@
     "api_responses.charge_agent_to_agent_disabled": "Charging from charging agent to another charging agent is currently disabled",
     "api_responses.freeze_charge_settings": "Charging is currently disabled by the administrator.",
     "invalid_code": "Invalid or expired verification code",
-     "milestone_vip_reward_message": "You have received :vip as a reward for completing :milestone",
-  "milestone_ware_reward_message": "You have received :ware as a reward for completing :milestone"
- 
+  "milestone_vip_reward_message": "You have received :vip as a reward for completing :milestone",
+  "milestone_ware_reward_message": "You have received :ware as a reward for completing :milestone",
+  "Actual Gift Price from Database": "Actual Gift Price from Database",
+  "Lucky Gift Total": "Lucky Gift Total",
+  "Regular Gift Total": "Regular Gift Total",
+  "Total Diamonds Sent": "Total Diamonds Sent"
 }

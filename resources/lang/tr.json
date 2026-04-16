@@ -1,5 +1,8 @@
 {
-    "Users": "Kullanıcılar",
+    "Users": "Kullanıcılar", 
+    
+    "total_diamonds_sent": "Gönderilen toplam elmas",
+
     "URI": "URI",
     "Id": "Kimlik",
     "ID": "ID",
@@ -4508,7 +4511,9 @@
   "api_responses.charge_agent_to_agent_disabled": "Şarj ajanından başka bir şarj ajanına şarj etme şu anda devre dışı bırakıldı",
   "api_responses.freeze_charge_settings": "Şarj işlemi şu anda yönetici tarafından devre dışı bırakıldı.",
   "milestone_vip_reward_message": ":milestone tamamlama ödülü olarak :vip kazandınız",
-  "milestone_ware_reward_message": ":milestone tamamlama ödülü olarak :ware kazandınız"
- 
-
+  "milestone_ware_reward_message": ":milestone tamamlama ödülü olarak :ware kazandınız",
+  "Actual Gift Price from Database": "Veritabanından Gerçek Hediye Fiyatı",
+  "Lucky Gift Total": "Şans Hediyesi Toplamı",
+  "Regular Gift Total": "Normal Hediye Toplamı",
+  "Total Diamonds Sent": "Gönderilen Toplam Elmas"
 }

@@ -114,7 +114,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
 
     Route::get('utd-success/{orderId}', [UtdService::class, 'success'])->name('utd.success');
-    Route::post('utd-callback', [UtdService::class, 'callback'])->middleware('verify.utdpay.webhook')->name('utd.callback');
+    Route::post('utd-callback', [UtdService::class, 'callback'])->middleware(['verify.utdpay.webhook', 'throttle:30,1'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -179,22 +179,16 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('/payment/success', [StripeController::class, 'success']);
     Route::get('/payment/cancel', [StripeController::class, 'cancel']);
 
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/broadcasting/auth', function (Request $request) {
+            return Broadcast::auth($request);
+        });
+    });
 
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen', 'localization'])->group(
         function () {
             Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
-            // Route::post('/broadcasting/auth', function (Request $request) {
-            //     return Broadcast::auth($request);
-            // });
-            Route::post('/broadcasting/auth', function (Request $request) {
-                try {
-                    $authResponse = Broadcast::auth($request);
-                    return $authResponse;
-                } catch (\Exception $e) {
-                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-                }
-            });
 
             Route::get('/user-gifts', [UserController::class, 'userGifts']);
 
