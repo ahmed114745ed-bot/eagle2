@@ -65,6 +65,11 @@ class FixGiftLogsTotalDiff extends Command
                             $diff
                         ));
                     } else {
+                        // Cast $diff to integer to avoid BIGINT overflow
+                        // The 'total' column in gift_logs is BIGINT (max ~9.2 quintillion)
+                        // Some differences exceed this, so we cap at PHP_INT_MAX
+                        $totalValue = (int) min($diff, PHP_INT_MAX);
+                        
                         DB::table('gift_logs')->insert([
                             'type'             => 2,
                             'giftId'           => 0,
@@ -79,7 +84,7 @@ class FixGiftLogsTotalDiff extends Command
                             'receiver_obtain'  => 0,
                             'roomowner_obtain' => 0,
                             'app_profit_coins' => 0,
-                            'total'            => $diff,  
+                            'total'            => $totalValue,  
                             'created_at'       => $now,
                             'updated_at'       => $now,
                         ]);
