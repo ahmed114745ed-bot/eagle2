@@ -40,14 +40,36 @@ class TestTestCharizma implements ShouldQueue
     public function handle()
     {
         $promises = [];
-        // info('TestTestCharizma before for');
+        \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][4-RTM] TestTestCharizma job started', [
+            'data_count' => count($this->data),
+            'data'       => $this->data,
+        ]);
+
         foreach ($this->data as $key => $value){
             [$data, $roomId, $userId] = $this->roomJob->getVariables($value);
+
+            \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][4-RTM] Sending to RTM for room', [
+                'room_id'  => $roomId,
+                'user_id'  => $userId,
+                'data'     => $data,
+            ]);
+
             $json = $this->roomJob->sendToZego($data, $roomId, $userId ?? 0);
-            // info('TestTestCharizma');
+
+            \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][4-RTM] JSON prepared for RTM', [
+                'room_id' => $roomId,
+                'user_id' => $userId,
+                'json'    => $json,
+            ]);
+
             $promise = Common::sendToZego3('SendCustomCommand', $roomId, $userId ?? 0, [$json]);
             $promises = array_merge($promises, $promise);
         }
+
+        \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][4-RTM] All RTM promises dispatched', [
+            'promises_count' => count($promises),
+        ]);
+
         Utils::unwrap($promises);
     }
 }

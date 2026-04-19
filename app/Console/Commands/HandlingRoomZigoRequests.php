@@ -47,6 +47,10 @@ class HandlingRoomZigoRequests extends Command
 
         $data = Redis::keys('*CharismaGift*');
 
+        \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][2-HANDLER] withRedis cycle started', [
+            'keys_found' => count($data),
+            'keys' => $data,
+        ]);
 
         $allData = [];
 
@@ -64,26 +68,60 @@ class HandlingRoomZigoRequests extends Command
                     throw new \RuntimeException("Invalid data from Redis key: {$cleanKey}");
                 }
 
+                \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][2-HANDLER] Processing Redis key', [
+                    'redis_key' => $cleanKey,
+                    'room_id'   => $item['room_id'] ?? '?',
+                    'user_id'   => $item['user_id'] ?? '?',
+                    'coins'     => $item['coins'] ?? '?',
+                    'type'      => $item['type'] ?? '?',
+                    'receivers' => unserialize($item['data'] ?? 'a:0:{}'),
+                ]);
+
                 $item = new \App\Tik\DTO\RoomJobClass($item ?? []);
 
                 $data_ne                = $roomFactory->setType($item->type)->work($item);
                 $allData[$item->type][] = $data_ne;
+
+                \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][2-HANDLER] work() result', [
+                    'room_id' => $item->room_id,
+                    'user_id' => $item->user_id,
+                    'type'    => $item->type,
+                    'result'  => $data_ne,
+                ]);
+
                 echo 'Done ' . $item->type . ' to room ' . $item->room_id . PHP_EOL;
             } catch (\Throwable $e) {
                 $type = is_object($item) ? ($item->type ?? '?') : 'unknown';
                 $room = is_object($item) ? ($item->room_id ?? '?') : 'unknown';
+                \Illuminate\Support\Facades\Log::channel('daily')->error('[CHARISMA][2-HANDLER] work() FAILED', [
+                    'redis_key' => $cleanKey ?? '?',
+                    'room_id'   => $room,
+                    'type'      => $type,
+                    'error'     => $e->getMessage(),
+                ]);
                 echo 'Fail ' . $type . ' to room ' . $room . ': ' . $e->getMessage() . PHP_EOL;
             }
             Redis::del($cleanKey);
 
         }
 
+        \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][3-ZEGO] Preparing to send to Zego', [
+            'allData_types' => array_keys($allData),
+            'allData'       => $allData,
+        ]);
+
         try {
             foreach ($allData as $key => $allDatum) {
                 $roomFactory->setType($key)->sendToZego($allData);
+                \Illuminate\Support\Facades\Log::channel('daily')->info('[CHARISMA][3-ZEGO] sendToZego dispatched', [
+                    'type' => $key,
+                ]);
                 echo 'Done zego  ' . $key . ' to room ' . PHP_EOL;
             }
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::channel('daily')->error('[CHARISMA][3-ZEGO] sendToZego FAILED', [
+                'error' => $e->getMessage(),
+            ]);
             echo 'Fail zego ' . $e->getMessage() . PHP_EOL;
         }
 
