@@ -406,14 +406,7 @@ if (!function_exists('get_file_details')) {
             $key = 'CharismaGift_' . $type . '_' . $userId . '_' . $roomId . '_' . implode($data) . '_' . $uniqueId;
             $data = serialize($data);
 
-            \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][1-DISPATCH] dispatchRoomsRedis called', [
-                'room_id'  => $roomId,
-                'user_id'  => $userId,
-                'coins'    => $coins,
-                'type'     => $type,
-                'redis_key' => $key,
-                'receivers' => unserialize($data),
-            ]);
+       
 
             try {
 
@@ -429,12 +422,7 @@ if (!function_exists('get_file_details')) {
                 ];
                 \Illuminate\Support\Facades\Redis::set($key, serialize($values));
 
-                \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][1-DISPATCH] Saved to Redis', [
-                    'room_id'   => $roomId,
-                    'user_id'   => $userId,
-                    'redis_key' => $key,
-                    'coins'     => $coins,
-                ]);
+             
 
                 //            \Illuminate\Support\Facades\DB::table('room_jobs')->insert($values);
             } catch (Exception $exception) {
