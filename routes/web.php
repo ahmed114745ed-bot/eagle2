@@ -991,17 +991,67 @@ Route::get('/gift-logs-fill-total', function () {
     ]);
 });
 
-// Gift Logs: fix total diff (dry-run preview)
+// Gift Logs: fix total diff (dry-run preview) — queries DB directly for accuracy
 Route::get('/gift-logs-fix-total-diff/preview', function () {
-    Artisan::call('gift-logs:fix-total-diff', ['--dry-run' => true]);
-    return response()->json([
-        'status'  => 'success',
-        'message' => '✅ Dry-run completed.',
-        'output'  => Artisan::output(),
-    ]);
+    $users      = [];
+    $totalDiff  = 0;
+    $totalUsers = DB::table('users')->where('total_diamond_send', '>', 0)->count();
+
+    DB::table('users')
+        ->select('id', 'total_diamond_send')
+        ->where('total_diamond_send', '>', 0)
+        ->orderBy('id')
+        ->chunk(500, function ($chunk) use (&$users, &$totalDiff) {
+            foreach ($chunk as $user) {
+                $userTotal = (float) ($user->total_diamond_send ?? 0);
+
+                // Sum of real gift logs (excluding correction records)
+                $giftLogsTotal = DB::table('gift_logs')
+                    ->where('sender_id', $user->id)
+                    ->whereNotNull('receiver_id')
+                    ->where('receiver_id', '!=', 0)
+                    ->where('giftName', '!=', 'diff_correction')
+                    ->selectRaw('COALESCE(SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))), 0) as total')
+                    ->value('total');
+
+                // Sum of existing correction records
+                $correctionTotal = DB::table('gift_logs')
+                    ->where('sender_id', $user->id)
+                    ->where('giftName', 'diff_correction')
+                    ->selectRaw('COALESCE(SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))), 0) as total')
+                    ->value('total');
+
+                $giftLogsTotal   = (float) ($giftLogsTotal ?? 0);
+                $correctionTotal = (float) ($correctionTotal ?? 0);
+                $totalWithCorrection = $giftLogsTotal + $correctionTotal;
+
+                $diff = $userTotal - $totalWithCorrection;
+
+                if (abs($diff) < 1) {
+                    continue;
+                }
+
+                $users[] = [
+                    'user_id'            => (int) $user->id,
+                    'total_diamond_send' => $userTotal,
+                    'gift_logs_sum'      => $totalWithCorrection,
+                    'diff'               => $diff,
+                ];
+                $totalDiff += $diff;
+            }
+        });
+
+    $html = view('gift-logs-fix-report', [
+        'users'       => $users,
+        'total_users' => $totalUsers,
+        'total_diff'  => $totalDiff,
+        'output'      => '',
+    ])->render();
+
+    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
 });
 
-// Gift Logs: fix total diff (actual run)
+// Gift Logs: fix total diff (actual run) — prevents duplicate correction records
 Route::get('/gift-logs-fix-total-diff/run', function (\Illuminate\Http\Request $request) {
     $chunk = (int) $request->query('chunk', 500);
     Artisan::call('gift-logs:fix-total-diff', ['--chunk' => $chunk]);
