@@ -2482,7 +2482,7 @@
                                 {{ __('total_diamonds_sent') }}
                             </div>
                             <div class="diamond-count">
-                                <span>{{ number_format(@$totalGiftPrice ?? 0) }}</span>
+                                <span>{{ number_format(@$totalGiftCoins ?? 0) }}</span>
                                 <div class="diamond-icon-container">
                                     <img src="{{ asset('images/diamond.jpg') }}" alt="Diamond" class="diamond-icon">
                                 </div>

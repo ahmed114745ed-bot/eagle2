@@ -472,6 +472,7 @@ class UserController extends MainController
         $usersCoins = null;
         $badges = null;
         $walletLogs = null;
+        $totalGiftCoins = 0;
 
         // Decide active tab early so we only eager load what we need
         $activeTab = request('tab', 'packs');
@@ -581,9 +582,14 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
-                $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
+                // Calculate total diamonds sent/received: SUM(total * giftNum)
+                // This represents the actual amount of diamonds in each transaction
+                $totalGiftCoins = (clone $giftBaseQuery)
+                    ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
+                    ->value('total') ?? 0;
 
-                $totalGiftPrice = (clone $giftBaseQuery)->sum('total');
+                // Keep totalGiftPrice for backward compatibility (sum of giftPrice column)
+                $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
 
                 break;
 
@@ -651,7 +657,8 @@ class UserController extends MainController
             'walletLogs',
             'activeTab',
             'availableBalance',
-            'curantBalance'
+            'curantBalance',
+            'totalGiftCoins'
         );
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
