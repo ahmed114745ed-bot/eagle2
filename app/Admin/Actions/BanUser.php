@@ -232,7 +232,7 @@ class BanUser extends Action
 
         $this->checkbox('type', __('type'))->options([
             'normal' => __('normal'),
-            'ip' => __('ip'),
+           // 'ip' => __('ip'),
             'device' => __('device'),
         ]);
         $this->select('ban_type_id', __('ban_type'))->options(function ($value) {
