@@ -41,6 +41,27 @@ class InvitationSettingsController extends AdminController
     {
         $form = new Form(new Config());
         Admin::style('.box-header { display: none !important; }');
+        Admin::style('
+            [dir="rtl"] .form-horizontal .form-group,
+            .rtl .form-horizontal .form-group {
+                display: flex;
+                flex-direction: row-reverse;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+            [dir="rtl"] .form-horizontal .control-label,
+            .rtl .form-horizontal .control-label {
+                text-align: right !important;
+            }
+            [dir="rtl"] .form-horizontal .help-block,
+            .rtl .form-horizontal .help-block {
+                text-align: right;
+            }
+            [dir="rtl"] .form-horizontal .box-footer,
+            .rtl .form-horizontal .box-footer {
+                text-align: right;
+            }
+        ');
         $form->setAction(admin_url('invitation-code/settings'));
 
         // Invitation Tab
