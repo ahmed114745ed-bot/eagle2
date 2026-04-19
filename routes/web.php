@@ -990,11 +990,32 @@ Route::get('/gift-logs-fill-total', function () {
 // Gift Logs: fix total diff (dry-run preview)
 Route::get('/gift-logs-fix-total-diff/preview', function () {
     Artisan::call('gift-logs:fix-total-diff', ['--dry-run' => true]);
-    return response()->json([
-        'status'  => 'success',
-        'message' => '✅ Dry-run completed.',
-        'output'  => Artisan::output(),
-    ]);
+    $output = Artisan::output();
+    
+    // Parse the output to extract user data
+    $lines = explode("\n", $output);
+    $users = [];
+    
+    foreach ($lines as $line) {
+        if (preg_match('/user_id=(\d+)\s*\|\s*total_diamond_send=([\d.]+)\s*\|\s*gift_logs_sum=([\d.]+)\s*\|\s*diff=([-\d.]+)/', $line, $matches)) {
+            $users[] = [
+                'user_id' => (int)$matches[1],
+                'total_diamond_send' => (float)$matches[2],
+                'gift_logs_sum' => (float)$matches[3],
+                'diff' => (float)$matches[4],
+            ];
+        }
+    }
+    
+    // Generate HTML report
+    $html = view('gift-logs-fix-report', [
+        'users' => $users,
+        'total_users' => count($users),
+        'total_diff' => array_sum(array_column($users, 'diff')),
+        'output' => $output,
+    ])->render();
+    
+    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
 });
 
 // Gift Logs: fix total diff (actual run)

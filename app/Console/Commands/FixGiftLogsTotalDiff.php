@@ -41,10 +41,17 @@ class FixGiftLogsTotalDiff extends Command
                 $now = now()->toDateTimeString();
 
                 foreach ($users as $user) {
-                    $giftLogsTotal = DB::table('gift_logs')
+                    // Calculate gift logs total in PHP to avoid SQL arithmetic overflow
+                    // Sum: total * giftNum for each row
+                    $giftLogs = DB::table('gift_logs')
                         ->where('sender_id', $user->id)
-                        ->selectRaw('SUM(total * giftNum) as grand_total')
-                        ->value('grand_total') ?? 0;
+                        ->select('total', 'giftNum')
+                        ->get();
+                    
+                    $giftLogsTotal = 0;
+                    foreach ($giftLogs as $log) {
+                        $giftLogsTotal += ((int) $log->total) * ((int) $log->giftNum);
+                    }
 
                     $userTotal = (float) ($user->total_diamond_send ?? 0);
                     $diff      = $userTotal - (float) $giftLogsTotal;
@@ -79,7 +86,7 @@ class FixGiftLogsTotalDiff extends Command
                             'receiver_obtain'  => 0,
                             'roomowner_obtain' => 0,
                             'app_profit_coins' => 0,
-                            'total'            => $diff,   // الفرق (موجب أو سالب)
+                            'total'            => (int) $diff,  
                             'created_at'       => $now,
                             'updated_at'       => $now,
                         ]);

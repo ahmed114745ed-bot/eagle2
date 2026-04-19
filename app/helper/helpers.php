@@ -406,6 +406,8 @@ if (!function_exists('get_file_details')) {
             $key = 'CharismaGift_' . $type . '_' . $userId . '_' . $roomId . '_' . implode($data) . '_' . $uniqueId;
             $data = serialize($data);
 
+       
+
             try {
 
                 $values = [
@@ -420,8 +422,15 @@ if (!function_exists('get_file_details')) {
                 ];
                 \Illuminate\Support\Facades\Redis::set($key, serialize($values));
 
+             
+
                 //            \Illuminate\Support\Facades\DB::table('room_jobs')->insert($values);
             } catch (Exception $exception) {
+                \Illuminate\Support\Facades\Log::channel('charisma_value')->error('[CHARISMA][1-DISPATCH] Redis save FAILED', [
+                    'room_id' => $roomId,
+                    'user_id' => $userId,
+                    'error'   => $exception->getMessage(),
+                ]);
             }
         }
     }
