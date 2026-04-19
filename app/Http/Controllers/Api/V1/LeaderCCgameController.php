@@ -243,7 +243,6 @@ class LeaderCCgameController extends Controller
         $wallet = GameWallet::filterByMonth()->first();
         if (!$wallet) return true;
 
-        return false ;
-       // return ($wallet->used + $coins) >= $wallet->balance;
+        return ($wallet->used + $coins) >= $wallet->balance;
     }
 }
