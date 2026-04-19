@@ -17,8 +17,6 @@ trait WinLuckyGift
 
     public function sendToZegoLuckyGift($zigoData)
     {
-        // Log::info($zigoData);
-        // Log::info('shami-logs');
         $d     = [
             "messageContent" => [
                 "msg"     => "SHBL",
@@ -50,8 +48,6 @@ trait WinLuckyGift
 
     public function sendToZegoLuckyGiftV2($zigoData)
     {
-        // Log::info($zigoData);
-        // Log::info('shami-logs');
         $d     = [
             "messageContent" => [
                 "msg"     => "SHBL",

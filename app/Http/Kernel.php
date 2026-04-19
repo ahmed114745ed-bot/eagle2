@@ -87,6 +87,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'localization' => \App\Http\Middleware\Localization::class,
         'multiLanguage' => MultiLanguageMiddleware::class,
+        'enhancedMultiLanguage' => \App\Http\Middleware\EnhancedMultiLanguage::class,
         'agency' => AgencyMiddleware::class,
         'ip' => IpMiddleware::class,
         'adminIp' => AdminIpMiddleware::class,
@@ -114,6 +115,7 @@ class Kernel extends HttpKernel
         'verify.utdFawry.signature' => \App\Http\Middleware\VerifyUtdFawrySignature::class,
         'verify.payMob.signature' => \App\Http\Middleware\VerifyPayMobSignature::class,
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
+        'verify.utdpay.webhook' => \App\Http\Middleware\VerifyUtdPayWebhook::class,
         'verify.codapay.webhook' => \App\Http\Middleware\VerifyCodapayWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
         //        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
@@ -136,5 +138,6 @@ class Kernel extends HttpKernel
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
         'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
+        'verify.utd.signature' => \App\Http\Middleware\VerifyUtdSignature::class,
     ];
 }

@@ -8,7 +8,6 @@ use App\Models\GiftLog;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use App\Admin\Controllers\MainController;
 
 class GiftLogSummaryController extends MainController
 {
@@ -35,24 +34,12 @@ class GiftLogSummaryController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            if (request('filter') === 'rooms') {
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->equal('room_id', __('room'))
-                        ->select()
-                        ->ajax(route('admin.filter-rooms'));
-                });
-            }
-            $filter->column(1 / 4, function ($filter) {
-                $filter->where(function ($query) {
-                    if ($this->input) {
-                        $timezone = getTimezone();
-                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
-                            ->setTimezone('UTC');
-                        $query->where('created_at', '>=', $start);
-                    }
-                }, __('From Date'), 'from_date')->datetime();
-            });
-            $filter->column(1 / 4, function ($filter) {
+
+            // Disable default ID filter to reorder it
+            $filter->disableIdFilter();
+
+            // Date range filters - From Date (column 1)
+            $filter->column(1 / 3, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $timezone = getTimezone();
@@ -62,14 +49,73 @@ class GiftLogSummaryController extends MainController
                     }
                 }, __('To Date'), 'to_date')->datetime();
             });
+
+            // To Date (column 2)
+            $filter->column(1 / 3, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $timezone = getTimezone();
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($this->input), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '>=', $start);
+                    }
+                }, __('From Date'), 'from_date')->datetime();
+            });
+
+            // Room filter (only for rooms tab) - column 3
+            if (request('filter') === 'rooms') {
+                $filter->column(1 / 3, function ($filter) {
+                    $filter->equal('room_id', __('room'))
+                        ->select()
+                        ->ajax(route('admin.filter-rooms'));
+                });
+            }
+
+            // ID filter at the end (last column)
+            $filter->column(1 / 3, function ($filter) {
+                $filter->equal('id', __('ID'))->placeholder(__('ID'));
+            });
         });
+
+        // Add custom filter styling
+        \Encore\Admin\Facades\Admin::style('
+            .filter-box {
+                border: 1px solid var(--gray-600) !important;
+                border-radius: var(--border-radius) !important;
+                box-shadow: var(--shadow-md) !important;
+                padding: 20px !important;
+            }
+            .filter-box .form-group {
+                margin-bottom: 15px !important;
+            }
+            .filter-box label {
+                font-weight: 600 !important;
+                margin-bottom: 8px !important;
+            }
+            .filter-box .form-control {
+                border: 1px solid var(--gray-300) !important;
+                border-radius: var(--border-radius) !important;
+            }
+            .filter-box .select2-container--default .select2-selection--single {
+                border: 1px solid var(--gray-300) !important;
+                border-radius: var(--border-radius) !important;
+            }
+            .filter-box .btn-primary {
+                border: none !important;
+                border-radius: var(--border-radius) !important;
+            }
+            .filter-box .btn-default {
+                border: none !important;
+                border-radius: var(--border-radius) !important;
+            }
+        ');
 
 
 
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
-        $grid->disableRowSelector(); 
+        $grid->disableRowSelector();
 
         return $grid;
     }

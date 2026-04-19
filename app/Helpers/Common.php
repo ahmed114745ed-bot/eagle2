@@ -824,6 +824,7 @@ class Common
     }
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
+  
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
         $isGroup = false;
@@ -892,9 +893,12 @@ class Common
 
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
+            $payload['android']['notification']['image'] = $data['image'];
         } else {
             $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
-        }
+            $payload['android']['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg'; 
+
+          }
 
         $headers = [
             'Authorization' => 'Bearer ' . $api_access_key,
@@ -909,7 +913,7 @@ class Common
         ]);
 
         $result = json_decode($result);
-
+ 
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);
@@ -1027,7 +1031,7 @@ class Common
 
         $result = $messaging->subscribeToTopic($topic, $registrationTokens);
 
-        //        logger()->info('✅ Kreait Topic Subscribe', [
+
         //            'topic' => $topic,
         //            'result' => $result,
         //        ]);
@@ -1044,7 +1048,7 @@ class Common
 
             $response = $messaging->unsubscribeFromTopic($topic, $registrationTokens);
 
-            //            logger()->info('✅ Unsubscribe from FCM topic result', [
+
             //                'topic'          => $topic,
             //                'tokensCount'    => count($registrationTokens),
             //                'response'       => $response,
@@ -1308,14 +1312,14 @@ class Common
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ];
-            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+
             //                'id' => $id,
             //            ]);
         }
 
         if (!empty($data)) {
             OfficialMessage::insert($data);
-            //            logger()->info('[sendOfficialMessage] Bulk insert success', [
+
             //                'user_ids' => $userIds,
             //            ]);
         }
@@ -1903,7 +1907,7 @@ class Common
         $value = Cache::rememberForever($key, function () use ($key) {
             return Setting::where('key', $key)->value('value');
         });
-        return $value;
+        return $value ?? null;
     }
 
     public  static function getDiamondsPercentage()
@@ -2062,7 +2066,7 @@ class Common
         Pk::where('room_id', $room->id)->where('status', 1)->update(['status' => 0]);
     }
 
-    private function handleCharismaStatusOnLogout($room, $users, $ownerId)
+    private static function handleCharismaStatusOnLogout($room, $users, $ownerId)
     {
         $userCharismaService = new UserCharismaService();
         $userCharismaService->removeRoomCharisma($room->id);

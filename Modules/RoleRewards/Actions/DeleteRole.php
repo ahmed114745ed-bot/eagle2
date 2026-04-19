@@ -25,4 +25,9 @@ class DeleteRole extends RowAction
 
         return $this->response()->success('Deleted successfully')->refresh();
     }
+
+    public function dialog()
+    {
+        $this->confirm(__('dashboard.chickDelete'), '', []);
+    }
 }

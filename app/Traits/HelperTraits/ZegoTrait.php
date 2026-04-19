@@ -98,7 +98,7 @@ trait ZegoTrait
             $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
 
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
-                Log::warning('ZegoTrait::sendToZego failed', [
+                Log::channel('zego')->warning('ZegoTrait::sendToZego failed', [
                     'action' => $Action,
                     'roomId' => $roomId,
                     'fromUserId' => $FromUserId,
@@ -108,7 +108,7 @@ trait ZegoTrait
             
             return $response;
         } catch (\Exception $exception) {
-            Log::error('ZegoTrait::sendToZego exception', [
+            Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
                 'action' => $Action,
                 'roomId' => (string)$RoomId,
                 'fromUserId' => (string)$FromUserId,
@@ -166,7 +166,26 @@ trait ZegoTrait
             'IsTest' => $IsTest,
         ]);
 
-        self::sendZegoRequest($params, timeout: 10);
+            $response = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
+            if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
+                Log::channel('zego')->warning('ZegoTrait::sendToZego failed', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $UserId,
+                    'response' => $response,
+                ]);
+            }
+            
+            return $response;
+        } catch (\Exception $exception) {
+            Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
+                'action' => $Action,
+                'roomId' => $RoomId,
+                'fromUserId' => $UserId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+        return;
     }
 
     public static function sendToZego_3($Action, $RoomId, $UserId, $IsTest = 'false')
@@ -188,10 +207,34 @@ trait ZegoTrait
             'Action' => $Action,
             'RoomId' => $RoomId,
             'UserId[]' => $UserId,
-            'IsTest' => $IsTest,
-        ]);
+            'AppId' => $AppId,
+            'SignatureNonce' => $SignatureNonce,
+            'Timestamp' => $Timestamp,
+            'Signature' => $signature,
+            'SignatureVersion' => $SignatureVersion,
+            'IsTest' => $IsTest
+        ];
+        $headers = [];
+        try {
+           $res = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
+            if ($res === null || (isset($res['Code']) && $res['Code'] != 0)) {
+                Log::channel('zego')->warning('ZegoTrait::sendToZego_3 failed', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $UserId,
+                    'response' => $res,
+                ]);
+            }
+           } catch (\Exception $exception) {
+            Log::channel('zego')->error('ZegoTrait::sendToZego_3 exception', [
+                'action' => $Action,
+                'roomId' => $RoomId,
+                'fromUserId' => $UserId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
 
-        return self::sendZegoRequest($params, timeout: 10);
+        return $res;
     }
 
     public static function sendToZego_4($Action, $RoomId, $fromUserId, $toUserId, $MessageContent, $IsTest = 'false')
@@ -217,8 +260,37 @@ trait ZegoTrait
             'FromUserId' => $fromUserId,
             'ToUserId[]' => $toUserId,
             'MessageContent' => $MessageContent,
-            'IsTest' => $IsTest,
-        ]);
+            'AppId' => $AppId,
+            'SignatureNonce' => $SignatureNonce,
+            'Timestamp' => $Timestamp,
+            'Signature' => $signature,
+            'SignatureVersion' => $SignatureVersion,
+            'IsTest' => $IsTest
+        ];
+        $headers = [];
+        try {
+            $res = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
+            if ($res === null || (isset($res['Code']) && $res['Code'] != 0)) {
+                Log::channel('zego')->warning('ZegoTrait::sendToZego_4 failed', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $fromUserId,
+                    'toUserId' => $toUserId,
+                    'response' => $res,
+                ]);
+                }
+
+            } catch (\Exception $exception) {
+                Log::channel('zego')->error('ZegoTrait::sendToZego_4 exception', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $fromUserId,
+                    'toUserId' => $toUserId,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+
+        
 
         return self::sendZegoRequest($params, timeout: 10);
     }

@@ -2,22 +2,24 @@
 
 namespace App\Admin\Controllers;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Agency;
-use App\Models\Config;
-use Encore\Admin\Grid;
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\AdminUser;
-use App\Models\UserSallary;
-use Illuminate\Http\Request;
-use App\Facades\ManagerHelper;
-use App\Models\ShippingAgency;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
+use App\Models\Agency;
 use App\Models\AgencyMangerPullingOut;
-use App\Admin\Controllers\MainController;
+use App\Models\Bd;
+use App\Models\BdSalary;
+use App\Models\Config;
+use App\Models\User;
+use App\Models\UserSallary;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\InfoBox;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends MainController
 {
@@ -29,18 +31,78 @@ class ReportController extends MainController
 
         $title = match ($name) {
             'users'     => __('Host reports'),
-            'agencies'    => __('agencies report'),
-            'agencies_manger'  => __('admin.manger'),
+            'agencies'  => __('agencies report'),
+            'bd'        => __('BD report'),
             default     => __('Host reports'),
         };
 
-        return parent::index($content
+        $total_sallary = BdSalary::sum(DB::raw('salary - cut_amount'));
+
+        // Start building content
+        $content = $content
             ->title($title)
-            ->description(__(request('desc', 'users')))
-            ->row(function ($row) {
-                $row->column(2, view('admin.grid.common.actions'));
-                $row->column(10, $this->grid());
-            }));
+            ->description(__(request('desc', 'users')));
+
+        // BD total salary card
+        if ($name === 'bd') {
+            $formattedSalary = number_format($total_sallary, 2);
+            $label = __('total_sallary');
+
+            Admin::style('
+                .bd-stat-wrapper {
+                    display: flex;
+                    justify-content: center;
+                    width: 100%;
+                    margin-bottom: 20px;
+                }
+                .bd-stat-card {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 24px;
+                    background: linear-gradient(135deg, #1e2632 0%, #161d27 100%);
+                    border-radius: 16px;
+                    padding: 24px 48px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                    border: 1px solid rgba(60, 141, 188, 0.3);
+                    min-width: 320px;
+                }
+                .bd-stat-icon {
+                    width: 56px;
+                    height: 56px;
+                    background: rgba(60, 141, 188, 0.15);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 28px;
+                    color: #3c8dbc;
+                }
+                .bd-stat-info { display: flex; flex-direction: column; align-items: center; }
+                .bd-stat-label { font-size: 14px; color: #a8b5c4; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+                .bd-stat-value { font-size: 36px; font-weight: 700; color: #3c8dbc; margin-top: 4px; }
+            ');
+
+            $content->row("
+                <div class='bd-stat-wrapper'>
+                    <div class='bd-stat-card'>
+                        <div class='bd-stat-icon'><i class='fa fa-dollar'></i></div>
+                        <div class='bd-stat-info'>
+                            <span class='bd-stat-label'>{$label}</span>
+                            <span class='bd-stat-value'>\${$formattedSalary}</span>
+                        </div>
+                    </div>
+                </div>
+            ");
+        }
+
+        // main row
+        $content->row(function ($row) {
+            $row->column(2, view('admin.grid.common.actions'));
+            $row->column(10, $this->grid());
+        });
+
+        return parent::index($content);
     }
 
     protected function grid()
@@ -53,9 +115,6 @@ class ReportController extends MainController
         );
 
         $grid = $this->{$name}();
-        $grid->disableExport();
-        $grid->disableActions();
-        $grid->disableCreateButton();
 
         return $grid;
     }
@@ -198,14 +257,6 @@ class ReportController extends MainController
                     </div>
                 </div>";
         });
-        // $grid->column('monthly_diamond_received', __('diamond'))->display(function () {
-        //     $diamond = @$this->getTotalDiamond(request('month'), request('year')) ?? 0;
-        //     $image = asset('images/diamond.jpg'); // Adjust path as needed
-        //     return "<div style='display: flex; align-items: center; '>
-        //             <span>{$diamond}</span>
-        //             <img src='{$image}' alt='USD' width='20' height='20'>
-        //         </div>";
-        // });
 
         $grid->column('diamonds', __('diamond'))->display(function ($v) {
             $diamond = floor($v ?? 0);
@@ -219,9 +270,7 @@ class ReportController extends MainController
         $grid->column('target', __('Target'))->display(function () {
             return $this->latestTarget->target_id ?? 0;
         });
-        // $grid->column('expenses', __('expenses'))->display(function () {
-        //     return @$this->getTotalCutAmount(request('month'), request('year')) ?? 0;
-        // });
+
 
         $grid->column('expenses', __('Expenses'))->display(function () {
             $url = admin_url('expenses') . '?' . http_build_query([
@@ -249,15 +298,6 @@ class ReportController extends MainController
                 });
          JS);
 
-        // $grid->column('total', __('salary'))->display(function () {
-        //     $salary = $this->getSalary(request('month'), request('year')) ?? 0;
-        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
-        //     return "<div style='display: flex; align-items: center;'>
-        //             <span>{$salary}</span>
-        //             <img src='{$image}' alt='USD' width='20' height='20'>
-        //         </div>";
-        // });
-
         $grid->column('total', __('salary'))->display(function ($v) {
             $salary = round($v, 2) ?? 0;
             $image = asset('images/dollar.jpg'); // Adjust path as needed
@@ -266,9 +306,6 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
-        // $grid->column('sallary_year', __('Year'))->display(function () {
-        //     return $this->latestUserSallary?->year ?? '-';
-        // });
 
         $grid->column('sallary_year', __('Year'))->display(function () {
             return $this->latest_salary_year ?? '-';
@@ -279,54 +316,11 @@ class ReportController extends MainController
             $monthName = Carbon::create()->month($month)->translatedFormat('F'); // اسم الشهر حسب اللغة
 
             $sallary = $this->userSallary;
-            // ->where('month', $month)
-            // ->where('year', request('year', now()->year))
-            // ->first();
+
 
             return $sallary ? $monthName : '-';
         });
 
-        // $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
-
-        //      $sallary = $this->userSallary()->first();
-
-        //     if (!$sallary || !$sallary->extras) {
-        //         return '<span style="color: #aaa;">No Data</span>';
-        //     }
-
-        //     $extras = json_decode($sallary->extras, true);
-
-        //     $momentUpload = $extras['moment']['upload'] ?? '-';
-        //     $momentLikes = $extras['moment']['likes'] ?? '-';
-        //     $momentComments = $extras['moment']['comments'] ?? '-';
-
-        //     $reelUpload = $extras['reel']['upload'] ?? '-';
-        //     $reelLikes = $extras['reel']['likes'] ?? '-';
-        //     $reelComments = $extras['reel']['comments'] ?? '-';
-
-        //     $labelMoments = __('Moments');
-        //     $labelReels = __('Reels');
-        //     $labelUploads = __('Uploads:');
-        //     $labelLikes = __('Likes:');
-        //     $labelComments = __('Comments:');
-
-        //     return <<<HTML
-        //         <div style="line-height: 1.6;">
-        //             <div><b>{$labelMoments}</b></div>
-        //             <ul style="margin-left: 8px;width: 149px;">
-        //                 <li><b>{$labelUploads}</b> {$momentUpload}</li>
-        //                 <li><b>{$labelLikes}</b> {$momentLikes}</li>
-        //                 <li><b>{$labelComments}</b> {$momentComments}</li>
-        //             </ul>
-        //             <div><b>{$labelReels}</b></div>
-        //             <ul style="margin-left: 8px;width: 149px;">
-        //                 <li><b>{$labelUploads}</b> {$reelUpload}</li>
-        //                 <li><b>{$labelLikes}</b> {$reelLikes}</li>
-        //                 <li><b>{$labelComments}</b> {$reelComments}</li>
-        //             </ul>
-        //         </div>
-        //     HTML;
-        // });
 
         $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
             $userId = $this->id;
@@ -384,6 +378,11 @@ class ReportController extends MainController
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . route('custom-export-users', ['month' => request('month'), 'year' => request('year'), 'agency_id' => request('agency_id'), 'id' => request('id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
         });
+
+        $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+
 
         return $grid;
     }
@@ -493,35 +492,21 @@ class ReportController extends MainController
                     </a>";
         });
 
-        // $grid->column('target', __('target'))->display(function () {
-        //     return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
-        // });
 
-        //  $grid->column('target', __('target'))->display(fn($v) => floor($v ?? 0));
+
         $grid->column('total_target', __('target'))->display(function ($v) {
             $value = is_array($v) ? ($v['target'] ?? 0) : $v;
             return floor((float) $value);
         });
-        // $grid->column('net_salary', __('Net Salary'))->display(function () {
-        //     return @$this->getTotalNetSallaryAgency(request('month'), request('year')) ?? 0;
-        // });
+
 
         $grid->column('net_salary', __('Net Salary'))->display(fn($v) => round($v, 2));
-        // $grid->column('expenses', __('expenses'))->display(function () {
-        //     return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
-        // });
+
 
         $grid->column('expenses', __('expenses'))->display(fn($v) => round($v, 2));
 
 
-        // $grid->column('total', __('salary'))->display(function () {
-        //     $salary = $this->getSalaryWithOutCutAmountAgency(request('month'), request('year')) ?? 0;
-        //     $image = asset('images/dollar.jpg');
-        //     return "<div style='display: flex; align-items: center;'>
-        //             <span>{$salary}</span>
-        //             <img src='{$image}' alt='USD' width='20' height='20'>
-        //         </div>";
-        // });
+
 
         $grid->column('total_salary', __('salary'))->display(function ($v) {
             $salary = round($v, 2);
@@ -532,9 +517,6 @@ class ReportController extends MainController
                 </div>";
         });
 
-        // $grid->column('hosts', __('dashboard.hosts'))->display(function () {
-        //     return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
-        // });
 
         $grid->column('users_count', __('dashboard.hosts'))->display(function ($value) {
             return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $value . '</a>';
@@ -550,6 +532,9 @@ class ReportController extends MainController
             $tools->append('<a href="' . route('agency-export-report') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
         });
 
+        $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
 
         return $grid;
     }
@@ -580,23 +565,21 @@ class ReportController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = $this->user ? url("admin/users/{$this->user->id}") : 0;
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
+            
+            return "<div class='user-card'>
                     $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    <div class='user-info'>
+                       <a href='{$showUrl}' class='user-name'>$name</a>
+                       <span class='user-uuid'>UUID: $uid</span>
                     </div>
                 </div>";
-        });;
+        });
 
         // $grid->column('due1', __('due'))->display(function ($_) {
         //     $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
@@ -606,35 +589,117 @@ class ReportController extends MainController
         //             <img src='{$image}' alt='USD' width='20' height='20'>
         //         </div>";
         // });
+        // Add custom styling for agencies manager table
+        Admin::style('
+            .agencies-manager-table .due-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: 600;
+                font-size: 14px;
+                min-width: 100px;
+                justify-content: center;
+            }
+            .agencies-manager-table .due-badge.loading {
+                background: #f0f0f0;
+                color: #888;
+            }
+            .agencies-manager-table .due-badge.positive {
+                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                color: #155724;
+                border: 1px solid #28a745;
+            }
+            .agencies-manager-table .due-badge.zero {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                color: #6c757d;
+                border: 1px solid #dee2e6;
+            }
+            .agencies-manager-table .user-card {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 8px;
+                border-radius: 12px;
+                transition: background 0.2s;
+            }
+            .agencies-manager-table .user-card:hover {
+                background: #f8f9fa;
+            }
+            .agencies-manager-table .user-info {
+                display: flex;
+                flex-direction: column;
+            }
+            .agencies-manager-table .user-name {
+                font-weight: 600;
+                color: #333;
+                text-decoration: none;
+            }
+            .agencies-manager-table .user-uuid {
+                font-size: 12px;
+                color: #888;
+                font-family: monospace;
+            }
+            .agencies-manager-table .spinner {
+                width: 16px;
+                height: 16px;
+                border: 2px solid #ddd;
+                border-top-color: #28a745;
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+            }
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        ');
+
         $grid->column('due', __('Due'))->display(function () {
             $url = admin_url('due-salary') . '?' . http_build_query([
                 'id'     => $this->id,
                 'app_id' => $this->app_id,
             ]);
 
-            $image = asset('images/dollar.jpg');
-
             return <<<HTML
-            <div class="due-salary"
-                data-url="{$url}"
-                style="display:flex;align-items:center;gap:6px;">
-                <span class="salary-value">...</span>
-                <img src="{$image}" alt="USD" width="20" height="20">
+            <div class="due-salary due-badge loading" data-url="{$url}">
+                <div class="spinner"></div>
+                <span class="salary-value">جاري التحميل...</span>
             </div>
             HTML;
         });
+
         Admin::script(<<<JS
+            // Add agencies-manager-table class to table for styling
+            document.querySelector('.grid-table')?.classList.add('agencies-manager-table');
+            
             document.querySelectorAll('.due-salary').forEach(el => {
                 fetch(el.dataset.url)
                     .then(res => res.json())
                     .then(data => {
-                        el.querySelector('.salary-value').innerText = data.salary;
+                        const value = parseFloat(data.salary) || 0;
+                        const valueEl = el.querySelector('.salary-value');
+                        valueEl.innerText = '$' + value.toLocaleString();
+                        
+                        // Remove spinner and loading class
+                        el.querySelector('.spinner')?.remove();
+                        el.classList.remove('loading');
+                        
+                        // Add appropriate class based on value
+                        if (value > 0) {
+                            el.classList.add('positive');
+                        } else {
+                            el.classList.add('zero');
+                        }
                     })
                     .catch(() => {
-                        el.querySelector('.salary-value').innerText = '0';
+                        const valueEl = el.querySelector('.salary-value');
+                        valueEl.innerText = '$0';
+                        el.querySelector('.spinner')?.remove();
+                        el.classList.remove('loading');
+                        el.classList.add('zero');
                     });
             });
-            JS);
+        JS);
         $grid->export(function ($export) {
             $export->filename('report');
             $export->column('uuid', function ($value, $original) {
@@ -652,7 +717,160 @@ class ReportController extends MainController
         return $grid;
     }
 
+    protected function bd()
+    {
+        $grid = new Grid(new Bd());
+        $countryID = session('filter_country_id');
 
+        $grid->disableRowSelector();
+
+        $grid->model()->with([
+            'bdSalaries',
+            'appUser',
+            'appUser.profile',
+            'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->where('app_id', '!=', 0)
+            ->addSelect([
+                'net_salary_calc' => DB::table('bd_salaries')
+                    ->selectRaw('COALESCE(SUM(salary - cut_amount), 0)')
+                    ->whereColumn('bd_salaries.bd_id', 'admin_users.id')
+            ])
+            ->orderByDesc('net_salary_calc');
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+            $filter->expand();
+            $filter->where(function ($query) {
+                $value = $this->input;
+                $query->where('id', $value)
+                    ->orWhereHas('appUser', function ($q) use ($value) {
+                        $q->where('uuid', $value);
+                    });
+            }, __('BD ID / User UUID'), 'bd_or_uuid');
+        });
+
+        // Add BD table styling
+        Admin::style('
+            .bd-report-table .bd-card {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 8px;
+                border-radius: 12px;
+                transition: all 0.2s ease;
+            }
+            .bd-report-table .bd-card:hover {
+                background: rgba(40, 167, 69, 0.05);
+                transform: translateX(4px);
+            }
+            .bd-report-table .bd-info {
+                display: flex;
+                flex-direction: column;
+            }
+            .bd-report-table .bd-name {
+                font-weight: 600;
+                color: #333;
+                text-decoration: none;
+                font-size: 14px;
+            }
+            .bd-report-table .bd-meta {
+                font-size: 12px;
+                color: #888;
+                font-family: monospace;
+            }
+            .bd-report-table .due-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 10px 20px;
+                border-radius: 25px;
+                font-weight: 700;
+                font-size: 15px;
+                min-width: 120px;
+                justify-content: center;
+                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                color: #155724;
+                border: 2px solid #28a745;
+                box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+            }
+            .bd-report-table .due-badge.zero {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                color: #6c757d;
+                border: 2px solid #dee2e6;
+                box-shadow: none;
+            }
+            .bd-report-table .due-badge i {
+                color: #28a745;
+                font-size: 16px;
+            }
+        ');
+
+        $grid->column('id', __('Id'));
+        
+        $grid->column('username', __('account dashboard'))->display(function ($name) {
+            $uid = @$this->id;
+            $path = @$this?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/usersBd/{$this->id}");
+            
+            return "<div class='bd-card'>
+                    $image
+                    <div class='bd-info'>
+                       <a href='{$showUrl}' class='bd-name'>$name</a>
+                       <span class='bd-meta'>BD ID: $uid</span>
+                    </div>
+                </div>";
+        });
+
+        $grid->column('appUser.name', __('account user'))->display(function ($name) {
+            $uid = @$this->appUser->uuid;
+            $path = @$this?->appUser->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this->appUser ? url("admin/users/{$this->appUser->id}") : 0;
+            
+            return "<div class='bd-card'>
+                    $image
+                    <div class='bd-info'>
+                       <a href='{$showUrl}' class='bd-name'>$name</a>
+                       <span class='bd-meta'>UUID: $uid</span>
+                    </div>
+                </div>";
+        });
+
+        $grid->column('due', __('Due'))->display(function () {
+            $salary = round($this->net_sallary ?? 0, 2);
+            $class = $salary > 0 ? '' : 'zero';
+            return "<div class='due-badge {$class}'>
+                    <i class='fa fa-dollar'></i>
+                    <span>" . number_format($salary, 2) . "</span>
+                </div>";
+        });
+
+        $grid->disableExport();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+        
+        // Add bd-report-table class
+        Admin::script("
+            document.querySelector('.grid-table')?.classList.add('bd-report-table');
+        ");
+        
+        return $grid;
+    }
 
 
     public function momentsReels(Request $request)

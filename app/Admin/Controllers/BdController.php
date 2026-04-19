@@ -125,8 +125,28 @@ class BdController extends MainController
             ->orderByDesc('id');
 
         $grid->filter(function ($filter) {
-            $filter->like('appUser.uuid', __('App User UUID'));
-            $filter->like('appUser.name', __('User Name'));
+            $filter->disableIdFilter();
+            $filter->expand();
+
+            // Column 1: User & BD Info
+            $filter->column(1 / 3, function ($filter) {
+                $filter->like('appUser.uuid', __('App User UUID'));
+                $filter->like('appUser.name', __('User Name'));
+                $filter->like('username', __('BD Username'));
+            });
+
+            // Column 2: Country & Super Admin
+            $filter->column(1 / 3, function ($filter) {
+                $filter->equal('country_id', __('Country'))->select(Country::pluck('name', 'id')->toArray());
+                $filter->equal('parent_id', __('Super Admin'))->select(SuperAdmin::pluck('username', 'id')->toArray());
+                $filter->equal('transfer_salary', __('transfer_salary'))->select([0 => __('No'), 1 => __('Yes')]);
+            });
+
+            // Column 3: Date & ID
+            $filter->column(1 / 3, function ($filter) {
+                $filter->equal('id', __('Id'));
+                $filter->between('created_at', __('Created at'))->datetime();
+            });
         });
         $grid->column('id', __('Id'));
         $grid->column('username', __('Bd'))->display(function ($name) {
@@ -671,6 +691,7 @@ class BdController extends MainController
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
+            $filter->equal('country_id', __('Country'))->select(Country::pluck('name', 'id')->toArray());
         });
         $grid->column('id', __('Id'));
         $grid->column('username', __('Bd'))->display(function ($name) {

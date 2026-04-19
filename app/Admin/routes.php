@@ -88,6 +88,7 @@ use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\RoleControllerNew;
+use App\Admin\Controllers\RoomBackgroundManagerController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Admin\Controllers\RoomMicController;
@@ -99,6 +100,7 @@ use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
+use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
@@ -253,6 +255,9 @@ Route::group(
         Route::get('profile', [AdminAuthController::class, 'index']);
         Route::resource('payment-with-method', PaymentMethodController::class);
         Route::post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
+
+        Route::get('utd-pay-gateways', [UtdPayGatewayController::class, 'index']);
+        Route::post('utd-pay-gateways/toggle', [UtdPayGatewayController::class, 'toggle']);
         Route::resource('users-settings', UserSettingController::class);
 
 
@@ -382,6 +387,7 @@ Route::group(
         Route::post("accept-change-country", [ChangeCountryRequestController::class, "changeCountry"]);
 
         Route::resource('backgrounds', 'BackgroundController');
+        Route::resource('room-background-manager', RoomBackgroundManagerController::class);
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
 

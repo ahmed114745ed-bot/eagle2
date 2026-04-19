@@ -584,7 +584,6 @@ class UserController extends Controller
 
         $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
 
-        //  \Log::info("Unread messages for user {$id}", ['count' => $unreadMessagesCount]);
 
         $response['chat_id'] = $chatRoom->id ?? null;
         $response['unread_messages_count'] = $unreadMessagesCount;
@@ -1087,16 +1086,34 @@ public function zegoCredential(Request $request)
             return Common::apiResponse(false, __('invitation.already_registered'), $existing, 409);
         }
 
-        $this->createInvitation($userParent->id, $userId);
+        // Use transaction to prevent race condition
+        try {
+            DB::transaction(function () use ($userId, $userParent) {
+                // Lock for update to prevent concurrent requests
+                $existingInvitation = UserCodeInvitation::where('invited_id', $userId)
+                    ->lockForUpdate()
+                    ->first();
+                    
+                if ($existingInvitation) {
+                    throw new \Exception('already_invited');
+                }
 
+                $invitation = $this->createInvitation($userParent->id, $userId);
+                
+                $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
+                    'invited_id' => $userId
+                ]);
 
-        $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
-            'invited_id' => $userId
-        ]);
-
-        $this->rewardUser(Auth::user(), $this->getValue('invitation_invitee_reward'), 'invitation_invitee_reward', [
-            'parent_id' => $userParent->id
-        ]);
+                $this->rewardUser(Auth::user(), $this->getValue('invitation_invitee_reward'), 'invitation_invitee_reward', [
+                    'parent_id' => $userParent->id
+                ]);
+            });
+        } catch (\Exception $e) {
+            if ($e->getMessage() === 'already_invited') {
+                return Common::apiResponse(false, __('invitation.already_registered'), null, 409);
+            }
+            throw $e;
+        }
 
         CustomNotification::codeInvitationUses($userParent, Auth::user());
 
@@ -1158,7 +1175,7 @@ public function zegoCredential(Request $request)
 
     private function rewardUser(User $user, int $reward, string $type, array $meta = []): void
     {
-        $amountBefore =  Common::getCurrentBalance($user->id);
+        $amountBefore = Common::getCurrentBalance($user->id);
 
         if ($reward > 0) {
             $user->increment('di', $reward);
@@ -1168,6 +1185,19 @@ public function zegoCredential(Request $request)
                 $amountBefore,
                 UserCoinLogType::INVITATION_CODE,
             );
+            
+            \Log::info('Invitation reward added', [
+                'user_id' => $user->id,
+                'reward' => $reward,
+                'amount_before' => $amountBefore,
+                'type' => $type
+            ]);
+        } else {
+            \Log::warning('Invitation reward is 0', [
+                'user_id' => $user->id,
+                'type' => $type,
+                'reward_value' => $reward
+            ]);
         }
     }
 

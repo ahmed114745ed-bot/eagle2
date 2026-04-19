@@ -61,6 +61,7 @@ class SettingController extends MainController
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
+        $utdGamesSettings = $gameSettings->get('utd_games');
         $isThemeEnabled = Common::getSettingValue('isThemeEnabled') ?? 0;
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
@@ -74,6 +75,7 @@ class SettingController extends MainController
                 'zeroGamesSettings',
                 'bytesunSettings',
                 'quantumNexusSettings',
+                'utdGamesSettings',
                 'pusher_app_secret',
                 'chargeTabType',
                 'zego_token',
@@ -269,72 +271,21 @@ class SettingController extends MainController
         }
     }
 
-    public function initCoinRates()
+
+    public function updateRoomMode(Request $request): JsonResponse
     {
-        $appBaseRate = \App\Services\CoinRateService::getAppBaseRate();
-        $superAdminCoins = Setting::where('key', 'super_admin_coins')->value('value') ?? $appBaseRate;
-        $areaManagerCoins = Setting::where('key', 'area_manager_coins')->value('value') ?? Setting::where('key', 'zones_coins')->value('value') ?? $appBaseRate;
-        $zones_coins =Setting::where('key', 'zones_coins')->value('value') ;
-        // Super Admins
-        $superAdmins = \App\Models\AdminUser::where('type', 'superadmin')->get();
-        foreach ($superAdmins as $admin) {
-            \App\Models\AdminCoinRate::updateOrCreate(
-                ['admin_id' => $admin->id],
-                ['rate' => $superAdminCoins]
+        try {
+            Setting::updateOrCreate(
+                ['key' => $request->field],
+                ['value' => $request->value]
             );
+
+            Cache::forget($request->field);
+            Cache::put($request->field, $request->value, now()->addYear());
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-
-        // Area Managers
-        $areaManagers = \App\Models\AdminUser::where('type', 'area-manager')->get();
-        foreach ($areaManagers as $manager) {
-            \App\Models\AdminCoinRate::updateOrCreate(
-                ['admin_id' => $manager->id],
-                ['rate' => $areaManagerCoins]
-            );
-        }
-
-        $userCoinsConfig = \App\Models\Setting::where('key', 'user_coins')->first();
-        $userRate = (float) $userCoinsConfig->value ;
-
-        \App\Models\Setting::updateOrCreate(
-            ['key' => 'user_transfer_coin_rate'],
-            ['value' => $userRate]
-        );
-        \App\Models\Setting::updateOrCreate(
-            ['key' => 'user_transfer_rate_enabled'],
-            ['value' => 1]
-        );
-
-        \App\Models\Setting::updateOrCreate(
-            ['key' => 'app_coin_rate'],
-            ['value' => $zones_coins]
-        );
-        \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_coin_rate');
-        \Illuminate\Support\Facades\Cache::forget('user_transfer_coin_rate');
-        \Illuminate\Support\Facades\Cache::forget('setting_user_transfer_rate_enabled');
-        \Illuminate\Support\Facades\Cache::forget('user_transfer_rate_enabled');
-
-        return 'تمت تهيئة قيم المشرفين بنجاح (Init Admin Rates Done)';
-    }
-
-    public function initUserCoinRates()
-    {
-
-        return 'تمت تهيئة قيم المستخدمين بنجاح (Init User Rates Done)';
-    }
-
-    public function backfillCharges()
-    {
-        set_time_limit(300);
-        $exitCode = \Artisan::call('charges:backfill', ['--chunk' => 500]);
-
-        $output = \Artisan::output();
-
-        if ($exitCode === 0) {
-           return  'تمت العملية تم تعبئة بيانات الشحنات القديمة بنجاح!';
-        } else {
-            return 'خطأ حدث خطأ أثناء تعبئة البيانات. راجع السجلات.';
-        }
-
     }
 }

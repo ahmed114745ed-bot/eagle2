@@ -167,16 +167,20 @@ class UserCommon
 
     public static function UserEarnedInvitation($userId, $amount, $chargeId = 0)
     {
-        if (self::isStopInvitationValid()) {
-            return;
-        }
+        // if (self::isStopInvitationValid()) {
+        //     return;
+        // }
         $invitation = self::getInvitation($userId);
         if (!$invitation || !self::isInvitationValid($invitation)) {
             return;
         }
 
-        $parent = User::find($invitation->user_id);
+        $parent = User::find($invitation->invited_id);
         if (!$parent) {
+            return;
+        }
+
+        if (!$parent->userSetting->show_invite_code) {
             return;
         }
 
@@ -190,7 +194,8 @@ class UserCommon
 
     private static function getInvitation($userId)
     {
-        return UserCodeInvitation::where("invited_id", $userId)->first();
+        // dd($userId);
+        return UserCodeInvitation::where("user_id", $userId)->first();
     }
     // private static function isStopInvitationValid()
     // {
@@ -199,6 +204,8 @@ class UserCommon
 
     private static function isStopInvitationValid()
     {
+
+        return  settings()->get('stop_invite_code') ?? 0;
         return getSettingCash('invite_code') ?? 0;
     }
 
@@ -208,11 +215,13 @@ class UserCommon
     private static function isInvitationValid($invitation): bool
     {
         $invitationDate = Carbon::parse($invitation->created_at)->format("Y-m-d");
-
+        $month =   Common::getConfig('invitation_code_date') ?? 0;
+        if ($month == 0) {
+            return true;
+        }
         $validUntil = Carbon::parse($invitationDate)
-            ->addMonths(settings()->get('invitation_code_date') ?? 1)
+            ->addMonths($month)
             ->format('Y-m-d');
-
         return date("Y-m-d") < $validUntil;
     }
 
@@ -248,7 +257,6 @@ class UserCommon
             $amountBefore,
             UserCoinLogType::INVITATION_CHARGE_EARNINGS,
         );
-
         InvitationEarningHelper::addEarning(
             parentId: $parent->id,
             userId: $invitation->invited_id,
@@ -388,11 +396,10 @@ class UserCommon
     }
 
     // public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null, $sendNotification = 1)
-
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null, $sendNotification = 1, $vip_gift_message = null, $vip_img = null)
     {
         DB::beginTransaction();
-        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification);
+        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification, $vip_gift_message, $vip_img);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -424,7 +431,6 @@ class UserCommon
     public static function removeBadgeFromUserByReceiverType(User $user, $id = null, $receiveType)
     {
         UserBadge::where('receive_type', $receiveType)->where('user_id', $user->id)->delete();
-        
     }
 
 
@@ -491,25 +497,30 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null, $feature = null)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null, $feature = null, $message = null)
     {
         $title = __('congratulations');
         $body = $user->name . ':' . __('You have received a gift: :ware', [
             'ware' => $ware->name
         ]);
+        $data = []; // Initialize $data array
+
         if ($feature) {
             $body = $user->name . ':' . __('wareGiftNotification', [
                 'wareName' => $ware->name,
                 'type'     => $feature->name
             ]);
-
-            // Log::info('Adding event ware to user', [
-            //     'user_id' => $user->id,
-            //     'ware_id' => $ware->id,
-            //     'feature' => $feature->name,
-            // ]);
         }
 
+        if ($message) {
+            $body = $message;
+            $img = $ware->show_img;
+            if ($img && !str_starts_with($img, 'http')) {
+                $data['image'] = 'https://storage.googleapis.com/' . env('GOOGLE_CLOUD_STORAGE_BUCKET') . '/' . $img;
+            } else {
+                $data['image'] = $img;
+            }
+        }
 
         DB::beginTransaction();
         try {
@@ -543,7 +554,7 @@ class UserCommon
                 ->where('id', $user->id)
                 ->value('notification_id');
 
-            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+            Common::send_firebase_notification($tokens_notfacion, $title, $body, '', $data);
         } catch (\Exception $exception) {
             DB::rollBack();
             \Log::error("حدث خطأ أثناء منح مكافأة الإنجاز: " . $exception->getMessage(), [
@@ -551,7 +562,7 @@ class UserCommon
                 'reward_id' => $reward->id ?? 'N/A',
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
-                'trace' => $exception->getTraceAsString(), 
+                'trace' => $exception->getTraceAsString(),
             ]);
             throw $exception;
         }
@@ -575,7 +586,6 @@ class UserCommon
 
 
             $pack = Pack::query()->create($arr);
-            //  \Log::info('Created Pack:', $pack->toArray());
 
             if ($sender) {
                 $pack->senderable()->associate($sender);

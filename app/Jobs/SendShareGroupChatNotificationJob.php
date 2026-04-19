@@ -22,6 +22,9 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     protected $text;
     protected $groupChatResource;
 
+    // ⏱️ زيادة timeout للـ job لأنه قد يستغرق وقتاً طويلاً عند معالجة آلاف الإشعارات
+    public $timeout = 300; // 5 دقائق
+
     public function __construct(User $user, ?string $text, array $groupChatResource)
     {
         $this->user = $user;
@@ -65,7 +68,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             if (!$roomId) {
                 return;
             }
-            $room = Room::find($roomId);
+            $room = Room::select('id', 'room_cover', 'final_room_image')->find($roomId);
             
             if (!$room) {
                 return;
@@ -79,57 +82,23 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
                 $roomImage = getImagePath($roomImage);
             }
             
-            $notificationsIdsChunks = User::withoutAppends()->where('notification_id', '!=', null)
-                ->select(['id', 'notification_id', 'lan'])
-                ->orderByDesc('online')
+            // ✅ تحسين الأداء: استخدام cursor بدلاً من get() لتقليل استهلاك الذاكرة
+            $notificationsIdsChunks = User::withoutAppends()
+                ->whereNotNull('notification_id')
                 ->where('id', '!=', $this->user->id)
+                ->select(['id', 'notification_id', 'lan'])
+                ->groupBy('notification_id') // ✅ استخدام groupBy للتأكد من uniqueness على مستوى الـ database
+                ->orderByDesc('online')
                 ->limit(5000)
-                ->get()
-                ->unique('notification_id')
+                ->cursor()
                 ->chunk(800);
 
             $totalSent = 0;
             $totalFailed = 0;
 
             foreach ($notificationsIdsChunks as $chunkIndex => $notificationsIds) {
-            
-
-                foreach ($notificationsIds as $notificationUser) {
-                    try {
-                        $userLanguage = $notificationUser->lan ?? 'en';
-                        $localizedMessage = __('share_room_message', [], $userLanguage);
-                        
-                        $title = ($this->user->name ?? '') . ' (' . config('app.name_en') .')';
-                        
-                        $result = Common::send_firebase_notification_with_room_image(
-                            $notificationUser->notification_id,
-                            $title,
-                            $localizedMessage,
-                            $roomImage,
-                            $roomId,
-                            data: [
-                                'title' => $title,
-                                'sub-title' => $localizedMessage,
-                                'room_id' => $roomId,
-                                'room_image' => $roomImage
-                            ],
-                            messageType: 'share-room',
-                            user: $this->user
-                        );
-
-                        if ($result) {
-                            $totalSent++;
-                        } else {
-                            $totalFailed++;
-                        }
-                    } catch (\Throwable $e) {
-                        $totalFailed++;
-                        Log::error('SendShareGroupChatNotificationJob: Failed to send to user', [
-                            'user_id' => $notificationUser->id ?? 'unknown',
-                            'error' => $e->getMessage()
-                        ]);
-                    }
-                }
+                // ✅ معالجة الـ chunk بشكل متوازي أو إرسال دفعات
+                $this->sendNotificationBatch($notificationsIds, $roomId, $roomImage, $translatedMessage, $totalSent, $totalFailed);
             }
 
         
@@ -138,6 +107,50 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
                 'user_id' => $this->user->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * ✅ دالة منفصلة لإرسال دفعة من الإشعارات
+     */
+    protected function sendNotificationBatch($notificationsIds, $roomId, $roomImage, $translatedMessage, &$totalSent, &$totalFailed): void
+    {
+        $notificationIds = $notificationsIds->pluck('notification_id')->toArray();
+        
+        if (empty($notificationIds)) {
+            return;
+        }
+
+        try {
+            $title = ($this->user->name ?? '') . ' (' . config('app.name_en') . ')';
+            
+            $result = Common::send_firebase_notification_with_room_image(
+                $notificationIds,
+                $title,
+                $translatedMessage,
+                $roomImage,
+                $roomId,
+                data: [
+                    'title' => $title,
+                    'sub-title' => $translatedMessage,
+                    'room_id' => $roomId,
+                    'room_image' => $roomImage
+                ],
+                messageType: 'share-room',
+                user: $this->user
+            );
+
+            if ($result) {
+                $totalSent += count($notificationIds);
+            } else {
+                $totalFailed += count($notificationIds);
+            }
+        } catch (\Throwable $e) {
+            $totalFailed += count($notificationIds);
+            Log::error('SendShareGroupChatNotificationJob: Failed to send batch', [
+                'batch_size' => count($notificationIds),
+                'error' => $e->getMessage()
             ]);
         }
     }

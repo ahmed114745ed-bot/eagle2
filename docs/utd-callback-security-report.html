@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTD Callback Security Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .header .subtitle {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        .badge {
+            display: inline-block;
+            background: #166534;
+            color: #4ade80;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 1px solid #334155;
+        }
+        .card h2 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h2 .icon {
+            font-size: 22px;
+        }
+        .endpoint {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            color: #38bdf8;
+            direction: ltr;
+            text-align: left;
+            margin-bottom: 8px;
+        }
+        .endpoint .method {
+            color: #fbbf24;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th {
+            background: #334155;
+            color: #cbd5e1;
+            padding: 12px 16px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #334155;
+            font-size: 14px;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .response-block {
+            background: #0f172a;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            direction: ltr;
+            text-align: left;
+            line-height: 1.6;
+        }
+        .status-pass {
+            color: #4ade80;
+            font-weight: 600;
+        }
+        .status-fail {
+            color: #f87171;
+            font-weight: 600;
+        }
+        .result-icon {
+            font-size: 18px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .summary-item {
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .summary-item .value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .summary-item .label {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+        .green { color: #4ade80; }
+        .red { color: #f87171; }
+        .yellow { color: #fbbf24; }
+        .footer {
+            text-align: center;
+            color: #475569;
+            font-size: 12px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="header">
+            <h1>UTD Callback Security Report</h1>
+            <div class="subtitle">POST /api/utd-callback &mdash; Replay Attack Test</div>
+            <div class="badge">PASSED</div>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">🎯</span> الهدف</h2>
+            <p>التأكد إن الـ endpoint مش بيزود فلوس لو اتضرب أكتر من مرة بنفس الـ order (حماية من Replay Attacks).</p>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">🔗</span> الـ Endpoint</h2>
+            <div class="endpoint">
+                <span class="method">POST</span> https://eagle.utdsoftware.com/api/utd-callback
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">🧪</span> نتائج الاختبار</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الحالة</th>
+                        <th>النتيجة</th>
+                        <th>الاستجابة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>ضرب الـ callback بـ order موجود<br><code style="color:#38bdf8;font-size:12px;">orderId: 1482</code></td>
+                        <td><span class="result-icon green">&#10004;</span></td>
+                        <td>
+                            <div class="response-block">
+                                {"status":"failed",<br>"reason":"Transaction already processed"}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>تكرار نفس الطلب (Replay)</td>
+                        <td><span class="result-icon green">&#10004;</span></td>
+                        <td>
+                            <div class="response-block">
+                                {"status":"failed",<br>"reason":"Transaction already processed"}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>order وهمي مش موجود<br><code style="color:#38bdf8;font-size:12px;">orderId: 99999</code></td>
+                        <td><span class="result-icon green">&#10004;</span></td>
+                        <td>
+                            <div class="response-block">
+                                {"status":"failed",<br>"reason":"Transaction not found"}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">📊</span> الملخص</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="value green">3/3</div>
+                    <div class="label">اختبارات ناجحة</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value green">0</div>
+                    <div class="label">فلوس مكررة</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value green">آمن</div>
+                    <div class="label">Replay Protection</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">✅</span> الخلاصة</h2>
+            <ul style="list-style: none; line-height: 2;">
+                <li><span class="green">&#10004;</span> تكرار الضرب على نفس الـ order <strong>مش بيزود فلوس</strong></li>
+                <li><span class="green">&#10004;</span> الـ orders الوهمية بترجع <strong>"Transaction not found"</strong></li>
+                <li><span class="green">&#10004;</span> الـ endpoint <strong>آمن</strong> ضد الـ Replay Attacks</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            Eagle Platform &mdash; Security Test Report &mdash; 15 April 2026
+        </div>
+
+    </div>
+</body>
+</html>

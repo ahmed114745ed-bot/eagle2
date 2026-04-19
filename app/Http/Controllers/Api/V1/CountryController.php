@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Index;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
@@ -22,9 +23,47 @@ class CountryController extends Controller
 
     public function allCountries(Request $request): JsonResponse
     {
-        $categoryId = $request->category_id;
-        $countries = $this->countryService->indexByHotAndSupporters($categoryId);
-        return Common::apiResponse(1, '', CountrySupportersResource::collection($countries));
+        try {
+  
+
+            $categoryId = $request->category_id;
+
+
+            $countries = $this->countryService->indexByHotAndSupporters($categoryId);
+
+            if ($countries === null) {
+                return Common::apiResponse(0, __('Failed to fetch countries data'), null, 500);
+            }
+
+            if (empty($countries)) {
+                return Common::apiResponse(1, __('No countries available'), CountrySupportersResource::collection($countries));
+            }
+
+      
+
+            // Transform to resource collection
+            $resourceCollection = CountrySupportersResource::collection($countries);
+
+            // Verify resource collection is not empty
+            if ($resourceCollection->isEmpty()) {
+                return Common::apiResponse(1, __('No countries available'), $resourceCollection);
+            }
+
+
+            return Common::apiResponse(1, '', $resourceCollection);
+
+        } catch (\Throwable $exception) {
+            // Log the exception with full details
+            Log::error('Error in allCountries method', [
+                'exception' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+                'category_id' => $request->category_id ?? null,
+            ]);
+
+            return Common::apiResponse(0, __('An error occurred while fetching countries'), null, 500);
+        }
     }
 
     public function getCountry($id)

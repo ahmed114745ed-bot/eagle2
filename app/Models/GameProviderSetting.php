@@ -31,15 +31,14 @@ class GameProviderSetting extends Model
 
     public function getAppKeyAttribute($value)
     {
-        if (!$value) {
-            return null;
-        }
+            if (!$value) {
+                return null;
+            }
 
-        try {
-            return Crypt::decryptString($value);
-        } catch (DecryptException $e) {
-            Log::warning("GameProviderSetting: Failed to decrypt app_key for provider [{$this->provider_code}]. The APP_KEY may have changed since this value was encrypted. Error: {$e->getMessage()}");
-            return null; // Return null instead of crashing
-        }
+            try {
+                return Crypt::decryptString($value);
+            } catch (\Exception $e) {
+                return $value;
+            }
     }
 }

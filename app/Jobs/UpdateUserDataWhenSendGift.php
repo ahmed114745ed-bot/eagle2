@@ -44,9 +44,10 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $receiverFeeRate =null;
         if ($luckyStatus == 1) {
             $version = Common::getSettingValue('lucky_gift_version');
-           if (in_array($version, [2, 3])) {
+           if (in_array($version, [4])) {
                 $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
             }
+            
            $hostPercentage  = $receiverFeeRate ?? getGiftPercentage('host_lucky_gift')  / 10;
         }else {
             $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
@@ -85,7 +86,6 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $receivedUsers = User::withoutAppends()->with(['agency', 'profile'])->whereIn('id', $receiversIds)->get();
 
         $price = $number * ($gift->price * $hostPercentage);
-        \Log::info('price: ' . $price);
         $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
 
         $cpIds = [];

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\LeaderCCgameController;
+use App\Http\Controllers\Api\V1\UtdGameController;
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'generalBan', 'update.last.seen'])
     ->group(function () {
@@ -36,4 +37,14 @@ Route::prefix('leader-cc-game')
     Route::post('get-user-info', [LeaderCCgameController::class, 'userInformation']);
     Route::post('change-balance', [LeaderCCgameController::class, 'updateGameCoin']);
     Route::post('make-up-orders', [LeaderCCgameController::class, 'makeUpOrders']);
+});
+
+Route::prefix('utd-game')
+    ->withoutMiddleware([\App\Http\Middleware\LogApiRequestResponse::class])
+    ->middleware(['verify.utd.signature', \App\Http\Middleware\MeasureRequestTimeMiddleware::class])
+    ->group(function () {
+
+    Route::post('get-user-info', [UtdGameController::class, 'getUserInfo']);
+    Route::post('change-balance', [UtdGameController::class, 'changeBalance']);
+    Route::post('make-up-orders', [UtdGameController::class, 'makeUpOrders']);
 });

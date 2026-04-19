@@ -17,11 +17,6 @@ class DeleteSubSuperAdminAction extends RowAction
 
     public function handle(Model $model, Request $request)
     {
-        \Log::info('DeleteSubSuperAdminAction handle method called', [
-            'model_id' => $model->id,
-            'model_class' => get_class($model),
-            'request_url' => $request->url(),
-            'request_method' => $request->method()
         ]);
         
         try {
@@ -30,15 +25,10 @@ class DeleteSubSuperAdminAction extends RowAction
                 $OldUserAppId->is_sub_super_admin = 0;
                 $OldUserAppId->save();
                 
-                \Log::info('Updated user is_sub_super_admin', [
-                    'user_id' => $OldUserAppId->id,
-                    'app_id' => $model->app_id
-                ]);
             }
 
             $model->delete();
             
-            \Log::info('Model deleted successfully', ['model_id' => $model->id]);
 
             return $this->response()->success('تم الحذف بنجاح')->refresh();
             
@@ -63,10 +53,6 @@ class DeleteSubSuperAdminAction extends RowAction
         $key = $this->getKey();
         
         // Log لتتبع المشكلة
-        \Log::info('DeleteSubSuperAdminAction HTML method called', [
-            'key' => $key,
-            'current_url' => request()->url(),
-            'action_class' => get_class($this)
         ]);
         
         return <<<HTML
@@ -81,7 +67,6 @@ class DeleteSubSuperAdminAction extends RowAction
     // Override الـ script method لإضافة JavaScript مخصص
     public function script()
     {
-        \Log::info('DeleteSubSuperAdminAction script method called');
         
         return <<<SCRIPT
         console.log('SuperAdmin Delete Script Loaded');

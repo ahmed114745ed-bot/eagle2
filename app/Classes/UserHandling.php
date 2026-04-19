@@ -84,10 +84,11 @@ class UserHandling
 
         // }
     }
-    public function kickUserFromAgency(User &$user, $isApp = 0): void
+    public function kickUserFromAgency(User &$user, $isApp = 0, $agencyId = null): void
     {
-        $this->handleUserSalaries($user);
-        $this->clearUserAgencyLogs($user);
+        
+        $this->handleUserSalaries($user, $agencyId);
+        $this->clearUserAgencyLogs($user, $agencyId);
         $this->updateUserJoinedAgency($user, $isApp);
         $this->resetUserAgencyData($user);
 
@@ -106,14 +107,15 @@ class UserHandling
         uploadMonthlyDiamondReceive($user->id, 0);
     }
 
-    private function handleUserSalaries(User $user)
+    private function handleUserSalaries(User $user, $agencyId = null)
     {
 
-            $agencyId = $user->agency_id;
+            $agencyId = $agencyId ?? $user->agency_id;
             $timezone = getTimezone();
             $currentMonth = now( $timezone)->month;
             $currentYear = now( $timezone)->year;
 
+       
             $userSalaries = UserSallary::query()
                 ->where('user_id', $user->id)
                 ->where('user_agency_id', $agencyId)
@@ -122,18 +124,23 @@ class UserHandling
                 ->where('is_finished', 0)
                 ->first();
 
-            if (!$userSalaries) return;
 
+            if (!$userSalaries) {
+                return;
+            }
+
+         
             if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
 
                 $userSalaries->update(['is_finished' => 1]);
+            } else {
             }
 
     }
 
-    private function clearUserAgencyLogs(User $user)
+    private function clearUserAgencyLogs(User $user, $agencyId = null)
     {
-        $agencyId = $user->agency_id;
+        $agencyId = $agencyId ?? $user->agency_id;
         GiftLog::query()->where('receiver_id', $user->id)
         ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();

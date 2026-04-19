@@ -37,10 +37,6 @@ class Chat implements ShouldBroadcast
 
     public function broadcastWith() : array
     {
-//        Log::info('Broadcasting chat event', [
-//            'user_id' => $this->user2->id,
-//            'chat_id' => $this->chat->id ?? null,
-//        ]);
 
         return (array) $this->chat;
     }

@@ -698,7 +698,7 @@ class GiftController extends MainController
     public function saveLuckyGiftVersion(Request $request)
     {
         $version = $request->input('lucky_gift_version');
-        if (in_array($version, [1, 2, 3])) {
+        if (in_array($version, [1, 2, 3, 4])) {
             Setting::updateOrCreate(['key' => 'lucky_gift_version'], ['value' => $version]);
             Cache::forget('lucky_gift_version');
             Cache::put('lucky_gift_version', $version);
@@ -739,6 +739,39 @@ class GiftController extends MainController
                 Cache::put($key, $request->input($key));
             }
         }
+
+        // Handle V7 FairLuck settings
+        // Percentage fields submitted as 0-100, stored as 0-1
+        $v7_pct_keys = ['V7_target_rtp', 'fair_luck_app_fee_rate', 'fair_luck_receiver_fee_rate', 'fair_luck_owner_fee_rate'];
+        foreach ($v7_pct_keys as $key) {
+            if ($request->has($key)) {
+                $value = (float) $request->input($key) / 100;
+                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $value]);
+                Cache::forget($key);
+                // Sync V7_app_fee_rate with fair_luck_app_fee_rate
+                if ($key === 'fair_luck_app_fee_rate') {
+                    \App\Models\FairLuckSetting::updateOrCreate(['key' => 'V7_app_fee_rate'], ['value' => $value]);
+                }
+            }
+        }
+
+        // Direct numeric V7 keys (stored as-is)
+        $v7_direct_keys = [
+            'V7_wallet_min', 'V7_wallet_tight', 'V7_wallet_target', 'V7_wallet_high', 'V7_wallet_drain',
+            'V7_negative_limit', 'V7_nowin_sensitivity', 'V7_win_base_sensitivity', 'V7_win_position_sensitivity',
+            'V7_boost_base_sensitivity', 'V7_boost_position_sensitivity', 'V7_wallet_weight', 'V7_rtp_weight',
+            'V7_nowin_floor', 'V7_rtp_activation', 'V7_max_loss_streak', 'V7_forced_win_mult',
+            'global_vault_negative_limit', 'coin_to_usd_rate',
+        ];
+        foreach ($v7_direct_keys as $key) {
+            if ($request->has($key)) {
+                \App\Models\FairLuckSetting::updateOrCreate(['key' => $key], ['value' => $request->input($key)]);
+                Cache::forget($key);
+            }
+        }
+
+        // Clear FairLuck settings cache so changes take effect immediately
+        \Illuminate\Support\Facades\Cache::forget('fair_luck:settings');
 
         admin_toastr(__('Settings updated successfully.'), 'success');
         return back();

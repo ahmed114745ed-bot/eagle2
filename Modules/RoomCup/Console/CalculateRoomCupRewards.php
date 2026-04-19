@@ -20,6 +20,7 @@ use Symfony\Component\Console\Command\Command as EnumCommand;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Facades\CustomNotification;
+use App\Models\GiftLog;
 
 
 
@@ -133,39 +134,100 @@ class CalculateRoomCupRewards extends Command
 
     private function processGiftsInPeriod(Carbon $start, Carbon $end): void
     {
+        $minTarget = RoomCupTarget::min('total');
+
         if ($this->type === 'daily') {
-            // Daily: process each gift record individually
-            TotalRoomGift::whereBetween('created_at', [$start, $end])
-                ->orderBy('id')
-                ->chunk(100, function ($gifts) {
-                    foreach ($gifts as $gift) {
-                        try {
-                            $this->processGift($gift);
-                        } catch (\Throwable $e) {
-                            $this->error("Failed to process gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()}");
-                            $this->logRoomCup("EXCEPTION processing gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()} | Trace: {$e->getTraceAsString()}");
-                        }
-                    }
-                });
-        } else {
-            // Weekly/Monthly: aggregate gifts per room
-            $aggregatedGifts = TotalRoomGift::whereBetween('created_at', [$start, $end])
+            // Daily: aggregate gifts from GiftLog per room for the day
+            $aggregatedGifts = GiftLog::whereBetween('created_at', [$start, $end])
                 ->select(
                     'room_id',
-                    DB::raw('SUM(current_total) as current_total'),
-                    DB::raw('SUM(number_of_visitors) as number_of_visitors'),
-                    DB::raw('MAX(id) as id')
+                    DB::raw('SUM(giftPrice) as current_total'),
                 )
+                ->whereNotNull('room_id')
                 ->groupBy('room_id')
+                ->having('current_total', '>=', $minTarget)
                 ->orderBy('room_id')
                 ->get();
 
+            // Get number_of_visitors from TotalRoomGift per room
+            $visitorsMap = TotalRoomGift::whereBetween('created_at', [$start, $end])
+                ->select(
+                    'room_id',
+                    DB::raw('SUM(number_of_visitors) as number_of_visitors')
+                )
+                ->groupBy('room_id')
+                ->pluck('number_of_visitors', 'room_id');
+
             foreach ($aggregatedGifts as $gift) {
                 try {
+                    $visitorsCount = $visitorsMap[$gift->room_id] ?? 0;
+
+                    $totalRoomGift = TotalRoomGift::firstOrCreate(
+                        [
+                            'room_id' => $gift->room_id,
+                            'created_at' => $start,
+                        ],
+                        [
+                            'current_total' => $gift->current_total,
+                            'number_of_visitors' => $visitorsCount,
+                            'updated_at' => now(),
+                        ]
+                    );
+
+                    $gift->id = $totalRoomGift->id;
+                    $gift->number_of_visitors = $visitorsCount;
+
                     $this->processGift($gift);
                 } catch (\Throwable $e) {
-                    $this->error("Failed to process gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()}");
-                    $this->logRoomCup("EXCEPTION processing gift ID: {$gift->id} | Room: {$gift->room_id} | Error: {$e->getMessage()} | Trace: {$e->getTraceAsString()}");
+                    $this->error("Failed to process gift | Room: {$gift->room_id} | Error: {$e->getMessage()}");
+                    $this->logRoomCup("EXCEPTION processing gift | Room: {$gift->room_id} | Error: {$e->getMessage()} | Trace: {$e->getTraceAsString()}");
+                }
+            }
+        } else {
+            // Weekly/Monthly: aggregate gifts from GiftLog per room
+            $aggregatedGifts = GiftLog::whereBetween('created_at', [$start, $end])
+                ->select(
+                    'room_id',
+                    DB::raw('SUM(giftPrice) as current_total'),
+                )
+                ->whereNotNull('room_id')
+                ->groupBy('room_id')
+                ->having('current_total', '>=', $minTarget)
+                ->orderBy('room_id')
+                ->get();
+
+            // Get number_of_visitors from TotalRoomGift per room
+            $visitorsMap = TotalRoomGift::whereBetween('created_at', [$start, $end])
+                ->select(
+                    'room_id',
+                    DB::raw('SUM(number_of_visitors) as number_of_visitors')
+                )
+                ->groupBy('room_id')
+                ->pluck('number_of_visitors', 'room_id');
+
+            foreach ($aggregatedGifts as $gift) {
+                try {
+                    $visitorsCount = $visitorsMap[$gift->room_id] ?? 0;
+
+                    $totalRoomGift = TotalRoomGift::firstOrCreate(
+                        [
+                            'room_id' => $gift->room_id,
+                            'created_at' => $start,
+                        ],
+                        [
+                            'current_total' => $gift->current_total,
+                            'number_of_visitors' => $visitorsCount,
+                            'updated_at' => now(),
+                        ]
+                    );
+
+                    $gift->id = $totalRoomGift->id;
+                    $gift->number_of_visitors = $visitorsCount;
+
+                    $this->processGift($gift);
+                } catch (\Throwable $e) {
+                    $this->error("Failed to process gift | Room: {$gift->room_id} | Error: {$e->getMessage()}");
+                    $this->logRoomCup("EXCEPTION processing gift | Room: {$gift->room_id} | Error: {$e->getMessage()} | Trace: {$e->getTraceAsString()}");
                 }
             }
         }
@@ -181,7 +243,7 @@ class CalculateRoomCupRewards extends Command
         $this->info("✅ Calculation finished");
     }
 
-    private function processGift(TotalRoomGift $gift): void
+    private function processGift($gift): void
     {
         $this->line("📦 Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
         $this->logRoomCup("Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");

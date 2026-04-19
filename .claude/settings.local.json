@@ -1,10 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan:*)",
-      "Bash(curl -s \"http://localhost/Eagle/public/master-recovery\")",
-      "Bash(cp master_recovery_report.html master_recovery_report_backup.html)",
-      "Bash(cp master_recovery_deductions.csv master_recovery_deductions_backup.csv)"
+      "Bash(php artisan:*)"
     ]
   }
 }

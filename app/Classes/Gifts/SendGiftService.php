@@ -32,7 +32,10 @@ class SendGiftService
             $totalPrice = $gift->price * $number;
 
         $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPK, appFeatureStatus: $appFeatureStatus);
-        GiftLog::query()->create($info);
+
+        DB::transaction(function () use ($info) {
+            GiftLog::query()->create($info);
+        }, attempts: 3);
     }
 
     public function sendGift2($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, $cpId = null)
@@ -47,7 +50,10 @@ class SendGiftService
             $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId, appFeatureStatus: $appFeatureStatus);
             $data[] = $info;
         }
-        DB::table('gift_logs')->insert($data);
+
+        DB::transaction(function () use ($data) {
+            DB::table('gift_logs')->insert($data);
+        }, attempts: 3);
     }
 
     public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null, $sourceType = null, $type = null)
@@ -75,7 +81,10 @@ class SendGiftService
             $info['room_boom_uuid'] = $roomBoomUuid;
             $data[] = $info;
         }
-        DB::table('gift_logs')->insert($data);
+
+        DB::transaction(function () use ($data) {
+            DB::table('gift_logs')->insert($data);
+        }, attempts: 3);
 
         return $roomBoomUuid;
     }
@@ -340,7 +349,6 @@ class SendGiftService
         ];
         $json = json_encode($ms);
 
-        \Illuminate\Support\Facades\Log::info("RTM Test (updatePk) roomId: $roomId", ['data' => $ms['messageContent']]);
 
         Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
     }
@@ -382,6 +390,7 @@ class SendGiftService
         $info['room_id'] = $room->id;
         $info['room_gift_status'] = $appFeatureStatus ?? false;
         $info['source_type'] = $sourceType;
+        $info['total'] = $gift->price;                          
 
         return $info;
     }

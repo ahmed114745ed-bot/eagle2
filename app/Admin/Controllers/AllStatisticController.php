@@ -676,7 +676,6 @@ class AllStatisticController extends MainController
             $allBalance = $balance->balance ?? 0;
             $availableBalance = $balance ? $balance->balance - $balance->used : 0;
 
-            // تأكد من أن البيانات صالحة للـ Chart
             $used = $balance->used ?? 0;
             $available = $availableBalance ?? 0;
 

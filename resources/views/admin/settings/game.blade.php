@@ -159,6 +159,81 @@
                 <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+                    <input type="hidden" name="provider_code" value="utd_games">
+                    <input type="hidden" name="provider_name" value="UTD Games">
+
+                    <div class="card p-4 shadow-sm border-0" style="min-height: 600px; border-radius: 12px;">
+
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="m-0" style="color: white;">{{ __('UTD Games') }}</h4>
+                            <div class="d-flex align-items-center">
+                                <input type="hidden" name="active" value="0">
+                                <input type="checkbox" id="utdGamesRadio"
+                                       class="custom-payment-radio libraryRealTime"
+                                       name="active" value="1"
+                                    {{ @$utdGamesSettings?->is_active == 1  ? 'checked' : '' }}>
+                                <label for="utdGamesRadio" class="switch"></label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="utd_games_app_key">{{ __('app key') }}:</label>
+                                    <input type="text" id="utd_games_app_key" name="app_key"
+                                           placeholder="app_key"
+                                           value="{{ $utdGamesSettings->app_key ?? '' }}" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Webhook Endpoints</h5>
+
+                        @php
+                            $utdRoutes = $utdGamesSettings->webhook_routes ?? [];
+
+                            if (is_string($utdRoutes)) {
+                                $utdRoutes = json_decode($utdRoutes, true);
+                            }
+
+                            $utdRoutes = is_array($utdRoutes) ? $utdRoutes : [];
+                        @endphp
+
+                        @if(count($utdRoutes))
+                            @foreach($utdRoutes as $key => $url)
+                                <div class="mb-3">
+                                    <label class="form-label text-capitalize fw-semibold">
+                                        {{ str_replace('_', ' ', $key) }}
+                                    </label>
+
+                                    <div class="webhook-container">
+                                        <div class="webhook-label">Type =&gt; POST</div>
+                                        <input type="text" class="form-control webhook-url" value="{{ $url }}" readonly>
+                                        <button type="button" class="btn btn-copy" onclick="copyWebhook(this)">
+                                            <i class="bi bi-clipboard"></i>Copy
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                No webhook endpoints configured.
+                            </div>
+                        @endif
+
+                    </div>
+                </form>
+            </div>
+
+              <div class="col-md-6 mb-3 ms-0 me-auto">
+                <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
+                    @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <input type="hidden" name="provider_code" value="zero_games">
                     <input type="hidden" name="provider_name" value="Zero Games">
 
