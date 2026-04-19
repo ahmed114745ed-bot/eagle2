@@ -1,4 +1,4 @@
-name: SSh-for-developer-pipline
+name: SSH-for-developer-pipeline
 on:
   push:
     branches: ["for-developer"]
@@ -6,7 +6,7 @@ jobs:
   run_for-developer_hub:
     runs-on: [self-hosted]
     steps:
-    - name: Pull latest code
+    - name: Pull latest code and cleanup
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.18.32"
@@ -15,12 +15,21 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 5m
         script: |
+          set -e
           cd /var/www/for-developer
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           mkdir -p storage/jobs-logs
           chmod -R 777 storage/jobs-logs
           test -f public/settings.json || echo '{}' > public/settings.json
           test -f gcp.json || echo '{}' > gcp.json
+          sudo docker builder prune -f 2>/dev/null || true
+          sudo docker image prune -f 2>/dev/null || true
+          AVAIL_KB=$(df --output=avail / | tail -1 | tr -d ' ')
+          if [ "$AVAIL_KB" -lt 10485760 ]; then
+            echo "Low disk space (${AVAIL_KB}KB free). Pruning old images..."
+            sudo docker image prune -a --filter "until=168h" -f 2>/dev/null || true
+          fi
+          echo "Disk space: $(df -h / | tail -1)"
   run_for-developer_app:
     runs-on: [self-hosted]
     needs: run_for-developer_hub
@@ -34,13 +43,16 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/for-developer
+          echo "Building for-developer-octa:${{ github.sha }}..."
           sudo docker build -t for-developer-octa:${{ github.sha }} -f Dockerfile-octana .
+          echo "Build succeeded. Updating service..."
           sudo docker service update --image for-developer-octa:${{ github.sha }} for-developer-octa
           sudo docker image prune -f 2>/dev/null || true
   run_for-developer_job:
     runs-on: [self-hosted]
-    needs: run_for-developer_hub
+    needs: run_for-developer_app
     steps:
     - name: Build and deploy for-developer jobs
       uses: appleboy/ssh-action@v1.2.1
@@ -51,8 +63,11 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/for-developer
+          echo "Building for-developer-job:${{ github.sha }}..."
           sudo docker build -t for-developer-job:${{ github.sha }} -f Dockerfile-jobs .
+          echo "Build succeeded. Updating service..."
           sudo docker service update --image for-developer-job:${{ github.sha }} for-developer-job
           sudo docker image prune -f 2>/dev/null || true
 
