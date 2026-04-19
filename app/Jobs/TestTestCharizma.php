@@ -43,9 +43,9 @@ class TestTestCharizma implements ShouldQueue
         // info('TestTestCharizma before for');
         foreach ($this->data as $key => $value){
             [$data, $roomId, $userId] = $this->roomJob->getVariables($value);
-            $josns[] =  $this->roomJob->sendToZego($data, $roomId, $userId ?? 0);
+            $json = $this->roomJob->sendToZego($data, $roomId, $userId ?? 0);
             // info('TestTestCharizma');
-            $promise =  Common::sendToZego3('SendCustomCommand', $roomId, $userId ?? 0, $josns);
+            $promise = Common::sendToZego3('SendCustomCommand', $roomId, $userId ?? 0, [$json]);
             $promises = array_merge($promises, $promise);
         }
         Utils::unwrap($promises);
