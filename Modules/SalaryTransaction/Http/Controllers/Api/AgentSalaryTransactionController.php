@@ -242,25 +242,13 @@ class AgentSalaryTransactionController extends Controller
         $paymentId = $request->payment_id;
 
         $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")
-            ->withCount('receiveShippingAgencyCharges')
+            ->withCount('charges')
             ->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))
             ->with('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
             ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
             ->paginate(10);
-
-        return Common::apiResponse(true, 'agencies', [
-            'data' => TransformersChargeAgentResource::collection($agencies),
-            'pagination' => [
-                'total' => $agencies->total(),
-                'per_page' => $agencies->perPage(),
-                'current_page' => $agencies->currentPage(),
-                'last_page' => $agencies->lastPage(),
-                'from' => $agencies->firstItem(),
-                'to' => $agencies->lastItem(),
-                'has_more' => $agencies->hasMorePages(),
-            ]
-        ]);
+        return Common::apiResponse(true, 'agencies', TransformersChargeAgentResource::collection($agencies));
     }
     public function add_request_salary(Request $request)
     {
