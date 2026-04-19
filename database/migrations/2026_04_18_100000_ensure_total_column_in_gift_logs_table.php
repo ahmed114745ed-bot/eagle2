@@ -9,18 +9,15 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Adds 'total' column to gift_logs if it does not already exist.
      */
     public function up(): void
     {
         if (!Schema::hasColumn('gift_logs', 'total')) {
-            Schema::table('gift_logs', function (Blueprint $table) {
-                $table->bigInteger('total')->nullable()->comment('سعر الهدية الاصلي المرسله');
-            });
-        } else {
-            // Change the 'total' column to BIGINT to support large values
-            // Disable FK checks to avoid constraint issues with orphaned rows
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
-            DB::statement("ALTER TABLE gift_logs CHANGE total total BIGINT DEFAULT NULL COMMENT 'سعر الهدية الاصلي المرسله'");
+            Schema::table('gift_logs', function (Blueprint $table) {
+                $table->bigInteger('total')->nullable()->comment('total');
+            });
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
     }
@@ -32,7 +29,9 @@ return new class extends Migration
     {
         if (Schema::hasColumn('gift_logs', 'total')) {
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
-            DB::statement("ALTER TABLE gift_logs CHANGE total total DECIMAL(12,2) UNSIGNED DEFAULT NULL COMMENT 'سعر الهدية الاصلي المرسله'");
+            Schema::table('gift_logs', function (Blueprint $table) {
+                $table->dropColumn('total');
+            });
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }
     }
