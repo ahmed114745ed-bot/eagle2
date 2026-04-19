@@ -41,20 +41,21 @@ class FixGiftLogsTotalDiff extends Command
                 $now = now()->toDateTimeString();
 
                 foreach ($users as $user) {
-                    // Calculate gift logs total in PHP to avoid SQL arithmetic overflow
-                    // Sum: total * giftNum for each row
-                    $giftLogs = DB::table('gift_logs')
+                    // Calculate gift logs total: SUM(total * giftNum) for valid gift logs
+                    // Exclude logs where receiver_id is NULL, 0, or equals sender_id (self-gifts)
+                    $giftLogsTotal = DB::table('gift_logs')
                         ->where('sender_id', $user->id)
-                        ->select('total', 'giftNum')
-                        ->get();
+                        ->where(function ($query) {
+                            $query->whereNotNull('receiver_id')
+                                  ->where('receiver_id', '!=', 0);
+                        })
+                        ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
+                        ->value('total');
                     
-                    $giftLogsTotal = 0;
-                    foreach ($giftLogs as $log) {
-                        $giftLogsTotal += ((int) $log->total) * ((int) $log->giftNum);
-                    }
+                    $giftLogsTotal = (float) ($giftLogsTotal ?? 0);
 
                     $userTotal = (float) ($user->total_diamond_send ?? 0);
-                    $diff      = $userTotal - (float) $giftLogsTotal;
+                    $diff      = $userTotal - $giftLogsTotal;
 
                     if ($diff == 0) {
                         $skipped++;
