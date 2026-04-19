@@ -23,7 +23,12 @@ class CheckLatestToken
         if (Auth::check()) {
             $user = Auth::user();
             $bearerToken = $request->bearerToken();
-            $lastToken = $user->tokens()->orderByDesc('id')->first()->token;
+            $latestToken = $user->tokens()->orderByDesc('id')->first();
+
+            if (!$latestToken) {
+                return Common::apiResponse(false, 'Unauthenticated', [], 401);
+            }
+            $lastToken = $latestToken->token;
 
             if (strpos($bearerToken, '|') !== false) {
                 [$id, $bearerToken] = explode('|', $bearerToken, 2);

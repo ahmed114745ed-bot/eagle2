@@ -16,6 +16,7 @@ use App\Models\Config;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\SalaryTransaction\Entities\AgencyTransferSalary;
@@ -223,31 +224,31 @@ class AgentSalaryTransactionController extends Controller
         }
     }
 
-    public function searchAgent(Request $request)
+    public function searchAgent(Request $request): JsonResponse
+    {
+        $countryId = $request->country_id;
+        $paymentId = $request->payment_id;
+
+        $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount('senderCharges')->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))->with('owner')
+            ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
+            ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
+            ->paginate(10);
+        return Common::apiResponse(true, 'agencies', TransformersChargeAgentResource::collection($agencies));
+    }
+
+    public function searchAgentV2(Request $request): JsonResponse
     {
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
         $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")
-            ->withCount('receiveShippingAgencyCharges')
+            ->withCount('senderCharges')
             ->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))
             ->with('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
             ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
             ->paginate(10);
-        
-        return Common::apiResponse(true, 'agencies', [
-            'data' => TransformersChargeAgentResource::collection($agencies),
-            'pagination' => [
-                'total' => $agencies->total(),
-                'per_page' => $agencies->perPage(),
-                'current_page' => $agencies->currentPage(),
-                'last_page' => $agencies->lastPage(),
-                'from' => $agencies->firstItem(),
-                'to' => $agencies->lastItem(),
-                'has_more' => $agencies->hasMorePages(),
-            ]
-        ]);
+        return Common::apiResponse(true, 'agencies', TransformersChargeAgentResource::collection($agencies));
     }
     public function add_request_salary(Request $request)
     {

@@ -157,7 +157,7 @@ class CoinService
                 if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $utdService = new UtdService();
 
-                $paymentUrl = $utdService->initiatePayment($log->id, $coin->usd, $user->id);
+                $paymentUrl = $utdService->initiatePayment($log->id, $coin->usd, $user);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }

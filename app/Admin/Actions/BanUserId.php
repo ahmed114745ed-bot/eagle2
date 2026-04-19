@@ -95,7 +95,7 @@ class BanUserId extends Action
         $this->integer('duration', __('duration(hours) : empty if forever'));
         $this->checkbox('type', __('type'))->options ([
             'normal' => __('normal'),
-            'ip' => __('ip'),
+          //  'ip' => __('ip'),
             'device' => __('device'),
         ]);
     }
