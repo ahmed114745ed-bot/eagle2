@@ -79,7 +79,7 @@ class FixGiftLogsTotalDiff extends Command
                             'receiver_obtain'  => 0,
                             'roomowner_obtain' => 0,
                             'app_profit_coins' => 0,
-                            'total'            => $diff,   // الفرق (موجب أو سالب)
+                            'total'            => $diff,  
                             'created_at'       => $now,
                             'updated_at'       => $now,
                         ]);
