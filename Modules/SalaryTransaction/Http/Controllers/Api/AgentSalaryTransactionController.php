@@ -229,7 +229,7 @@ class AgentSalaryTransactionController extends Controller
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
-        $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount('charges')->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))->with('owner')
+        $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")->withCount('senderCharges')->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))->with('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
             ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
             ->paginate(10);
@@ -242,7 +242,7 @@ class AgentSalaryTransactionController extends Controller
         $paymentId = $request->payment_id;
 
         $agencies = ShippingAgency::with("Countries", "AgencypaymentGateways")
-            ->withCount('charges')
+            ->withCount('senderCharges')
             ->whereHas('owner', fn($query) => $query->where('appear_charger_agency', 1))
             ->with('owner')
             ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))

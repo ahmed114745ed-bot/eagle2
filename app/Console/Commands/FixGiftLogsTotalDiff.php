@@ -42,6 +42,7 @@ class FixGiftLogsTotalDiff extends Command
 
                 foreach ($users as $user) {
                     // Calculate gift logs total in PHP to avoid SQL arithmetic overflow
+                    // Sum: total * giftNum for each row
                     $giftLogs = DB::table('gift_logs')
                         ->where('sender_id', $user->id)
                         ->select('total', 'giftNum')
