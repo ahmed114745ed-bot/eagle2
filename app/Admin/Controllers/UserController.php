@@ -466,6 +466,7 @@ class UserController extends MainController
         $salaries = null;
         $charges = null;
         $giftSLogs = $diamonds = null;
+        $totalGiftPrice = 0;
         $actualGiftPrice = $luckyGiftTotal = $regularGiftTotal = 0;
         $userJoinAgencies = null;
         $usersCoins = null;
