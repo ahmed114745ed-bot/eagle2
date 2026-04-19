@@ -44,7 +44,26 @@ class HandlingRoomZigoRequests extends Command
      */
     public function withRedis(RoomJobFactory $roomFactory): void
     {
+        // Prevent multiple instances from processing the same Redis keys simultaneously
+        $lock = \Illuminate\Support\Facades\Cache::lock('charisma_handler_lock', 30);
 
+        if (!$lock->get()) {
+            \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][2-HANDLER] Skipped - another instance is running');
+            sleep(5);
+            return;
+        }
+
+        try {
+            $this->processRedisKeys($roomFactory);
+        } finally {
+            $lock->release();
+        }
+
+        sleep(5);
+    }
+
+    private function processRedisKeys(RoomJobFactory $roomFactory): void
+    {
         $data = Redis::keys('*CharismaGift*');
 
         \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][2-HANDLER] withRedis cycle started', [
@@ -136,11 +155,5 @@ class HandlingRoomZigoRequests extends Command
             ]);
             echo 'Fail zego ' . $e->getMessage() . PHP_EOL;
         }
-
-
-
-
-
-        sleep(5);
     }
 }
