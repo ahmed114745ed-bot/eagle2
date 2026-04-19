@@ -41,10 +41,16 @@ class FixGiftLogsTotalDiff extends Command
                 $now = now()->toDateTimeString();
 
                 foreach ($users as $user) {
-                    $giftLogsTotal = DB::table('gift_logs')
+                    // Calculate gift logs total in PHP to avoid SQL arithmetic overflow
+                    $giftLogs = DB::table('gift_logs')
                         ->where('sender_id', $user->id)
-                        ->selectRaw('SUM(CAST(total AS SIGNED) * giftNum) as grand_total')
-                        ->value('grand_total') ?? 0;
+                        ->select('total', 'giftNum')
+                        ->get();
+                    
+                    $giftLogsTotal = 0;
+                    foreach ($giftLogs as $log) {
+                        $giftLogsTotal += ((int) $log->total) * ((int) $log->giftNum);
+                    }
 
                     $userTotal = (float) ($user->total_diamond_send ?? 0);
                     $diff      = $userTotal - (float) $giftLogsTotal;
