@@ -82,6 +82,11 @@ class InvitationSettingsController extends AdminController
                 ->default($this->getValue('invitation_invitee_reward'))
                 ->rules('required|numeric|min:0')
                 ->help(__('invitation.invitee_reward_help'));
+
+            $form->decimal('invitation_code_date', __('invitation code date'))
+                ->default($this->getValue('invitation_code_date'))
+                ->rules('required|numeric|min:0')
+                ->help(__('Invitation validity period in months.'));
         });
 
         // General Tab
@@ -110,6 +115,8 @@ class InvitationSettingsController extends AdminController
             Config::updateOrCreate(['name' => 'earn_from_invitation'], ['value' => $form->value]);
             Config::updateOrCreate(['name' => 'invitation_host_reward'], ['value' => $form->host_reward]);
             Config::updateOrCreate(['name' => 'invitation_invitee_reward'], ['value' => $form->invitee_reward]);
+            Config::updateOrCreate(['name' => 'invitation_code_date'], ['value' => $form->invitation_code_date]);
+
             Setting::updateOrCreate(['key' => 'invitation_content_ar'], ['value' => $form->content]);
             Setting::updateOrCreate(['key' => 'invitation_content_en'], ['value' => $form->content_en]);
 
