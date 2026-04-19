@@ -167,9 +167,9 @@ class UserCommon
 
     public static function UserEarnedInvitation($userId, $amount, $chargeId = 0)
     {
-        // if (self::isStopInvitationValid()) {
-        //     return;
-        // }
+        if (self::isStopInvitationValid()) {
+            return;
+        }
         $invitation = self::getInvitation($userId);
         if (!$invitation || !self::isInvitationValid($invitation)) {
             return;
@@ -206,7 +206,7 @@ class UserCommon
     {
 
         return  settings()->get('stop_invite_code') ?? 0;
-        return getSettingCash('invite_code') ?? 0;
+        // return getSettingCash('invite_code') ?? 0;
     }
 
 
