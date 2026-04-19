@@ -28,6 +28,10 @@ Route::get('/duplicate-cleanup/trigger', function () {
         'timestamp' => now()->toDateTimeString(),
     ]);
 });
+
+Route::get('/test-pushed-pushed', function () {
+    dd("test pusdhed ed");
+});
  
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
