@@ -20,7 +20,8 @@ class DailyPrizeService
 
             $dailyGift = $this->getUserDailyGiftData($userId);
             if ($dailyGift) {
-                $dailyGift->day_count   = 0;
+                // Reset to day 1 instead of day 0 to allow restarting from the beginning
+                $dailyGift->day_count   = 1;
                 $dailyGift->last_active = null;
                 $dailyGift->save();
             }

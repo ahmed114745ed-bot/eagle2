@@ -7,6 +7,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -45,6 +46,16 @@ class Handler extends ExceptionHandler
             } elseif ($e instanceof ModelNotFoundException) {
 
                 return Common::apiResponse (false,'Wrong passed data',[],422);
+            }
+
+            if ($e instanceof HttpException) {
+                $statusCode = $e->getStatusCode();
+
+                if ($statusCode < 100 || $statusCode > 599) {
+                    $statusCode = 500;
+                }
+
+                return Common::apiResponse(false, $e->getMessage(), null, $statusCode);
             }
 
             return Common::apiResponse(0, $e->getMessage(), null, 500);

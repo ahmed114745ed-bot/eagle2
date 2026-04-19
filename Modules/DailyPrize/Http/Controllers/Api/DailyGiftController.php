@@ -124,7 +124,14 @@ class DailyGiftController extends Controller
         if ($result != null) {
             $currentDay = $result->day_count;
             if ($this->dailyPrizeService->isNewDay($user->id)) {
-                $currentDay += 1;
+                // Check if we've completed all days in the cycle
+                $totalDays = $this->dailyPrizeService->dailyGiftsCount();
+                if ($currentDay >= $totalDays) {
+                    // Reset to day 1 to allow restarting from the beginning
+                    $currentDay = 1;
+                } else {
+                    $currentDay += 1;
+                }
             }
         }
 
