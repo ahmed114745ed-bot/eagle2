@@ -66,10 +66,7 @@ class HandlingRoomZigoRequests extends Command
     {
         $data = Redis::keys('*CharismaGift*');
 
-        \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][2-HANDLER] withRedis cycle started', [
-            'keys_found' => count($data),
-            'keys' => $data,
-        ]);
+
 
         $allData = [];
 
@@ -81,11 +78,6 @@ class HandlingRoomZigoRequests extends Command
 
                 $rawValue = Redis::get($cleanKey);
 
-                \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][2-HANDLER] Raw Redis value', [
-                    'redis_key' => $cleanKey,
-                    'raw_type'  => gettype($rawValue),
-                    'raw_value' => substr((string) $rawValue, 0, 200),
-                ]);
 
                 $item = @unserialize($rawValue);
 
@@ -99,26 +91,12 @@ class HandlingRoomZigoRequests extends Command
                     continue;
                 }
 
-                \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][2-HANDLER] Processing Redis key', [
-                    'redis_key' => $cleanKey,
-                    'room_id'   => $item['room_id'] ?? '?',
-                    'user_id'   => $item['user_id'] ?? '?',
-                    'coins'     => $item['coins'] ?? '?',
-                    'type'      => $item['type'] ?? '?',
-                    'receivers' => unserialize($item['data'] ?? 'a:0:{}'),
-                ]);
+
 
                 $item = new \App\Tik\DTO\RoomJobClass($item ?? []);
 
                 $data_ne                = $roomFactory->setType($item->type)->work($item);
                 $allData[$item->type][] = $data_ne;
-
-                \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][2-HANDLER] work() result', [
-                    'room_id' => $item->room_id,
-                    'user_id' => $item->user_id,
-                    'type'    => $item->type,
-                    'result'  => $data_ne,
-                ]);
 
                 echo 'Done ' . $item->type . ' to room ' . $item->room_id . PHP_EOL;
             } catch (\Throwable $e) {
@@ -136,17 +114,11 @@ class HandlingRoomZigoRequests extends Command
 
         }
 
-        \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][3-ZEGO] Preparing to send to Zego', [
-            'allData_types' => array_keys($allData),
-            'allData'       => $allData,
-        ]);
-
+ 
         try {
             foreach ($allData as $key => $allDatum) {
                 $roomFactory->setType($key)->sendToZego($allData);
-                \Illuminate\Support\Facades\Log::channel('charisma_value')->info('[CHARISMA][3-ZEGO] sendToZego dispatched', [
-                    'type' => $key,
-                ]);
+         
                 echo 'Done zego  ' . $key . ' to room ' . PHP_EOL;
             }
         } catch (\Exception $e) {
