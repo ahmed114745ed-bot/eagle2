@@ -1,5 +1,6 @@
 {
-    "Laravel": "سبسيب",
+    "Laravel": "سبسيب", 
+    "total_diamonds_sent": "إجمالي الكوينزات المرسلة",
     "Save order": "حفظ الترتيب",
     "Select All Permissions": "تحديد جميع الصلاحيات",
     "selected": "محدد",
@@ -98,6 +99,7 @@
     "room in home screen layer": "الغرف في واجهة الشاشة الرئيسية",
     "show rooms": "عرض الغرف",
     "latest_withdrawals": "آخر المسحوبات",
+    "Total Diamond Send": "إجمالي الماسات المرسلة",
     "latest_payments": "آخر عمليات الدفع",
     "table_header_index": "#",
     "table_header_account": "الحساب",
@@ -4246,6 +4248,8 @@
     "invitation.invitee_reward": "جائزة المدعو (كوينز)",
     "invitation.invitee_reward_help": "عدد الكوينزات التي يحصل عليها المدعو عند استخدام الكود.",
     "invitation.saved_successfully": "تم حفظ إعدادات كود الدعوة بنجاح",
+    "percentage invitation code": "نسبة كود الدعوة",
+    "invitation code setting": "إعدادات كود الدعوة",
     "invitation.user_not_found": "لم يتم العثور علي المستخدم",
     "invitation.validation_failed": "لقد مر علي المستخدم 48 ساعة من تاريخ انشائه أو المستخدم مسجل من قبل لدي شخص آخر",
     "invitation.success": "تمت الإضافة بنجاح",
@@ -5394,5 +5398,9 @@
     "Charge settings":"اعددات الشحن",
     "charge settings":"اعددات الشحن",
   "milestone_vip_reward_message": "لقد حصلت على :vip كمكافأة على إتمام :milestone",
-  "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone"
+  "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone",
+  "Actual Gift Price from Database": "إجمالي سعر الهدايا الفعلي من قاعدة البيانات",
+  "Lucky Gift Total": "إجمالي هدايا الحظ",
+  "Regular Gift Total": "إجمالي الهدايا العادية",
+  "Total Diamonds Sent": "إجمالي الماسات المرسلة"
 }

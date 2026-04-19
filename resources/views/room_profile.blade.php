@@ -131,12 +131,6 @@
         </div>
     </div>
 
-    @php
-        if (!request()->has('tab')) {
-            header('Location: ' . url()->current() . '?tab=admins');
-            exit();
-        }
-    @endphp
 
     <div class="agency-tabs">
         <a href="?tab=admins" class="tab-btn {{ request('tab') == 'admins' ? 'active' : '' }}"
