@@ -466,10 +466,13 @@ class UserController extends MainController
         $salaries = null;
         $charges = null;
         $giftSLogs = $diamonds = null;
+        $totalGiftPrice = 0;
+        $actualGiftPrice = $luckyGiftTotal = $regularGiftTotal = 0;
         $userJoinAgencies = null;
         $usersCoins = null;
         $badges = null;
         $walletLogs = null;
+        $totalGiftCoins = 0;
 
         // Decide active tab early so we only eager load what we need
         $activeTab = request('tab', 'packs');
@@ -477,7 +480,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email','sender_level', 'received_level', 'phone', 'bio']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email','sender_level', 'received_level', 'phone', 'bio','total_diamond_send']);
 
         $with = [
             'profile:id,user_id,avatar,gender',
@@ -572,18 +575,6 @@ class UserController extends MainController
                     ->with([
                         'receiver:id,name,uuid,special_id',
                         'sender:id,name,uuid,special_id',
-                        // 'sender.packs' => function ($q) {
-                        //     $q->whereIn('type', [25])
-                        //         ->where('is_used', true)
-                        //         ->with('ware:id,value');
-                        // },
-                        // 'receiver.packs' => function ($q) {
-                        //     $q->whereIn('type', [25])
-                        //         ->where('is_used', true)
-                        //         ->with('ware:id,value');
-                        // },
-                        // 'receiver.profile',
-                        // 'sender.profile',
                         'gift:id,name,price,e_name,img,type',
                         'room:id,room_name,room_cover',
                         'agency:id,name',
@@ -591,7 +582,15 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
+                // Calculate total diamonds sent/received: SUM(total * giftNum)
+                // This represents the actual amount of diamonds in each transaction
+                $totalGiftCoins = (clone $giftBaseQuery)
+                    ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
+                    ->value('total') ?? 0;
+
+                // Keep totalGiftPrice for backward compatibility (sum of giftPrice column)
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
+
                 break;
 
             case 'user-agency':
@@ -650,6 +649,7 @@ class UserController extends MainController
             'charges',
             'giftSLogs',
             'diamonds',
+            'totalGiftPrice',
             'userJoinAgencies',
             'usersCoins',
             'badges',
@@ -657,7 +657,8 @@ class UserController extends MainController
             'walletLogs',
             'activeTab',
             'availableBalance',
-            'curantBalance'
+            'curantBalance',
+            'totalGiftCoins'
         );
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));

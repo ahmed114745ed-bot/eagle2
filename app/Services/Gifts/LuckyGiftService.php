@@ -30,6 +30,7 @@ use App\Helpers\CacheHelper;
 use Illuminate\Support\Facades\Cache;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 class LuckyGiftService
 {

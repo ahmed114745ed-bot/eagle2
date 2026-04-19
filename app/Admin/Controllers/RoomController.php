@@ -70,6 +70,10 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
+        if (!request()->has('tab')) {
+            return redirect(url()->current() . '?tab=admins');
+        }
+
         $room = Room::with(['owner.profile', 'roomLevel', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);

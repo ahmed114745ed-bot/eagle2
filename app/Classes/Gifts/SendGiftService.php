@@ -390,6 +390,7 @@ class SendGiftService
         $info['room_id'] = $room->id;
         $info['room_gift_status'] = $appFeatureStatus ?? false;
         $info['source_type'] = $sourceType;
+        $info['total'] = $gift->price;                          
 
         return $info;
     }

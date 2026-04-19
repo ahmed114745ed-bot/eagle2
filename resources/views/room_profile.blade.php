@@ -131,9 +131,6 @@
         </div>
     </div>
 
-    @php
-        $currentTab = request('tab', 'admins');
-    @endphp
 
     <div class="agency-tabs">
         <a href="?tab=admins" class="tab-btn {{ $currentTab == 'admins' ? 'active' : '' }}"
