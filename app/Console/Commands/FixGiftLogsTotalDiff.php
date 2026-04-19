@@ -43,7 +43,7 @@ class FixGiftLogsTotalDiff extends Command
                 foreach ($users as $user) {
                     $giftLogsTotal = DB::table('gift_logs')
                         ->where('sender_id', $user->id)
-                        ->selectRaw('SUM(total * giftNum) as grand_total')
+                        ->selectRaw('SUM(CAST(total AS SIGNED) * giftNum) as grand_total')
                         ->value('grand_total') ?? 0;
 
                     $userTotal = (float) ($user->total_diamond_send ?? 0);
