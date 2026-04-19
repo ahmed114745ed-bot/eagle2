@@ -473,6 +473,7 @@ class UserController extends MainController
         $badges = null;
         $walletLogs = null;
 
+        
         // Decide active tab early so we only eager load what we need
         $activeTab = request('tab', 'packs');
 
