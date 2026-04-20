@@ -92,7 +92,7 @@ return [
     'admin_family'                     => 'Selamat, Anda sekarang moderator keluarga :name. Jadilah baik di posisi ini untuk kemajuan :appName',
     'send_Family'                      => ':name meminta bergabung dengan keluarga',
     'request_agency'                  => ':name ingin bergabung dengan agen :agency_name',
-    'host_salary' => 'Gaji sebesar :amount telah ditarik dari dompet oleh :from',
+    'host_salary' => 'Gaji sebesar :amount telah disetorkan ke agensi :agency oleh :from',
     'target' => 'Selamat! :user Anda mencapai target baru di agen :agency, gaji Anda sekarang :salary',
     'sender_level'        => 'Selamat :user, Anda mencapai level pengirim :level',
     'receiver_level'      => 'Selamat, Anda mencapai level penerima :level',

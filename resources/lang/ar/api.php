@@ -95,7 +95,7 @@ return [
     'admin_family'                     => ' تهانينا لقد اصبحت الان مشرف فى عائلة :name يجب عليك ان تكون جيد بالمنصب من اجل ارتقاء :appName ',
     'send_Family'                      => ' :name طلب الاندمام الى عائله',
     'request_agency'                  => '  :name يريد الاندمام الى الوكاله :agency_name',
-    'host_salary'=> 'لقد تم سحب مرتب من المحفظه بقيمه :amount  بوسطه :from',
+    'host_salary'=> 'تم إيداع راتب بقيمة :amount في وكالة :agency بواسطة :from',
     'target' => 'Congrats! :user you achieve new target in :agency agency your salary now is :salary',
     'sender_level'        => 'Congratulations :user you reach sender level :level',
     'receiver_level'      => 'Congratulations you reach receiver level :level',
