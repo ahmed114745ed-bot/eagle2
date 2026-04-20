@@ -15,7 +15,6 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 5m
         script: |
-          set -e
           cd /var/www/for-developer
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           mkdir -p storage/jobs-logs
