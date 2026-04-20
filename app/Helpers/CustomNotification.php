@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\UserOfficialMessage;
 use Modules\Moment\Entities\Moment;
 use App\Models\OfficialMessageAdmin;
+use App\Models\ShippingAgency;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Cache;
 use Modules\Public\Http\Services\UserCounterServices;
@@ -672,11 +673,12 @@ class CustomNotification
     }
 
 
-    public function hostSalary(User $user, User $invitationUser, float $amount = 0)
+    public function hostSalary(ShippingAgency $agency, User $invitationUser, float $amount = 0)
     {
+        $user = $agency->owner;
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
-        $body = __('api.host_salary', ['from' => @$invitationUser->name, 'amount' => $amount], $lang);
+        $body = __('api.host_salary', ['agency' => $agency->name, 'from' => @$invitationUser->name, 'amount' => $amount], $lang);
 
         $data = [
             'coins' => $amount,

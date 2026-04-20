@@ -232,7 +232,7 @@ class ChargeController extends Controller
             $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
 
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
-            CustomNotification::hostSalary($to->owner, $from,  $usd);
+            CustomNotification::hostSalary($to, $from,  $usd);
             DB::commit();
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {

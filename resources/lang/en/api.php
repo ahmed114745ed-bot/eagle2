@@ -99,7 +99,7 @@ return [
     'monthly_achievments' => "Congrats! You got a new madal",
     'app_message'         => "You have new message from :appName official team",
     'kick_out'            => "You are kicked out of the room",
-    'host_salary' => 'A salary has been withdrawn from the wallet with an amount of :amount by :from',
+    'host_salary' => 'A salary of :amount has been deposited in agency :agency by :from',
     'top_rank_sender'     => "Congrats! You are now the TOP gifts sender of the :type \nStaying on TOP is harder than reaching the TOP, Protect your throne (king, queen)",
     'top_rank_receive'    => "Congrats! You are now the TOP gifts receive of the :type \nStaying on TOP is harder than reaching the TOP, Protect your throne (king, queen)",
     'expired_aristocracy' => "Sorry! Your (aristocracy, entering effect, frame, bubble) is expired \nJoin now and revive it",
