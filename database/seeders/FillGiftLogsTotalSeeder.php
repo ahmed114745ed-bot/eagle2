@@ -45,7 +45,7 @@ class FillGiftLogsTotalSeeder extends Seeder
                 $q->whereNull('total')->orWhere('total', 0);
             })
             ->orderBy('id')
-            ->chunk(self::CHUNK_SIZE, function ($logs) use ($giftPrices, $bar, &$updated) {
+            ->chunkById(self::CHUNK_SIZE, function ($logs) use ($giftPrices, $bar, &$updated) {
 
                 foreach ($logs as $log) {
                     $price = $giftPrices[$log->giftId] ?? null;
@@ -64,7 +64,7 @@ class FillGiftLogsTotalSeeder extends Seeder
                     $updated++;
                     $bar->advance();
                 }
-            });
+            }, 'id');
 
         $bar->finish();
         $this->command->newLine(2);
