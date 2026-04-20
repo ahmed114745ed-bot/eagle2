@@ -720,8 +720,6 @@ if (!function_exists('handleShowImageWithTypes')) {
                 $style = "width: {$width}px; height: {$height}px;";
                 $style .= " display: inline-block;"; // ensures it doesn't stretch the cell
                 $style .= " vertical-align: middle;"; // aligns icons in table rows
-                $style .= " overflow: hidden;"; // prevent canvas from overflowing in RTL
-                $style .= " direction: ltr;"; // force LTR so SVGA canvas offset is correct
 
                 $style .= " justify-content: center;";   // horizontal center
                 $style .= " align-items: center;";
@@ -731,7 +729,7 @@ if (!function_exists('handleShowImageWithTypes')) {
 
                 // Optional: scale and horizontal flip for RTL
                 $scale = 1;
-                $flip = 'scaleX(1)';
+                $flip = $direction === 'rtl' ? 'scaleX(-0.5)' : 'scaleX(1)';
                 $style .= " transform: {$flip} scale({$scale});";
 
                 // Add RTL/LTR class for CSS if needed
