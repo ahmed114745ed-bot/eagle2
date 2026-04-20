@@ -16,11 +16,11 @@ Route::prefix('game-duplicate-check')->group(function () {
 Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
 Route::get('/duplicate-cleanup/trigger', function () {
     \Illuminate\Support\Facades\Log::info('=== Cleanup Trigger: Starting CleanupDuplicateOrdersJob directly ===');
-    
+
     // Run directly (synchronously) instead of dispatching to queue
     $job = new \App\Jobs\CleanupDuplicateOrdersJob();
     $job->handle();
-    
+
     \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob completed directly');
     return response()->json([
         'status' => 'completed',
@@ -28,7 +28,7 @@ Route::get('/duplicate-cleanup/trigger', function () {
         'timestamp' => now()->toDateTimeString(),
     ]);
 });
- 
+
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -41,6 +41,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Enums\AdminNotificationType;
 use App\Enums\SuperAdminNotificationType;
+use App\Models\UserCodeInvitation;
 use App\Exports\AgencyCharge;
 use App\Exports\AgencyChargeTransactions;
 use App\Facades\CustomNotification;
@@ -326,6 +327,36 @@ Route::get('/user-join-agency', function () {
     return response()->json([
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+
+Route::get('/count-invite-codes', function () {
+
+    $tz = getTimezone();
+
+    // Start date (GMT+2 → UTC)
+    $from = Carbon::parse('Apr 19, 4:27 PM', $tz)->setTimezone('UTC');
+
+    // Current time in UTC
+    $to = Carbon::now('UTC');
+
+    $count = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->count();
+
+        $accounts = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->get();
+
+        $data = [
+            
+            'count' => $count,
+            'accounts' => $accounts,
+            'from' => $from->toDateTimeString(),
+            'to' => $to->toDateTimeString(),
+            
+        ];
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $data,
     ]);
 });
 
@@ -987,17 +1018,67 @@ Route::get('/gift-logs-fill-total', function () {
     ]);
 });
 
-// Gift Logs: fix total diff (dry-run preview)
+// Gift Logs: fix total diff (dry-run preview) — queries DB directly for accuracy
 Route::get('/gift-logs-fix-total-diff/preview', function () {
-    Artisan::call('gift-logs:fix-total-diff', ['--dry-run' => true]);
-    return response()->json([
-        'status'  => 'success',
-        'message' => '✅ Dry-run completed.',
-        'output'  => Artisan::output(),
-    ]);
+    $users      = [];
+    $totalDiff  = 0;
+    $totalUsers = DB::table('users')->where('total_diamond_send', '>', 0)->count();
+
+    DB::table('users')
+        ->select('id', 'total_diamond_send')
+        ->where('total_diamond_send', '>', 0)
+        ->orderBy('id')
+        ->chunk(500, function ($chunk) use (&$users, &$totalDiff) {
+            foreach ($chunk as $user) {
+                $userTotal = (float) ($user->total_diamond_send ?? 0);
+
+                // Sum of real gift logs (excluding correction records)
+                $giftLogsTotal = DB::table('gift_logs')
+                    ->where('sender_id', $user->id)
+                    ->whereNotNull('receiver_id')
+                    ->where('receiver_id', '!=', 0)
+                    ->where('giftName', '!=', 'diff_correction')
+                    ->selectRaw('COALESCE(SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))), 0) as total')
+                    ->value('total');
+
+                // Sum of existing correction records
+                $correctionTotal = DB::table('gift_logs')
+                    ->where('sender_id', $user->id)
+                    ->where('giftName', 'diff_correction')
+                    ->selectRaw('COALESCE(SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))), 0) as total')
+                    ->value('total');
+
+                $giftLogsTotal   = (float) ($giftLogsTotal ?? 0);
+                $correctionTotal = (float) ($correctionTotal ?? 0);
+                $totalWithCorrection = $giftLogsTotal + $correctionTotal;
+
+                $diff = $userTotal - $totalWithCorrection;
+
+                if (abs($diff) < 1) {
+                    continue;
+                }
+
+                $users[] = [
+                    'user_id'            => (int) $user->id,
+                    'total_diamond_send' => $userTotal,
+                    'gift_logs_sum'      => $totalWithCorrection,
+                    'diff'               => $diff,
+                ];
+                $totalDiff += $diff;
+            }
+        });
+
+    $html = view('gift-logs-fix-report', [
+        'users'       => $users,
+        'total_users' => $totalUsers,
+        'total_diff'  => $totalDiff,
+        'output'      => '',
+    ])->render();
+
+    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
 });
 
-// Gift Logs: fix total diff (actual run)
+// Gift Logs: fix total diff (actual run) — prevents duplicate correction records
 Route::get('/gift-logs-fix-total-diff/run', function (\Illuminate\Http\Request $request) {
     $chunk = (int) $request->query('chunk', 500);
     Artisan::call('gift-logs:fix-total-diff', ['--chunk' => $chunk]);
@@ -3325,12 +3406,13 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
 });
 
 Route::get('test-done', function () {
-   return 17;
+    return 17;
 });
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
 
-Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $id;
+Route::get('/update-user-monthly-diamonds/{id}', function ($id) {
+    $userId = $id;
     $month = 4; // April
     $year = 2026;
 

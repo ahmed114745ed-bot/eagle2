@@ -30,7 +30,7 @@ use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 
-class rankingServiceV2
+class RankingServiceV2
 {
     protected $rankingRepo, $cpRepository;
     
