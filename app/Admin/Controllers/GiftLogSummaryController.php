@@ -149,41 +149,40 @@ class GiftLogSummaryController extends MainController
             return self::renderEntityCard($this, $filter);
         });
 
-        if($filter === 'rooms') {
-            $grid->column('total', __('visitors'))
-            ->display(function () {
-                $query = $this->room->totalRoomGifts();
-
-                $toDate = request()->input('to_date');
-                $fromDate = request()->input('from_date');
-                $timezone = getTimezone();
-
-                if ($toDate) {
-                    $end = Carbon::parse(convertArabicToEnglishNumbers($toDate), $timezone)
-                        ->setTimezone('UTC');
-                    $query->where('created_at', '<=', $end);
-                }
-
-                if ($fromDate) {
-                    $start = Carbon::parse(convertArabicToEnglishNumbers($fromDate), $timezone)
-                        ->setTimezone('UTC');
-                    $query->where('created_at', '>=', $start);
-                }
-
-                return "<div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($query->sum('number_of_visitors')) . "</span>
-                </div>";
-            });
-        }
 
         $grid->column('total', __('diamonds'))
             ->display(function () {
-                $image = asset('images/diamond.jpg'); // Make sure this image exists
+                $image = asset('images/diamond.jpg');
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($this->total) . "</span>
                     <img src='{$image}' alt='💎' width='20' height='20'>
                 </div>";
             });
+
+        if ($filter === 'rooms') {
+            $grid->column('visitors_count', __('visitors'))
+                ->display(function () {
+                    $query = $this->room->totalRoomGifts();
+
+                    $toDate = request()->input('to_date');
+                    $fromDate = request()->input('from_date');
+                    $timezone = getTimezone();
+
+                    if ($toDate) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($toDate), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '<=', $end);
+                    }
+
+                    if ($fromDate) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($fromDate), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '>=', $start);
+                    }
+
+                    return number_format($query->sum('number_of_visitors'));
+                });
+        }
     }
 
     protected function buildTabs(string $active): string
