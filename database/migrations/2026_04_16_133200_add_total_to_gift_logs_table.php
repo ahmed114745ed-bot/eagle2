@@ -11,15 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('gift_logs', function (Blueprint $table) {
-            $table->unsignedDecimal('total', 12, 2)->nullable()->comment('سعر الهدية الاصلي المرسله');
-        });
+        if (!Schema::hasColumn('gift_logs', 'total')) {
+            Schema::table('gift_logs', function (Blueprint $table) {
+                $table->unsignedDecimal('total', 12, 2)->nullable()->comment('سعر الهدية الاصلي المرسله');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('gift_logs', function (Blueprint $table) {
-            $table->dropColumn('total');
-        });
+        if (Schema::hasColumn('gift_logs', 'total')) {
+            Schema::table('gift_logs', function (Blueprint $table) {
+                $table->dropColumn('total');
+            });
+        }
     }
 };
