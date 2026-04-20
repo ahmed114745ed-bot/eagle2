@@ -168,7 +168,7 @@ class GroupChatController extends MainController
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('text', __('Message'))->limit(50);
-        $grid->column('name', __('Name'))
+        $grid->column('name', __('user'))
             ->display(function ($name) {
 
                 $user = $this->user;
