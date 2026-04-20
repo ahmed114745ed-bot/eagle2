@@ -1115,7 +1115,7 @@ public function zegoCredential(Request $request)
             throw $e;
         }
 
-        CustomNotification::codeInvitationUses($userParent, Auth::user());
+        CustomNotification::codeInvitationUses($userParent, Auth::user(),$this->getValue('invitation_invitee_reward'));
 
         return Common::apiResponse(true, __('invitation.success'), $request->code, 200);
     }

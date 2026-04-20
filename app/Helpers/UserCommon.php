@@ -175,7 +175,7 @@ class UserCommon
             return;
         }
 
-        $parent = User::find($invitation->invited_id);
+        $parent = User::find($invitation->user_id);
         if (!$parent) {
             return;
         }
@@ -195,7 +195,7 @@ class UserCommon
     private static function getInvitation($userId)
     {
         // dd($userId);
-        return UserCodeInvitation::where("user_id", $userId)->first();
+        return UserCodeInvitation::where("invited_id", $userId)->first();
     }
     // private static function isStopInvitationValid()
     // {

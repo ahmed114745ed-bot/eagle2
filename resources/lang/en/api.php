@@ -84,7 +84,7 @@ return [
     'agencyJoinRequest'       => ':name want to join your agency :agencyName',
     'got_coin'            => 'Congrats :name !   :coins :unit are added to your account by :admin from dashboard',
     'got_earned_coin' => 'Through the invitation code 🎉 Congratulations :name, :coins coins have been added to your account',
-    'code_invitation_uses' => '🎉 Congratulations :name, your invitation code has been used!',
+    'code_invitation_uses' => '🎉 Congratulations :name, your invitation code has been accepted by :from and you earned :coins coins',
     'sender_level'        => 'Congratulations :user you reach sender level :level',
     'senderLevelUpgrade' => 'Sender level upgraded',
     'receiver_level'      => 'Congratulations you reach receiver level :level',

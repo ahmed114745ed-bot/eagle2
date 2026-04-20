@@ -649,7 +649,7 @@ class CustomNotification
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
-        $body = __('api.code_invitation_uses', ['name' => $user->name], $lang);
+        $body = __('api.code_invitation_uses', ['name' => $user->name,'from' => @$invitationUser->name, 'coins' => $amount], $lang);
 
         $data = [
             'coins' => $amount,
