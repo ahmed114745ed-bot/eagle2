@@ -98,7 +98,7 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = @$extraDataInRoom?->total ?? 0;
+                $user['total'] = numToStringNew(@$extraDataInRoom?->total ?? 0);
                 $allDataChanges[] = $user;
             }
         }
@@ -134,7 +134,7 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = @$extraDataInRoom?->total ?? 0;
+                $user['total'] = numToStringNew(@$extraDataInRoom?->total ?? 0);
                 $allDataChanges[] = $user;
             }
         }
