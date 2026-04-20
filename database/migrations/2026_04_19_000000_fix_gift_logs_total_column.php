@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,11 +12,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('gift_logs', function (Blueprint $table) {
-            // Change the 'total' column from TINYINT to BIGINT to support large discrepancy values
-            // TINYINT max: 127, BIGINT max: 9,223,372,036,854,775,807
-            $table->bigInteger('total')->change();
-        });
+        try {
+            if (!Schema::hasColumn('gift_logs', 'total')) {
+                Schema::table('gift_logs', function (Blueprint $table) {
+                    $table->bigInteger('total')->nullable();
+                });
+            } else {
+                // Change the 'total' column to BIGINT to support large values
+                // Disable FK checks to avoid constraint issues with orphaned rows
+                DB::statement('SET FOREIGN_KEY_CHECKS=0');
+                DB::statement("ALTER TABLE gift_logs CHANGE total total BIGINT DEFAULT NULL COMMENT 'سعر الهدية الاصلي المرسله'");
+                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+            }
+        } catch (\Throwable $e) {
+            // Column already exists or ALTER failed — safe to ignore duplicate column errors
+            // SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'total'
+            if (str_contains($e->getMessage(), '1060') || str_contains($e->getMessage(), 'Duplicate column')) {
+                return;
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -24,9 +39,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('gift_logs', function (Blueprint $table) {
-            // Revert back to TINYINT
-            $table->tinyInteger('total')->change();
-        });
+        if (Schema::hasColumn('gift_logs', 'total')) {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::statement("ALTER TABLE gift_logs CHANGE total total DECIMAL(12,2) UNSIGNED DEFAULT NULL COMMENT 'سعر الهدية الاصلي المرسله'");
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
     }
 };

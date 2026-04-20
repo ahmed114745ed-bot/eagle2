@@ -28,7 +28,7 @@
 "The percentage that the inviter takes from each recharge of the invited person.": "आमंत्रित व्यक्ति के प्रत्येक रिचार्ज से आमंत्रक को मिलने वाला प्रतिशत।",
   "Instant reward (coins) for the inviter at the moment the invitation is accepted.": "निमंत्रण स्वीकार करते ही आमंत्रक को तुरंत मिलने वाला इनाम (कॉइन्स)।",
   "Instant reward (coins) for the invited person at the moment of acceptance.": "स्वीकार करने के समय आमंत्रित व्यक्ति को तुरंत मिलने वाला इनाम (कॉइन्स)।",
-  "Invitation validity period in months.": "निमंत्रण की वैधता अवधि (महीनों में)।",
+  "Invitation validity period in days.": "निमंत्रण की वैधता अवधि दिनों में।",
   "invitation code settings": "निमंत्रण कोड सेटिंग्स",
   "earn from invitation": "निमंत्रण से कमाई",
   "invitation host reward": "निमंत्रण होस्ट का इनाम",

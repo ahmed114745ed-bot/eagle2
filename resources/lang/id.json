@@ -28,7 +28,7 @@
 "The percentage that the inviter takes from each recharge of the invited person.": "Persentase yang diterima pengundang dari setiap isi ulang yang dilakukan oleh orang yang diundang.",
   "Instant reward (coins) for the inviter at the moment the invitation is accepted.": "Hadiah instan (koin) untuk pengundang saat undangan diterima.",
   "Instant reward (coins) for the invited person at the moment of acceptance.": "Hadiah instan (koin) untuk orang yang diundang saat menerima undangan.",
-  "Invitation validity period in months.": "Masa berlaku undangan dalam bulan.",
+  "Invitation validity period in days.": "Masa berlaku undangan dalam hari.",
   "invitation code settings": "Pengaturan kode undangan",
   "earn from invitation": "Penghasilan dari undangan",
   "invitation host reward": "Hadiah pengundang",

@@ -86,7 +86,7 @@ class InvitationSettingsController extends AdminController
             $form->decimal('invitation_code_date', __('invitation code date'))
                 ->default($this->getValue('invitation_code_date'))
                 ->rules('required|numeric|min:0')
-                ->help(__('Invitation validity period in months.'));
+                ->help(__('Invitation validity period in days.'));
         });
 
         // General Tab
