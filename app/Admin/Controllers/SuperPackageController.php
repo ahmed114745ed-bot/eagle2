@@ -190,6 +190,21 @@ class SuperPackageController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+
+        Admin::style('
+            .rtl .grid-expand .table td,
+            .rtl .grid-expand .table th {
+                text-align: center !important;
+            }
+            .rtl .grid-expand .table td img,
+            .rtl .grid-expand .table td canvas,
+            .rtl .grid-expand .table td div {
+                margin: 0 auto !important;
+            }
+            .rtl .grid-expand .table {
+                direction: ltr;
+            }
+        ');
         $grid->disableExport();
         $grid->actions(function ($actions) {
             $actions->disableView();
@@ -428,34 +443,13 @@ class SuperPackageController extends MainController
                     <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
                 </button>
             </div>
-            <style>
-                #btn-add-continue { display: inline-block; }
-                #btn-add-continue:closest(.form-group) { width: 100%; }
-            </style>
         ');
 
-        Admin::style('
-            .box-footer:has(#btn-add-continue) {
-                text-align: center !important;
-                width: 100% !important;
-            }
-            #btn-add-continue {
-                margin: 0 auto;
-            }
-            .fields-group > .col-md-12:has(#btn-add-continue) {
-                width: 100% !important;
-                flex: 0 0 100% !important;
-                max-width: 100% !important;
-            }
-            .form-group:has(#btn-add-continue) {
-                width: 100% !important;
-                display: block !important;
-            }
-            .form-group:has(#btn-add-continue) .col-sm-8,
-            .form-group:has(#btn-add-continue) .col-sm-12 {
-                width: 100% !important;
-                text-align: center !important;
-            }
+        Admin::script('
+            var btnWrapper = $("#btn-add-continue").closest(".form-group");
+            btnWrapper.css({"width":"100%", "text-align":"center"});
+            btnWrapper.find(".col-sm-8, .col-sm-12, .col-md-8, .col-md-12").css({"width":"100%", "max-width":"100%", "text-align":"center"});
+            btnWrapper.closest(".col-md-12").css({"width":"100%", "max-width":"100%"});
         ');
 
         $form->saving(function (Form $form) {
