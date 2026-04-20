@@ -100,7 +100,7 @@ return [
     'momentComment' => 'Momente yorum',
     'acceptYourAgency' => 'Ajansınız kabul edildi',
     'got_earned_coin' => 'Davet kodu ile 🎉 Tebrikler :name, hesabınıza :coins coin eklendi',
-    'code_invitation_uses' => '🎉 Tebrikler :name, davet kodunuz kullanıldı!',
+    'code_invitation_uses' => '🎉 Tebrikler :name, davet kodunuz :from tarafından kabul edildi ve :coins jeton kazandınız',
     "roomTarget" => "Tebrikler! :room odasında yeni hedefe ulaştınız ve :coins coin kazandınız",
     'maleCp' => ":name, :type türünde bir ilişki gönderdi.",
     'acceptCp' => ':name ilişki isteğinizi kabul etti',

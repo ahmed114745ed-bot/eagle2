@@ -11,10 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('gift_logs', 'total')) {
-            Schema::table('gift_logs', function (Blueprint $table) {
-                $table->unsignedDecimal('total', 12, 2)->nullable()->comment('سعر الهدية الاصلي المرسله');
-            });
+        try {
+            if (!Schema::hasColumn('gift_logs', 'total')) {
+                Schema::table('gift_logs', function (Blueprint $table) {
+                    $table->unsignedDecimal('total', 12, 2)->nullable();
+                });
+            }
+        } catch (\Throwable $e) {
+            // Column already exists or another DB error — safe to ignore
+            // SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'total'
+            if (str_contains($e->getMessage(), '1060') || str_contains($e->getMessage(), 'Duplicate column')) {
+                // Already exists, nothing to do
+                return;
+            }
+            throw $e;
         }
     }
 
