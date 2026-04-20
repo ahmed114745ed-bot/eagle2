@@ -215,12 +215,12 @@ class UserCommon
     private static function isInvitationValid($invitation): bool
     {
         $invitationDate = Carbon::parse($invitation->created_at)->format("Y-m-d");
-        $month =   Common::getConfig('invitation_code_date') ?? 0;
-        if ($month == 0) {
+        $days =   Common::getConfig('invitation_code_date') ?? 0;
+        if ($days == 0) {
             return true;
         }
         $validUntil = Carbon::parse($invitationDate)
-            ->addMonths($month)
+            ->addDays($days)
             ->format('Y-m-d');
         return date("Y-m-d") < $validUntil;
     }

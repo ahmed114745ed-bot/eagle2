@@ -24,7 +24,7 @@
 "The percentage that the inviter takes from each recharge of the invited person.": "النسبة التي يأخذها الداعي من كل شحن للشخص المدعو.",
 "Instant reward (coins) for the inviter at the moment the invitation is accepted.": "مكافأة فورية (عملات) للداعي في لحظة قبول الدعوة.",
     "Instant reward (coins) for the invited person at the moment of acceptance.": "مكافأة فورية (عملات) للشخص المدعو في لحظة القبول.",
-    "Invitation validity period in months.": "مدة صلاحية الدعوة بالأشهر.",
+    "Invitation validity period in days.": "مدة صلاحية الدعوة بالأيام.",
     "invitation code settings": "إعدادات رمز الدعوة",
     "earn from invitation": "المكسب من الدعوة",
     "invitation host reward":"مكافأة مضيف الدعوة",
