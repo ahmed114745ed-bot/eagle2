@@ -316,7 +316,7 @@ class SuperPackageController extends MainController
         }
 
         $form->html('<div class="form-divider full-column-width"> <span>' . __('Rewards') . '</span> </div>');
-
+        $form->html('<div class="full-column-width">');
         $form->select('type', trans('type'))->options([
             "ware" => __('ware'),
             "badge" => __('badge'),
@@ -353,6 +353,18 @@ class SuperPackageController extends MainController
 
                 $form->number('expire', __('expire'))->default(1);
             });
+        $form->html('</div>');
+
+        Admin::style('
+
+        .rtl .fields-group .form-group {
+            display: block !important;
+        }
+
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
 
         $form->html('
             <script>
@@ -411,11 +423,39 @@ class SuperPackageController extends MainController
         ');
 
         $form->html('
-            <div class="box-footer">
+            <div class="box-footer" style="text-align: center; width: 100%;">
                 <button type="button" id="btn-add-continue" class="btn btn-success">
                     <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
                 </button>
             </div>
+            <style>
+                #btn-add-continue { display: inline-block; }
+                #btn-add-continue:closest(.form-group) { width: 100%; }
+            </style>
+        ');
+
+        Admin::style('
+            .box-footer:has(#btn-add-continue) {
+                text-align: center !important;
+                width: 100% !important;
+            }
+            #btn-add-continue {
+                margin: 0 auto;
+            }
+            .fields-group > .col-md-12:has(#btn-add-continue) {
+                width: 100% !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            .form-group:has(#btn-add-continue) {
+                width: 100% !important;
+                display: block !important;
+            }
+            .form-group:has(#btn-add-continue) .col-sm-8,
+            .form-group:has(#btn-add-continue) .col-sm-12 {
+                width: 100% !important;
+                text-align: center !important;
+            }
         ');
 
         $form->saving(function (Form $form) {
