@@ -9,6 +9,7 @@ use App\models\User;
 use App\Models\Room;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Transformers\CharismaResource;
 
 class UserCharismaService
@@ -99,6 +100,7 @@ class UserCharismaService
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
                 $user['total'] = numToStringNew(@$extraDataInRoom?->total ?? 0);
+                Log::info($user['total']);
                 $allDataChanges[] = $user;
             }
         }
