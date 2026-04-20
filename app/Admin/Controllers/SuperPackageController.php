@@ -191,19 +191,18 @@ class SuperPackageController extends MainController
             }
         ");
 
-        Admin::style('
-            .rtl .grid-expand .table td,
-            .rtl .grid-expand .table th {
-                text-align: center !important;
-            }
-            .rtl .grid-expand .table td img,
-            .rtl .grid-expand .table td canvas,
-            .rtl .grid-expand .table td div {
-                margin: 0 auto !important;
-            }
-            .rtl .grid-expand .table {
-                direction: ltr;
-            }
+        Admin::script('
+            $(document).on("click", ".grid-expand", function(){
+                setTimeout(function(){
+                    $(".grid-box .table .table").css("direction", "ltr");
+                    $(".grid-box .table .table td, .grid-box .table .table th").css("text-align", "center");
+                    $(".grid-box .table .table .rtlSvga").css("direction", "ltr");
+                }, 300);
+            });
+            // Also apply immediately for already expanded
+            $(".grid-box .table .table").css("direction", "ltr");
+            $(".grid-box .table .table td, .grid-box .table .table th").css("text-align", "center");
+            $(".grid-box .table .table .rtlSvga").css("direction", "ltr");
         ');
         $grid->disableExport();
         $grid->actions(function ($actions) {
