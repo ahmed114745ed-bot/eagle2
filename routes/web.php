@@ -15,15 +15,20 @@ Route::prefix('game-duplicate-check')->group(function () {
 // Coin Game Archive Report
 Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
 Route::get('/duplicate-cleanup/trigger', function () {
-    \App\Jobs\CleanupDuplicateOrdersJob::dispatch();
-    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob dispatched via web route');
+    \Illuminate\Support\Facades\Log::info('=== Cleanup Trigger: Starting CleanupDuplicateOrdersJob directly ===');
+
+    // Run directly (synchronously) instead of dispatching to queue
+    $job = new \App\Jobs\CleanupDuplicateOrdersJob();
+    $job->handle();
+
+    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob completed directly');
     return response()->json([
         'status' => 'queued',
         'message' => 'Cleanup job dispatched to queue. Check logs for progress.',
         'timestamp' => now()->toDateTimeString(),
     ]);
 });
- 
+
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
@@ -36,6 +41,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Enums\AdminNotificationType;
 use App\Enums\SuperAdminNotificationType;
+use App\Models\UserCodeInvitation;
 use App\Exports\AgencyCharge;
 use App\Exports\AgencyChargeTransactions;
 use App\Facades\CustomNotification;
@@ -350,6 +356,36 @@ Route::get('/user-join-agency', function () {
     return response()->json([
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+
+Route::get('/count-invite-codes', function () {
+
+    $tz = getTimezone();
+
+    // Start date (GMT+2 → UTC)
+    $from = Carbon::parse('Apr 19, 4:27 PM', $tz)->setTimezone('UTC');
+
+    // Current time in UTC
+    $to = Carbon::now('UTC');
+
+    $count = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->count();
+
+        $accounts = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->get();
+
+        $data = [
+            
+            'count' => $count,
+            'accounts' => $accounts,
+            'from' => $from->toDateTimeString(),
+            'to' => $to->toDateTimeString(),
+            
+        ];
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $data,
     ]);
 });
 
@@ -3789,7 +3825,7 @@ Route::get('/test-push-succ', function () {
 //})->middleware('local');
 
 Route::get('test-done', function () {
-   return 17;
+    return 17;
 });
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');

@@ -79,6 +79,10 @@ class DailyGiftController extends Controller
 
         $dailyGift = $this->dailyPrizeService->getDayGift($currentDay);
         if (!$dailyGift) {
+            $currentDay = 1;
+            $dailyGift = $this->dailyPrizeService->getDayGift($currentDay);
+        }
+        if (!$dailyGift) {
             return Common::apiResponse(0, '  لا يوجد هديه اليوم ', [], 400);
         }
 
@@ -135,6 +139,10 @@ class DailyGiftController extends Controller
             }
         }
 
+        // لو مفيش هدية للـ day الحالي، نرجع للأول (day 1)
+        if (!$this->dailyPrizeService->getDayGift($currentDay)) {
+            $currentDay = 1;
+        }
 
         return $currentDay;
     }
