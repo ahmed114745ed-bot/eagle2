@@ -174,7 +174,12 @@ class GiftLogService
             }
 
             if ($room->charizma_status) {
-                dispatchRoomsRedis($room->id, $userId, ($gift->price * $number), $receivedUsers->pluck('id')->toArray());
+                $charismaRoomId = $room->id;
+                $charismaCoins = ($gift->price * $number);
+                $charismaReceivers = $receivedUsers->pluck('id')->toArray();
+                \Illuminate\Support\Facades\DB::afterCommit(function () use ($charismaRoomId, $userId, $charismaCoins, $charismaReceivers) {
+                    dispatchRoomsRedis($charismaRoomId, $userId, $charismaCoins, $charismaReceivers);
+                });
             }
 
             $realPrice = (int) ($number * $gift->price);

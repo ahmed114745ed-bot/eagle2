@@ -132,7 +132,7 @@ class BanController extends MainController
         $grid->column('type', __('Type'))->display(function ($type) {
             $types = [
                 'normal' => __('normal'),
-                'ip' => __('ip'),
+             //   'ip' => __('ip'),
                 'device' => __('device'),
             ];
 

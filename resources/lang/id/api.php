@@ -85,7 +85,7 @@ return [
     'agencyJoinRequest'       => ':name ingin bergabung dengan agen Anda :agencyName',
     'got_coin' => 'Selamat :name, :coins :unit telah ditambahkan ke akun Anda oleh :admin dari dashboard',
     'got_earned_coin' => 'Melalui kode undangan 🎉 Selamat :name, :coins koin telah ditambahkan ke akun Anda',
-    'code_invitation_uses' => '🎉 Selamat :name, kode undangan Anda telah digunakan!',
+    'code_invitation_uses' => '🎉 Selamat :name, kode undangan Anda telah diterima oleh :from dan Anda mendapatkan :coins koin',
     'send_level'                       => 'Anda mengirim level :level',
     'enter_room'                       => ':name membuka ruang suara. Klik untuk bergabung dan bersenang-senang bersama kami',
     'accept_family'                    => 'Selamat: Anda diterima ke keluarga :name. Keluarga berarti kumpul seru, ayo bergabung dan besarkan komunitas!',

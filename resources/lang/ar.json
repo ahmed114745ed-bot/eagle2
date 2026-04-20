@@ -1,5 +1,6 @@
 {
-    "Laravel": "سبسيب",
+    "Laravel": "سبسيب", 
+    "total_diamonds_sent": "إجمالي الكوينزات المرسلة",
     "Save order": "حفظ الترتيب",
     "Select All Permissions": "تحديد جميع الصلاحيات",
     "selected": "محدد",
@@ -23,7 +24,7 @@
 "The percentage that the inviter takes from each recharge of the invited person.": "النسبة التي يأخذها الداعي من كل شحن للشخص المدعو.",
 "Instant reward (coins) for the inviter at the moment the invitation is accepted.": "مكافأة فورية (عملات) للداعي في لحظة قبول الدعوة.",
     "Instant reward (coins) for the invited person at the moment of acceptance.": "مكافأة فورية (عملات) للشخص المدعو في لحظة القبول.",
-    "Invitation validity period in months.": "مدة صلاحية الدعوة بالأشهر.",
+    "Invitation validity period in days.": "مدة صلاحية الدعوة بالأيام.",
     "invitation code settings": "إعدادات رمز الدعوة",
     "earn from invitation": "المكسب من الدعوة",
     "invitation host reward":"مكافأة مضيف الدعوة",
@@ -98,6 +99,7 @@
     "room in home screen layer": "الغرف في واجهة الشاشة الرئيسية",
     "show rooms": "عرض الغرف",
     "latest_withdrawals": "آخر المسحوبات",
+    "Total Diamond Send": "إجمالي الماسات المرسلة",
     "latest_payments": "آخر عمليات الدفع",
     "table_header_index": "#",
     "table_header_account": "الحساب",
@@ -209,6 +211,7 @@
     "Owner Profit Percentage (Owner Profit %)": "نسبة أرباح المالك (٪ أرباح المالك)",
     "Number of Admin Seats (Num of Admins)": "عدد مقاعد المسؤولين (عدد المسؤولين)",
     "Condition for Room Growth (Num of Visitors)": "شرط نمو الغرفة (عدد الزوار)",
+    "visitors":"زوار",
     "Target of Room Diamond (Total)": "الهدف من ماسات الغرفة (الإجمالي)",
     "TargetDiamond": "يمثل هذا الهدف عدد الماسات التي يجب أن يحققها الغرفة (مثل 1,000,000). عند الوصول إلى هذا الهدف، قد يتم تفعيل مكافآت معينة أو فتح ميزات جديدة.",
     "ConditionGroeth": "يحدد الحد الأدنى لعدد الزوار المطلوب لزيادة ظهور الغرفة أو فتح مزايا جديدة. يمكنك تخصيص هذا الشرط بناءً على أداء الغرفة.",
@@ -4246,6 +4249,8 @@
     "invitation.invitee_reward": "جائزة المدعو (كوينز)",
     "invitation.invitee_reward_help": "عدد الكوينزات التي يحصل عليها المدعو عند استخدام الكود.",
     "invitation.saved_successfully": "تم حفظ إعدادات كود الدعوة بنجاح",
+    "percentage invitation code": "نسبة كود الدعوة",
+    "invitation code setting": "إعدادات كود الدعوة",
     "invitation.user_not_found": "لم يتم العثور علي المستخدم",
     "invitation.validation_failed": "لقد مر علي المستخدم 48 ساعة من تاريخ انشائه أو المستخدم مسجل من قبل لدي شخص آخر",
     "invitation.success": "تمت الإضافة بنجاح",
@@ -5394,5 +5399,9 @@
     "Charge settings":"اعددات الشحن",
     "charge settings":"اعددات الشحن",
   "milestone_vip_reward_message": "لقد حصلت على :vip كمكافأة على إتمام :milestone",
-  "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone"
+  "milestone_ware_reward_message": "لقد حصلت على :ware كمكافأة على إتمام :milestone",
+  "Actual Gift Price from Database": "إجمالي سعر الهدايا الفعلي من قاعدة البيانات",
+  "Lucky Gift Total": "إجمالي هدايا الحظ",
+  "Regular Gift Total": "إجمالي الهدايا العادية",
+  "Total Diamonds Sent": "إجمالي الماسات المرسلة"
 }
