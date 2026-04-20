@@ -158,6 +158,12 @@ return [
             'path' => storage_path('logs/utd.log'),
             'level' => 'debug',
         ],
+        'zigo_handler' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/zigo_handler.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];
