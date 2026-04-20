@@ -64,8 +64,7 @@ trait ZegoTrait
 
         return null;
     }
-
-    protected static function buildZegoParams(array $baseParams): array
+    public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
     {
         
         $roomId = $RoomId ?? request()->room_id;
@@ -87,12 +86,10 @@ trait ZegoTrait
             'SignatureNonce' => $SignatureNonce,
             'Timestamp' => $Timestamp,
             'Signature' => $signature,
-            'SignatureVersion' => '2.0',
+            'SignatureVersion' => $SignatureVersion,
+            'IsTest' => $IsTest
         ];
-    }
-
-    protected static function sendZegoRequest(array $params, string $url = 'https://rtc-api.zego.im', int $timeout = 20)
-    {
+        $headers = [];
         try {
           
             $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
@@ -110,61 +107,42 @@ trait ZegoTrait
         } catch (\Exception $exception) {
             Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
                 'action' => $Action,
-                'roomId' => (string)$RoomId,
-                'fromUserId' => (string)$FromUserId,
-                'message' => $MessageContent,
-                'isTest' => $IsTest,
-            ]);
-        }
-
-        $params = self::buildZegoParams([
-            'Action' => $Action,
-            'RoomId' => $RoomId,
-            'FromUserId' => $FromUserId,
-            'MessageContent' => $MessageContent,
-            'IsTest' => $IsTest,
-        ]);
-
-        $response = self::sendZegoRequest($params);
-
-        if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
-            Log::warning('ZegoTrait::sendToZego failed', [
-                'action' => $Action,
                 'roomId' => $RoomId,
                 'fromUserId' => $FromUserId,
-                'response' => $response,
+                'error' => $exception->getMessage(),
             ]);
         }
 
-        return $response;
+        return null;
     }
 
     public static function sendToZego_2($Action, $RoomId, $UserId, $UserName, $MessageContent, $IsTest = 'false')
     {
-        $provider = Common::getConfig('sound_library');
-
-        if ($provider == '3') {
-            $utdKeys = Common::getUtdData();
-            return self::sendUtdRequest([
-                'apiKey' => $utdKeys['utd_app_id'] ?? null,
-                'action' => $Action,
-                'roomId' => (string)$RoomId,
-                'fromUserId' => (string)$UserId,
-                'userName' => $UserName,
-                'message' => $MessageContent,
-                'isTest' => $IsTest,
-            ]);
-        }
-
-        $params = self::buildZegoParams([
+        $url = 'https://rtc-api.zego.im';
+        // $AppId = self::getConf('zego_app_id');
+        $AppId = self::zegoData('zego_app_id');
+        $SignatureNonce = self::getSignatureNonce();
+        $Timestamp = time();
+        //  $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        $signature = md5($str);
+        $SignatureVersion = '2.0';
+        $params = [
             'Action' => $Action,
             'RoomId' => $RoomId,
             'UserId' => $UserId,
             'UserName' => $UserName,
             'MessageCategory' => 1,
             'MessageContent' => $MessageContent,
-            'IsTest' => $IsTest,
-        ]);
+            'AppId' => $AppId,
+            'SignatureNonce' => $SignatureNonce,
+            'Timestamp' => $Timestamp,
+            'Signature' => $signature,
+            'SignatureVersion' => $SignatureVersion,
+            'IsTest' => $IsTest
+        ];
+        $headers = [];
+        try {
 
             $response = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
@@ -190,20 +168,17 @@ trait ZegoTrait
 
     public static function sendToZego_3($Action, $RoomId, $UserId, $IsTest = 'false')
     {
-        $provider = Common::getConfig('sound_library');
+        $url = 'https://rtc-api.zego.im';
 
-        if ($provider == '3') {
-            $utdKeys = Common::getUtdData();
-            return self::sendUtdRequest([
-                'apiKey' => $utdKeys['utd_app_id'] ?? null,
-                'action' => $Action,
-                'roomId' => (string)$RoomId,
-                'toUserId' => (array)$UserId,
-                'isTest' => $IsTest,
-            ]);
-        }
-
-        $params = self::buildZegoParams([
+        // $AppId = self::getConf('zego_app_id');
+        $AppId = self::zegoData('zego_app_id');
+        $SignatureNonce = self::getSignatureNonce();
+        $Timestamp = time();
+        //  $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        $signature = md5($str);
+        $SignatureVersion = '2.0';
+        $params = [
             'Action' => $Action,
             'RoomId' => $RoomId,
             'UserId[]' => $UserId,
@@ -239,22 +214,16 @@ trait ZegoTrait
 
     public static function sendToZego_4($Action, $RoomId, $fromUserId, $toUserId, $MessageContent, $IsTest = 'false')
     {
-        $provider = Common::getConfig('sound_library');
-
-        if ($provider == '3') {
-            $utdKeys = Common::getUtdData();
-            return self::sendUtdRequest([
-                'apiKey' => $utdKeys['utd_app_id'] ?? null,
-                'action' => $Action,
-                'roomId' => (string)$RoomId,
-                'fromUserId' => (string)$fromUserId,
-                'toUserId' => (array)$toUserId,
-                'message' => $MessageContent,
-                'isTest' => $IsTest,
-            ]);
-        }
-
-        $params = self::buildZegoParams([
+        $url = 'https://rtc-api.zego.im';
+       // $AppId = self::getConf('zego_app_id');
+        $AppId = self::zegoData('zego_app_id');
+        $SignatureNonce = self::getSignatureNonce();
+        $Timestamp = time();
+       // $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        $signature = md5($str);
+        $SignatureVersion = '2.0';
+        $params = [
             'Action' => $Action,
             'RoomId' => $RoomId,
             'FromUserId' => $fromUserId,
@@ -292,7 +261,6 @@ trait ZegoTrait
 
         
 
-        return self::sendZegoRequest($params, timeout: 10);
+        return $res;
     }
-
 }
