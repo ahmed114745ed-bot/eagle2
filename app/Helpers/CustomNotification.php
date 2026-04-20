@@ -593,7 +593,7 @@ class CustomNotification
     }
 
 
-    public function chargeAction(User $user, $request, $admin = "Admin", $agency = null ,$coins = 0)
+    public function chargeAction(User $user, $request, $admin = "Admin", $agency = null, $coins = 0)
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
@@ -616,7 +616,7 @@ class CustomNotification
 
         if (!$user->is_logout)
             Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $body, data: $data, messageType: 'charge-action-notifaction');
-            Common::sendOfficialMessage($user->id, title: $body, titleAr: $body);
+        Common::sendOfficialMessage($user->id, title: $body, titleAr: $body);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
@@ -649,7 +649,7 @@ class CustomNotification
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
-        $body = __('api.code_invitation_uses', ['name' => $user->name,'from' => @$invitationUser->name, 'coins' => $amount], $lang);
+        $body = __('api.code_invitation_uses', ['name' => $user->name, 'from' => @$invitationUser->name, 'coins' => $amount], $lang);
 
         $data = [
             'coins' => $amount,
@@ -661,6 +661,33 @@ class CustomNotification
                 $body,
                 data: $data,
                 messageType: 'charge-action-notifaction'
+            );
+        }
+        Common::sendOfficialMessage(
+            $user->id,
+            title: $body,
+            titleAr: $body
+        );
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+
+    public function hostSalary(User $user, User $invitationUser, float $amount = 0)
+    {
+        $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+        $lang = $user?->lan ?? 'en';
+        $body = __('api.host_salary', ['from' => @$invitationUser->name, 'amount' => $amount], $lang);
+
+        $data = [
+            'coins' => $amount,
+        ];
+        if (!$user->is_logout) {
+            Common::send_firebase_notification(
+                $tokens_notification,
+                $this->appName($user->lan),
+                $body,
+                data: $data,
+                messageType: 'host-salary-notification'
             );
         }
         Common::sendOfficialMessage(
