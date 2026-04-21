@@ -24,7 +24,7 @@ class CharismaWork implements RoomJobInterface
 
     public function sendToZego($data, int $roomId,int $user_id):  string
     {
-        if (!UserCharismaService::FORMAT_TOTAL_IN_SERVICE) {
+        if (UserCharismaService::FORMAT_TOTAL_IN_SERVICE) {
             $data = array_map(function($user) {
                 if (isset($user['total'])) {
                     \Log::info('sendToZego - Before format', [
