@@ -19,25 +19,33 @@ class CharismaLevelController extends  MainController
     protected $title = 'CharismaLevel';
     public $permission_name = 'charisma-levels';
 
-    
+
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('badges'))
+            ->title(trans('Charisma Levels'))
             ->body($this->grid()));
     }
 
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('badges'))
+            ->title(trans('Charisma Levels'))
             ->body($this->detail($id)));
     }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('Charisma Levels'))
+            ->body($this->form()));
+    }
+
 
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
-            ->title(trans('badges'))
+            ->title(trans('Charisma Levels'))
             ->body($this->form()->edit($id)));
     }
 
