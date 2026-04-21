@@ -132,7 +132,12 @@ class LuckyGiftService
 
             $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
             $receiverName = $receivedUsers->first()?->name;
-            $receiversCount = $receivedUsers->count();
+            
+            // FIX 2: Use actual receivers from DB instead of overwriting count
+            // This prevents budget calculation from being based on potentially fewer users
+            $receiversIds = $receivedUsers->pluck('id')->map(fn($id) => (string) $id)->all();
+            $receiversCount = count($receiversIds);
+            
             $isToRoom = $receiversCount > 1;
             $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
@@ -703,21 +708,29 @@ class LuckyGiftService
 
     private function getResponseData2($gift, $room, $user, $receiversIds, $receiverName)
     {
+        
         $microphones = $room->microphones ?? collect();
 
+        $positions = [];
+        $missingReceivers = [];
 
-
-        $positions = $microphones
-            ->filter(fn($mic) => in_array($mic->user_id, $receiversIds))
-            ->pluck('position')
-            ->values()
-            ->all();
-
-        $missingReceivers = array_diff($receiversIds, $microphones->pluck('user_id')->all());
-
+        foreach ($receiversIds as $receiverId) {
+            $mic = $microphones->firstWhere('user_id', $receiverId);
+            if ($mic) {
+                $positions[] = $mic->position;
+            } else {
+                $positions[] = -1;
+                $missingReceivers[] = $receiverId;
+            }
+        }
 
         if (!empty($missingReceivers)) {
-            $positions[] = -1;
+            \Illuminate\Support\Facades\Log::warning('Lucky gift: receivers without room_microphones records', [
+                'room_id' => $room->id,
+                'missing_receiver_ids' => $missingReceivers,
+                'total_receivers' => count($receiversIds),
+                'with_records' => count($receiversIds) - count($missingReceivers),
+            ]);
         }
 
         return [
