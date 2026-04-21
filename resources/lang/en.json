@@ -1,5 +1,6 @@
 {
     "Id": "Id",
+    "total_diamonds_sent": "Total coins sent",
     "ID": "ID",
     "Name": "Name",
     "User": "User",
@@ -1743,5 +1744,6 @@
   "milestone_ware_reward_message": "You have received :ware as a reward for completing :milestone",
   "Actual Gift Price from Database": "Actual Gift Price from Database",
   "Lucky Gift Total": "Lucky Gift Total",
-  "Regular Gift Total": "Regular Gift Total"
+  "Regular Gift Total": "Regular Gift Total",
+  "Total Diamonds Sent": "Total Diamonds Sent"
 }

@@ -4,11 +4,11 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Http\Repositories\ChatRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ChatMessageBatchService;
 
 class UpdateLastSeen
 {
@@ -19,27 +19,29 @@ class UpdateLastSeen
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $cacheKey = 'user_last_seen_' . $user->id;
 
-            if (Auth::check()) {
-                $user = Auth::user();
-                $cacheKey = 'user_last_seen_' . $user->id;
+            if (!Cache::has($cacheKey)) {
                 $chatsId = (new ChatRepository())->getUserChatRooms($user->id);
-                ChatMessage::whereIn('chat_room_id', $chatsId)
-                    ->where('user_id', '!=', $user->id)
-                    ->where('status', 'sended')
-                    ->update(['status' => 'received']);
 
-                if (!Cache::has($cacheKey)) {
-                    $user->update([
-                        'last_seen_at' => now(),
-                        'online' => true,
-                    ]);
-
-                    Cache::put($cacheKey, true, now()->addMinutes(2));
+                if (!empty($chatsId)) {
+                    app(ChatMessageBatchService::class)->markMessagesAsReceivedInBatch(
+                        $chatsId,
+                        $user->id
+                    );
                 }
+
+                $user->update([
+                    'last_seen_at' => now(),
+                    'online' => true,
+                ]);
+
+                Cache::put($cacheKey, true, now()->addMinutes(2));
             }
+        }
 
-            return $next($request);
-
+        return $next($request);
     }
 }

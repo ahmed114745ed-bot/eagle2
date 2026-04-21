@@ -1,5 +1,8 @@
 {
-    "Users": "Kullanıcılar",
+    "Users": "Kullanıcılar", 
+    
+    "total_diamonds_sent": "Gönderilen toplam elmas",
+
     "URI": "URI",
     "Id": "Kimlik",
     "ID": "ID",
@@ -43,7 +46,7 @@
 "The percentage that the inviter takes from each recharge of the invited person.": "Davet edenin, davet edilen kişinin her yüklemesinden aldığı yüzde.",
   "Instant reward (coins) for the inviter at the moment the invitation is accepted.": "Davet kabul edildiği anda davet edene verilen anlık ödül (coin).",
   "Instant reward (coins) for the invited person at the moment of acceptance.": "Kabul anında davet edilen kişiye verilen anlık ödül (coin).",
-  "Invitation validity period in months.": "Davetin geçerlilik süresi (ay olarak).",
+  "Invitation validity period in days.": "Davetin geçerlilik süresi (gün olarak).",
   "invitation code settings": "Davet kodu ayarları",
   "earn from invitation": "Davetten kazanç",
   "invitation host reward": "Davet eden ödülü",
@@ -4511,7 +4514,6 @@
   "milestone_ware_reward_message": ":milestone tamamlama ödülü olarak :ware kazandınız",
   "Actual Gift Price from Database": "Veritabanından Gerçek Hediye Fiyatı",
   "Lucky Gift Total": "Şans Hediyesi Toplamı",
-  "Regular Gift Total": "Normal Hediye Toplamı"
- 
-
+  "Regular Gift Total": "Normal Hediye Toplamı",
+  "Total Diamonds Sent": "Gönderilen Toplam Elmas"
 }

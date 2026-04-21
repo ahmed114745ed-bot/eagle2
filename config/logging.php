@@ -132,6 +132,12 @@ return [
             'path' => storage_path('logs/charisma.log'),
             'level' => 'debug',
         ],
+        'charisma_value' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/charisma-value-log.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
         'roomCup' => [
             'driver' => 'single',
             'path' => storage_path('logs/roomCup.log'),
@@ -151,6 +157,12 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/utd.log'),
             'level' => 'debug',
+        ],
+        'zigo_handler' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/zigo_handler.log'),
+            'level' => 'debug',
+            'days' => 14,
         ],
     ],
 

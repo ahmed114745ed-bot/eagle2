@@ -127,11 +127,11 @@ class ChargeController extends Controller
         }
 
         if (!$usd)  return Common::apiResponse(0, 'not found', 404);
-        
+
         $rate = Common::getCoinsValue('user_coins');
 
         if (!$rate)  return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
-        
+
         $coins = $usd * $rate;
 
         $totalSalary = $from->salary;
@@ -232,7 +232,7 @@ class ChargeController extends Controller
             $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
 
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
-
+            CustomNotification::hostSalary($to, $from,  $usd);
             DB::commit();
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
@@ -475,7 +475,7 @@ class ChargeController extends Controller
         $from = $request->user();
         if (!$request->id || !$request->amount) return Common::apiResponse(false, 'missing_params');
         if ($request->amount < 0) return Common::apiResponse(false, 'value not allow');
-      
+
         $toUser = null;
         $to = null;
 
@@ -504,7 +504,7 @@ class ChargeController extends Controller
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_agent_disabled'), 403);
             }
         }
-        
+
 
         try {
             $this->chargeService->chargeAgencyToAnother($from, $request);
