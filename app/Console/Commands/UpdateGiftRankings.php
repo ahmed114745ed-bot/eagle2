@@ -56,7 +56,6 @@ class UpdateGiftRankings extends Command
                 break;
         }
 
-        
         $rankings = DB::connection()->getPdo()->prepare("
             SELECT
                 $column AS ranker_id,
@@ -73,25 +72,26 @@ class UpdateGiftRankings extends Command
         $rankings->execute([$startDate]);
         $rankingData = $rankings->fetchAll(\PDO::FETCH_ASSOC);
 
-        DB::transaction(function () use ($type, $role, $rankingData, $rankerType) {
+        // Prepare insert data outside of transaction
+        $now = now();
+        $insertData = array_map(function ($ranking) use ($type, $role, $rankerType, $now) {
+            return [
+                'type' => $type,
+                'role' => $role,
+                'ranker_id' => $ranking['ranker_id'],
+                'ranker_type' => $rankerType,
+                'total_gifts' => $ranking['total_gifts'],
+                'last_calculated_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }, $rankingData);
+
+        DB::transaction(function () use ($type, $role, $insertData) {
             DB::table('gift_rankings')
                 ->where('type', $type)
                 ->where('role', $role)
                 ->delete();
-
-            $now = now();
-            $insertData = array_map(function ($ranking) use ($type, $role, $rankerType, $now) {
-                return [
-                    'type' => $type,
-                    'role' => $role,
-                    'ranker_id' => $ranking['ranker_id'],
-                    'ranker_type' => $rankerType,
-                    'total_gifts' => $ranking['total_gifts'],
-                    'last_calculated_at' => $now,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }, $rankingData);
 
             // Insert in chunks to avoid memory issues with large datasets
             foreach (array_chunk($insertData, 50) as $chunk) {

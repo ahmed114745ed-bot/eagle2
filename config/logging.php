@@ -164,6 +164,11 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'datetime' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/datetime.log'),
+            'level' => 'debug',
+        ],
     ],
 
 ];
