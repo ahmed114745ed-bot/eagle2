@@ -30,6 +30,7 @@ use App\Tik\Repositories\RequestBackgroundImageRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Modules\TaskStream\Services\TaskStreamService;
+use App\Models\RoomMicrophone;
 
 class RoomRepoService
 {
@@ -465,10 +466,10 @@ class RoomRepoService
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
         $youtubeStatus =  (bool)(getSettingCash('youtube_status') ?? true);
         if ($currentMode == 5 && $youtubeStatus === false) return Common::apiResponse(0, __('this feature stopped'), null, 404);
-        //get last mode of rooms to if is cinema mode and change it update room background
         $lastMode = $room->mode;
         $room->mode = $currentMode;
         $room->save();
+        RoomMicrophone::where('room_id', $room->id)->delete();
         $jsons = [];
         $map = [];
         $mode = '';
