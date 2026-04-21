@@ -37,45 +37,60 @@ class ChatMessageBatchService
         $totalUpdated = 0;
         $batchCount = 0;
         $failedBatches = [];
-
-    
+        $maxRetries = 3;
 
         try {
             foreach (array_chunk($roomIds, self::BATCH_SIZE) as $chunk) {
-                try {
-                    $batchCount++;
-                    $updated = DB::transaction(function () use ($chunk, $excludeUserId) {
-                        return ChatMessage::whereIn('chat_room_id', $chunk)
-                            ->where('user_id', '!=', $excludeUserId)
-                            ->where('status', 'sended')
-                            ->update(['status' => 'received']);
-                    });
+                $retryCount = 0;
+                $updated = 0;
+                
+                while ($retryCount < $maxRetries) {
+                    try {
+                        $batchCount++;
+                        $updated = DB::transaction(function () use ($chunk, $excludeUserId) {
+                            return ChatMessage::whereIn('chat_room_id', $chunk)
+                                ->where('user_id', '!=', $excludeUserId)
+                                ->where('status', 'sended')
+                                ->update(['status' => 'received']);
+                        });
 
-                    $totalUpdated += $updated;
+                        $totalUpdated += $updated;
+                        break; // Success, exit retry loop
 
-                 
+                    } catch (\Exception $e) {
+                        $retryCount++;
+                        
+                        // Check if it's a deadlock error (1213)
+                        if (strpos($e->getMessage(), '1213') !== false && $retryCount < $maxRetries) {
+                            // Exponential backoff: 100ms, 200ms, 400ms
+                            usleep(pow(2, $retryCount - 1) * 100 * 1000);
+                            continue;
+                        }
+                        
+                        // If max retries exceeded or not a deadlock, log and add to failed batches
+                        $failedBatches[] = [
+                            'batch_number' => $batchCount,
+                            'rooms' => $chunk,
+                            'error' => $e->getMessage(),
+                            'retry_count' => $retryCount,
+                        ];
 
-                    if ($batchCount < ceil(count($roomIds) / self::BATCH_SIZE)) {
-                        usleep(self::BATCH_SLEEP_MS * 1000);
+                        Log::channel('chat')->error('Batch update failed', [
+                            'batch_number' => $batchCount,
+                            'rooms_in_batch' => count($chunk),
+                            'error' => $e->getMessage(),
+                            'retry_count' => $retryCount,
+                        ]);
+                        break;
                     }
+                }
 
-                } catch (\Exception $e) {
-                    $failedBatches[] = [
-                        'batch_number' => $batchCount,
-                        'rooms' => $chunk,
-                        'error' => $e->getMessage(),
-                    ];
-
-                    Log::channel('chat')->error('Batch update failed', [
-                        'batch_number' => $batchCount,
-                        'rooms_in_batch' => count($chunk),
-                        'error' => $e->getMessage(),
-                    ]);
+                if ($batchCount < ceil(count($roomIds) / self::BATCH_SIZE)) {
+                    usleep(self::BATCH_SLEEP_MS * 1000);
                 }
             }
 
             $duration = (microtime(true) - $startTime) * 1000;
-
 
             return [
                 'success' => empty($failedBatches),
