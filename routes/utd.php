@@ -526,6 +526,9 @@ Route::middleware([])->group(function () {
     Route::post('/update-room-mode', [SettingController::class, 'updateRoomMode']);
     Route::post('/update-charisma-format', [SettingController::class, 'updateCharismaFormat']);
 
+        Route::post('/update-charisma-badge', [SettingController::class, 'updateCharismaBadge']);
+
+
 
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
