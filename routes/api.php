@@ -3,10 +3,10 @@
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Services\UtdService;
+use App\Http\Controllers\UtdController;
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\CodapayController;
 use Illuminate\Http\Request;
-use App\Services\PayPalService;
-use App\Services\CodapayService;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -106,15 +106,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
     Route::get('/fawry/done', [PaymentMethodController::class, 'success']);
     Route::post('utd-paymob-callback', [PaymentMethodController::class, 'utdPayMobCallback'])->middleware('verify.utdFawry.signature');
-    Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
-    Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
-    Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
+    Route::post('paypal-callback', [PayPalController::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
+    Route::get('paypal-return/{orderId}', [PayPalController::class, 'success'])->name('paypal.success');
+    Route::get('paypal-cancel/{orderId}', [PayPalController::class, 'cancel'])->name('paypal.cancel');
 
-    Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
-    Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
+    Route::get('codapay-callback', [CodapayController::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
+    Route::get('codapay-success/{id}/{country}', [CodapayController::class, 'success'])->name('codapay.success');
 
-    Route::get('utd-success/{orderId}', [UtdService::class, 'success'])->name('utd.success');
-    Route::post('utd-callback', [UtdService::class, 'callback'])->middleware(['verify.utdpay.webhook', 'throttle:30,1'])->name('utd.callback');
+    Route::get('utd-success/{orderId}', [UtdController::class, 'success'])->name('utd.success');
+    Route::post('utd-callback', [UtdController::class, 'callback'])->middleware(['verify.utdpay.webhook', 'throttle:30,1'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
