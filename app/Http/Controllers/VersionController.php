@@ -79,6 +79,8 @@ class VersionController extends Controller
             return $setting?->value ?? 3;
         });
 
+        $micImages = Config::whereIn('name', ['open_mic_image', 'close_mic_image'])->pluck('value', 'name');
+
 
 
         $data = [
@@ -138,7 +140,12 @@ class VersionController extends Controller
                 "metadata" => [
                     "default_screen" => $settings['default_screen'] ?? 'audio_room',
                 ]
-            ]
+            ],
+            'mic_images' => [
+                'open'  => $micImages['open_mic_image'] ?? '',
+                'close' => $micImages['close_mic_image'] ?? '',
+            ],
+
 
         ];
 
