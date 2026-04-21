@@ -47,12 +47,15 @@ class ChatMessageBatchService
                 while ($retryCount < $maxRetries) {
                     try {
                         $batchCount++;
-                        $updated = DB::transaction(function () use ($chunk, $excludeUserId) {
-                            return ChatMessage::whereIn('chat_room_id', $chunk)
-                                ->where('user_id', '!=', $excludeUserId)
-                                ->where('status', 'sended')
-                                ->update(['status' => 'received']);
-                        });
+                        $updated = 0;
+                        foreach ($chunk as $roomId) {
+                            $updated += DB::transaction(function () use ($roomId, $excludeUserId) {
+                                return ChatMessage::where('chat_room_id', $roomId)
+                                    ->where('user_id', '!=', $excludeUserId)
+                                    ->where('status', 'sended')
+                                    ->update(['status' => 'received']);
+                            });
+                        }
 
                         $totalUpdated += $updated;
                         break; // Success, exit retry loop

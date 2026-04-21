@@ -71,6 +71,11 @@ class FairLuckWallet extends Model
             return false;
         }
 
+        if ($walletType === self::TYPE_UNIFIED_VAULT) {
+            self::incrementRedisBalance($walletType, $amount);
+            return true;
+        }
+
         return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
             $wallet = self::where('wallet_type', $walletType)
                 ->lockForUpdate()
@@ -99,6 +104,14 @@ class FairLuckWallet extends Model
     {
         if ($amount <= 0) {
             return false;
+        }
+
+        if ($walletType === self::TYPE_UNIFIED_VAULT) {
+            $limit = self::getNegativeLimit();
+            if (!self::decrementRedisBalance($walletType, $amount)) {
+                return false;
+            }
+            return true;
         }
 
         return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
@@ -203,9 +216,7 @@ class FairLuckWallet extends Model
         return (int) $balance;
     }
 
-    /**
-     * زيادة الرصيد في Redis (Atomic)
-     */
+
     public static function incrementRedisBalance(string $walletType, int $amount): int
     {
         if ($amount <= 0) {
