@@ -716,6 +716,10 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
 
+                    ['key' => 'charisma-levels', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit'],
                     ],],
