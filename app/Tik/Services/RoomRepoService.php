@@ -534,13 +534,6 @@ class RoomRepoService
             'position' => 0,
             'status'   => 1,
         ]);
-
-        \Log::info('Default microphone created', [
-            'room_id' => $room->id,
-            'mic_id'  => $mic->id,
-            'user_id' => $mic->user_id,
-            'position'=> $mic->position,
-        ]);
     }
     public function getRoomBackground(?Room $room)
     {
