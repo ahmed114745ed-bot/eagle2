@@ -8,6 +8,7 @@ use App\Models\Room;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class CharismaWork implements RoomJobInterface
+
 {
 
     public function work($roomJob) : array
@@ -23,27 +24,19 @@ class CharismaWork implements RoomJobInterface
 
     public function sendToZego($data, int $roomId,int $user_id):  string
     {
-        // Format all totals before sending to Zego
-        $formattedData = array_map(function($user) {
-            if (isset($user['total'])) {
-                \Log::info('sendToZego - Before format', [
-                    'user_id' => $user['user_id'] ?? 'N/A',
-                    'total_raw' => $user['total'],
-                    'total_type' => gettype($user['total'])
-                ]);
-                $user['total'] = numToStringNew($user['total']);
-                \Log::info('sendToZego - After format', [
-                    'user_id' => $user['user_id'] ?? 'N/A',
-                    'total_formatted' => $user['total']
-                ]);
-            }
-            return $user;
-        }, $data);
+        if (!UserCharismaService::FORMAT_TOTAL_IN_SERVICE) {
+            $data = array_map(function($user) {
+                if (isset($user['total'])) {
+                    $user['total'] = numToStringNew($user['total']);
+                }
+                return $user;
+            }, $data);
+        }
 
         $ms   = [
             'messageContent' => [
                 "message" => "updateCharisma",
-                "data"    => $formattedData,
+                "data"    => $data,
             ]
         ];
         $json = json_encode($ms);

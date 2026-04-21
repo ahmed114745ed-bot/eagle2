@@ -62,18 +62,19 @@ class UpdateSendCharismaToZigo implements ShouldQueue
             return;
         }
 
-        // Format totals before sending to Zego
-        $formattedData = array_map(function($user) {
-            if (isset($user['total'])) {
-                $user['total'] = numToStringNew($user['total']);
-            }
-            return $user;
-        }, $data);
+        if (!UserCharismaService::FORMAT_TOTAL_IN_SERVICE) {
+            $data = array_map(function($user) {
+                if (isset($user['total'])) {
+                    $user['total'] = numToStringNew($user['total']);
+                }
+                return $user;
+            }, $data);
+        }
 
         $ms = [
             'messageContent' => [
                 "message" => "updateCharisma",
-                "data" => $formattedData,
+                "data" => $data,
             ]
         ];
         $json = json_encode($ms);
