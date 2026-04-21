@@ -31,6 +31,7 @@ class CharismaWork implements RoomJobInterface
                     'total_raw' => $user['total'],
                     'total_type' => gettype($user['total'])
                 ]);
+                info('formatTotalInService', [UserCharismaService::formatTotalInService()]);
                 $user['total'] = UserCharismaService::formatTotalInService()
                     ? numToStringNew($user['total'])
                     : (int) $user['total'];
