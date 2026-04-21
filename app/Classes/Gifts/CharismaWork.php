@@ -27,7 +27,16 @@ class CharismaWork implements RoomJobInterface
         if (!UserCharismaService::FORMAT_TOTAL_IN_SERVICE) {
             $data = array_map(function($user) {
                 if (isset($user['total'])) {
+                    \Log::info('sendToZego - Before format', [
+                        'user_id' => $user['user_id'] ?? 'N/A',
+                        'total_raw' => $user['total'],
+                        'total_type' => gettype($user['total'])
+                    ]);
                     $user['total'] = numToStringNew($user['total']);
+                    \Log::info('sendToZego - After format', [
+                        'user_id' => $user['user_id'] ?? 'N/A',
+                        'total_formatted' => $user['total']
+                    ]);
                 }
                 return $user;
             }, $data);
