@@ -12,7 +12,6 @@ services:
       - /var/www/rixo-chat/storage:/app/storage
     networks:
       - app-network
-      - monitoring_monitoring
     deploy:
       replicas: 4
       update_config:
@@ -64,7 +63,6 @@ services:
       - "6379:6379"
     networks:
       - app-network
-      - monitoring_monitoring
     deploy:
       resources:
         limits:
@@ -81,5 +79,3 @@ networks:
   app-network:
     external: true
     name: q7s5ppqh7msig6kannz2d74m8
-  monitoring_monitoring:
-    external: true
