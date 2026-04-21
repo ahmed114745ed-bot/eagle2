@@ -14,6 +14,7 @@ use Modules\Charizma\Transformers\CharismaResource;
 
 class UserCharismaService
 {
+    const FORMAT_TOTAL_IN_SERVICE = false;
 
     private Collection $userCharismaLevels;
 
@@ -100,7 +101,9 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
+                $user['total'] = self::FORMAT_TOTAL_IN_SERVICE
+                    ? numToStringNew($extraDataInRoom->total ?? 0)
+                    : (int) $extraDataInRoom->total;
                 Log::info('Total for user ' . $userId . ': ' . $user['total']);
                 $allDataChanges[] = $user;
             }
@@ -138,7 +141,9 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
+                $user['total'] = self::FORMAT_TOTAL_IN_SERVICE
+                    ? numToStringNew($extraDataInRoom->total ?? 0)
+                    : (int) $extraDataInRoom->total;
                 $allDataChanges[] = $user;
             }
         }
