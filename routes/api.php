@@ -752,3 +752,13 @@ Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getC
 Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
 Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
 Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
+
+// Queue restart route
+Route::get('queue/restart', function () {
+    \Artisan::call('queue:restart');
+    return response()->json([
+        'success' => true,
+        'message' => 'Queue workers restarted successfully',
+        'output' => \Artisan::output()
+    ]);
+});

@@ -100,8 +100,8 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = $extraDataInRoom->total; // Keep as integer for now
-                Log::info('Total for user ' . $userId . ': ' . $extraDataInRoom->total);
+                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
+                Log::info('Total for user ' . $userId . ': ' . $user['total']);
                 $allDataChanges[] = $user;
             }
         }
@@ -138,7 +138,7 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = $extraDataInRoom->total; // Keep as integer for now
+                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
                 $allDataChanges[] = $user;
             }
         }
