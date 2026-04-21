@@ -31,6 +31,7 @@ use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\CharismaLevelController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
@@ -99,7 +100,6 @@ use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
@@ -117,6 +117,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\UserWalletController;
+use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -708,7 +709,7 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-
+        Route::resource('charisma-levels', CharismaLevelController::class);
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');

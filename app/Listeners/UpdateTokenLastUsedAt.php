@@ -20,6 +20,7 @@ class UpdateTokenLastUsedAt
     public function handle(TokenAuthenticated $event): void
     {
         // Use the service to update last_used_at with deadlock handling
-        SanctumTokenService::updateLastUsedAt($event->accessToken);
+        // The TokenAuthenticated event has a $token property, not $accessToken
+        SanctumTokenService::updateLastUsedAt($event->token);
     }
 }
