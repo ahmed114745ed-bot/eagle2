@@ -81,6 +81,7 @@ class UpdateUserWhenSendGift
 
             foreach ($users as $user) {
                 $updateData = [
+                    'salary_is_updated' => 1,
                     'total_diamond_received' => DB::raw("total_diamond_received + {$totalCoins}"),
                 ];
 
