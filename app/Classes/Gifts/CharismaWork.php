@@ -23,10 +23,18 @@ class CharismaWork implements RoomJobInterface
 
     public function sendToZego($data, int $roomId,int $user_id):  string
     {
+        // Format all totals before sending to Zego
+        $formattedData = array_map(function($user) {
+            if (isset($user['total'])) {
+                $user['total'] = numToStringNew($user['total']);
+            }
+            return $user;
+        }, $data);
+
         $ms   = [
             'messageContent' => [
                 "message" => "updateCharisma",
-                "data"    => $data,
+                "data"    => $formattedData,
             ]
         ];
         $json = json_encode($ms);
@@ -71,7 +79,7 @@ class CharismaWork implements RoomJobInterface
             $finalResult[] = [
                 'room_id' => $info['room_id'],
                 'data' => $users_data,
-                'total' => $info['total'],
+                'total' => $info['total'], // Keep as integer, will be formatted in sendToZego
             ];
         }
 
