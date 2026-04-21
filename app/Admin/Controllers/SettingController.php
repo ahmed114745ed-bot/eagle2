@@ -301,4 +301,22 @@ class SettingController extends MainController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+
+    public function updateCharismaBadge(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => 'charisma_badge'],
+                ['value' => $request->value]
+            );
+
+            Cache::forget('charisma_badge');
+            Cache::put('charisma_badge', $request->value, now()->addYear());
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }
