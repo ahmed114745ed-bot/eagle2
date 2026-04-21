@@ -36,7 +36,7 @@ class UpdateUserWhenSendGift
             }
 
             $updateData = [
-                'salary_is_updated' => DB::raw('1'),
+                'salary_is_updated' => true,
                 'total_diamond_received' => DB::raw("total_diamond_received + {$totalCoins}"),
             ];
 
