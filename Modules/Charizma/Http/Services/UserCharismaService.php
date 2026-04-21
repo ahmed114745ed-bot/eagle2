@@ -9,6 +9,7 @@ use App\models\User;
 use App\Models\Room;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Transformers\CharismaResource;
 
 class UserCharismaService
@@ -84,21 +85,23 @@ class UserCharismaService
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {
+            // Always get or create the record
+            $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
+                'user_id' => $userId,
+                'room_id' => $roomId
+            ], ['total' => 0]);
 
             if ($earnedCoins) {
-                // Find or create the ExtraDataInRoom record
-                $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
-                    'user_id' => $userId,
-                    'room_id' => $roomId
-                ], ['total' => 0]);
-
                 // Update the total earned coins using atomic increment
                 $extraDataInRoom->increment('total', $earnedCoins);
+                // Reload the model to get fresh data
+                $extraDataInRoom->refresh();
             }
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = @$extraDataInRoom?->total ?? 0;
+                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
+                Log::info('Total for user ' . $userId . ': ' . $user['total']);
                 $allDataChanges[] = $user;
             }
         }
@@ -120,21 +123,22 @@ class UserCharismaService
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {
+            // Always get or create the record
+            $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
+                'user_id' => $userId,
+                'room_id' => $roomId
+            ], ['total' => 0]);
 
             if ($earnedCoins) {
-                // Find or create the ExtraDataInRoom record
-                $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
-                    'user_id' => $userId,
-                    'room_id' => $roomId
-                ], ['total' => 0]);
-
                 // Update the total earned coins using atomic increment
                 $extraDataInRoom->increment('total', $earnedCoins);
+                // Reload the model to get fresh data
+                $extraDataInRoom->refresh();
             }
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = @$extraDataInRoom?->total ?? 0;
+                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
                 $allDataChanges[] = $user;
             }
         }
@@ -182,7 +186,7 @@ class UserCharismaService
         foreach ($userIds as $userId) {
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = 0;
+                $user['total'] = numToStringNew(0);
                 $allDataChanges[] = $user;
             }
         }
@@ -196,7 +200,7 @@ class UserCharismaService
         foreach ($userIds as $userId) {
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = 0;
+                $user['total'] = numToStringNew(0);
                 $allDataChanges[] = $user;
             }
         }

@@ -15,13 +15,12 @@ class CharismaResource extends JsonResource
     public function toArray($request)
     {
         return [
-            
+
             'user_id'      => $this->user_id,
-            'total'        =>intval($this->total) ?? 0,
+            'total'        => numToStringNew(intval($this->total) ?? 0),
             'position'     => $this->position ?? 0
-            
+
 
         ];
-
     }
 }
