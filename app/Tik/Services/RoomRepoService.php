@@ -469,7 +469,7 @@ class RoomRepoService
         $lastMode = $room->mode;
         $room->mode = $currentMode;
         $room->save();
-        RoomMicrophone::where('room_id', $room->id)->delete();
+        $this->resetRoomMicrophones($room);
         $jsons = [];
         $map = [];
         $mode = '';
@@ -523,6 +523,24 @@ class RoomRepoService
 
 
         return Common::apiResponse(1, 'done', null, 201);
+    }
+
+    public function resetRoomMicrophones($room)
+    {
+        RoomMicrophone::where('room_id', $room->id)->delete();
+        $mic = RoomMicrophone::create([
+            'room_id'  => $room->id,
+            'user_id'  => $room->uid,
+            'position' => 0,
+            'status'   => 1,
+        ]);
+
+        Log::info('Default microphone created', [
+            'room_id' => $room->id,
+            'mic_id'  => $mic->id,
+            'user_id' => $mic->user_id,
+            'position'=> $mic->position,
+        ]);
     }
     public function getRoomBackground(?Room $room)
     {

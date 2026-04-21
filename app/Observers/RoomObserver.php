@@ -43,14 +43,6 @@ class RoomObserver
         if ($room->isDirty('mode')) {
             \App\Models\RoomMicrophone::where('room_id', $room->id)->delete();
             
-            // Automatically place room owner in the first seat (position 0)
-            \App\Models\RoomMicrophone::create([
-                'room_id' => $room->id,
-                'user_id' => $room->uid,
-                'position' => 0,
-                'status' => 1,
-            ]);
-            
             $mics = explode(',', $room->all_microphone);
             $count = count($mics);
 
