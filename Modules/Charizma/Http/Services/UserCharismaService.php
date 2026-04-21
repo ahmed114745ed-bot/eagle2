@@ -88,20 +88,18 @@ class UserCharismaService
 
             if ($earnedCoins) {
                 // Find or create the ExtraDataInRoom record
-                ExtraDataInRoom::firstOrCreate([
+                $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
                     'user_id' => $userId,
                     'room_id' => $roomId
-                ], ['total' => 0])->increment('total', $earnedCoins);
+                ], ['total' => 0]);
+
+                // Update the total earned coins using atomic increment
+                $extraDataInRoom->increment('total', $earnedCoins);
             }
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                // Get the current total directly from database
-                $total = ExtraDataInRoom::where('user_id', $userId)
-                    ->where('room_id', $roomId)
-                    ->value('total') ?? 0;
-
-                $user['total'] = numToStringNew($total);
+                $user['total'] = numToStringNew(@$extraDataInRoom?->total ?? 0);
                 Log::info($user['total']);
                 $allDataChanges[] = $user;
             }
@@ -127,20 +125,18 @@ class UserCharismaService
 
             if ($earnedCoins) {
                 // Find or create the ExtraDataInRoom record
-                ExtraDataInRoom::firstOrCreate([
+                $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
                     'user_id' => $userId,
                     'room_id' => $roomId
-                ], ['total' => 0])->increment('total', $earnedCoins);
+                ], ['total' => 0]);
+
+                // Update the total earned coins using atomic increment
+                $extraDataInRoom->increment('total', $earnedCoins);
             }
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                // Get the current total directly from database
-                $total = ExtraDataInRoom::where('user_id', $userId)
-                    ->where('room_id', $roomId)
-                    ->value('total') ?? 0;
-
-                $user['total'] = numToStringNew($total);
+                $user['total'] = numToStringNew(@$extraDataInRoom?->total ?? 0);
                 $allDataChanges[] = $user;
             }
         }
