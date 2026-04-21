@@ -1,0 +1,17 @@
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Original working jobs
+0 0 * * * cd /app && php artisan remove-background:cron >> /app/storage/logs/app-remove-bg.log 2>&1
+0 0 1 * * cd /app && php artisan users:reset-monthly-diamond >> /app/storage/logs/app-reset-MD.log 2>&1
+0 0 1 * * cd /app && php artisan users:reset-monthly-days >> /app/storage/logs/app-reset-MDays.log 2>&1
+0 0 * * * cd /app && php artisan users:reset-today-days >> /app/storage/logs/app-R-TD.log 2>&1
+0 0 * * 0 cd /app && php artisan update-gift-weakly:cron >> /app/storage/logs/weekly-date.log 2>&1
+0 0 * * * cd /app && php artisan app:reset-top-room-rank >> /app/storage/logs/app-R-TR.log 2>&1
+*/5 * * * * cd /app && php artisan redis:get_data >> /app/storage/logs/redis.log 2>&1
+
+# Modified non-working jobs with debug output
+0 22 * * * cd /app && echo "[$(date)] Running weekly-star-winner" >> /app/storage/logs/debug.log && php artisan weekly-star-winner >> /app/storage/logs/appweeklystarwinnerSA.log 2>&1
+0 22 * * * cd /app && echo "[$(date)] Running weekly-star-update" >> /app/storage/logs/debug.log && php artisan weekly-star-update >> /app/storage/logs/appweeklystarupdateSA.log 2>&1
+0 22 * * * cd /app && echo "[$(date)] Running pk-event-update" >> /app/storage/logs/debug.log && php artisan pk-event-update >> /app/storage/logs/app-pkevent.log 2>&1
+0 22 * * * cd /app && echo "[$(date)] Running pk-event-winner" >> /app/storage/logs/debug.log && php artisan pk-event-winner >> /app/storage/logs/app-pkwinner.log 2>&1
+0 0 1 * * cd /app && echo "[$(date)] Running app:update-game-wallet" >> /app/storage/logs/debug.log && php artisan app:update-game-wallet >> /app/storage/logs/game_wallet_app.log 2>&1
