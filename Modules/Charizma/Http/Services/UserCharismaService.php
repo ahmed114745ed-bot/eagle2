@@ -85,24 +85,23 @@ class UserCharismaService
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {
+            // Always get or create the record
+            $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
+                'user_id' => $userId,
+                'room_id' => $roomId
+            ], ['total' => 0]);
 
             if ($earnedCoins) {
-                // Find or create the ExtraDataInRoom record
-                ExtraDataInRoom::firstOrCreate([
-                    'user_id' => $userId,
-                    'room_id' => $roomId
-                ], ['total' => 0])->increment('total', $earnedCoins);
+                // Update the total earned coins using atomic increment
+                $extraDataInRoom->increment('total', $earnedCoins);
+                // Reload the model to get fresh data
+                $extraDataInRoom->refresh();
             }
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                // Get the current total directly from database
-                $total = ExtraDataInRoom::where('user_id', $userId)
-                    ->where('room_id', $roomId)
-                    ->value('total') ?? 0;
-
-                $user['total'] = $total; // Keep as integer for now
-                Log::info('Total for user ' . $userId . ': ' . $total);
+                $user['total'] = $extraDataInRoom->total; // Keep as integer for now
+                Log::info('Total for user ' . $userId . ': ' . $extraDataInRoom->total);
                 $allDataChanges[] = $user;
             }
         }
@@ -124,23 +123,22 @@ class UserCharismaService
         $allDataChanges = [];
 
         foreach ($userIds as $userId) {
+            // Always get or create the record
+            $extraDataInRoom = ExtraDataInRoom::firstOrCreate([
+                'user_id' => $userId,
+                'room_id' => $roomId
+            ], ['total' => 0]);
 
             if ($earnedCoins) {
-                // Find or create the ExtraDataInRoom record
-                ExtraDataInRoom::firstOrCreate([
-                    'user_id' => $userId,
-                    'room_id' => $roomId
-                ], ['total' => 0])->increment('total', $earnedCoins);
+                // Update the total earned coins using atomic increment
+                $extraDataInRoom->increment('total', $earnedCoins);
+                // Reload the model to get fresh data
+                $extraDataInRoom->refresh();
             }
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                // Get the current total directly from database
-                $total = ExtraDataInRoom::where('user_id', $userId)
-                    ->where('room_id', $roomId)
-                    ->value('total') ?? 0;
-
-                $user['total'] = $total; // Keep as integer for now
+                $user['total'] = $extraDataInRoom->total; // Keep as integer for now
                 $allDataChanges[] = $user;
             }
         }
