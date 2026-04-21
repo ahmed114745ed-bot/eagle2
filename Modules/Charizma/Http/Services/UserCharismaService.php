@@ -9,11 +9,16 @@ use App\models\User;
 use App\Models\Room;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Transformers\CharismaResource;
 
 class UserCharismaService
 {
+    public static function formatTotalInService(): bool
+    {
+        return (bool) Cache::get('charisma_format', false);
+    }
 
     private Collection $userCharismaLevels;
 
@@ -100,7 +105,9 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
+                $user['total'] = self::formatTotalInService()
+                    ? numToStringNew($extraDataInRoom->total ?? 0)
+                    : (int) $extraDataInRoom->total;
                 Log::info('Total for user ' . $userId . ': ' . $user['total']);
                 $allDataChanges[] = $user;
             }
@@ -138,7 +145,9 @@ class UserCharismaService
 
             $user = $users->where('user_id', $userId)->first();
             if ($user) {
-                $user['total'] = (int) $extraDataInRoom->total; // Cast to integer
+                $user['total'] = self::formatTotalInService()
+                    ? numToStringNew($extraDataInRoom->total ?? 0)
+                    : (int) $extraDataInRoom->total;
                 $allDataChanges[] = $user;
             }
         }

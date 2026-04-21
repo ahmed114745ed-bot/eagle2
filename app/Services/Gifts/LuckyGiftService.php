@@ -67,13 +67,7 @@ class LuckyGiftService
         return $lock;
     }
 
-
-
-
-
-
-
-        public function sendLuckyGift7(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift7(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift): array
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId = $user->id;
