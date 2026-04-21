@@ -284,4 +284,21 @@ class SettingController extends MainController
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function updateCharismaFormat(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => 'charisma_format'],
+                ['value' => $request->value]
+            );
+
+            Cache::forget('charisma_format');
+            Cache::put('charisma_format', $request->value, now()->addYear());
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }
