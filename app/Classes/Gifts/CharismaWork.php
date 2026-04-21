@@ -24,23 +24,23 @@ class CharismaWork implements RoomJobInterface
 
     public function sendToZego($data, int $roomId,int $user_id):  string
     {
-        if (UserCharismaService::FORMAT_TOTAL_IN_SERVICE) {
-            $data = array_map(function($user) {
-                if (isset($user['total'])) {
-                    \Log::info('sendToZego - Before format', [
-                        'user_id' => $user['user_id'] ?? 'N/A',
-                        'total_raw' => $user['total'],
-                        'total_type' => gettype($user['total'])
-                    ]);
-                    $user['total'] = numToStringNew($user['total']);
-                    \Log::info('sendToZego - After format', [
-                        'user_id' => $user['user_id'] ?? 'N/A',
-                        'total_formatted' => $user['total']
-                    ]);
-                }
-                return $user;
-            }, $data);
-        }
+        $data = array_map(function($user) {
+            if (isset($user['total'])) {
+                \Log::info('sendToZego - Before format', [
+                    'user_id' => $user['user_id'] ?? 'N/A',
+                    'total_raw' => $user['total'],
+                    'total_type' => gettype($user['total'])
+                ]);
+                $user['total'] = UserCharismaService::FORMAT_TOTAL_IN_SERVICE
+                    ? numToStringNew($user['total'])
+                    : (int) $user['total'];
+                \Log::info('sendToZego - After format', [
+                    'user_id' => $user['user_id'] ?? 'N/A',
+                    'total_formatted' => $user['total']
+                ]);
+            }
+            return $user;
+        }, $data);
 
         $ms   = [
             'messageContent' => [
