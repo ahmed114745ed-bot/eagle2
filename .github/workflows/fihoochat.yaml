@@ -106,9 +106,9 @@ jobs:
 
           CONTAINER_ID=$(docker ps --filter "name=fihoochat-octa.1" --format "{{.ID}}" | head -n 1)
           if [ -n "$CONTAINER_ID" ]; then
-            docker exec $CONTAINER_ID php artisan whatsapp:change-token
+            docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "WhatsApp token skipped (non-fatal)"
           else
-            exit 1
+            echo "No container for token (non-fatal)"
           fi
 
   run_fihoochat_job:
