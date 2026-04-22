@@ -12,7 +12,7 @@ return new class extends Migration
     {
  
         Schema::table('fair_luck_wallets', function (Blueprint $table) {
-            if (!$this->indexExists('fair_luck_wallets', 'wallet_type')) {
+            if (!$this->uniqueConstraintExists('fair_luck_wallets', 'wallet_type')) {
                 $table->unique('wallet_type')->comment('Ensures one row per wallet type');
             }
         });
@@ -42,7 +42,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('fair_luck_wallets', function (Blueprint $table) {
-            if ($this->indexExists('fair_luck_wallets', 'wallet_type')) {
+            if ($this->uniqueConstraintExists('fair_luck_wallets', 'wallet_type')) {
                 $table->dropUnique('fair_luck_wallets_wallet_type_unique');
             }
         });
@@ -58,6 +58,19 @@ return new class extends Migration
                 $table->dropIndex('idx_room_created');
             }
         });
+    }
+
+    /**
+     * Helper method to check if a unique constraint exists
+     */
+    private function uniqueConstraintExists(string $table, string $column): bool
+    {
+        $constraints = DB::select(
+            "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+             WHERE TABLE_NAME = ? AND COLUMN_NAME = ? AND CONSTRAINT_NAME LIKE '%unique%'",
+            [$table, $column]
+        );
+        return !empty($constraints);
     }
 
     /**

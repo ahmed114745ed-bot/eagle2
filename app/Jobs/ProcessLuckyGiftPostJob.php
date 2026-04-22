@@ -78,8 +78,8 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
 
             if ($userId && $totalDiamond > 0) {
                 try {
-                    $userCoinsBefore = $this->payload['user_coins_before'] ?? 0;
-                    $userCoinsAfter = $this->payload['user_coins_after'] ?? 0;
+                    $userCoinsBefore = $this->payload['user_coins_before'] ?? $this->payload['user_coin_before'] ?? 0;
+                    $userCoinsAfter = $this->payload['user_coins_after'] ?? $this->payload['user_coin_after'] ?? 0;
                     $this->updateUserCoinsAndDiamond($userId, $userCoinsBefore, $userCoinsAfter, $totalDiamond, $senderLevel);
                 } catch (\Throwable $e) {
                     Log::warning('Failed to update user coins in ProcessLuckyGiftPostJob', [
@@ -101,6 +101,8 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
 
             // 1. Update cache
             if ($userId && $roomId && $giftId) {
+                $userCoinsBeforeCache = $this->payload['user_coins_before'] ?? $this->payload['user_coin_before'] ?? 0;
+                $userCoinsAfterCache = $this->payload['user_coins_after'] ?? $this->payload['user_coin_after'] ?? 0;
                 $this->updateCache(
                     $userId,
                     $roomId,
@@ -110,8 +112,8 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
                     $this->payload['number'] ?? 0,
                     $totalPrice,
                     $coinsForReceiver,
-                    $this->payload['user_coin_before'] ?? 0,
-                    $this->payload['user_coin_after'] ?? 0,
+                    $userCoinsBeforeCache,
+                    $userCoinsAfterCache,
                     $this->payload['total_user_win'] ?? 0,
                     $this->payload['total_count_win'] ?? 0
                 );
