@@ -105,3 +105,9 @@ input:checked+.slider {
 .rtl .form-horizontal .form-group .control-label {
     text-align: right !important;
 }
+
+/* ===== Fix: Widget form layout in menu page ===== */
+.fields-group > .form-group {
+    align-items: center;
+    margin-bottom: 0;
+}
