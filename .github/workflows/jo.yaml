@@ -1,12 +1,16 @@
-name: SSh-jo-pipline
+name: Deploy Jo
 on:
   push:
     branches: ["jo"]
+concurrency:
+  group: jo-deploy
+  cancel-in-progress: false
+
 jobs:
-  run_jo_hub:
-    runs-on: [self-hosted] #ubuntu-latest
+  hub:
+    runs-on: [self-hosted]
     steps:
-    - name: print out jo
+    - name: Pull code and rotate logs
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.156.128"
@@ -16,61 +20,49 @@ jobs:
         command_timeout: 5m
         script: |
           cd /var/www/jo
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh || source /home/${{ secrets.USERNAME }}/hub.sh
+          mkdir -p storage/jobs-logs
+          chmod -R 777 storage/jobs-logs
+          test -f public/settings.json || echo '{}' > public/settings.json
+          test -f gcp.json || echo '{}' > gcp.json
+          LOG_FILE=storage/logs/laravel.log
+          if [ -f "$LOG_FILE" ]; then
+            LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
+            if [ "$LOG_SIZE" -gt 104857600 ]; then
+              truncate -s 0 "$LOG_FILE"
+            fi
+          fi
+          find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
+            sudo docker system prune -a -f 2>/dev/null
           fi
-  run_jo_app:
-    runs-on: [self-hosted] #ubuntu-latest
-    needs: run_jo_hub
+
+  migrate:
+    runs-on: [self-hosted]
+    needs: hub
     steps:
-    - name: print out jo
+    - name: Run migrations
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.156.128"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 20m
+        command_timeout: 5m
         script: |
           cd /var/www/jo
-          pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t jo:${{ github.sha }} -f Dockerfile-octana .
-          docker service update --image jo:${{ github.sha }} jo-octa
-
-          # Get container ID of task 5live-app.1
-          CONTAINER_ID=$(docker ps --filter "name=jo-octa.1" --format "{{.ID}}" | head -n 1)
-
-          # Run artisan command inside that container
+          CONTAINER_ID=$(sudo docker ps --filter "name=jo-octa.1" --format "{{.ID}}" | head -n 1)
           if [ -n "$CONTAINER_ID" ]; then
-            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
-          else
-            echo "No running container found for jo-app.1 service task"
-            exit 1
+            sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force || echo "Migration warning (non-fatal)"
           fi
 
-          # check again
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
-  run_jo_job:
-    runs-on: [self-hosted] #ubuntu-latest
-    needs: run_jo_hub
+  deploy-app:
+    runs-on: [self-hosted]
+    needs: [hub, migrate]
     steps:
-    - name: print out jo Job
+    - name: Build and deploy app
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.156.128"
@@ -80,7 +72,74 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/jo
-          pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t jo-job:${{ github.sha }} -f Dockerfile-jobs .
-          docker service update --image jo-job:${{ github.sha }} jo-job
+          sudo docker build -t jo:${{ github.sha }} -f Dockerfile-octana .
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating jo-octa..."
+            if sudo docker service update \
+              --image jo:${{ github.sha }} \
+              --update-order start-first \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              jo-octa; then
+              break
+            fi
+            [ "$attempt" -eq 3 ] && exit 1
+            sleep 15
+          done
+          sleep 10
+          CONTAINER_ID=$(sudo docker ps --filter "name=jo-octa.1" --format "{{.ID}}" | head -n 1)
+          if [ -n "$CONTAINER_ID" ]; then
+            sudo docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "WhatsApp token skipped (non-fatal)"
+          fi
+
+  deploy-job:
+    runs-on: [self-hosted]
+    needs: [hub, migrate]
+    steps:
+    - name: Build and deploy job workers
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.156.128"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/jo
+          sudo docker build -t jo-job:${{ github.sha }} -f Dockerfile-jobs .
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating jo-job..."
+            if sudo docker service update \
+              --image jo-job:${{ github.sha }} \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              jo-job; then
+              break
+            fi
+            [ "$attempt" -eq 3 ] && exit 1
+            sleep 15
+          done
+
+  cleanup:
+    runs-on: [self-hosted]
+    needs: [deploy-app, deploy-job]
+    if: always()
+    steps:
+    - name: Cleanup old images
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.156.128"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          CURRENT=${{ github.sha }}
+          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'jo.*(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
+            sudo docker rmi "$img" 2>/dev/null || true
+          done
+          sudo docker image prune -f 2>/dev/null || true
+          sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
+          echo "Disk: $(df -h / | awk 'NR==2{print $5}')"
