@@ -42,6 +42,8 @@
 "Show charisma levels": "Tampilkan level karisma",
 "charisma levels": "Level karisma",
 "client Id": "ID Klien",
+"Withdrawal settings": "Pengaturan penarikan",
+"Limit per single withdrawal transaction": "Batas per transaksi penarikan tunggal",
    "Default area manager not found. Please set a default area manager before deleting.": "Manajer area default tidak ditemukan. Silakan tetapkan manajer area default sebelum menghapus.",
    "Super Roles": "Peran",
 "Browse super roles": "Jelajahi Peran",
