@@ -161,14 +161,6 @@ class LuckyGiftService
             $totalPriceFull = $giftPrice * $number * $receiversCount;
 
             while ($user->di >= $totalPriceFull && $index > 0) {
-                $balanceBeforeIteration = $user->di;
-                UserCoinLogHelper::logByType(
-                    $user->id,
-                    -abs($totalPriceFull),
-                    $balanceBeforeIteration,
-                    UserCoinLogType::LUCKY_GIFT,
-                    $gift?->name,
-                );
 
                 foreach ($receiversIds as $receiverId) {
 
@@ -208,6 +200,15 @@ class LuckyGiftService
                         ]);
                         continue;
                     }
+
+                    // Log deduction ONLY after successful processBet
+                    UserCoinLogHelper::logByType(
+                        $user->id,
+                        -abs($unitPrice),
+                        $senderBalanceBeforeHit,
+                        UserCoinLogType::LUCKY_GIFT,
+                        $gift?->name,
+                    );
 
                     $iterationWin = 0;
                     $isWinner = false;
