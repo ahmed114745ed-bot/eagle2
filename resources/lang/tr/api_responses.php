@@ -154,6 +154,7 @@ return [
     'shippingAgency' => 'Bu kargo ajansına katılamazsınız',
     'frozen' => 'Yükleme geçici olarak durduruldu. Lütfen yönetimle iletişime geçin.',
     'frozen_agency' => 'Ajans cüzdanı geçici olarak donduruldu',
+    'min_withdrawal_amount' => ':amount değerinden daha az çekim yapamazsınız',
 
 
 ];

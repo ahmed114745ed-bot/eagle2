@@ -155,5 +155,6 @@ return [
      'frozenMassForYou'=> 'Dompet agen Anda dibekukan',
      'frozen_agency'=> 'Dompet agen dibekukan sementara',
      'balance_low' => 'Saldo Anda kurang',
+     'min_withdrawal_amount' => 'Anda tidak dapat menarik kurang dari :amount',
      
 ];
