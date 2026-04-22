@@ -77,7 +77,9 @@ class FairLuckWallet extends Model
         }
 
         return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
-            $wallet = self::where('wallet_type', $walletType)->first();
+            $wallet = self::where('wallet_type', $walletType)
+                ->lockForUpdate()
+                ->first();
 
             if (!$wallet) {
                 $wallet = self::create([
@@ -95,7 +97,7 @@ class FairLuckWallet extends Model
             self::logHistory($walletType, $amount, $before, $wallet->balance, $description, $userId);
 
             return true;
-        }, 5); // Retry up to 5 times on lock timeout
+        }, 5); 
     }
 
     public static function decreaseBalance(string $walletType, int $amount, ?string $description = null, ?int $userId = null): bool
@@ -223,7 +225,6 @@ class FairLuckWallet extends Model
 
         $key = "fairluck:wallet:{$walletType}";
 
-        // Initialize if not exists
         if (Redis::get($key) === null) {
             self::getRedisBalance($walletType);
         }
