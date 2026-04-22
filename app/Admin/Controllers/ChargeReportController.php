@@ -93,37 +93,37 @@ class ChargeReportController extends MainController
         $grid->disableRowSelector();
         $grid->model()
             ->when($countryID, fn($q) =>
-                $q->where(function ($q) use ($countryID) {
-                    $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
-                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
-                }))
+            $q->where(function ($q) use ($countryID) {
+                $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+            }))
             ->orderByDesc('created_at')->with([
-                    // 'sender',
-                    // 'sender.profile:id,user_id,avatar',
-                    'receiver',
-                    'receiver.profile:id,user_id,avatar',
-                    // 'sender.packs' => function ($q) {
-                    //     $q->whereIn('type', [25])
-                    //         ->where('is_used', true)
-                    //         ->with('ware:id,value');
-                    // },
-                    'receiver.packs' => function ($q) {
-                        $q->whereIn('type', [25])
-                            ->where('is_used', true)
-                            ->with('ware:id,value');
-                    },
-                    'admin',
-                    'admin.agency',
-                    'senderUser',
-                    'senderUser.profile:id,user_id,avatar',
-                    'senderUser.packs' => function ($q) {
-                        $q->whereIn('type', [25])
-                            ->where('is_used', true)
-                            ->with('ware:id,value');
-                    },
-                    'receiveragency',
+                // 'sender',
+                // 'sender.profile:id,user_id,avatar',
+                'receiver',
+                'receiver.profile:id,user_id,avatar',
+                // 'sender.packs' => function ($q) {
+                //     $q->whereIn('type', [25])
+                //         ->where('is_used', true)
+                //         ->with('ware:id,value');
+                // },
+                'receiver.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'admin',
+                'admin.agency',
+                'senderUser',
+                'senderUser.profile:id,user_id,avatar',
+                'senderUser.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'receiveragency',
 
-                ]);
+            ]);
 
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash");
@@ -163,12 +163,12 @@ class ChargeReportController extends MainController
         if ($charger_type != "shipping-agency-activity") {
             $this->filterChargeDash($grid);
         }
-        $grid->model()->when(request('from_date') && request('to_date'), function ($query, ) {
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
             $end = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
             $query->whereBetween('created_at', [$start, $end]);
-        })->when(!request('from_date'), function ($query, ) {
+        })->when(!request('from_date'), function ($query,) {
 
             $start = now()->startOfMonth();
             $end = $end = now()->endOfMonth();
@@ -484,21 +484,21 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        $grid->model()->when(!request('from_date'), function ($query, ) {
+        $grid->model()->when(!request('from_date'), function ($query,) {
 
             $start =   now()->startOfMonth();
 
             $end = $end = now()->endOfMonth();
-            $query->where('created_at', '>=',$start);
+            $query->where('created_at', '>=', $start);
         })->with([
-                    'user',
-                    'user.profile',
-                    'user.packs' => function ($q) {
-                        $q->whereIn('type', [25])
-                            ->where('is_used', true)
-                            ->with('ware:id,value');
-                    },
-                ])
+            'user',
+            'user.profile',
+            'user.packs' => function ($q) {
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
+        ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at');
 
@@ -514,8 +514,8 @@ class ChargeReportController extends MainController
                         $query->where('method', $this->input);
                     }
                 }, __('Select type'), 'method')->select(
-                        ['' => __('All')] + PaymentCoin::orderBy('type')->pluck('title', 'type')->toArray()
-                    );
+                    ['' => __('All')] + PaymentCoin::orderBy('type')->pluck('title', 'type')->toArray()
+                );
 
                 $filter->equal('status', __('Status'))->select([
                     '' => __('All'),
@@ -652,7 +652,7 @@ class ChargeReportController extends MainController
 
 
         $grid->header(function () {
-            $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/ ;
+            $query = CoinLog::query()/*->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])*/;
 
             $query->when(!request('from_date'), function ($query) {
                 $start = now()->startOfMonth();
@@ -663,7 +663,7 @@ class ChargeReportController extends MainController
             $query->when(
                 request('user.uuid'),
                 fn($q, $uuid) =>
-                $q->whereHas('user', fn($u,$uuid) => $u->where('uuid', $uuid))
+                $q->whereHas('user', fn($u, $uuid) => $u->where('uuid', $uuid))
             );
 
             $query->when(
@@ -721,14 +721,17 @@ class ChargeReportController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
+            $editUrl = $this->user ? url("admin/users/{$this->user->id}") : '';
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
+
+                    <a href='{$editUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
-                        <strong>$name</strong><br>
+                        <strong style='text-decoration: underline; cursor: pointer;'>$name</strong><br>
                         <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
                     </div>
+                </a>
                 </div>
             ";
         });
@@ -798,12 +801,12 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        $grid->model()->when(request('from_date') && request('to_date'), function ($query, ) {
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
             $end = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
             $query->whereBetween('created_at', [$start, $end]);
-        })->when(!request('from_date'), function ($query, ) {
+        })->when(!request('from_date'), function ($query,) {
 
             $start = now()->startOfMonth();
             $end = $end = now()->endOfMonth();
@@ -842,7 +845,8 @@ class ChargeReportController extends MainController
                 }, __('From Date'), 'from_date')
                     ->date()
                     ->default(now()->startOfMonth()->toDateString());
-
+            });
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
                         $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
@@ -885,14 +889,17 @@ class ChargeReportController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
+            $editUrl = $this->user ? url("admin/users/{$this->user->id}") : '';
             return "
              <div style='display: flex; align-items: center; gap: 10px;'>
-                 $image
-                 <div>
-                     <strong>$name</strong><br>
-                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                 </div>
+
+                 <a href='{$editUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong style='text-decoration: underline; cursor: pointer;'>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </a>
              </div>
          ";
         });
@@ -952,12 +959,12 @@ class ChargeReportController extends MainController
                     ->with('ware:id,value');
             },
         ])
-            ->when(request('from_date') && request('to_date'), function ($query, ) {
+            ->when(request('from_date') && request('to_date'), function ($query,) {
 
                 $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
                 $end = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
                 $query->whereBetween('created_at', [$start, $end]);
-            })->when(!request('from_date'), function ($query, ) {
+            })->when(!request('from_date'), function ($query,) {
 
                 $start = now()->startOfMonth();
                 $end = $end = now()->endOfMonth();
@@ -1122,7 +1129,7 @@ class ChargeReportController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
+            $showUrl = $this->user->id ? url("admin/users/{$this->user->id}") :  '';
             return "
              <div style='display: flex; align-items: center; gap: 10px;'>
                  $image
@@ -1130,6 +1137,14 @@ class ChargeReportController extends MainController
                      <strong>$name</strong><br>
                      <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
                  </div>
+
+                  $image
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
              </div>
          ";
         });
