@@ -108,6 +108,24 @@ input:checked+.slider {
 
 /* ===== Fix: Widget form layout in menu page ===== */
 .fields-group > .form-group {
+    display: flex !important;
+    flex-wrap: wrap;
     align-items: center;
-    margin-bottom: 0;
+    gap: 10px;
+    margin-bottom: 0 !important;
+}
+
+/* Label takes full row, input takes full row (stacked) */
+.fields-group > .form-group > .control-label {
+    flex: 0 0 100%;
+    max-width: 100%;
+    float: none !important;
+    padding-bottom: 4px;
+}
+
+.fields-group > .form-group > div[class*="col-sm-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    float: none !important;
+    width: 100% !important;
 }
