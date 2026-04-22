@@ -121,7 +121,7 @@ class CoinGameUserService
             ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id', function($join) {
                 $join->whereRaw('up.id = (SELECT id FROM profiles WHERE user_id = u.id LIMIT 1)');
             })
-            ->groupBy('coin_game_users_daily_aggregated.user_id', 'coin_game_users_daily_aggregated.game_id', 'coin_game_users_daily_aggregated.date', 'u.uuid', 'u.name', 'up.avatar')
+            ->groupBy('coin_game_users_daily_aggregated.user_id', 'u.uuid', 'u.name', 'up.avatar')
             ->orderByDesc(DB::raw('SUM(coin_game_users_daily_aggregated.total_played)'));
 
 

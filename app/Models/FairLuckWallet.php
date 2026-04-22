@@ -73,9 +73,7 @@ class FairLuckWallet extends Model
         }
 
         return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
-            $wallet = self::where('wallet_type', $walletType)
-                ->lockForUpdate()
-                ->first();
+            $wallet = self::where('wallet_type', $walletType)->first();
 
             if (!$wallet) {
                 $wallet = self::create([
