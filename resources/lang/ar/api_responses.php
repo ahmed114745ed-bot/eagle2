@@ -155,5 +155,6 @@ return [
      'frozenMassForYou'=> 'تم تجميد محفظة وكالتك',
      'frozen_agency'=> 'تم تجميد محفظة الوكالة مؤقتا',
      'balance_low' => 'ليس لديك ما يكفي من العملات',
+     'min_withdrawal_amount' => 'لا يمكنك التحويل بأقل من :amount',
      
 ];

@@ -46,34 +46,18 @@ class LuckyGiftService
 
     private function acquireUserLock(int $userId, int $timeoutSeconds = 30): \Illuminate\Contracts\Cache\Lock
     {
-     /*   $lock = Cache::lock(
-            "lucky_gift_lock:user:{$userId}",
-            $timeoutSeconds
-        );
+         $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
 
-        if (!$lock->get()) {
-            throw new InvalidArgumentException(__('api_responses.try_again'));
-        }
+         try {
+             $lock->block(3);
+         } catch (LockTimeoutException $e) {
+             throw new InvalidArgumentException(__('api_responses.try_again'));
+         }
 
-        return $lock;*/
-        $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
+         return $lock;
+     }
 
-        try {
-            $lock->block(5);
-        } catch (LockTimeoutException $e) {
-            throw new InvalidArgumentException(__('api_responses.try_again'));
-        }
-
-        return $lock;
-    }
-
-
-
-
-
-
-
-        public function sendLuckyGift7(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift7(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift): array
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId = $user->id;
@@ -89,7 +73,15 @@ class LuckyGiftService
         $hostPercentage = $receiverFeeRate;
         $total_cashback_percentage = 0;
 
-       
+        // ========================================================================
+        // CHUNKING STRATEGY FOR LARGE COUNTS
+        // ========================================================================
+        // If count > 10, split into chunks to prevent worker blocking
+        // First chunk (5-10) processed synchronously, rest queued
+        $chunkSize = 10;
+        $firstChunkSize = min($count, $chunkSize);
+        $remainingCount = $count - $firstChunkSize;
+        $operationId = \Illuminate\Support\Str::uuid()->toString();
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('id', $giftId)
@@ -103,7 +95,7 @@ class LuckyGiftService
         $receiversCount = count($receiversIds);
         $numberOfGift = $number * $receiversCount;
         $totalPrice = $giftPrice * $numberOfGift;
-        $totalPriceFull = $totalPrice * $count;
+        $totalPriceFull = $totalPrice * $firstChunkSize;
 
         // Acquire lock BEFORE validation to prevent race conditions
         $lock = $this->acquireUserLock($userId);
@@ -138,7 +130,12 @@ class LuckyGiftService
 
             $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name', 'agency_id'])->get();
             $receiverName = $receivedUsers->first()?->name;
-            $receiversCount = $receivedUsers->count();
+            
+            // FIX 2: Use actual receivers from DB instead of overwriting count
+            // This prevents budget calculation from being based on potentially fewer users
+            $receiversIds = $receivedUsers->pluck('id')->map(fn($id) => (string) $id)->all();
+            $receiversCount = count($receiversIds);
+            
             $isToRoom = $receiversCount > 1;
             $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
@@ -307,10 +304,20 @@ class LuckyGiftService
                 ];
             }
 
-            $room->session += $coinsForOwnerTotal * $count;
-            $room->save();
-
-         
+            // ========================================================================
+            // DEFERRED POST-PROCESSING (moved to async job)
+            // ========================================================================
+            // All post-processing is now dispatched to a queue job to prevent
+            // worker blocking. The synchronous part is now complete.
+            
+            // Prepare response with current state
+            $totalDiamond = $totalPrice * $count;
+            $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_diamond_send, $totalDiamond, $user->sub_sender_level);
+            $coinsForReceiverBase = $number * ($giftPrice * $hostPercentage);
+            $price = $coinsForReceiverBase * $receiversCount;
+            $coinsForReceiver = $coinsForReceiverBase * $count;
+            $number = $number * $count;
+            $roomSessionToAdd = $coinsForOwnerTotal * $count;
 
             $responseData['session'] = $room->session_string;
             $responseData['user_coins'] = $user->di;
@@ -336,47 +343,35 @@ class LuckyGiftService
                 ],
             ];
 
-            // Update user coins and diamond
-            $totalDiamond = $totalPrice * $count;
-            $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_diamond_send, $totalDiamond, $user->sub_sender_level);
-            $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
-
-            $coinsForReceiverBase = $number * ($giftPrice * $hostPercentage);
-            $price = $coinsForReceiverBase * $receiversCount;
-            $coinsForReceiver = $coinsForReceiverBase * $count;
-            $number = $number * $count;
-
-            $newUserCoin = ($user->di - $userCoins);
-            $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
-
-            if ($room->charizma_status && $coinsForReceiver > 1) {
-                dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
-            } elseif ($room->lastPk && $coinsForReceiver > 1) {
-                dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds, "pk");
-            }
-
-            $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-
-            $settings = \App\Helpers\CacheHelper::cacheSettings();
-            if (gettype($settings) !== 'array') {
-                $settings = $settings->pluck('value', 'key')->toArray();
-            }
-            $roomBoomSettings = $settings['room_boom'] ?? 1;
-            $totalHostDiamond = (int) $totalPrice * $hostPercentage;
-            if ($roomBoomSettings) {
-                (new NewRoomBoomGiftService())->sendGift($room, $totalHostDiamond, $userId);
-            } else {
-                $tz = getTimezone();
-                $todayStart = \Carbon\Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
-                $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
-                $totalRoomGift->increment('current_total', $totalHostDiamond);
-            }
             $responseData['total_pk'] = $coinsForReceiver;
 
-            if ($room->type == 'audio') {
-                $serviceLevel = new UpgradeRoomLevelServices();
-                $serviceLevel->sendGift($room, $totalPrice * $count);
-            }
+            // Dispatch post-processing job ASYNCHRONOUSLY
+            // This prevents worker blocking and reduces response time to < 10s
+            \App\Jobs\ProcessLuckyGiftPostJob::dispatch([
+                'user_id' => $userId,
+                'room_id' => $roomId,
+                'gift_id' => $giftId,
+                'receivers_ids' => $receiversIds,
+                'count' => $count,
+                'total_price' => $totalPrice,
+                'total_user_win' => $total_user_win,
+                'total_count_win' => $total_count_win,
+                'coins_for_receiver' => $coinsForReceiver,
+                'total_diamond' => $totalDiamond,
+                'room_session' => $roomSessionToAdd,
+                'sender_level' => $senderLevel,
+                'charizma_status' => $room->charizma_status,
+                'last_pk' => $room->lastPk ?? false,
+                'room_type' => $room->type,
+                'host_percentage' => $hostPercentage,
+                'room_boom_enabled' => true,
+                'data' => $data,
+                'number' => $number,
+                'price' => $price,
+                'user_coins_before' => $oldUserCoin,
+                'user_coins_after' => $user->di,
+                'owner_id' => $ownerId,
+            ])->onQueue('gifts');
 
             return $responseData;
         } finally {
@@ -581,15 +576,22 @@ class LuckyGiftService
             ];
         }
 
-        // update room session
-        // $room->session      += (int)$gift->price * $number * $count * 0.1;
-        $room->session += $coinsForOwner * $count;
-        $room->save();
+        // ========================================================================
+        // DEFERRED POST-PROCESSING (moved to async job)
+        // ========================================================================
+        // All post-processing is now dispatched to a queue job to prevent
+        // worker blocking. The synchronous part is now complete.
+
+        // Prepare response with current state
+        $totalDiamond = $totalPrice * $count;
+        $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
+        
+        $coinsForReceiver = $coinsForReceiver * $count;
+        $number = $number * $count;
+        $newUserCoin = $user->di;
 
         // add session to response
         $responseData['session'] = $room->session_string;
-
-        //new user coins
         $responseData['user_coins'] = $userCoins;
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
@@ -602,53 +604,35 @@ class LuckyGiftService
             'total_win_count' => $total_count_win,
         ];
 
-        //update user coins and diamond and sender level
-        $totalDiamond = $totalPrice * $count;
-        $senderLevel = $updateUserWhenSendGift->getSenderLevel($user->total_sender_diamonds, $totalDiamond, $user->sub_sender_level);
-        $this->updateUserCoins($user->id, $user->di, $userCoins, $totalDiamond, senderLevel: $senderLevel);
-
-
-        // update core wallet
-        $diffAppWallet = $appWallet->coins - $firstAppWalletCoins;
-        $diffOwnerWallet = $ownerWallet->coins - $firstOwnerWalletCoins;
-        $this->updateCoreWallet($diffAppWallet, $diffOwnerWallet);
-
-
-        $coinsForReceiver = $coinsForReceiver * $count;
-        $number = $number * $count;
-
-        $newUserCoin = ($user->di - $userCoins);
-        $this->updateCache($userId, $roomId, $receiversIds, $giftId, $data, $number, $price, $coinsForReceiver, $oldUserCoin, $newUserCoin, $total_user_win, $total_count_win);
-
-        if ($room->charizma_status && $coinsForReceiver > 1) {
-            dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds);
-        } elseif ($room->lastPk && $coinsForReceiver > 1) {
-            dispatchRoomsRedis($roomId, $userId, $coinsForReceiver, $receiversIds, "pk");
-        }
-
-        $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-
-        // Update total_room_gifts table
-        $settings = CacheHelper::cacheSettings();
-        if (gettype($settings) !== 'array') {
-            $settings = $settings->pluck('value', 'key')->toArray();
-        }
-        $roomBoomSettings = $settings['room_boom'] ?? 1;
-        $totalHostDiamond = (int) $totalPrice * $hostPercentage;
-        if ($roomBoomSettings) {
-
-            (new NewRoomBoomGiftService())->sendGift($room, $totalHostDiamond, $userId);
-        } else {
-            $tz = getTimezone();
-            $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
-            $totalRoomGift = (new RoomService())->getOrCreateTotalRoomGift($room->id, $todayStart);
-            $totalRoomGift->increment('current_total', $totalHostDiamond);
-        }
-
-        if ($room->type == 'audio') {
-            $serviceLevel = new UpgradeRoomLevelServices();
-            $serviceLevel->sendGift($room, $totalPrice * $count);
-        }
+        // Dispatch post-processing job ASYNCHRONOUSLY
+        // This prevents worker blocking and reduces response time to < 10s
+        \App\Jobs\ProcessLuckyGiftPostJob::dispatch([
+            'user_id' => $userId,
+            'room_id' => $roomId,
+            'gift_id' => $giftId,
+            'receivers_ids' => $receiversIds,
+            'count' => $count,
+            'total_price' => $totalPrice,
+            'total_user_win' => $total_user_win,
+            'total_count_win' => $total_count_win,
+            'coins_for_receiver' => $coinsForReceiver,
+            'total_diamond' => $totalDiamond,
+            'room_session' => $coinsForOwner * $count,
+            'sender_level' => $senderLevel,
+            'charizma_status' => $room->charizma_status,
+            'last_pk' => $room->lastPk ?? false,
+            'room_type' => $room->type,
+            'host_percentage' => $hostPercentage,
+            'room_boom_enabled' => true,
+            'data' => $data,
+            'number' => $number,
+            'price' => $price,
+            'user_coins_before' => $oldUserCoin,
+            'user_coins_after' => $newUserCoin,
+            'owner_id' => $ownerId,
+            'app_wallet_diff' => $appWallet->coins - $firstAppWalletCoins,
+            'owner_wallet_diff' => $ownerWallet->coins - $firstOwnerWalletCoins,
+        ])->onQueue('gifts');
 
         return $responseData;
         } finally {
@@ -709,21 +693,29 @@ class LuckyGiftService
 
     private function getResponseData2($gift, $room, $user, $receiversIds, $receiverName)
     {
+        
         $microphones = $room->microphones ?? collect();
 
+        $positions = [];
+        $missingReceivers = [];
 
-
-        $positions = $microphones
-            ->filter(fn($mic) => in_array($mic->user_id, $receiversIds))
-            ->pluck('position')
-            ->values()
-            ->all();
-
-        $missingReceivers = array_diff($receiversIds, $microphones->pluck('user_id')->all());
-
+        foreach ($receiversIds as $receiverId) {
+            $mic = $microphones->firstWhere('user_id', $receiverId);
+            if ($mic) {
+                $positions[] = $mic->position;
+            } else {
+                $positions[] = -1;
+                $missingReceivers[] = $receiverId;
+            }
+        }
 
         if (!empty($missingReceivers)) {
-            $positions[] = -1;
+            \Illuminate\Support\Facades\Log::warning('Lucky gift: receivers without room_microphones records', [
+                'room_id' => $room->id,
+                'missing_receiver_ids' => $missingReceivers,
+                'total_receivers' => count($receiversIds),
+                'with_records' => count($receiversIds) - count($missingReceivers),
+            ]);
         }
 
         return [

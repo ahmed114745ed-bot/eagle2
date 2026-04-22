@@ -2462,7 +2462,7 @@
                 <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px;">
 
                     <!-- Total Diamond Send from Users Table Card -->
-                    <div style="flex: 1 1 calc(50% - 20px); min-width: 280px; max-width: 500px;">
+                    {{-- <div style="flex: 1 1 calc(50% - 20px); min-width: 280px; max-width: 500px;">
                         <div class="diamond-summary-box" style="background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%); margin: 0;">
                             <div class="diamond-title">
                                 {{ __('Total Diamond Send') }}
@@ -2474,7 +2474,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div style="flex: 1 1 calc(50% - 20px); min-width: 280px; max-width: 500px;">
                         <div class="diamond-summary-box" style="background: linear-gradient(90deg, #27ae60 0%, #229954 100%); margin: 0;">

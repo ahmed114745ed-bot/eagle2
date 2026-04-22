@@ -287,7 +287,24 @@ class UserCommon
             'updated_at' => now(),
         ];
 
-        DB::table('user_lucky_gifts')->insert($data);
+        $maxRetries = 5;
+        $retryCount = 0;
+        
+        while ($retryCount < $maxRetries) {
+            try {
+                DB::table('user_lucky_gifts')->insert($data);
+                return;
+            } catch (\Exception $e) {
+                $retryCount++;
+                
+                if (strpos($e->getMessage(), '1205') !== false && $retryCount < $maxRetries) {
+                    usleep(pow(2, $retryCount - 1) * 100 * 1000);
+                    continue;
+                }
+                
+                throw $e;
+            }
+        }
     }
 
     public function userMoreStatistics(User $user)

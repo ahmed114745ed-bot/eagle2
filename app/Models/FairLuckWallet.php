@@ -64,12 +64,16 @@ class FairLuckWallet extends Model
     }
 
     /**
-     * زيادة رصيد محفظة معينة
      */
     public static function increaseBalance(string $walletType, int $amount, ?string $description = null, ?int $userId = null): bool
     {
         if ($amount <= 0) {
             return false;
+        }
+
+        if ($walletType === self::TYPE_UNIFIED_VAULT) {
+            self::incrementRedisBalance($walletType, $amount);
+            return true;
         }
 
         return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
@@ -93,13 +97,21 @@ class FairLuckWallet extends Model
             self::logHistory($walletType, $amount, $before, $wallet->balance, $description, $userId);
 
             return true;
-        });
+        }, 5); 
     }
 
     public static function decreaseBalance(string $walletType, int $amount, ?string $description = null, ?int $userId = null): bool
     {
         if ($amount <= 0) {
             return false;
+        }
+
+        if ($walletType === self::TYPE_UNIFIED_VAULT) {
+            $limit = self::getNegativeLimit();
+            if (!self::decrementRedisBalance($walletType, $amount)) {
+                return false;
+            }
+            return true;
         }
 
         return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
@@ -123,33 +135,53 @@ class FairLuckWallet extends Model
             self::logHistory($walletType, -$amount, $before, $newBalance, $description, $userId);
 
             return true;
-        });
+        }, 5); // Retry up to 5 times on lock timeout
     }
 
    
     public static function setBalance(string $walletType, int $balance): bool
     {
-        return DB::transaction(function () use ($walletType, $balance) {
-            $wallet = self::where('wallet_type', $walletType)
-                ->lockForUpdate()
-                ->first();
+        $maxRetries = 5;
+        $retryCount = 0;
+        
+        while ($retryCount < $maxRetries) {
+            try {
+                return DB::transaction(function () use ($walletType, $balance) {
+                    $wallet = self::where('wallet_type', $walletType)
+                        ->lockForUpdate()
+                        ->first();
 
-            if (!$wallet) {
-                self::create([
-                    'wallet_type' => $walletType,
-                    'balance' => max(0, $balance),
-                    'last_updated' => now(),
-                ]);
-                return true;
+                    if (!$wallet) {
+                        self::create([
+                            'wallet_type' => $walletType,
+                            'balance' => max(0, $balance),
+                            'last_updated' => now(),
+                        ]);
+                        return true;
+                    }
+
+                    $wallet->update([
+                        'balance' => max(0, $balance),
+                        'last_updated' => now(),
+                    ]);
+
+                    return true;
+                });
+            } catch (\Exception $e) {
+                $retryCount++;
+                
+                if (strpos($e->getMessage(), '1205') !== false && $retryCount < $maxRetries) {
+                    // Exponential backoff: 100ms, 200ms, 400ms, 800ms, 1600ms
+                    usleep(pow(2, $retryCount - 1) * 100 * 1000);
+                    continue;
+                }
+                
+                // If max retries exceeded or not a lock timeout, throw exception
+                throw $e;
             }
-
-            $wallet->update([
-                'balance' => max(0, $balance),
-                'last_updated' => now(),
-            ]);
-
-            return true;
-        });
+        }
+        
+        return false;
     }
 
     /**
@@ -184,9 +216,7 @@ class FairLuckWallet extends Model
         return (int) $balance;
     }
 
-    /**
-     * زيادة الرصيد في Redis (Atomic)
-     */
+
     public static function incrementRedisBalance(string $walletType, int $amount): int
     {
         if ($amount <= 0) {
@@ -195,7 +225,6 @@ class FairLuckWallet extends Model
 
         $key = "fairluck:wallet:{$walletType}";
 
-        // Initialize if not exists
         if (Redis::get($key) === null) {
             self::getRedisBalance($walletType);
         }

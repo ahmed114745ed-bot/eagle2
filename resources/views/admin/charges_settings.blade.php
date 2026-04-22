@@ -487,6 +487,7 @@
     <div class="settings-sidebar">
         <div class="settings-menu">
             <button onclick="showSection('chargesSettings')">{{ __('Charges settings') }}</button>
+            <button onclick="showSection('withSettings')">{{ __('Withdrawal settings') }}</button>
         </div>
     </div>
     <div class="all-page" style="width: 100%;">
@@ -498,60 +499,90 @@
                 <h3> {{ __('Charges settings') }}</h3>
 
                 <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" id="targetSettingsForm">
-            @csrf
-            <div class="form row">
-                <div class="col-md-6">
-                    <div class="form-group ">
-                        <label>{{ __('Zones') }}</label>
-                        <input type="text" name="zones_coins" id="zones_coins"
-                               value="{{ $settings['zones_coins'] ?? '' }}" class="form-control" >
-                               <!-- value="{{ $settings['zones_coins'] ?? '' }}" class="form-control"> -->
-                        <small id="zones_coins_hint" class="form-text text-muted mt-1"
-                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            {{ __('1 :dollar = :value  :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small>
-                    </div>
-                </div>
+                    @csrf
+                    <div class="form row">
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label>{{ __('Zones') }}</label>
+                                <input type="number" name="zones_coins" id="zones_coins"
+                                    value="{{ $settings['zones_coins'] ?? '' }}" class="form-control" >
+                                    <!-- value="{{ $settings['zones_coins'] ?? '' }}" class="form-control"> -->
+                                <small id="zones_coins_hint" class="form-text text-muted mt-1"
+                                    data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                                    {{ __('1 :dollar = :value  :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                                </small>
+                            </div>
+                        </div>
 
-                <div class="col-md-6">
-                    <div class="form-group ">
-                        <label>{{ __('Super Admin') }}</label>
-                        <input type="text" name="super_admin_coins" id="super_admin_coins"
-                               value="{{ $superadmin_coins }}" class="form-control">
-                        <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
-                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small>
-                    </div>
-                </div>
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label>{{ __('Super Admin') }}</label>
+                                <input type="number" name="super_admin_coins" id="super_admin_coins"
+                                    value="{{ $superadmin_coins }}" class="form-control">
+                                <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
+                                    data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                                    {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                                </small>
+                            </div>
+                        </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{ __('Agency Charge') }}</label>
-                        <input type="text" name="shipping_coins" id="shipping_coins"
-                               value="{{ $shipping_coins }}" class="form-control">
-                        <small id="shipping_coins_hint" class="form-text text-muted mt-1"
-                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small>
-                    </div>
-                </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Agency Charge') }}</label>
+                                <input type="number" name="shipping_coins" id="shipping_coins"
+                                    value="{{ $shipping_coins }}" class="form-control">
+                                <small id="shipping_coins_hint" class="form-text text-muted mt-1"
+                                    data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                                    {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                                </small>
+                            </div>
+                        </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{ __('The User') }}</label>
-                        <input type="text" name="user_coins" id="user_coins"
-                               value="{{ $user_coins }}" class="form-control">
-                        <small id="user_coins_hint" class="form-text text-muted mt-1"
-                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small>
-                    </div>
-                </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('The User') }}</label>
+                                <input type="number" name="user_coins" id="user_coins"
+                                    value="{{ $user_coins }}" class="form-control">
+                                <small id="user_coins_hint" class="form-text text-muted mt-1"
+                                    data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                                    {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                                </small>
+                            </div>
+                        </div>
 
-                <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
+                        <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
+                    </div>
+                </form>
             </div>
-        </form>
+
+
+            <div id="withSettings" class="settings-section ">
+
+                <h3> {{ __('Withdrawal settings') }}</h3>
+
+                <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" id="targetSettingsForm">
+                    @csrf
+                    <div class="form row">
+
+
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label>{{ __('Limit per single withdrawal transaction') }}</label>
+                                <input type="number" name="limit_daily_withdrawal" id="limit_daily_withdrawal"
+                                    value="{{ $settings['limit_daily_withdrawal'] ?? 1 }}" class="form-control" >
+        
+                            </div>
+                        </div>
+
+                    </div>
+                    <br>
+                    <div class="action-buttons"style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary btn-save">
+                            <i class="fas fa-save"></i> {{ __('Save') }}
+                        </button>
+                        
+                    </div>
+                </form>
             </div>
 
             <!-- Bootstrap Modal -->
