@@ -132,11 +132,8 @@ class CoinGameUserService
                 $query->where('coin_game_users_daily_aggregated.game_id', $this->input);
             }, 'Game');
 
-            $filter->between('date', __('Created At'))
-                ->datetime([
-                    'format' => 'YYYY-MM-DD HH:mm:ss',
-                    'locale' => 'en',
-                ]);
+           $filter->between('date', __('Created At'))
+                     ->date();
         });
 
         $userService = $this->userService;
