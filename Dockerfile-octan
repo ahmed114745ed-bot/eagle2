@@ -77,6 +77,8 @@ RUN sed -i "/^OCTANE_/d" .env && sed -i "/^SESSION_DRIVER/d" .env && sed -i "/^L
 "OCTANE_MAX_REQUESTS=${OCTANE_MAX_REQUESTS}" \
 "OCTANE_SERVER=${OCTANE_SERVER}" \
 "OCTANE_TASK_WORKERS=${OCTANE_TASK_WORKERS}" \
+"SESSION_DRIVER=redis" \
+"LOG_LEVEL=error" \
 >> .env
 
 
