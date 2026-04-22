@@ -1,12 +1,16 @@
-name: SSh-bigo-room-pipline
+name: Deploy Bigo Room
 on:
   push:
     branches: ["bigo-room"]
+concurrency:
+  group: bigo-room-deploy
+  cancel-in-progress: false
+
 jobs:
-  run_bigo-room_hub:
+  hub:
     runs-on: [self-hosted]
     steps:
-    - name: Pull latest code
+    - name: Pull code and rotate logs
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.164.14"
@@ -16,56 +20,49 @@ jobs:
         command_timeout: 5m
         script: |
           cd /var/www/bigo-room
-          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh || source /home/${{ secrets.USERNAME }}/hub.sh
+          mkdir -p storage/jobs-logs
+          chmod -R 777 storage/jobs-logs
+          test -f public/settings.json || echo '{}' > public/settings.json
+          test -f gcp.json || echo '{}' > gcp.json
+          LOG_FILE=storage/logs/laravel.log
+          if [ -f "$LOG_FILE" ]; then
+            LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
+            if [ "$LOG_SIZE" -gt 104857600 ]; then
+              truncate -s 0 "$LOG_FILE"
+            fi
+          fi
+          find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
           threshold=80
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
+            sudo docker system prune -a -f 2>/dev/null
           fi
-  run_bigo-room_octa:
+
+  migrate:
     runs-on: [self-hosted]
-    needs: run_bigo-room_hub
+    needs: hub
     steps:
-    - name: Build and deploy Octane
+    - name: Run migrations
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.164.14"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 20m
+        command_timeout: 5m
         script: |
           cd /var/www/bigo-room
-          pwd
-          docker build -t bigo-room-octa:${{ github.sha }} -f Dockerfile-octana .
-          docker service update --image bigo-room-octa:${{ github.sha }} bigo-room-octa
-
-          # Run whatsapp token update
-          CONTAINER_ID=$(docker ps --filter "name=bigo-room-octa.1" --format "{{.ID}}" | head -n 1)
+          CONTAINER_ID=$(sudo docker ps --filter "name=bigo-room-octa.1" --format "{{.ID}}" | head -n 1)
           if [ -n "$CONTAINER_ID" ]; then
-            docker exec $CONTAINER_ID php artisan whatsapp:change-token
-          else
-            echo "No running container found for bigo-room-octa.1 service task"
-            exit 1
+            sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force || echo "Migration warning (non-fatal)"
           fi
 
-          # Disk cleanup check
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
-          fi
-  run_bigo-room_job:
+  deploy-app:
     runs-on: [self-hosted]
-    needs: run_bigo-room_hub
+    needs: [hub, migrate]
     steps:
-    - name: Build and deploy Jobs
+    - name: Build and deploy app
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.164.14"
@@ -75,6 +72,74 @@ jobs:
         command_timeout: 20m
         script: |
           cd /var/www/bigo-room
-          pwd
-          docker build -t bigo-room-job:${{ github.sha }} -f Dockerfile-jobs .
-          docker service update --image bigo-room-job:${{ github.sha }} bigo-room-job
+          sudo docker build -t bigo-room-octa:${{ github.sha }} -f Dockerfile-octana .
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating bigo-room-octa..."
+            if sudo docker service update \
+              --image bigo-room-octa:${{ github.sha }} \
+              --update-order start-first \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              bigo-room-octa; then
+              break
+            fi
+            [ "$attempt" -eq 3 ] && exit 1
+            sleep 15
+          done
+          sleep 10
+          CONTAINER_ID=$(sudo docker ps --filter "name=bigo-room-octa.1" --format "{{.ID}}" | head -n 1)
+          if [ -n "$CONTAINER_ID" ]; then
+            sudo docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "WhatsApp token skipped (non-fatal)"
+          fi
+
+  deploy-job:
+    runs-on: [self-hosted]
+    needs: [hub, migrate]
+    steps:
+    - name: Build and deploy job workers
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.164.14"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/bigo-room
+          sudo docker build -t bigo-room-job:${{ github.sha }} -f Dockerfile-jobs .
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt: updating bigo-room-job..."
+            if sudo docker service update \
+              --image bigo-room-job:${{ github.sha }} \
+              --update-parallelism 1 \
+              --update-delay 10s \
+              --update-failure-action rollback \
+              bigo-room-job; then
+              break
+            fi
+            [ "$attempt" -eq 3 ] && exit 1
+            sleep 15
+          done
+
+  cleanup:
+    runs-on: [self-hosted]
+    needs: [deploy-app, deploy-job]
+    if: always()
+    steps:
+    - name: Cleanup old images
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.164.14"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          CURRENT=${{ github.sha }}
+          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'bigo-room.*(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
+            sudo docker rmi "$img" 2>/dev/null || true
+          done
+          sudo docker image prune -f 2>/dev/null || true
+          sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
+          echo "Disk: $(df -h / | awk 'NR==2{print $5}')"
