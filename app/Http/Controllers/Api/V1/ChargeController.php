@@ -67,6 +67,12 @@ class ChargeController extends Controller
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
+        $limitWithdrawal = (int) (Common::getSettingValue('limit_daily_withdrawal') ?? 1);
+
+        if(floatval($request->usd) < $limitWithdrawal){
+            return Common::apiResponse(0, __('api_responses.min_withdrawal_amount', ['amount' => $limitWithdrawal]), 422);
+        }
+
         $types = [
             'user' => [$this, 'chargeToUser'],
             'agency' => [$this, 'chargeToAgency']
@@ -300,6 +306,14 @@ class ChargeController extends Controller
         if ($stop_all_charge === 1) {
             return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
         }
+
+        $limitWithdrawal = (int) (Common::getSettingValue('limit_daily_withdrawal') ?? 1);
+
+        if($request->amount < $limitWithdrawal){
+            return Common::apiResponse(0, __('api_responses.min_withdrawal_amount', ['amount' => $limitWithdrawal]), 422);
+        }
+
+         
         $types = [
             'user' => [$this, 'ChargeDollarForOwner_to_users'],
             'agency' => [$this, 'ChargeDollarForOwner_to_agency']
