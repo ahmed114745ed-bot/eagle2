@@ -49,7 +49,7 @@ class LuckyGiftService
          $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
 
          try {
-             $lock->block(3);
+             $lock->block(15);
          } catch (LockTimeoutException $e) {
              throw new InvalidArgumentException(__('api_responses.try_again'));
          }
@@ -203,7 +203,7 @@ class LuckyGiftService
                             'receiver_id' => $receiverId,
                             'error' => $e->getMessage(),
                         ]);
-                        $result = null;
+                        continue;
                     }
 
                     $iterationWin = 0;
