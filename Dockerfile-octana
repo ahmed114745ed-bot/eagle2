@@ -78,7 +78,7 @@ ENV OCTANE_TASK_WORKERS=4
 ENV OCTANE_SERVER="swoole"
 
 
-RUN printf "%s\n" \
+RUN sed -i "/^OCTANE_/d" .env && sed -i "/^SESSION_DRIVER/d" .env && sed -i "/^LOG_LEVEL/d" .env && printf "%s\n" \
 "OCTANE_WORKERS=${OCTANE_WORKERS}" \
 "OCTANE_MAX_REQUESTS=${OCTANE_MAX_REQUESTS}" \
 "OCTANE_SERVER=${OCTANE_SERVER}" \
