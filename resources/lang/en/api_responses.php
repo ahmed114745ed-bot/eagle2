@@ -161,6 +161,6 @@ return [
     'frozen' => 'Charging has been temporarily frozen. Please contact administration.',
     'frozen_agency' => 'The agency wallet has been temporarily frozen',
     'balance_low' => "You not have enough coins",
-    'min_withdrawal_amount' => 'You cannot withdraw less than :amount',
+    'min_withdrawal_amount' => 'You cannot charge less than :amount',
 
 ];
