@@ -317,7 +317,6 @@ class LuckyGiftService
             $price = $coinsForReceiverBase * $receiversCount;
             $coinsForReceiver = $coinsForReceiverBase * $count;
             $number = $number * $count;
-            $newUserCoin = ($user->di - $userCoins);
             $roomSessionToAdd = $coinsForOwnerTotal * $count;
 
             $responseData['session'] = $room->session_string;
@@ -370,7 +369,7 @@ class LuckyGiftService
                 'number' => $number,
                 'price' => $price,
                 'user_coins_before' => $oldUserCoin,
-                'user_coins_after' => $newUserCoin,
+                'user_coins_after' => $user->di,
                 'owner_id' => $ownerId,
             ])->onQueue('gifts');
 
@@ -589,7 +588,7 @@ class LuckyGiftService
         
         $coinsForReceiver = $coinsForReceiver * $count;
         $number = $number * $count;
-        $newUserCoin = ($user->di - $userCoins);
+        $newUserCoin = $user->di;
 
         // add session to response
         $responseData['session'] = $room->session_string;
