@@ -820,6 +820,8 @@ class ChargeReportController extends MainController
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
+            });
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input !== '' && $this->input !== null) {
                         $query->where('method', $this->input);
