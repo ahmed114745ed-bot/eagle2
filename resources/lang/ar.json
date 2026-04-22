@@ -228,7 +228,7 @@
     "Select Super Admins": "اختر مدير دول",
     "Email": "بريد الكتروني",
     "Withdrawal settings":"إعدادات السحب",
-    "Limit on daily withdrawal transactions": "الحد الأقصى لعمليات السحب اليومية",
+    "Limit per single withdrawal transaction": "الحد للسحب العمليه الواحده",
     "cancel cp": "إلغاء العلاقة",
     "Cp Report": "تقرير CP",
     "audio": "صوت",

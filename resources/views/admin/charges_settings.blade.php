@@ -567,7 +567,7 @@
 
                         <div class="col-md-6">
                             <div class="form-group ">
-                                <label>{{ __('Limit on daily withdrawal transactions') }}</label>
+                                <label>{{ __('Limit per single withdrawal transaction') }}</label>
                                 <input type="number" name="limit_daily_withdrawal" id="limit_daily_withdrawal"
                                     value="{{ $settings['limit_daily_withdrawal'] ?? 1 }}" class="form-control" >
         
