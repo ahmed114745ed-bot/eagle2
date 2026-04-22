@@ -373,9 +373,7 @@ class LuckyGiftService
         $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();
         $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
 
-        $senderBalanceBefore = $user->di;
-        $totalWalletsBefore = null;
-        $totalWalletsAfter = null;
+            while ($user->di >= $totalPriceFull && $index > 0) {
 
         $totalPriceFull = $giftPrice * $number * $receiversCount;
 
@@ -392,15 +390,118 @@ class LuckyGiftService
 
             foreach ($receiversIds as $receiverId) {
 
-                if ($user->di < $unitPrice) {
-                    $index = 0;
-                    break;
+                    $senderBalanceBeforeHit = $user->di;
+
+                    try {
+                        $result = $fairService->processBet(
+                            $user,
+                            $gift,
+                            $netBetAmount,
+                            $unitPrice,
+                            $roomId,
+                            $receiverId,
+                            $appFee,
+                            $receiverFee,
+                            $senderBalanceBeforeHit,
+                            $user->di - $unitPrice
+                        );
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::error('FairLuckServiceV7 processBet FAILED', [
+                            'user_id' => $userId,
+                            'throw_number' => $throwNumber,
+                            'receiver_id' => $receiverId,
+                            'error' => $e->getMessage(),
+                        ]);
+                        $result = null;
+                    }
+
+                    // Log deduction ONLY after successful processBet
+                    UserCoinLogHelper::logByType(
+                        $user->id,
+                        -abs($unitPrice),
+                        $senderBalanceBeforeHit,
+                        UserCoinLogType::LUCKY_GIFT,
+                        $gift?->name,
+                    );
+
+                    $iterationWin = 0;
+                    $isWinner = false;
+                    $multiplier = 0;
+                    $message = null;
+
+                    if ($result) {
+                        $isWinner = (bool) ($result->isWinner ?? false);
+                        $multiplier = (float) ($result->multiplier ?? 0);
+                        $iterationWin = (float) ($result->profitAmount ?? 0);
+
+                        if ($isWinner && $iterationWin > 0) {
+                            $user->enableSaving = false;
+                            $user->di += $iterationWin;
+
+                            $total_user_win += $iterationWin;
+                            $total_count_win++;
+                            if ($iterationWin > $max_single_win) {
+                                $max_single_win = $iterationWin;
+                            }
+
+                            if ($multiplier > 1) {
+                                $message = $this->winnerMessage($multiplier);
+                            }
+                        }
+
+                        if ($totalWalletsBefore === null) {
+                            $totalWalletsBefore = $result->wallets_before ?? null;
+                        }
+                        $totalWalletsAfter = $result->wallets_after ?? null;
+                    }
+
+                    $isPopular = $multiplier >= 5;
+
+                    if ($isPopular && $iterationWin > 0) {
+                        $this->sendPopularToZegoV2(
+                            $userId,
+                            $user,
+                            $gift,
+                            $ownerId,
+                            $room,
+                            $multiplier,
+                            cashbackValue: $iterationWin
+                        );
+                    }
+
+                    [$commentMessage, $sendMessage] = $this->getSendMessage(
+                        $giftPrice,
+                        $message,
+                        $receiverName,
+                        $number,
+                        isToRoom: $isToRoom
+                    );
+
+                    $senderBalanceAfterHit = (int) ($senderBalanceBeforeHit - $unitPrice + ($iterationWin > 0 ? $iterationWin : 0));
+
+                    $responseData['combo'][] = [
+                        'status' => 0,
+                        'data' => [
+                            'win_coins' => (int) $iterationWin,
+                            'is_win' => $isWinner,
+                            'is_popular' => $isPopular,
+                            'comment_message' => $commentMessage,
+                            'winner_comment' => $sendMessage,
+                        ],
+                        'error_message' => '',
+                        'sender_balance_before' => (int) $senderBalanceBeforeHit,
+                        'sender_balance_after' => $senderBalanceAfterHit,
+                        'wallets_before' => $result?->wallets_before,
+                        'wallets_after' => $result?->wallets_after,
+                    ];
+
+                    $user->di -= $unitPrice;
+                    $total_cashback_percentage += $multiplier;
                 }
 
                 $throwNumber++;
 
                 $senderBalanceBeforeHit = $user->di;
-
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
                 $netBetAmount = $unitPrice - $appFee - $receiverFee;
