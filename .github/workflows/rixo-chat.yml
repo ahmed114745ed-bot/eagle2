@@ -54,4 +54,20 @@ jobs:
           
           sudo -E docker stack deploy -c rixo-deployment.yml rixo
 
+  cleanup_images:
+    runs-on: [self-hosted]
+    needs: deploy_rixo_stack
+    if: always()
+    environment: rixo-prod
+    steps:
+    - name: prune dangling images
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.96.67"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          sleep 30
           sudo docker image prune -f
