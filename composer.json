@@ -57,6 +57,7 @@
         "utd/daily-prize": "*",
         "utd/events": "*",
         "utd/family": "*",
+        "utd/form": "dev-achievmentPackage",
         "utd/gifts": "*",
         "utd/host-level": "*",
         "utd/lucky-box": "*",
@@ -271,6 +272,13 @@
         {
             "type": "path",
             "url": "packages/Utd/Badge"
-        }c
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Form",
+            "options": {
+                "symlink": true
+            }
+        }
     ]
 }
