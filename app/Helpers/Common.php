@@ -2544,6 +2544,7 @@ class Common
         }
         $agency = is_numeric($agency) ? ShippingAgency::find($agency) : $agency;
 
+        if (!$agency) {
             return false;
         }
 
