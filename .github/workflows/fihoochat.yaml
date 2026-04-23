@@ -74,39 +74,43 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/fihoochat
-          sudo docker build -t fihoochat-octa:${{ github.sha }} . -f Dockerfile-octana
 
-          for attempt in 1 2 3; do
-            if sudo docker service update \
-              --image fihoochat-octa:${{ github.sha }} \
-              --replicas 2 \
-              --limit-memory 2.5gb \
-              --reserve-memory 1.0gb \
-              --update-order stop-first \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              --update-failure-action rollback \
-              fihoochat-octa; then
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              exit 1
-            fi
-            sleep 15
-          done
+          echo "Building fihoochat-octa:${{ github.sha }}..."
+          sudo docker build -t fihoochat-octa:${{ github.sha }} . -f Dockerfile-octana
+          echo "Build succeeded."
+
+          sudo docker service update \
+            --image fihoochat-octa:${{ github.sha }} \
+            --replicas 2 \
+            --limit-memory 2.5gb \
+            --reserve-memory 1.0gb \
+            --update-order stop-first \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            --update-failure-action rollback \
+            fihoochat-octa
+
+          UPDATE_STATE=$(sudo docker service inspect fihoochat-octa --format '{{.UpdateStatus.State}}')
+          if [ "$UPDATE_STATE" = "rollback_completed" ]; then
+            echo "ERROR: Service update rolled back!"
+            sudo docker service ps fihoochat-octa --no-trunc --format "{{.Name}} {{.CurrentState}} {{.Error}}" | head -10
+            exit 1
+          fi
 
           RUNNING_IMAGE=$(sudo docker service inspect fihoochat-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
           EXPECTED_IMAGE="fihoochat-octa:${{ github.sha }}"
           if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
             exit 1
           fi
+          echo "Verified: fihoochat-octa is running $RUNNING_IMAGE"
 
-          sleep 15
-
-          CONTAINER_ID=$(docker ps --filter "name=fihoochat-octa.1" --format "{{.ID}}" | head -n 1)
+          sleep 10
+          CONTAINER_ID=$(sudo docker ps --filter "name=fihoochat-octa.1" --format "{{.ID}}" | head -n 1)
           if [ -n "$CONTAINER_ID" ]; then
-            docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "WhatsApp token skipped (non-fatal)"
+            sudo docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "WhatsApp token skipped (non-fatal)"
           else
             echo "No container for token (non-fatal)"
           fi
@@ -125,33 +129,38 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/fihoochat
-          sudo docker build -t fihoochat-job:${{ github.sha }} -f Dockerfile-jobs .
 
-          for attempt in 1 2 3; do
-            if sudo docker service update \
-              --image fihoochat-job:${{ github.sha }} \
-              --replicas 1 \
-              --limit-cpu 5.0 \
-              --limit-memory 2.5gb \
-              --reserve-memory 1.0gb \
-              --update-parallelism 1 \
-              --update-delay 10s \
-              --update-failure-action rollback \
-              fihoochat-job; then
-              break
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              exit 1
-            fi
-            sleep 15
-          done
+          echo "Building fihoochat-job:${{ github.sha }}..."
+          sudo docker build -t fihoochat-job:${{ github.sha }} -f Dockerfile-jobs .
+          echo "Build succeeded."
+
+          sudo docker service update \
+            --image fihoochat-job:${{ github.sha }} \
+            --replicas 1 \
+            --limit-cpu 5.0 \
+            --limit-memory 2.5gb \
+            --reserve-memory 1.0gb \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            --update-failure-action rollback \
+            fihoochat-job
+
+          UPDATE_STATE=$(sudo docker service inspect fihoochat-job --format '{{.UpdateStatus.State}}')
+          if [ "$UPDATE_STATE" = "rollback_completed" ]; then
+            echo "ERROR: Service update rolled back!"
+            sudo docker service ps fihoochat-job --no-trunc --format "{{.Name}} {{.CurrentState}} {{.Error}}" | head -10
+            exit 1
+          fi
 
           RUNNING_IMAGE=$(sudo docker service inspect fihoochat-job --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
           EXPECTED_IMAGE="fihoochat-job:${{ github.sha }}"
           if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
             exit 1
           fi
+          echo "Verified: fihoochat-job is running $RUNNING_IMAGE"
 
   run_fihoochat_cleanup:
     runs-on: [self-hosted]
