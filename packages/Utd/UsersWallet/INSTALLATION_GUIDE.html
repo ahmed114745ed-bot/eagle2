@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UsersWallet Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cover-page h1 {
+            font-size: 48px;
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #1e40af;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2563eb;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #1e3a8a;
+            margin: 30px 0 15px 0;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: #3b82f6;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #cbd5e1;
+        }
+
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc a {
+            color: #1e40af;
+            text-decoration: none;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #be185d;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+
+        .note {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note-title {
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a8a;
+            display: inline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        @media print {
+            body {
+                padding: 20px;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>&#x1F4B0; UsersWallet Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the UsersWallet package for managing user wallets, withdrawals, exchanges, and diamond transactions</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: April 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#requirements">1. Requirements</a></li>
+            <li><a href="#installation">2. Installation Steps</a></li>
+            <li><a href="#configuration">3. Configuration</a></li>
+            <li><a href="#database">4. Database Setup</a></li>
+            <li><a href="#routes">5. Routes & Middleware</a></li>
+            <li><a href="#verification">6. Verification</a></li>
+            <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+            <li><a href="#api-reference">8. API Reference</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Requirements -->
+    <h1 id="requirements">1. Requirements</h1>
+
+    <h2>1.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.2 or higher</td>
+            <td><span class="checkmark">&#x2713;</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">&#x2713;</span></td>
+        </tr>
+        <tr>
+            <td>Laravel-Admin Package</td>
+            <td>1.8+</td>
+            <td><span class="checkmark">&#x2713;</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Sanctum</td>
+            <td>3.3+</td>
+            <td><span class="checkmark">&#x2713;</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">&#x2713;</span></td>
+        </tr>
+    </table>
+
+    <h2>1.2 Frontend Requirements</h2>
+    <table>
+        <tr>
+            <th>Library</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>jQuery</td>
+            <td>3.6+</td>
+            <td>DOM manipulation & AJAX</td>
+        </tr>
+        <tr>
+            <td>SweetAlert2</td>
+            <td>11+</td>
+            <td>Alert dialogs for approve/reject withdrawals</td>
+        </tr>
+        <tr>
+            <td>Font Awesome</td>
+            <td>6.4+</td>
+            <td>Icons</td>
+        </tr>
+    </table>
+
+    <h2>1.3 Database Tables</h2>
+    <p>The package will create the following tables and views:</p>
+    <ul>
+        <li><code>wallet_templates</code> - Wallet template definitions (bank, digital wallet, etc.)</li>
+        <li><code>wallet_fields</code> - Custom fields for each wallet template</li>
+        <li><code>wallets</code> - User wallet records with balances</li>
+        <li><code>wallet_logs</code> - Transaction logs for wallet operations</li>
+        <li><code>user_withdrawals</code> - User withdrawal requests</li>
+        <li><code>user_diamond_logs</code> - Diamond transaction history</li>
+        <li><code>all_user_logs</code> (view) - Combined view of all user logs</li>
+        <li><code>wallet_logs_view</code> (view) - Wallet logs aggregation view</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Installation -->
+    <h1 id="installation">2. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>UsersWallet</code> folder to your project:</p>
+        <pre><code>packages/Utd/UsersWallet</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/UsersWallet",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
+}</code></pre>
+        <p>And add the package to the require section:</p>
+        <pre><code>"utd/users-wallet": "*"</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/users-wallet</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Register in PackageHelper</span>
+        <p>Add the UsersWallet package to <code>app/Support/PackageHelper.php</code>:</p>
+        <pre><code>use Utd\UsersWallet\Entities\UserWallet;
+
+// Add to the $packages array:
+'usersWallet' => UserWallet::class,</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <span class="step-title">Run Migrations</span>
+        <pre><code>php artisan migrate</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">6</span>
+        <span class="step-title">Run Database Seeders</span>
+        <p>Run the wallet seeders to set up admin menu and wallet templates:</p>
+        <pre><code>php artisan db:seed --class="Utd\UsersWallet\Database\Seeders\WalletMenuSeeder"
+php artisan db:seed --class="Utd\UsersWallet\Database\Seeders\BankAccountTemplateSeeder"
+php artisan db:seed --class="Utd\UsersWallet\Database\Seeders\DigitalWalletTemplateSeeder"
+php artisan db:seed --class="Utd\UsersWallet\Database\Seeders\OtherWalletTemplateSeeder"</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">7</span>
+        <span class="step-title">Update Admin Permissions</span>
+        <p>Run the permissions seeder to add Wallet permissions:</p>
+        <pre><code>php artisan db:seed --class=PermissionTypeSeeder</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">8</span>
+        <span class="step-title">Clear Cache</span>
+        <pre><code>php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Configuration -->
+    <h1 id="configuration">3. Configuration</h1>
+
+    <h2>3.1 Publish Configuration</h2>
+    <p>Optionally publish the config file to customize settings:</p>
+    <pre><code>php artisan vendor:publish --tag=config --provider="Utd\UsersWallet\UsersWalletServiceProvider"</code></pre>
+    <p>This publishes the config to <code>config/userswallet.php</code>.</p>
+
+    <h2>3.2 Publish Views</h2>
+    <p>Optionally publish views for customization:</p>
+    <pre><code>php artisan vendor:publish --tag=userswallet-module-views</code></pre>
+    <p>Views will be published to <code>resources/views/modules/userswallet/</code>.</p>
+
+    <h2>3.3 Wallet Templates</h2>
+    <p>The package comes with 3 pre-built wallet templates:</p>
+    <table>
+        <tr>
+            <th>Template</th>
+            <th>Seeder</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>Bank Account</td>
+            <td>BankAccountTemplateSeeder</td>
+            <td>Bank transfer withdrawal method</td>
+        </tr>
+        <tr>
+            <td>Digital Wallet</td>
+            <td>DigitalWalletTemplateSeeder</td>
+            <td>E-wallet withdrawal method (Vodafone Cash, etc.)</td>
+        </tr>
+        <tr>
+            <td>Other</td>
+            <td>OtherWalletTemplateSeeder</td>
+            <td>Custom/other withdrawal methods</td>
+        </tr>
+    </table>
+
+    <h2>3.4 External File Guards</h2>
+    <p>The following external files use <code>PackageHelper::isInstalled('usersWallet')</code> guards and will gracefully degrade when the package is not installed:</p>
+    <ul>
+        <li><code>app/helper/helpers.php</code> - wallet_available_by_user(), wallet_curant_by_user()</li>
+        <li><code>app/Admin/Controllers/AllStatisticController.php</code> - Withdrawals query, ajaxWalletLogs()</li>
+        <li><code>app/Admin/Controllers/UserController.php</code> - wallet_logs case</li>
+        <li><code>app/Tik/Services/ChargeRepoService.php</code> - WalletTransactionService calls</li>
+        <li><code>app/Bd/Controllers/WalletController.php</code> - WalletTransactionService calls</li>
+        <li><code>Modules/SuperAdmin/Http/Controllers/SuperAdmin/WalletController.php</code> - WalletTransactionService calls</li>
+        <li><code>Modules/AreaManager/Http/Controllers/WalletController.php</code> - WalletTransactionService calls</li>
+        <li><code>app/Observers/UserSallaryObserver.php</code> - UpdateUserWalletBalances dispatch</li>
+        <li><code>database/seeders/PermissionTypeSeeder.php</code> - Wallet permissions (spread operator pattern)</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Database -->
+    <h1 id="database">4. Database Setup</h1>
+
+    <h2>4.1 Migration Files</h2>
+    <p>The package includes 16 migration files that create and update the following tables:</p>
+
+    <table>
+        <tr>
+            <th>Migration</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>create_wallet_templates_table</td>
+            <td>Wallet template definitions (name, type, status)</td>
+        </tr>
+        <tr>
+            <td>add_columns_to_wallet_templates_table</td>
+            <td>Additional columns for wallet templates</td>
+        </tr>
+        <tr>
+            <td>create_wallet_fields_table</td>
+            <td>Custom fields per template (label, type, validation)</td>
+        </tr>
+        <tr>
+            <td>create_wallets_table</td>
+            <td>User wallet records with balances</td>
+        </tr>
+        <tr>
+            <td>create_wallet_logs_table</td>
+            <td>Transaction log entries</td>
+        </tr>
+        <tr>
+            <td>chnge_operation_wallet_logs_table</td>
+            <td>Update operation column in wallet_logs</td>
+        </tr>
+        <tr>
+            <td>add_target_id_to_wallet_logs_table</td>
+            <td>Target ID FK on wallet_logs</td>
+        </tr>
+        <tr>
+            <td>add_related_id_to_wallet_logs_table</td>
+            <td>Related ID column on wallet_logs</td>
+        </tr>
+        <tr>
+            <td>create_user_withdrawals_table</td>
+            <td>Withdrawal requests with status tracking</td>
+        </tr>
+        <tr>
+            <td>create_user_diamond_logs_table</td>
+            <td>Diamond transaction history</td>
+        </tr>
+        <tr>
+            <td>add_feature_type_to_user_coin_logs</td>
+            <td>Feature type column on user_coin_logs</td>
+        </tr>
+        <tr>
+            <td>drop_old_tables</td>
+            <td>Cleanup of legacy wallet tables</td>
+        </tr>
+        <tr>
+            <td>create_all_user_logs_view</td>
+            <td>Combined user logs database view</td>
+        </tr>
+        <tr>
+            <td>create_all_user_logs_view (updated)</td>
+            <td>Updated combined user logs view</td>
+        </tr>
+        <tr>
+            <td>create_wallet_logs_view</td>
+            <td>Wallet logs aggregation view</td>
+        </tr>
+        <tr>
+            <td>update_wallet_logs_view</td>
+            <td>Updated wallet logs view</td>
+        </tr>
+    </table>
+
+    <h2>4.2 Seeders</h2>
+    <table>
+        <tr>
+            <th>Seeder</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>WalletMenuSeeder</td>
+            <td>Creates admin menu: parent "Wallet" with child "e_wallet"</td>
+        </tr>
+        <tr>
+            <td>BankAccountTemplateSeeder</td>
+            <td>Creates bank account wallet template with fields</td>
+        </tr>
+        <tr>
+            <td>DigitalWalletTemplateSeeder</td>
+            <td>Creates digital wallet template with fields</td>
+        </tr>
+        <tr>
+            <td>OtherWalletTemplateSeeder</td>
+            <td>Creates other/custom wallet template with fields</td>
+        </tr>
+        <tr>
+            <td>RecalculateWalletsSeeder</td>
+            <td>Recalculates all wallet balances from logs</td>
+        </tr>
+        <tr>
+            <td>UsersWalletDatabaseSeeder</td>
+            <td>Master seeder that runs all package seeders</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Routes -->
+    <h1 id="routes">5. Routes & Middleware</h1>
+
+    <h2>5.1 Admin Routes (Web)</h2>
+    <p>Middleware: <code>web, admin, adminIp, multiLanguage</code></p>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/wallet-withdrawal</td>
+            <td>List all withdrawal requests</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/wallet-withdrawal/{id}</td>
+            <td>Show withdrawal details</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/admin/wallet/withdrawals/{id}/approve</td>
+            <td>Approve a withdrawal request</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/admin/wallet/withdrawals/{id}/reject</td>
+            <td>Reject a withdrawal request</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/wallet-templates</td>
+            <td>List wallet templates</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/wallet-templates/create</td>
+            <td>Create new wallet template</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/wallet-templates/{id}/edit</td>
+            <td>Edit wallet template</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/wallet-fields/{wallet_template_id}</td>
+            <td>List fields for a template</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/wallet-fields/{wallet_template_id}/create</td>
+            <td>Create new field</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/admin/wallet-fields/{wallet_template_id}</td>
+            <td>Store new field</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td>/admin/wallet-fields/{wallet_template_id}/{id}</td>
+            <td>Update a field</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>/admin/wallet-fields/{wallet_template_id}/{id}</td>
+            <td>Delete a field</td>
+        </tr>
+    </table>
+
+    <h2>5.2 API Routes</h2>
+    <p>Middleware: <code>auth:sanctum, checkLatestToken, generalBan, userBan, localization</code></p>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/wallets/withdraw</td>
+            <td>Request a withdrawal</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/wallets/transfer</td>
+            <td>Transfer balance to another user</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/profits</td>
+            <td>Get profits grouped by type</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/latest-operations</td>
+            <td>Get latest wallet operations</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/getTemplate</td>
+            <td>Get wallet template by type</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/transactions</td>
+            <td>Get wallet transactions</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/diamonds-statistic</td>
+            <td>Get diamond statistics</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/history</td>
+            <td>Get wallet history</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/exchange/list</td>
+            <td>List exchange options</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/exchange/v2/list</td>
+            <td>Exchange settings (v2)</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/wallets/exchange/make</td>
+            <td>Perform an exchange</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/wallets/exchange/v2/make</td>
+            <td>Perform exchange by coins (v2)</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/wallets/exchange/logs</td>
+            <td>Get exchange logs</td>
+        </tr>
+    </table>
+
+    <h2>5.3 Exchange API Routes (Top-Level)</h2>
+    <p>Middleware: <code>auth:sanctum, checkLatestToken, generalBan, userBan, update.last.seen, localization</code></p>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/exchange/list</td>
+            <td>List exchange options</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/exchange/v2/list</td>
+            <td>Exchange settings (v2)</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/exchange/make</td>
+            <td>Perform an exchange</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/exchange/v2/make</td>
+            <td>Perform exchange by coins (v2)</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/exchange/logs</td>
+            <td>Get exchange logs</td>
+        </tr>
+    </table>
+
+    <h2>5.4 UTD Routes (Dashboard API)</h2>
+    <p>Middleware: <code>api, localization</code> &mdash; Prefix: <code>/api/utd</code></p>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/exchanges</td>
+            <td>List all exchanges</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/exchanges/show/{id}</td>
+            <td>Show exchange details</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/utd/exchanges/create</td>
+            <td>Create new exchange config</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/utd/exchanges/update/{id}</td>
+            <td>Update exchange config</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>/api/utd/exchanges/delete/{id}</td>
+            <td>Delete exchange config</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/users/exchange-diamonds/{id}</td>
+            <td>Get user exchange diamond logs</td>
+        </tr>
+    </table>
+
+    <h2>5.5 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr wallet
+php artisan route:list | findstr exchange</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Verification -->
+    <h1 id="verification">6. Verification</h1>
+
+    <h2>6.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/users-wallet</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>All wallet migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>3. Routes Registered</td>
+            <td><code>php artisan route:list</code></td>
+            <td>wallet-templates, wallet-withdrawal routes visible</td>
+        </tr>
+        <tr>
+            <td>4. Admin Menu</td>
+            <td>Check admin sidebar</td>
+            <td>"Wallet" parent with "e_wallet" child menu</td>
+        </tr>
+        <tr>
+            <td>5. Templates Page</td>
+            <td>Visit /admin/wallet-templates</td>
+            <td>Page loads with wallet templates list</td>
+        </tr>
+        <tr>
+            <td>6. Withdrawals Page</td>
+            <td>Visit /admin/wallet-withdrawal</td>
+            <td>Page loads with withdrawal requests</td>
+        </tr>
+        <tr>
+            <td>7. PackageHelper</td>
+            <td><code>php artisan tinker</code> then <code>PackageHelper::isInstalled('usersWallet')</code></td>
+            <td>Returns <code>true</code></td>
+        </tr>
+    </table>
+
+    <h2>6.2 Test Admin Access</h2>
+    <p>Open your browser and navigate to:</p>
+    <pre><code>https://your-domain.com/admin/wallet-templates
+https://your-domain.com/admin/wallet-withdrawal</code></pre>
+
+    <h2>6.3 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test Wallet Template (requires auth token)
+curl -X GET "https://your-domain.com/api/wallets/getTemplate?type=bank" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Profits Endpoint
+curl -X GET "https://your-domain.com/api/wallets/profits" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Exchange List
+curl -X GET "https://your-domain.com/api/exchange/list?type=1" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Diamond Statistics
+curl -X GET "https://your-domain.com/api/wallets/diamonds-statistic" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"</code></pre>
+
+    <div class="success">
+        <strong>Success!</strong>
+        <p>If you can access the admin pages and the API returns data, your installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Troubleshooting -->
+    <h1 id="troubleshooting">7. Troubleshooting</h1>
+
+    <h2>7.1 Common Issues</h2>
+
+    <h3>Issue: Page Not Found (404)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan route:clear
+php artisan cache:clear
+php artisan config:clear</code></pre>
+    </div>
+
+    <h3>Issue: Class Not Found Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>composer dump-autoload
+php artisan package:discover</code></pre>
+    </div>
+
+    <h3>Issue: Admin Menu Not Showing</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Run the menu seeder: <code>php artisan db:seed --class="Utd\UsersWallet\Database\Seeders\WalletMenuSeeder"</code></li>
+            <li>Clear cache: <code>php artisan cache:clear</code></li>
+            <li>Check that "Wallet" parent menu exists in the admin_menu table</li>
+        </ol>
+    </div>
+
+    <h3>Issue: "Column already exists" on Migration</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>If <code>feature_type</code> column already exists in <code>user_coin_logs</code>:</p>
+        <ol>
+            <li>Manually insert the migration record to skip it:</li>
+        </ol>
+        <pre><code>php artisan tinker
+DB::table('migrations')->insert([
+    'migration' => '2025_11_26_111617_add_feature_type_to_user_coin_logs',
+    'batch' => DB::table('migrations')->max('batch') + 1
+]);</code></pre>
+        <p>Then re-run <code>php artisan migrate</code>.</p>
+    </div>
+
+    <h3>Issue: View Already Exists</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>If database views already exist from a previous installation:</p>
+        <pre><code>php artisan tinker
+DB::statement('DROP VIEW IF EXISTS all_user_logs');
+DB::statement('DROP VIEW IF EXISTS wallet_logs_view');</code></pre>
+        <p>Then re-run <code>php artisan migrate</code>.</p>
+    </div>
+
+    <h3>Issue: Wallet Functions Return 0</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Verify <code>'usersWallet' => UserWallet::class</code> is in PackageHelper</li>
+            <li>Verify <code>Utd\UsersWallet\Entities\UserWallet</code> class exists</li>
+            <li>Run <code>composer dump-autoload</code></li>
+        </ol>
+    </div>
+
+    <h3>Issue: WalletTransactionService Not Found in External Files</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>External files reference <code>Utd\UsersWallet\Services\WalletTransactionService</code>. Ensure the package is installed and autoloaded:</p>
+        <pre><code>composer dump-autoload
+php artisan config:clear</code></pre>
+    </div>
+
+    <h2>7.2 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <h2>7.3 Browser Console</h2>
+    <p>Press <code>F12</code> to open Developer Tools and check for JavaScript errors in the Console tab.</p>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: API Reference -->
+    <h1 id="api-reference">8. API Reference</h1>
+
+    <h2>8.1 Get Wallet Template</h2>
+    <pre><code>GET /api/wallets/getTemplate?type={template_type}
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "success",
+    "data": [
+        {
+            "id": 1,
+            "name": "Bank Account",
+            "type": "bank",
+            "fields": [
+                {
+                    "id": 1,
+                    "label": "Account Holder Name",
+                    "type": "text",
+                    "required": true
+                }
+            ]
+        }
+    ]
+}</code></pre>
+
+    <h2>8.2 Request Withdrawal</h2>
+    <pre><code>POST /api/wallets/withdraw
+Authorization: Bearer {token}
+
+Body (JSON):
+{
+    "amount": 100,
+    "meta": {
+        "bank_name": "XYZ Bank",
+        "account_number": "1234567890"
+    }
+}
+
+Response:
+{
+    "status": true,
+    "message": "Withdrawal request created successfully. Status: pending.",
+    "data": {
+        "id": 1,
+        "user_id": 5,
+        "amount": 100,
+        "status": "pending",
+        "created_at": "2026-04-23T10:30:00Z"
+    }
+}</code></pre>
+
+    <h2>8.3 Transfer to User</h2>
+    <pre><code>POST /api/wallets/transfer
+Authorization: Bearer {token}
+
+Body (JSON):
+{
+    "user_id": 10,
+    "amount": 50.00
+}
+
+Response:
+{
+    "status": true,
+    "message": "Transfer completed successfully",
+    "data": {
+        "coins": "1500",
+        "usd": "75.00"
+    }
+}</code></pre>
+
+    <h2>8.4 Get Profits by Type</h2>
+    <pre><code>GET /api/wallets/profits
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "success",
+    "data": [
+        {
+            "type": "gift",
+            "total": 500,
+            "percentage": 45.5
+        },
+        {
+            "type": "room",
+            "total": 300,
+            "percentage": 27.3
+        }
+    ]
+}</code></pre>
+
+    <h2>8.5 Get Latest Operations</h2>
+    <pre><code>GET /api/wallets/latest-operations
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "success",
+    "data": [
+        {
+            "id": 1,
+            "type": "add",
+            "amount": 100,
+            "description": "Gift received",
+            "created_at": "2026-04-23T10:00:00Z"
+        }
+    ]
+}</code></pre>
+
+    <h2>8.6 Get Wallet Transactions</h2>
+    <pre><code>GET /api/wallets/transactions
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "success",
+    "data": [
+        {
+            "id": 1,
+            "type": "add",
+            "value": 200,
+            "description": "target_achieved",
+            "created_at": "2026-04-23T09:00:00Z"
+        }
+    ]
+}</code></pre>
+
+    <h2>8.7 Diamond Statistics</h2>
+    <pre><code>GET /api/wallets/diamonds-statistic?type={type}&startDate={date}&endDate={date}
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "",
+    "data": {
+        "total": 5000,
+        "items": [ ... ]
+    }
+}</code></pre>
+
+    <h2>8.8 Wallet History</h2>
+    <pre><code>GET /api/wallets/history?type={type}&start_date={date}&end_date={date}
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "",
+    "data": [
+        {
+            "id": 1,
+            "amount": 100,
+            "type": "received",
+            "feature_type": "gift",
+            "created_at": "2026-04-23T08:00:00Z"
+        }
+    ]
+}</code></pre>
+
+    <h2>8.9 Exchange List</h2>
+    <pre><code>GET /api/exchange/list?type={type}
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "1500",
+    "data": [ ... ]
+}</code></pre>
+
+    <h2>8.10 Perform Exchange</h2>
+    <pre><code>POST /api/exchange/make
+Authorization: Bearer {token}
+
+Body (JSON):
+{
+    "item_id": 5
+}
+
+Response:
+{
+    "status": true,
+    "message": "2000",
+    "data": {
+        "diamond": 2000,
+        "coins": 5000
+    }
+}</code></pre>
+
+    <h2>8.11 Perform Exchange V2</h2>
+    <pre><code>POST /api/exchange/v2/make
+Authorization: Bearer {token}
+
+Body (JSON):
+{
+    "diamonds": 100,
+    "exchange": "coins"
+}
+
+Response:
+{
+    "status": true,
+    "message": "exchange done successful",
+    "data": {
+        "diamond": 1900,
+        "coins": 5500
+    }
+}</code></pre>
+
+    <h2>8.12 Exchange Logs</h2>
+    <pre><code>GET /api/exchange/logs?type={type}
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "ok",
+    "data": [
+        {
+            "id": 1,
+            "diamonds": 100,
+            "coins": 500,
+            "type": 0,
+            "created_at": "2026-04-23T07:00:00Z"
+        }
+    ]
+}</code></pre>
+
+    <h2>8.13 Approve Withdrawal (Admin)</h2>
+    <pre><code>POST /admin/wallet/withdrawals/{id}/approve
+
+Response:
+{
+    "success": true,
+    "message": "Approved successfully"
+}</code></pre>
+
+    <h2>8.14 Reject Withdrawal (Admin)</h2>
+    <pre><code>POST /admin/wallet/withdrawals/{id}/reject
+
+Response:
+{
+    "success": true,
+    "message": "Rejected successfully"
+}</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section: Services -->
+    <h1>9. Key Services & Classes</h1>
+
+    <p>The package provides the following key services used internally and by external files:</p>
+
+    <table>
+        <tr>
+            <th>Class</th>
+            <th>Namespace</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>WalletService</td>
+            <td>Utd\UsersWallet\Services</td>
+            <td>Core wallet operations (transfer, profits, transactions, history)</td>
+        </tr>
+        <tr>
+            <td>WalletTransactionService</td>
+            <td>Utd\UsersWallet\Services</td>
+            <td>Store wallet transactions (used by external BD/SuperAdmin/AreaManager controllers)</td>
+        </tr>
+        <tr>
+            <td>ExchangeService</td>
+            <td>Utd\UsersWallet\Services</td>
+            <td>Diamond exchange operations</td>
+        </tr>
+        <tr>
+            <td>WalletHelper</td>
+            <td>Utd\UsersWallet\Helpers</td>
+            <td>Helper functions (createWithdrawal, addAllBalancesByDiffs)</td>
+        </tr>
+        <tr>
+            <td>UpdateUserWalletBalances</td>
+            <td>Utd\UsersWallet\Jobs</td>
+            <td>Queue job for recalculating wallet balances</td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <div class="warning-title">Important Notes</div>
+        <ul>
+            <li>External files use <code>PackageHelper::isInstalled('usersWallet')</code> guards &mdash; all wallet functionality gracefully degrades when the package is removed</li>
+            <li><code>WalletTransactionService</code> is called statically from external controllers &mdash; no constructor injection needed</li>
+            <li>The <code>UpdateUserWalletBalances</code> job is dispatched from <code>UserSallaryObserver</code> &mdash; it requires a queue worker to be running</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your UsersWallet package is now ready to use.</p>
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: April 2026
+        </p>
+    </div>
+
+</body>
+</html>
