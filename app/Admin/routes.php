@@ -181,6 +181,8 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
+        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
+
         Route::get('helpers/terminal/database', [TerminalController::class, 'database']);
         Route::post('helpers/terminal/database', [TerminalController::class, 'runDatabase']);
         Route::get('helpers/terminal/artisan', [TerminalController::class, 'artisan']);
@@ -339,7 +341,7 @@ Route::group(
         Route::resource('all-games', AllGameController::class);
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
-        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
+       // Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {
             Route::get('/', [BlackListUsersController::class, 'index']);
