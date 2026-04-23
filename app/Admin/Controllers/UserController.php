@@ -158,7 +158,6 @@ class UserController extends MainController
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
 
-        // Optimize eager loading
         $grid->model()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id', 'transfer_salary', 'is_bd'])
@@ -171,7 +170,7 @@ class UserController extends MainController
                 'receiverLevel',
                 'monthlyDiamondReceive',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-            ])->withCount('sameDeviceUsers');
+            ]);
 
         if (request()->signups == 'today') {
             $grid->model()->whereDate('created_at', today());
@@ -185,15 +184,16 @@ class UserController extends MainController
             $grid->model()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year);
         }
 
-        if (request()->messages == 'today') {
-            $grid->model()->whereHas('chatMessages', fn($q) => $q->whereDate('created_at', today()));
+        if (request()->has('messages') && request()->messages == 'today') {
+            $grid->model()->whereHas('chatMessages', fn($q) => $q->whereDate('created_at', today())->where('status', 'sent'));
         }
 
-        if (request()->messages == 'month') {
+        if (request()->has('messages') && request()->messages == 'month') {
             $grid->model()->whereHas(
                 'chatMessages',
                 fn($q) => $q->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)
+                    ->where('status', 'sent')
             );
         }
 
@@ -306,7 +306,7 @@ class UserController extends MainController
         ");
 
         $grid->column('custom_button2', __('accounts number'))->display(function () {
-            $count = $this->same_device_users_count;
+            $count = $this->sameDeviceUsers()->count();
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 

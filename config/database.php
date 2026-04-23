@@ -58,9 +58,19 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // ✅ الجزء 1: تقليل Pool Size
+            // تحديد عدد الـ connections في كل Octane container
+            // بدل unlimited connections، نحدد maximum 10 connections
+            // 5 containers × 10 = 50 max connections (بدل 130)
+            'pool' => [
+                'min' => env('DB_POOL_MIN', 2),
+                'max' => env('DB_POOL_MAX', 10),
+            ],
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
                 PDO::ATTR_TIMEOUT => env('DB_CONNECTION_TIMEOUT', 10),
+                // ✅ Heartbeat to detect stale connections
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION sql_mode='STRICT_TRANS_TABLES'",
             ]) : [],
         ],
 
