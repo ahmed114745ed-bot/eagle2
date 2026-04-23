@@ -2595,7 +2595,7 @@ class Common
 
     public static function checkUserAgencyFrozen(User $user): void
     {
-        $ownedAgency = Agency::withoutGlobalScopes()
+        $ownedAgency = ShippingAgency::withoutGlobalScopes()
             ->where('app_owner_id', $user->id)
             ->whereNull('deleted_at')
             ->first();

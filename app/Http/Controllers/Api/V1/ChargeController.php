@@ -120,7 +120,7 @@ class ChargeController extends Controller
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
 
-        Common::checkUserAgencyFrozen($from);
+        // Common::checkUserAgencyFrozen($from);
 
         if ($to->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
