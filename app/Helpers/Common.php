@@ -1970,7 +1970,9 @@ class Common
 
     public static function searchAgency($id)
     {
+        \Log::info("searchAgency called with ID: {$id}");
         $agency = ShippingAgency::find($id);
+        \Log::info("searchAgency result: " . ($agency ? "Found agency ID {$agency->id}" : "Not found"));
         return $agency ?? 0;
     }
 

@@ -238,8 +238,18 @@ class ChargeRepoService
     {
 
         try {
+            \Log::info("chargeDollarForOwner_to_agency called", [
+                'sender_id' => $sender->id,
+                'receiver_id' => $receiverid,
+                'count' => $count,
+            ]);
 
             $receiver = Common::searchAgency($receiverid);
+
+            \Log::info("Receiver agency search result", [
+                'receiver' => $receiver ? get_class($receiver) : 'null or 0',
+                'receiver_id' => is_object($receiver) ? $receiver->id : 'N/A',
+            ]);
 
             if (! $receiver) {
                 throw new Exception('this  not found');
@@ -249,7 +259,13 @@ class ChargeRepoService
                 throw new Exception(__('api_responses.frozen_agency'));
             }
 
+            \Log::info("Searching for sender agency", ['sender_agency_id' => $sender->agency_id]);
             $agency = $this->shippingAgencyRepository->findAllByStatus($sender->agency_id);
+            \Log::info("Sender agency search result", [
+                'agency' => $agency ? get_class($agency) : 'null',
+                'agency_id' => $agency?->id ?? 'N/A',
+            ]);
+
             if (! isset($agency)) {
                 throw new Exception('agency not founded');
             }
@@ -276,11 +292,20 @@ class ChargeRepoService
 
             $coinPrise = Common::getCoinsValue('shipping_coins');
             $numDi = $coinPrise * $count;
+
+            \Log::info("About to call chargeAgency", [
+                'sender' => $agency->id,
+                'receiver' => $receiver->id,
+            ]);
+
             $this->chargeAgency(sender: $agency, receiver: $receiver, chargeType: 'host_agency', amount: $numDi, usd: $count, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
 
             return [$receiver, $numDi, $salary];
         } catch (Exception $e) {
+            \Log::error("chargeDollarForOwner_to_agency error: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             // \DB::rollBack();
             throw new Exception($e->getMessage());
         }
@@ -372,7 +397,23 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-   
+        \Log::info("chargeAgency called", [
+            'sender_id' => $sender?->id ?? 'null',
+            'receiver_id' => $receiver?->id ?? 'null',
+            'receiver_type' => get_class($receiver ?? new \stdClass()),
+            'chargeType' => $chargeType,
+            'amount' => $amount,
+        ]);
+
+        if (!$receiver) {
+            \Log::error("chargeAgency: receiver is null!");
+            throw new \Exception('Receiver agency not found');
+        }
+
+        if (!$sender) {
+            \Log::error("chargeAgency: sender is null!");
+            throw new \Exception('Sender agency not found');
+        }
 
         $receiver->increment('coins', $amount);
 
