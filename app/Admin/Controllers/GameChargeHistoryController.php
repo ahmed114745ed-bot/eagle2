@@ -19,12 +19,12 @@ class GameChargeHistoryController extends MainController
      *
      * @var string
      */
-   protected $title = 'Game Charge History';
+    protected $title = 'Game Charge History';
 
 
     public function index(Content $content)
     {
-        return$content
+        return $content
             ->title(trans('Game Charge History'))
             ->body($this->grid());
     }
