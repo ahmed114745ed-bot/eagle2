@@ -72,7 +72,7 @@
         "utd/special-id": "*",
         "utd/switch-account": "*",
         "utd/task-stream": "*",
-        "utd/users-wallet": "*",
+        "utd/users-wallet": "dev-achievmentPackage",
         "utd/vip": "*"
     },
     "require-dev": {
@@ -283,10 +283,7 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/UsersWallet",
-            "options": {
-                "symlink": true
-            }
+            "url": "packages/Utd/UsersWallet"
         }
     ]
 }
