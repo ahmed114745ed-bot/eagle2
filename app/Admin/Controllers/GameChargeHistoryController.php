@@ -12,7 +12,7 @@ use App\Models\GameChargeHistory;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 
-class GameChargeHistoryController extends MainController
+class GameChargeHistoryController extends AdminController
 {
     /**
      * Title for current resource.
@@ -20,35 +20,34 @@ class GameChargeHistoryController extends MainController
      * @var string
      */
     protected $title = 'Game Charge History';
+    
+    // public function index(Content $content)
+    // {
+    //     return $content
+    //         ->title(trans('Game Charge History'))
+    //         ->body($this->grid());
+    // }
 
+    // public function create(Content $content)
+    // {
+    //     return $content
+    //         ->title(trans(__($this->title)))
+    //         ->body($this->form());
+    // }
 
-    public function index(Content $content)
-    {
-        return $content
-            ->title(trans('Game Charge History'))
-            ->body($this->grid());
-    }
+    // public function show($id, Content $content)
+    // {
+    //     return $content
+    //         ->title(trans(__($this->title)))
+    //         ->body($this->detail($id));
+    // }
 
-    public function create(Content $content)
-    {
-        return $content
-            ->title(trans(__($this->title)))
-            ->body($this->form());
-    }
-
-    public function show($id, Content $content)
-    {
-        return $content
-            ->title(trans(__($this->title)))
-            ->body($this->detail($id));
-    }
-
-    public function edit($id, Content $content)
-    {
-        return  $content
-            ->title(trans(__($this->title)))
-            ->body($this->form()->edit($id));
-    }
+    // public function edit($id, Content $content)
+    // {
+    //     return  $content
+    //         ->title(trans(__($this->title)))
+    //         ->body($this->form()->edit($id));
+    // }
 
     /**
      * Make a grid builder.
