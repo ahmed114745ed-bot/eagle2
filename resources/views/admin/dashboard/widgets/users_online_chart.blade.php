@@ -13,7 +13,7 @@
     } elseif (request()->is('areaManager*')) {
         $fetchUrl = "areaManager/statistics/users-online-stats";
     } else {
-        $fetchUrl = "statistics/users-online-stats";
+        $fetchUrl = "admin/statistics/users-online-stats";
     }
     $onlineUsersLabel = __('online_users');
     $offlineUsersLabel = __('offline_users');
