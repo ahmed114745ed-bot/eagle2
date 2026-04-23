@@ -24,30 +24,30 @@ class GameChargeHistoryController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
+        return$content
             ->title(trans('Game Charge History'))
-            ->body($this->grid()));
+            ->body($this->grid());
     }
 
     public function create(Content $content)
     {
-        return parent::create($content
+        return $content
             ->title(trans(__($this->title)))
-            ->body($this->form()));
+            ->body($this->form());
     }
 
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
+        return $content
             ->title(trans(__($this->title)))
-            ->body($this->detail($id)));
+            ->body($this->detail($id));
     }
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id, $content
+        return  $content
             ->title(trans(__($this->title)))
-            ->body($this->form()->edit($id)));
+            ->body($this->form()->edit($id));
     }
 
     /**

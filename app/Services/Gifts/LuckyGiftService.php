@@ -49,7 +49,7 @@ class LuckyGiftService
          $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
 
          try {
-             $lock->block(3);
+             $lock->block(15);
          } catch (LockTimeoutException $e) {
              throw new InvalidArgumentException(__('api_responses.try_again'));
          }
@@ -158,14 +158,6 @@ class LuckyGiftService
             $totalPriceFull = $giftPrice * $number * $receiversCount;
 
             while ($user->di >= $totalPriceFull && $index > 0) {
-                $balanceBeforeIteration = $user->di;
-                UserCoinLogHelper::logByType(
-                    $user->id,
-                    -abs($totalPriceFull),
-                    $balanceBeforeIteration,
-                    UserCoinLogType::LUCKY_GIFT,
-                    $gift?->name,
-                );
 
                 foreach ($receiversIds as $receiverId) {
 
@@ -203,8 +195,17 @@ class LuckyGiftService
                             'receiver_id' => $receiverId,
                             'error' => $e->getMessage(),
                         ]);
-                        $result = null;
+                        continue;
                     }
+
+                    // Log deduction ONLY after successful processBet
+                    UserCoinLogHelper::logByType(
+                        $user->id,
+                        -abs($unitPrice),
+                        $senderBalanceBeforeHit,
+                        UserCoinLogType::LUCKY_GIFT,
+                        $gift?->name,
+                    );
 
                     $iterationWin = 0;
                     $isWinner = false;
