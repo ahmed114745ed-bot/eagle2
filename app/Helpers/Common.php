@@ -2593,10 +2593,11 @@ class Common
     }
 
 
-    public  static function  checkUserAgencyFrozen(User $user): void
+    public static function checkUserAgencyFrozen(User $user): void
     {
         $ownedAgency = Agency::withoutGlobalScopes()
             ->where('app_owner_id', $user->id)
+            ->whereNull('deleted_at')
             ->first();
 
         if ($ownedAgency && $ownedAgency->is_frozen) {
@@ -2605,6 +2606,7 @@ class Common
         if ($user->agency_id) {
             $hostAgency = Agency::withoutGlobalScopes()
                 ->where('id', $user->agency_id)
+                ->whereNull('deleted_at')
                 ->first();
 
             if ($hostAgency && $hostAgency->is_frozen) {
