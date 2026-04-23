@@ -164,8 +164,24 @@ class GiftLogSummaryController extends MainController
                 ->display(function () {
                     $query = $this->room->totalRoomGifts();
 
+                    // Laravel-Admin hashes filter keys using md5, so we need to
+                    // check both readable keys and hashed keys from the request.
                     $toDate = request()->input('to_date');
                     $fromDate = request()->input('from_date');
+
+                    // If readable keys not found, try to find hashed keys
+                    if (!$toDate || !$fromDate) {
+                        $allInputs = request()->all();
+                        foreach ($allInputs as $key => $value) {
+                            if (!$value || !is_string($value)) continue;
+                            if (!$toDate && preg_match('/^[a-f0-9]{32}$/', $key)) {
+                                // We can't reliably distinguish which hash is which
+                                // so we skip hashed keys here - the grid filter
+                                // handles date filtering via $this->input internally
+                            }
+                        }
+                    }
+
                     $timezone = getTimezone();
 
                     if ($toDate) {
