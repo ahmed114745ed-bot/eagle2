@@ -18,7 +18,8 @@ use App\Models\BDSallary;
 use App\Models\UserWallet;
 use Illuminate\Http\Request;
 use Utd\Agency\Entities\ShippingAgency;
-use App\Services\WalletService;
+use App\Support\PackageHelper;
+use Utd\UsersWallet\Services\WalletTransactionService;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
@@ -274,15 +275,17 @@ class WalletController extends MainController
             }
         }
 
-        WalletService::storeTransaction(
-            $appID,
-            'add',
-            $request->amount,
-            'user_transaction',
-            'transfer_to_wallet',
-            [],
-            'trans_to_my_wallet'
-        );
+        if (PackageHelper::isInstalled('usersWallet')) {
+            WalletTransactionService::storeTransaction(
+                $appID,
+                'add',
+                $request->amount,
+                'user_transaction',
+                'transfer_to_wallet',
+                [],
+                'trans_to_my_wallet'
+            );
+        }
 
         admin_toastr(__('transferred_successfully'), 'success');
         return back();
@@ -397,16 +400,17 @@ class WalletController extends MainController
             $adminType = UserTypeEnum::SUPER_ADMIN;
         }
 
-        WalletService::storeTransaction(
-            $fromUser->id,
-            'cut',
-            $usd,
-            'user_transaction',
-            'transfer_to_agency',
-            ['agency_id' => $toAgency->id],
-            'trans_to_agency'
-
-        );
+        if (PackageHelper::isInstalled('usersWallet')) {
+            WalletTransactionService::storeTransaction(
+                $fromUser->id,
+                'cut',
+                $usd,
+                'user_transaction',
+                'transfer_to_agency',
+                ['agency_id' => $toAgency->id],
+                'trans_to_agency'
+            );
+        }
 
         $data = [
             'charger_id' => $fromUser->id,

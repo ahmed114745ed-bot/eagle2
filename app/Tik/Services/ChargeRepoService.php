@@ -11,7 +11,8 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Utd\Agency\Repositories\ShippingAgencyRepository;
 use Utd\Agency\Entities\ShippingAgency;
-use App\Services\WalletService;
+use App\Support\PackageHelper;
+use Utd\UsersWallet\Services\WalletTransactionService;
 use Illuminate\Support\Facades\DB;
 use Utd\Agency\Repositories\UserRepository;
 use Utd\Agency\Repositories\AgencyRepository;
@@ -288,8 +289,8 @@ class ChargeRepoService implements ChargeServiceInterface
     public function charge($sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
 
-        if ($chargeType === 'user') {
-            WalletService::storeTransaction(
+        if ($chargeType === 'user' && PackageHelper::isInstalled('usersWallet')) {
+            WalletTransactionService::storeTransaction(
                 $sender->id,
                 'cut',
                 $usd,
@@ -335,15 +336,17 @@ class ChargeRepoService implements ChargeServiceInterface
 
         $receiver->increment('coins', $amount);
 
-        WalletService::storeTransaction(
-            $sender->id,
-            'cut',
-            $usd,
-            'user_transaction',
-            'transfer_to_agency',
-            ['agency_id' => $receiver->id],
-            'charge_to_agency'
-        );
+        if (PackageHelper::isInstalled('usersWallet')) {
+            WalletTransactionService::storeTransaction(
+                $sender->id,
+                'cut',
+                $usd,
+                'user_transaction',
+                'transfer_to_agency',
+                ['agency_id' => $receiver->id],
+                'charge_to_agency'
+            );
+        }
 
         $data = [
             'charger_id' => $sender->id,

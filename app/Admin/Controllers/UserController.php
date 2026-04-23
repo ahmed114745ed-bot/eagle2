@@ -28,7 +28,7 @@ use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-use Modules\UsersWallet\Entities\WalletLog;
+use Utd\UsersWallet\Entities\WalletLog;
 use Utd\Vip\Entities\UserVip;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
@@ -633,14 +633,16 @@ class UserController extends MainController
                 break;
 
             case 'wallet_logs':
-                $year = request('year');
-                $month = request('month');
-                $walletLogs = WalletLog::where('user_id', $id)
-                    ->when($year, fn($q) => $q->whereYear('created_at', $year))
-                    ->when($month, fn($q) => $q->whereMonth('created_at', $month))
-                    ->orderByDesc('id')
-                    ->paginate(20, ['*'], 'wallet_logs_page')
-                    ->appends(['tab' => 'wallet_logs', 'year' => $year, 'month' => $month]);
+                if (PackageHelper::isInstalled('usersWallet')) {
+                    $year = request('year');
+                    $month = request('month');
+                    $walletLogs = WalletLog::where('user_id', $id)
+                        ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                        ->when($month, fn($q) => $q->whereMonth('created_at', $month))
+                        ->orderByDesc('id')
+                        ->paginate(20, ['*'], 'wallet_logs_page')
+                        ->appends(['tab' => 'wallet_logs', 'year' => $year, 'month' => $month]);
+                }
                 break;
         }
         $countries = $this->countries();

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
-use Modules\UsersWallet\Entities\UserWallet;
+use Utd\UsersWallet\Entities\UserWallet;
 use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
@@ -1310,6 +1310,8 @@ if (!function_exists('isValidTimezone')) {
 if (!function_exists('wallet_available_by_user')) {
     function wallet_available_by_user($userId)
     {
+        if (!\App\Support\PackageHelper::isInstalled('usersWallet')) return 0;
+
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
 
         $currentBalance   = $wallet->balance ?? 0;
@@ -1324,6 +1326,8 @@ if (!function_exists('wallet_available_by_user')) {
 if (!function_exists('wallet_curant_by_user')) {
     function wallet_curant_by_user($userId)
     {
+        if (!\App\Support\PackageHelper::isInstalled('usersWallet')) return 0;
+
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
 
         $currentBalance   = $wallet->balance ?? 0;

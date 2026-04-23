@@ -40,7 +40,6 @@ use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\CountryController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\EmojiController;
-use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\ImageController;
@@ -66,7 +65,6 @@ use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\utd\TicketController;
 use App\Http\Controllers\utd\WithdrawController;
 use Illuminate\Support\Facades\Route;
-use Modules\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
 use Utd\Events\Http\Controllers\Utd\EventPeriodController;
 use Utd\Events\Http\Controllers\Utd\RoleEventController;
 use Utd\Events\Http\Controllers\Utd\TargetEventController;
@@ -546,7 +544,6 @@ Route::middleware([])->group(function () {
         Route::get('coins/{id}', [ChargesController::class, 'userCharge']);
         Route::get('salary/{id}', [UserController::class, 'userSalaryWithHisAgency']);
         Route::get('report/{id}', [Report_userController::class, 'userReport']);
-        Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
         Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
         Route::get('vip/{id}', [UserController::class, 'userVip']);
@@ -599,13 +596,6 @@ Route::middleware([])->group(function () {
         Route::delete('/delete/{id}', [SilverController::class, 'destroy']);
     });
 
-    Route::prefix('exchanges')->group(function () {
-        Route::get('/', [ExchangeController::class, 'all']);
-        Route::get('/show/{id}', [ExchangeController::class, 'show']);
-        Route::post('/create', [ExchangeController::class, 'create']);
-        Route::post('/update/{id}', [ExchangeController::class, 'update']);
-        Route::delete('/delete/{id}', [ExchangeController::class, 'destroy']);
-    });
     Route::get('codes', [UserController::class, 'allCodes']);
 
     Route::prefix('offers')->group(function () {

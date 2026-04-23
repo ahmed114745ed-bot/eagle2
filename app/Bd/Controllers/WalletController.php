@@ -8,7 +8,6 @@ use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\Bd;
 use App\Models\User;
-use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -19,20 +18,13 @@ use App\Models\BDSallary;
 use App\Models\UserWallet;
 use Illuminate\Http\Request;
 use Utd\Agency\Entities\ShippingAgency;
-use App\Services\WalletService;
+use App\Support\PackageHelper;
+use Utd\UsersWallet\Services\WalletTransactionService;
 use Encore\Admin\Layout\Content;
-use App\Models\WalletTransaction;
-use App\Services\BDChargeService;
-use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
-use Modules\Wallet\Services\CheckSystemConfigs;
-use Modules\Wallet\Services\CheckUserExistence;
 use Encore\Admin\Controllers\HasResourceActions;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class WalletController extends MainController
 {
@@ -280,15 +272,17 @@ class WalletController extends MainController
             }
         }
 
-        WalletService::storeTransaction(
-            $appID,
-            'add',
-            $request->amount,
-            'user',
-            'transfer_to_wallet',
-            [],
-            'trans_to_my_wallet'
-        );
+        if (PackageHelper::isInstalled('usersWallet')) {
+            WalletTransactionService::storeTransaction(
+                $appID,
+                'add',
+                $request->amount,
+                'user',
+                'transfer_to_wallet',
+                [],
+                'trans_to_my_wallet'
+            );
+        }
 
         admin_toastr(__('transferred_successfully'), 'success');
         return back();
@@ -386,16 +380,18 @@ class WalletController extends MainController
             $descriptionData = ['receiver_id'  => $receiver->id];
 
             // Deduct from BD's linked user wallet
-            $bdUserId = $sender->app_id ?? $sender->id;
-            WalletService::storeTransaction(
-                $bdUserId,
-                'cut',
-                $amount,
-                'user',
-                'transfer_to_user',
-                $descriptionData,
-                'charge'
-            );
+            if (PackageHelper::isInstalled('usersWallet')) {
+                $bdUserId = $sender->app_id ?? $sender->id;
+                WalletTransactionService::storeTransaction(
+                    $bdUserId,
+                    'cut',
+                    $amount,
+                    'user',
+                    'transfer_to_user',
+                    $descriptionData,
+                    'charge'
+                );
+            }
 
 
 
@@ -489,16 +485,18 @@ class WalletController extends MainController
         $toAgency->increment('coins', $coins);
 
         // Deduct from BD's linked user wallet
-        $bdUserId = $fromUser->app_id ?? $fromUser->id;
-        WalletService::storeTransaction(
-            $bdUserId,
-            'cut',
-            $usd,
-            'user',
-            'transfer_to_agency',
-            ['agency_id' => $toAgency->id],
-            'charge'
-        );
+        if (PackageHelper::isInstalled('usersWallet')) {
+            $bdUserId = $fromUser->app_id ?? $fromUser->id;
+            WalletTransactionService::storeTransaction(
+                $bdUserId,
+                'cut',
+                $usd,
+                'user',
+                'transfer_to_agency',
+                ['agency_id' => $toAgency->id],
+                'charge'
+            );
+        }
 
         $data = [
             'charger_id' => $fromUser->id,

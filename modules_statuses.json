@@ -26,6 +26,5 @@
     "AreaManager": true,
     "SuperAdmin": true,
     "TaskStream": false,
-    "UsersWallet": true,
     "RankingReward": false
 }

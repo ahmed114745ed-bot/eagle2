@@ -910,21 +910,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'wallet fields',
-                'sort' => 41,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 41],
-                ],
-                'permissions' => [
-                    ['key' => 'wallet-template', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'wallet-fields', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'emojis',
                 'sort' => 43,
                 'types' => [
@@ -1321,6 +1306,24 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
                     ],],
 
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('usersWallet')) {
+            $categories[] = [
+                'name' => 'wallet fields',
+                'sort' => 41,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 41],
+                ],
+                'permissions' => [
+                    ['key' => 'wallet-template', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'wallet-fields', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
                 ],
             ];
         }

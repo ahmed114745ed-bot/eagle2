@@ -9,8 +9,9 @@ use App\Models\AgencySallary;
 use App\Classes\Enums\NotificationType;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Services\BdAgencyHostSallaryService;
-use Modules\UsersWallet\Helpers\WalletHelper;
-use App\Jobs\UpdateUserWalletBalances;
+use App\Support\PackageHelper;
+use Utd\UsersWallet\Helpers\WalletHelper;
+use Utd\UsersWallet\Jobs\UpdateUserWalletBalances;
 
 class UserSallaryObserver
 {
@@ -46,14 +47,16 @@ class UserSallaryObserver
             'dB' => $originalDbValue ?? 0,
         ];
         
-        UpdateUserWalletBalances::dispatch(
-            $userSalary->user_id,
-            $newData,
-            $oldData,
-            $userSalary->user_agency_id,
-            'sallary_update',
-            $userSalary->target_id,
-        )->onQueue('wallet');
+        if (PackageHelper::isInstalled('usersWallet')) {
+            UpdateUserWalletBalances::dispatch(
+                $userSalary->user_id,
+                $newData,
+                $oldData,
+                $userSalary->user_agency_id,
+                'sallary_update',
+                $userSalary->target_id,
+            )->onQueue('wallet');
+        }
     }
 
     public function updating(UserSallary $userSalary)
@@ -81,14 +84,16 @@ class UserSallaryObserver
             'dB' => $originalDbValue ?? 0,
         ];
         \Log::info($userSalary->target_id,);
-        UpdateUserWalletBalances::dispatch(
-            $userSalary->user_id,
-            $newData,
-            $oldData,
-            $userSalary->user_agency_id,
-            'sallary_update',
-            $userSalary->target_id,
-        )->onQueue('wallet');
+        if (PackageHelper::isInstalled('usersWallet')) {
+            UpdateUserWalletBalances::dispatch(
+                $userSalary->user_id,
+                $newData,
+                $oldData,
+                $userSalary->user_agency_id,
+                'sallary_update',
+                $userSalary->target_id,
+            )->onQueue('wallet');
+        }
         
 
     }

@@ -30,7 +30,7 @@ use Modules\AreaManager\Entities\AreaManager;
 use App\Support\PackageHelper;
 use App\Models\CoinGameUserDailyAggregated;
 use Carbon\CarbonPeriod;
-use Modules\UsersWallet\Entities\WalletLog;
+use Utd\UsersWallet\Entities\WalletLog;
 
 class AllStatisticController extends MainController
 {
@@ -848,30 +848,33 @@ class AllStatisticController extends MainController
                 'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
             ]);
 
-        $withdrawals = WalletLog::with('user.profile')->where('operation', 'subtract')
-            ->latest()
-            ->take(8)
-            ->get()
-            ->map(function ($w) {
-                $defaultImage = asset('images/businessman-icon.jpg');
-                $path = $w->user->profile?->avatar ?? null;
-                $url = $path ? getImagePath($path) : $defaultImage;
+        $withdrawals = collect();
+        if (PackageHelper::isInstalled('usersWallet')) {
+            $withdrawals = WalletLog::with('user.profile')->where('operation', 'subtract')
+                ->latest()
+                ->take(8)
+                ->get()
+                ->map(function ($w) {
+                    $defaultImage = asset('images/businessman-icon.jpg');
+                    $path = $w->user->profile?->avatar ?? null;
+                    $url = $path ? getImagePath($path) : $defaultImage;
 
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
 
-                return [
-                    'id' => $w->id,
-                    'user_name' => $w->user->name ?? '',
-                    'uuid' => $w->user->uuid ?? '',
-                    'user_id' => $w->user_id,
-                    'img' => $url,
-                    'amount' => $w->amount,
-                    'type' => $w->type,
-                    'date' => $w->created_at->format('Y-m-d')
-                ];
-            });
+                    return [
+                        'id' => $w->id,
+                        'user_name' => $w->user->name ?? '',
+                        'uuid' => $w->user->uuid ?? '',
+                        'user_id' => $w->user_id,
+                        'img' => $url,
+                        'amount' => $w->amount,
+                        'type' => $w->type,
+                        'date' => $w->created_at->format('Y-m-d')
+                    ];
+                });
+        }
 
         $topUsers = \DB::table('charges')
             ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
@@ -951,6 +954,10 @@ class AllStatisticController extends MainController
 
     public function ajaxWalletLogs(Request $request)
     {
+
+        if (!PackageHelper::isInstalled('usersWallet')) {
+            return response()->json(['data' => []]);
+        }
 
         $logs = WalletLog::with('user.profile')
             ->whereIn('operation', ['add', 'cut'])

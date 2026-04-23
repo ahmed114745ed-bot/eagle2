@@ -55,7 +55,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
-use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use Utd\Achievements\Http\Controllers\AchievementController;
 use Utd\Family\Http\Controllers\Api\FamilyController;
 use Utd\Room\Entities\Room;
@@ -294,14 +293,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('getTimes', [HomeController::class, 'getTimes']);
             });
             Route::post('send_pack', [UserController::class, 'sendPack']);
-
-            Route::prefix('exchange')->group(function () {
-                Route::get('/list', [ExchangeController::class, 'exchangeList']);
-                Route::get('/v2/list', [ExchangeController::class, 'exchangeSettingNumber']);
-                Route::post('/make', [ExchangeController::class, 'exchangeSave']);
-                Route::post('/v2/make', [ExchangeController::class, 'exchangeCoin']);
-                Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
-            });
 
             Route::get('trxs', [ChargeController::class, 'trxLog']);
             Route::get('images', [HomeController::class, 'getImages']);

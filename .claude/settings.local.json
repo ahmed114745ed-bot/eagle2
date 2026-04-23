@@ -17,7 +17,12 @@
       "Bash(php artisan *)",
       "Bash(composer dump-autoload *)",
       "Bash(composer show *)",
-      "Bash(composer require *)"
+      "Bash(composer require *)",
+      "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Entities/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Entities/\")",
+      "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Enum/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Enum/\")",
+      "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Helpers/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Helpers/\")",
+      "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Http/Controllers/Api/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Http/Controllers/Api/\")",
+      "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Http/Controllers/Web/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Http/Controllers/Web/\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\eagle\\Modules\\Form\\Database\\Seeders"

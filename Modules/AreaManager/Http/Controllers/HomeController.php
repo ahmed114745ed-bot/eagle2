@@ -31,7 +31,7 @@ use Utd\Chat\Entities\ChatMessage;
 use App\Admin\Controllers\MainController;
 use App\Models\CoinGameUserDailyAggregated;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\UsersWallet\Entities\WalletLog;
+use Utd\UsersWallet\Entities\WalletLog;
 
 class HomeController extends MainController
 {

@@ -38,7 +38,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use App\Traits\SpecialId;
-use Modules\UsersWallet\Entities\UserWallet;
+use Utd\UsersWallet\Entities\UserWallet;
 use Utd\Vip\Entities\OVip;
 use Utd\Vip\Entities\UserVip;
 use Utd\Vip\Entities\Vip;
@@ -1867,7 +1867,8 @@ class User extends Authenticatable
 
     public function wallet()
     {
-        return $this->hasOne(UserWallet::class);
+        return PackageHelper::checkRelation($this, 'usersWallet', 'hasOne') ??
+            $this->hasOne(UserWallet::class);
     }
 
     public function momentUserGift()
@@ -2524,6 +2525,7 @@ class User extends Authenticatable
 
     public function userWallet()
     {
-        return $this->hasOne(UserWallet::class);
+        return PackageHelper::checkRelation($this, 'usersWallet', 'hasOne') ??
+            $this->hasOne(UserWallet::class);
     }
 }

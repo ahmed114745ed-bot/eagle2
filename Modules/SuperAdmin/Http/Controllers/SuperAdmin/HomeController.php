@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\DB;
 use App\Support\PackageHelper;
 use App\Admin\Controllers\MainController;
 use App\Models\CoinGameUserDailyAggregated;
-use Modules\UsersWallet\Entities\WalletLog;
+use Utd\UsersWallet\Entities\WalletLog;
 
 class HomeController extends  MainController
 {

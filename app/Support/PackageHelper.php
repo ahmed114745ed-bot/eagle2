@@ -26,6 +26,7 @@ use Utd\Vip\Entities\OVip;
 use Utd\HostLevel\Entities\HostLevel;
 use Utd\Badge\Entities\Badge;
 use Utd\Form\Entities\FormTemplate;
+use Utd\UsersWallet\Entities\UserWallet;
 use Utd\Milestones\Entities\Milestone;
 use Utd\SpecialId\Entities\SpecialHistory;
 use Utd\SwitchAccount\Entities\UserAccount;
@@ -59,6 +60,7 @@ class PackageHelper
         'milestone' => Milestone::class,
         'badge' => Badge::class,
         'form' => FormTemplate::class,
+        'usersWallet' => UserWallet::class,
     ];
 
     /**
