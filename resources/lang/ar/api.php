@@ -93,7 +93,7 @@ return [
     'enter_room'                       => 'قام :name بفتح الغرفه الصوتية  . هيا اضغط هنا و انضم الينا وامرح معنا',
     'accept_family'                    => 'تهانينا: لقد تم قبول اضافتك الى عائلة :name . العائلة يعنى اللمة الحلوة يلا شارك وكبر اللمة الحلوة',
     'admin_family'                     => ' تهانينا لقد اصبحت الان مشرف فى عائلة :name يجب عليك ان تكون جيد بالمنصب من اجل ارتقاء :appName ',
-    'send_Family'                      => ' :name طلب الاندمام الى عائله',
+    'send_Family'                      => ' :name طلب الانضمام الى عائله',
     'request_agency'                  => '  :name يريد الاندمام الى الوكاله :agency_name',
     'host_salary'=> 'تم إيداع راتب بقيمة :amount في وكالة :agency بواسطة :from',
     'target' => 'Congrats! :user you achieve new target in :agency agency your salary now is :salary',
