@@ -1,4 +1,6 @@
 {
+    "Note": "ملاحظة",
+    "Today's data does not appear in this report. Only archived data is displayed.": "بيانات اليوم لا تظهر في هذا التقرير. يتم عرض البيانات المؤرشفة فقط.",
     "Laravel": "سبسيب", 
     "total_diamonds_sent": "إجمالي الكوينزات المرسلة",
     "Save order": "حفظ الترتيب",
