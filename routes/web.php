@@ -1751,7 +1751,6 @@ Route::get('/backfill-roomcup-rewards', function () {
                 'rooms' => [],
             ];
 
-            // chunk(50) بدل get() عشان الذاكرة
             \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$dayStart, $dayEnd])
                 ->orderBy('id')
                 ->chunk(50, function ($gifts) use (&$dayResults, &$totalProcessed, &$totalRewarded, $dayStart, $dayEnd) {
