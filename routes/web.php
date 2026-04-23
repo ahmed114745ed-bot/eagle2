@@ -449,6 +449,12 @@ Route::get('/change_agencies_type', function () {
     return "agencies types changed successfully!";
 });
 
+Route::get('admin/auth', function () {
+        return view('checkLogin');
+    })->name('admin/auth');
+        Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+
+
 Route::get('/config_cache', function () {
     return Artisan::call('config:cache');
 });
@@ -618,10 +624,7 @@ Route::group([
     ],
     'as' => '',
 ], function () {
-    Route::get('admin/auth', function () {
-        return view('checkLogin');
-    })->name('admin/auth');
-    Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+    
 });
 
 Route::get('/update-rooms', function () {
