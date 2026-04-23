@@ -44,27 +44,12 @@ class AuthController extends Controller
         
         // Check device account limit BEFORE registration
         $deviceToken = $request->input('device_token');
-        \Log::info('=== REGISTER REQUEST ===', [
-            'phone' => $phone,
-            'device_token' => $deviceToken,
-            'all_request' => $request->all()
-        ]);
         
         if (!empty($deviceToken)) {
             try {
                 $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
-                \Log::info('Device token check', [
-                    'device_token' => $deviceToken,
-                    'register_account_limit' => $register_account
-                ]);
                 
                 $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
-                \Log::info('Device token history record', [
-                    'device_token' => $deviceToken,
-                    'record_exists' => $record ? true : false,
-                    'record_count' => $record?->count ?? 0,
-                    'limit' => $register_account
-                ]);
                 
                 if ($record && $record->count >= $register_account) {
                     \Log::warning('Device account limit exceeded', [
@@ -83,7 +68,6 @@ class AuthController extends Controller
         
         try {
             [$user, $token] = $this->authService->registration($request);
-            \Log::info('User registered successfully', ['user_id' => $user->id, 'phone' => $phone]);
         } catch (\Exception $exception) {
             \Log::error('Registration failed', ['error' => $exception->getMessage(), 'phone' => $phone]);
             return Common::apiResponse(0, $exception->getMessage(), null, 422);
@@ -103,7 +87,6 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        \Log::info('Login request received', ['request' => $request->all()]);
         $globalKeys = [
             'is_multi' => $request->input('is_multi', false),
             'notification_id' => $request->input('notification_id', null)
@@ -118,7 +101,6 @@ class AuthController extends Controller
                 $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'], 'id_token' => $request['id_token'], 'image' => $request['google_image'], 'lat' => $request['lat'], 'long' => $request['long'], 'iso' => $request['iso'], 'uuid' => $request['uuid']];
                 $fields = array_merge($globalKeys, $fields);
                 $response = $this->loginWithGoogle($fields);
-   \Log::info( $response);
                 return $response;
             case 'apple':
                 $fields = [

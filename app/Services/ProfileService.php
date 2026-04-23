@@ -90,7 +90,8 @@ class ProfileService
                $newImagePath = WebPHelper::uploadWebp(
                     $file,
                     'profile',
-                    'profile_image'
+                    'profile_image',
+                    async: true  // Convert to WebP asynchronously
                 );
                 $user->images()->create([
                     'img' => $newImagePath,

@@ -22,6 +22,8 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     protected $text;
     protected $groupChatResource;
 
+    public $timeout = 300; 
+
     public function __construct(User $user, ?string $text, array $groupChatResource)
     {
         $this->user = $user;
@@ -63,13 +65,23 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             $roomId = $parts[3] ?? null;
 
             if (!$roomId) {
+                Log::warning('SendShareGroupChatNotificationJob: Invalid room ID in text', [
+                    'text' => $this->text,
+                ]);
                 return;
             }
-            $room = Room::find($roomId);
-            
-            if (!$room) {
+
+            // ✅ Add error handling for ChatRoom not found
+            try {
+                $room = Room::select('id', 'room_cover', 'final_room_image')->findOrFail($roomId);
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                Log::warning('SendShareGroupChatNotificationJob: ChatRoom not found', [
+                    'room_id' => $roomId,
+                    'user_id' => $this->user->id,
+                ]);
                 return;
             }
+
 
             $roomImage = $room->room_cover ?? $room->final_room_image ?? $this->groupChatResource['image_url'] ?? '';
             $userLang = $this->user->lan ?? 'en';
@@ -79,57 +91,21 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
                 $roomImage = getImagePath($roomImage);
             }
             
-            $notificationsIdsChunks = User::withoutAppends()->where('notification_id', '!=', null)
-                ->select(['id', 'notification_id', 'lan'])
-                ->orderByDesc('online')
+            $notificationsIdsChunks = User::withoutAppends()
+                ->whereNotNull('notification_id')
                 ->where('id', '!=', $this->user->id)
+                ->select(['id', 'notification_id', 'lan'])
+                ->groupBy('notification_id') 
+                ->orderByDesc('online')
                 ->limit(5000)
-                ->get()
-                ->unique('notification_id')
+                ->cursor()
                 ->chunk(800);
 
             $totalSent = 0;
             $totalFailed = 0;
 
             foreach ($notificationsIdsChunks as $chunkIndex => $notificationsIds) {
-            
-
-                foreach ($notificationsIds as $notificationUser) {
-                    try {
-                        $userLanguage = $notificationUser->lan ?? 'en';
-                        $localizedMessage = __('share_room_message', [], $userLanguage);
-                        
-                        $title = ($this->user->name ?? '') . ' (' . config('app.name_en') .')';
-                        
-                        $result = Common::send_firebase_notification_with_room_image(
-                            $notificationUser->notification_id,
-                            $title,
-                            $localizedMessage,
-                            $roomImage,
-                            $roomId,
-                            data: [
-                                'title' => $title,
-                                'sub-title' => $localizedMessage,
-                                'room_id' => $roomId,
-                                'room_image' => $roomImage
-                            ],
-                            messageType: 'share-room',
-                            user: $this->user
-                        );
-
-                        if ($result) {
-                            $totalSent++;
-                        } else {
-                            $totalFailed++;
-                        }
-                    } catch (\Throwable $e) {
-                        $totalFailed++;
-                        Log::error('SendShareGroupChatNotificationJob: Failed to send to user', [
-                            'user_id' => $notificationUser->id ?? 'unknown',
-                            'error' => $e->getMessage()
-                        ]);
-                    }
-                }
+                $this->sendNotificationBatch($notificationsIds, $roomId, $roomImage, $translatedMessage, $totalSent, $totalFailed);
             }
 
         
@@ -138,6 +114,49 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
                 'user_id' => $this->user->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     */
+    protected function sendNotificationBatch($notificationsIds, $roomId, $roomImage, $translatedMessage, &$totalSent, &$totalFailed): void
+    {
+        $notificationIds = $notificationsIds->pluck('notification_id')->toArray();
+        
+        if (empty($notificationIds)) {
+            return;
+        }
+
+        try {
+            $title = ($this->user->name ?? '') . ' (' . config('app.name_en') . ')';
+            
+            $result = Common::send_firebase_notification_with_room_image(
+                $notificationIds,
+                $title,
+                $translatedMessage,
+                $roomImage,
+                $roomId,
+                data: [
+                    'title' => $title,
+                    'sub-title' => $translatedMessage,
+                    'room_id' => $roomId,
+                    'room_image' => $roomImage
+                ],
+                messageType: 'share-room',
+                user: $this->user
+            );
+
+            if ($result) {
+                $totalSent += count($notificationIds);
+            } else {
+                $totalFailed += count($notificationIds);
+            }
+        } catch (\Throwable $e) {
+            $totalFailed += count($notificationIds);
+            Log::error('SendShareGroupChatNotificationJob: Failed to send batch', [
+                'batch_size' => count($notificationIds),
+                'error' => $e->getMessage()
             ]);
         }
     }

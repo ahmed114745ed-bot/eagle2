@@ -30,6 +30,7 @@ use App\Tik\Repositories\RequestBackgroundImageRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Modules\TaskStream\Services\TaskStreamService;
+use App\Models\RoomMicrophone;
 
 class RoomRepoService
 {
@@ -112,7 +113,8 @@ class RoomRepoService
             $room->room_cover = WebPHelper::uploadWebp(
                 $request->file('room_cover'),
                 'rooms',
-                'room_cover'
+                'room_cover',
+                async: true  // Convert to WebP asynchronously
             );
         } else {
             $room->room_cover = $request->room_cover;
@@ -459,16 +461,15 @@ class RoomRepoService
         $room = $roomId
             ? $this->repository->findById($roomId)
             : $this->repository->findRoomUserEnableAudio($request->owner_id);
-        // \Log::info("changeMode: RoomID={$room->id} mode changed from {$room} ");
 
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
         $youtubeStatus =  (bool)(getSettingCash('youtube_status') ?? true);
         if ($currentMode == 5 && $youtubeStatus === false) return Common::apiResponse(0, __('this feature stopped'), null, 404);
-        //get last mode of rooms to if is cinema mode and change it update room background
         $lastMode = $room->mode;
         $room->mode = $currentMode;
         $room->save();
+        $this->resetRoomMicrophones($room);
         $jsons = [];
         $map = [];
         $mode = '';
@@ -512,7 +513,6 @@ class RoomRepoService
 
 
         $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
-        // \Log::info("changeMode: Sending Zego command, RoomID={$room->id}, Mode={$mode}, Background");
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
@@ -523,6 +523,17 @@ class RoomRepoService
 
 
         return Common::apiResponse(1, 'done', null, 201);
+    }
+
+    public function resetRoomMicrophones($room)
+    {
+        RoomMicrophone::where('room_id', $room->id)->delete();
+        $mic = RoomMicrophone::create([
+            'room_id'  => $room->id,
+            'user_id'  => $room->uid,
+            'position' => 0,
+            'status'   => 1,
+        ]);
     }
     public function getRoomBackground(?Room $room)
     {
@@ -667,7 +678,8 @@ class RoomRepoService
             $room->room_cover = WebPHelper::uploadWebp(
                 $request->file('room_cover'),
                 'rooms',
-                'room_cover'
+                'room_cover',
+                async: true  // Convert to WebP asynchronously
             );
         }
 

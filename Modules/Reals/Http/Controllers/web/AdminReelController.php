@@ -16,6 +16,11 @@ class AdminReelController extends MainController
 {
     public function index(Content $content)
     {
+        // Force full page reload for PJAX requests (Alpine.js requires clean page load)
+        if (request()->pjax()) {
+            return redirect()->to(request()->fullUrl());
+        }
+
         // Generate or retrieve random seed for this session
         if (!session()->has('reels_random_seed')) {
             session(['reels_random_seed' => mt_rand(1, 999999)]);
@@ -34,7 +39,10 @@ class AdminReelController extends MainController
                 return [
                     'id' => $reel->id,
                     'user_id' => $reel->user_id,
-                    'user' => $reel->user,
+                    'user' => $reel->user ? [
+                        'id' => $reel->user->id,
+                        'name' => $reel->user->name ?? 'Unknown',
+                    ] : null,
                     'title' => $reel->description ?: 'بدون عنوان',
                     'description' => $reel->description,
                     'video_url' => $videoUrl,
@@ -94,7 +102,10 @@ class AdminReelController extends MainController
                 return [
                     'id' => $reel->id,
                     'user_id' => $reel->user_id,
-                    'user' => $reel->user,
+                    'user' => $reel->user ? [
+                        'id' => $reel->user->id,
+                        'name' => $reel->user->name ?? 'Unknown',
+                    ] : null,
                     'title' => $reel->description ?: 'بدون عنوان',
                     'description' => $reel->description,
                     'video_url' => $videoUrl,
@@ -130,7 +141,10 @@ class AdminReelController extends MainController
             'reel' => [
                 'id' => $reel->id,
                 'user_id' => $reel->user_id,
-                'user' => $reel->user,
+                'user' => $reel->user ? [
+                    'id' => $reel->user->id,
+                    'name' => $reel->user->name ?? 'Unknown',
+                ] : null,
                 'title' => $reel->description ?: 'بدون عنوان',
                 'description' => $reel->description,
                 'video_url' => $videoUrl,

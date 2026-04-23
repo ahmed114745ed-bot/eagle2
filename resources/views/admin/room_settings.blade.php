@@ -258,6 +258,7 @@
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
                 <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
                 <button onclick="showSection('show_room')">{{ __('show rooms') }}</button>
+                <button onclick="showSection('microphone_settings')">{{ __('Microphone settings') }}</button>
             </div>
         </div>
 
@@ -429,6 +430,42 @@
                 </div>
             </form>
         </div>
+        <div id="microphone_settings" class="settings-section">
+            <h3>{{ __('Microphone settings') }}</h3>
+            <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST" enctype="multipart/form-data">
+                <div class="form">
+                    @csrf
+
+                    {{-- Open Mic Image --}}
+                    <label>{{ __('Open Mic Image') }}</label>
+                    @if(!empty($settings['open_mic_image']))
+                        <img src="{{ getImagePath($settings['open_mic_image']) }}" alt="Open Mic"
+                             style="width: 120px; height: 120px; object-fit: contain; cursor: pointer; border: 1px solid #444; border-radius: 8px; padding: 5px; background: #333;"
+                             onclick="openFullScreen(this)">
+                    @endif
+                    <input class="form-control" type="file" name="open_mic_image" accept="image/*">
+                    <small class="form-text text-muted" style="position: relative; top: -10px; color: #aaa;">
+                        {{ __('Upload an image for the open (active) microphone.') }}
+                    </small>
+
+                    {{-- Close Mic Image --}}
+                    <label>{{ __('Close Mic Image') }}</label>
+                    @if(!empty($settings['close_mic_image']))
+                        <img src="{{ getImagePath($settings['close_mic_image']) }}" alt="Close Mic"
+                             style="width: 120px; height: 120px; object-fit: contain; cursor: pointer; border: 1px solid #444; border-radius: 8px; padding: 5px; background: #333;"
+                             onclick="openFullScreen(this)">
+                    @endif
+                    <input class="form-control" type="file" name="close_mic_image" accept="image/*">
+                    <small class="form-text text-muted" style="position: relative; top: -10px; color: #aaa;">
+                        {{ __('Upload an image for the closed (muted) microphone.') }}
+                    </small>
+
+                    <br>
+                    <button type="submit">{{ __('save') }}</button>
+                </div>
+            </form>
+        </div>
+
     </div>
     <div id="imageModal" class="modal" onclick="closeFullScreen()">
         <span class="close">&times;</span>

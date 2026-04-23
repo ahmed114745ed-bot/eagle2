@@ -62,6 +62,15 @@ class UpdateSendCharismaToZigo implements ShouldQueue
             return;
         }
 
+        $data = array_map(function($user) {
+            if (isset($user['total'])) {
+                $user['total'] = UserCharismaService::formatTotalInService()
+                    ? numToStringNew($user['total'])
+                    : (int) $user['total'];
+            }
+            return $user;
+        }, $data);
+
         $ms = [
             'messageContent' => [
                 "message" => "updateCharisma",
@@ -70,7 +79,6 @@ class UpdateSendCharismaToZigo implements ShouldQueue
         ];
         $json = json_encode($ms);
 
-        \Illuminate\Support\Facades\Log::info("RTM Test (updateCharisma) roomId: {$room->id}", ['data' => $data]);
 
         $response = Common::sendToZego('SendCustomCommand', $room->id, $this->userId, $json);
 

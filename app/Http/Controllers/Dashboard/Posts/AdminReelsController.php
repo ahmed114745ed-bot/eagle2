@@ -16,7 +16,7 @@ class AdminReelsController extends Controller
     {
         $query = $request->get('query');
         $check = json_decode($query);
-        if( $check->id !== '')
+        if($check && $check->id !== '')
         {
           if($check->type == 'user_id')
             {

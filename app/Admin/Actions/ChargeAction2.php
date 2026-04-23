@@ -80,7 +80,7 @@ class ChargeAction2 extends Action
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
-                if ($agency->owner) CustomNotification::chargeAction($agency->owner, $request, $admin);
+                if ($agency->owner) CustomNotification::chargeAction($agency->owner, $request, $admin, $agency, $coins);
             }
         });
 

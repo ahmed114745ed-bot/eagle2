@@ -48,20 +48,11 @@
                                     <input type="radio" name="lucky_gift_version" value="1" {{ $currentVersion == 1 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
                                     <strong>{{ __('Version 1 (Standard)') }}</strong>
                                 </label>
-                                <label
-                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 2 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
-                                    <input type="radio" name="lucky_gift_version" value="2" {{ $currentVersion == 2 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
-                                    <strong>{{ __('Version 2 (FairLuck)') }}</strong>
-                                </label>
-                                <label
-                                    style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 3 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
-                                    <input type="radio" name="lucky_gift_version" value="3" {{ $currentVersion == 3 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
-                                    <strong>{{ __('Version 3 (FairLuck V6)') }}</strong>
-                                </label>
+                              
                                 <label
                                     style="margin: 0; padding: 10px 20px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; {{ $currentVersion == 4 ? 'background: #f4f4f4; border-color: #3c8dbc;' : '' }}">
                                     <input type="radio" name="lucky_gift_version" value="4" {{ $currentVersion == 4 ? 'checked' : '' }} onchange="this.form.submit()" style="margin: 0;">
-                                    <strong>{{ __('Version 4 (FairLuck V7)') }}</strong>
+                                    <strong>{{ __('Version 2 (FairLuck V2)') }}</strong>
                                 </label>
                             </div>
                         </form>
@@ -121,64 +112,6 @@
                         </div>
                     </form>
                 </div>
-            @elseif($currentVersion == 2)
-                {{-- Version 2 Content (Matched with fairluck/dashboard.blade.php) --}}
-                @php $settings = $fairLuckSettings; @endphp
-                <div class="box box-info">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">{{ __('FairLuck Settings') }}</h3>
-                    </div>
-                    <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
-                        @csrf
-                        <div class="box-body">
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit') }}</label>
-                                <div class="col-sm-8">
-                                    <input type="number" name="global_vault_negative_limit" class="form-control"
-                                        value="{{ $settings['global_vault_negative_limit'] ?? 30000 }}">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('App Fee Rate (0.10 = 10%)') }}</label>
-                                <div class="col-sm-8">
-                                    <input type="number" step="0.01" name="fair_luck_app_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_app_fee_rate'] ?? '0' }}">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate (0.10 = 10%)') }}</label>
-                                <div class="col-sm-8">
-                                    <input type="number" step="0.01" name="fair_luck_receiver_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_receiver_fee_rate'] ?? '0' }}">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }}</label>
-                                <div class="col-sm-8">
-                                    <input type="number" step="0.01" name="fair_luck_owner_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0' }}">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="box-footer">
-                            <button type="submit" class="btn btn-primary pull-right">{{ __('Save') }}</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="box box-success">
-                            <div class="box-header with-border">
-                                <h3 class="box-title">{{ __('Global Vault Balance History') }}</h3>
-                            </div>
-                            <div class="box-body">
-                                <canvas id="vaultChart" style="height: 300px;"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @elseif($currentVersion == 3)
                 {{-- Version 3 Content (FairLuck V6 - Same settings as V2) --}}
                 @php $settings = $fairLuckSettings; @endphp
                 <div class="box box-success">
@@ -278,13 +211,6 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate (0.10 = 10%)') }} / {{ __('معدل رسوم المالك (0.10 = 10%)') }}</label>
-                                <div class="col-sm-8">
-                                    <input type="number" step="0.01" name="fair_luck_owner_fee_rate" class="form-control"
-                                        value="{{ $settings['fair_luck_owner_fee_rate'] ?? '0' }}">
-                                </div>
-                            </div>
                         </div>
                         <div class="box-footer">
                             <button type="submit" class="btn btn-success pull-right">{{ __('Save V6 Settings') }} / {{ __('حفظ إعدادات V6') }}</button>
@@ -305,522 +231,115 @@
                     </div>
                 </div>
             @elseif($currentVersion == 4)
-                {{-- Version 4 Content (FairLuck V7 - User-First Overhaul) --}}
+                {{-- Version 4 Content (FairLuck V7 - Simplified) --}}
                 @php $settings = $fairLuckSettings; @endphp
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">{{ __('FairLuck V7 Settings (User-First)') }} / {{ __('إعدادات FairLuck V7 (تركيز على المستخدم)') }}</h3>
-                        <span class="label label-success pull-right">92% RTP Default</span>
+                        <h3 class="box-title"><i class="fa fa-sliders"></i> {{ __('FairLuck V2 Quick Settings') }}</h3>
+                        <div class="box-tools">
+                            <a href="{{ admin_url('fairluck') }}" class="btn btn-sm btn-default" title="{{ __('Advanced Settings') }}">
+                                <i class="fa fa-cogs"></i> {{ __('Advanced Settings') }}
+                            </a>
+                        </div>
                     </div>
-                    <form action="{{ route('admin.lucky-gift.version.update') }}" method="post" class="form-horizontal">
+                    <form action="{{ admin_url('fairluck/save-settings') }}" method="post" class="form-horizontal">
                         @csrf
-
-                         {{-- Section 1: Core RTP Settings --}}
-                         <div class="box-header with-border bg-light-blue" style="margin-top: 15px;">
-                             <h4 class="box-title">{{ __('Core RTP Settings') }} / {{ __('إعدادات RTP الأساسية') }}</h4>
-                             <p style="color: #0066cc; font-size: 12px; margin: 10px 0 0 0;">
-                                 <strong>ملاحظة مهمة:</strong> إعدادات الإصدار السابع (V7) تتحكم في نظام الاحتمالية المتقدم الذي يوازن بين عائد اللاعبين وصحة محفظة النظام. هذه الإعدادات حساسة جداً وتؤثر بشكل مباشر على تجربة اللعبة والأرباح.
-                             </p>
-                         </div>
-                         <div class="box-body">
-                             <div class="form-group">
-                                 <label class="col-sm-3 control-label">{{ __('Target RTP') }} / {{ __('RTP المستهدف') }}</label>
-                                 <div class="col-sm-4">
-                                     <div class="input-group">
-                                         <input type="number" step="0.01" min="70" max="99" name="V7_target_rtp" class="form-control"
-                                             value="{{ isset($settings['V7_target_rtp']) ? (float)$settings['V7_target_rtp'] * 100 : 92 }}">
-                                         <span class="input-group-addon">%</span>
-                                     </div>
-                                     <span class="help-block">
-                                         <strong>الشرح:</strong> نسبة العائد النظري للاعب (RTP - Return To Player). تحدد كم نسبة من الرهانات يجب أن تعود للاعبين على المدى الطويل. مثلاً: 92% تعني أن اللاعبين يسترجعون 92 من كل 100 وحدة يراهنونها. القيمة الأعلى تعني عائد أفضل للاعبين لكن أرباح أقل للنظام. النطاق: 70-99%. الافتراضي: 92%
-                                     </span>
-                                 </div>
-                             </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Max Win Probability') }} / {{ __('أقصى احتمالية فوز') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="10" max="95" name="V7_max_probability_cap" class="form-control"
-                                            value="{{ isset($settings['V7_max_probability_cap']) ? (float)$settings['V7_max_probability_cap'] * 100 : 50 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى لاحتمالية الفوز. لا يمكن أن تتجاوز احتمالية الفوز هذه النسبة حتى لو كانت ظروف اللعبة تتطلب ذلك. هذا يضمن عدم إعطاء اللاعبين فرصة فوز عالية جداً. الافتراضي: 50%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Boost Scaling Factor') }} / {{ __('معامل زيادة الاحتمالية') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="1" max="20" name="V7_boost_scaling" class="form-control"
-                                            value="{{ isset($settings['V7_boost_scaling']) ? (float)$settings['V7_boost_scaling'] * 100 : 5 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> معامل التعزيز يحدد كم يتم زيادة احتمالية الفوز عندما تكون ظروف اللعبة مواتية (مثل عندما تكون محفظة النظام صحية). قيمة أعلى تعني زيادة أكبر في الاحتمالية. الافتراضي: 5%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Reduce Scaling Factor') }} / {{ __('معامل تقليل الاحتمالية') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="1" max="10" name="V7_reduce_scaling" class="form-control"
-                                            value="{{ isset($settings['V7_reduce_scaling']) ? (float)$settings['V7_reduce_scaling'] * 100 : 2 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> معامل التقليل يحدد كم يتم تقليل احتمالية الفوز عندما تكون محفظة النظام في حالة حرجة. قيمة أعلى تعني تقليل أكبر في الاحتمالية. الافتراضي: 2%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Chaos Factor Min') }} / {{ __('أدنى معامل عشوائية') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="50" max="100" name="V7_chaos_factor_min" class="form-control"
-                                            value="{{ isset($settings['V7_chaos_factor_min']) ? (float)$settings['V7_chaos_factor_min'] * 100 : 90 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأدنى لعامل الفوضى الذي يضيف عشوائية إلى النتائج لتجنب الأنماط المتوقعة. قيمة أعلى تعني عشوائية أقل. الافتراضي: 90%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Chaos Factor Max') }} / {{ __('أقصى معامل عشوائية') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="100" max="150" name="V7_chaos_factor_max" class="form-control"
-                                            value="{{ isset($settings['V7_chaos_factor_max']) ? (float)$settings['V7_chaos_factor_max'] * 100 : 110 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى لعامل الفوضى الذي يضيف عشوائية إلى النتائج. قيمة أعلى تعني عشوائية أكبر. الافتراضي: 110%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section 2: Multiplier Weights --}}
-                        <div class="box-header with-border bg-light-blue">
-                            <h4 class="box-title">{{ __('Multiplier Weights') }} / {{ __('أوزان المضاعفات') }}</h4>
-                        </div>
-                        <div class="box-body">
-                            <div class="alert alert-info">
-                                {{ __('Higher weight = more frequent wins. Flattened distribution means big wins happen as often as small wins.') }}
-                            </div>
-
-                            <div class="row">
-                                @php
-                                    $multipliers = [5, 10, 20, 50, 70, 100, 250, 500, 1000];
-                                    $defaultWeights = [500, 500, 500, 500, 500, 500, 400, 300, 200];
-                                    $storedWeights = $settings['V7_multiplier_weights'] ?? [];
-                                    if (is_string($storedWeights)) {
-                                        $storedWeights = json_decode($storedWeights, true) ?? [];
-                                    }
-                                @endphp
-                                @foreach($multipliers as $index => $m)
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label">{{ $m }}x</label>
-                                        <div class="col-sm-8">
-                                            <input type="number" min="1" max="5000" name="V7_multiplier_weights[{{ $m }}]" class="form-control weight-input"
-                                                data-multiplier="{{ $m }}"
-                                                value="{{ $storedWeights[$m] ?? $defaultWeights[$index] }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-
-                           
-                        </div>
-
-                        {{-- Section 3: New Player Settings --}}
-                        <div class="box-header with-border bg-light-blue">
-                            <h4 class="box-title">{{ __('New Player Settings') }} / {{ __('إعدادات اللاعب الجديد') }}</h4>
-                        </div>
                         <div class="box-body">
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('New Player Boost Bets') }} / {{ __('رهانات تعزيز اللاعب الجديد') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="5" max="100" name="V7_new_player_bets" class="form-control"
-                                        value="{{ $settings['V7_new_player_bets'] ?? 20 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> عدد الرهانات التي يجب أن يقوم بها اللاعب الجديد قبل أن يتم اعتباره لاعباً متقدماً. اللاعبون الجدد يحصلون على معاملة خاصة وتعزيز في احتمالية الفوز. الافتراضي: 20
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('New Player Boost Multiplier') }} / {{ __('معامل تعزيز اللاعب الجديد') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" step="0.1" min="1.0" max="5.0" name="V7_new_player_boost" class="form-control"
-                                        value="{{ $settings['V7_new_player_boost'] ?? 3.0 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> معامل التعزيز الذي يتم تطبيقه على احتمالية الفوز للاعبين الجدد. قيمة 3.0 تعني أن احتمالية الفوز تُضرب في 3 للاعبين الجدد. قيمة أعلى تعني فرصة أفضل للفوز. الافتراضي: 3.0x
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Low Balance Threshold') }} / {{ __('حد الرصيد المنخفض') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="5" max="50" name="V7_low_balance_threshold" class="form-control"
-                                        value="{{ $settings['V7_low_balance_threshold'] ?? 15 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> نسبة الرصيد إلى الرهان. إذا كان (رصيد اللاعب / قيمة الرهان) أقل من هذا الحد، يتم تفعيل آليات الحماية وزيادة احتمالية الفوز. مثلاً: إذا كان الحد 15 ورصيد اللاعب 150 وقيمة الرهان 10، فإن النسبة = 150/10 = 15 (عند الحد بالضبط). الافتراضي: 15
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Low Balance Min Probability') }} / {{ __('أدنى احتمالية عند رصيد منخفض') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('App Profit') }} / {{ __('نسبة ربح التطبيق') }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
-                                        <input type="number" step="0.01" min="5" max="50" name="V7_low_balance_min_prob" class="form-control"
-                                            value="{{ isset($settings['V7_low_balance_min_prob']) ? (float)$settings['V7_low_balance_min_prob'] * 100 : 18 }}">
+                                        <input type="number" step="0.01" min="0" max="50" name="fair_luck_app_fee_rate" class="form-control"
+                                            value="{{ isset($settings['fair_luck_app_fee_rate']) ? round((float)$settings['fair_luck_app_fee_rate'] * 100, 2) : 1.5 }}">
                                         <span class="input-group-addon">%</span>
                                     </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأدنى لاحتمالية الفوز عندما يكون رصيد اللاعب منخفضاً. يضمن أن اللاعبين لديهم فرصة معقولة للفوز حتى عند انخفاض الرصيد. الافتراضي: 18%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section 4: Wallet Protection (USD) --}}
-                        <div class="box-header with-border bg-light-blue">
-                            <h4 class="box-title">{{ __('Wallet Protection (USD)') }} / {{ __('حماية المحفظة (بالدولار)') }}</h4>
-                        </div>
-                        <div class="box-body">
-                            <div class="alert alert-warning">
-                                <strong>{{ __('Important') }}:</strong> {{ __('All thresholds are now in USD. Set the Coin-to-USD rate below.') }}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Coin to USD Rate') }} / {{ __('سعر صرف العملة إلى الدولار') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" step="0.0001" min="0.0001" max="1.0000" name="coin_to_usd_rate" class="form-control"
-                                        value="{{ $settings['coin_to_usd_rate'] ?? 0.01 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> سعر صرف العملة الداخلية إلى الدولار الأمريكي. يستخدم لتحويل الأرصدة والرهانات من العملة الداخلية إلى الدولار. مثال: 0.01 تعني أن 1 عملة = 0.01 دولار. الافتراضي: 0.01
-                                    </span>
+                                    <span class="help-block">{{ __('Recommended: 1.5%') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Healthy Wallet (USD)') }} / {{ __('المحفظة الصحية (بالدولار)') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Receiver Share') }} / {{ __('نسبة المستقبل') }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
-                                        <span class="input-group-addon">$</span>
-                                        <input type="number" step="100" min="100" name="wallet_healthy_usd" class="form-control"
-                                            value="{{ $settings['wallet_healthy_usd'] ?? 1000 }}">
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأدنى لرصيد المحفظة بالدولار الذي يعتبر صحياً. عندما يكون الرصيد أعلى من هذا الحد، تكون المحفظة في حالة صحية ويمكن السماح بمضاعفات أعلى. الافتراضي: $1,000
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Warning Wallet (USD)') }} / {{ __('محفظة التحذير (بالدولار)') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">$</span>
-                                        <input type="number" step="100" min="50" name="wallet_warning_usd" class="form-control"
-                                            value="{{ $settings['wallet_warning_usd'] ?? 500 }}">
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الذي عندما ينخفض الرصيد عنه، يتم إصدار تحذير. المحفظة في هذه الحالة تحتاج إلى مراقبة وقد يتم تقليل المضاعفات المسموحة. الافتراضي: $500
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Critical Wallet (USD)') }} / {{ __('محفظة حرجة (بالدولار)') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">$</span>
-                                        <input type="number" step="100" min="0" name="wallet_critical_usd" class="form-control"
-                                            value="{{ $settings['wallet_critical_usd'] ?? 200 }}">
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الذي عندما ينخفض الرصيد عنه، تكون المحفظة في حالة حرجة وتحتاج إلى تدخل فوري. يتم تقليل المضاعفات بشكل كبير وتفعيل آليات الحماية. الافتراضي: $200
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Max Negative Wallet (USD)') }} / {{ __('أقصى محفظة سالبة (بالدولار)') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">$</span>
-                                        <input type="number" step="100" min="0" name="wallet_max_negative_usd" class="form-control"
-                                            value="{{ $settings['wallet_max_negative_usd'] ?? 300 }}">
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى الذي يمكن أن تنخفض إليه المحفظة بالدولار (خط الائتمان). عندما تصل المحفظة إلى هذا الحد السالب، يتم إيقاف اللعبة. الافتراضي: $300
-                                    </span>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Wallet Healthy Max Multiplier') }} / {{ __('أقصى مضاعف للمحفظة الصحية') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="100" max="1000" name="V7_wallet_healthy_max_mult" class="form-control"
-                                        value="{{ $settings['V7_wallet_healthy_max_mult'] ?? 1000 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى للمضاعف الذي يمكن أن يحصل عليه اللاعب عندما تكون محفظة النظام في حالة صحية (أعلى من الحد الصحي). الافتراضي: 1000x
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Wallet Moderate Max Mult') }} / {{ __('أقصى مضاعف للمحفظة المتوسطة') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="50" max="500" name="V7_wallet_moderate_max_mult" class="form-control"
-                                        value="{{ $settings['V7_wallet_moderate_max_mult'] ?? 100 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى للمضاعف عندما تكون محفظة النظام في حالة متوسطة (بين التحذير والصحي). الافتراضي: 100x
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Wallet Low Max Mult') }} / {{ __('أقصى مضاعف للمحفظة المنخفضة') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="10" max="100" name="V7_wallet_low_max_mult" class="form-control"
-                                        value="{{ $settings['V7_wallet_low_max_mult'] ?? 50 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى للمضاعف عندما تكون محفظة النظام منخفضة (بين التحذير والحرج). الافتراضي: 50x
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Wallet Critical Max Mult') }} / {{ __('أقصى مضاعف للمحفظة الحرجة') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="5" max="50" name="V7_wallet_critical_max_mult" class="form-control"
-                                        value="{{ $settings['V7_wallet_critical_max_mult'] ?? 20 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى للمضاعف عندما تكون محفظة النظام في حالة حرجة (أقل من الحد الحرج). الافتراضي: 20x
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Min Probability When Low') }} / {{ __('أدنى احتمالية عند انخفاض المحفظة') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="30" max="80" name="V7_min_prob_when_low" class="form-control"
-                                            value="{{ isset($settings['V7_min_prob_when_low']) ? (float)$settings['V7_min_prob_when_low'] * 100 : 60 }}">
+                                        <input type="number" step="0.01" min="0" max="50" name="fair_luck_receiver_fee_rate" class="form-control"
+                                            value="{{ isset($settings['fair_luck_receiver_fee_rate']) ? round((float)$settings['fair_luck_receiver_fee_rate'] * 100, 2) : 10 }}">
                                         <span class="input-group-addon">%</span>
                                     </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأدنى لاحتمالية الفوز عندما تكون محفظة النظام منخفضة. يضمن أن اللاعبين لديهم فرصة معقولة للفوز حتى عند انخفاض المحفظة. الافتراضي: 60%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section 5: Cooldown & Safety --}}
-                        <div class="box-header with-border bg-light-blue">
-                            <h4 class="box-title">{{ __('Cooldown & Safety') }} / {{ __('فترة الانتظار والسلامة') }}</h4>
-                        </div>
-                        <div class="box-body">
-                            <div class="alert alert-info">
-                                <strong>{{ __('Important') }}:</strong> {{ __('Cooldown is DISABLED by default (0 = disabled). Users can win big back-to-back.') }}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Jackpot Cooldown (bets)') }} / {{ __('فترة انتظار الجاكبوت (رهانات)') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="0" max="1000" name="fairluck_jackpot_cooldown_bets" class="form-control"
-                                        value="{{ $settings['fairluck_jackpot_cooldown_bets'] ?? 0 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> عدد الرهانات التي يجب أن يقوم بها اللاعب بعد الفوز بالجاكبوت (مضاعف 250x أو أعلى) قبل أن يكون مؤهلاً للفوز به مرة أخرى. 0 = معطل (لا توجد فترة انتظار). الافتراضي: 0 (معطل)
-                                    </span>
+                                    <span class="help-block">{{ __('Recommended: 10%') }}</span>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Min Bets for 100x+') }} / {{ __('الحد الأدنى من الرهانات لـ 100x+') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="10" max="100" name="V7_min_bets_100x" class="form-control"
-                                        value="{{ $settings['V7_min_bets_100x'] ?? 30 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> عدد الرهانات التي يجب أن يقوم بها اللاعب قبل أن يكون مؤهلاً للحصول على مضاعف 100x أو أعلى. يضمن أن اللاعبين الجدد لا يحصلون على مضاعفات عالية جداً في البداية. الافتراضي: 30
-                                    </span>
-                                </div>
-                            </div>
+     
 
                             <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Min Bets for 500x+') }} / {{ __('الحد الأدنى من الرهانات لـ 500x+') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" min="50" max="500" name="V7_min_bets_500x" class="form-control"
-                                        value="{{ $settings['V7_min_bets_500x'] ?? 100 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> عدد الرهانات التي يجب أن يقوم بها اللاعب قبل أن يكون مؤهلاً للحصول على مضاعف 500x أو أعلى. هذا حد أعلى من 100x لضمان أن المضاعفات الكبيرة جداً تُعطى فقط للاعبين ذوي الخبرة. الافتراضي: 100
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Max Single Win (% of wallet)') }} / {{ __('أقصى فوز واحد (% من المحفظة)') }}</label>
+                                <label class="col-sm-3 control-label">{{ __('Target RTP') }} / {{ __('نسبة RTP') }}</label>
                                 <div class="col-sm-4">
                                     <div class="input-group">
-                                        <input type="number" step="0.01" min="5" max="50" name="V7_max_single_win_pct" class="form-control"
-                                            value="{{ isset($settings['V7_max_single_win_pct']) ? (float)$settings['V7_max_single_win_pct'] * 100 : 15 }}">
+                                        <input type="number" step="0.1" min="70" max="100" name="V7_target_rtp" class="form-control"
+                                            value="{{ isset($settings['V7_target_rtp']) ? round((float)$settings['V7_target_rtp'] * 100, 1) : 99 }}">
                                         <span class="input-group-addon">%</span>
                                     </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى لمبلغ الفوز الواحد كنسبة من رصيد المحفظة. يمنع الفوز الكبير جداً الذي قد يؤثر على استقرار النظام. مثلاً: إذا كانت المحفظة 10,000 دولار و15%، فإن أقصى فوز واحد = 1,500 دولار. النطاق: 5-50%. الافتراضي: 15%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section 6: Wallet Distribution --}}
-                        <div class="box-header with-border bg-light-blue">
-                            <h4 class="box-title">{{ __('Wallet Distribution') }} / {{ __('توزيع المحفظة') }}</h4>
-                        </div>
-                        <div class="box-body">
-                            <div class="alert alert-info">
-                                <strong>{{ __('Note') }}:</strong> {{ __('These percentages should add up to 100%. They determine how the system allocates funds across different wallet pools.') }}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Global Vault %') }} / {{ __('نسبة المحفظة العامة') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="30" max="80" name="V7_wallet_dist_global" class="form-control"
-                                            value="{{ isset($settings['V7_wallet_dist_global']) ? (float)$settings['V7_wallet_dist_global'] * 100 : 65 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> نسبة الأموال المخصصة للمحفظة العامة من إجمالي الأموال المتاحة. هذه المحفظة تستخدم لدفع الفوز العادي والمتوسط. قيمة أعلى تعني أموال أكثر متاحة للفوز العادي. الافتراضي: 65%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Jackpot Wallet %') }} / {{ __('نسبة محفظة الجاكبوت') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="10" max="40" name="V7_wallet_dist_jackpot" class="form-control"
-                                            value="{{ isset($settings['V7_wallet_dist_jackpot']) ? (float)$settings['V7_wallet_dist_jackpot'] * 100 : 20 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> نسبة الأموال المخصصة لمحفظة الجاكبوت من إجمالي الأموال المتاحة. هذه المحفظة تستخدم لدفع الفوز الكبير جداً (مضاعفات عالية جداً). قيمة أعلى تعني جوائز جاكبوت أكبر. الافتراضي: 20%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Medium Wallet %') }} / {{ __('نسبة المحفظة المتوسطة') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="5" max="30" name="V7_wallet_dist_medium" class="form-control"
-                                            value="{{ isset($settings['V7_wallet_dist_medium']) ? (float)$settings['V7_wallet_dist_medium'] * 100 : 15 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> نسبة الأموال المخصصة للمحفظة المتوسطة من إجمالي الأموال المتاحة. هذه المحفظة تستخدم لدفع الفوز المتوسط (مضاعفات متوسطة). قيمة أعلى تعني فوز متوسط أكثر. الافتراضي: 15%
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section 7: Fee Settings --}}
-                        <div class="box-header with-border bg-light-blue">
-                            <h4 class="box-title">{{ __('Fee Settings') }} / {{ __('إعدادات الرسوم') }}</h4>
-                        </div>
-                        <div class="box-body">
-                            <div class="alert alert-warning">
-                                <strong>{{ __('Important') }}:</strong> {{ __('Fees are deducted from the winning amount. Higher fees = lower payouts to users.') }}
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('App Fee Rate') }} / {{ __('نسبة رسوم التطبيق') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="0" max="100" name="fair_luck_app_fee_rate" class="form-control"
-                                            value="{{ isset($settings['fair_luck_app_fee_rate']) ? (float)$settings['fair_luck_app_fee_rate'] * 100 : 10 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> نسبة الرسوم التي يأخذها التطبيق من كل معاملة فوز. هذه الرسوم تذهب إلى مالك التطبيق. مثلاً: إذا كان الفوز 100 دولار ورسوم التطبيق 10%، فإن التطبيق يأخذ 10 دولار. الافتراضي: 10%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Receiver Fee Rate') }} / {{ __('نسبة رسوم المستقبل') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="0" max="100" name="fair_luck_receiver_fee_rate" class="form-control"
-                                            value="{{ isset($settings['fair_luck_receiver_fee_rate']) ? (float)$settings['fair_luck_receiver_fee_rate'] * 100 : 10 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> نسبة الرسوم التي يأخذها المستقبل (الشخص الذي يتلقى الهدية) من الفوز. هذه الرسوم تذهب إلى المستقبل كحافز. مثلاً: إذا كان الفوز 100 دولار ورسوم المستقبل 10%، فإن المستقبل يأخذ 10 دولار إضافية. الافتراضي: 10%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Owner Fee Rate') }} / {{ __('نسبة رسوم مالك الغرفة') }}</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="number" step="0.01" min="0" max="100" name="fair_luck_owner_fee_rate" class="form-control"
-                                            value="{{ isset($settings['fair_luck_owner_fee_rate']) ? (float)$settings['fair_luck_owner_fee_rate'] * 100 : 10 }}">
-                                        <span class="input-group-addon">%</span>
-                                    </div>
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> نسبة الرسوم التي يأخذها مالك الغرفة من كل معاملة فوز. هذه الرسوم تذهب إلى مالك الغرفة كحافز على استضافة اللعبة. مثلاً: إذا كان الفوز 100 دولار ورسوم مالك الغرفة 10%، فإن مالك الغرفة يأخذ 10 دولار. الافتراضي: 10%
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">{{ __('Global Vault Negative Limit (coins - legacy)') }} / {{ __('حد الرصيد السالب العام (عملات - قديم)') }}</label>
-                                <div class="col-sm-4">
-                                    <input type="number" name="global_vault_negative_limit" class="form-control"
-                                        value="{{ $settings['global_vault_negative_limit'] ?? 30000 }}">
-                                    <span class="help-block">
-                                        <strong>الشرح:</strong> الحد الأقصى الذي يمكن أن تنخفض إليه المحفظة بالعملات (إذا لم يتم تعيين سعر صرف الدولار). هذا إعداد قديم ويُستخدم فقط للتوافقية مع الإصدارات السابقة. الافتراضي: 30000
-                                    </span>
+                                    <span class="help-block">{{ __('Recommended: 99%') }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="box-footer">
-                            <button type="submit" class="btn btn-success btn-lg pull-right">{{ __('Save All V7 Settings') }} / {{ __('حفظ جميع إعدادات V7') }}</button>
+                            <a href="{{ admin_url('fairluck') }}" class="btn btn-default"><i class="fa fa-cogs"></i> {{ __('All Settings') }}</a>
+                            <button type="submit" class="btn btn-success pull-right"><i class="fa fa-save"></i> {{ __('Save') }}</button>
                         </div>
                     </form>
                 </div>
 
+                {{-- Vault Status Card --}}
+                @php
+                    $vaultBalance = \App\Models\FairLuckWallet::where('wallet_type', 'global_vault')->value('balance') ?? 0;
+                    $walletMin = (int)($settings['V7_wallet_min'] ?? 10000);
+                    $walletTight = (int)($settings['V7_wallet_tight'] ?? 50000);
+                    $walletTarget = (int)($settings['V7_wallet_target'] ?? 200000);
+                    $walletHigh = (int)($settings['V7_wallet_high'] ?? 500000);
+                    $walletDrain = (int)($settings['V7_wallet_drain'] ?? 1000000);
+                    $zone = $vaultBalance <= $walletMin ? 'CRITICAL' : ($vaultBalance <= $walletTight ? 'TIGHT' : ($vaultBalance <= $walletTarget ? 'NORMAL' : ($vaultBalance <= $walletHigh ? 'GENEROUS' : 'DRAIN')));
+                    $zoneColor = ['CRITICAL' => '#dc3545', 'TIGHT' => '#e67e22', 'NORMAL' => '#3498db', 'GENEROUS' => '#28a745', 'DRAIN' => '#8e44ad'][$zone];
+                    $appWallet = \App\Models\CoreWallet::where('name', 'app_wallet')->value('coins') ?? 0;
+                @endphp
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="box box-success">
-                            <div class="box-header with-border">
-                                <h3 class="box-title">{{ __('Global Vault Balance History') }} / {{ __('سجل رصيد الخزينة العام') }}</h3>
+                    <div class="col-md-6">
+                        <div class="small-box" style="background: {{ $zoneColor }}; color: #fff;">
+                            <div class="inner">
+                                <h3>{{ number_format($vaultBalance) }}</h3>
+                                <p>{{ __('Lucky Wallet') }} — {{ $zone }}</p>
                             </div>
-                            <div class="box-body">
-                                <canvas id="vaultChartV7" style="height: 300px;"></canvas>
-                            </div>
+                            <div class="icon"><i class="fa fa-diamond"></i></div>
                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="small-box bg-orange" style="color: #fff;">
+                            <div class="inner">
+                                <h3>{{ number_format($appWallet) }}</h3>
+                                <p>{{ __('App Wallet') }}</p>
+                            </div>
+                            <div class="icon"><i class="fa fa-money"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Live Vault Chart --}}
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-line-chart"></i> {{ __('Vault Balance — Live') }}</h3>
+                        <div class="box-tools">
+                            <div class="btn-group btn-group-sm" id="chartRange">
+                                <button class="btn btn-default" data-range="50">{{ __('Last 50') }}</button>
+                                <button class="btn btn-default active" data-range="100">{{ __('Last 100') }}</button>
+                                <button class="btn btn-default" data-range="500">{{ __('Last 500') }}</button>
+                                <button class="btn btn-default" data-range="all">{{ __('All') }}</button>
+                            </div>
+                            <span id="autoRefreshLabel" class="label label-success" style="margin-left:10px;">{{ __('Auto-refresh: 30s') }}</span>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <canvas id="vaultChartV7" style="height: 350px;"></canvas>
                     </div>
                 </div>
             @endif
@@ -951,65 +470,158 @@
             var labels = historyData.map(function (d) { return d.date; });
             var dataPoints = historyData.map(function (d) { return d.after; });
 
-            var chartId = '{{ $currentVersion == 3 ? 'vaultChartV6' : ($currentVersion == 4 ? 'vaultChartV7' : 'vaultChart') }}';
-            var ctx = document.getElementById(chartId).getContext('2d');
-            var chart = new Chart(ctx, {
+            var chartId = '{{ $currentVersion == 3 ? "vaultChartV6" : ($currentVersion == 4 ? "vaultChartV7" : "vaultChart") }}';
+            var canvas = document.getElementById(chartId);
+            if (!canvas) return;
+
+            @if($currentVersion == 4)
+            // V7: Enhanced chart with zone lines, time ranges, auto-refresh
+            var ZONES = {
+                min: {{ $settings['V7_wallet_min'] ?? 10000 }},
+                tight: {{ $settings['V7_wallet_tight'] ?? 50000 }},
+                target: {{ $settings['V7_wallet_target'] ?? 200000 }},
+                high: {{ $settings['V7_wallet_high'] ?? 500000 }},
+                drain: {{ $settings['V7_wallet_drain'] ?? 1000000 }}
+            };
+            var allData = historyData;
+            var currentRange = 100;
+            var vaultChart = null;
+
+            function getZone(val) {
+                if (val <= ZONES.min) return 'CRITICAL';
+                if (val <= ZONES.tight) return 'TIGHT';
+                if (val <= ZONES.target) return 'NORMAL';
+                if (val <= ZONES.high) return 'GENEROUS';
+                return 'DRAIN';
+            }
+
+            function getZoneColor(val) {
+                var z = getZone(val);
+                return {CRITICAL:'#dc3545',TIGHT:'#e67e22',NORMAL:'#3498db',GENEROUS:'#28a745',DRAIN:'#8e44ad'}[z];
+            }
+
+            function renderChart(range) {
+                currentRange = range;
+                var data = range === 'all' ? allData : allData.slice(-range);
+                var labs = data.map(function(d) { return d.date; });
+                var pts = data.map(function(d) { return d.after; });
+
+                if (vaultChart) vaultChart.destroy();
+
+                // Zone threshold datasets
+                var zoneLines = [
+                    { label: 'CRITICAL (' + ZONES.min.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.min), borderColor: '#dc3545', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
+                    { label: 'TIGHT (' + ZONES.tight.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.tight), borderColor: '#e67e22', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
+                    { label: 'TARGET (' + ZONES.target.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.target), borderColor: '#3498db', borderDash: [8,4], borderWidth: 2, pointRadius: 0, fill: false },
+                    { label: 'GENEROUS (' + ZONES.high.toLocaleString() + ')', data: Array(pts.length).fill(ZONES.high), borderColor: '#28a745', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
+                ];
+
+                vaultChart = new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labs,
+                        datasets: [{
+                            label: '{{ __("Vault Balance") }}',
+                            data: pts,
+                            borderColor: 'rgba(60,141,188,1)',
+                            backgroundColor: 'rgba(60,141,188,0.15)',
+                            fill: true, tension: 0.2, borderWidth: 2,
+                            pointBackgroundColor: function(ctx) { return getZoneColor(pts[ctx.dataIndex] || 0); },
+                            pointRadius: pts.length > 200 ? 0 : 3,
+                            pointHoverRadius: 6
+                        }].concat(zoneLines)
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'nearest', intersect: false },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, font: { size: 11 } } },
+                            tooltip: {
+                                padding: 12, titleFont: { size: 13 }, bodyFont: { size: 12 },
+                                callbacks: {
+                                    title: function(items) {
+                                        var d = data[items[0].dataIndex];
+                                        return d ? d.date : '';
+                                    },
+                                    label: function(ctx) {
+                                        if (ctx.datasetIndex > 0) return null; // skip zone lines
+                                        var d = data[ctx.dataIndex];
+                                        if (!d) return '';
+                                        var zone = getZone(d.after);
+                                        return [
+                                            'Balance: ' + d.after.toLocaleString() + ' [' + zone + ']',
+                                            'Change: ' + (d.change >= 0 ? '+' : '') + d.change.toLocaleString(),
+                                            'Before: ' + d.before.toLocaleString(),
+                                            d.desc.replace('V7 bet credit','Bet').replace('V7 win payout','Win Payout')
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { maxTicksLimit: 15, font: { size: 10 } } },
+                            y: {
+                                beginAtZero: false,
+                                ticks: { callback: function(v) { return v >= 1000 ? (v/1000).toFixed(0) + 'k' : v; } },
+                                title: { display: true, text: '{{ __("Coins") }}' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderChart(100);
+
+            // Time range buttons
+            $('#chartRange button').on('click', function() {
+                $('#chartRange button').removeClass('active');
+                $(this).addClass('active');
+                var r = $(this).data('range');
+                renderChart(r === 'all' ? 'all' : parseInt(r));
+            });
+
+            // Auto-refresh every 30s
+            setInterval(function() {
+                $.getJSON('{{ admin_url("fairluck") }}?ajax=history', function(resp) {
+                    if (resp && resp.length) {
+                        allData = resp;
+                        renderChart(currentRange);
+                    }
+                }).fail(function() {}); // silent fail
+            }, 30000);
+
+            @else
+            // V2/V3: Simple chart
+            var chart = new Chart(canvas.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: "{{ __('Global Vault Balance') }} / {{ __('رصيد الخزينة العام') }}",
+                        label: "{{ __('Vault Balance') }}",
                         data: dataPoints,
                         borderColor: 'rgba(60,141,188,0.8)',
                         backgroundColor: 'rgba(60,141,188,0.2)',
-                        fill: true,
-                        tension: 0.1,
-                        pointBackgroundColor: function (context) {
-                            var val = dataPoints[context.dataIndex] || 0;
-                            return val < 0 ? 'rgba(255,99,132,1)' : 'rgba(60,141,188,1)';
-                        },
-                        pointBorderColor: '#fff',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        fill: true, tension: 0.1,
+                        pointBackgroundColor: function(ctx) { return (dataPoints[ctx.dataIndex]||0) < 0 ? '#e74c3c' : '#3c8dbc'; },
+                        pointRadius: 4, pointHoverRadius: 6
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'nearest',
-                        intersect: false,
-                    },
                     plugins: {
                         tooltip: {
-                            padding: 10,
                             callbacks: {
-                                label: function (context) {
-                                    var data = historyData[context.dataIndex];
-                                    var lines = [];
-                                    lines.push("{{ __('🎯 Balance After:  ') }}" + data.after.toLocaleString());
-                                    lines.push("{{ __('💰 Change Amt:  ') }}" + (data.change > 0 ? '+' : '') + data.change.toLocaleString());
-                                    lines.push("{{ __('⏳ Balance Before: ') }}" + data.before.toLocaleString());
-
-                                    var desc = data.desc;
-                                    desc = desc.replace('Win payout', "{{ __('🏆 Win') }}")
-                                        .replace('Loss bet', "{{ __('💔 Loss') }}")
-                                        .replace('Bet contribution', "{{ __('💸 Bet') }}");
-
-                                    lines.push("{{ __('📝 Info: ') }}" + desc);
-
-                                    if (data.after < 0) {
-                                        lines.push("{{ __('⚠️ Status: Wallet is Negative!') }}");
-                                    }
-                                    return lines;
+                                label: function(ctx) {
+                                    var d = historyData[ctx.dataIndex];
+                                    return ['Balance: ' + d.after.toLocaleString(), 'Change: ' + (d.change>0?'+':'') + d.change.toLocaleString(), d.desc];
                                 }
                             }
                         }
                     },
-                    scales: {
-                        y: { beginAtZero: false }
-                    }
+                    scales: { y: { beginAtZero: false } }
                 }
             });
+            @endif
         });
     </script>
 @endif

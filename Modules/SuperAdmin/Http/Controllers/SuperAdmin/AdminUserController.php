@@ -35,12 +35,6 @@ class AdminUserController extends EncorUsersController
 
     public function grid()
     {
-        \Log::info('AdminUserController grid method called - COMPLETE OVERRIDE', [
-            'controller_class' => get_class($this),
-            'request_url' => request()->url(),
-            'request_path' => request()->path()
-        ]);
-
         $permission_name = $this->permission_name;
 
         $grid = new \Encore\Admin\Grid(new \App\Models\Admin());
@@ -214,15 +208,6 @@ class AdminUserController extends EncorUsersController
 
     public function destroy($id)
     {
-        \Log::info('AdminUserController destroy method called', [
-            'id' => $id,
-            'controller_class' => get_class($this),
-            'request_url' => request()->url(),
-            'request_method' => request()->method(),
-            'request_path' => request()->path(),
-            'current_route' => request()->route()->getName()
-        ]);
-
         try {
             $user = $this->model->find($id);
             if ($user) {
@@ -237,10 +222,6 @@ class AdminUserController extends EncorUsersController
                 $OldUserAppId->is_sub_super_admin = 0;
                 $OldUserAppId->save();
 
-                \Log::info('Updated user is_sub_super_admin in destroy method', [
-                    'user_id' => $OldUserAppId->id,
-                    'app_id' => $user->app_id
-                ]);
             }
 
             //  Agency::query ()->where ('owner_id',$id)->delete ();
@@ -248,7 +229,6 @@ class AdminUserController extends EncorUsersController
             // حذف المستخدم
             $user->delete();
 
-            \Log::info('User deleted successfully in destroy method', ['user_id' => $id]);
 
             return response()->json(['success' => true, 'message' => 'تم الحذف بنجاح']);
         } catch (\Exception $e) {

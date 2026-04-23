@@ -144,16 +144,13 @@ class DetailedMultiUserReportV6 extends Command
             }
             
             foreach ($this->users as $index => &$userData) {
-                // مطابق لـ LuckyGiftService::sendLuckyGift6
                 $unitPrice = $betAmount; // سعر الهدية = ما يدفعه اليوزر
                 $appFeeRate = \App\Models\FairLuckSetting::getAppFeeRate();       // 0.10
                 $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate(); // 0.10
-                $ownerFeeRate = \App\Models\FairLuckSetting::getOwnerFeeRate();    // 0.10
 
                 $appFee = $unitPrice * $appFeeRate;
                 $receiverFee = $unitPrice * $receiverFeeRate;
-                $ownerFee = $unitPrice * $ownerFeeRate;
-                $netBetAmount = $unitPrice - $appFee - $receiverFee - $ownerFee;
+                $netBetAmount = $unitPrice - $appFee - $receiverFee ;
 
                 if ($userData['user']->di < $unitPrice) {
                     continue;

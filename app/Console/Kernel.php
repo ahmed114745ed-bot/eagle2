@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('remove-background:cron')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/remove-background-cron.log'))
             ->runInBackground();
 
@@ -57,6 +58,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:reset-top-room-rank')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/app-reset-top-room-rank.log'))
             ->runInBackground();
 
@@ -74,24 +76,28 @@ class Kernel extends ConsoleKernel
         $schedule->command('weekly-star-winner')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/weekly-star-winner.log'))
             ->runInBackground();
 
         $schedule->command('weekly-star-update')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/weekly-star-update.log'))
             ->runInBackground();
 
         $schedule->command('pk-event-winner')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/pk-event-winner.log'))
             ->runInBackground();
 
         $schedule->command('pk-event-update')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/pk-event-update.log'))
             ->runInBackground();
 
@@ -168,12 +174,14 @@ class Kernel extends ConsoleKernel
         $schedule->command('monthly-ranking')
             ->monthly()
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/monthly-ranking.log'))
             ->runInBackground();
 
         $schedule->command('daily-ranking')
             ->dailyAt('00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/daily-ranking.log'))
             ->runInBackground();
         $weekEnd = Common::getSettingValue('week_start') ?? 'monday';
@@ -183,6 +191,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('weekly-ranking')
             ->weeklyOn($carbonDay, '00:00')
             ->timezone(getTimezone())
+            ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/weekly-ranking.log'))
             ->runInBackground();
 
@@ -209,12 +218,14 @@ class Kernel extends ConsoleKernel
         $type = $settings['type'] ?? 'daily';
         $time = '00:00';
 
+        $weekStartDay = \App\helper\TimeHelper::startOfWeekConst();
+
         $command = $schedule->command('roomcup:calculate-rewards')
             ->timezone(getTimezone());
 
         match ($type) {
             'daily' => $command->dailyAt($time),
-            'weekly' => $command->weeklyOn(1, $time),
+            'weekly' => $command->weeklyOn($weekStartDay, $time),
             'monthly' => $command->monthlyOn(1, $time),
             default => $command->dailyAt($time),
         };

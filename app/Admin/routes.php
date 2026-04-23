@@ -31,6 +31,7 @@ use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\CharismaLevelController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
@@ -87,6 +88,7 @@ use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\RoleControllerNew;
+use App\Admin\Controllers\RoomBackgroundManagerController;
 use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Admin\Controllers\RoomMicController;
@@ -98,7 +100,6 @@ use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
@@ -116,6 +117,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\UserWalletController;
+use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -195,6 +197,26 @@ $routes = collect(app('router')->getRoutes()->get());
 $filtered = $routes->reject(function ($route) {
     return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');
 });
+
+
+Route::group(
+        [
+            'prefix'        => config('admin.route.prefix'),
+            'namespace'     => config('admin.route.namespace'),
+            'middleware'    => [
+               'web',
+            'admin.auth',
+            'adminIp',
+                //            'adminGeneralBan',
+                'multiLanguage',
+            ],
+            'as'            => config('admin.route.prefix') . '.',
+        ],
+        function () {
+
+                Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
+
+        });
 
 
 
@@ -337,7 +359,6 @@ Route::group(
         Route::resource('all-games', AllGameController::class);
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
-        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {
             Route::get('/', [BlackListUsersController::class, 'index']);
@@ -377,6 +398,7 @@ Route::group(
         Route::post("accept-change-country", [ChangeCountryRequestController::class, "changeCountry"]);
 
         Route::resource('backgrounds', 'BackgroundController');
+        Route::resource('room-background-manager', RoomBackgroundManagerController::class);
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
 
@@ -706,7 +728,7 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-
+        Route::resource('charisma-levels', CharismaLevelController::class);
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');

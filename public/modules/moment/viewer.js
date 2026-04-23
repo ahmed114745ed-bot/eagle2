@@ -37,6 +37,7 @@
         loadMoments();
         setupEventHandlers();
         setupScrollHandling();
+        initUsersSidebar();
     });
 
     function detectAndApplyDirection() {
@@ -1543,8 +1544,8 @@
         loadMoments(false);
     };
 
-// Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
+    // Users sidebar initialization function (called from $(document).ready for PJAX compatibility)
+    function initUsersSidebar() {
         loadUsers(true);
 
         // Scroll handler for infinite scroll
@@ -1578,7 +1579,7 @@
                 loadUsers(true);
             }, 500);
         });
-    });
+    }
 
 })(jQuery);
 

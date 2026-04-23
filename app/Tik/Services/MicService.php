@@ -142,7 +142,11 @@ class MicService
 
         $position = (int) $data['position'];
 
-        $maxPositions = $room->mode == 0 ? 9 : 23;
+        $modeMaxSeats = [
+            '0' => 8, '1' => 15, '2' => 11, '3' => 8, '4' => 3,
+            '5' => 7, '6' => 1, '7' => 21, '8' => 7, '9' => 7,
+        ];
+        $maxPositions = $modeMaxSeats[$room->mode] ?? 8;
         if ($position < 0 || $position > $maxPositions) {
             throw new Exception(__('api_responses.position_error'));
         }
@@ -288,7 +292,6 @@ class MicService
                 return true;
             }
         }
-        //        Log::info("📩 [CP] No nearby CPs found, sending lovely message anyway", []);
 
         $this->sendCpLovelyMessage($room, $user);
 
@@ -679,7 +682,11 @@ class MicService
         $data['owner_id'] = $room->uid;
 
         // position validation based on room mode
-        $maxPositions = $room->mode == 0 ? 9 : 17;
+        $modeMaxSeats = [
+            '0' => 8, '1' => 15, '2' => 11, '3' => 8, '4' => 3,
+            '5' => 7, '6' => 1, '7' => 21, '8' => 7, '9' => 7,
+        ];
+        $maxPositions = $modeMaxSeats[$room->mode] ?? 8;
         if ($position < 0 || $position > $maxPositions) {
             throw new Exception(__('api_responses.position_error'));
         }

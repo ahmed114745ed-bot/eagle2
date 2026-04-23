@@ -1,5 +1,33 @@
 <?php
 
+// V7 FairLuck Monitor (temp, public, obscured path)
+Route::get('monitor/v7/3305d927f49322e0', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'dashboard']);
+Route::get('monitor/v7/3305d927f49322e0/api', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'apiStats']);
+
+// TEMPORARY: Game duplicate orders check and fix endpoints
+// DELETE these routes after the issue is resolved on production
+Route::prefix('game-duplicate-check')->group(function () {
+    Route::get('/status', [\App\Http\Controllers\Api\V1\GameDuplicateCheckController::class, 'status']);
+    Route::post('/migrate', [\App\Http\Controllers\Api\V1\GameDuplicateCheckController::class, 'runMigrations']);
+    Route::get('/logs', [\App\Http\Controllers\Api\V1\GameDuplicateCheckController::class, 'logs']);
+});
+
+// Coin Game Archive Report
+Route::get('/coin-game-archive-report', [\App\Http\Controllers\Api\V1\CoinGameArchiveReportController::class, 'htmlReport'])->name('coin-game-archive-report');
+Route::get('/duplicate-cleanup/trigger', function () {
+    \Illuminate\Support\Facades\Log::info('=== Cleanup Trigger: Starting CleanupDuplicateOrdersJob directly ===');
+
+    // Run directly (synchronously) instead of dispatching to queue
+    $job = new \App\Jobs\CleanupDuplicateOrdersJob();
+    $job->handle();
+
+    \Illuminate\Support\Facades\Log::info('CleanupDuplicateOrdersJob completed directly');
+    return response()->json([
+        'status' => 'completed',
+        'message' => 'Cleanup job completed. Check logs for details.',
+        'timestamp' => now()->toDateTimeString(),
+    ]);
+});
 
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
@@ -13,6 +41,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Enums\AdminNotificationType;
 use App\Enums\SuperAdminNotificationType;
+use App\Models\UserCodeInvitation;
 use App\Exports\AgencyCharge;
 use App\Exports\AgencyChargeTransactions;
 use App\Facades\CustomNotification;
@@ -302,6 +331,36 @@ Route::get('/user-join-agency', function () {
 });
 
 
+Route::get('/count-invite-codes', function () {
+
+    $tz = getTimezone();
+
+    // Start date (GMT+2 → UTC)
+    $from = Carbon::parse('Apr 19, 4:27 PM', $tz)->setTimezone('UTC');
+
+    // Current time in UTC
+    $to = Carbon::now('UTC');
+
+    $count = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->count();
+
+        $accounts = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->get();
+
+        $data = [
+            
+            'count' => $count,
+            'accounts' => $accounts,
+            'from' => $from->toDateTimeString(),
+            'to' => $to->toDateTimeString(),
+            
+        ];
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $data,
+    ]);
+});
+
+
 
 Route::get('/badge-seeders', function () {
 
@@ -389,6 +448,12 @@ Route::get('/change_agencies_type', function () {
 
     return "agencies types changed successfully!";
 });
+
+Route::get('admin/auth', function () {
+        return view('checkLogin');
+    })->name('admin/auth');
+        Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+
 
 Route::get('/config_cache', function () {
     return Artisan::call('config:cache');
@@ -559,10 +624,7 @@ Route::group([
     ],
     'as' => '',
 ], function () {
-    Route::get('admin/auth', function () {
-        return view('checkLogin');
-    })->name('admin/auth');
-    Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+    
 });
 
 Route::get('/update-rooms', function () {
@@ -741,7 +803,6 @@ Route::get('/fix-bag-gifts', function (\Illuminate\Http\Request $request) {
         ->havingRaw('COUNT(*) > 1')
         ->get();
 
-    Log::info("Found " . $affected->count() . " affected bag gift transactions.");
 
     if ($affected->isEmpty()) {
         return response()->json([
@@ -949,6 +1010,87 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
 });
 
 Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
+
+// Gift Logs: fill total column from gifts table (seeder via web)
+Route::get('/gift-logs-fill-total', function () {
+    Artisan::call('db:seed', ['--class' => \Database\Seeders\FillGiftLogsTotalSeeder::class]);
+    return response()->json([
+        'status'  => 'success',
+        'message' => '✅ FillGiftLogsTotalSeeder executed successfully.',
+        'output'  => Artisan::output(),
+    ]);
+});
+
+// Gift Logs: fix total diff (dry-run preview) — queries DB directly for accuracy
+Route::get('/gift-logs-fix-total-diff/preview', function () {
+    $users      = [];
+    $totalDiff  = 0;
+    $totalUsers = DB::table('users')->where('total_diamond_send', '>', 0)->count();
+
+    DB::table('users')
+        ->select('id', 'total_diamond_send')
+        ->where('total_diamond_send', '>', 0)
+        ->orderBy('id')
+        ->chunk(500, function ($chunk) use (&$users, &$totalDiff) {
+            foreach ($chunk as $user) {
+                $userTotal = (float) ($user->total_diamond_send ?? 0);
+
+                // Sum of real gift logs (excluding correction records)
+                $giftLogsTotal = DB::table('gift_logs')
+                    ->where('sender_id', $user->id)
+                    ->whereNotNull('receiver_id')
+                    ->where('receiver_id', '!=', 0)
+                    ->where('giftName', '!=', 'diff_correction')
+                    ->selectRaw('COALESCE(SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))), 0) as total')
+                    ->value('total');
+
+                // Sum of existing correction records
+                $correctionTotal = DB::table('gift_logs')
+                    ->where('sender_id', $user->id)
+                    ->where('giftName', 'diff_correction')
+                    ->selectRaw('COALESCE(SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))), 0) as total')
+                    ->value('total');
+
+                $giftLogsTotal   = (float) ($giftLogsTotal ?? 0);
+                $correctionTotal = (float) ($correctionTotal ?? 0);
+                $totalWithCorrection = $giftLogsTotal + $correctionTotal;
+
+                $diff = $userTotal - $totalWithCorrection;
+
+                if (abs($diff) < 1) {
+                    continue;
+                }
+
+                $users[] = [
+                    'user_id'            => (int) $user->id,
+                    'total_diamond_send' => $userTotal,
+                    'gift_logs_sum'      => $totalWithCorrection,
+                    'diff'               => $diff,
+                ];
+                $totalDiff += $diff;
+            }
+        });
+
+    $html = view('gift-logs-fix-report', [
+        'users'       => $users,
+        'total_users' => $totalUsers,
+        'total_diff'  => $totalDiff,
+        'output'      => '',
+    ])->render();
+
+    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
+});
+
+// Gift Logs: fix total diff (actual run) — prevents duplicate correction records
+Route::get('/gift-logs-fix-total-diff/run', function (\Illuminate\Http\Request $request) {
+    $chunk = (int) $request->query('chunk', 500);
+    Artisan::call('gift-logs:fix-total-diff', ['--chunk' => $chunk]);
+    return response()->json([
+        'status'  => 'success',
+        'message' => '✅ gift-logs:fix-total-diff executed successfully.',
+        'output'  => Artisan::output(),
+    ]);
+});
 
 
 Route::get('/test-games', function () {
@@ -1225,7 +1367,6 @@ Route::get('/codapay/create-payment', function () {
     $url = 'https://airtime.codapayments.com/airtime/api/restful/v2.0/Payment/init.json';
 
     try {
-        // Log::info("🟢 Codapay: Sending JSON Request", ['url' => $url, 'payload' => $payload]);
 
         $response = Http::timeout(15)
             ->withHeaders(['Content-Type' => 'application/json'])
@@ -1249,7 +1390,6 @@ Route::get('/codapay/create-payment', function () {
 
         $result = $response->json();
 
-        // Log::info("✅ Codapay Response Received", ['result' => $result]);
 
         // ✅ تحقق من النجاح
         if (isset($result['initResult']['resultCode']) && $result['initResult']['resultCode'] === 0) {
@@ -1969,6 +2109,40 @@ Route::get('/backfill-roomcup-weekly-rewards', function () {
     }
 });
 
+Route::get('/update-reward-dates', function () {
+
+    $rewards = \Modules\RoomCup\Entities\RoomCupReward::all();
+
+    $results = [];
+
+    foreach ($rewards as $reward) {
+        $oldDate = $reward->created_at->copy();
+
+        if ($oldDate->isSaturday()) {
+            $newDate = $oldDate->copy()->subWeek();
+        } else {
+            $newDate = $oldDate->copy()->previous(Carbon::SATURDAY);
+        }
+
+        \Illuminate\Support\Facades\DB::table('room_cup_rewards')
+            ->where('id', $reward->id)
+            ->update([
+                'created_at' => $newDate,
+                'updated_at' => $newDate,
+            ]);
+
+        $results[] = [
+            'id'       => $reward->id,
+            'old_date' => $oldDate->toDateTimeString(),
+            'new_date' => $newDate->toDateTimeString(),
+        ];
+    }
+
+    return response()->json([
+        'total_updated' => count($results),
+        'details'       => $results,
+    ]);
+});
 
 Route::get('/fix-pack-expire', function () {
     $packs = \App\Models\Pack::where('is_used', 1)
@@ -2508,13 +2682,11 @@ use Illuminate\Support\Facades\Log;
 
 Route::get('/fix-paid-usd', function () {
 
-    Log::info('Fix paid_usd process started');
 
     $logs = CoinLog::whereNull('paid_usd')
         ->orWhere('paid_usd', 0)
         ->get();
 
-    Log::info('Total logs fetched', ['count' => $logs->count()]);
 
     $updated = 0;
     $skipped = 0;
@@ -2524,11 +2696,6 @@ Route::get('/fix-paid-usd', function () {
 
         try {
 
-            Log::info('Processing log', [
-                'log_id' => $log->id,
-                'obtained_coins' => $log->obtained_coins,
-                'current_paid_usd' => $log->paid_usd
-            ]);
 
             $coin = Coin::where('coin', $log->obtained_coins)->first();
 
@@ -2540,11 +2707,6 @@ Route::get('/fix-paid-usd', function () {
                 $saved = $log->save();
 
                 if ($saved) {
-                    Log::info('Log updated successfully', [
-                        'log_id' => $log->id,
-                        'old_paid_usd' => $oldValue,
-                        'new_paid_usd' => $coin->usd
-                    ]);
                 } else {
                     Log::warning('Log save returned false', [
                         'log_id' => $log->id
@@ -2572,11 +2734,6 @@ Route::get('/fix-paid-usd', function () {
         }
     }
 
-    Log::info('Fix paid_usd process finished', [
-        'updated' => $updated,
-        'skipped' => $skipped,
-        'errors' => $errors
-    ]);
 
     return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
 });
@@ -2883,12 +3040,13 @@ Route::get('/fix-charges-usd', function () {
 //})->middleware('local');
 
 Route::get('test-done', function () {
-   return 17;
+    return 17;
 });
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
 
-Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $id;
+Route::get('/update-user-monthly-diamonds/{id}', function ($id) {
+    $userId = $id;
     $month = 4; // April
     $year = 2026;
 
@@ -2917,5 +3075,28 @@ Route::get('/update-user-monthly-diamonds/{id}', function ($id) {    $userId = $
         'year' => $year,
         'total_diamonds' => $totalDiamonds,
         'message' => 'تم تحديث مجموع الماسات الشهرية للمستخدم {$userId} بنجاح'
+    ]);
+});
+
+use App\Models\Setting;
+
+
+Route::get('/set-lucky-version-7', function () {
+
+    $version = 4;
+
+    Setting::updateOrCreate(
+        ['key' => 'lucky_gift_version'],
+        ['value' => $version]
+    );
+
+    Cache::forget('lucky_gift_version');
+    Cache::put('lucky_gift_version', $version);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Version updated successfully',
+        'current_version' => $version,
+        'cached_version' => Cache::get('lucky_gift_version')
     ]);
 });

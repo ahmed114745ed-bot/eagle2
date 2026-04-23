@@ -32,7 +32,10 @@ class SendGiftService
             $totalPrice = $gift->price * $number;
 
         $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPK, appFeatureStatus: $appFeatureStatus);
-        GiftLog::query()->create($info);
+
+        DB::transaction(function () use ($info) {
+            GiftLog::query()->create($info);
+        }, attempts: 3);
     }
 
     public function sendGift2($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, $cpId = null)
@@ -47,7 +50,10 @@ class SendGiftService
             $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId, appFeatureStatus: $appFeatureStatus);
             $data[] = $info;
         }
-        DB::table('gift_logs')->insert($data);
+
+        DB::transaction(function () use ($data) {
+            DB::table('gift_logs')->insert($data);
+        }, attempts: 3);
     }
 
     public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null, $sourceType = null, $type = null)
@@ -75,7 +81,10 @@ class SendGiftService
             $info['room_boom_uuid'] = $roomBoomUuid;
             $data[] = $info;
         }
-        DB::table('gift_logs')->insert($data);
+
+        DB::transaction(function () use ($data) {
+            DB::table('gift_logs')->insert($data);
+        }, attempts: 3);
 
         return $roomBoomUuid;
     }
@@ -289,8 +298,15 @@ class SendGiftService
             ->get()
             ->keyBy('position');
 
-        $team1Positions = [1, 2, 5, 6];
-        $team2Positions = [3, 4, 7, 8];
+        // FIX 4: Dynamically calculate team positions based on actual mic count
+        // Instead of hardcoded [1,2,5,6] and [3,4,7,8] which only work for 8-mic rooms
+        $totalMics = $microphones->count();
+        $midpoint = (int) ceil($totalMics / 2);
+        
+        // Team 1: positions 0 to midpoint-1
+        // Team 2: positions midpoint to totalMics-1
+        $team1Positions = range(0, $midpoint - 1);
+        $team2Positions = range($midpoint, $totalMics - 1);
 
         $team1 = collect($team1Positions)
             ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
@@ -303,7 +319,7 @@ class SendGiftService
             ->filter()
             ->values()
             ->toArray();
-
+            
         $t1Add = 0;
         $t2Add = 0;
         foreach ($receivedIds as $toUid) {
@@ -340,7 +356,6 @@ class SendGiftService
         ];
         $json = json_encode($ms);
 
-        \Illuminate\Support\Facades\Log::info("RTM Test (updatePk) roomId: $roomId", ['data' => $ms['messageContent']]);
 
         Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
     }
@@ -382,6 +397,7 @@ class SendGiftService
         $info['room_id'] = $room->id;
         $info['room_gift_status'] = $appFeatureStatus ?? false;
         $info['source_type'] = $sourceType;
+        $info['total'] = $gift->price;                          
 
         return $info;
     }
@@ -395,8 +411,15 @@ class SendGiftService
             ->get()
             ->keyBy('position');
 
-        $team1Positions = [1, 2, 5, 6];
-        $team2Positions = [3, 4, 7, 8];
+        // FIX 4: Dynamically calculate team positions based on actual mic count
+        // Instead of hardcoded [1,2,5,6] and [3,4,7,8] which only work for 8-mic rooms
+        $totalMics = $microphones->count();
+        $midpoint = (int) ceil($totalMics / 2);
+        
+        // Team 1: positions 0 to midpoint-1
+        // Team 2: positions midpoint to totalMics-1
+        $team1Positions = range(0, $midpoint - 1);
+        $team2Positions = range($midpoint, $totalMics - 1);
 
         $team1 = collect($team1Positions)
             ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
