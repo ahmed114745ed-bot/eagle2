@@ -3102,3 +3102,7 @@ Route::get('/set-lucky-version-7', function () {
         'cached_version' => Cache::get('lucky_gift_version')
     ]);
 });
+
+Route::get('/test-push-23', function () {
+    dd("push successfully");
+});
