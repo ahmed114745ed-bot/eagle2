@@ -12,7 +12,15 @@
       "Bash(grep -rl \"use App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\Gift;\" --include=\"*.php\")",
       "Bash(xargs sed:*)",
       "Bash(find . -name \"*.php\" -not -path \"./app/Models/Gift.php\" -not -name \"*.backup\" -not -name \"*.md\" -exec grep -l \"App.Models.Gift\" {} \\\\;)",
-      "Bash(php -r ':*)"
+      "Bash(php -r ':*)",
+      "Bash(git log *)",
+      "Bash(php artisan *)",
+      "Bash(composer dump-autoload *)",
+      "Bash(composer show *)",
+      "Bash(composer require *)"
+    ],
+    "additionalDirectories": [
+      "d:\\projects\\eagle\\Modules\\Form\\Database\\Seeders"
     ]
   }
 }

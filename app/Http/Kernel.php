@@ -127,7 +127,6 @@ class Kernel extends HttpKernel
         'pk.live' => \App\Http\Middleware\PkLiveMiddleware::class,
         'remaining.diamond.action' => \App\Http\Middleware\RemainingDiamondsMiddleware::class,
 
-        'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
         'host.level' => \App\Http\Middleware\HostLevelMiddleware::class,
         'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
 

@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Utd\CP\Database\Seeders\CPDatabaseSeeder;
-use Modules\Form\Database\Seeders\AgencyAndBdFormsSeeder;
-use Modules\Form\Database\Seeders\CustomFieldWidgetSeeder;
+use Utd\Form\Database\Seeders\AgencyAndBdFormsSeeder;
+use Utd\Form\Database\Seeders\CustomFieldWidgetSeeder;
 use Utd\RoomCup\Database\Seeders\RoomCupDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder

@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cover-page h1 {
+            font-size: 48px;
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #1e40af;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2563eb;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #1e3a8a;
+            margin: 30px 0 15px 0;
+        }
+
+        h3 {
+            font-size: 18px;
+            color: #3b82f6;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #cbd5e1;
+        }
+
+        .toc li:last-child {
+            border-bottom: none;
+        }
+
+        .toc a {
+            color: #1e40af;
+            text-decoration: none;
+        }
+
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #be185d;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+
+        .note {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .note-title {
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a8a;
+            display: inline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        @media print {
+            body {
+                padding: 20px;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>📝 Form Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the dynamic Form builder package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: April 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#requirements">1. Requirements</a></li>
+            <li><a href="#installation">2. Installation Steps</a></li>
+            <li><a href="#configuration">3. Configuration</a></li>
+            <li><a href="#database">4. Database Setup</a></li>
+            <li><a href="#routes">5. Routes & Middleware</a></li>
+            <li><a href="#verification">6. Verification</a></li>
+            <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+            <li><a href="#api-reference">8. API Reference</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Requirements -->
+    <h1 id="requirements">1. Requirements</h1>
+
+    <h2>1.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.2 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel-Admin Package</td>
+            <td>1.8+</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Spatie Translatable</td>
+            <td>6.11+</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Sanctum</td>
+            <td>3.3+</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>1.2 Frontend Requirements</h2>
+    <table>
+        <tr>
+            <th>Library</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>jQuery</td>
+            <td>3.6+</td>
+            <td>DOM manipulation & AJAX</td>
+        </tr>
+        <tr>
+            <td>SweetAlert2</td>
+            <td>11+</td>
+            <td>Alert dialogs for approve/reject</td>
+        </tr>
+        <tr>
+            <td>Font Awesome</td>
+            <td>6.4+</td>
+            <td>Icons</td>
+        </tr>
+    </table>
+
+    <h2>1.3 Database Tables</h2>
+    <p>The package will create the following tables:</p>
+    <ul>
+        <li><code>form_templates</code> - Form template definitions (multi-language)</li>
+        <li><code>form_sections</code> - Sections within form templates</li>
+        <li><code>form_fields</code> - Individual fields with validation rules</li>
+        <li><code>form_submissions</code> - User form submissions</li>
+        <li><code>form_submission_values</code> - Field values per submission</li>
+        <li><code>custom_field_widgets</code> - Reusable custom widget components</li>
+        <li><code>form_requests</code> - Agency/BD registration requests</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Installation -->
+    <h1 id="installation">2. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>Form</code> folder to your project:</p>
+        <pre><code>packages/Utd/Form</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Form",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
+}</code></pre>
+        <p>And add the package to the require section:</p>
+        <pre><code>"utd/form": "*"</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/form</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Register in PackageHelper</span>
+        <p>Add the Form package to <code>app/Support/PackageHelper.php</code>:</p>
+        <pre><code>use Utd\Form\Entities\FormTemplate;
+
+// Add to the $packages array:
+'form' => FormTemplate::class,</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <span class="step-title">Run Migrations</span>
+        <pre><code>php artisan migrate</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">6</span>
+        <span class="step-title">Run Database Seeders</span>
+        <p>Run the Form seeders to set up admin menu, widgets, and default form templates:</p>
+        <pre><code>php artisan db:seed --class="Utd\Form\Database\Seeders\MenuFormSeeder"
+php artisan db:seed --class="Utd\Form\Database\Seeders\CustomFieldWidgetSeeder"
+php artisan db:seed --class="Utd\Form\Database\Seeders\AgencyAndBdFormsSeeder"</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">7</span>
+        <span class="step-title">Update Admin Permissions</span>
+        <p>Run the permissions seeder to add Form permissions:</p>
+        <pre><code>php artisan db:seed --class=PermissionTypeSeeder</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">8</span>
+        <span class="step-title">Clear Cache</span>
+        <pre><code>php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Configuration -->
+    <h1 id="configuration">3. Configuration</h1>
+
+    <h2>3.1 Multi-Language Support</h2>
+    <p>The Form package supports multiple languages out of the box. Form templates, sections, and field labels can be translated into:</p>
+    <ul>
+        <li>Arabic (ar)</li>
+        <li>English (en)</li>
+        <li>Turkish (tr)</li>
+        <li>Hindi (hi)</li>
+    </ul>
+
+    <h2>3.2 Custom Widgets</h2>
+    <p>The package comes with 4 pre-built custom widgets:</p>
+    <table>
+        <tr>
+            <th>Widget</th>
+            <th>Type</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>BD Selector</td>
+            <td>bd_selector</td>
+            <td>Multi-select Business Development managers</td>
+        </tr>
+        <tr>
+            <td>User Picker</td>
+            <td>user_picker</td>
+            <td>Single user selection</td>
+        </tr>
+        <tr>
+            <td>Agency Selector</td>
+            <td>agency_selector</td>
+            <td>Agency selection from API</td>
+        </tr>
+        <tr>
+            <td>Previous Experiences</td>
+            <td>previous_experiences</td>
+            <td>Dynamic field for app experience entries</td>
+        </tr>
+    </table>
+
+    <h2>3.3 Data Sources</h2>
+    <p>Built-in data sources for select/dropdown fields:</p>
+    <ul>
+        <li><code>countries</code> - 55+ countries with translations</li>
+        <li><code>cities</code> - Cities for US, SA, EG</li>
+        <li><code>languages</code> - 12 languages with translations</li>
+        <li><code>currencies</code> - 11 currencies with symbols</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Database -->
+    <h1 id="database">4. Database Setup</h1>
+
+    <h2>4.1 Migration Files</h2>
+    <p>The package includes 15 migration files that create and update the following tables:</p>
+
+    <table>
+        <tr>
+            <th>Migration</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>create_form_templates_table</td>
+            <td>Main form template definitions</td>
+        </tr>
+        <tr>
+            <td>create_form_sections_table</td>
+            <td>Sections within templates</td>
+        </tr>
+        <tr>
+            <td>create_form_fields_table</td>
+            <td>Individual form fields</td>
+        </tr>
+        <tr>
+            <td>create_form_submissions_table</td>
+            <td>Submission records</td>
+        </tr>
+        <tr>
+            <td>create_form_submission_values_table</td>
+            <td>Field values for submissions</td>
+        </tr>
+        <tr>
+            <td>create_custom_field_widgets_table</td>
+            <td>Custom widget definitions</td>
+        </tr>
+        <tr>
+            <td>add_widget_support_to_form_fields</td>
+            <td>Widget FK on form_fields</td>
+        </tr>
+        <tr>
+            <td>add_json_support_to_form_submission_values</td>
+            <td>JSON value storage</td>
+        </tr>
+        <tr>
+            <td>add_data_source_to_form_fields_table</td>
+            <td>Data source column</td>
+        </tr>
+        <tr>
+            <td>add_cant_delete_table</td>
+            <td>Protection flag for sections/fields</td>
+        </tr>
+        <tr>
+            <td>add_note_text_to_form_templates_table</td>
+            <td>Note text column for templates</td>
+        </tr>
+    </table>
+
+    <h2>4.2 Seeders</h2>
+    <table>
+        <tr>
+            <th>Seeder</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>MenuFormSeeder</td>
+            <td>Creates admin menu entries under Agency System</td>
+        </tr>
+        <tr>
+            <td>CustomFieldWidgetSeeder</td>
+            <td>Creates 4 pre-built custom widgets</td>
+        </tr>
+        <tr>
+            <td>AgencyAndBdFormsSeeder</td>
+            <td>Creates Host Agency and BD form templates</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Routes -->
+    <h1 id="routes">5. Routes & Middleware</h1>
+
+    <h2>5.1 Web Routes (Public)</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/forms?type=&token=&lang=</td>
+            <td>Display form by type (token auth)</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/forms/create/{type}</td>
+            <td>Submit form request</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/forms/{id}</td>
+            <td>View submitted request</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/host-agency/search</td>
+            <td>Search BD/agencies</td>
+        </tr>
+    </table>
+
+    <h2>5.2 Admin Routes</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/form-templates</td>
+            <td>List all form templates</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/form-templates/create</td>
+            <td>Create new template</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/form-templates/{id}/edit</td>
+            <td>Edit template</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/form-templates/{id}</td>
+            <td>Preview template</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/form-requests</td>
+            <td>List form requests</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/admin/requests/{id}/approve</td>
+            <td>Approve a request</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/admin/requests/{id}/reject</td>
+            <td>Reject a request</td>
+        </tr>
+    </table>
+
+    <h2>5.3 API Routes</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/form-list</td>
+            <td>List active forms (auth required)</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/widgets</td>
+            <td>List available widgets</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/widgets/{id}/data</td>
+            <td>Get widget data</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/widgets/bd-users</td>
+            <td>Get BD users</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/widgets/agencies</td>
+            <td>Get agencies</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/data-sources/{source}</td>
+            <td>Get predefined data (countries, cities, etc.)</td>
+        </tr>
+    </table>
+
+    <h2>5.4 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr form</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Verification -->
+    <h1 id="verification">6. Verification</h1>
+
+    <h2>6.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/form</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>All form migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>3. Routes Registered</td>
+            <td><code>php artisan route:list</code></td>
+            <td>form-templates routes visible</td>
+        </tr>
+        <tr>
+            <td>4. Admin Menu</td>
+            <td>Check admin sidebar</td>
+            <td>"registration forms" menu under Agency System</td>
+        </tr>
+        <tr>
+            <td>5. Templates Page</td>
+            <td>Visit /admin/form-templates</td>
+            <td>Page loads without errors</td>
+        </tr>
+        <tr>
+            <td>6. Requests Page</td>
+            <td>Visit /admin/form-requests</td>
+            <td>Page loads with tabs</td>
+        </tr>
+    </table>
+
+    <h2>6.2 Test Admin Access</h2>
+    <p>Open your browser and navigate to:</p>
+    <pre><code>https://your-domain.com/admin/form-templates
+https://your-domain.com/admin/form-requests</code></pre>
+
+    <h2>6.3 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test Form List (requires auth token)
+curl -X GET "https://your-domain.com/api/form-list" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Data Sources
+curl -X GET "https://your-domain.com/api/data-sources/countries?locale=ar" \
+  -H "Accept: application/json"
+
+# Test Widgets
+curl -X GET "https://your-domain.com/api/widgets" \
+  -H "Accept: application/json"</code></pre>
+
+    <div class="success">
+        <strong>Success!</strong>
+        <p>If you can access the admin pages and the API returns data, your installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Troubleshooting -->
+    <h1 id="troubleshooting">7. Troubleshooting</h1>
+
+    <h2>7.1 Common Issues</h2>
+
+    <h3>Issue: Page Not Found (404)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan route:clear
+php artisan cache:clear
+php artisan config:clear</code></pre>
+    </div>
+
+    <h3>Issue: Class Not Found Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>composer dump-autoload
+php artisan package:discover</code></pre>
+    </div>
+
+    <h3>Issue: Admin Menu Not Showing</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Run the menu seeder: <code>php artisan db:seed --class="Utd\Form\Database\Seeders\MenuFormSeeder"</code></li>
+            <li>Clear cache: <code>php artisan cache:clear</code></li>
+            <li>Check that "Agency System" parent menu exists</li>
+        </ol>
+    </div>
+
+    <h3>Issue: Form Submissions Not Saving</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Check migration status: <code>php artisan migrate:status</code></li>
+            <li>Ensure all form tables exist in the database</li>
+            <li>Verify CSRF token is included in form submissions</li>
+        </ol>
+    </div>
+
+    <h3>Issue: Translation Fields Not Working</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Ensure <code>spatie/laravel-translatable</code> is installed</li>
+            <li>Verify JSON columns in database (title, description, field_label)</li>
+            <li>Check that locale is set correctly in the request</li>
+        </ol>
+    </div>
+
+    <h3>Issue: Token Authentication Failing</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Verify Laravel Sanctum is properly configured</li>
+            <li>Check that the token is valid and not expired</li>
+            <li>Ensure the <code>personal_access_tokens</code> table exists</li>
+        </ol>
+    </div>
+
+    <h2>7.2 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <h2>7.3 Browser Console</h2>
+    <p>Press <code>F12</code> to open Developer Tools and check for JavaScript errors in the Console tab.</p>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: API Reference -->
+    <h1 id="api-reference">8. API Reference</h1>
+
+    <h2>8.1 List Forms</h2>
+    <pre><code>GET /api/form-list?type={form_type}
+Authorization: Bearer {token}
+
+Response:
+{
+    "status": true,
+    "message": "Success",
+    "data": [
+        {
+            "form_type": "host_agency",
+            "link": "/forms?type=host_agency&token=&lang="
+        }
+    ]
+}</code></pre>
+
+    <h2>8.2 Get Data Source</h2>
+    <pre><code>GET /api/data-sources/{source}?locale={locale}
+
+Sources: countries, cities, languages, currencies
+
+Response:
+[
+    {
+        "value": "EG",
+        "label": "Egypt"
+    },
+    {
+        "value": "SA",
+        "label": "Saudi Arabia"
+    }
+]</code></pre>
+
+    <h2>8.3 List Widgets</h2>
+    <pre><code>GET /api/widgets
+
+Response:
+[
+    {
+        "id": 1,
+        "widget_type": "bd_selector",
+        "widget_name": {"en": "BD Selector", "ar": "..."},
+        "allows_multiple": true
+    }
+]</code></pre>
+
+    <h2>8.4 Get Widget Data</h2>
+    <pre><code>GET /api/widgets/{id}/data
+
+Response:
+{
+    "widget": { ... },
+    "data": [ ... ]
+}</code></pre>
+
+    <h2>8.5 Submit Form Request</h2>
+    <pre><code>POST /forms/create/{type}
+
+Body (form-data):
+- user_id: int
+- token: string
+- agency_name / bd_name: string
+- whatsapp_number: string
+- bd_id: int (optional)
+- country_id: int (optional)
+- [dynamic fields based on form template]
+
+Response:
+{
+    "success": true,
+    "message": "Request under review!",
+    "data": {
+        "order_id": 123
+    }
+}</code></pre>
+
+    <h2>8.6 Approve Request (Admin)</h2>
+    <pre><code>POST /admin/requests/{id}/approve
+
+Response:
+{
+    "success": true,
+    "message": "Approved successfully"
+}</code></pre>
+
+    <h2>8.7 Reject Request (Admin)</h2>
+    <pre><code>POST /admin/requests/{id}/reject
+
+Response:
+{
+    "success": true,
+    "message": "Rejected successfully",
+    "icon": "success"
+}</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section: Form Types -->
+    <h1>9. Supported Form Types</h1>
+
+    <p>The package supports three specialized form types with automatic entity creation on approval:</p>
+
+    <table>
+        <tr>
+            <th>Form Type</th>
+            <th>Purpose</th>
+            <th>On Approve</th>
+        </tr>
+        <tr>
+            <td><code>host_agency</code></td>
+            <td>Host Agency registration</td>
+            <td>Creates Agency record, sets user type to 2</td>
+        </tr>
+        <tr>
+            <td><code>bd_form</code></td>
+            <td>Business Development registration</td>
+            <td>Creates Bd record</td>
+        </tr>
+        <tr>
+            <td><code>shipping_agency</code></td>
+            <td>Shipping Agency registration</td>
+            <td>Creates ShippingAgency record</td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <div class="warning-title">Important Notes</div>
+        <ul>
+            <li>Each user can only own one entity of each type</li>
+            <li>Super admins and sub-super admins cannot register agencies</li>
+            <li>Duplicate submissions (same user + same form type) are prevented</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your Form package is now ready to use.</p>
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: April 2026
+        </p>
+    </div>
+
+</body>
+</html>

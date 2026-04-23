@@ -25,6 +25,7 @@ use Utd\RoomCup\Entities\RoomCupTarget;
 use Utd\Vip\Entities\OVip;
 use Utd\HostLevel\Entities\HostLevel;
 use Utd\Badge\Entities\Badge;
+use Utd\Form\Entities\FormTemplate;
 use Utd\Milestones\Entities\Milestone;
 use Utd\SpecialId\Entities\SpecialHistory;
 use Utd\SwitchAccount\Entities\UserAccount;
@@ -57,6 +58,7 @@ class PackageHelper
         'RoleReward' => RoleReward::class,
         'milestone' => Milestone::class,
         'badge' => Badge::class,
+        'form' => FormTemplate::class,
     ];
 
     /**

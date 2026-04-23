@@ -24,7 +24,6 @@
     "RoleRewards": false,
     "Milestones": false,
     "AreaManager": true,
-    "Form": true,
     "SuperAdmin": true,
     "TaskStream": false,
     "UsersWallet": true,

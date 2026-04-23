@@ -482,15 +482,15 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => ['browse', 'edit'],
                     ],],
 
+                    ...(PackageHelper::isInstalled('form') ? [
+                        ['key' => 'templates-form', 'except' => ['create', 'delete',], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'edit', 'show'],
+                        ],],
 
-                    ['key' => 'templates-form', 'except' => ['create', 'delete',], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'edit', 'show'],
-                    ],],
-
-
-                    ['key' => 'form-request', 'except' => ['create', 'edit'], 'additional' => ['type-switch', 'approve-switch', 'reject-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'type-switch', 'approve-switch', 'reject-switch', 'show'],
-                    ],],
+                        ['key' => 'form-request', 'except' => ['create', 'edit'], 'additional' => ['type-switch', 'approve-switch', 'reject-switch'], 'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'type-switch', 'approve-switch', 'reject-switch', 'show'],
+                        ],],
+                    ] : []),
                 ],
 
             ],

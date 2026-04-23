@@ -137,7 +137,7 @@
     $badgeCount = 0;
 
     $badgeConfig = [
-        'form-requests' => fn() => \Illuminate\Support\Facades\Cache::remember('menu_badge_form_requests', 60, fn() => \Modules\Form\Entities\FormRequest::where('status', 'pending')->count()),
+        'form-requests' => fn() => \Illuminate\Support\Facades\Cache::remember('menu_badge_form_requests', 60, fn() => \Utd\Form\Entities\FormRequest::where('status', 'pending')->count()),
         'superadmin-banner-requests' => fn() => \Illuminate\Support\Facades\Cache::remember('menu_badge_banner_requests', 60, fn() => \Modules\SuperAdmin\Entities\SuperadminBannerRequest::where('status', 'pending')->count()),
         'country-requests' => fn() => \Illuminate\Support\Facades\Cache::remember('menu_badge_country_requests', 60, fn() => \App\Models\ChangeCountryRequest::where('status', 'pending')->count()),
     ];
