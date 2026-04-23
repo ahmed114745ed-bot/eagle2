@@ -16,6 +16,11 @@ class AdminReelController extends MainController
 {
     public function index(Content $content)
     {
+        // Force full page reload for PJAX requests (Alpine.js requires clean page load)
+        if (request()->pjax()) {
+            return redirect()->to(request()->fullUrl());
+        }
+
         // Generate or retrieve random seed for this session
         if (!session()->has('reels_random_seed')) {
             session(['reels_random_seed' => mt_rand(1, 999999)]);

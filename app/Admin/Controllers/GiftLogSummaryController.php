@@ -149,14 +149,56 @@ class GiftLogSummaryController extends MainController
             return self::renderEntityCard($this, $filter);
         });
 
+
         $grid->column('total', __('diamonds'))
             ->display(function () {
-                $image = asset('images/diamond.jpg'); // Make sure this image exists
+                $image = asset('images/diamond.jpg');
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($this->total) . "</span>
                     <img src='{$image}' alt='💎' width='20' height='20'>
                 </div>";
             });
+
+        if ($filter === 'rooms') {
+            $grid->column('visitors_count', __('visitors'))
+                ->display(function () {
+                    $query = $this->room->totalRoomGifts();
+
+                    // Laravel-Admin hashes filter keys using md5, so we need to
+                    // check both readable keys and hashed keys from the request.
+                    $toDate = request()->input('to_date');
+                    $fromDate = request()->input('from_date');
+
+                    // If readable keys not found, try to find hashed keys
+                    if (!$toDate || !$fromDate) {
+                        $allInputs = request()->all();
+                        foreach ($allInputs as $key => $value) {
+                            if (!$value || !is_string($value)) continue;
+                            if (!$toDate && preg_match('/^[a-f0-9]{32}$/', $key)) {
+                                // We can't reliably distinguish which hash is which
+                                // so we skip hashed keys here - the grid filter
+                                // handles date filtering via $this->input internally
+                            }
+                        }
+                    }
+
+                    $timezone = getTimezone();
+
+                    if ($toDate) {
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($toDate), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '<=', $end);
+                    }
+
+                    if ($fromDate) {
+                        $start = Carbon::parse(convertArabicToEnglishNumbers($fromDate), $timezone)
+                            ->setTimezone('UTC');
+                        $query->where('created_at', '>=', $start);
+                    }
+
+                    return number_format($query->sum('number_of_visitors'));
+                });
+        }
     }
 
     protected function buildTabs(string $active): string

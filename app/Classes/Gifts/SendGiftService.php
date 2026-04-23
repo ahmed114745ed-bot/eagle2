@@ -298,8 +298,15 @@ class SendGiftService
             ->get()
             ->keyBy('position');
 
-        $team1Positions = [1, 2, 5, 6];
-        $team2Positions = [3, 4, 7, 8];
+        // FIX 4: Dynamically calculate team positions based on actual mic count
+        // Instead of hardcoded [1,2,5,6] and [3,4,7,8] which only work for 8-mic rooms
+        $totalMics = $microphones->count();
+        $midpoint = (int) ceil($totalMics / 2);
+        
+        // Team 1: positions 0 to midpoint-1
+        // Team 2: positions midpoint to totalMics-1
+        $team1Positions = range(0, $midpoint - 1);
+        $team2Positions = range($midpoint, $totalMics - 1);
 
         $team1 = collect($team1Positions)
             ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)
@@ -312,7 +319,7 @@ class SendGiftService
             ->filter()
             ->values()
             ->toArray();
-
+            
         $t1Add = 0;
         $t2Add = 0;
         foreach ($receivedIds as $toUid) {
@@ -390,6 +397,7 @@ class SendGiftService
         $info['room_id'] = $room->id;
         $info['room_gift_status'] = $appFeatureStatus ?? false;
         $info['source_type'] = $sourceType;
+        $info['total'] = $gift->price;                          
 
         return $info;
     }
@@ -403,8 +411,15 @@ class SendGiftService
             ->get()
             ->keyBy('position');
 
-        $team1Positions = [1, 2, 5, 6];
-        $team2Positions = [3, 4, 7, 8];
+        // FIX 4: Dynamically calculate team positions based on actual mic count
+        // Instead of hardcoded [1,2,5,6] and [3,4,7,8] which only work for 8-mic rooms
+        $totalMics = $microphones->count();
+        $midpoint = (int) ceil($totalMics / 2);
+        
+        // Team 1: positions 0 to midpoint-1
+        // Team 2: positions midpoint to totalMics-1
+        $team1Positions = range(0, $midpoint - 1);
+        $team2Positions = range($midpoint, $totalMics - 1);
 
         $team1 = collect($team1Positions)
             ->map(fn($pos) => $microphones[$pos]->user_id ?? 0)

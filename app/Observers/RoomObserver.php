@@ -41,6 +41,8 @@ class RoomObserver
     public function changeMode(Room &$room)
     {
         if ($room->isDirty('mode')) {
+            \App\Models\RoomMicrophone::where('room_id', $room->id)->delete();
+            
             $mics = explode(',', $room->all_microphone);
             $count = count($mics);
 

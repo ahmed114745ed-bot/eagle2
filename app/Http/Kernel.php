@@ -8,6 +8,7 @@ use App\Http\Middleware\AuthenticateWeb;
 use App\Http\Middleware\CheckLoginAdmin;
 use App\Http\Middleware\AgencyMiddleware;
 use App\Http\Middleware\AdminIpMiddleware;
+use App\Http\Middleware\DisablePjaxForOctane;
 use Modules\SuperAdmin\Http\Middleware\PreviewSuperAdmin;
 use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
@@ -39,6 +40,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\OctaneCacheClearing::class,
         \App\Http\Middleware\ForcePusherRefresh::class,
         \App\Http\Middleware\RefreshThemeConfig::class,
+        DisablePjaxForOctane::class,
     ];
 
     /**
@@ -113,6 +115,7 @@ class Kernel extends HttpKernel
         'verify.utdFawry.signature' => \App\Http\Middleware\VerifyUtdFawrySignature::class,
         'verify.payMob.signature' => \App\Http\Middleware\VerifyPayMobSignature::class,
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
+        'verify.utdpay.webhook' => \App\Http\Middleware\VerifyUtdPayWebhook::class,
         'verify.codapay.webhook' => \App\Http\Middleware\VerifyCodapayWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
         //        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,

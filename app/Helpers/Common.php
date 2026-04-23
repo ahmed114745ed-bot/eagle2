@@ -1890,7 +1890,7 @@ class Common
         $value = Cache::rememberForever($key, function () use ($key) {
             return Setting::where('key', $key)->value('value');
         });
-        return $value;
+        return $value ?? null;
     }
 
     public  static function getDiamondsPercentage()
@@ -2049,7 +2049,7 @@ class Common
         Pk::where('room_id', $room->id)->where('status', 1)->update(['status' => 0]);
     }
 
-    private function handleCharismaStatusOnLogout($room, $users, $ownerId)
+    private static function handleCharismaStatusOnLogout($room, $users, $ownerId)
     {
         $userCharismaService = new UserCharismaService();
         $userCharismaService->removeRoomCharisma($room->id);
@@ -2544,6 +2544,10 @@ class Common
         }
         $agency = is_numeric($agency) ? ShippingAgency::find($agency) : $agency;
 
+        if (!$agency) {
+            return false;
+        }
+
         $ownerId = $agency->app_owner_id ?? null;
         if (!$ownerId) {
             return false;
@@ -2593,18 +2597,20 @@ class Common
     }
 
 
-    public  static function  checkUserAgencyFrozen(User $user): void
+    public static function checkUserAgencyFrozen(User $user): void
     {
-        $ownedAgency = Agency::withoutGlobalScopes()
+        $ownedAgency = ShippingAgency::withoutGlobalScopes()
             ->where('app_owner_id', $user->id)
+            ->whereNull('deleted_at')
             ->first();
 
         if ($ownedAgency && $ownedAgency->is_frozen) {
             throw new \Exception(__('frozen_agency_by_admin'));
         }
         if ($user->agency_id) {
-            $hostAgency = Agency::withoutGlobalScopes()
+            $hostAgency = ShippingAgency::withoutGlobalScopes()
                 ->where('id', $user->agency_id)
+                ->whereNull('deleted_at')
                 ->first();
 
             if ($hostAgency && $hostAgency->is_frozen) {

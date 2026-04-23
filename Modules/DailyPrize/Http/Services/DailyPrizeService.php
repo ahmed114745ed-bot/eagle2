@@ -20,7 +20,8 @@ class DailyPrizeService
 
             $dailyGift = $this->getUserDailyGiftData($userId);
             if ($dailyGift) {
-                $dailyGift->day_count   = 0;
+                // Reset to day 1 instead of day 0 to allow restarting from the beginning
+                $dailyGift->day_count   = 1;
                 $dailyGift->last_active = null;
                 $dailyGift->save();
             }
@@ -48,11 +49,21 @@ class DailyPrizeService
 
     public function getDayGift(int $day)
     {
-        $day = ($day % ($this->dailyGiftsCount() ?: 1)) ;
+        $totalDays = $this->dailyGiftsCount() ?: 1;
+        $day = ($day % $totalDays);
         if ($day == 0) $day = 7;
-        return DailyGift::with('ware')->selectRaw('daily_gifts.*, (SELECT SUM((type - 1) * 7 + `order`) FROM daily_gifts as dg WHERE dg.id = daily_gifts.id) as day')
+
+        $gift = DailyGift::with('ware')->selectRaw('daily_gifts.*, (SELECT SUM((type - 1) * 7 + `order`) FROM daily_gifts as dg WHERE dg.id = daily_gifts.id) as day')
                         ->having('day', '=', $day)
                         ->first();
+
+        if (!$gift && $day !== 1) {
+            $gift = DailyGift::with('ware')->selectRaw('daily_gifts.*, (SELECT SUM((type - 1) * 7 + `order`) FROM daily_gifts as dg WHERE dg.id = daily_gifts.id) as day')
+                            ->having('day', '=', 1)
+                            ->first();
+        }
+
+        return $gift;
     }
 
 

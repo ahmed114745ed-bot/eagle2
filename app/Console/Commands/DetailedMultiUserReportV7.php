@@ -230,15 +230,12 @@ class DetailedMultiUserReportV7 extends Command
                 $totalPayout = 0;
                 $senderPayout = 0;
                 $receiverPayout = 0;
-                $hostPayout = 0;
 
                 if ($isWinner) {
                     $totalPayout = $netBet * $mult;
                     $receiverRate = (float) \App\Models\FairLuckSetting::getByKey('fair_luck_receiver_fee_rate', 0.10);
-                    $ownerRate = (float) \App\Models\FairLuckSetting::getByKey('fair_luck_owner_fee_rate', 0.10);
                     $receiverPayout = (int) round($totalPayout * $receiverRate);
-                    $hostPayout = (int) round($totalPayout * $ownerRate);
-                    $senderPayout = $totalPayout - $receiverPayout - $hostPayout;
+                    $senderPayout = $totalPayout - $receiverPayout ;
 
                     // Allow vault to go negative up to the limit
                     if (($luckyWallet - $totalPayout) >= -$negativeLimit) {
@@ -247,7 +244,7 @@ class DetailedMultiUserReportV7 extends Command
                         // Beyond negative limit — force no-win
                         $mult = 0;
                         $isWinner = false;
-                        $totalPayout = $senderPayout = $receiverPayout = $hostPayout = 0;
+                        $totalPayout = $senderPayout = $receiverPayout  = 0;
                     }
                 }
 
@@ -305,7 +302,6 @@ class DetailedMultiUserReportV7 extends Command
                     'wallet_zone' => $selection['walletZone'],
                     'jackpot_gate_fired' => $selection['jackpotGateFired'],
                     'receiver_payout' => $receiverPayout,
-                    'host_payout' => $hostPayout,
                     'net_bet' => $netBet,
                     'total_payout' => $totalPayout,
                 ];
@@ -450,7 +446,7 @@ class DetailedMultiUserReportV7 extends Command
         $splitErrors = 0;
         foreach ($this->allRounds as $r) {
             if ($r['is_winner']) {
-                $sum = ($r['profit_amount'] ?? 0) + ($r['receiver_payout'] ?? 0) + ($r['host_payout'] ?? 0);
+                $sum = ($r['profit_amount'] ?? 0) + ($r['receiver_payout'] ?? 0);
                 if ($sum != ($r['total_payout'] ?? 0)) $splitErrors++;
             }
         }
@@ -627,7 +623,7 @@ body{background:#f8f9fb;font-family:'Segoe UI',sans-serif}
 <td>" . number_format($r['user_balance_after']) . "</td>
 <td>" . number_format($r['wallet_factor'], 4) . "</td><td>" . number_format($r['rtp_factor'], 4) . "</td>
 <td>{$r['wallet_zone']}</td><td>" . number_format($r['lucky_wallet_after']) . "</td>
-<td>" . number_format($r['receiver_payout']) . "</td><td>" . number_format($r['host_payout']) . "</td>
+<td>" . number_format($r['receiver_payout']) . "</td>
 <td>" . number_format($r['app_fee']) . "</td><td>" . number_format($r['cumulative_app_fee']) . "</td>
 <td>" . number_format($r['app_wallet']) . "</td><td>{$gate}</td>
 </tr>";

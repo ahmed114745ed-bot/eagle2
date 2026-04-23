@@ -198,7 +198,15 @@ class LeaderCCgameController extends Controller
                 $coin = abs((int)$request->coin);
                 $user->di += $coin;
                 $user->save();
-
+                $amount = abs($coin);
+                $sign   =  1;
+                UserCoinLogHelper::logByType(
+                    $user->id,
+                    $sign * $amount,
+                    $user->di,
+                    UserCoinLogType::COIN_GAME,
+                    null,
+                );
                 DB::table('coin_game_users')->insert([
                     'user_id'    => $user->id,
                     'coins'      => $coin,

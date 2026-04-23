@@ -17,15 +17,20 @@ class PoolManager
 {
     public function getBalance(): int
     {
-        return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT);
+        return FairLuckWallet::getRedisBalance(FairLuckWallet::TYPE_UNIFIED_VAULT);
     }
 
     public function creditBet(int $netBet): void
     {
         if ($netBet <= 0) return;
 
-        FairLuckWallet::incrementRedisBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet);
-        FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $netBet, 'V7 bet credit', null);
+        $key = 'fairluck:wallet:' . FairLuckWallet::TYPE_UNIFIED_VAULT;
+        try {
+            FairLuckWallet::increaseBalance(FairLuckWallet::TYPE_UNIFIED_VAULT, $netBet, 'V7 bet credit', null);
+        } catch (\Throwable $e) {
+            Redis::decrby($key, $netBet);
+            throw $e;
+        }
     }
 
     /**
@@ -38,7 +43,7 @@ class PoolManager
         if ($amount <= 0) return true;
 
         $negativeLimit = (int) \App\Models\FairLuckSetting::getByKey('V7_negative_limit', 30_000);
-        $key = 'fairluck:wallet:' . FairLuckWallet::TYPE_GLOBAL_VAULT;
+        $key = 'fairluck:wallet:' . FairLuckWallet::TYPE_UNIFIED_VAULT;
 
         // Atomic Lua script: check if (balance - amount) >= -negativeLimit, then debit
         // Redis EVAL is safe — executes Lua on Redis server, not PHP eval()
@@ -54,11 +59,10 @@ class PoolManager
             return false;
         }
 
-        // Redis confirmed — persist to DB
+        // Redis confirmed — persist to DB without row-level locking
         try {
-            FairLuckWallet::decreaseBalance(FairLuckWallet::TYPE_GLOBAL_VAULT, $amount, 'V7 win payout', null);
+            FairLuckWallet::persistDecreaseBalance(FairLuckWallet::TYPE_UNIFIED_VAULT, $amount, 'V7 win payout', null);
         } catch (\Throwable $e) {
-            // DB failed — re-credit Redis to stay in sync
             Redis::incrby($key, $amount);
             return false;
         }

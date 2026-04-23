@@ -66,7 +66,12 @@ class ConfigController extends Controller
         if (isset($request['keys'])) {
             $keys = $request['keys'];
             $keys = array_diff($keys, ['zego_server_secret', 'zego_app_id', 'app_sign']);
-            $configs = Common::getConfFromKey($keys);
+            
+            // Cache config keys for 5 minutes
+            $cacheKey = 'config_keys_' . md5(json_encode(sort($keys)));
+            $configs = Cache::remember($cacheKey, 300, function () use ($keys) {
+                return Common::getConfFromKey($keys);
+            });
 
             $configs = $configs->flatMap(function ($value) {
                 return [

@@ -35,8 +35,6 @@ class AdminUserController extends EncorUsersController
 
     public function grid()
     {
-        ]);
-
         $permission_name = $this->permission_name;
 
         $grid = new \Encore\Admin\Grid(new \App\Models\Admin());
@@ -210,8 +208,6 @@ class AdminUserController extends EncorUsersController
 
     public function destroy($id)
     {
-        ]);
-
         try {
             $user = $this->model->find($id);
             if ($user) {

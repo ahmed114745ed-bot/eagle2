@@ -43,6 +43,7 @@ enum UserCoinLogType: string
     case ROOM_CUP = 'room_cup';
     case HOST_LEVEL = 'host_level';
     case GIFT_RANKING = 'gift-ranking';
+    case LEVEL_INTERVAL = 'level_interval';
 
     public function meta(): array
     {
@@ -157,6 +158,12 @@ enum UserCoinLogType: string
 
             self::HOST_LEVEL => [
                 'sub_type' => 'host_levels',
+                'item_name' => 'rewards',
+                'queue_job' => null,
+            ],
+
+            self::LEVEL_INTERVAL => [
+                'sub_type' => 'level_interval',
                 'item_name' => 'rewards',
                 'queue_job' => null,
             ],

@@ -402,36 +402,35 @@ if (!function_exists('get_file_details')) {
         function dispatchRoomsRedis(int $roomId, int $userId, $coins = 0, $data = null, string $type = 'charisma'): void
         {
 
-            $key = 'CharismaGift_' . $type . '_' . $userId . '_' . $roomId . '_' . implode($data);
+            $uniqueId = microtime(true) . '_' . mt_rand(1000, 9999);
+            $key = 'CharismaGift_' . $type . '_' . $userId . '_' . $roomId . '_' . implode($data) . '_' . $uniqueId;
             $data = serialize($data);
+
+       
 
             try {
 
-                $rData = Redis::get($key);
+                $values = [
+                    'user_id' => $userId,
+                    'room_id' => $roomId,
+                    'data' => $data,
+                    'type' => $type,
+                    'coins' => $coins,
+                    'created_at' => now(),
+                    'updated_at' => now(),
 
-                if ($rData) {
-                    $rData = unserialize($rData);
-                    if (isset($coins)) {
-                        $rData['coins'] += $coins;
-                        Redis::set($key, serialize($rData));
-                    }
-                } else {
+                ];
+                \Illuminate\Support\Facades\Redis::set($key, serialize($values));
 
-                    $values = [
-                        'user_id' => $userId,
-                        'room_id' => $roomId,
-                        'data' => $data,
-                        'type' => $type,
-                        'coins' => $coins,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-
-                    ];
-                    \Illuminate\Support\Facades\Redis::set($key, serialize($values));
-                }
+             
 
                 //            \Illuminate\Support\Facades\DB::table('room_jobs')->insert($values);
             } catch (Exception $exception) {
+                \Illuminate\Support\Facades\Log::channel('charisma_value')->error('[CHARISMA][1-DISPATCH] Redis save FAILED', [
+                    'room_id' => $roomId,
+                    'user_id' => $userId,
+                    'error'   => $exception->getMessage(),
+                ]);
             }
         }
     }

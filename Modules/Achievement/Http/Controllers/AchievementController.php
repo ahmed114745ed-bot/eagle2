@@ -158,15 +158,15 @@ class AchievementController extends Controller
             $pkArray = ($pkEvent?->rewards->map(fn($e) =>
             /** @var PkReward $e*/
             collect(
-                ['image' => $e->target, 'name' => 'event' . '_' . $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,]
+                ['image' => $e->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '', 'name' => 'event' . '_' . $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,]
             )->merge($append))->toArray()) ?? [];
             $chargeArray = $chargeEvent?->pluck('rewards')->flatten()->map(function ($e) use ($append) {
                 /** @var RewardTarget $e */
-                return collect(['image' => @$e->getAttribute('target'), 'name' => 'event' . '_' . $e->getAttribute('target'), 'target' => __('target-events')])->merge($append);
+                return collect(['image' => @$e->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '', 'name' => 'event' . '_' . $e->getAttribute('target'), 'target' => __('target-events')])->merge($append);
             })->toArray() ?? [];
             $weeklyArray = $weeklyStar?->pluck('rewards')->flatten()->map(fn($e) =>
             /** @var Reward $e*/
-            collect(['image' => $e->target, 'name' => 'event' . '_' . $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
+            collect(['image' => $e->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '', 'name' => 'event' . '_' . $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
 
 
             $list = array_merge($weeklyArray, $pkArray, $chargeArray);

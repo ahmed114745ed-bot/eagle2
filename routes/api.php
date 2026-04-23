@@ -1,75 +1,76 @@
 <?php
 
-use App\Models\Room;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Services\UtdService;
-use Illuminate\Http\Request;
-use App\Services\PayPalService;
-use App\Services\CodapayService;
-use Illuminate\Support\Facades\Route;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Http\Controllers\PaySkyController;
-use App\Http\Controllers\StripeController;
-use App\Http\Controllers\PaytabsController;
-use App\Http\Controllers\VersionController;
-use App\Http\Controllers\Api\BadgeController;
-use App\Http\Controllers\Api\V1\PkController;
-use App\Http\Controllers\AppFeatureController;
-use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\CoinController;
-use App\Http\Controllers\Api\V1\GiftController;
-use App\Http\Controllers\Api\V1\HomeController;
-use App\Http\Controllers\Api\V1\PackController;
-use App\Http\Controllers\Api\V1\RoomController;
-use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\HealthCheckController;
-use App\Http\Controllers\NowPaymentsController;
-use App\Http\Controllers\RoomSettingController;
-use App\Http\Controllers\Api\LanguageController;
-use App\Http\Controllers\Api\V1\AgoraController;
-use App\Http\Controllers\Api\V1\ColorController;
-use App\Http\Controllers\Api\V1\EmojiController;
-use App\Http\Controllers\Api\V1\MusicController;
-use App\Http\Controllers\FirebaseAuthController;
-use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V2\AgencyController;
-use App\Http\Controllers\Api\V1\AllGameController;
-use App\Http\Controllers\Api\V1\CountryController;
-use App\Http\Controllers\Api\V1\GiftLogController;
-use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\RankingController;
 use App\Admin\Controllers\AgencySettingsController;
-use App\Http\Controllers\Api\V1\QuestionController;
-use App\Http\Controllers\Api\V1\Ranking2Controller;
-use Modules\Vip\Http\Controllers\Api\VipController;
-use App\Http\Controllers\Api\V1\CommunityController;
-use App\Http\Controllers\Api\V1\GroupChatController;
-use App\Http\Controllers\Api\V1\BackgroundController;
-use App\Http\Controllers\Api\V1\CoinReportController;
-use App\Http\Controllers\Api\V1\ReportUserController;
-use App\Http\Controllers\Api\V1\UploadLinkController;
-use App\Http\Controllers\Api\V1\ChargeLevelController;
-use App\Http\Controllers\Api\V1\GiftCategoryController;
-use App\Http\Controllers\Api\V1\HomeCarouselController;
-use App\Http\Controllers\Api\V1\RoomCategoryController;
-use App\Http\Controllers\Api\V1\Auth\RegisterController;
-use App\Http\Controllers\Api\V1\GooglePaymentController;
-use App\Http\Controllers\Api\V1\PaymentGetWayController;
-use App\Http\Controllers\Api\V1\PaymentMethodController;
-use App\Http\Controllers\Api\V1\StorageUploadController;
-use App\Http\Controllers\Dashboard\StatisticsController;
-use App\Http\Controllers\Api\V1\Room\EnteranceController;
+use App\Helpers\Common;
+use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\FairLuckV5Controller;
+use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\V1\AgoraController;
+use App\Http\Controllers\Api\V1\AllGameController;
+use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\ChargeController;
+use App\Http\Controllers\Api\V1\ChargeLevelController;
+use App\Http\Controllers\Api\V1\CharismaLevelController;
+use App\Http\Controllers\Api\V1\CoinController;
+use App\Http\Controllers\Api\V1\CoinReportController;
+use App\Http\Controllers\Api\V1\ColorController;
+use App\Http\Controllers\Api\V1\CommunityController;
+use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\EmojiController;
+use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V1\GiftCategoryController;
+use App\Http\Controllers\Api\V1\GiftController;
+use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\Api\V1\GooglePaymentController;
+use App\Http\Controllers\Api\V1\GroupChatController;
+use App\Http\Controllers\Api\V1\HomeCarouselController;
+use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\MusicController;
+use App\Http\Controllers\Api\V1\PackController;
+use App\Http\Controllers\Api\V1\PaymentGetWayController;
+use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\QuestionController;
+use App\Http\Controllers\Api\V1\Ranking2Controller;
+use App\Http\Controllers\Api\V1\RankingController;
+use App\Http\Controllers\Api\V1\ReportUserController;
+use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
+use App\Http\Controllers\Api\V1\RoomCategoryController;
+use App\Http\Controllers\Api\V1\RoomController;
+use App\Http\Controllers\Api\V1\StorageUploadController;
+use App\Http\Controllers\Api\V1\UploadLinkController;
+use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V2\AgencyController;
+use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\AppFeatureController;
+use App\Http\Controllers\CodapayController;
+use App\Http\Controllers\Dashboard\StatisticsController;
+use App\Http\Controllers\FirebaseAuthController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\PaySkyController;
+use App\Http\Controllers\PaytabsController;
+use App\Http\Controllers\RoomSettingController;
+use App\Http\Controllers\StripeController;
+use App\Http\Controllers\UtdController;
+use App\Http\Controllers\VersionController;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Models\Room;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use Modules\Vip\Http\Controllers\Api\VipController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -106,15 +107,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
     Route::get('/fawry/done', [PaymentMethodController::class, 'success']);
     Route::post('utd-paymob-callback', [PaymentMethodController::class, 'utdPayMobCallback'])->middleware('verify.utdFawry.signature');
-    Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
-    Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
-    Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
+    Route::post('paypal-callback', [PayPalController::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
+    Route::get('paypal-return/{orderId}', [PayPalController::class, 'success'])->name('paypal.success');
+    Route::get('paypal-cancel/{orderId}', [PayPalController::class, 'cancel'])->name('paypal.cancel');
 
-    Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
-    Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
+    Route::get('codapay-callback', [CodapayController::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
+    Route::get('codapay-success/{id}/{country}', [CodapayController::class, 'success'])->name('codapay.success');
 
-    Route::get('utd-success/{trx}', [UtdService::class, 'success'])->name('utd.success');
-    Route::post('utd-callback', [UtdService::class, 'callback'])->name('utd.callback');
+    Route::get('utd-success/{orderId}', [UtdController::class, 'success'])->name('utd.success');
+    Route::post('utd-callback', [UtdController::class, 'callback'])->middleware(['verify.utdpay.webhook', 'throttle:30,1'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -179,22 +180,16 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('/payment/success', [StripeController::class, 'success']);
     Route::get('/payment/cancel', [StripeController::class, 'cancel']);
 
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('/broadcasting/auth', function (Request $request) {
+            return Broadcast::auth($request);
+        });
+    });
 
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen', 'localization'])->group(
         function () {
             Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
-            // Route::post('/broadcasting/auth', function (Request $request) {
-            //     return Broadcast::auth($request);
-            // });
-            Route::post('/broadcasting/auth', function (Request $request) {
-                try {
-                    $authResponse = Broadcast::auth($request);
-                    return $authResponse;
-                } catch (\Exception $e) {
-                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-                }
-            });
 
             Route::get('/user-gifts', [UserController::class, 'userGifts']);
 
@@ -309,6 +304,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('shipping-agency-report', [CoinController::class, 'shippingAgencyCoinReport']);
             });
 
+            Route::prefix('charisma-levels')->group(function () {
+                Route::get('/', [CharismaLevelController::class, 'index']);
+            });
+
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/details', [UserController::class, 'showUsersDetails'])->where('id', '[0-9]+');
@@ -396,16 +395,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 //todo
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
-                // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
-                Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                // Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift6'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post('/v5/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGiftV5'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                // Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V3'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                // Route::post('/v4/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift4'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post('/v6/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift6'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post('/v7/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift7'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post( '/v7/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);
@@ -765,3 +757,13 @@ Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getC
 Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
 Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
 Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
+
+// Queue restart route
+Route::get('queue/restart', function () {
+    \Artisan::call('queue:restart');
+    return response()->json([
+        'success' => true,
+        'message' => 'Queue workers restarted successfully',
+        'output' => \Artisan::output()
+    ]);
+});

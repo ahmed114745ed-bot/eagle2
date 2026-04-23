@@ -100,6 +100,7 @@ class User extends Authenticatable
         'sender_level' => 'integer',
         'charge_status' => 'boolean',
         'transfer_salary' => 'boolean',
+        'salary_is_updated' => 'boolean',
     ];
 
     protected $appends = [
