@@ -2,11 +2,14 @@ name: SSh-pop-live-pipline
 on:
   push:
     branches: ["pop-live"]
+concurrency:
+  group: pop-live-deploy
+  cancel-in-progress: false
 jobs:
   run_pop-live_hub:
     runs-on: ubuntu-latest
     steps:
-    - name: print out pop-live
+    - name: Pull latest code and cleanup
       uses: appleboy/ssh-action@v1.2.2
       with:
         host: "34.18.63.120"
@@ -17,20 +20,24 @@ jobs:
         script: |
           cd /var/www/pop-live
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up  Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
+          mkdir -p storage/jobs-logs
+          chmod -R 777 storage/jobs-logs
+
+          LOG_FILE=storage/logs/laravel.log
+          if [ -f "$LOG_FILE" ]; then
+            LOG_SIZE=$(stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
+            if [ "$LOG_SIZE" -gt 104857600 ]; then
+              echo "Rotating laravel.log ($(du -h $LOG_FILE | cut -f1))"
+              truncate -s 0 "$LOG_FILE"
+            fi
           fi
+          find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
+
   run_pop-live_app:
-    runs-on: [self-hosted] #ubuntu-latest 
+    runs-on: ubuntu-latest
     needs: run_pop-live_hub
     steps:
-    - name: print out pop-live
+    - name: Build and deploy Pop Live Octane
       uses: appleboy/ssh-action@v1.2.2
       with:
         host: "34.18.63.120"
@@ -39,38 +46,50 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/pop-live
-          pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+
+          echo "Building pop-live:${{ github.sha }}..."
           docker build -t pop-live:${{ github.sha }} -f Dockerfile-octan .
-          docker service update --image pop-live:${{ github.sha }} pop-live-octa
+          echo "Build succeeded."
 
-          # Get container ID of task 5live-app.1
-          CONTAINER_ID=$(docker ps --filter "name=pop-live-octa.1" --format "{{.ID}}" | head -n 1)
+          docker service update \
+            --image pop-live:${{ github.sha }} \
+            --update-order stop-first \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            --update-failure-action rollback \
+            pop-live-octa
 
-          # Run artisan command inside that container
-          if [ -n "$CONTAINER_ID" ]; then
-            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
-          else
-            echo "No running container found for pop-live-octa.1 service task"
+          UPDATE_STATE=$(docker service inspect pop-live-octa --format '{{.UpdateStatus.State}}')
+          if [ "$UPDATE_STATE" = "rollback_completed" ]; then
+            echo "ERROR: Service update rolled back!"
+            docker service ps pop-live-octa --no-trunc --format "{{.Name}} {{.CurrentState}} {{.Error}}" | head -10
             exit 1
           fi
 
-          # check again
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space is more than $threshold% utilized"
-          # Execute the command to clean up Docker system
-            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
-          else
-            echo "Disk space is within acceptable limits $current% "
+          RUNNING_IMAGE=$(docker service inspect pop-live-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+          EXPECTED_IMAGE="pop-live:${{ github.sha }}"
+          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            exit 1
           fi
+          echo "Verified: pop-live-octa is running $RUNNING_IMAGE"
+
+          sleep 10
+          CONTAINER_ID=$(docker ps --filter "name=pop-live-octa.1" --format "{{.ID}}" | head -n 1)
+          if [ -n "$CONTAINER_ID" ]; then
+            docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "Warning: whatsapp:change-token failed but continuing"
+          else
+            echo "ERROR: No running container found for pop-live-octa.1"
+            exit 1
+          fi
+
   run_pop-live_job:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: ubuntu-latest
     needs: run_pop-live_hub
     steps:
-    - name: print out pop-live Job
+    - name: Build and deploy Pop Live jobs
       uses: appleboy/ssh-action@v1.2.2
       with:
         host: "34.18.63.120"
@@ -79,8 +98,58 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 20m
         script: |
+          set -e
           cd /var/www/pop-live
-          pwd
-          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+
+          echo "Building pop-live-job:${{ github.sha }}..."
           docker build -t pop-live-job:${{ github.sha }} -f Dockerfile-jobs .
-          docker service update --image pop-live-job:${{ github.sha }} pop-live-job
+          echo "Build succeeded."
+
+          docker service update \
+            --image pop-live-job:${{ github.sha }} \
+            --update-parallelism 1 \
+            --update-delay 10s \
+            --update-failure-action rollback \
+            pop-live-job
+
+          UPDATE_STATE=$(docker service inspect pop-live-job --format '{{.UpdateStatus.State}}')
+          if [ "$UPDATE_STATE" = "rollback_completed" ]; then
+            echo "ERROR: Service update rolled back!"
+            docker service ps pop-live-job --no-trunc --format "{{.Name}} {{.CurrentState}} {{.Error}}" | head -10
+            exit 1
+          fi
+
+          RUNNING_IMAGE=$(docker service inspect pop-live-job --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+          EXPECTED_IMAGE="pop-live-job:${{ github.sha }}"
+          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            exit 1
+          fi
+          echo "Verified: pop-live-job is running $RUNNING_IMAGE"
+
+  run_pop-live_cleanup:
+    runs-on: ubuntu-latest
+    needs: [run_pop-live_app, run_pop-live_job]
+    if: always()
+    steps:
+    - name: Cleanup old images
+      uses: appleboy/ssh-action@v1.2.2
+      with:
+        host: "34.18.63.120"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          CURRENT=${{ github.sha }}
+
+          for img in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'pop-live(-job)?:' | grep -v "$CURRENT" | grep -v '<none>'); do
+            echo "Removing old image: $img"
+            docker rmi "$img" 2>/dev/null || true
+          done
+
+          docker image prune -f 2>/dev/null || true
+          docker builder prune -f --filter "until=24h" 2>/dev/null || true
+
+          USAGE=$(df -h / | awk 'NR==2{print $5}')
+          echo "Disk usage after cleanup: $USAGE"
