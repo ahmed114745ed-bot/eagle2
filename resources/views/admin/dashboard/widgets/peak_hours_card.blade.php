@@ -18,7 +18,7 @@
     } elseif (request()->is('areaManager*')) {
         $fetchUrl = "areaManager/statistics/peak-hours";
     } else {
-        $fetchUrl = "statistics/peak-hours";
+        $fetchUrl = "admin/statistics/peak-hours";
     }
 @endphp
 

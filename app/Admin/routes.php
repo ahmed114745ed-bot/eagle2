@@ -199,6 +199,26 @@ $filtered = $routes->reject(function ($route) {
 });
 
 
+Route::group(
+        [
+            'prefix'        => config('admin.route.prefix'),
+            'namespace'     => config('admin.route.namespace'),
+            'middleware'    => [
+               'web',
+            'admin.auth',
+            'adminIp',
+                //            'adminGeneralBan',
+                'multiLanguage',
+            ],
+            'as'            => config('admin.route.prefix') . '.',
+        ],
+        function () {
+
+                Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
+
+        });
+
+
 
 Route::group(
     [
@@ -339,7 +359,6 @@ Route::group(
         Route::resource('all-games', AllGameController::class);
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
-        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {
             Route::get('/', [BlackListUsersController::class, 'index']);
