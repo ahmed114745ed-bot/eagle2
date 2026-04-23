@@ -190,6 +190,20 @@ class SuperPackageController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+
+        Admin::script('
+            $(document).on("click", ".grid-expand", function(){
+                setTimeout(function(){
+                    $(".grid-box .table .table").css("direction", "ltr");
+                    $(".grid-box .table .table td, .grid-box .table .table th").css("text-align", "center");
+                    $(".grid-box .table .table .rtlSvga").css("direction", "ltr");
+                }, 300);
+            });
+            // Also apply immediately for already expanded
+            $(".grid-box .table .table").css("direction", "ltr");
+            $(".grid-box .table .table td, .grid-box .table .table th").css("text-align", "center");
+            $(".grid-box .table .table .rtlSvga").css("direction", "ltr");
+        ');
         $grid->disableExport();
         $grid->actions(function ($actions) {
             $actions->disableView();
@@ -316,7 +330,7 @@ class SuperPackageController extends MainController
         }
 
         $form->html('<div class="form-divider full-column-width"> <span>' . __('Rewards') . '</span> </div>');
-
+        $form->html('<div class="full-column-width">');
         $form->select('type', trans('type'))->options([
             "ware" => __('ware'),
             "badge" => __('badge'),
@@ -353,6 +367,18 @@ class SuperPackageController extends MainController
 
                 $form->number('expire', __('expire'))->default(1);
             });
+        $form->html('</div>');
+
+        Admin::style('
+
+        .rtl .fields-group .form-group {
+            display: block !important;
+        }
+
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
 
         $form->html('
             <script>
@@ -411,11 +437,18 @@ class SuperPackageController extends MainController
         ');
 
         $form->html('
-            <div class="box-footer">
+            <div class="box-footer" style="text-align: center; width: 100%;">
                 <button type="button" id="btn-add-continue" class="btn btn-success">
                     <i class="fa fa-plus"></i> ' . __('Add & Continue') . '
                 </button>
             </div>
+        ');
+
+        Admin::script('
+            var btnWrapper = $("#btn-add-continue").closest(".form-group");
+            btnWrapper.css({"width":"100%", "text-align":"center"});
+            btnWrapper.find(".col-sm-8, .col-sm-12, .col-md-8, .col-md-12").css({"width":"100%", "max-width":"100%", "text-align":"center"});
+            btnWrapper.closest(".col-md-12").css({"width":"100%", "max-width":"100%"});
         ');
 
         $form->saving(function (Form $form) {

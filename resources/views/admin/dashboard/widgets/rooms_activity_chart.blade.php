@@ -18,7 +18,7 @@
     } elseif (request()->is('areaManager*')) {
         $fetchUrl = "areaManager/statistics/rooms-activity";
     } else {
-        $fetchUrl = "statistics/rooms-activity";
+        $fetchUrl = "admin/statistics/rooms-activity";
     }
 @endphp
 

@@ -22,8 +22,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     protected $text;
     protected $groupChatResource;
 
-    // ⏱️ زيادة timeout للـ job لأنه قد يستغرق وقتاً طويلاً عند معالجة آلاف الإشعارات
-    public $timeout = 300; // 5 دقائق
+    public $timeout = 300; 
 
     public function __construct(User $user, ?string $text, array $groupChatResource)
     {
@@ -66,13 +65,23 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             $roomId = $parts[3] ?? null;
 
             if (!$roomId) {
+                Log::warning('SendShareGroupChatNotificationJob: Invalid room ID in text', [
+                    'text' => $this->text,
+                ]);
                 return;
             }
-            $room = Room::select('id', 'room_cover', 'final_room_image')->find($roomId);
-            
-            if (!$room) {
+
+            // ✅ Add error handling for ChatRoom not found
+            try {
+                $room = Room::select('id', 'room_cover', 'final_room_image')->findOrFail($roomId);
+            } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                Log::warning('SendShareGroupChatNotificationJob: ChatRoom not found', [
+                    'room_id' => $roomId,
+                    'user_id' => $this->user->id,
+                ]);
                 return;
             }
+
 
             $roomImage = $room->room_cover ?? $room->final_room_image ?? $this->groupChatResource['image_url'] ?? '';
             $userLang = $this->user->lan ?? 'en';
@@ -82,12 +91,11 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
                 $roomImage = getImagePath($roomImage);
             }
             
-            // ✅ تحسين الأداء: استخدام cursor بدلاً من get() لتقليل استهلاك الذاكرة
             $notificationsIdsChunks = User::withoutAppends()
                 ->whereNotNull('notification_id')
                 ->where('id', '!=', $this->user->id)
                 ->select(['id', 'notification_id', 'lan'])
-                ->groupBy('notification_id') // ✅ استخدام groupBy للتأكد من uniqueness على مستوى الـ database
+                ->groupBy('notification_id') 
                 ->orderByDesc('online')
                 ->limit(5000)
                 ->cursor()
@@ -97,7 +105,6 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             $totalFailed = 0;
 
             foreach ($notificationsIdsChunks as $chunkIndex => $notificationsIds) {
-                // ✅ معالجة الـ chunk بشكل متوازي أو إرسال دفعات
                 $this->sendNotificationBatch($notificationsIds, $roomId, $roomImage, $translatedMessage, $totalSent, $totalFailed);
             }
 
@@ -112,7 +119,6 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     }
 
     /**
-     * ✅ دالة منفصلة لإرسال دفعة من الإشعارات
      */
     protected function sendNotificationBatch($notificationsIds, $roomId, $roomImage, $translatedMessage, &$totalSent, &$totalFailed): void
     {

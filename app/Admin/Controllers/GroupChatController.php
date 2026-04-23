@@ -2,17 +2,18 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UserService;
 use App\Jobs\SendNotificationsToAllUsers;
+use App\Models\GroupChat;
 use App\Models\User;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Models\GroupChat;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Widgets\Box;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Public\Http\Services\UpgradeLevelServices;
@@ -112,21 +113,30 @@ class GroupChatController extends MainController
     protected function grid()
     {
         $grid = new Grid(new GroupChat());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->model()->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
                 });
             });
-        })->orderByDesc('id');
+        }) ->with([
+                'user.profile',
+                
+                'user.userSetting',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
+                'user.monthlyDiamondReceive',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])->orderByDesc('id');
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
 
             // Row 1: User search and Message
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
                     $query->whereHas('user', function ($query) use ($input) {
@@ -136,94 +146,102 @@ class GroupChatController extends MainController
                 }, __('User'))->placeholder(__('Search by name or UUID'));
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->like('text', __('Message'));
             });
 
             // Row 2: User ID and Date Range
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user_id', __('User ID'));
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->between('created_at', __('Created At'))->date();
             });
         });
 
         $grid->tools(function ($tools) {
-            $tools->append('<a href="'.route('admin.chat.view').'" class="btn btn-sm btn-success" style="margin-left: 10px;">
-                <i class="fa fa-comments"></i> '.__('View Chat Interface').'
+            $tools->append('<a href="' . route('admin.chat.view') . '" class="btn btn-sm btn-success" style="margin-left: 10px;">
+                <i class="fa fa-comments"></i> ' . __('View Chat Interface') . '
             </a>');
         });
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('text', __('Message'))->limit(50);
-        $grid->column('user_id', __('User ID'));
+        $grid->column('name', __('user'))
+            ->display(function ($name) {
+
+                $user = $this->user;
+                if (!$user) {
+                    return __('No User');
+                }
+                return app(UserService::class)->adminUserAvatar($user);
+            });
         $grid->column('image', __('Image'))->image('', 50, 50);
         $grid->column('parent_id', __('Parent ID'));
         $grid->column('created_at', __('Created at'))->sortable();
         $grid->column('updated_at', __('Updated at'))->sortable();
         $grid->disableCreateButton();
-//        $grid->filter(function($filter){
-//            $filter->like('text', 'Message');
-//            $filter->equal('user_id', 'User ID');
-//            $filter->between('created_at', 'Created Date')->datetime();
-//        });
+        //        $grid->filter(function($filter){
+        //            $filter->like('text', 'Message');
+        //            $filter->equal('user_id', 'User ID');
+        //            $filter->between('created_at', 'Created Date')->datetime();
+        //        });
 
         return $grid;
-//        $grid = new Grid(new GroupChat);
-//        $countryID =session('filter_country_id');
-//        $grid->model()->when($countryID, function ($query) use ($countryID) {
-//            $query->where(function ($q) use ($countryID) {
-//                $q->whereHas('user', function ($subQuery) use ($countryID) {
-//                    $subQuery->where('country_id', $countryID);
-//                });
-//            });
-//        })->orderByDesc('id');
-//        $grid->quickSearch();
-//        $grid->filter(function (Grid\Filter $filter) {
-//            $filter->expand();
-//            $filter->disableIdFilter();
-//            $filter->column('1/2', function ($filter) {
-//                $filter->where(function ($query) {
-//                    $input = $this->input;
-//                    $query->whereHas('user', function ($query) use ($input) {
-//                        $query->where('name', 'like', "%$input%")
-//                            ->orWhere('uuid', 'like', "%$input%");
-//                    });
-//                }, __('User'))->placeholder(__('Search by name or UUID '));
-//            });
-//        });
-//        $grid->id(__('ID'));
-//        $grid->column('user.name', __('name'))->display(function ($recever) {
-//            $name =  $this->user?->name ?? '';
-//            $uid = @$this->user?->uuid ?? 0;
-//            $path = @$this->user?->profile?->avatar;
-//            $defaultImage = asset("images/businessman-icon.jpg");
-//            $url = getImagePath($path) ?? $defaultImage;
-//
-//            // Check if the image exists
-//            if (!isImageExists($url)) {
-//                $url = $defaultImage;
-//            }
-//            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-//
-//            return "
-//             <div style='display: flex; align-items: center; gap: 10px;'>
-//                 $image
-//                 <div>
-//                     <strong>$name</strong><br>
-//                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-//                 </div>
-//             </div>
-//         ";
-//        });
-//        $grid->text(__('text'));
-//
-//        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
-//        $grid->disableExport();
-//        $this->extendGrid($grid);
-//        return $grid;
+        //        $grid = new Grid(new GroupChat);
+        //        $countryID =session('filter_country_id');
+        //        $grid->model()->when($countryID, function ($query) use ($countryID) {
+        //            $query->where(function ($q) use ($countryID) {
+        //                $q->whereHas('user', function ($subQuery) use ($countryID) {
+        //                    $subQuery->where('country_id', $countryID);
+        //                });
+        //            });
+        //        })->orderByDesc('id');
+        //        $grid->quickSearch();
+        //        $grid->filter(function (Grid\Filter $filter) {
+        //            $filter->expand();
+        //            $filter->disableIdFilter();
+        //            $filter->column('1/2', function ($filter) {
+        //                $filter->where(function ($query) {
+        //                    $input = $this->input;
+        //                    $query->whereHas('user', function ($query) use ($input) {
+        //                        $query->where('name', 'like', "%$input%")
+        //                            ->orWhere('uuid', 'like', "%$input%");
+        //                    });
+        //                }, __('User'))->placeholder(__('Search by name or UUID '));
+        //            });
+        //        });
+        //        $grid->id(__('ID'));
+        //        $grid->column('user.name', __('name'))->display(function ($recever) {
+        //            $name =  $this->user?->name ?? '';
+        //            $uid = @$this->user?->uuid ?? 0;
+        //            $path = @$this->user?->profile?->avatar;
+        //            $defaultImage = asset("images/businessman-icon.jpg");
+        //            $url = getImagePath($path) ?? $defaultImage;
+        //
+        //            // Check if the image exists
+        //            if (!isImageExists($url)) {
+        //                $url = $defaultImage;
+        //            }
+        //            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+        //
+        //            return "
+        //             <div style='display: flex; align-items: center; gap: 10px;'>
+        //                 $image
+        //                 <div>
+        //                     <strong>$name</strong><br>
+        //                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+        //                 </div>
+        //             </div>
+        //         ";
+        //        });
+        //        $grid->text(__('text'));
+        //
+        //        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+        //        $grid->disableExport();
+        //        $this->extendGrid($grid);
+        //        return $grid;
     }
 
     /**
@@ -547,4 +565,3 @@ class GroupChatController extends MainController
         }
     }
 }
-

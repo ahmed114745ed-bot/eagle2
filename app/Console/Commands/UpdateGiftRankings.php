@@ -43,7 +43,6 @@ class UpdateGiftRankings extends Command
 
     private function updateRanking(string $type, string $role, string $column, $startDate): void
     {
-
         switch ($role) {
             case 'agency':
                 $rankerType = \App\Models\Agency::class;
@@ -56,35 +55,48 @@ class UpdateGiftRankings extends Command
                 $rankerType = \App\Models\User::class;
                 break;
         }
-        DB::transaction(function () use ($type, $role, $column, $startDate, $rankerType) {
-            // 1. Delete all old rankings of this type
-            DB::table('gift_rankings')
-                ->where('type', $type)
-                ->where('role', $role)
-                ->delete();
 
-            // 2. Insert fresh rankings
-            DB::statement("
-            INSERT INTO gift_rankings (
-                type, role, ranker_id, ranker_type, total_gifts, last_calculated_at, created_at, updated_at
-            )
+        $rankings = DB::connection()->getPdo()->prepare("
             SELECT
-                " . DB::getPdo()->quote($type) . ",
-                " . DB::getPdo()->quote($role) . ",
                 $column AS ranker_id,
-                '" . addslashes($rankerType) . "' AS ranker_type,
-                SUM(giftPrice) AS total_gifts,
-                NOW(),
-                NOW(),
-                NOW()
+                SUM(giftPrice) AS total_gifts
             FROM gift_logs
-            WHERE created_at >= " . DB::getPdo()->quote($startDate) . "
+            WHERE created_at >= ?
             AND $column IS NOT NULL
             AND $column != 0
             GROUP BY $column
             ORDER BY total_gifts DESC
             LIMIT 100
         ");
+        
+        $rankings->execute([$startDate]);
+        $rankingData = $rankings->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Prepare insert data outside of transaction
+        $now = now();
+        $insertData = array_map(function ($ranking) use ($type, $role, $rankerType, $now) {
+            return [
+                'type' => $type,
+                'role' => $role,
+                'ranker_id' => $ranking['ranker_id'],
+                'ranker_type' => $rankerType,
+                'total_gifts' => $ranking['total_gifts'],
+                'last_calculated_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }, $rankingData);
+
+        DB::transaction(function () use ($type, $role, $insertData) {
+            DB::table('gift_rankings')
+                ->where('type', $type)
+                ->where('role', $role)
+                ->delete();
+
+            // Insert in chunks to avoid memory issues with large datasets
+            foreach (array_chunk($insertData, 50) as $chunk) {
+                DB::table('gift_rankings')->insert($chunk);
+            }
         });
     }
 }
