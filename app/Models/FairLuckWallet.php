@@ -50,7 +50,6 @@ class FairLuckWallet extends Model
      */
     public static function increaseVault(int $amount, ?string $description = null, ?int $userId = null): bool
     {
-        self::incrementRedisBalance(self::TYPE_UNIFIED_VAULT, $amount);
         return self::increaseBalance(self::TYPE_UNIFIED_VAULT, $amount, $description, $userId);
     }
 
@@ -59,7 +58,6 @@ class FairLuckWallet extends Model
      */
     public static function decreaseVault(int $amount, ?string $description = null, ?int $userId = null): bool
     {
-        self::decrementRedisBalance(self::TYPE_UNIFIED_VAULT, $amount);
         return self::decreaseBalance(self::TYPE_UNIFIED_VAULT, $amount, $description, $userId);
     }
 
@@ -73,31 +71,53 @@ class FairLuckWallet extends Model
 
         if ($walletType === self::TYPE_UNIFIED_VAULT) {
             self::incrementRedisBalance($walletType, $amount);
+
+            try {
+                $wallet = self::where('wallet_type', $walletType)->first();
+                if (!$wallet) {
+                    self::create([
+                        'wallet_type' => $walletType,
+                        'balance' => $amount,
+                        'last_updated' => now(),
+                    ]);
+
+                    self::logHistory($walletType, $amount, 0, $amount, $description, $userId);
+                    return true;
+                }
+
+                $before = $wallet->balance;
+                self::where('wallet_type', $walletType)
+                    ->increment('balance', $amount, ['last_updated' => now()]);
+                $after = self::where('wallet_type', $walletType)->value('balance');
+
+                self::logHistory($walletType, $amount, $before, $after, $description, $userId);
+                return true;
+            } catch (\Throwable $e) {
+                self::decrementRedisBalance($walletType, $amount);
+                throw $e;
+            }
+        }
+
+        $wallet = self::where('wallet_type', $walletType)->first();
+
+        if (!$wallet) {
+            self::create([
+                'wallet_type' => $walletType,
+                'balance' => $amount,
+                'last_updated' => now(),
+            ]);
+            self::logHistory($walletType, $amount, 0, $amount, $description, $userId);
             return true;
         }
 
-        return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
-            $wallet = self::where('wallet_type', $walletType)
-                ->lockForUpdate()
-                ->first();
+        $before = $wallet->balance;
+        self::where('wallet_type', $walletType)
+            ->increment('balance', $amount, ['last_updated' => now()]);
+        $after = self::where('wallet_type', $walletType)->value('balance');
 
-            if (!$wallet) {
-                $wallet = self::create([
-                    'wallet_type' => $walletType,
-                    'balance' => $amount,
-                    'last_updated' => now(),
-                ]);
-                self::logHistory($walletType, $amount, 0, $amount, $description, $userId);
-                return true;
-            }
+        self::logHistory($walletType, $amount, $before, $after, $description, $userId);
 
-            $before = $wallet->balance;
-            $wallet->increment('balance', $amount);
-            $wallet->update(['last_updated' => now()]);
-            self::logHistory($walletType, $amount, $before, $wallet->balance, $description, $userId);
-
-            return true;
-        }, 5); 
+        return true;
     }
 
     public static function decreaseBalance(string $walletType, int $amount, ?string $description = null, ?int $userId = null): bool
@@ -111,33 +131,93 @@ class FairLuckWallet extends Model
             if (!self::decrementRedisBalance($walletType, $amount)) {
                 return false;
             }
+
+            try {
+                $wallet = self::where('wallet_type', $walletType)->first();
+                if (!$wallet) {
+                    self::create([
+                        'wallet_type' => $walletType,
+                        'balance' => -$amount,
+                        'last_updated' => now(),
+                    ]);
+
+                    self::logHistory($walletType, -$amount, 0, -$amount, $description, $userId);
+                    return true;
+                }
+
+                $before = $wallet->balance;
+                $updated = self::where('wallet_type', $walletType)
+                    ->where('balance', '>=', $amount - $limit)
+                    ->decrement('balance', $amount, ['last_updated' => now()]);
+
+                if (!$updated) {
+                    self::incrementRedisBalance($walletType, $amount);
+                    return false;
+                }
+
+                $after = self::where('wallet_type', $walletType)->value('balance');
+                self::logHistory($walletType, -$amount, $before, $after, $description, $userId);
+                return true;
+            } catch (\Throwable $e) {
+                self::incrementRedisBalance($walletType, $amount);
+                throw $e;
+            }
+        }
+
+        $wallet = self::where('wallet_type', $walletType)->first();
+        if (!$wallet) {
+            return false;
+        }
+
+        $limit = ($walletType === self::TYPE_GLOBAL_VAULT || $walletType === self::TYPE_UNIFIED_VAULT) ? self::getNegativeLimit() : 0;
+        if (($wallet->balance + $limit) < $amount) {
+            return false;
+        }
+
+        $before = $wallet->balance;
+        $updated = self::where('wallet_type', $walletType)
+            ->where('balance', '>=', $amount - $limit)
+            ->decrement('balance', $amount, ['last_updated' => now()]);
+
+        if (!$updated) {
+            return false;
+        }
+
+        $after = self::where('wallet_type', $walletType)->value('balance');
+        self::logHistory($walletType, -$amount, $before, $after, $description, $userId);
+
+        return true;
+    }
+
+    public static function persistDecreaseBalance(string $walletType, int $amount, ?string $description = null, ?int $userId = null): bool
+    {
+        $wallet = self::where('wallet_type', $walletType)->first();
+        $limit = ($walletType === self::TYPE_GLOBAL_VAULT || $walletType === self::TYPE_UNIFIED_VAULT) ? self::getNegativeLimit() : 0;
+
+        if (!$wallet) {
+            self::create([
+                'wallet_type' => $walletType,
+                'balance' => -$amount,
+                'last_updated' => now(),
+            ]);
+            self::logHistory($walletType, -$amount, 0, -$amount, $description, $userId);
             return true;
         }
 
-        return DB::transaction(function () use ($walletType, $amount, $description, $userId) {
-            $wallet = self::where('wallet_type', $walletType)
-                ->lockForUpdate()
-                ->first();
+        $before = $wallet->balance;
+        $updated = self::where('wallet_type', $walletType)
+            ->where('balance', '>=', $amount - $limit)
+            ->decrement('balance', $amount, ['last_updated' => now()]);
 
-            $limit = ($walletType === self::TYPE_GLOBAL_VAULT || $walletType === self::TYPE_UNIFIED_VAULT) ? self::getNegativeLimit() : 0;
+        if (!$updated) {
+            return false;
+        }
 
-            if (!$wallet || ($wallet->balance + $limit) < $amount) {
-                return false;
-            }
+        $after = self::where('wallet_type', $walletType)->value('balance');
+        self::logHistory($walletType, -$amount, $before, $after, $description, $userId);
 
-            $before = $wallet->balance;
-            $newBalance = $wallet->balance - $amount;
-            $wallet->update([
-                'balance' => $newBalance,
-                'last_updated' => now(),
-            ]);
-
-            self::logHistory($walletType, -$amount, $before, $newBalance, $description, $userId);
-
-            return true;
-        }, 5); // Retry up to 5 times on lock timeout
+        return true;
     }
-
    
     public static function setBalance(string $walletType, int $balance): bool
     {

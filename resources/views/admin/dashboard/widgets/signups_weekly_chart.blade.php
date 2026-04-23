@@ -14,7 +14,7 @@
     } elseif (request()->is('areaManager*')) {
         $fetchUrl = "areaManager/statistics/comparison-user-signup";
     } else {
-        $fetchUrl = "statistics/comparison-user-signup";
+        $fetchUrl = "admin/statistics/comparison-user-signup";
     }
 @endphp
 

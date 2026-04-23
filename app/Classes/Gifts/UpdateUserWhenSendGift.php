@@ -73,11 +73,14 @@ class UpdateUserWhenSendGift
     public function updateUsers(int $totalCoins, array $userIds)
     {
         sort($userIds);
-        DB::transaction(function () use ($totalCoins, $userIds) {
+
+        $affectedUsers = DB::transaction(function () use ($totalCoins, $userIds) {
             $users = User::whereIn('id', $userIds)
                 ->orderBy('id')
                 ->lockForUpdate()
                 ->get();
+
+            $updatedUsers = [];
 
             foreach ($users as $user) {
                 $updateData = [
@@ -91,29 +94,50 @@ class UpdateUserWhenSendGift
 
                 DB::table('users')->where('id', $user->id)->update($updateData);
 
-                $user->refresh();
-
-                $lastReceivedLevel = $user->total_received_level;
-                try {
-                    (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
-
-                    if ($user->total_received_level != $lastReceivedLevel) {
-                        dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))
-                            ->onQueue('notification');
-                    }
-                } catch (\Exception $e) {
-                    Log::build([
-                        'driver' => 'single',
-                        'path' => storage_path('logs/diamond_upgrade.log'),
-                    ])->error("Error in checkUserLevelUpgrated for user {$user->id}: " . $e->getMessage());
-                }
-
-                uploadMonthlyDiamondReceive(
-                    $user->id,
-                    $user->monthly_diamond_received + $totalCoins
-                );
+                $updatedUsers[] = [
+                    'id' => $user->id,
+                    'last_received_level' => $user->total_received_level,
+                    'monthly_diamond_received' => $user->monthly_diamond_received,
+                ];
             }
+
+            return $updatedUsers;
         }, 5);
+
+        if (empty($affectedUsers)) {
+            return;
+        }
+
+        $usersById = User::whereIn('id', array_column($affectedUsers, 'id'))
+            ->get()
+            ->keyBy('id');
+
+        foreach ($affectedUsers as $userMeta) {
+            $user = $usersById->get($userMeta['id']);
+            if (!$user) {
+                continue;
+            }
+
+            $lastReceivedLevel = $userMeta['last_received_level'];
+            try {
+                (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
+
+                if ($user->total_received_level != $lastReceivedLevel) {
+                    dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))
+                        ->onQueue('notification');
+                }
+            } catch (\Exception $e) {
+                Log::build([
+                    'driver' => 'single',
+                    'path' => storage_path('logs/diamond_upgrade.log'),
+                ])->error("Error in checkUserLevelUpgrated for user {$user->id}: " . $e->getMessage());
+            }
+
+            uploadMonthlyDiamondReceive(
+                $user->id,
+                $userMeta['monthly_diamond_received'] + $totalCoins
+            );
+        }
     }
     public function updateReceivedLevels(User $receivedUser)
     {
