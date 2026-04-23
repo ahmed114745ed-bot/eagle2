@@ -11,9 +11,12 @@ return [
     | API, giving you convenient access to each back-end using the same
     | syntax for every one. Here you may define a default connection.
     |
+    | Default: redis (for production)
+    | Fallback: database (for development)
+    |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'sync'),
+    'default' => env('QUEUE_CONNECTION', 'redis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -38,54 +41,66 @@ return [
             'driver' => 'database',
             'table' => 'jobs',
             'queue' => 'default',
-            'retry_after' => 90,
-            'after_commit' => false,
+            'retry_after' => 300,
+            'after_commit' => true,
         ],
         
         'luckyBox' => [
             'driver' => 'database',
             'connection' => 'default',
             'queue' => 'luckyBox',
-            'retry_after' => 90,
+            'retry_after' => 300,
             'block_for' => null,
+            'after_commit' => true,
         ],
         'heavyProcessing' => [
-            'driver' => env('QUEUE_CONNECTION', 'database'),
+            'driver' => env('QUEUE_CONNECTION', 'redis'),
             'connection' => 'default',
             'queue' => ['heavy1', 'heavy2', 'heavy3'],
-            'retry_after' => 90,
+            'retry_after' => 300,
             'block_for' => null,
+            'after_commit' => true,
         ],
         'sendComment' => [
             'driver' => 'database',
             'connection' => 'default',
             'queue' => 'sendComment',
-            // Other configuration options...
+            'retry_after' => 300,
+            'after_commit' => true,
         ],
         'notification' => [
             'driver' => 'database',
             'connection' => 'default',
             'queue' => ['default','heavy1'],
-            'retry_after' => 90,
+            'retry_after' => 300,
             'block_for' => null,
-            // Other configuration options...
+            'after_commit' => true,
         ],
         'luckyGift' => [
             'driver' => 'database',
             'connection' => 'default',
             'queue' => ['lucky_gift', 'lucky_gift_2', 'lucky_gift_3'],
-            'retry_after' => 90,
+            'retry_after' => 300,
             'block_for' => null,
+            'after_commit' => true,
         ],
 
+        'increment-diamond' => [
+            'driver' => 'database',
+            'connection' => 'default',
+            'queue' => 'increment-diamond',
+            'retry_after' => 300,
+            'block_for' => null,
+            'after_commit' => true,
+        ],
 
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',
             'queue' => 'default',
-            'retry_after' => 90,
+            'retry_after' => 300,
             'block_for' => 0,
-            'after_commit' => false,
+            'after_commit' => true,
         ],
 
         'sqs' => [
@@ -96,19 +111,18 @@ return [
             'queue' => env('SQS_QUEUE', 'default'),
             'suffix' => env('SQS_SUFFIX'),
             'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-            'after_commit' => false,
+            'after_commit' => true,
+            'retry_after' => 300,
         ],
 
         'redis' => [
             'driver' => 'redis',
             'connection' => 'default',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
+            'queue' => env('QUEUE_NAME', 'default'),
+            'retry_after' => 300,
             'block_for' => null,
-            'after_commit' => false,
+            'after_commit' => true,
         ],
-
-
 
     ],
 

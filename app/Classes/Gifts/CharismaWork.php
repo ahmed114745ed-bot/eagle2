@@ -8,6 +8,7 @@ use App\Models\Room;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class CharismaWork implements RoomJobInterface
+
 {
 
     public function work($roomJob) : array
@@ -23,6 +24,25 @@ class CharismaWork implements RoomJobInterface
 
     public function sendToZego($data, int $roomId,int $user_id):  string
     {
+        $data = array_map(function($user) {
+            if (isset($user['total'])) {
+                \Log::info('sendToZego - Before format', [
+                    'user_id' => $user['user_id'] ?? 'N/A',
+                    'total_raw' => $user['total'],
+                    'total_type' => gettype($user['total'])
+                ]);
+                info('formatTotalInService', [UserCharismaService::formatTotalInService()]);
+                $user['total'] = UserCharismaService::formatTotalInService()
+                    ? numToStringNew($user['total'])
+                    : (int) $user['total'];
+                \Log::info('sendToZego - After format', [
+                    'user_id' => $user['user_id'] ?? 'N/A',
+                    'total_formatted' => $user['total']
+                ]);
+            }
+            return $user;
+        }, $data);
+
         $ms   = [
             'messageContent' => [
                 "message" => "updateCharisma",
@@ -44,6 +64,13 @@ class CharismaWork implements RoomJobInterface
             foreach ($item as $userData) {
                 if (is_array($userData)) { // Ensure we're working with the user data arrays
                     $user_id = $userData['user_id'];
+
+                    \Log::info('prepareDataToZego - userData', [
+                        'user_id' => $user_id,
+                        'total' => $userData['total'] ?? 'NOT SET',
+                        'total_type' => isset($userData['total']) ? gettype($userData['total']) : 'N/A'
+                    ]);
+
                     if (!isset($result[$room_id])) {
                         $result[$room_id] = [
                             'room_id' => $room_id,
@@ -59,7 +86,7 @@ class CharismaWork implements RoomJobInterface
                         $result[$room_id]['data'][$user_id] = $userData;
                     }
                     // Always add to the room's total
-                    $result[$room_id]['total'] += $userData['total'];
+                    $result[$room_id]['total'] += (int) ($userData['total'] ?? 0);
                 }
             }
         }
@@ -71,7 +98,7 @@ class CharismaWork implements RoomJobInterface
             $finalResult[] = [
                 'room_id' => $info['room_id'],
                 'data' => $users_data,
-                'total' => $info['total'],
+                'total' => $info['total'], // Keep as integer, will be formatted in sendToZego
             ];
         }
 

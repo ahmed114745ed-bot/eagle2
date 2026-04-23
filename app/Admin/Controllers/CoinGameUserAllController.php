@@ -4,6 +4,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\CoinGameUserAggregated;
+use App\Models\CoinGameUserArchive;
 use App\Models\CoinGameUserDailyAggregated;
 use App\Models\User;
 use App\Models\AllGame;
@@ -86,16 +87,18 @@ class CoinGameUserAllController extends AdminController
     public function ajaxTotals(Request $request)
     {
         $filters = $request->all();
-   
-       
-        $query = CoinGameUserDailyAggregated::query();
-    
+
+        $query = CoinGameUserArchive::query()
+            ->whereNotNull('game_id');
+
+        // Apply filters using readable keys from request
+        // The AJAX request passes the same query string from the URL,
+        // which contains the hashed filter keys from Laravel-Admin.
+        // We use applyFilters which handles both readable and hashed keys.
         $query = $this->service->applyFilters($query, $filters);
-     
-    
+
         $totals = $this->service->calculateTotals($query, $filters);
-   
-    
+
         $html = view('admin.info_boxes', compact('totals'))->render();
         return response()->json(['html' => $html]);
     }

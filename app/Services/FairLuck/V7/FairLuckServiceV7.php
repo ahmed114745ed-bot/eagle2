@@ -185,6 +185,6 @@ class FairLuckServiceV7
                 'wallets_after'    => ['lucky_wallet' => $luckyBalanceAfter],
                 'pool_health'      => ['status' => $selection['walletZone']],
             ];
-        });
+        }, 3);
     }
 }

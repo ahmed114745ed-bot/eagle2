@@ -2,13 +2,14 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Models\Config;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Auth\Permission;
 
 class RoomSettingsController extends Controller
 {
@@ -22,8 +23,8 @@ class RoomSettingsController extends Controller
 
     public function index(Content $content)
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('browse-'.$this->permission_name);
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_name);
         }
         $settings = Config::pluck('value', 'name')->toArray();
         return $content
@@ -34,10 +35,22 @@ class RoomSettingsController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('edit-'.$this->permission_name);
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token');
+        // Handle file uploads for mic images
+        $fileFields = ['open_mic_image', 'close_mic_image'];
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+
+                $image = Common::upload('images', $file);
+
+                Config::updateOrCreate(['name' => $field], ['value' =>  $image]);
+            }
+        }
+
+        $data = $request->except(array_merge(['_token'], $fileFields));
 
         foreach ($data as $key => $value) {
             Config::updateOrCreate(['name' => $key], ['value' => $value]);
