@@ -2604,7 +2604,7 @@ class Common
             throw new \Exception(__('frozen_agency_by_admin'));
         }
         if ($user->agency_id) {
-            $hostAgency = Agency::withoutGlobalScopes()
+            $hostAgency = ShippingAgency::withoutGlobalScopes()
                 ->where('id', $user->agency_id)
                 ->whereNull('deleted_at')
                 ->first();
