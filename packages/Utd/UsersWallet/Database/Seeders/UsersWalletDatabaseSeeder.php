@@ -17,7 +17,8 @@ class UsersWalletDatabaseSeeder extends Seeder
         $this->call([
             DigitalWalletTemplateSeeder::class,
             OtherWalletTemplateSeeder::class,
-            BankAccountTemplateSeeder::class
+            BankAccountTemplateSeeder::class,
+            WalletMenuSeeder::class
         ]);
     }
 }
