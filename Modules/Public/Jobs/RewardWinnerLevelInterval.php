@@ -54,7 +54,7 @@ class RewardWinnerLevelInterval implements ShouldQueue
                     'max' => $levelInterval->max,
                     'level_interval_id' => $levelInterval->id
                 ])->exists();
-                if ($tokeReward) return;
+                if ($tokeReward) continue;
                 foreach ($rewards as $rewad) {
  //dd(66662226);
                     if ($rewad->type == "coins") {
