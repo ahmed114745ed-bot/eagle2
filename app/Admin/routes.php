@@ -762,6 +762,7 @@ Route::group(
         Route::get('coin-game-users/show', [CoinGameUserAllController::class, 'showAll']);
         Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
             ->name('coin-game-users.ajax');
+        Route::get('coin-game-users/round-orders', [CoinGameUserAllController::class, 'roundOrders']);
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 

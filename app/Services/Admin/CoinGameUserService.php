@@ -618,7 +618,10 @@ class CoinGameUserService
             </a>
         HTML;
         });
-        $grid->column('round_id', __('Round ID'))->sortable();
+        $grid->column('round_id', __('Round ID'))->display(function ($v) {
+            $url = admin_url("coin-game-users/round-orders?round_id={$v}");
+            return "<a href='{$url}' style='color:#007bff; font-weight:bold;'>{$v}</a>";
+        })->sortable();
         $grid->column('total_loss', __('Total Loss'))->display(function ($v) {
             return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
         })->sortable();
@@ -631,6 +634,46 @@ class CoinGameUserService
 
         $grid->tools(function ($tools) use ($userId) {
             $tools->append('<a href="' . admin_url("coin-game-users/details?user_id={$userId}") . '" class="btn btn-sm btn-default">
+                <i class="fa fa-arrow-left"></i> ' . __('Back') . '</a>');
+        });
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableRowSelector();
+        $grid->disableActions();
+
+        return $grid;
+    }
+
+    public function buildRoundOrdersGrid($roundId): Grid
+    {
+        $grid = new Grid(new CoinGameUserAll());
+
+        $grid->model()
+            ->with(['user', 'game', 'customGame'])
+            ->where('round_id', $roundId)
+            ->orderByDesc('created_at');
+
+        $grid->column('id', __('ID'))->sortable();
+        $grid->column('order_id', __('Order ID'))->sortable();
+        $grid->column('user_id', __('User ID'))->display(function () {
+            return $this->user->name ?? $this->user_id;
+        });
+        $grid->column('game_name', __('Game'));
+        $grid->column('coins', __('Coins'))->display(function ($v) {
+            return number_format($v);
+        })->sortable();
+        $grid->column('type', __('Type'))->display(function ($v) {
+            return $v == 0
+                ? "<span style='color:red; font-weight:bold;'>" . __('Loss') . "</span>"
+                : "<span style='color:green; font-weight:bold;'>" . __('Win') . "</span>";
+        });
+        $grid->column('app_profit_coins', __('App Profit Coins'))->display(function ($v) {
+            return number_format($v ?? 0);
+        })->sortable();
+        $grid->column('created_at', __('Created At'))->sortable();
+
+        $grid->tools(function ($tools) {
+            $tools->append('<a href="javascript:history.back()" class="btn btn-sm btn-default">
                 <i class="fa fa-arrow-left"></i> ' . __('Back') . '</a>');
         });
         $grid->disableCreateButton();

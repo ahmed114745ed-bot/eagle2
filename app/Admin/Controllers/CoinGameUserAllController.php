@@ -84,6 +84,20 @@ class CoinGameUserAllController extends AdminController
     }
 
 
+    public function roundOrders(Content $content, Request $request)
+    {
+        $roundId = $request->get('round_id');
+        if (!$roundId) {
+            return redirect(admin_url('coin-game-users-reports'));
+        }
+        $grid = $this->service->buildRoundOrdersGrid($roundId);
+
+        return $content
+            ->title(__('round_orders'))
+            ->description(__('round_orders') . " | Round: {$roundId}")
+            ->body($grid);
+    }
+
     public function ajaxTotals(Request $request)
     {
         $filters = $request->all();
