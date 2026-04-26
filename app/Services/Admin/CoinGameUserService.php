@@ -235,30 +235,24 @@ class CoinGameUserService
      */
     public function buildGrid(): Grid
     {
-        $grid = new Grid(new CoinGameUserArchive());
+        // Performance: use pre-aggregated table instead of raw archive (prevents 408 timeout)
+        $grid = new Grid(new CoinGameUserAggregated());
 
         $grid->model()
             ->select([
-                'coin_game_users_archive.user_id',
-                'u.uuid as user_uuid',
-                'u.name as user_name',
-                'up.avatar as user_avatar',
-                DB::raw('SUM(coin_game_users_archive.coins) as total_played'),
-                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) as total_loss'),
-                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as total_win'),
-                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) - SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as app_profit'),
-                DB::raw('MIN(coin_game_users_archive.created_at) as first_played'),
-                DB::raw('MAX(coin_game_users_archive.created_at) as last_played'),
+                'user_id',
+                'user_uuid',
+                'user_name',
+                'user_avatar',
+                DB::raw('SUM(total_played) as total_played'),
+                DB::raw('SUM(total_loss) as total_loss'),
+                DB::raw('SUM(total_win) as total_win'),
+                DB::raw('SUM(app_profit) as app_profit'),
+                DB::raw('MIN(date) as first_played'),
+                DB::raw('MAX(date) as last_played'),
             ])
-            ->from('coin_game_users_archive')
-            ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_archive.user_id')
-            ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
-            ->whereNotNull('coin_game_users_archive.game_id')
-            ->groupBy(
-                'coin_game_users_archive.user_id',
-                'u.uuid', 'u.name', 'up.avatar'
-            )
-            ->orderByDesc(DB::raw('SUM(coin_game_users_archive.coins)'));
+            ->groupBy('user_id', 'user_uuid', 'user_name', 'user_avatar')
+            ->orderByDesc(DB::raw('SUM(total_played)'));
 
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -267,21 +261,19 @@ class CoinGameUserService
 
             $filter->where(function ($query) {
                 if (!empty($this->input)) {
-                    $query->whereHas('user', function ($q) {
-                        $q->where('uuid', 'LIKE', "%{$this->input}%");
-                    });
+                    $query->where('user_uuid', 'LIKE', "%{$this->input}%");
                 }
             }, 'User UUID', 'user_uuid')->placeholder('UUID');
 
             $filter->where(function ($query) {
                 if ($value = $this->input) {
-                    $query->where('coin_game_users_archive.created_at', '>=', $value);
+                    $query->where('date', '>=', $value);
                 }
             }, 'From', 'from_date')->datetime();
 
             $filter->where(function ($query) {
                 if ($value = $this->input) {
-                    $query->where('coin_game_users_archive.created_at', '<=', $value);
+                    $query->where('date', '<=', $value);
                 }
             }, 'To', 'to_date')->datetime();
         });
@@ -295,7 +287,30 @@ class CoinGameUserService
 
         $userService = $this->userService;
 
-        $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
+        // Performance: batch-load User models with profile & packs for all rows on this page
+        // This avoids N+1 queries when adminUserAvatar() accesses profile->avatar
+        $usersCache = collect();
+
+        $grid->rows(function ($rows) use (&$usersCache) {
+            $userIds = $rows->pluck('user_id')->unique()->filter()->toArray();
+            if (!empty($userIds)) {
+                $usersCache = User::whereIn('id', $userIds)
+                    ->with([
+                        'profile',
+                        'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                    ])
+                    ->get()
+                    ->keyBy('id');
+            }
+        });
+
+        $grid->column('user_uuid', __('User'))->display(function () use ($userService, &$usersCache) {
+            // Use batch-loaded User model (with profile & packs) if available
+            $user = $usersCache[$this->user_id] ?? null;
+            if ($user) {
+                return $userService->adminUserAvatar($user, withoutLevels: true);
+            }
+            // Fallback to plain object from joined data
             return $userService->adminUserAvatar((object)[
                 'id'     => $this->user_id,
                 'uuid'   => $this->user_uuid,
@@ -384,7 +399,7 @@ class CoinGameUserService
             ])
             ->from('coin_game_users_daily_aggregated')
             ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_daily_aggregated.user_id')
-            ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id', function($join) {
+            ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id', function ($join) {
                 $join->whereRaw('up.id = (SELECT id FROM profiles WHERE user_id = u.id LIMIT 1)');
             })
             ->groupBy('coin_game_users_daily_aggregated.user_id', 'u.uuid', 'u.name', 'up.avatar')
@@ -409,8 +424,8 @@ class CoinGameUserService
                 }
             }, 'Game', 'game_id');
 
-           $filter->between('date', __('Created At'))
-                     ->date();
+            $filter->between('date', __('Created At'))
+                ->date();
         });
 
         $userService = $this->userService;
@@ -452,7 +467,13 @@ class CoinGameUserService
 
         $grid->model()
             ->where('user_id', $user_id)
-            ->with(['user', 'game', 'customGame'])
+            ->with([
+                'user',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'game',
+                'customGame'
+            ])
             ->select([
                 'game_id',
                 'game_name',
