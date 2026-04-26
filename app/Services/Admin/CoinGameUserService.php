@@ -558,79 +558,88 @@ class CoinGameUserService
 
     public function buildGrid_details($user_id): Grid
     {
-        $grid = new Grid(new CoinGameUserAggregated());
+        $grid = new Grid(new CoinGameUserArchive());
 
         $grid->model()
-            ->where('user_id', $user_id)
-            ->with([
-                'user',
-                'user.profile',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-
-                'game',
-                'customGame'
-            ])
             ->select([
-                'game_id',
-                'game_name',
-                'game_image',
-                DB::raw('SUM(total_played) as total_played'),
-                DB::raw('SUM(total_loss) as total_loss'),
-                DB::raw('SUM(total_win) as total_win'),
-                DB::raw('SUM(app_profit) as app_profit'),
-                'user_id',
-                'user_uuid',
-                'user_name',
-                'user_avatar',
+                'coin_game_users_archive.user_id',
+                'coin_game_users_archive.game_id',
+                'u.uuid as user_uuid',
+                'u.name as user_name',
+                'up.avatar as user_avatar',
+                'g.name as game_name',
+                'g.image as game_image',
+                DB::raw('SUM(coin_game_users_archive.coins) as total_played'),
+                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) as total_loss'),
+                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as total_win'),
+                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END)
+                    - SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as app_profit'),
             ])
-            ->groupBy('game_id', 'game_name', 'game_image', 'user_id', 'user_uuid', 'user_name', 'user_avatar')
+            ->from('coin_game_users_archive')
+            ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_archive.user_id')
+            ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
+            ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_archive.game_id')
+            ->where('coin_game_users_archive.user_id', $user_id)
+            ->whereNotNull('coin_game_users_archive.game_id')
+            ->groupBy(
+                'coin_game_users_archive.user_id',
+                'coin_game_users_archive.game_id',
+                'u.uuid',
+                'u.name',
+                'up.avatar',
+                'g.name',
+                'g.image'
+            )
             ->orderByDesc('total_played');
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
 
             $filter->where(function ($query) {
                 if (!empty($this->input)) {
-                    $query->whereHas('user', function ($q) {
-                        $q->where('uuid', 'like', "%{$this->input}%");
-                    });
-                }
-            }, 'User UUID', 'user_uuid')->placeholder('UUID');
-
-            $filter->where(function ($query) {
-                if (!empty($this->input)) {
-                    $query->where('game_id', 'like', "%{$this->input}%");
+                    $query->where('coin_game_users_archive.game_id', $this->input);
                 }
             }, 'Game', 'game_id')->placeholder('ID');
 
-            $filter->between('date', __('Created At'))->datetime([
-                'format' => 'YYYY-MM-DD HH:mm:ss',
-                'locale' => 'en'
-            ]);
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($value = $this->input) {
+                        $query->where('coin_game_users_archive.created_at', '>=', $value);
+                    }
+                }, 'From', 'from_date')->datetime();
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($value = $this->input) {
+                        $query->where('coin_game_users_archive.created_at', '<=', $value);
+                    }
+                }, 'To', 'to_date')->datetime();
+            });
         });
 
         $userService = $this->userService;
 
         $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
-            return $userService->adminUserAvatar((object)[
+            return $userService->adminUserAvatarII((object)[
                 'id'     => $this->user_id,
                 'uuid'   => $this->user_uuid,
                 'name'   => $this->user_name,
                 'avatar' => $this->user_avatar,
-            ], withoutLevels: true);
+            ], true);
         });
 
         $grid->column('game_id', __('Game'))->display(function () {
             $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($this->game_image ?? @$this->customGame?->image ?? $defaultImage) ?? $defaultImage;
+            $url = getImagePath($this->game_image ?? $defaultImage) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
 
             $uniqueId = $this->game_id ?? 'game-unknown';
             $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
-            $id = $this->customGame->id ?? $this->game_id;
             $gameIdHtml = "game-{$this->game_id}";
-            $urlLink = admin_url("all-games/{$id}");
-            $name =  app()->getLocale() === 'ar' ? ($this->game_name ?? @$this->customGame?->name ?? @$this->customGame?->name_en) : ($this->game_name ?? @$this->customGame?->name_en ?? @$this->customGame?->name);
+            $urlLink = admin_url("all-games/{$this->game_id}");
+            $name = $this->game_name ?? $this->game_id;
 
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
@@ -646,9 +655,16 @@ class CoinGameUserService
         HTML;
         });
 
-        $grid->column('total_loss', __('Total Loss'))->display(fn($v) => number_format($v))->sortable();
-        $grid->column('total_win', __('Total Win'))->display(fn($v) => number_format($v))->sortable();
-        $grid->column('app_profit', __('App Profit'))->display(fn($v) => number_format($v))->sortable();
+        $grid->column('total_loss', __('Total Loss'))->display(
+            fn($v) => "<span style='color:red;font-weight:bold;'>" . number_format($v) . "</span>"
+        )->sortable();
+        $grid->column('total_win', __('Total Win'))->display(
+            fn($v) => "<span style='color:green;font-weight:bold;'>" . number_format($v) . "</span>"
+        )->sortable();
+        $grid->column('app_profit', __('App Profit'))->display(function ($v) {
+            $color = $v >= 0 ? 'green' : 'red';
+            return "<span style='color:{$color};font-weight:bold;'>" . number_format($v) . "</span>";
+        })->sortable();
 
         $grid->column('details', __('Details'))->display(function () {
             $url = admin_url("coin-game-users/show?user_id={$this->user_id}&game_id={$this->game_id}");
