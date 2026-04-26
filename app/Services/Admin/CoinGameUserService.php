@@ -439,8 +439,7 @@ class CoinGameUserService
         $grid->disableActions();
         $grid->disableExport();
 
-        // ✅ Pagination (IMPORTANT)
-        $grid->paginate(20);
+        $grid->paginate(10);
 
         return $grid;
     }
@@ -551,6 +550,7 @@ class CoinGameUserService
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
+        $grid->paginate(10);
 
         return $grid;
     }
@@ -664,6 +664,7 @@ class CoinGameUserService
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableExport();
+        $grid->paginate(10);
 
         return $grid;
     }
@@ -762,6 +763,7 @@ class CoinGameUserService
         $grid->disableExport();
         $grid->disableRowSelector();
         $grid->disableActions();
+        $grid->paginate(10);
 
         return $grid;
     }
@@ -802,6 +804,7 @@ class CoinGameUserService
         $grid->disableExport();
         $grid->disableRowSelector();
         $grid->disableActions();
+        $grid->paginate(10);
 
         return $grid;
     }
