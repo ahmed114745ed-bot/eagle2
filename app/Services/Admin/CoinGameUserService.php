@@ -736,10 +736,13 @@ class CoinGameUserService
             </a>
         HTML;
         });
-        $grid->column('round_id', __('Round ID'))->display(function ($v) {
-            $url = admin_url("coin-game-users/round-orders?round_id={$v}");
-            return "<a href='{$url}' style='color:#007bff; font-weight:bold;'>{$v}</a>";
-        })->sortable();
+        $grid->column('round_id', __('Round ID'))->sortable();
+        $grid->column('orders', __('Orders'))->display(function () {
+            $url = admin_url("coin-game-users/round-orders?round_id={$this->round_id}");
+            return "<a href='{$url}' class='btn btn-sm btn-primary'>
+                    <i class='fa fa-eye'></i> " . __('Orders') . "
+                </a>";
+        });
         $grid->column('total_loss', __('Total Loss'))->display(function ($v) {
             return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
         })->sortable();
