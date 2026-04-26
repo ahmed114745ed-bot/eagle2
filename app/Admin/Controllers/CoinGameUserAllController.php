@@ -125,7 +125,7 @@ class CoinGameUserAllController extends AdminController
     {
         $filters = $request->all();
 
-        $query = CoinGameUserArchive::query()
+        $query = CoinGameUserDailyAggregated::query()
             ->whereNotNull('game_id');
 
         // Apply filters using readable keys from request
