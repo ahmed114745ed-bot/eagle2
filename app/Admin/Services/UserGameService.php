@@ -14,7 +14,6 @@ class UserGameService
     
         public function adminUserAvatar($user, bool $withoutLevels = false): string
         {
-            
             if (! $user) {
                 return __('No user');
             }
@@ -25,12 +24,12 @@ class UserGameService
     
             // Avatar
             $defaultImage = asset('images/businessman-icon.jpg');
-            // Performance: safely access profile->avatar with null coalescing (no lazy load on plain objects)
-            $path = (isset($user->profile) && $user->profile ? $user->profile->avatar : null) ?? $user->avatar ?? null;
+            $path = $user->profile->avatar ?? $user->avatar ?? null; // 👈 fallback
     
             $url = getImagePath($path) ?? $defaultImage;
-            // Performance: removed isImageExists() HTTP get_headers call (2s timeout per row)
-            // Browser handles broken images gracefully with onerror fallback
+            if (! isImageExists($url)) {
+                $url = $defaultImage;
+            }
     
             $image = handleShowImageWithTypes($user->id ?? 0, $url, 50, 50);
     
