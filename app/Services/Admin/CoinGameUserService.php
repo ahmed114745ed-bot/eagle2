@@ -764,6 +764,8 @@ class CoinGameUserService
         $grid->column('first_played', __('Start Date'))->display(fn($v) => $v)->sortable();
         $grid->column('last_played', __('End Date'))->display(fn($v) => $v)->sortable();
         $grid->column('orders', __('Orders'))->display(function () use ($userId) {
+            \Log::info("userId:serv " . $userId);
+            \Log::info("round_id:serv " . $this->round_id);
             $url = admin_url("coin-game-users/round-orders?user_id={$userId}&round_id={$this->round_id}");
             return "<a href='{$url}' class='btn btn-sm btn-primary'>
                     <i class='fa fa-eye'></i> " . __('Orders') . "
