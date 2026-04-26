@@ -82,29 +82,7 @@ return [
     |
     */
 
-    'listeners' => [
-
-     
-        'tick@1000' => function () {
-            static $lastDbQuery = null;
-
-            if ($lastDbQuery && (time() - $lastDbQuery > 30)) {
-                \Illuminate\Support\Facades\DB::disconnect();
-                
-                $lastDbQuery = null;
-            }
-        },
-
-     
-        'request' => function ($request) {
-            static $lastDbQuery;
-
-            if ($request->getHost()) {
-                $lastDbQuery = time();
-            }
-        },
-
-    ],
+    'listeners' => [],
 
     /*
     |--------------------------------------------------------------------------

@@ -89,6 +89,7 @@ class UpgradeLevelServices
 
             $hadNotRewards = $this->hadNotRewards($user->id, $user->total_sender_level);
             if ($hadNotRewards) {
+               
                 dispatch(new RewardWinnerLevelInterval($user->id, $senderLevel, 2))->onQueue('level_rewards');
             }
         }

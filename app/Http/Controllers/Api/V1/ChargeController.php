@@ -120,7 +120,7 @@ class ChargeController extends Controller
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
 
-        Common::checkUserAgencyFrozen($from);
+        // Common::checkUserAgencyFrozen($from);
 
         if ($to->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
@@ -195,9 +195,9 @@ class ChargeController extends Controller
         if ($from->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
-
+        Log::info("ChargeToAgency: User {$from->id} is trying to charge agency {$toId} with amount {$request->amount}");
         Common::checkUserAgencyFrozen($from);
-
+        Log::info("ChargeToAgency: User {$from->id} passed agency frozen check");
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
 
