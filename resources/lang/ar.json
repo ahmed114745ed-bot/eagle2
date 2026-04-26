@@ -1,4 +1,4 @@
-{
+ {
     "Note": "ملاحظة",
     "Today's data does not appear in this report. Only archived data is displayed.": "بيانات اليوم لا تظهر في هذا التقرير. يتم عرض البيانات المؤرشفة فقط.",
     "Laravel": "سبسيب", 
@@ -14,6 +14,13 @@
     "Dashboard": "لوحة التحكم",
     "Admin": "المدير",
     "Users": "المستخدمين",
+    "Word":"كلمة",
+    "word":"كلمة",
+    "Replacement":"الاستبدال",
+    "Severity":"الشدة",
+    "Action":"الإجراء",
+    "Is active":"نشط",
+    "Sensitive Words": "الكلمات الحساسة",
     "URI": "الرابط",
     "Roles": "الادوار",
     "total_balance": "اجمالي التارجت ",

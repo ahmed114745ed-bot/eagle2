@@ -97,6 +97,7 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\RouteController;
 use App\Admin\Controllers\ScaffoldController;
+use App\Admin\Controllers\SensitiveWordController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
@@ -200,23 +201,23 @@ $filtered = $routes->reject(function ($route) {
 
 
 Route::group(
-        [
-            'prefix'        => config('admin.route.prefix'),
-            'namespace'     => config('admin.route.namespace'),
-            'middleware'    => [
-               'web',
+    [
+        'prefix'        => config('admin.route.prefix'),
+        'namespace'     => config('admin.route.namespace'),
+        'middleware'    => [
+            'web',
             'admin.auth',
             'adminIp',
-                //            'adminGeneralBan',
-                'multiLanguage',
-            ],
-            'as'            => config('admin.route.prefix') . '.',
+            //            'adminGeneralBan',
+            'multiLanguage',
         ],
-        function () {
+        'as'            => config('admin.route.prefix') . '.',
+    ],
+    function () {
 
-                Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
-
-        });
+        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
+    }
+);
 
 
 
@@ -458,6 +459,7 @@ Route::group(
         ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
+        Route::resource('sensitive-words', SensitiveWordController::class);
 
 
         Route::get('/soon', 'AllStatisticController@index2');

@@ -43,6 +43,7 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\RoomController;
+use App\Http\Controllers\Api\V1\SensitiveWordController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -385,7 +386,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
-
+             Route::get('/bad-words', [SensitiveWordController::class, 'index']);
             Route::prefix('gifts')->withoutMiddleware(['throttle', 'throttle:api'])->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
                 Route::get('/v2', [GiftController::class, 'getByCategory']);
