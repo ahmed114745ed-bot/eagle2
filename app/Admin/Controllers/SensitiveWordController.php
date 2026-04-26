@@ -77,7 +77,7 @@ class SensitiveWordController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('word', __('Word'))->display(function ($value) {
             $locale = \Illuminate\Support\Facades\App::getLocale();
-            return $value[$locale] ?? ($value['en'] ?? '');
+            return $value[$locale] ?? ($value['ar'] ?? '');
         });
         $grid->column('replacement', __('Replacement'));
         $grid->column('severity', __('Severity'));
