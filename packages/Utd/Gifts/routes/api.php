@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Utd\Gifts\Http\Controllers\Api\GiftController;
 use Utd\Gifts\Http\Controllers\Api\GiftCategoryController;
+use Utd\Gifts\Http\Controllers\Api\GiftController;
 use Utd\Gifts\Http\Controllers\Api\GiftLogController;
 
 Route::prefix('api/')->middleware(['api', 'auth:sanctum'])->group(function () {

@@ -7,18 +7,17 @@ use App\Exceptions\NotInfMoneyException;
 use App\Jobs\IncreaseDiamondJob;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
-use Mockery\Exception;
-use Modules\Vip\Entities\Vip;
-use Utd\Gifts\Entities\UserGift;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
+use Modules\Vip\Entities\Vip;
+use Throwable;
+use Utd\Gifts\Entities\UserGift;
 
 class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftContract
 {
-
     private array $expPercentages;
 
     public function __construct()
@@ -39,7 +38,7 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
         $user->salary_is_updated = true;
         $user->total_diamond_received += $totalCoins;
 
-        if ($user->type_user == 0 && $user->agency_id == 0) {
+        if ($user->type_user === 0 && $user->agency_id === 0) {
             $user->exchange_diamonds += $totalCoins;
         }
 
@@ -48,7 +47,7 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
         try {
             (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
 
-            if ($user->total_received_level != $lastReceivedLevel) {
+            if ($user->total_received_level !== $lastReceivedLevel) {
                 dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))
                     ->onQueue('notification');
             }
@@ -56,28 +55,26 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
             Log::build([
                 'driver' => 'single',
                 'path' => storage_path('logs/diamond_upgrade.log'),
-            ])->error("Error in checkUserLevelUpgrated for user {$user->id}: " . $e->getMessage());
+            ])->error("Error in checkUserLevelUpgrated for user {$user->id}: ".$e->getMessage());
         }
 
         $user->save();
 
+        /*   try {
+               uploadMonthlyDiamondReceive($receivedUser->id, $diamondUser);
 
-     /*   try {
-            uploadMonthlyDiamondReceive($receivedUser->id, $diamondUser);
+               Log::build([
+                   'driver' => 'single',
+                   'path' => storage_path('logs/monthly_diamond.log'),
+               ])->info("MonthlyDiamondReceive updated for user {$receivedUser->id}: {$diamondUser}");
 
-            Log::build([
-                'driver' => 'single',
-                'path' => storage_path('logs/monthly_diamond.log'),
-            ])->info("MonthlyDiamondReceive updated for user {$receivedUser->id}: {$diamondUser}");
-
-        } catch (\Exception $e) {
-            Log::build([
-                'driver' => 'single',
-                'path' => storage_path('logs/monthly_diamond.log'),
-            ])->error("Failed to update MonthlyDiamondReceive for user {$receivedUser->id}: " . $e->getMessage());
-        }*/
+           } catch (\Exception $e) {
+               Log::build([
+                   'driver' => 'single',
+                   'path' => storage_path('logs/monthly_diamond.log'),
+               ])->error("Failed to update MonthlyDiamondReceive for user {$receivedUser->id}: " . $e->getMessage());
+           }*/
     }
-
 
     public function updateUsers(int $totalCoins, array $userIds)
     {
@@ -87,15 +84,14 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
         //     'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
         // ]);
         DB::transaction(function () use ($totalCoins, $userIds) {
-            $users = User::
-                  whereIn('id', $userIds)
+            $users = User::whereIn('id', $userIds)
                 ->lockForUpdate()
                 ->get();
 
             foreach ($users as $user) {
                 DB::table('users')->where('id', $user->id)->update([
-                    'total_diamond_received'   => $user->total_diamond_received + $totalCoins,
-                    'exchange_diamonds'        => $user->agency_id == 0
+                    'total_diamond_received' => $user->total_diamond_received + $totalCoins,
+                    'exchange_diamonds' => $user->agency_id === 0
                         ? $user->exchange_diamonds + $totalCoins
                         : $user->exchange_diamonds,
                 ]);
@@ -106,17 +102,18 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
             }
         });
     }
+
     public function updateReceivedLevels(User $receivedUser)
     {
         $receivedUser->enableSaving = false;
-        //update monthly diamond for received user
+        // update monthly diamond for received user
         // update levels
         $lastReceivedLevel = $receivedUser->total_received_level;
 
-        $totalDiamondReceived                  = $receivedUser->total_received_diamonds;
-        $levelVip                     = $this->getLevel(1, $totalDiamondReceived);
-        $receivedUser->received_level = $levelVip != null ? (@$levelVip->level - $receivedUser->sub_receiver_level) ?? 0 : 0;
-        if ($receivedUser->total_received_level != $lastReceivedLevel) {
+        $totalDiamondReceived = $receivedUser->total_received_diamonds;
+        $levelVip = $this->getLevel(1, $totalDiamondReceived);
+        $receivedUser->received_level = $levelVip !== null ? (@$levelVip->level - $receivedUser->sub_receiver_level) ?? 0 : 0;
+        if ($receivedUser->total_received_level !== $lastReceivedLevel) {
             dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
         }
 
@@ -133,7 +130,6 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
         return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
-
     /*
      * 1 for receiver
      * 2, 3 for sender or vip
@@ -146,7 +142,7 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
             ->update([
                 'di' => DB::raw("di - {$totalCoins}"),
                 'monthly_diamond_send' => DB::raw("monthly_diamond_send + {$totalCoins}"),
-                'total_diamond_send' => DB::raw("total_diamond_send + {$totalCoins}")
+                'total_diamond_send' => DB::raw("total_diamond_send + {$totalCoins}"),
             ]);
 
         if ($affected === 0) {
@@ -160,7 +156,7 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
 
         (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
 
-        if ($senderUser->total_sender_level != $lastLevel) {
+        if ($senderUser->total_sender_level !== $lastLevel) {
             dispatch(
                 new SendCustomOfficialMessageToUser(
                     $senderUser->id,
@@ -169,30 +165,28 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
             )->onQueue('notification');
         }
 
-
         return $senderUser->fresh();
     }
+
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sendFromBagAndRemoveGift(int $totalCoins, User $senderUser, int $giftId, int $number)
     {
         $senderUser->enableSaving = false;
         $senderUser->monthly_diamond_send += $totalCoins;
-        $senderUser->total_diamond_send   += $totalCoins;
+        $senderUser->total_diamond_send += $totalCoins;
         $lastSenderUser = $senderUser->total_sender_level;
-
 
         $userGift = UserGift::where('user_id', $senderUser->id)
             ->where('gift_id', $giftId)
-            ->where('quantity', '>',0)
-            ->where(function($query) {
+            ->where('quantity', '>', 0)
+            ->where(function ($query) {
                 $query->where('expire', 0)
                     ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
             })->first();
 
-
-        throw_if(( !$userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
+        throw_if((! $userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
 
         $userGift->quantity -= $number;
 
@@ -201,7 +195,6 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
         } else {
             $userGift->delete();
         }
-
 
         (new UpgradeLevelServices())->checkUserLevelUpgrated($senderUser);
         if ($senderUser->total_sender_level > $lastSenderUser) {
@@ -217,20 +210,21 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
         return $senderUser;
     }
 
-
     public function getSenderLevel($totalDiamondSend, $totalDiamond, int $subSenderLevel)
     {
-        $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages['exp_sender_percentage'];
+        $total = (int) ($totalDiamondSend + $totalDiamond) * $this->expPercentages['exp_sender_percentage'];
         // dd($total,$totalDiamondSend,$totalDiamond ,$this->expPercentages['exp_sender_percentage']);
-        $levelVip                 = $this->getLevel(2, $total);
-        return $levelVip != null ? (@$levelVip->level) ?? 0 : 0;
+        $levelVip = $this->getLevel(2, $total);
+
+        return $levelVip !== null ? (@$levelVip->level) ?? 0 : 0;
     }
 
     public function getRoomLevel($total)
     {
         // $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages[0] ;
-        $levelVip                 = $this->getLevel(4, $total);
-        return $levelVip != null ? @$levelVip->level ?? 0 : 0;
+        $levelVip = $this->getLevel(4, $total);
+
+        return $levelVip !== null ? @$levelVip->level ?? 0 : 0;
     }
 
     public function getRoomLevelDetails($total)
@@ -240,10 +234,10 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
 
     public function getReceiverLevel($totalDiamondReceived, $totalDiamond, int $subReceiverLevel)
     {
-        $total = intval($totalDiamondReceived + $totalDiamond) * $this->expPercentages['exp_received_percentage'];
+        $total = (int) ($totalDiamondReceived + $totalDiamond) * $this->expPercentages['exp_received_percentage'];
 
-        $levelVip                 = $this->getLevel(1, $total);
+        $levelVip = $this->getLevel(1, $total);
 
-        return $levelVip != null ? (@$levelVip->level) ?? 0 : 0;
+        return $levelVip !== null ? (@$levelVip->level) ?? 0 : 0;
     }
 }

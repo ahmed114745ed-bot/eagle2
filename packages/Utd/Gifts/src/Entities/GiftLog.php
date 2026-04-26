@@ -5,7 +5,6 @@ namespace Utd\Gifts\Entities;
 use App\Models\Agency;
 use App\Models\User;
 use App\Support\PackageHelper;
-use App\Traits\HostLevelTrait;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +16,7 @@ use Utd\Room\Entities\Room;
  */
 class GiftLog extends Model
 {
-    use HostLevelTrait, TimestampsWithTimezone;
+    use TimestampsWithTimezone;
 
     protected $table = 'gift_logs';
 

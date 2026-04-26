@@ -3,7 +3,6 @@
 namespace Utd\Reals\Http\Controllers;
 
 use App\Helpers\Common;
-use Utd\Reals\Services\RealsNotification;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Throwable;
 use Utd\Reals\Http\Requests\StoreRealComment;
 use Utd\Reals\Services\RealCommentsService;
+use Utd\Reals\Services\RealsNotification;
 use Utd\Reals\Services\RealsService;
 use Utd\Reals\Transformers\RealCommentsResource;
 

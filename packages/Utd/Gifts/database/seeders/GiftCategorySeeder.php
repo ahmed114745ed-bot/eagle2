@@ -2,9 +2,9 @@
 
 namespace Utd\Gifts\Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
-use Illuminate\Database\Seeder;
 
 class GiftCategorySeeder extends Seeder
 {
@@ -15,9 +15,9 @@ class GiftCategorySeeder extends Seeder
      */
     public function run()
     {
-        $normal  = GiftCategory::create([
-            "type" => 'normal',
-            "title" => [
+        $normal = GiftCategory::create([
+            'type' => 'normal',
+            'title' => [
                 'en' => 'Normal ',
                 'ar' => 'عادية',
                 'hi' => 'साधारण ',
@@ -26,9 +26,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 1)->update(['gift_category_id' => $normal->id]);
-        $hot  = GiftCategory::create([
-            "type" => 'normal',
-            "title" => [
+        $hot = GiftCategory::create([
+            'type' => 'normal',
+            'title' => [
                 'en' => 'Hot',
                 'ar' => 'ساخنة',
                 'hi' => 'गरम',
@@ -37,9 +37,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 2)->update(['gift_category_id' => $hot->id]);
-        $country  = GiftCategory::create([
-            "type" => 'normal',
-            "title" => [
+        $country = GiftCategory::create([
+            'type' => 'normal',
+            'title' => [
                 'en' => 'Country',
                 'ar' => 'دولة',
                 'hi' => 'देश',
@@ -48,9 +48,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 3)->update(['gift_category_id' => $country->id]);
-        $moment  = GiftCategory::create([
-            "type" => 'normal',
-            "title" => [
+        $moment = GiftCategory::create([
+            'type' => 'normal',
+            'title' => [
                 'en' => 'Moment',
                 'ar' => 'لحظة',
                 'hi' => 'पल',
@@ -59,9 +59,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 4)->update(['gift_category_id' => $moment->id]);
-        $vip  = GiftCategory::create([
-            "type" => 'vip',
-            "title" => [
+        $vip = GiftCategory::create([
+            'type' => 'vip',
+            'title' => [
                 'en' => 'VIP',
                 'ar' => 'شخص مهم',
                 'hi' => 'वीआईपी',
@@ -70,9 +70,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 9)->update(['gift_category_id' => $vip->id]);
-        $event  = GiftCategory::create([
-            "type" => 'normal',
-            "title" => [
+        $event = GiftCategory::create([
+            'type' => 'normal',
+            'title' => [
                 'en' => 'Events',
                 'ar' => 'الفعاليات',
                 'hi' => 'इवेंट्स',
@@ -81,9 +81,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 7)->update(['gift_category_id' => $event->id]);
-        $lucky  = GiftCategory::create([
+        $lucky = GiftCategory::create([
 
-            "type" => 'lucky_gift',
+            'type' => 'lucky_gift',
             'title' => [
                 'en' => 'Lucky gifts',        // English
                 'ar' => 'هدايا محظوظة',       // Arabic
@@ -93,9 +93,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 6)->update(['gift_category_id' => $lucky->id]);
-        $famous  = GiftCategory::create([
-            "type" => 'normal',
-            "title" => [
+        $famous = GiftCategory::create([
+            'type' => 'normal',
+            'title' => [
                 'en' => 'Famous gifts',
                 'ar' => 'هدايا مشهورة',
                 'hi' => 'प्रसिद्ध उपहार',
@@ -104,9 +104,9 @@ class GiftCategorySeeder extends Seeder
 
         ]);
         Gift::where('type', 5)->update(['gift_category_id' => $famous->id]);
-        $cp  = GiftCategory::create([
-            "type" => 'cp',
-            "title" => [
+        $cp = GiftCategory::create([
+            'type' => 'cp',
+            'title' => [
                 'en' => 'Cp',
                 'ar' => 'cp',
                 'hi' => 'cp',

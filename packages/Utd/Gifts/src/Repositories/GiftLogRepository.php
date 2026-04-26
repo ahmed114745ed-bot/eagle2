@@ -2,10 +2,10 @@
 
 namespace Utd\Gifts\Repositories;
 
+use App\Contracts\GiftLogRepositoryContract;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Utd\Gifts\Entities\GiftLog;
-use App\Contracts\GiftLogRepositoryContract;
 
 class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryContract
 {

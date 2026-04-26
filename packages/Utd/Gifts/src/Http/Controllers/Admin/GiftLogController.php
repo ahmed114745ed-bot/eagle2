@@ -81,19 +81,19 @@ class GiftLogController extends MainController
 
         $grid->column('sender.name', __('Sender'))
             ->display(function ($val) {
-                /** @var \Utd\Gifts\Entities\GiftLog $this */
+                /** @var GiftLog $this */
                 return $this->sender ? $this->sender->name : '-';
             });
 
         $grid->column('receiver.name', __('Receiver'))
             ->display(function ($val) {
-                /** @var \Utd\Gifts\Entities\GiftLog $this */
+                /** @var GiftLog $this */
                 return $this->receiver ? $this->receiver->name : '-';
             });
 
         $grid->column('roomOwner.name', __('Room Owner'))
             ->display(function ($val) {
-                /** @var \Utd\Gifts\Entities\GiftLog $this */
+                /** @var GiftLog $this */
                 return $this->roomOwner ? $this->roomOwner->name : '-';
             });
 
