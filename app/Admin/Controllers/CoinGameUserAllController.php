@@ -98,10 +98,22 @@ class CoinGameUserAllController extends AdminController
             ->where('user_id', $userId)
             ->whereNotNull('game_id');
 
-        $filters = $request->all();
-        $query = $this->service->applyFilters($query, $filters);
+        $from = $request->get('from_date');
+        $to = $request->get('to_date');
 
-        $totals = $this->service->calculateTotals($query, $filters);
+        if ($from) {
+            $query->where('created_at', '>=', $from);
+        }
+        if ($to) {
+            $query->where('created_at', '<=', $to);
+        }
+
+        $totals = $query->selectRaw("
+            SUM(coins) as total_played,
+            SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
+            SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
+            SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) - SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as app_profit
+        ")->first();
 
         $html = view('admin.info_boxes', compact('totals'))->render();
         return response()->json(['html' => $html]);
