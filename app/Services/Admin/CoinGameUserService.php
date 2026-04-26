@@ -672,57 +672,57 @@ class CoinGameUserService
 
     public function buildShowAllGrid($userId, $gameId): Grid
     {
-        $grid = new Grid(new CoinGameUserAll());
+        $grid = new Grid(new CoinGameUserArchive());
 
         $grid->model()
-            ->with(['user', 'game', 'customGame'])
-            ->selectRaw("
-                game_name,
-                game_image,
-                game_id,
-                round_id,
-                SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
-                SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
-                MIN(created_at) as first_played,  
-                MAX(created_at) as last_played    
-            ")
-            ->where('user_id', $userId)
-            ->where('game_id', $gameId)
-            ->whereNotNull('round_id')
-            ->groupBy('game_name', 'round_id', 'game_image', 'game_id')
+            ->select([
+                'coin_game_users_archive.round_id',
+                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) as total_loss'),
+                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as total_win'),
+                DB::raw('MIN(coin_game_users_archive.created_at) as first_played'),
+                DB::raw('MAX(coin_game_users_archive.created_at) as last_played'),
+                'ag.id as game_id',
+                'ag.name as game_name',
+                'ag.image as game_image',
+            ])
+            ->leftJoin('all_games as ag', 'ag.id', '=', 'coin_game_users_archive.game_id')
+            ->where('coin_game_users_archive.user_id', $userId)
+            ->where('coin_game_users_archive.game_id', $gameId)
+            ->whereNotNull('coin_game_users_archive.round_id')
+            ->groupBy('coin_game_users_archive.round_id', 'ag.id', 'ag.name', 'ag.image')
             ->orderByDesc('last_played');
 
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
             $filter->where(function ($q) {
                 if (!empty($this->input)) {
-                    $q->where('round_id', 'like', "%{$this->input}%");
+                    $q->where('coin_game_users_archive.round_id', 'like', "%{$this->input}%");
                 }
             }, __('Round ID'), 'round_id')->placeholder(__('Round ID'));
 
-            $filter->where(function ($q) {
-                if (!empty($this->input)) {
-                    $q->where('game_id', 'like', "%{$this->input}%");
-                }
-            }, __('game id'), 'game_id_filter')->placeholder(__('Game ID'));
-
-            $filter->between('created_at', __('Created At'))->datetime([
+            $filter->between('coin_game_users_archive.created_at', __('Created At'))->datetime([
                 'format' => 'YYYY-MM-DD HH:mm:ss',
                 'locale' => 'en'
             ]);
         });
 
+        $grid->header(function () {
+            return '<div class="alert alert-warning" style="margin-bottom:15px;">
+                <i class="fa fa-exclamation-triangle"></i>
+                <strong>' . __('Note') . ':</strong> ' . __('Today\'s data does not appear in this report. Only archived data is displayed.') . '
+            </div>';
+        });
+
         $grid->column('game_name', __('Game'))->display(function () {
             $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($this->game_image ?? @$this->customGame?->image) ?? $defaultImage;
+            $url = getImagePath($this->game_image) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
 
             $uniqueId = $this->game_id ?? 'game-unknown';
             $imageTag = handleShowImageWithTypes((string) $uniqueId, $url, 50, 50, 0);
-            $id = $this->customGame->id ?? $this->game_id;
             $gameIdHtml = "game-{$this->game_id}";
-            $urlLink = admin_url("all-games/{$id}");
-            $name =  app()->getLocale() === 'ar' ? ($this->game_name ?? @$this->customGame?->name ?? @$this->customGame?->name_en) : ($this->game_name ?? @$this->customGame?->name_en ?? @$this->customGame?->name);
+            $urlLink = admin_url("all-games/{$this->game_id}");
+            $name = $this->game_name ?? 'Unknown Game';
 
             return <<<HTML
             <a href="{$urlLink}" style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;transition:background-color 0.2s;">
