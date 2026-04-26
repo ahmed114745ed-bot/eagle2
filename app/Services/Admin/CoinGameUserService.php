@@ -288,7 +288,7 @@ class CoinGameUserService
 
     //     $grid->header(function () {
     //         return '<div class="alert alert-warning" style="margin-bottom:15px;">
-    //             <i class="fa fa-exclamation-triangle"></i> 
+    //             <i class="fa fa-exclamation-triangle"></i>
     //             <strong>' . __('Note') . ':</strong> ' . __('Today\'s data does not appear in this report. Only archived data is displayed.') . '
     //         </div>';
     //     });
@@ -349,7 +349,7 @@ class CoinGameUserService
                 DB::raw('SUM(coin_game_users_archive.coins) as total_played'),
                 DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) as total_loss'),
                 DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as total_win'),
-                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) 
+                DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END)
                     - SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as app_profit'),
                 DB::raw('MIN(coin_game_users_archive.created_at) as first_played'),
                 DB::raw('MAX(coin_game_users_archive.created_at) as last_played'),
@@ -390,7 +390,7 @@ class CoinGameUserService
         // ✅ Header
         $grid->header(function () {
             return '<div class="alert alert-warning" style="margin-bottom:15px;">
-            <i class="fa fa-exclamation-triangle"></i> 
+            <i class="fa fa-exclamation-triangle"></i>
             <strong>' . __('Note') . ':</strong> ' . __('Today\'s data does not appear in this report. Only archived data is displayed.') . '
         </div>';
         });
@@ -684,8 +684,8 @@ class CoinGameUserService
                 round_id,
                 SUM(CASE WHEN type = 0 THEN coins ELSE 0 END) as total_loss,
                 SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) as total_win,
-                MIN(created_at) as first_played,  
-                MAX(created_at) as last_played    
+                MIN(created_at) as first_played,
+                MAX(created_at) as last_played
             ")
             ->where('user_id', $userId)
             ->where('game_id', $gameId)
