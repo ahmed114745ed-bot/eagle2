@@ -2544,6 +2544,10 @@ class Common
         }
         $agency = is_numeric($agency) ? ShippingAgency::find($agency) : $agency;
 
+        if (!$agency) {
+            return false;
+        }
+
         $ownerId = $agency->app_owner_id ?? null;
         if (!$ownerId) {
             return false;
