@@ -783,7 +783,7 @@ class CoinGameUserService
         return $grid;
     }
 
-    public function buildRoundOrdersGrid($roundId): Grid
+    public function buildRoundOrdersGrid($roundId,$userId): Grid
     {
         $grid = new Grid(new CoinGameUserAll());
 
