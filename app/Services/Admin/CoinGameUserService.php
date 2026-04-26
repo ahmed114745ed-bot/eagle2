@@ -570,6 +570,7 @@ class CoinGameUserService
             ")
             ->where('user_id', $userId)
             ->where('game_id', $gameId)
+            ->whereNotNull('round_id')
             ->groupBy('game_name', 'round_id', 'game_image', 'game_id')
             ->orderByDesc('last_played');
 
