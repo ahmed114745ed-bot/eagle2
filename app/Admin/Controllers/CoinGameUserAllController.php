@@ -123,8 +123,7 @@ class CoinGameUserAllController extends AdminController
     {
         $roundId = $request->get('round_id');
         $userId = $request->get('user_id');
-        \Log::info("roundId: " . $roundId);
-        \Log::info("userId: " . $userId);
+     
         if (!$roundId) {
             return redirect(admin_url('coin-game-users-reports'));
         }
