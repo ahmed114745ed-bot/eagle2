@@ -21,6 +21,13 @@
     "Action":"الإجراء",
     "Is active":"نشط",
     "Sensitive Words": "الكلمات الحساسة",
+
+    "Warn": "تحذير",
+    "Block": "حظر",
+    "Low": "منخفض",
+    "Medium": "متوسط",
+    "High": "مرتفع",
+    "Critical": "حرج",
     "URI": "الرابط",
     "Roles": "الادوار",
     "total_balance": "اجمالي التارجت ",
