@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(where msedge *)",
+      "Bash(where chrome *)",
+      "Read(//c/Program Files \\(x86\\)/Microsoft/Edge/Application/**)",
+      "Read(//c/Program Files/Microsoft/Edge/Application/**)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Bash(\"/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe\" --headless --disable-gpu --print-to-pdf=\"d:/projects/eagle/redis-session-report.pdf\" --no-margins \"file:///d:/projects/eagle/redis-session-report.html\")"
     ]
   }
 }
