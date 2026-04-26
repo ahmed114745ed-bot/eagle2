@@ -737,12 +737,6 @@ class CoinGameUserService
         HTML;
         });
         $grid->column('round_id', __('Round ID'))->sortable();
-        $grid->column('orders', __('Orders'))->display(function () {
-            $url = admin_url("coin-game-users/round-orders?round_id={$this->round_id}");
-            return "<a href='{$url}' class='btn btn-sm btn-primary'>
-                    <i class='fa fa-eye'></i> " . __('Orders') . "
-                </a>";
-        });
         $grid->column('total_loss', __('Total Loss'))->display(function ($v) {
             return "<span style='color:red; font-weight:bold;'>" . number_format($v) . "</span>";
         })->sortable();
@@ -752,6 +746,12 @@ class CoinGameUserService
         })->sortable();
         $grid->column('first_played', __('Start Date'))->display(fn($v) => $v)->sortable();
         $grid->column('last_played', __('End Date'))->display(fn($v) => $v)->sortable();
+        $grid->column('orders', __('Orders'))->display(function () {
+            $url = admin_url("coin-game-users/round-orders?round_id={$this->round_id}");
+            return "<a href='{$url}' class='btn btn-sm btn-primary'>
+                    <i class='fa fa-eye'></i> " . __('Orders') . "
+                </a>";
+        });
 
         $grid->tools(function ($tools) use ($userId) {
             $tools->append('<a href="' . admin_url("coin-game-users/details?user_id={$userId}") . '" class="btn btn-sm btn-default">
