@@ -28,7 +28,7 @@ class CoinGameUserService
     }
 
 
-    public function applyFiltersOld($query,  array $filters)
+    public function applyFilters($query,  array $filters)
     {
         if (!empty($filters['user']['uuid'])) {
             $userUuid = $filters['user']['uuid'];
@@ -62,7 +62,7 @@ class CoinGameUserService
     }
 
 
-    public function calculateTotalsOld($query, $filters): object
+    public function calculateTotals($query, $filters): object
     {
 
         return $query->selectRaw("
@@ -74,7 +74,7 @@ class CoinGameUserService
     }
 
 
-    public function renderInfoBoxesOld(Row $row, $totals): void
+    public function renderInfoBoxes(Row $row, $totals): void
     {
         $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue',  number_format($totals->total_played ?? 0, 2), '50px'));
         $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red',  number_format($totals->total_loss ?? 0, 2), '50px'));
@@ -87,7 +87,7 @@ class CoinGameUserService
      * Resolves hashed filter keys from Laravel-Admin by iterating request params
      * and matching against known filter labels.
      */
-    public function applyFilters($query, array $filters)
+    public function applyFilters0($query, array $filters)
     {
         // Laravel-Admin's filter->where() hashes the column name using md5(file+line+label).
         // We need to find filter values by checking all request keys since they are hashed.
@@ -206,7 +206,7 @@ class CoinGameUserService
     /**
      * Calculate totals for archive-based queries.
      */
-    public function calculateTotals($query, $filters): object
+    public function calculateTotals0($query, $filters): object
     {
         return $query->selectRaw("
             SUM(coins) as total_played,
@@ -220,7 +220,7 @@ class CoinGameUserService
     /**
      * Render info boxes for archive-based totals.
      */
-    public function renderInfoBoxes(Row $row, $totals): void
+    public function renderInfoBoxes0(Row $row, $totals): void
     {
         $row->column(3, new CustomInfoBox(__('Total Played'), 'gamepad', 'blue', number_format($totals->total_played ?? 0, 2), '50px'));
         $row->column(3, new CustomInfoBox(__('Total Loss'), 'times-circle', 'red', number_format($totals->total_loss ?? 0, 2), '50px'));
@@ -334,7 +334,7 @@ class CoinGameUserService
     //     return $grid;
     // }
 
-    public function buildGrid(): Grid
+    public function buildGrid0(): Grid
     {
         $grid = new Grid(new CoinGameUserArchive());
 
@@ -440,7 +440,6 @@ class CoinGameUserService
         $grid->disableExport();
 
         $grid->paginate(10);
-
         return $grid;
     }
 
@@ -448,7 +447,7 @@ class CoinGameUserService
     /**
      * Apply grid filters.
      */
-    public function applyGridFilters(Grid $grid)
+    public function applyGridFilters0(Grid $grid)
     {
         $grid->filter(function (Grid\Filter $filter) {
 
@@ -478,7 +477,7 @@ class CoinGameUserService
 
 
 
-    public function buildGridOld(): Grid
+    public function buildGrid(): Grid
     {
         $grid = new Grid(new CoinGameUserDailyAggregated());
         $grid->model()
