@@ -57,8 +57,8 @@ class LuckyGiftService
          return $lock;
      }
 
-    public function sendLuckyGift7(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift): array
-    {
+    public function sendLuckyGiftV2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift): array
+    {   
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId = $user->id;
         $ownerId = @$data['owner_id'];
@@ -382,7 +382,7 @@ class LuckyGiftService
 
 
 
-    public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGiftV1(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId = $user->id;
