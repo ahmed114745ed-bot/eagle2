@@ -19,7 +19,7 @@ class UserGameService
             }
     
             // UUIDs
-            $uid     = e($user->original_uuid ?? $user->uuid ?? $user->id);
+            $uid     = e( $user->id);
             $special = e($user->uuid ?? '-');
     
             // Avatar

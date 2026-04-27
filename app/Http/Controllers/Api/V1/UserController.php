@@ -840,6 +840,12 @@ class UserController extends Controller
 
     public function zegoCredential()
     {
+
+        $zego_feature = \Cache::rememberForever('zego_feature', function () {
+            return \DB::table('settings')->where('key', 'zego_feature')->value('value');
+        });
+
+        if ($zego_feature && $zego_feature == 1)    return Common::apiResponse(0, __('Zego Feature is Disabled, Contact the administration'), null, 403);
         $ZegoEncreyptkey = config('app.zego_credential');
 
         // youtube key
@@ -1017,13 +1023,13 @@ class UserController extends Controller
                 $existingInvitation = UserCodeInvitation::where('invited_id', $userId)
                     ->lockForUpdate()
                     ->first();
-                    
+
                 if ($existingInvitation) {
                     throw new \Exception('already_invited');
                 }
 
                 $invitation = $this->createInvitation($userParent->id, $userId);
-                
+
                 $this->rewardUser($userParent, $this->getValue('invitation_host_reward'), 'invitation_host_reward', [
                     'invited_id' => $userId
                 ]);
@@ -1039,7 +1045,7 @@ class UserController extends Controller
             throw $e;
         }
 
-        CustomNotification::codeInvitationUses($userParent, Auth::user(),$this->getValue('invitation_invitee_reward'));
+        CustomNotification::codeInvitationUses($userParent, Auth::user(), $this->getValue('invitation_invitee_reward'));
 
         return Common::apiResponse(true, __('invitation.success'), $request->code, 200);
     }
@@ -1109,7 +1115,7 @@ class UserController extends Controller
                 $amountBefore,
                 UserCoinLogType::INVITATION_CODE,
             );
-            
+
             \Log::info('Invitation reward added', [
                 'user_id' => $user->id,
                 'reward' => $reward,
@@ -1543,7 +1549,7 @@ class UserController extends Controller
         });
     }
 
-      public function userLevelDetails(Request $request)
+    public function userLevelDetails(Request $request)
     {
         $user = $request->user()->fresh();
 

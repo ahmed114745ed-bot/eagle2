@@ -127,7 +127,7 @@ class ChargeRepoService
 
         try {
 
-            if (! $isRoomTarget) {
+            if (!$isRoomTarget) {
 
                 $this->userSalaryRepository->incrementCutAmount($fromUser->id, $usd);
             } else {
@@ -308,7 +308,7 @@ class ChargeRepoService
             $amountBefore,
             UserCoinLogType::APP_CHARGE,
         );
-    
+
         // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
 
@@ -372,7 +372,7 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-   
+
 
         $receiver->increment('coins', $amount);
 
@@ -555,7 +555,7 @@ class ChargeRepoService
             throw new Exception(__('balance not enough'));
         }
 
-   
+
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
@@ -606,7 +606,7 @@ class ChargeRepoService
             (new UserAchievementService())->insertCharging($receiver, $amount);
         }
 
-        UserCommon::UserEarnedInvitation($receiver->id, $amount );
+        UserCommon::UserEarnedInvitation($receiver->id, $amount);
         UserCommon::addChargeLevel($receiver->id, $amount);
     }
 }
