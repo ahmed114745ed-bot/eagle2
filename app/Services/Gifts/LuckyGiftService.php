@@ -58,7 +58,7 @@ class LuckyGiftService
      }
 
     public function sendLuckyGiftV2(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift): array
-    {
+    {   
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId = $user->id;
         $ownerId = @$data['owner_id'];
