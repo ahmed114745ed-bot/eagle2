@@ -125,7 +125,7 @@ return [
             'worker_num' => env('OCTANE_WORKERS', swoole_cpu_num()),
             'task_worker_num' => env('OCTANE_TASK_WORKERS', min(4, (int) ceil(swoole_cpu_num() / 4))),
             'max_request' => env('OCTANE_MAX_REQUESTS', 500),
-            'package_max_length' => 10 * 1024 * 1024,
+            'package_max_length' => 20 * 1024 * 1024,
             'http_parse_post' => true,
             'http_parse_cookie' => true,
             'enable_coroutine' => true,
