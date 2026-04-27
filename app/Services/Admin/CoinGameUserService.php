@@ -696,19 +696,20 @@ class CoinGameUserService
         $grid->model()
             ->select([
                 'coin_game_users_archive.round_id',
+                'coin_game_users_archive.game_id',
                 DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) as total_loss'),
                 DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as total_win'),
                 DB::raw('MIN(coin_game_users_archive.created_at) as first_played'),
                 DB::raw('MAX(coin_game_users_archive.created_at) as last_played'),
-                'ag.id as game_id',
-                'ag.name as game_name',
-                'ag.image as game_image',
+                DB::raw('COALESCE(ag.name, cg.name) as game_name'),
+                DB::raw('COALESCE(ag.image, cg.image) as game_image'),
             ])
             ->leftJoin('all_games as ag', 'ag.id', '=', 'coin_game_users_archive.game_id')
+            ->leftJoin('all_games as cg', 'cg.custom_id', '=', 'coin_game_users_archive.game_id')
             ->where('coin_game_users_archive.user_id', $userId)
             ->where('coin_game_users_archive.game_id', $gameId)
             ->whereNotNull('coin_game_users_archive.round_id')
-            ->groupBy('coin_game_users_archive.round_id', 'ag.id', 'ag.name', 'ag.image')
+            ->groupBy('coin_game_users_archive.round_id', 'coin_game_users_archive.game_id', 'ag.name', 'ag.image', 'cg.name', 'cg.image')
             ->orderByDesc('last_played');
 
         $grid->filter(function ($filter) {
