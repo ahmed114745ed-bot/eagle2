@@ -387,14 +387,15 @@ class RoomController extends MainController
             return settings()->get('make_rooms_top') ?? 0;
         });
 
-        // ✅ ترتيب الغرف
+        // ✅ ترتيب الغرف (same as API endpoint)
         $orderSql = [];
+        $orderSql[] = 'pin DESC';
         if ($makeRoomsTop == 1) {
             $orderSql[] = 'is_top DESC';
         }
         $orderSql[] = 'status_priority DESC';
-        $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
+        $orderSql[] = 'hour_hot DESC';
 
         if (request()->online == 1) {
             $grid->model()->whereHas('roomVisitors');
