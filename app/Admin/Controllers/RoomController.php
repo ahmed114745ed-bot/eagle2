@@ -388,7 +388,9 @@ class RoomController extends MainController
         });
 
         // ✅ ترتيب الغرف (same as API endpoint RoomRepository::all)
+        // rooms with room_status = 0 always at end
         $orderSql = [];
+        $orderSql[] = 'CASE WHEN rooms.room_status = 0 THEN 1 ELSE 0 END ASC';
         $orderSql[] = 'pin DESC';
         if ($makeRoomsTop == 1) {
             $orderSql[] = 'is_top = 1 DESC';
