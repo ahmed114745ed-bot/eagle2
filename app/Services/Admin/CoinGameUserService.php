@@ -567,8 +567,8 @@ class CoinGameUserService
                 'u.uuid as user_uuid',
                 'u.name as user_name',
                 'up.avatar as user_avatar',
-                'g.name as game_name',
-                'g.image as game_image',
+                DB::raw('COALESCE(g.name, cg.name) as game_name'),
+                DB::raw('COALESCE(g.image, cg.image) as game_image'),
                 DB::raw('SUM(coin_game_users_archive.coins) as total_played'),
                 DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 0 THEN coin_game_users_archive.coins ELSE 0 END) as total_loss'),
                 DB::raw('SUM(CASE WHEN coin_game_users_archive.type = 1 THEN coin_game_users_archive.coins ELSE 0 END) as total_win'),
@@ -579,6 +579,7 @@ class CoinGameUserService
             ->leftJoin('users as u', 'u.id', '=', 'coin_game_users_archive.user_id')
             ->leftJoin('profiles as up', 'up.user_id', '=', 'u.id')
             ->leftJoin('all_games as g', 'g.id', '=', 'coin_game_users_archive.game_id')
+            ->leftJoin('all_games as cg', 'cg.custom_id', '=', 'coin_game_users_archive.game_id')
             ->where('coin_game_users_archive.user_id', $user_id)
             ->whereNotNull('coin_game_users_archive.game_id')
             ->groupBy(
@@ -588,7 +589,9 @@ class CoinGameUserService
                 'u.name',
                 'up.avatar',
                 'g.name',
-                'g.image'
+                'g.image',
+                'cg.name',
+                'cg.image'
             )
             ->orderByDesc('total_played');
 
