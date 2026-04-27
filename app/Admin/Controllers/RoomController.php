@@ -387,13 +387,12 @@ class RoomController extends MainController
             return settings()->get('make_rooms_top') ?? 0;
         });
 
-        // ✅ ترتيب الغرف (same as API endpoint)
+        // ✅ ترتيب الغرف (same as API endpoint RoomRepository::all)
         $orderSql = [];
         $orderSql[] = 'pin DESC';
         if ($makeRoomsTop == 1) {
-            $orderSql[] = 'is_top DESC';
+            $orderSql[] = 'is_top = 1 DESC';
         }
-        $orderSql[] = 'status_priority DESC';
         $orderSql[] = 'room_visitors_count DESC';
         $orderSql[] = 'hour_hot DESC';
 
@@ -407,6 +406,8 @@ class RoomController extends MainController
 
     protected function applyFilterType(Grid $grid, string $filterType, $user): void
     {
+        // ✅ Same filter ordering as API RoomRepository::all()
+        // Base ordering (pin, is_top, room_visitors_count, hour_hot) is already set in setupBaseModel
         switch ($filterType) {
             case 'boss':
                 $cacheKey = "user:{$user->id}:rooms:boss";
@@ -423,43 +424,34 @@ class RoomController extends MainController
             case 'trend':
                 $grid->model()
                     ->orderByDesc('top_room')
-                    ->orderByDesc('pin')
-                    // ->orderByDesc('room_visitors_count')
                     ->orderByDesc('session');
                 break;
 
             case 'popular':
                 $grid->model()
-                    ->orderByDesc('top_room')
-                    ->orderByDesc('pin');
-                // ->orderByDesc('room_visitors_count');
+                    ->orderByDesc('top_room');
                 break;
 
             case 'last_create':
                 $grid->model()
                     ->whereDate('created_at', '>=', now()->subDays(3))
-                    ->orderByDesc('pin')
                     ->orderByDesc('id');
                 break;
 
             case 'pk':
                 $grid->model()
-                    ->has('lastPk')
-                    ->orderByDesc('pin');
+                    ->has('lastPk');
                 break;
 
             case 'party':
                 $grid->model()
-                    ->whereHas('roomCategory', fn($q) => $q->where('type', 'party'))
-                    ->orderByDesc('pin');
+                    ->whereHas('roomCategory', fn($q) => $q->where('type', 'party'));
                 break;
 
-            case 'festival':
             case 'recently':
+            case 'festival':
                 $grid->model()
-                    ->orderByDesc('pin')
                     ->orderByDesc('top_room')
-                    // ->orderByDesc('room_visitors_count')
                     ->orderByDesc('session');
                 break;
 
@@ -479,23 +471,19 @@ class RoomController extends MainController
                 if (!empty($roomTypes)) {
                     $grid->model()
                         ->whereIn('room_type', $roomTypes)
-                        ->orderByDesc('pin')
                         ->orderByDesc('top_room')
                         ->orderByDesc('session');
                 }
                 break;
 
             case 'nearby':
-                $cacheKey = "user:{$user->id}:rooms:nearby";
                 $coords = [$user->lat, $user->long, $user->lat];
-
                 $grid->model()
                     ->selectRaw(
                         'rooms.*, (6371 * acos(cos(radians(?)) * cos(radians(owner.lat)) * cos(radians(owner.long) - radians(?)) + sin(radians(?)) * sin(radians(owner.lat)))) AS distance',
                         $coords
                     )
                     ->join('users as owner', 'rooms.uid', '=', 'owner.id')
-                    ->orderByDesc('pin')
                     ->orderBy('distance');
                 break;
 
@@ -529,9 +517,7 @@ class RoomController extends MainController
                 break;
 
             default:
-                $grid->model()
-                    ->orderByDesc('pin')
-                    ->orderByDesc('hour_hot');
+                // No extra ordering - base ordering handles it
                 break;
         }
     }
