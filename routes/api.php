@@ -395,10 +395,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 //todo
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
-                Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post( '/v7/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);

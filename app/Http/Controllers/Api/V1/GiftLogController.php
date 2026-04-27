@@ -355,23 +355,15 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-          $luckyStatus = Common::getSettingValue('lucky_gifts_action');
-
-         if ($luckyStatus == 1) {
-             $version = Common::getSettingValue('lucky_gift_version');
-
-             if ($version == 4) {
-                 return $this->sendLuckyGift7($request, $updateUserWhenSendGift);
-             }
-             return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
-         }
-         return $this->sendLuckyGift2V3($request, $updateUserWhenSendGift);
+        $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+        if ($luckyStatus == 4) {
+            return $this->sendLuckyGiftV2($request, $updateUserWhenSendGift);
+        }
+         return $this->sendLuckyGiftV1($request, $updateUserWhenSendGift);
     }
 
 
-
-
-    public function sendLuckyGift2V3(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGiftV1(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
 
         $stopLucky = settings()->get('stop_luckyGift');
@@ -395,7 +387,7 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
+            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGiftV1($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
@@ -407,7 +399,7 @@ class GiftLogController extends Controller
 
 
 
-    public function sendLuckyGift7(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGiftV2(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
@@ -430,7 +422,7 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            $data = $this->luckyGiftService->sendLuckyGift7($data, $user, $updateUserWhenSendGift);
+            $data = $this->luckyGiftService->sendLuckyGiftV2($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
