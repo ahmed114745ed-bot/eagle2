@@ -720,10 +720,17 @@ class CoinGameUserService
                 }
             }, __('Round ID'), 'round_id')->placeholder(__('Round ID'));
 
-            $filter->between('coin_game_users_archive.created_at', __('Created At'))->datetime([
-                'format' => 'YYYY-MM-DD HH:mm:ss',
-                'locale' => 'en'
-            ]);
+            $filter->where(function ($q) {
+                if (!empty($this->input)) {
+                    $q->where('coin_game_users_archive.created_at', '>=', $this->input);
+                }
+            }, __('From Date'), 'from_date')->datetime(['format' => 'YYYY-MM-DD HH:mm:ss', 'locale' => 'en']);
+
+            $filter->where(function ($q) {
+                if (!empty($this->input)) {
+                    $q->where('coin_game_users_archive.created_at', '<=', $this->input);
+                }
+            }, __('To Date'), 'to_date')->datetime(['format' => 'YYYY-MM-DD HH:mm:ss', 'locale' => 'en']);
         });
 
         $grid->header(function () {
