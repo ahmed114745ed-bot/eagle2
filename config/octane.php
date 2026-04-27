@@ -1,23 +1,6 @@
 <?php
 
-use Laravel\Octane\Events\RequestReceived;
-use Laravel\Octane\Events\RequestTerminated;
-use Laravel\Octane\Events\TaskReceived;
-use Laravel\Octane\Events\TickReceived;
-use Laravel\Octane\Events\WorkerStarting;
-use Laravel\Octane\Events\WorkerStopping;
-use Laravel\Octane\Listeners\CollectGarbage;
-use Laravel\Octane\Listeners\DisconnectFromDatabases;
-use Laravel\Octane\Listeners\EnsureUploadedFilesAreValid;
-use Laravel\Octane\Listeners\EnsureUploadedFilesCanBeMoved;
-use Laravel\Octane\Listeners\FlushTemporaryContainerInstances;
-use Laravel\Octane\Listeners\ReportException;
-use Laravel\Octane\Listeners\StopWorkerIfNecessary;
-use Laravel\Octane\Listeners\FlushAuthenticationState;
-use Laravel\Octane\Listeners\FlushSessionState;
-use Laravel\Octane\Listeners\FlushLocaleState;
-use Laravel\Octane\Listeners\FlushQueuedCookies;
-use Laravel\Octane\Octane;
+
 
 return [
 
@@ -25,148 +8,107 @@ return [
     |--------------------------------------------------------------------------
     | Octane Server
     |--------------------------------------------------------------------------
+    |
+    | This value is the type of server that Octane will be running on.
+    |
     */
 
     'server' => env('OCTANE_SERVER', 'swoole'),
 
     /*
     |--------------------------------------------------------------------------
-    | Force HTTPS
+    | Octane Port
     |--------------------------------------------------------------------------
+    |
+    | This value is the port that Octane will be listening on.
+    |
     */
 
-    'https' => env('OCTANE_HTTPS', false),
+    'port' => env('OCTANE_PORT', 8000),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Octane Workers
+    |--------------------------------------------------------------------------
+    |
+    | The number of workers that should be assigned to Octane. By default,
+    | this will be the number of CPU cores available on the machine.
+    |
+    */
+
+    'workers' => env('OCTANE_WORKERS'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Octane Max Requests
+    |--------------------------------------------------------------------------
+    |
+    | The number of requests an Octane worker will process before being
+    | recycled. This is useful for preventing memory leaks.
+    |
+    */
+
+    'max_requests' => env('OCTANE_MAX_REQUESTS', 500),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Octane Tick Frequency
+    |--------------------------------------------------------------------------
+    |
+    | The number of milliseconds between each "tick" of the Octane server.
+    |
+    */
+
+    'tick_frequency' => env('OCTANE_TICK_FREQUENCY', 1000),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Octane Cache Table Size
+    |--------------------------------------------------------------------------
+    |
+    | The size of the Swoole table used for caching.
+    |
+    */
+
+    'cache_table_size' => env('OCTANE_CACHE_TABLE_SIZE', 32000),
 
     /*
     |--------------------------------------------------------------------------
     | Octane Listeners
     |--------------------------------------------------------------------------
     |
-    | هذه الـ listeners مهمة جداً لـ reset الـ state بين الـ requests
-    | خاصة الـ Authentication state
+    | These listeners are called at various points in the Octane lifecycle.
+    | They can be used to perform tasks like closing idle database connections.
     |
     */
 
-    'listeners' => [
-        WorkerStarting::class => [
-            EnsureUploadedFilesAreValid::class,
-            EnsureUploadedFilesCanBeMoved::class,
-        ],
+    'listeners' => [],
 
-        RequestReceived::class => [
-            ...Octane::prepareApplicationForNextOperation(),
-            ...Octane::prepareApplicationForNextRequest(),
-            FlushAuthenticationState::class,
-            FlushSessionState::class,
-            FlushLocaleState::class,
-            FlushQueuedCookies::class,
-        ],
+    /*
+    |--------------------------------------------------------------------------
+    | Octane Middleware
+    |--------------------------------------------------------------------------
+    |
+    | These middleware are applied to all requests processed by Octane.
+    |
+    */
 
-        RequestTerminated::class => [
-            FlushTemporaryContainerInstances::class,
-            // DisconnectFromDatabases::class,
-            CollectGarbage::class,
-            ReportException::class,
-            StopWorkerIfNecessary::class,
-        ],
-
-        TaskReceived::class => [
-            ...Octane::prepareApplicationForNextOperation(),
-        ],
-
-        TickReceived::class => [
-            ...Octane::prepareApplicationForNextOperation(),
-        ],
-
-        WorkerStopping::class => [
-            //
-        ],
+    'middleware' => [
+        // 'Illuminate\Http\Middleware\TrustProxies',
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Warm Services
+    | Octane Warm
     |--------------------------------------------------------------------------
+    |
+    | These classes will be instantiated and registered in the container
+    | when Octane starts. This is useful for warming up the application.
+    |
     */
 
     'warm' => [
-        ...Octane::defaultServicesToWarm(),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Flush Services
-    |--------------------------------------------------------------------------
-    */
-
-    'flush' => [
-        'auth',
-        'auth.driver',
-        'session',
-        'session.store',
-        'request',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Swoole Options
-    |--------------------------------------------------------------------------
-    */
-
-    'swoole' => [
-        'options' => [
-            'worker_num' => env('OCTANE_WORKERS', swoole_cpu_num()),
-            'task_worker_num' => env('OCTANE_TASK_WORKERS', min(4, (int) ceil(swoole_cpu_num() / 4))),
-            'max_request' => env('OCTANE_MAX_REQUESTS', 500),
-            'package_max_length' => 20 * 1024 * 1024,
-            'http_parse_post' => true,
-            'http_parse_cookie' => true,
-            'enable_coroutine' => true,
-            'log_level' => env('APP_DEBUG', false) ? 0 : 3,
-            'daemonize' => false,
-            'open_tcp_nodelay' => true,
-            'enable_reuse_port' => true,
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Garbage Collection
-    |--------------------------------------------------------------------------
-    */
-
-    'garbage' => env('OCTANE_GARBAGE_COLLECTION', 50),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Maximum Execution Time
-    |--------------------------------------------------------------------------
-    */
-
-    'max_execution_time' => 30,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Tables
-    |--------------------------------------------------------------------------
-    */
-
-    'tables' => [
-        'example:1000' => [
-            'name' => 'string:1000',
-            'votes' => 'int',
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Cache
-    |--------------------------------------------------------------------------
-    */
-
-    'cache' => [
-        'rows' => 1000,
-        'bytes' => 10000,
+        // 'App\Models\User',
     ],
 
 ];
