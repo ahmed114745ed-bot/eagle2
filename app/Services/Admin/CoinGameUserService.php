@@ -766,8 +766,9 @@ class CoinGameUserService
         })->sortable();
         $grid->column('first_played', __('Start Date'))->display(fn($v) => $v)->sortable();
         $grid->column('last_played', __('End Date'))->display(fn($v) => $v)->sortable();
-        $grid->column('orders', __('Orders'))->display(function () {
-            $url = admin_url("coin-game-users/round-orders?round_id={$this->round_id}");
+        $grid->column('orders', __('Orders'))->display(function () use ($userId) {
+
+            $url = admin_url("coin-game-users/round-orders?user_id={$userId}&round_id={$this->round_id}");
             return "<a href='{$url}' class='btn btn-sm btn-primary'>
                     <i class='fa fa-eye'></i> " . __('Orders') . "
                 </a>";
@@ -786,13 +787,14 @@ class CoinGameUserService
         return $grid;
     }
 
-    public function buildRoundOrdersGrid($roundId): Grid
+    public function buildRoundOrdersGrid($roundId,$userId): Grid
     {
         $grid = new Grid(new CoinGameUserAll());
 
         $grid->model()
             ->with(['user', 'game', 'customGame'])
             ->where('round_id', $roundId)
+            ->where('user_id', $userId)
             ->orderByDesc('created_at');
 
         $grid->column('id', __('ID'))->sortable();
