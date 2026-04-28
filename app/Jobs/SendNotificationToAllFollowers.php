@@ -51,7 +51,7 @@ class SendNotificationToAllFollowers implements ShouldQueue
             // Notification content
             $bodyAr = __('api.enter_room', ['name' => $owner->name], 'ar');
             $bodyEn = __('api.enter_room', ['name' => $owner->name], 'en');
-            $icon = $owner->profile->avatar ?? '';
+            $icon = @$owner?->profile?->avatar ?? '';
 
             $data = [
                 'image' => getDriverUrl().'/'.$icon,
