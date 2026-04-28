@@ -557,7 +557,11 @@ class EnteranceRoomServices
             $room->is_afk = 1;
             $room->save();
             if ($room->count_room_socket == 0) {
-                dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
+                try {
+                    dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to dispatch follower notification: ' . $e->getMessage());
+                }
             }
         }
 
@@ -833,7 +837,11 @@ class EnteranceRoomServices
             $room->save();
 
             if ($room->count_room_socket == 0) {
-                dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
+                try {
+                    dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to dispatch follower notification: ' . $e->getMessage());
+                }
             }
         }
     }

@@ -26,53 +26,72 @@ class SendNotificationToAllFollowers implements ShouldQueue
 
     public function handle(): void
     {
-        $appNameEn = Cache::rememberForever('app_title_en', fn () => Setting::where('key', 'app_title_en')->value('value') ?? 'Default');
-        $appNameAr = Cache::rememberForever('app_title_ar', fn () => Setting::where('key', 'app_title_ar')->value('value') ?? 'Default');
+        try {
+            $appNameEn = Cache::rememberForever('app_title_en', fn () => Setting::where('key', 'app_title_en')->value('value') ?? 'Default');
+            $appNameAr = Cache::rememberForever('app_title_ar', fn () => Setting::where('key', 'app_title_ar')->value('value') ?? 'Default');
 
-        // Load user and profile in one query
-        $owner = User::query()
-            ->with(['profile:id,user_id,avatar'])
-            ->select('id', 'name')
-            ->findOrFail($this->userId); // safer than find()
+            // Load user and profile in one query
+            $owner = User::query()
+                ->with(['profile:id,user_id,avatar'])
+                ->select('id', 'name')
+                ->find($this->userId);
 
-        // Get followers via relationship
-        $followers = $owner->followerss()
-            ->select('users.id', 'notification_id', 'lan')
-            ->get();
+            if (!$owner) {
+                return;
+            }
 
-        $usersTokenEn = $followers->where('lan', '!=', 'ar')->pluck('notification_id')->filter()->values();
-        $usersTokenAr = $followers->where('lan', 'ar')->pluck('notification_id')->filter()->values();
+            // Get followers via relationship
+            $followers = $owner->followerss()
+                ->select('users.id', 'notification_id', 'lan')
+                ->get();
 
-        // Notification content
-        $bodyAr = __('api.enter_room', ['name' => $owner->name], 'ar');
-        $bodyEn = __('api.enter_room', ['name' => $owner->name], 'en');
-        $icon = $owner->profile->avatar;
+            $usersTokenEn = $followers->where('lan', '!=', 'ar')->pluck('notification_id')->filter()->values();
+            $usersTokenAr = $followers->where('lan', 'ar')->pluck('notification_id')->filter()->values();
 
-        $data = [
-            'image' => getDriverUrl().'/'.$icon,
-            'owner_id' => $owner->id,
-            'name' => $owner->name,
-        ];
+            // Notification content
+            $bodyAr = __('api.enter_room', ['name' => $owner->name], 'ar');
+            $bodyEn = __('api.enter_room', ['name' => $owner->name], 'en');
+            $icon = $owner->profile->avatar ?? '';
 
-        // Send notifications in chunks
-        $usersTokenEn->chunk(100)->each(fn ($chunk) => Common::send_firebase_notification(
-            $chunk->all(),
-            $appNameEn,
-            $bodyEn,
-            $icon,
-            $data,
-            messageType: 'enter-room'
-        )
-        );
+            $data = [
+                'image' => getDriverUrl().'/'.$icon,
+                'owner_id' => $owner->id,
+                'name' => $owner->name,
+            ];
 
-        $usersTokenAr->chunk(100)->each(fn ($chunk) => Common::send_firebase_notification(
-            $chunk->all(),
-            $appNameAr,
-            $bodyAr,
-            $icon,
-            $data,
-            messageType: 'enter-room'
-        )
-        );
+            // Send notifications in chunks
+            $usersTokenEn->chunk(100)->each(function ($chunk) use ($appNameEn, $bodyEn, $icon, $data) {
+                try {
+                    Common::send_firebase_notification(
+                        $chunk->all(),
+                        $appNameEn,
+                        $bodyEn,
+                        $icon,
+                        $data,
+                        messageType: 'enter-room'
+                    );
+                } catch (\Throwable $e) {
+                    \Log::warning('Firebase notification failed (EN): ' . $e->getMessage());
+                }
+            });
+
+            $usersTokenAr->chunk(100)->each(function ($chunk) use ($appNameAr, $bodyAr, $icon, $data) {
+                try {
+                    Common::send_firebase_notification(
+                        $chunk->all(),
+                        $appNameAr,
+                        $bodyAr,
+                        $icon,
+                        $data,
+                        messageType: 'enter-room'
+                    );
+                } catch (\Throwable $e) {
+                    \Log::warning('Firebase notification failed (AR): ' . $e->getMessage());
+                }
+            });
+        } catch (\Throwable $e) {
+            \Log::warning('SendNotificationToAllFollowers failed: ' . $e->getMessage());
+            // Ignore Firebase errors - don't block enter room flow
+        }
     }
 }
