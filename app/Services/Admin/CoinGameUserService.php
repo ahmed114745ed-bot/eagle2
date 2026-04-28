@@ -714,23 +714,31 @@ class CoinGameUserService
 
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
-            $filter->where(function ($q) {
-                if (!empty($this->input)) {
-                    $q->where('coin_game_users_archive.round_id', 'like', "%{$this->input}%");
-                }
-            }, __('Round ID'), 'round_id')->placeholder(__('Round ID'));
+            $filter->expand();
 
-            $filter->where(function ($q) {
-                if (!empty($this->input)) {
-                    $q->where('coin_game_users_archive.created_at', '>=', $this->input);
-                }
-            }, __('From Date'), 'from_date')->datetime(['format' => 'YYYY-MM-DD HH:mm:ss', 'locale' => 'en']);
+            $filter->column(1 / 3, function ($filter) {
+                $filter->where(function ($q) {
+                    if (!empty($this->input)) {
+                        $q->where('round_id', 'like', "%{$this->input}%");
+                    }
+                }, __('Round ID'), 'round_id')->placeholder(__('Round ID'));
+            });
 
-            $filter->where(function ($q) {
-                if (!empty($this->input)) {
-                    $q->where('coin_game_users_archive.created_at', '<=', $this->input);
-                }
-            }, __('To Date'), 'to_date')->datetime(['format' => 'YYYY-MM-DD HH:mm:ss', 'locale' => 'en']);
+            $filter->column(1 / 3, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($value = $this->input) {
+                        $query->where('coin_game_users_archive.created_at', '>=', $value);
+                    }
+                }, __('From'), 'from_date')->datetime();
+            });
+
+            $filter->column(1 / 3, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($value = $this->input) {
+                        $query->where('coin_game_users_archive.created_at', '<=', $value);
+                    }
+                }, __('To'), 'to_date')->datetime();
+            });
         });
 
         $grid->header(function () {

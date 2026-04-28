@@ -688,6 +688,7 @@ class GiftController extends MainController
             ->limit(100)
             ->get()->reverse()->values();
 
+        //dd($fairLuckHistory, $fairLuckSettings);
         return $content->view('lucky_gift', [
             'config' => $config,
             'fairLuckSettings' => $fairLuckSettings,
