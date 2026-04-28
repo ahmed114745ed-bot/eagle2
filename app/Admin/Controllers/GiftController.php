@@ -687,7 +687,8 @@ class GiftController extends MainController
             ->orderBy('created_at', 'desc')
             ->limit(100)
             ->get()->reverse()->values();
-      //  dd($fairLuckHistory, $fairLuckSettings);
+
+        //dd($fairLuckHistory, $fairLuckSettings);
         return $content->view('lucky_gift', [
             'config' => $config,
             'fairLuckSettings' => $fairLuckSettings,
