@@ -676,6 +676,9 @@ class CustomNotification
     public function hostSalary(ShippingAgency $agency, User $invitationUser, float $amount = 0)
     {
         $user = $agency->owner;
+        if (!$user) {
+            return;
+        }
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $lang = $user?->lan ?? 'en';
         $body = __('api.host_salary', ['agency' => $agency->name, 'from' => @$invitationUser->name, 'amount' => $amount], $lang);

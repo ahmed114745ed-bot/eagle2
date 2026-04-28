@@ -2,20 +2,22 @@
 
 namespace Modules\Public\Jobs;
 
-use Carbon\Carbon;
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
+use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Ware;
-use App\Helpers\UserCommon;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Modules\Vip\Entities\OVip;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Modules\Public\Entities\LevelInterval;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Modules\Achievement\Entities\UserAchievementLevel;
+use Modules\Public\Entities\LevelInterval;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Modules\Vip\Entities\OVip;
 
 class RewardWinnerLevelInterval implements ShouldQueue
 {
@@ -36,7 +38,7 @@ class RewardWinnerLevelInterval implements ShouldQueue
 
         $levelIntervals = LevelInterval::query()
             ->where('min', '<=', $this->level)
-            ->where('max', '>=', $this->level)
+           // ->where('max', '>=', $this->level)
             ->where('type', $this->type)->orderBy('min')->get();
 
 
@@ -47,17 +49,25 @@ class RewardWinnerLevelInterval implements ShouldQueue
                 if (!$user) return;
                 $tokeReward  = WinnerLevelInterval::where([
                     'user_id' => $user->id,
-                    'user_level' => $this->level,
+                    //'user_level' => $this->level,
                     'min' => $levelInterval->min,
                     'max' => $levelInterval->max,
                     'level_interval_id' => $levelInterval->id
                 ])->exists();
-                if ($tokeReward) return;
+                if ($tokeReward) continue;
                 foreach ($rewards as $rewad) {
-
+ //dd(66662226);
                     if ($rewad->type == "coins") {
+                        $amountBefore = $user->di;
                         $user->di += $rewad->target;
                         $user->save();
+
+                         UserCoinLogHelper::logByType(
+                        $user->id,
+                        $rewad->target,
+                        $amountBefore,
+                        UserCoinLogType::LEVEL_INTERVAL,
+                    );
                     } elseif ($rewad->type == "vip") {
                         $vip = OVip::query()->find($rewad->target);
                         if ($vip) UserCommon::addVipToUser($user, $vip, $rewad->expire, null, 'reward-winner-interval');

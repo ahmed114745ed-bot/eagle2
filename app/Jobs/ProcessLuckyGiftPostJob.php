@@ -21,14 +21,14 @@ use App\Helpers\CacheHelper;
 
 /**
  * ProcessLuckyGiftPostJob
- * 
+ *
  * Handles all post-processing operations for lucky gift sends:
  * - Cache updates
  * - User updates
  * - Charisma dispatch
  * - Room boom processing
  * - Level upgrades
- * 
+ *
  * This job runs AFTER the main gift transaction completes,
  * allowing the HTTP response to return quickly (< 10 seconds)
  */
@@ -141,11 +141,11 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
                 $this->upgradeRoomLevel($roomId, $totalPrice, $count);
             }
 
-            Log::info('ProcessLuckyGiftPostJob completed successfully', [
-                'user_id' => $userId,
-                'room_id' => $roomId,
-                'receivers_count' => count($receiversIds),
-            ]);
+//            Log::info('ProcessLuckyGiftPostJob completed successfully', [
+//                'user_id' => $userId,
+//                'room_id' => $roomId,
+//                'receivers_count' => count($receiversIds),
+//            ]);
         } catch (\Throwable $e) {
             Log::error('ProcessLuckyGiftPostJob failed', [
                 'error' => $e->getMessage(),

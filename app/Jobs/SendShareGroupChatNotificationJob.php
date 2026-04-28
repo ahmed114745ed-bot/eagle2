@@ -73,7 +73,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
 
             // ✅ Add error handling for ChatRoom not found
             try {
-                $room = Room::select('id', 'room_cover', 'final_room_image')->findOrFail($roomId);
+                $room = Room::select('id', 'room_cover', 'mode','is_pk_custom')->findOrFail($roomId);
             } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 Log::warning('SendShareGroupChatNotificationJob: ChatRoom not found', [
                     'room_id' => $roomId,

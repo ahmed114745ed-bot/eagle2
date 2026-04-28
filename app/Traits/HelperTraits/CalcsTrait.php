@@ -706,10 +706,6 @@ trait CalcsTrait
 
         // If next level exp equals current level exp (data issue), return 0 to avoid division by zero
         if ($sender_div <= 0) {
-            \Log::warning("VIP level data issue: Level {$gold_level} has same or lower exp as next level", [
-                'current_exp' => $current_gold_num,
-                'next_exp' => $nextGoldData['next_exp']
-            ]);
             return 0.0;
         }
 
