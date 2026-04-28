@@ -504,7 +504,7 @@ class ChargeReportController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->disableIdFilter();
+            // $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
                 $filter->equal('trx', __('trx_no'));
