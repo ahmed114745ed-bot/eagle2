@@ -121,6 +121,10 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-12" style="flex: 0 0 100%; max-width: 100%;">
+                <div style="border-top: 2px solid #ddd; margin: 25px 0;"></div>
+            </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="app_primary_color">{{ __('Dark Body Color') }}</label>
@@ -146,6 +150,101 @@
                     </div>
                 </div>
             </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="is_body_theme_enabled">{{ __('body theme enable') }}</label>
+                        <input type="hidden" name="is_body_theme_enabled" value="0">
+                        <input type="checkbox" name="is_body_theme_enabled" id="is_body_theme_enabled" value="1"
+                               data-bootstrap-switch {{ data_get($settings, 'is_body_theme_enabled') ? 'checked' : '' }}>
+                    </div>  
+               </div>
+
+                <div class="col-md-6" id="background_body_theme_group"
+                     style="display: {{ data_get($settings, 'is_body_theme_enabled') ? 'block' : 'none' }};">
+                    <div class="form-group">
+                        <label>{{ __('Background body theme') }}</label>
+                        <select name="background_body_theme" id="background_body_theme" class="form-control" onchange="toggleBodyThemeBackgroundInput()">
+                            <option value="color" {{ data_get($settings, 'background_body_theme') === 'color' ? 'selected' : '' }}>Color</option>
+                            <option value="image" {{ data_get($settings, 'background_body_theme') === 'image' ? 'selected' : '' }}>Image</option>
+                            <option value="gradient" {{ data_get($settings, 'background_body_theme') === 'gradient' ? 'selected' : '' }}>Gradient</option>
+                        </select>
+                    </div>
+                </div>
+
+            <div class="col-md-6" id="background_body_theme_color_group"
+                 style="display: {{ data_get($settings, 'background_body_theme') === 'color' ? 'block' : 'none' }};">
+                <div class="form-group">
+                    <label for="background_color">{{ __('Background body theme Color') }}</label>
+                    <div class="input-group colorpicker-element">
+                        <span class="input-group-addon">
+                            <i style="background-color: {{ data_get($settings, 'background_body_theme_color', '#ffffff') }};"></i>
+                        </span>
+                        <input type="text" name="background_body_theme_color" id="background_body_theme_color" class="form-control"
+                               value="{{ data_get($settings, 'background_body_theme_color', '#ffffff') }}" placeholder="اختر لون">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6" id="background_body_theme_image_group"
+                 style="display: {{ data_get($settings, 'background_body_theme') === 'image' ? 'block' : 'none' }};">
+                <div class="form-group">
+                    <label>{{ __('Background body theme Image') }}</label>
+                    <input type="file" name="background_body_theme_image" class="form-control" accept="image/*">
+                    @if(data_get($settings, 'background_body_theme') === 'image' && !empty(data_get($settings, 'background_body_theme_image')))
+                        <div class="mt-2">
+                            <img src="{{ getImagePath(data_get($settings, 'background_body_theme_image')) }}" width="100" class="img-thumbnail">
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="col-md-6" id="background_body_theme_gradient_group"
+                 style="display: {{ data_get($settings, 'background_body_theme') === 'gradient' ? 'block' : 'none' }};">
+                <div class="form-group">
+                    <label for="background_color">{{ __('Background body theme Color one') }}</label>
+                    <div class="input-group colorpicker-element">
+                        <span class="input-group-addon">
+                            <i style="background-color: {{ data_get($settings, 'background_body_theme_color_one', '#ffffff') }};"></i>
+                        </span>
+                        <input type="text" name="background_body_theme_color_one" id="background_body_theme_color_one" class="form-control"
+                               value="{{ data_get($settings, 'background_body_theme_color_one', '#ffffff') }}" placeholder="اختر لون">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="background_color">{{ __('Background body theme Color two') }}</label>
+                    <div class="input-group colorpicker-element">
+                        <span class="input-group-addon">
+                            <i style="background-color: {{ data_get($settings, 'background_body_theme_color_two', '#ffffff') }};"></i>
+                        </span>
+                        <input type="text" name="background_body_theme_color_two" id="background_body_theme_color_two" class="form-control"
+                               value="{{ data_get($settings, 'background_body_theme_color_two', '#ffffff') }}" placeholder="اختر لون">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="background_color">{{ __('Background body theme Color three') }}</label>
+                    <div class="input-group colorpicker-element">
+                        <span class="input-group-addon">
+                            <i style="background-color: {{ data_get($settings, 'background_body_theme_color_three', '#ffffff') }};"></i>
+                        </span>
+                        <input type="text" name="background_body_theme_color_three" id="background_body_theme_color_three" class="form-control"
+                               value="{{ data_get($settings, 'background_body_theme_color_three', '#ffffff') }}" placeholder="اختر لون">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="is_dark_mode_enabled">{{ __('Dark Mode Enabled') }}</label>
+                        <input type="hidden" name="is_dark_mode_enabled" value="0">
+                        <input type="checkbox" name="is_dark_mode_enabled" value="1"
+                               data-bootstrap-switch {{ data_get($settings, 'is_dark_mode_enabled') ? 'checked' : '' }}>
+                    </div>
+                </div>
+
+            
         
             @if ($isThemeEnabled)
                 <div class="col-md-6">

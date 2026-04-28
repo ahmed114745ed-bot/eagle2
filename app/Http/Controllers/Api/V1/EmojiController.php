@@ -56,7 +56,9 @@ class EmojiController extends Controller
 
     public function categories(Request $request)
     {
-        $categories = EmojiCategory::orderBy('sort', 'asc')->get();
+        $categories = \Illuminate\Support\Facades\Cache::remember('emoji_categories', 300, function () {
+            return EmojiCategory::orderBy('sort', 'asc')->get();
+        });
         return Common::apiResponse(1, '', GiftCategoryResource::collection($categories));
     }
 }

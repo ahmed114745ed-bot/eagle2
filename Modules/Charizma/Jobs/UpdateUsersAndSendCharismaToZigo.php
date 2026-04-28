@@ -35,6 +35,16 @@ class UpdateUsersAndSendCharismaToZigo implements ShouldQueue
     {
         $data =
             (new UserCharismaService())->addTotalEarnedCoinsInUserRoom($this->room, $this->userIds, $this->earnedCoinsPerUser);
+
+        $data = array_map(function($user) {
+            if (isset($user['total'])) {
+                $user['total'] = UserCharismaService::formatTotalInService()
+                    ? numToStringNew($user['total'])
+                    : (int) $user['total'];
+            }
+            return $user;
+        }, $data);
+
         $ms = [
             'messageContent' => [
                 "message" => "updateCharisma",

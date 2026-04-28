@@ -351,6 +351,11 @@ class SettingsController extends Controller
             $data['gradient_3'] = $request->gradient_3;
         }
 
+
+         elseif ($request->background_body_theme === 'image' && $request->hasFile('background_body_theme_image')) {
+            $data['background_body_theme_image'] = Common::upload('images', $request->file('background_body_theme_image'));
+        }
+
         // Primary Color
         $data['app_primary_color'] = $request->app_primary_color;
 

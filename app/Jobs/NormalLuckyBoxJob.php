@@ -70,21 +70,22 @@ class NormalLuckyBoxJob implements ShouldQueue
              } else {
                  CustomNotification::closeLuckyBox($user, @$userBox?->image, 0);
              }
-             foreach ($usersRoomVisit as $userRoomVisit) {
+              foreach ($usersRoomVisit as $userRoomVisit) {
 
-                 $m = [
-                     "messageContent" => [
-                         "message" => "hideluckybox",
-                         "ownerBoxId" => $owner->id, // ✅ آمن الآن - تم التحقق من null
-                         "ownerBoxName" => $owner->name, // ✅ آمن الآن - تم التحقق من null
-                         "boxCoins" => $userBox->coins,
-                         "boxId" => $userBox->id,
-                         "boxType" => $userBox->type == 1 ? 'super' : 'normal',
-                         "numOfBoxes" => $c
-                     ]
-                 ];
-                 $json = json_encode($m);
-                 Common::sendToZego('SendCustomCommand', $room->id, $userRoomVisit, $json); // ✅ آمن الآن - تم التحقق من null
-             }
-         }
+                  $m = [
+                      "messageContent" => [
+                          "message" => "hideluckybox",
+                          "ownerBoxId" => $owner->id, // ✅ آمن الآن - تم التحقق من null
+                          "ownerBoxName" => $owner->name, // ✅ آمن الآن - تم التحقق من null
+                          "boxCoins" => $userBox->coins,
+                          "boxId" => $userBox->id,
+                          "boxType" => $userBox->type == 1 ? 'super' : 'normal',
+                          "numOfBoxes" => $c
+                      ]
+                  ];
+                  $json = json_encode($m);
+                  Common::sendToZego('SendCustomCommand', $room->id, $userRoomVisit, $json); // ✅ آمن الآن - تم التحقق من null
+              }
+          }
+    }
 }

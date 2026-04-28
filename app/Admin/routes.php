@@ -31,6 +31,7 @@ use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\CharismaLevelController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
@@ -96,10 +97,10 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\RouteController;
 use App\Admin\Controllers\ScaffoldController;
+use App\Admin\Controllers\SensitiveWordController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
@@ -117,6 +118,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\UserWalletController;
+use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -196,6 +198,26 @@ $routes = collect(app('router')->getRoutes()->get());
 $filtered = $routes->reject(function ($route) {
     return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');
 });
+
+
+Route::group(
+    [
+        'prefix'        => config('admin.route.prefix'),
+        'namespace'     => config('admin.route.namespace'),
+        'middleware'    => [
+            'web',
+            'admin.auth',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as'            => config('admin.route.prefix') . '.',
+    ],
+    function () {
+
+        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
+    }
+);
 
 
 
@@ -338,7 +360,6 @@ Route::group(
         Route::resource('all-games', AllGameController::class);
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
-        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {
             Route::get('/', [BlackListUsersController::class, 'index']);
@@ -438,6 +459,7 @@ Route::group(
         ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
+        Route::resource('sensitive-words', SensitiveWordController::class);
 
 
         Route::get('/soon', 'AllStatisticController@index2');
@@ -708,7 +730,7 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-
+        Route::resource('charisma-levels', CharismaLevelController::class);
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
@@ -738,8 +760,10 @@ Route::group(
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
         Route::get('coin-game-users/details', [CoinGameUserAllController::class, 'index_details']);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class, 'showAll']);
+        Route::get('coin-game-users/round-orders', [CoinGameUserAllController::class, 'roundOrders']);
         Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
             ->name('coin-game-users.ajax');
+        Route::get('coin-game-users/details-ajax', [CoinGameUserAllController::class, 'ajaxDetailsTotals']);
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 

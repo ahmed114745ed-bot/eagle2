@@ -101,170 +101,18 @@ class BadgeController extends MainController
 
         $form->html(function () use ($form) {
 
-            // Get existing images for this badge
-            // $badgeImages = $form->model()->exists
-            //     ? $form->model()->images()->get()->keyBy('language')
-            //     : collect();
-
             $badgeImages = collect();
 
             if (request()->route('badge')) {
                 $badge = Badge::with('images')->find(request()->route('badge'));
                 $badgeImages = $badge?->images->keyBy('language') ?? collect();
             }
-          //  dd($badgeImages);
 
             return view('multiBadges', compact('badgeImages'));
         });
 
 
-        // $form->saved(function (Form $form) {
-        //     $images = request()->file('images');
-        //     $allData = request()->input('images', []);
-
-        //     if (!$images && empty($allData)) {
-        //         throw new \Exception('Images are required');
-        //     }
-
-        //     foreach ($allData as $lang => $dataInput) {
-
-        //         // Find existing BadgeImage for this badge and language
-        //         $badgeImage = BadgeImage::where('badge_id', $form->model()->id)
-        //             ->where('language', $lang)
-        //             ->first();
-
-        //         $data = [
-        //             'badge_id'   => $form->model()->id,
-        //             'image_type' => $dataInput['image_type'] ?? ImageType::Image->value,
-        //             'language'   => $lang,
-        //         ];
-
-        //         // Handle show_image
-        //         if (!empty($images[$lang]['image'])) {
-        //             $file = $images[$lang]['image'];
-
-
-        //             $data['image'] = Common::upload('badges', $file);
-        //         } elseif ($badgeImage) {
-        //             // Keep existing if no new file uploaded
-        //             $data['image'] = $badgeImage->image;
-        //         }
-
-        //         // Handle default_image
-        //         if (!empty($images[$lang]['default_image'])) {
-        //             $file = $images[$lang]['default_image'];
-
-
-
-        //             $data['show_image'] = Common::upload('badges', $file);
-        //         } elseif ($badgeImage) {
-        //             // Keep existing if no new file uploaded
-        //             $data['show_image'] = $badgeImage->show_image;
-        //         }
-
-        //         if ($badgeImage) {
-        //             // Update existing
-        //             $badgeImage->update($data);
-        //         } else {
-        //             // Create new if not exists
-        //             BadgeImage::create($data);
-        //         }
-        //     }
-        // });
-
-
-        // $form->saved(function (Form $form) {
-        //     $images = request()->file('images');
-        //     $allData = request()->input('images', []);
-
-        //     foreach ($allData as $lang => $dataInput) {
-
-        //         // Always inherit default image if it's missing for this language
-        //         if ($lang !== 'default') {
-        //             $dataInput['image']         = $dataInput['image'] ?? $allData['default']['image'] ?? null;
-        //             $dataInput['default_image'] = $dataInput['default_image'] ?? $allData['default']['default_image'] ?? null;
-        //             $dataInput['image_type']    = $dataInput['image_type'] ?? $allData['default']['image_type'] ?? ImageType::Image->value;
-        //         }
-
-        //         $badgeImage = BadgeImage::where('badge_id', $form->model()->id)
-        //             ->where('language', $lang)
-        //             ->first();
-
-        //         $data = [
-        //             'badge_id'   => $form->model()->id,
-        //             'image_type' => $dataInput['image_type'] ?? ImageType::Image->value,
-        //             'language'   => $lang,
-        //         ];
-
-        //         // Handle image file upload
-        //         if (!empty($images[$lang]['image'])) {
-        //             $data['image'] = Common::upload('badges', $images[$lang]['image']);
-        //         } else {
-        //             $data['image'] = $dataInput['image'] ?? null;
-        //         }
-
-        //         // Handle default image upload
-        //         if (!empty($images[$lang]['default_image'])) {
-        //             $data['show_image'] = Common::upload('badges', $images[$lang]['default_image']);
-        //         } else {
-        //             $data['show_image'] = $dataInput['default_image'] ?? null;
-        //         }
-
-        //         if ($badgeImage) {
-        //             $badgeImage->update($data);
-        //         } else {
-        //             BadgeImage::create($data);
-        //         }
-        //     }
-        // });
-
-        // $form->saved(function (Form $form) {
-        //     $images = request()->file('images', []);
-        //     $allData = request()->input('images', []);
-
-        //     $defaultBadgeImage = BadgeImage::where('badge_id', $form->model()->id)
-        //         ->where('language', 'default')
-        //         ->first();
-
-        //     foreach ($allData as $lang => $dataInput) {
-
-        //         $badgeImage = BadgeImage::where('badge_id', $form->model()->id)
-        //             ->where('language', $lang)
-        //             ->first();
-
-        //         $data = [
-        //             'badge_id'   => $form->model()->id,
-        //             'image_type' => $dataInput['image_type'] ?? ($defaultBadgeImage->image_type ?? ImageType::Image->value),
-        //             'language'   => $lang,
-        //         ];
-
-        //         // --- IMAGE ---
-        //         if (!empty($images[$lang]['image'])) {
-        //             $data['image'] = Common::upload('badges', $images[$lang]['image']);
-        //         } elseif (isset($dataInput['image_file'])) {
-        //             // copy default file
-        //             $data['image'] = Common::upload('badges', $defaultBadgeImage->image);
-        //         } elseif ($lang !== 'default') {
-        //             $data['image'] = $defaultBadgeImage->image ?? null;
-        //         }
-
-        //         // --- SHOW IMAGE ---
-        //         if (!empty($images[$lang]['default_image'])) {
-        //             $data['show_image'] = Common::upload('badges', $images[$lang]['default_image']);
-        //         } elseif (isset($dataInput['show_file'])) {
-        //             $data['show_image'] = Common::upload('badges', $defaultBadgeImage->show_image);
-        //         } elseif ($lang !== 'default') {
-        //             $data['show_image'] = $defaultBadgeImage->show_image ?? null;
-        //         }
-
-        //         if ($badgeImage) {
-        //             $badgeImage->update($data);
-        //         } else {
-        //             BadgeImage::create($data);
-        //         }
-        //     }
-        // });
-
+    
 
         $form->saved(function (Form $form) {
             // Get uploaded files
