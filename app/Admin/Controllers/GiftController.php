@@ -687,7 +687,7 @@ class GiftController extends MainController
             ->orderBy('created_at', 'desc')
             ->limit(100)
             ->get()->reverse()->values();
-
+        dd($fairLuckHistory, $fairLuckSettings);
         return $content->view('lucky_gift', [
             'config' => $config,
             'fairLuckSettings' => $fairLuckSettings,
@@ -757,11 +757,25 @@ class GiftController extends MainController
 
         // Direct numeric V7 keys (stored as-is)
         $v7_direct_keys = [
-            'V7_wallet_min', 'V7_wallet_tight', 'V7_wallet_target', 'V7_wallet_high', 'V7_wallet_drain',
-            'V7_negative_limit', 'V7_nowin_sensitivity', 'V7_win_base_sensitivity', 'V7_win_position_sensitivity',
-            'V7_boost_base_sensitivity', 'V7_boost_position_sensitivity', 'V7_wallet_weight', 'V7_rtp_weight',
-            'V7_nowin_floor', 'V7_rtp_activation', 'V7_max_loss_streak', 'V7_forced_win_mult',
-            'global_vault_negative_limit', 'coin_to_usd_rate',
+            'V7_wallet_min',
+            'V7_wallet_tight',
+            'V7_wallet_target',
+            'V7_wallet_high',
+            'V7_wallet_drain',
+            'V7_negative_limit',
+            'V7_nowin_sensitivity',
+            'V7_win_base_sensitivity',
+            'V7_win_position_sensitivity',
+            'V7_boost_base_sensitivity',
+            'V7_boost_position_sensitivity',
+            'V7_wallet_weight',
+            'V7_rtp_weight',
+            'V7_nowin_floor',
+            'V7_rtp_activation',
+            'V7_max_loss_streak',
+            'V7_forced_win_mult',
+            'global_vault_negative_limit',
+            'coin_to_usd_rate',
         ];
         foreach ($v7_direct_keys as $key) {
             if ($request->has($key)) {
