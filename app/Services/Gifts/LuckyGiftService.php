@@ -72,7 +72,6 @@ class LuckyGiftService
         $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
         $hostPercentage = $receiverFeeRate;
         $total_cashback_percentage = 0;
-        \Log::info("hostPercentage: v2" . $hostPercentage);
         
 
         // ========================================================================
@@ -398,7 +397,6 @@ class LuckyGiftService
         $roomrPercentage = getGiftPercentage('owner_lucky_gift') / 10;
         $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
         $total_cashback_percentage = 0;
-        \Log::info("hostPercentage: v1 " . $hostPercentage);
 
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
