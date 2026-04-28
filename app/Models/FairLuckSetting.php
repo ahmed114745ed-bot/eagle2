@@ -47,6 +47,10 @@ class FairLuckSetting extends Model
 
     public static function getReceiverFeeRate(): float
     {
+        \Log::info('Retrieving receiver fee rate', [
+            'key' => 'fair_luck_receiver_fee_rate',
+            'value' => static::getByKey('fair_luck_receiver_fee_rate', 0.10)
+        ]);
         return (float) static::getByKey('fair_luck_receiver_fee_rate', 0.10);
     }
 
