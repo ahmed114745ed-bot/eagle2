@@ -504,10 +504,11 @@ class ChargeReportController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->disableIdFilter();
+             $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
-                $filter->equal('trx', __('trx_no'));
+                $filter->equal('trx', __('trx'));
+                 $filter->equal('id', __('transaction id'));
 
                 $filter->where(function ($query) {
                     if ($this->input !== '') {
@@ -663,7 +664,7 @@ class ChargeReportController extends MainController
             $query->when(
                 request('user.uuid'),
                 fn($q, $uuid) =>
-                $q->whereHas('user', fn($u, $uuid) => $u->where('uuid', $uuid))
+                $q->whereHas('user', fn($u) => $u->where('uuid', $uuid))
             );
 
             $query->when(

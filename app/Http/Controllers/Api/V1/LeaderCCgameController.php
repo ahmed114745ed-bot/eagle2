@@ -110,7 +110,7 @@ class LeaderCCgameController extends Controller
                     return $this->json(4004, 'Insufficient game coins');
                 }
 
-
+                $amountBefore = $user->di;
                 $user->di = $type == 1 ? ($user->di - $coin) : ($user->di + $coin);
                 $user->save();
                 $amount = abs($coin);
@@ -118,7 +118,7 @@ class LeaderCCgameController extends Controller
                 UserCoinLogHelper::logByType(
                     $user->id,
                     $sign * $amount,
-                    $user->di,
+                    $amountBefore,
                     UserCoinLogType::COIN_GAME,
                     null,
                 );
@@ -196,6 +196,7 @@ class LeaderCCgameController extends Controller
                 if (!$user) return $this->json(4005, 'user not found');
 
                 $coin = abs((int)$request->coin);
+                $amountBefore = $user->di;
                 $user->di += $coin;
                 $user->save();
                 $amount = abs($coin);
@@ -203,7 +204,7 @@ class LeaderCCgameController extends Controller
                 UserCoinLogHelper::logByType(
                     $user->id,
                     $sign * $amount,
-                    $user->di,
+                    $amountBefore,
                     UserCoinLogType::COIN_GAME,
                     null,
                 );

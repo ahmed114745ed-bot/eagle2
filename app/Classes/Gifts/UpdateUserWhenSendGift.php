@@ -52,6 +52,7 @@ class UpdateUserWhenSendGift
 
             try {
                 (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
+                $user->save();
 
                 if ($user->total_received_level != $lastReceivedLevel) {
                     dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))
@@ -121,6 +122,7 @@ class UpdateUserWhenSendGift
             $lastReceivedLevel = $userMeta['last_received_level'];
             try {
                 (new UpgradeReceiverLevelServices())->checkUserLevelUpgrated($user);
+                $user->save();
 
                 if ($user->total_received_level != $lastReceivedLevel) {
                     dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))

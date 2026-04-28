@@ -114,7 +114,7 @@
                 </div>
                 {{-- Version 3 Content (FairLuck V6 - Same settings as V2) --}}
                 @php $settings = $fairLuckSettings; @endphp
-                <div class="box box-success">
+                {{-- <div class="box box-success">
                     <div class="box-header with-border">
                         <h3 class="box-title">{{ __('FairLuck V6 Settings (Advanced Protection)') }} / {{ __('إعدادات FairLuck V6 (الحماية المتقدمة)') }}</h3>
                     </div>
@@ -216,9 +216,9 @@
                             <button type="submit" class="btn btn-success pull-right">{{ __('Save V6 Settings') }} / {{ __('حفظ إعدادات V6') }}</button>
                         </div>
                     </form>
-                </div>
+                </div> --}}
 
-                <div class="row">
+                {{-- <div class="row">
                     <div class="col-md-12">
                         <div class="box box-success">
                             <div class="box-header with-border">
@@ -229,7 +229,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             @elseif($currentVersion == 4)
                 {{-- Version 4 Content (FairLuck V7 - Simplified) --}}
                 @php $settings = $fairLuckSettings; @endphp
