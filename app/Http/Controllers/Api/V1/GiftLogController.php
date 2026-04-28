@@ -355,7 +355,8 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
-        $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+       // $luckyStatus = Common::getSettingValue('lucky_gifts_action');
+        $luckyStatus = Common::getSettingValue('lucky_gift_version');
         if ($luckyStatus == 4) {
             Log::channel('lucky_gift')->info('Lucky gift send attempt while lucky gifts are disabled', [
                 'user_id' => $request->user()->id,
