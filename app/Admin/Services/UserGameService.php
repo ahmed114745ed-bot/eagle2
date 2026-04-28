@@ -11,52 +11,54 @@ use Modules\Vip\Entities\Vip;
 
 class UserGameService
 {
-    
-        public function adminUserAvatar($user, bool $withoutLevels = false): string
-        {
-            if (! $user) {
-                return __('No user');
-            }
-    
-            // UUIDs
-            $uid     = e( $user->id);
-            $special = e($user->uuid ?? '-');
-    
-            // Avatar
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $path = $user->profile->avatar ?? $user->avatar ?? null; // 👈 fallback
-    
-            $url = getImagePath($path) ?? $defaultImage;
-            if (! isImageExists($url)) {
-                $url = $defaultImage;
-            }
-    
-            $image = handleShowImageWithTypes($user->id ?? 0, $url, 50, 50);
-    
-            // Level-related data
-            $levelImages = '';
-            if (! $withoutLevels && method_exists(UserLevelHelper::class, 'getReceiverImage')) {
-                $receiverImg = getImagePath(UserLevelHelper::getReceiverImage($user));
-                $senderImg   = getImagePath(UserLevelHelper::getSenderImage($user));
-    
-                foreach ([$receiverImg, $senderImg] as $img) {
-                    if (!empty($img)) {
-                        $levelImages .= "<img src='{$img}' style='width:32px;height:14px;margin-right:2px;'>";
-                    }
+
+    public function adminUserAvatar($user, bool $withoutLevels = false): string
+    {
+        if (! $user) {
+            return __('No user');
+        }
+
+        // UUIDs
+        $uid     = e($user->original_uuid ?? $user->uuid ?? $user->id);
+        $id     = e($user->id ?? '-');
+        $special = e($user->uuid ?? '-');
+
+        // Avatar
+        $defaultImage = asset('images/businessman-icon.jpg');
+        $path = $user->profile->avatar ?? $user->avatar ?? null; // 👈 fallback
+
+        $url = getImagePath($path) ?? $defaultImage;
+        if (! isImageExists($url)) {
+            $url = $defaultImage;
+        }
+
+        $image = handleShowImageWithTypes($user->id ?? 0, $url, 50, 50);
+
+        // Level-related data
+        $levelImages = '';
+        if (! $withoutLevels && method_exists(UserLevelHelper::class, 'getReceiverImage')) {
+            $receiverImg = getImagePath(UserLevelHelper::getReceiverImage($user));
+            $senderImg   = getImagePath(UserLevelHelper::getSenderImage($user));
+
+            foreach ([$receiverImg, $senderImg] as $img) {
+                if (!empty($img)) {
+                    $levelImages .= "<img src='{$img}' style='width:32px;height:14px;margin-right:2px;'>";
                 }
             }
-    
-            // اسم المستخدم
-            $rawName   = $user->name ?? '';
-            $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $rawName);
-            $name      = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    
-            return <<<HTML
+        }
+
+        // اسم المستخدم
+        $rawName   = $user->name ?? '';
+        $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $rawName);
+        $name      = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        return <<<HTML
             <a href="{$this->adminUserUrl($user->id ?? 0)}" 
                style="display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:inherit;">
                 {$image}
                 <div>
                     <strong style="font-size:16px;">{$name}</strong><br>
+                     <span style="font-size:13px;">id: {$id}</span><br>
                     <span style="font-size:13px;">
                         UID: <span id="uid-{$user->id}">{$uid}</span>
                         <button onclick="event.preventDefault();event.stopPropagation();copyToClipboard('uid-{$user->id}')"
@@ -68,55 +70,55 @@ class UserGameService
                 </div>
             </a>
             HTML;
+    }
+
+    public function adminUserAvatarII($user, bool $withoutLevels = false): string
+    {
+        if (! $user) {
+            return __('No user');
         }
 
-        public function adminUserAvatarII($user, bool $withoutLevels = false): string
-{
-    if (! $user) {
-        return __('No user');
-    }
+        $uid     = e($user->uuid ?? $user->id);
+        $special = e($user->uuid ?? '-');
 
-    $uid     = e($user->uuid ?? $user->id);
-    $special = e($user->uuid ?? '-');
+        // ✅ Image (no filesystem check)
+        $defaultImage = asset('images/businessman-icon.jpg');
+        $path = $user->avatar ?? null;
 
-    // ✅ Image (no filesystem check)
-    $defaultImage = asset('images/businessman-icon.jpg');
-    $path = $user->avatar ?? null;
+        $url = $path ? getImagePath($path) : $defaultImage;
 
-    $url = $path ? getImagePath($path) : $defaultImage;
-
-    $image = "<img src='{$url}' width='50' height='50'
+        $image = "<img src='{$url}' width='50' height='50'
         style='border-radius:50%;object-fit:cover;'>";
 
-    // ✅ Levels (cached)
-    $levelImages = '';
+        // ✅ Levels (cached)
+        $levelImages = '';
 
-    if (! $withoutLevels) {
-        $levelImages = cache()->remember(
-            "user_levels_{$user->id}",
-            3600,
-            function () use ($user) {
-                $html = '';
+        if (! $withoutLevels) {
+            $levelImages = cache()->remember(
+                "user_levels_{$user->id}",
+                3600,
+                function () use ($user) {
+                    $html = '';
 
-                $receiverImg = getImagePath(UserLevelHelper::getReceiverImage($user));
-                $senderImg   = getImagePath(UserLevelHelper::getSenderImage($user));
+                    $receiverImg = getImagePath(UserLevelHelper::getReceiverImage($user));
+                    $senderImg   = getImagePath(UserLevelHelper::getSenderImage($user));
 
-                foreach ([$receiverImg, $senderImg] as $img) {
-                    if (!empty($img)) {
-                        $html .= "<img src='{$img}'
+                    foreach ([$receiverImg, $senderImg] as $img) {
+                        if (!empty($img)) {
+                            $html .= "<img src='{$img}'
                             style='width:32px;height:14px;margin-right:2px;'>";
+                        }
                     }
+
+                    return $html;
                 }
+            );
+        }
 
-                return $html;
-            }
-        );
-    }
+        // ✅ Safe name
+        $name = e(preg_replace('/[\x00-\x1F\x7F]/u', '', $user->name ?? ''));
 
-    // ✅ Safe name
-    $name = e(preg_replace('/[\x00-\x1F\x7F]/u', '', $user->name ?? ''));
-
-    return <<<HTML
+        return <<<HTML
     <a href="{$this->adminUserUrl($user->id)}"
        style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
         {$image}
@@ -128,16 +130,10 @@ class UserGameService
         </div>
     </a>
     HTML;
-}
-    
-        protected function adminUserUrl($id): string
-        {
-            return url("admin/users/{$id}");
-        }
-    
+    }
 
-
-
-
-
+    protected function adminUserUrl($id): string
+    {
+        return url("admin/users/{$id}");
+    }
 }
