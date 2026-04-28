@@ -56,7 +56,7 @@ class SendNotificationToAllFollowers implements ShouldQueue
             $data = [
                 'image' => getDriverUrl().'/'.$icon,
                 'owner_id' => $owner->id,
-                'name' => $owner->name,
+                'name' => @$owner?->name ?? '',
             ];
 
             // Send notifications in chunks
