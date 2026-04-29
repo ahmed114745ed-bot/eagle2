@@ -178,13 +178,6 @@ class Common
         return $data;
     }
 
-    public static function getLevels($levels): Collection
-    {
-        return PackageHelper::isInstalled('vip')
-            ? Vip::query()->whereIn('type', [1, 2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get()
-            : collect();
-    }
-
     public static function apiResponse2(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $isPagination = false)
     {
 

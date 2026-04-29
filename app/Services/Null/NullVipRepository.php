@@ -54,4 +54,9 @@ class NullVipRepository implements VipRepositoryContract
     {
         return collect();
     }
+
+    public function getLevels(array $levels)
+    {
+        return collect();
+    }
 }

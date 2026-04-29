@@ -21,4 +21,6 @@ interface VipRepositoryContract
     public function getLevelGroups(): array;
 
     public function getLevelsByType(int $type);
+
+    public function getLevels(array $levels);
 }

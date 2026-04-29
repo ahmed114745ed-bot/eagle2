@@ -3,6 +3,8 @@
 namespace Utd\Gifts\Http\Controllers\Api;
 
 use App\Contracts\RoomTopUsersRepositoryContract;
+use App\Contracts\VipRepositoryContract;
+use App\Support\PackageHelper;
 use App\Events\GiftBannerEvent;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\CustomNotification;
@@ -233,7 +235,9 @@ class GiftLogController extends Controller
                 $firstReceiver->total_received_level,
                 $firstReceiver->total_sender_level,
             ];
-            $levels = $this->Common::getLevels($levels);
+            $levels = PackageHelper::isInstalled('vip')
+                ? app(VipRepositoryContract::class)->getLevels($levels)
+                : collect();
             $senderLevels = $levels->where('type', '=', 2);
             $receiverLevels = $levels->where('type', '=', 1);
             $values = [
