@@ -2,7 +2,7 @@
 
 namespace Utd\Room\Jobs;
 
-use App\Events\BannerEvent;
+use Utd\Room\Events\BannerEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
