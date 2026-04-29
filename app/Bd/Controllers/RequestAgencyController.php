@@ -118,8 +118,8 @@ class RequestAgencyController extends AdminController
         });
 
         $grid->column('actions', __('Actions'))->display(function () {
-            $approveUrl = "bd/requests/{$this->id}/approve";
-            $rejectUrl = "bd/requests/{$this->id}/reject";
+            $approveUrl = "/requests/{$this->id}/approve";
+            $rejectUrl = "/requests/{$this->id}/reject";
             $showUrl = url("bd/request-agencies/{$this->id}");
 
             if ($this->status === 'rejected') {
