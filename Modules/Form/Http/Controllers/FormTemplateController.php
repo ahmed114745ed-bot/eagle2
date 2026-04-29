@@ -436,7 +436,6 @@ class FormTemplateController extends Controller
             'created_at' => now(),
         ]);
 
-         dd($save);
         if (!$save) {
             return response()->json([
                 'success' => false,
