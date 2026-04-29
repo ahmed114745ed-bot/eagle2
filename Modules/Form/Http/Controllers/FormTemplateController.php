@@ -402,7 +402,6 @@ class FormTemplateController extends Controller
     public function storeSubmission(Request $request, string $type)
     {
 
-        dd($request->all(), $type);
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
 
         $data = $request->except('_token');
@@ -436,6 +435,8 @@ class FormTemplateController extends Controller
             'country' => $request->country_id,
             'created_at' => now(),
         ]);
+
+         dd($save);
         if (!$save) {
             return response()->json([
                 'success' => false,
