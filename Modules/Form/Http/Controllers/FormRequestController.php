@@ -417,17 +417,8 @@ class FormRequestController extends MainController
         $bd = Bd::find($request->bd_id);
 
         // Resolve country_id: prefer owner's, fallback to BD's
-        $countryId = $owner->country_id ?? $bd?->country_id;
-
-        // Validate the country actually exists to avoid FK constraint violation
-        if (!$countryId || !Country::where('id', $countryId)->exists()) {
-            dd($owner->country_id , $bd?->country_id,$bd?->id );
-            return response()->json([
-                'success' => false,
-                'message' => __('invalid_country'),
-            ], 400);
-        }
-
+        $countryId = @$owner?->country?->id ?? @$bd?->country?->id ?? null;
+        
         Agency::create([
             'name' => $request->name,
             'phone' => $request->whatsapp_number,
@@ -523,15 +514,7 @@ class FormRequestController extends MainController
         $bd = Bd::find($request->bd_id);
 
         // Resolve country_id: prefer owner's, fallback to BD's
-        $countryId = $owner->country_id ?? $bd?->country_id;
-
-        // Validate the country actually exists to avoid FK constraint violation
-        if (!$countryId || !Country::where('id', $countryId)->exists()) {
-            return response()->json([
-                'success' => false,
-                'message' => __('invalid_country'),
-            ], 400);
-        }
+        $countryId = @$owner?->country?->id ?? @$bd?->country?->id ?? null;
 
         ShippingAgency::create([
             'name' => $request->name,
