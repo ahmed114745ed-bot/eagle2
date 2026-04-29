@@ -413,13 +413,13 @@ class FormRequestController extends MainController
                 'message' => __('user_already_has_agency'),
             ], 400);
         }
-
+        $bd = Bd::find($request->bd_id);
         Agency::create([
             'name' => $request->name,
             'phone' => $request->whatsapp_number,
             'app_owner_id' => $owner->id,
             'bd_id' => $request->bd_id,
-            'country_id' => @$owner?->country_id ?? null,
+            'country_id' => @$owner?->country_id ?? $bd->country_id,
         ]);
         $request->update(['status' => 'approved']);
         $owner->type_user = 2;
