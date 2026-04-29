@@ -317,6 +317,19 @@ class ParentUsersController extends MainController
         $userId = request("ids");
 
         $grid = new Grid(new UserCodeInvitation());
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+
+            $filter->column('1/2', function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $query->where('invited.uuid', $input);
+                }, __('User'))->placeholder(__('Search by  UUID '));
+            });
+        });
+
         $grid->model()->with([
             'invited',
             'invited.profile',
