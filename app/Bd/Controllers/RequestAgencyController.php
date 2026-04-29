@@ -33,6 +33,7 @@ class RequestAgencyController extends AdminController
 
     protected function getGrid($type)
     {
+
         $grid = new Grid(new FormRequest());
 
         $grid->model()
@@ -117,9 +118,9 @@ class RequestAgencyController extends AdminController
         });
 
         $grid->column('actions', __('Actions'))->display(function () {
-            $approveUrl = "bd/requests/{$this->id}/approve";
-            $rejectUrl = "bd/requests/{$this->id}/reject";
-            $showUrl = url("bd/requests/{$this->id}");
+            $approveUrl = url("bd/requests/{$this->id}/approve");
+            $rejectUrl = url("bd/requests/{$this->id}/reject");
+            $showUrl = url("bd/request-agencies/{$this->id}");
 
             if ($this->status === 'rejected') {
                 return '<span class="text-danger">' . __('Rejected') . '</span>';
@@ -303,5 +304,3 @@ class RequestAgencyController extends AdminController
         return $show;
     }
 }
-
-
