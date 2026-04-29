@@ -81,10 +81,9 @@ class RequestAgenciesController extends Controller
         $additionalInfo->save();
         $appOwnerId = $agency->app_owner_id;
         $user = User::find($appOwnerId);
-        $user->type_user = 2;
-        $user->agency_id = $agency->id;
-        $user->save();
-        uploadMonthlyDiamondReceive($user->id, 0);
+
+        \App\Facades\UserHandling::changeUserAgency($user, $agency->id, 2);
+
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
@@ -92,4 +91,5 @@ class RequestAgenciesController extends Controller
         CustomNotification::acceptRequestAgency($user);
         return Common::apiResponse(true, 'Succcess');
     }
+
 }

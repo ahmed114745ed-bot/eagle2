@@ -114,6 +114,8 @@ class ChangeUsersAgencyAction extends RowAction
           
             $userSalaries->update(['is_finished' => 1]);
         }
+        uploadMonthlyDiamondReceive($user->id, 0);
+
     
     }
 
