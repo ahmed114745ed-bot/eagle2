@@ -325,7 +325,9 @@ class ParentUsersController extends MainController
             $filter->column('1/2', function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
-                    $query->where('invited.uuid', $input);
+                    $query->whereHas('invited', function ($q) use ($input) {
+                        $q->where('uuid', $input);
+                    });
                 }, __('User'))->placeholder(__('Search by  UUID '));
             });
         });
