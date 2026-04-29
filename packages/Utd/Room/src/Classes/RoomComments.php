@@ -6,7 +6,7 @@ use App\Enums\UserCoinLogType;
 use App\Exceptions\NotInfCoins;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use App\Jobs\AllOpeningRoomsZegoRequest;
+use Utd\Room\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\SendCustomToZend;
 use App\Models\User;
 use Utd\Room\Entities\Room;

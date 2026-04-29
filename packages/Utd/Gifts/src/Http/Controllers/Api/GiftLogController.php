@@ -14,7 +14,7 @@ use App\Helpers\UserCommon;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Http\Resources\GiftLogUtdResource;
-use App\Jobs\AllOpeningRoomsZegoRequest;
+use Utd\Room\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\CleanGiftLogsJob;
 use App\Jobs\UpdateUserDataWhenSendGift;
 use App\Models\Agency;
@@ -307,7 +307,9 @@ class GiftLogController extends Controller
 
                 //                $this->Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
 
-                dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
+                if (PackageHelper::isInstalled('room')) {
+                    dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
+                }
             }
         }
 
