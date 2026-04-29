@@ -417,16 +417,16 @@ class FormRequestController extends MainController
         $bd = Bd::find($request->bd_id);
 
         // Resolve country_id: prefer owner's, fallback to BD's
-        $countryId = $owner->country_id ?? $bd?->country_id;
+        $countryId = $owner->country->id ?? $bd?->country_id ?? null;
 
         // Validate the country actually exists to avoid FK constraint violation
-        if (!$countryId || !Country::where('id', $countryId)->exists()) {
-            dd($owner->country_id , $bd?->country_id,$bd?->id );
-            return response()->json([
-                'success' => false,
-                'message' => __('invalid_country'),
-            ], 400);
-        }
+        // if (!$countryId || !Country::where('id', $countryId)->exists()) {
+        //     dd($owner->country_id , $bd?->country_id,$bd?->id );
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => __('invalid_country'),
+        //     ], 400);
+        // }
 
         Agency::create([
             'name' => $request->name,
