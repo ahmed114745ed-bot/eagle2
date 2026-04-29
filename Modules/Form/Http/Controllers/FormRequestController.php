@@ -419,7 +419,7 @@ class FormRequestController extends MainController
             'phone' => $request->whatsapp_number,
             'app_owner_id' => $owner->id,
             'bd_id' => $request->bd_id,
-            'country_id' => $owner->country_id,
+            'country_id' => @$owner?->country_id ?? null,
         ]);
         $request->update(['status' => 'approved']);
         $owner->type_user = 2;
