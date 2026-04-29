@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
-use Modules\Vip\Entities\Vip;
+use App\Contracts\VipRepositoryContract;
+use App\Support\PackageHelper;
 use Throwable;
 use Utd\Gifts\Entities\UserGift;
 
@@ -126,8 +127,9 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
 
     public function getLevel(int $type, int $totalCoins)
     {
-
-        return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
+        return PackageHelper::isInstalled('vip')
+            ? app(VipRepositoryContract::class)->getLevel($type, $totalCoins)
+            : null;
     }
 
     /*

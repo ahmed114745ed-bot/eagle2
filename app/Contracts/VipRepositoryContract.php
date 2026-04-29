@@ -23,4 +23,6 @@ interface VipRepositoryContract
     public function getLevelsByType(int $type);
 
     public function getLevels(array $levels);
+
+    public function getLevel(int $type, int $totalCoins);
 }

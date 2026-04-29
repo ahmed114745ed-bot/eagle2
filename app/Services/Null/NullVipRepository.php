@@ -59,4 +59,9 @@ class NullVipRepository implements VipRepositoryContract
     {
         return collect();
     }
+
+    public function getLevel(int $type, int $totalCoins)
+    {
+        return null;
+    }
 }

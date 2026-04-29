@@ -78,6 +78,11 @@ class VipRepository extends AbstractRepository implements VipRepositoryContract
         return Vip::query()->whereIn('type', [1, 2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get();
     }
 
+    public function getLevel(int $type, int $totalCoins)
+    {
+        return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
+    }
+
     private function mapChunk($vips)
     {
         return $vips->chunk(10)->map(function ($chunk) {
