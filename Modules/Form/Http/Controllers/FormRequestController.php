@@ -7,6 +7,7 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Services\UserService;
 use App\Models\Agency;
 use App\Models\Bd;
+use App\Models\Country;
 use App\Models\ShippingAgency;
 use App\Models\User;
 use Encore\Admin\Facades\Admin;
@@ -414,12 +415,24 @@ class FormRequestController extends MainController
             ], 400);
         }
         $bd = Bd::find($request->bd_id);
+
+        // Resolve country_id: prefer owner's, fallback to BD's
+        $countryId = $owner->country_id ?? $bd?->country_id;
+
+        // Validate the country actually exists to avoid FK constraint violation
+        if (!$countryId || !Country::where('id', $countryId)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('invalid_country'),
+            ], 400);
+        }
+
         Agency::create([
             'name' => $request->name,
             'phone' => $request->whatsapp_number,
             'app_owner_id' => $owner->id,
-            'bd_id' => $request->bd_id,
-            'country_id' => @$owner?->country_id ?? $bd->country_id,
+            'bd_id' => $bd?->id,
+            'country_id' => $countryId,
         ]);
         $request->update(['status' => 'approved']);
         $owner->type_user = 2;
@@ -506,12 +519,25 @@ class FormRequestController extends MainController
             ], 400);
         }
 
+        $bd = Bd::find($request->bd_id);
+
+        // Resolve country_id: prefer owner's, fallback to BD's
+        $countryId = $owner->country_id ?? $bd?->country_id;
+
+        // Validate the country actually exists to avoid FK constraint violation
+        if (!$countryId || !Country::where('id', $countryId)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('invalid_country'),
+            ], 400);
+        }
+
         ShippingAgency::create([
             'name' => $request->name,
             'phone' => $request->whatsapp_number,
             'app_owner_id' => $owner->id,
-            'bd_id' => $request->bd_id,
-            'country_id' => $owner->country_id,
+            'bd_id' => $bd?->id,
+            'country_id' => $countryId,
         ]);
 
         MilestoneHelper::grantMilestoneToUser($owner, 'charge-agency-owner');
