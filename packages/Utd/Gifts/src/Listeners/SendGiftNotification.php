@@ -2,9 +2,9 @@
 
 namespace Utd\Gifts\Listeners;
 
-use App\Helpers\CustomNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Utd\Gifts\Events\GiftSent;
+use Utd\Gifts\Services\GiftsNotification;
 
 class SendGiftNotification implements ShouldQueue
 {
@@ -13,7 +13,6 @@ class SendGiftNotification implements ShouldQueue
     public function handle(GiftSent $event): void
     {
         foreach ($event->logs as $log) {
-            // Send notification based on source type
             match ($event->dto->sourceType) {
                 'room' => $this->notifyRoomGift($event, $log),
                 'moment' => $this->notifyMomentGift($event, $log),
@@ -25,25 +24,19 @@ class SendGiftNotification implements ShouldQueue
 
     private function notifyRoomGift($event, $log): void
     {
-        // Room-specific notification logic
-        // يمكن استدعاء Room package notification
     }
 
     private function notifyMomentGift($event, $log): void
     {
-        // Moment-specific notification
-        if (class_exists(CustomNotification::class)) {
-            CustomNotification::sendMomentGift(
-                $event->sender,
-                $event->gift,
-                $log->receiver,
-                $event->dto->getMomentId()
-            );
-        }
+        (new GiftsNotification)->sendMomentGift(
+            $event->sender,
+            $event->gift,
+            $log->receiver,
+            $event->dto->getMomentId()
+        );
     }
 
     private function notifyReelGift($event, $log): void
     {
-        // Reel-specific notification
     }
 }
