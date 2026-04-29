@@ -671,7 +671,7 @@ class ParentUsersController extends MainController
                         <div class="pc-stat-lbl"><i class="fa fa-list"></i> Operations</div>
                     </div>
                     <div class="pc-stat pc-stat-charge">
-                        <div class="pc-stat-val">💎 {$totalCharge}</div>
+                        <div class="pc-stat-val">🪙 {$totalCharge}</div>
                         <div class="pc-stat-lbl">Total Charge</div>
                     </div>
                     <div class="pc-stat pc-stat-earn">
