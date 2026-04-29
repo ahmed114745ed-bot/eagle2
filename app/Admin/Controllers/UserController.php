@@ -8,6 +8,7 @@ use App\Models\Pack;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
+use App\Models\Setting;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
@@ -140,7 +141,7 @@ class UserController extends MainController
     {
         $transfer_salary = settings()->get('transfer_salary');
         $stop_invite_code = settings()->get('stop_invite_code');
-        $stop_charge = settings()->get('stop_charge');
+        $stop_charge = Common::getSettingValue('stop_charge') ?? 0;
         $make_rooms_top = settings()->get('make_rooms_top');
         $make_gift_top = settings()->get('close_open_gifts');
 
@@ -403,11 +404,14 @@ class UserController extends MainController
 
     public function stop_charge(Request $request)
     {
-        if ($request->stop_charge == "false") {
-            settings()->set("stop_charge", "0");
-        } else {
-            settings()->set("stop_charge", "1");
-        }
+        $value = $request->stop_charge == "false" ? "0" : "1";
+
+        Setting::updateOrCreate(
+            ['key' => 'stop_charge'],
+            ['value' => $value]
+        );
+
+        Cache::forget('stop_charge');
     }
 
     public function make_rooms_top(Request $request)
