@@ -9,6 +9,7 @@ use App\models\User;
 use App\Models\Room;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Collection;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Transformers\CharismaResource;
@@ -17,7 +18,9 @@ class UserCharismaService
 {
     public static function formatTotalInService(): bool
     {
-        return (bool) Cache::get('charisma_format', false);
+        return (bool) Cache::rememberForever('charisma_format', function () {
+            return Setting::where('key', 'charisma_format')->value('value') ?? false;
+        });
     }
 
     private Collection $userCharismaLevels;
