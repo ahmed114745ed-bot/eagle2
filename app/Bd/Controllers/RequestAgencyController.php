@@ -33,6 +33,8 @@ class RequestAgencyController extends AdminController
 
     protected function getGrid($type)
     {
+
+        dd($type, auth()->id());
         $grid = new Grid(new FormRequest());
 
         $grid->model()
@@ -303,5 +305,3 @@ class RequestAgencyController extends AdminController
         return $show;
     }
 }
-
-
