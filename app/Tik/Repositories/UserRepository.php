@@ -543,7 +543,12 @@ class UserRepository extends AbstractRepository
 
     public function changeAgencyForHost($oldAgencyId, $newAgencyId)
     {
-        $this->model->where('agency_id', $oldAgencyId)->where('type_user', 1)->update(['agency_id', $newAgencyId]);
+        $users = $this->model->where('agency_id', $oldAgencyId)->where('type_user', 1)->get();
+
+        foreach ($users as $user) {
+            \App\Facades\UserHandling::changeUserAgency($user, $newAgencyId);
+        }
+
         return true;
     }
 
@@ -659,4 +664,5 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->where('email', $email)->exists();
     }
+
 }

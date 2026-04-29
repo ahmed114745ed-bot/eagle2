@@ -392,8 +392,8 @@ class AgencyController extends MainController
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()
-            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen','created_by')
-            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid','creator')])
+            ->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'coins', 'img', 'is_frozen', 'created_by')
+            ->with(['owner' => fn($query) => $query->select('id', 'name', 'uuid', 'creator')])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -765,24 +765,50 @@ class AgencyController extends MainController
             $newOwnerId = request()->app_owner_id;
             $form->model()->type = 1;
 
+
+
+            $currentAgencyId = $form->model()->id ?? null;
+            if ($appOwnerId) {
+                $existingAgency = Agency::where('app_owner_id', $appOwnerId)
+                    ->when($currentAgencyId, function ($query) use ($currentAgencyId) {
+                        $query->where('id', '!=', $currentAgencyId);
+                    })
+                    ->first();
+                $user = User::find($appOwnerId);
+
+
+                if ($existingAgency) {
+                    $error = new \Illuminate\Support\MessageBag([
+                        'app_owner_id' => [__('This user is already an owner of agency: ') . $existingAgency->name],
+                    ]);
+                    return back()->withInput()->withErrors($error);
+                }
+
+                if ($user && $user->agency_id && $user->agency_id != $currentAgencyId) {
+                    $error = new \Illuminate\Support\MessageBag([
+                        'app_owner_id' => [__('This user is already a member of another agency')],
+                    ]);
+                    return back()->withInput()->withErrors($error);
+                }
+            }
             if ($form->model()->exists && $newOwnerId !== null && $newOwnerId != $originalOwnerId) {
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
 
-                $user->update([
-                    'type_user' => 0,
-                    'agency_id' => 0,
-                    'is_host' => 0,
-                ]);
-                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                // Use centralized method to remove old owner
+                \App\Facades\UserHandling::changeUserAgency($user, 0, 0);
+                $user->is_host = 0;
+                $user->save();
             }
 
-            User::where('id', intval($appOwnerId))->update([
-                'type_user' => 2,
-                'is_host' => 1,
-                'agency_id' => $form->model()->id,
-            ]);
+            $newOwner = User::find(intval($appOwnerId));
+            if ($newOwner) {
+                // Use centralized method to assign new owner
+                \App\Facades\UserHandling::changeUserAgency($newOwner, $form->model()->id, 2);
+                $newOwner->is_host = 1;
+                $newOwner->save();
+            }
         });
     }
 
@@ -791,11 +817,13 @@ class AgencyController extends MainController
         $form->saved(function (Form $form) {
             $appOwnerId = intval($form->model()->app_owner_id);
 
-            User::where('id', $appOwnerId)->update([
-                'type_user' => 2,
-                'is_host' => 1,
-                'agency_id' => $form->model()->id,
-            ]);
+            $owner = User::find($appOwnerId);
+            if ($owner) {
+                // Use centralized method to assign owner
+                \App\Facades\UserHandling::changeUserAgency($owner, $form->model()->id, 2);
+                $owner->is_host = 1;
+                $owner->save();
+            }
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
