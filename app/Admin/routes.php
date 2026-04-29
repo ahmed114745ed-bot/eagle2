@@ -384,7 +384,7 @@ Route::group(
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
         Route::put('wares/toggle-enable/{id}', [WareController::class, 'toggleEnable']);
-
+        Route::resource('percentage-games', PercentageGameController::class);
         Route::resource('test-pusher', TestPusherController::class);
         Route::resource('report_user', ReportUserController::class)->middleware('web-agency-feature');
         // Route::resource('coupons', 'CouponController');
