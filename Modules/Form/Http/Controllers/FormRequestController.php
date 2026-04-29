@@ -421,6 +421,7 @@ class FormRequestController extends MainController
 
         // Validate the country actually exists to avoid FK constraint violation
         if (!$countryId || !Country::where('id', $countryId)->exists()) {
+            dd($owner->country_id , $bd?->country_id,$bd?->id );
             return response()->json([
                 'success' => false,
                 'message' => __('invalid_country'),
