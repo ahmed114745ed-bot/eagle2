@@ -6,22 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('gift_categories', function (Blueprint $table) {
-            $table->id();
-            $table->json('title');
-            $table->string('type');
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('gift_categories')) {
+            Schema::create('gift_categories', function (Blueprint $table) {
+                $table->id();
+                $table->json('title');
+                $table->string('type');
+                $table->bigInteger('sort')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('gift_categories');

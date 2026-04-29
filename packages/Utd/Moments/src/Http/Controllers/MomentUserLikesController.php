@@ -3,7 +3,6 @@
 namespace Utd\Moments\Http\Controllers;
 
 use App\Helpers\Common;
-use Utd\Moments\Services\MomentsNotification;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -13,6 +12,7 @@ use Utd\Moments\Entities\Moment;
 use Utd\Moments\Entities\MomentLikes;
 use Utd\Moments\Services\MomentLikesService;
 use Utd\Moments\Services\MomentService;
+use Utd\Moments\Services\MomentsNotification;
 use Utd\Moments\Transformers\MomentlikesResource;
 
 class MomentUserLikesController extends Controller

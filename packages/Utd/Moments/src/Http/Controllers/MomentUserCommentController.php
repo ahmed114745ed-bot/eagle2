@@ -3,7 +3,6 @@
 namespace Utd\Moments\Http\Controllers;
 
 use App\Helpers\Common;
-use Utd\Moments\Services\MomentsNotification;
 use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Support\Renderable;
@@ -14,6 +13,7 @@ use Utd\Moments\Entities\Moment;
 use Utd\Moments\Entities\MomentCommint;
 use Utd\Moments\Services\MomentCommentsService;
 use Utd\Moments\Services\MomentService;
+use Utd\Moments\Services\MomentsNotification;
 use Utd\Moments\Transformers\MomentCommmintResource;
 
 class MomentUserCommentController extends Controller

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_zego_messages', function (Blueprint $table) {
-            $table->bigInteger('gift_id')->nullable();
-        });
+        if (Schema::hasTable('custom_zego_messages') && ! Schema::hasColumn('custom_zego_messages', 'gift_id')) {
+            Schema::table('custom_zego_messages', function (Blueprint $table) {
+                $table->bigInteger('gift_id')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_zego_messages', function (Blueprint $table) {
-            $table->dropColumn('gift_id');
-        });
+        if (Schema::hasTable('custom_zego_messages') && Schema::hasColumn('custom_zego_messages', 'gift_id')) {
+            Schema::table('custom_zego_messages', function (Blueprint $table) {
+                $table->dropColumn('gift_id');
+            });
+        }
     }
 };

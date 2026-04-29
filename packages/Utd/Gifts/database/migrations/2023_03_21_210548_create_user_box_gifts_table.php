@@ -13,19 +13,31 @@ class CreateUserBoxGiftsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_box_gifts', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedBigInteger('box_uses_id')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->integer('coins')->nullable();
-            $table->unsignedBigInteger('room_uid')->nullable();
-            $table->unsignedBigInteger('room_id')->nullable();
-            $table->unsignedTinyInteger('type')->comment('0=local 1=global')->nullable();
-            $table->unsignedBigInteger('box_uses_owner_id')->nullable();
-            $table->string('image')->nullable();
-            $table->string('label')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('user_box_gifts')) {
+            Schema::create('user_box_gifts', function (Blueprint $table) {
+                $table->increments('id');
+                $table->unsignedBigInteger('user_id')->nullable();
+                $table->integer('coins')->nullable();
+                $table->unsignedTinyInteger('type')->comment('0=local 1=global')->nullable();
+                $table->unsignedBigInteger('box_uses_owner_id')->nullable();
+                $table->string('image')->nullable();
+                $table->string('label')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (Schema::hasTable('box_uses') && Schema::hasTable('user_box_gifts') && ! Schema::hasColumn('user_box_gifts', 'box_uses_id')) {
+            Schema::table('user_box_gifts', function (Blueprint $table) {
+                $table->unsignedBigInteger('box_uses_id')->nullable();
+            });
+        }
+
+        if (Schema::hasTable('rooms') && Schema::hasTable('user_box_gifts') && ! Schema::hasColumn('user_box_gifts', 'room_id')) {
+            Schema::table('user_box_gifts', function (Blueprint $table) {
+                $table->unsignedBigInteger('room_uid')->nullable();
+                $table->unsignedBigInteger('room_id')->nullable();
+            });
+        }
     }
 
     /**

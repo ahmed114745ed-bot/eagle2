@@ -4,40 +4,43 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGiftsTable extends Migration
+return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
-        Schema::create('gifts', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name')->comment('اسم الهدية')->nullable();
-            $table->string('e_name')->comment('الاسم الانجليزي')->nullable();
-            $table->unsignedTinyInteger('type')->default('1')->comment('1 هدية عادية 2 هدية ساخنة')->nullable();
-            $table->unsignedTinyInteger('vip_level')->default('0000')->comment('المستوى المطلوب لكبار الشخصيات')->nullable();
-            $table->unsignedInteger('hot')->nullable();
-            $table->unsignedTinyInteger('is_play')->comment('0 لا يوجد بث 1 خدمة كاملة البث')->nullable();
-            $table->integer('price')->comment('السعر')->nullable();
-            $table->string('img')->nullable();
-            $table->string('show_img')->nullable();
-            $table->string('show_img2')->nullable();
-            $table->unsignedTinyInteger('sort')->default('1')->nullable();
-            $table->unsignedTinyInteger('enable')->default('1')->comment('1 ممكنة 2 غير ممكنة')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('gifts')) {
+            Schema::create('gifts', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->string('e_name')->nullable();
+                $table->unsignedTinyInteger('type')->default(1)->nullable();
+                $table->unsignedInteger('hot')->nullable();
+                $table->unsignedTinyInteger('is_play')->nullable();
+                $table->integer('price')->default(0)->nullable();
+                $table->string('img')->nullable();
+                $table->string('show_img')->nullable();
+                $table->string('show_img2')->nullable();
+                $table->bigInteger('sort')->nullable();
+                $table->unsignedTinyInteger('enable')->default(1)->nullable();
+                $table->boolean('music_gift')->default(false);
+                $table->boolean('international_gift')->default(false);
+                $table->string('image_type')->nullable();
+                $table->unsignedBigInteger('created_by')->nullable();
+                $table->unsignedBigInteger('updated_by')->nullable();
+                $table->unsignedInteger('gift_category_id')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (Schema::hasTable('o_vips') && Schema::hasTable('gifts') && ! Schema::hasColumn('gifts', 'vip_level')) {
+            Schema::table('gifts', function (Blueprint $table) {
+                $table->unsignedTinyInteger('vip_level')->default(0)->nullable();
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('gifts');
     }
-}
+};

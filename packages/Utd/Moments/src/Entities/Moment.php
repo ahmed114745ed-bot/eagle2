@@ -4,9 +4,9 @@ namespace Utd\Moments\Entities;
 
 use App\Models\User;
 use App\Support\PackageHelper;
-use Utd\Gifts\Entities\Gift;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Gifts\Entities\Gift;
 
 class Moment extends Model
 {
