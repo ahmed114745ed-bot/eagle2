@@ -208,6 +208,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
 
             Route::get('zego-credential', [UserController::class, 'zegoCredential']);
+            Route::get('zego-credential-encrypted', [UserController::class, 'zegoCredentialEncrypted']);
 
 
             Route::prefix('config')->group(function () {
