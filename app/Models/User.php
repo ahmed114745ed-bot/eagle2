@@ -513,6 +513,12 @@ class User extends Authenticatable
         return $this->hasMany(UserEarnInvitation::class, 'parent_id');
     }
 
+    public function userCodeInvite()
+    {
+        return $this->hasMany(UserCodeInvitation::class, 'user_id');
+    }
+
+
     public function scopeWithoutAppends($query)
     {
         self::$withoutAppends = true;

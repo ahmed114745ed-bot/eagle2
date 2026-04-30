@@ -247,6 +247,14 @@ class AgencyRepository extends AbstractRepository
         return Agency::where('app_owner_id', $ownerId)->first();
     }
 
+    public function getAgencyByOwnerIdAndType($ownerId, $type)
+    {
+        return Agency::where('app_owner_id', $ownerId)
+            ->where('type', $type)
+            ->where('status', 1)
+            ->first();
+    }
+
     public function getJoinRequests($agencyId)
     {
         return AgencyJoinRequest::where('agency_id', $agencyId);
