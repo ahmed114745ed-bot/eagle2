@@ -4,7 +4,7 @@ namespace Utd\Gifts\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\GiftResource;
+use Utd\Gifts\Http\Resources\GiftResource;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

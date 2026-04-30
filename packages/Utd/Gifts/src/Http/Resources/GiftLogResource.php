@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Resources\Api\V1;
+namespace Utd\Gifts\Http\Resources;
 
-use App\Http\Resources\GiftResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GiftLogResource extends JsonResource

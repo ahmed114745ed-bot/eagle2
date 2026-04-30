@@ -207,10 +207,10 @@ return [
     |
     */
     'resources' => [
-        'gift' => env('GIFTS_GIFT_RESOURCE', 'App\Http\Resources\GiftResource'),
-        'gift_category' => env('GIFTS_GIFT_CATEGORY_RESOURCE', 'App\Http\Resources\GiftCategoryResource'),
-        'gift_log' => env('GIFTS_GIFT_LOG_RESOURCE', 'App\Http\Resources\Api\V1\GiftLogResource'),
-        'gift_log_utd' => env('GIFTS_GIFT_LOG_UTD_RESOURCE', 'App\Http\Resources\GiftLogUtdResource'),
+        'gift' => env('GIFTS_GIFT_RESOURCE', 'Utd\Gifts\Http\Resources\GiftResource'),
+        'gift_category' => env('GIFTS_GIFT_CATEGORY_RESOURCE', 'Utd\Gifts\Http\Resources\GiftCategoryResource'),
+        'gift_log' => env('GIFTS_GIFT_LOG_RESOURCE', 'Utd\Gifts\Http\Resources\GiftLogResource'),
+        'gift_log_utd' => env('GIFTS_GIFT_LOG_UTD_RESOURCE', 'Utd\Gifts\Http\Resources\GiftLogUtdResource'),
     ],
 
     /*
@@ -247,7 +247,7 @@ return [
     |
     */
     'events_classes' => [
-        'gift_banner' => env('GIFTS_BANNER_EVENT', 'App\Events\GiftBannerEvent'),
+        'gift_banner' => env('GIFTS_BANNER_EVENT', 'Utd\Gifts\Events\GiftBannerEvent'),
     ],
 
     /*
@@ -320,6 +320,6 @@ return [
     |
     */
     'observers' => [
-        'gift_category' => env('GIFTS_CATEGORY_OBSERVER', 'App\Observers\GiftCategoryObserver'),
+        'gift_category' => env('GIFTS_CATEGORY_OBSERVER', 'Utd\Gifts\Observers\GiftCategoryObserver'),
     ],
 ];

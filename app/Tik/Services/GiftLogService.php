@@ -3,7 +3,7 @@
 namespace App\Tik\Services;
 
 
-use App\Enums\GiftSourceType;
+use Utd\Gifts\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
 use App\Helpers\CacheHelper;
 use App\Helpers\UserCoinLogHelper;
@@ -11,10 +11,10 @@ use App\Models\User;
 use App\Helpers\Common;
 use Utd\Gifts\Entities\UserGift;
 use App\Support\PackageHelper;
-use App\Tik\DTO\ReceiverGiftDTO;
+use Utd\Gifts\DTOs\ReceiverGiftDTO;
 use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
-use App\Events\GiftBannerEvent;
+use Utd\Gifts\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Contracts\SendGiftServiceContract;
 use Illuminate\Database\Eloquent\Collection;

@@ -1,27 +1,18 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Utd\Gifts\Http\Resources;
 
 use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GiftResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
     public function toArray($request)
     {
-//        $userId = request('user_id') ?? request()->user()->id;
-//        $hasPivotType11 = $request->query('type') == 11 && isset($this->pivot);
         $giftLogs = $this->additional['gift_total'] ?? null;
         return [
             'id' => $this->id,
             'name' =>  $this->name,
-            // 'type' => $this->type = 1 ? 'normal' : 'hot',
             'type' => $this->category?->type ?? 'normal',
             'price' => $this->price ?: 0,
             'img' => $this->img ?: '',

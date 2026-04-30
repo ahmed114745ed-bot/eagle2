@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Tik\Services\EmojiService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\EmojiResource;
-use App\Http\Resources\GiftCategoryResource;
+use Utd\Gifts\Http\Resources\GiftCategoryResource;
 use App\Models\EmojiCategory;
 
 class EmojiController extends Controller

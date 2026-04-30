@@ -3,7 +3,7 @@
 namespace Utd\Gifts\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Room\AdminGiftsResource;
+use Utd\Gifts\Http\Resources\AdminGiftsResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 use Utd\Gifts\Entities\Gift;

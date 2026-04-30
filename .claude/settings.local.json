@@ -23,7 +23,8 @@
       "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Helpers/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Helpers/\")",
       "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Http/Controllers/Api/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Http/Controllers/Api/\")",
       "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Http/Controllers/Web/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Http/Controllers/Web/\")",
-      "Bash(git ls-tree *)"
+      "Bash(git ls-tree *)",
+      "Bash(find d:\\\\\\\\projects\\\\\\\\eagle\\\\\\\\packages\\\\\\\\Utd\\\\\\\\Gifts\\\\\\\\src -name \"*DTO*\" -o -name \"*Resource*\")"
     ],
     "additionalDirectories": [
       "d:\\projects\\eagle\\Modules\\Form\\Database\\Seeders"

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tik\DTO;
+namespace Utd\Gifts\DTOs;
 
 use Utd\Room\Entities\Room;
 

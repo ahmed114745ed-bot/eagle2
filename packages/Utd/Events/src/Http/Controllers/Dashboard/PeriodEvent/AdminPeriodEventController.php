@@ -3,7 +3,7 @@
 namespace Utd\Events\Http\Controllers\Dashboard\PeriodEvent;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Room\AdminGiftsResource;
+use Utd\Gifts\Http\Resources\AdminGiftsResource;
 use Utd\Gifts\Entities\Gift;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

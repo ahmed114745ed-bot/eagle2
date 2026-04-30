@@ -2,11 +2,10 @@
 
 namespace Utd\Gifts\Entities;
 
-use App\Observers\GiftCategoryObserver as AppGiftCategoryObserver;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Utd\Gifts\Observers\GiftCategoryObserver as PackageGiftCategoryObserver;
+use Utd\Gifts\Observers\GiftCategoryObserver;
 
 class GiftCategory extends Model
 {
@@ -51,11 +50,6 @@ class GiftCategory extends Model
     {
         parent::booted();
 
-        // Use package observer if exists, otherwise check for app observer
-        if (class_exists(PackageGiftCategoryObserver::class)) {
-            static::observe(PackageGiftCategoryObserver::class);
-        } elseif (class_exists(AppGiftCategoryObserver::class)) {
-            static::observe(AppGiftCategoryObserver::class);
-        }
+        static::observe(GiftCategoryObserver::class);
     }
 }

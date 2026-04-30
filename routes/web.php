@@ -1333,13 +1333,13 @@ Route::get('/debug/test-gift-banner', function () {
 
     try {
         // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
-        event(new \App\Events\GiftBannerEvent($testGift));
+        event(new \Utd\Gifts\Events\GiftBannerEvent($testGift));
 
         return response()->json([
             'success' => true,
             'message' => '🎁 GiftBannerEvent dispatched to Queue!',
             'event' => [
-                'class' => \App\Events\GiftBannerEvent::class,
+                'class' => \Utd\Gifts\Events\GiftBannerEvent::class,
                 'channel' => 'gift_banner',
                 'broadcast_as' => 'gift_banner',
                 'queue' => 'heavyProcessing (or similar)',
