@@ -261,8 +261,8 @@ return [
         'achievement_gift' => 'App\Traits\AchievementGift',
         'host_level' => 'App\Traits\HostLevelTrait',
         'cp_gift_log' => 'Modules\CP\Traits\CpGiftLog',
-        'win_lucky_gift' => env('GIFTS_WIN_LUCKY_TRAIT', 'App\Traits\Gifts\WinLuckyGift'),
-        'lucky_gift_probability' => env('GIFTS_LUCKY_PROBABILITY_TRAIT', 'App\Traits\Gifts\LuckyGiftProbability'),
+        'win_lucky_gift' => env('GIFTS_WIN_LUCKY_TRAIT', 'Utd\Gifts\Traits\WinLuckyGift'),
+        'lucky_gift_probability' => env('GIFTS_LUCKY_PROBABILITY_TRAIT', 'Utd\Gifts\Traits\LuckyGiftProbability'),
         'timestamps_with_timezone' => env('GIFTS_TIMESTAMPS_TRAIT', 'App\Traits\TimestampsWithTimezone'),
     ],
 
