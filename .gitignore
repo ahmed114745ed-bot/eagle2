@@ -32,6 +32,7 @@ php.ini
 gcp.json
 service-account.json
 AuthKey_*.p8
+/storage/app/credentials/
 /config/theme.php
 /config/laravel-ffmpeg.php
 /config/filesystem.php
