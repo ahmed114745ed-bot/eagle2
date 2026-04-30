@@ -107,7 +107,7 @@ use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
 use App\Admin\Controllers\SuperRoleController;
 use App\Admin\Controllers\TargetController;
-// use App\Admin\Controllers\TerminalController; // REMOVED: Security risk (RCE-002)
+use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\UserChargeHistoryController;
@@ -183,12 +183,10 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
-        // REMOVED: TerminalController routes (Security Risk - RCE-002)
-        // Allows arbitrary Artisan command execution + raw SQL/MongoDB/Redis queries
-        // Route::get('helpers/terminal/database', [TerminalController::class, 'database']);
-        // Route::post('helpers/terminal/database', [TerminalController::class, 'runDatabase']);
-        // Route::get('helpers/terminal/artisan', [TerminalController::class, 'artisan']);
-        // Route::post('helpers/terminal/artisan', [TerminalController::class, 'runArtisan']);
+        Route::get('helpers/terminal/database', [TerminalController::class, 'database']);
+        Route::post('helpers/terminal/database', [TerminalController::class, 'runDatabase']);
+        Route::get('helpers/terminal/artisan', [TerminalController::class, 'artisan']);
+        Route::post('helpers/terminal/artisan', [TerminalController::class, 'runArtisan']);
         Route::get('helpers/scaffold', [ScaffoldController::class, 'index']);
         Route::post('helpers/scaffold', [ScaffoldController::class, 'store']);
         Route::get('helpers/routes', [RouteController::class, 'index']);
