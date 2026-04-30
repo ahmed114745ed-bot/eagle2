@@ -163,11 +163,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // authorization
     Route::prefix('auth')->group(function () {
         Route::get('all-countries', [CountryController::class, 'index']);
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('recall-account', [AuthController::class, 'recallAccount']);
-        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset']);
-        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode']);
+        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:auth-register');
+        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:auth-login');
+        Route::post('recall-account', [AuthController::class, 'recallAccount'])->middleware('throttle:auth-login');
+        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset'])->middleware('throttle:auth-otp');
+        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode'])->middleware('throttle:auth-otp');
     });
 
 
