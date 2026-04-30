@@ -1344,7 +1344,7 @@ class Common
     public static function fireBaseFactory()
     {
         return (new Factory)
-            ->withServiceAccount(public_path('firebase_credentials.json'))
+            ->withServiceAccount(storage_path('app/credentials/firebase_credentials.json'))
             ->withDatabaseUri('https://yay-chat-c2333-default-rtdb.firebaseio.com');
     }
 

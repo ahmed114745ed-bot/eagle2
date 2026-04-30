@@ -208,7 +208,7 @@ class MyDataResourceOld extends JsonResource
             ]),
 
         ];
-        $data['auth_token'] = @$this->auth_token;
+//        $data['auth_token'] = @$this->auth_token;
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
             $data['is_mic'] = $this->is_mic;
         }

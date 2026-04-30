@@ -316,13 +316,19 @@ class AgencyController extends MainController
     }
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
     {
+        // Whitelist allowed column names to prevent SQL injection
+        $allowedColumns = ['receiver_id', 'sender_id', 'roomowner_id', 'user_id'];
+        if (!in_array($keywords, $allowedColumns, true)) {
+            throw new \InvalidArgumentException('Invalid column name');
+        }
+
         return GiftLog::query()
             ->whereHas($rel)
             ->with($rel)
             ->where('agency_id', $agencyId)
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->selectRaw("SUM(giftPrice) as exp, $keywords")
+            ->selectRaw("SUM(giftPrice) as exp, " . $keywords)
             ->groupBy($keywords)
             ->havingRaw("exp > 0")
             ->orderByRaw("exp DESC")

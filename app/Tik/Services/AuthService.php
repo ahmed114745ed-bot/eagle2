@@ -438,6 +438,11 @@ class AuthService
     private function storeImageFromUrl(string $url, User $user): ?Profile
     {
         try {
+            if (!isValidExternalUrl($url)) {
+                Log::warning('Blocked SSRF attempt', ['url' => $url]);
+                return null;
+            }
+
             $response = Http::get($url);
 
             if (!$response->successful() || empty($response->body())) {
