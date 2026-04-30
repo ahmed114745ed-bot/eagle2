@@ -8,7 +8,7 @@ use Tests\TestCase;
 use Mockery;
 use App\Models\User;
 use Utd\Gifts\Entities\Gift;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Services\Gifts\LuckyGiftService;
 use App\Contracts\UpdateUserWhenSendGiftContract;
 use Illuminate\Support\Facades\DB;

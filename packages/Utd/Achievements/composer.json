@@ -18,7 +18,10 @@
         "psr-4": {
             "Utd\\Achievements\\": "src/",
             "Utd\\Achievements\\Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {

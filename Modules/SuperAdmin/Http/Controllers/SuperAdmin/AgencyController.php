@@ -36,6 +36,7 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\SuperAdmin\Actions\SuperAdmin\DeleteAgencyAction;
+use App\Support\PackageHelper;
 
 class AgencyController extends MainController
 {
@@ -699,7 +700,9 @@ class AgencyController extends MainController
                     'agency_id' => 0,
                     'is_host' => 0,
                 ]);
-                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                }
             }
 
             User::where('id', intval($appOwnerId))->update([

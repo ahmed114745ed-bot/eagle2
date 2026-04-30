@@ -108,7 +108,9 @@ class UserHandling
         $user->save();
         app(\App\Contracts\MilestoneHelperContract::class)->removeReward($user, 'host');
 
-        uploadMonthlyDiamondReceive($user->id, 0);
+        if (PackageHelper::isInstalled('achievement')) {
+            uploadMonthlyDiamondReceive($user->id, 0);
+        }
     }
 
     private function handleUserSalaries(User $user)

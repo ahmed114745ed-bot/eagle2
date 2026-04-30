@@ -154,7 +154,7 @@ return [
         
         'remaining_diamond' => env('GIFTS_REMAINING_DIAMOND_MODEL', 'App\Models\RemainingDiamond'),
         
-        'monthly_diamond_receive' => env('GIFTS_MONTHLY_DIAMOND_RECEIVE_MODEL', 'App\Models\MonthlyDiamondReceive'),
+        'monthly_diamond_receive' => env('GIFTS_MONTHLY_DIAMOND_RECEIVE_MODEL', 'Utd\Achievements\Entities\MonthlyDiamondReceive'),
         
         'setting' => env('GIFTS_SETTING_MODEL', 'App\Models\Setting'),
     ],

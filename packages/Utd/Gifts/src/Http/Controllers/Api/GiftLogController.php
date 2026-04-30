@@ -21,7 +21,7 @@ use App\Models\Agency;
 use App\Models\AppFeature;
 use App\Models\CoreWallet;
 use App\Models\Cp;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Models\RemainingDiamond;
 use App\Models\User;
 use App\Models\UserSallary;

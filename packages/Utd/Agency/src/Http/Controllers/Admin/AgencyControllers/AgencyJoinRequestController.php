@@ -2,6 +2,7 @@
 
 namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
+use App\Support\PackageHelper;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -186,7 +187,9 @@ class AgencyJoinRequestController extends MainController
                     ->where('id', $user_id)
                     ->update(['type_user' => 1]);
 
-                uploadMonthlyDiamondReceive($user_id, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($user_id, 0);
+                }
 
                 $user = User::query()->where('id', $form->model()->user_id)->first();
                 if ($user->agency_id) {

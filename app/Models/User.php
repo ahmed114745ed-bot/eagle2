@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Helpers\Common;
 use App\Helpers\UserPackHelper;
 use App\Models\Config as ConfigModel;

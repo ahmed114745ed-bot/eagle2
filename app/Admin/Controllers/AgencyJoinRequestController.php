@@ -22,6 +22,7 @@ use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;
+use App\Support\PackageHelper;
 
 class AgencyJoinRequestController extends MainController
 {
@@ -328,7 +329,9 @@ class AgencyJoinRequestController extends MainController
                     ]);
                 }
 
-                uploadMonthlyDiamondReceive($user_id, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($user_id, 0);
+                }
             }
         });
 

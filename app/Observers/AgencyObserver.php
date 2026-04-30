@@ -7,7 +7,7 @@ use App\Models\Admin;
 use App\Models\Agency;
 use App\Facades\UserHandling;
 use App\Models\AgencyJoinRequest;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Models\UsersJoinedAgency;
 
 class AgencyObserver

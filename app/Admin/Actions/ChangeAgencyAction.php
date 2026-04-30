@@ -15,6 +15,7 @@ use Encore\Admin\Actions\RowAction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
+use App\Support\PackageHelper;
 
 class ChangeAgencyAction extends RowAction
 {
@@ -51,7 +52,9 @@ class ChangeAgencyAction extends RowAction
 
                 $oldAgencyId = $user->agency_id;
 
-                uploadMonthlyDiamondReceive($user->id, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($user->id, 0);
+                }
 
                 $this->handleUserSalaries($user);
                 $this->clearUserAgencyLogs($user ,$oldAgencyId);

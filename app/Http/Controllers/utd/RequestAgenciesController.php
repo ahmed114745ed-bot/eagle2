@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
 use App\Notifications\RefuseAgency;
+use App\Support\PackageHelper;
 
 class RequestAgenciesController extends Controller
 {
@@ -84,7 +85,9 @@ class RequestAgenciesController extends Controller
         $user->type_user = 2;
         $user->agency_id = $agency->id;
         $user->save();
-        uploadMonthlyDiamondReceive($user->id, 0);
+        if (PackageHelper::isInstalled('achievement')) {
+            uploadMonthlyDiamondReceive($user->id, 0);
+        }
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }

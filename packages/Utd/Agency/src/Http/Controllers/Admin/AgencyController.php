@@ -2,6 +2,7 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use App\Support\PackageHelper;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Controllers\MainController;
@@ -1246,7 +1247,9 @@ class AgencyController extends MainController
                     'agency_id' => 0,
                     'is_host' => 0,
                 ]);
-                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                }
             }
 
             // تعيين created_by عند الإنشاء فقط

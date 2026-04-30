@@ -18,7 +18,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\MessageBag;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Extensions\TargetsExport;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use Illuminate\Http\Request;
 
 

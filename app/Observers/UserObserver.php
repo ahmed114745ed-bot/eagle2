@@ -11,6 +11,7 @@ use App\Models\BlackList;
 use App\Models\Report_user;
 use App\Models\AgencyJoinRequest;
 use App\Support\FamilyPackage;
+use App\Support\PackageHelper;
 
 class UserObserver
 {
@@ -98,7 +99,9 @@ class UserObserver
             if ($user->agency_id) {
                 if ($user->is_host == 0) {
                     $user->coins = 0;
-                    uploadMonthlyDiamondReceive($user->id, 0);
+                    if (PackageHelper::isInstalled('achievement')) {
+                        uploadMonthlyDiamondReceive($user->id, 0);
+                    }
                 }
                 $user->is_host = 1;
             }

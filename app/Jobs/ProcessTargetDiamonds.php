@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Target;
 use App\Models\UserSallary;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Models\TargetEdit;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

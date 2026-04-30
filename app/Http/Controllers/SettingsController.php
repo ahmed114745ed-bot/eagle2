@@ -26,7 +26,7 @@ use Utd\Room\Jobs\ChangeCinemaModeJob;
 use App\Models\Language;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\File;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Models\NotificationTranslation;
 
 class SettingsController extends Controller

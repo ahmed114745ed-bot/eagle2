@@ -11,9 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\CalculateUserTargetJob;
 use Illuminate\Support\Facades\Auth;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\FixedTarget\Services\FixedTargetV2Service;
+use App\Support\PackageHelper;
 
 class DiamondController extends Controller
 {
@@ -53,7 +54,9 @@ class DiamondController extends Controller
             // تحديث جدول users
 
             $monthlyDiamond = $totalReceived ?? 0;
-            uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
+            if (PackageHelper::isInstalled('achievement')) {
+                uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
+            }
         }
 
         // $totalReceived = DB::table('gift_logs')

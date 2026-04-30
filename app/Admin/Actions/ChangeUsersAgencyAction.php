@@ -16,6 +16,7 @@ use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
+use App\Support\PackageHelper;
 
 class ChangeUsersAgencyAction extends RowAction
 {
@@ -68,7 +69,9 @@ class ChangeUsersAgencyAction extends RowAction
             $user->agency_id = $newAgencyId;
             $user->save();
 
-            uploadMonthlyDiamondReceive($user->id, 0);
+            if (PackageHelper::isInstalled('achievement')) {
+                uploadMonthlyDiamondReceive($user->id, 0);
+            }
 
             $joined = UsersJoinedAgency::where([
                 'user_id' => $user->id,

@@ -8,7 +8,6 @@ use App\Classes\AppSetting;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
-use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
 use Utd\UsersWallet\Entities\UserWallet;
@@ -204,46 +203,6 @@ if (!function_exists('deleteFile')) {
 }
 
 
-if (!function_exists('uploadMonthlyDiamondReceive')) {
-    function uploadMonthlyDiamondReceive($user_id, $monthlyDiamondValue)
-    {
-        $date = \Carbon\Carbon::now(getTimezone());
-        MonthlyDiamondReceive::updateOrCreate(
-            [
-                'user_id' => $user_id,
-                'month' => $date->month,
-                'year'  => $date->year,
-            ],
-            [
-                'monthly_diamond_received' => $monthlyDiamondValue,
-            ]
-        );
-    }
-}
-
-if (!function_exists('incrementMonthlyDiamond')) {
-    function incrementMonthlyDiamond($user_id, $value)
-    {
-        $date = \Carbon\Carbon::now(getTimezone());
-
-        $monthlyRecord = MonthlyDiamondReceive::where('user_id', $user_id)
-            ->where('month', $date->month)
-            ->where('year', $date->year)
-            ->lockForUpdate()
-            ->first();
-
-        if ($monthlyRecord) {
-            $monthlyRecord->increment('monthly_diamond_received', $value);
-        } else {
-            MonthlyDiamondReceive::create([
-                'user_id' => $user_id,
-                'month'   => $date->month,
-                'year'    => $date->year,
-                'monthly_diamond_received' => $value,
-            ]);
-        }
-    }
-}
 
 if (!function_exists('human_file_size')) {
     function human_file_size($bytes, $decimals = 2)

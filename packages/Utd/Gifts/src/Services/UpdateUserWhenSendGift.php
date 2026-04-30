@@ -4,7 +4,7 @@ namespace Utd\Gifts\Services;
 
 use App\Classes\Enums\NotificationType;
 use App\Exceptions\NotInfMoneyException;
-use App\Jobs\IncreaseDiamondJob;
+use Utd\Achievements\Jobs\IncreaseDiamondJob;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
 use Illuminate\Support\Facades\Config;
@@ -30,9 +30,11 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
     {
         $user = User::where('id', $receivedUser->id)->lockForUpdate()->first();
 
-        IncreaseDiamondJob::dispatch($user->id, $totalCoins)
-            ->afterCommit()
-            ->onQueue('increment-diamond');
+        if (PackageHelper::isInstalled('achievement')) {
+            IncreaseDiamondJob::dispatch($user->id, $totalCoins)
+                ->afterCommit()
+                ->onQueue('increment-diamond');
+        }
 
         $diamondUser = $user->monthly_diamond_received + $totalCoins;
 
@@ -99,7 +101,9 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
 
                 $monthlyDiamond = $user->monthly_diamond_received + $totalCoins;
 
-                uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
+                }
             }
         });
     }

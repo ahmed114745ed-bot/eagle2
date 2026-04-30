@@ -784,7 +784,9 @@ class AgencyController extends MainController
                     'agency_id' => 0,
                     'is_host' => 0,
                 ]);
-                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                }
             }
 
             User::where('id', intval($appOwnerId))->update([

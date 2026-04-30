@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
+use App\Support\PackageHelper;
 
 class AgencyJoinRequestController extends MainController
 {
@@ -194,7 +195,9 @@ class AgencyJoinRequestController extends MainController
                     ->where('id', $user_id)
                     ->update(['type_user' => 1]);
                 
-                 uploadMonthlyDiamondReceive($user_id, 0);
+                 if (PackageHelper::isInstalled('achievement')) {
+                     uploadMonthlyDiamondReceive($user_id, 0);
+                 }
               
                 $user = User::query()->where('id', $form->model()->user_id)->first();
                 if ($user->agency_id) {

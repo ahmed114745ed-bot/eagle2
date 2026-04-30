@@ -13,7 +13,7 @@ use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Traits\Salaries\UserSalaryTrait;
 
 

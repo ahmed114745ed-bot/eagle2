@@ -2,7 +2,8 @@
 
 namespace Utd\Gifts\Listeners;
 
-use App\Jobs\IncreaseDiamondJob;
+use Utd\Achievements\Jobs\IncreaseDiamondJob;
+use App\Support\PackageHelper;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Utd\Gifts\Events\GiftSent;
 
@@ -14,8 +15,10 @@ class IncrementReceiverDiamond implements ShouldQueue
     {
         $pricePerReceiver = $event->getPricePerReceiver();
 
-        foreach ($event->getReceiverIds() as $receiverId) {
-            IncreaseDiamondJob::dispatch($receiverId, $pricePerReceiver);
+        if (PackageHelper::isInstalled('achievement')) {
+            foreach ($event->getReceiverIds() as $receiverId) {
+                IncreaseDiamondJob::dispatch($receiverId, $pricePerReceiver);
+            }
         }
     }
 }

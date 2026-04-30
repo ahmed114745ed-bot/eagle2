@@ -2,6 +2,7 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -319,7 +320,9 @@ class AgencyJoinRequestController extends MainController
                     ]);
                 }
 
-                uploadMonthlyDiamondReceive($user_id, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($user_id, 0);
+                }
             }
         });
 

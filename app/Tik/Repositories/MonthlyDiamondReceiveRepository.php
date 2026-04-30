@@ -3,7 +3,7 @@
 namespace App\Tik\Repositories;
 
 
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 
 
 class MonthlyDiamondReceiveRepository extends AbstractRepository

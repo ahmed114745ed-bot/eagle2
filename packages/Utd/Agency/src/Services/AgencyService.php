@@ -2,6 +2,7 @@
 
 namespace Utd\Agency\Services;
 
+use App\Support\PackageHelper;
 use App\Exceptions\CValidationException;
 use App\Facades\CustomNotification;
 use App\Facades\UserHandling;
@@ -13,7 +14,7 @@ use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\LiveTime;
-use App\Models\MonthlyDiamondReceive;
+use Utd\Achievements\Entities\MonthlyDiamondReceive;
 use App\Models\User;
 use App\Models\UsersJoinedAgency;
 use App\Notifications\AcceptAgency;
@@ -545,7 +546,9 @@ class AgencyService implements AgencyServiceInterface
             $user->agency_id = $agency->id;
             $user->is_host = 1;
             $user->save();
-            uploadMonthlyDiamondReceive($user->id, 0);
+            if (PackageHelper::isInstalled('achievement')) {
+                uploadMonthlyDiamondReceive($user->id, 0);
+            }
         }
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail', $agency->additionalInfo->gmail)->notify(new AcceptAgency());

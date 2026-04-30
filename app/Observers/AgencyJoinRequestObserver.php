@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
+use App\Support\PackageHelper;
 
 class AgencyJoinRequestObserver
 {
@@ -17,13 +18,17 @@ class AgencyJoinRequestObserver
 
                 $user->type_user = 1;
                 $user->save();
-                uploadMonthlyDiamondReceive($user->id, 0);
+                if (PackageHelper::isInstalled('achievement')) {
+                    uploadMonthlyDiamondReceive($user->id, 0);
+                }
                 $agid = $user->agency_id;
 
                 if ($agid == '' || $agid == null || $agid == 0) {
                     $user->coins = 0;
                     $user->save();
-                    uploadMonthlyDiamondReceive($user->id, 0);
+                    if (PackageHelper::isInstalled('achievement')) {
+                        uploadMonthlyDiamondReceive($user->id, 0);
+                    }
                 }
                 // CustomNotification::acceptAgency($agency, $user);
             }

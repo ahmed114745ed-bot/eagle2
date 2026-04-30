@@ -22,7 +22,8 @@
       "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Enum/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Enum/\")",
       "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Helpers/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Helpers/\")",
       "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Http/Controllers/Api/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Http/Controllers/Api/\")",
-      "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Http/Controllers/Web/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Http/Controllers/Web/\")"
+      "Bash(cp \"d:/projects/eagle/Modules/UsersWallet/Http/Controllers/Web/\"*.php \"d:/projects/eagle/packages/Utd/UsersWallet/src/Http/Controllers/Web/\")",
+      "Bash(git ls-tree *)"
     ],
     "additionalDirectories": [
       "d:\\projects\\eagle\\Modules\\Form\\Database\\Seeders"
