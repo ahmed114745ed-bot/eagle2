@@ -30,6 +30,8 @@ php.ini
 /config/filesystems.php
 /public/images/app-logo.png
 gcp.json
+service-account.json
+AuthKey_*.p8
 /config/theme.php
 /config/laravel-ffmpeg.php
 /config/filesystem.php
