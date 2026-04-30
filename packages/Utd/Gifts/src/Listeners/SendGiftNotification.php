@@ -22,9 +22,7 @@ class SendGiftNotification implements ShouldQueue
         }
     }
 
-    private function notifyRoomGift($event, $log): void
-    {
-    }
+    private function notifyRoomGift($event, $log): void {}
 
     private function notifyMomentGift($event, $log): void
     {
@@ -36,7 +34,5 @@ class SendGiftNotification implements ShouldQueue
         );
     }
 
-    private function notifyReelGift($event, $log): void
-    {
-    }
+    private function notifyReelGift($event, $log): void {}
 }

@@ -2,15 +2,15 @@
 
 namespace Utd\Gifts\Helpers;
 
-use Utd\Gifts\Entities\Gift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Utd\Gifts\Entities\Gift;
 
 class GiftHelper
 {
     public static function UserLuckyGift($isWin, $userId, Gift $gift, $value, $number, $totalNumWin, $totalUserWin)
     {
-        if (!Schema::hasTable('user_lucky_gifts')) {
+        if (! Schema::hasTable('user_lucky_gifts')) {
             return;
         }
 

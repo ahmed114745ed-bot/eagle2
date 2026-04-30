@@ -7,8 +7,8 @@ enum GiftSourceType: string
     case GIFT = 'gift';
     case COINS = 'coins';
 
-    public static function fromType( $type): self
+    public static function fromType($type): self
     {
-        return $type == 'bag' ? self::GIFT : self::COINS;
+        return $type === 'bag' ? self::GIFT : self::COINS;
     }
 }

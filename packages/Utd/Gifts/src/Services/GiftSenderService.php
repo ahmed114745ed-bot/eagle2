@@ -23,7 +23,6 @@ class GiftSenderService
     public function __construct(
         private GiftRepository $giftRepository,
         private BalanceService $balanceService,
-        private GiftValidationService $validationService
     ) {}
 
     /**
@@ -125,9 +124,6 @@ class GiftSenderService
                 "VIP level {$gift->vip_level} required to send this gift"
             );
         }
-
-        // Additional validations
-        $this->validationService->validate($dto, $gift, $sender);
     }
 
     /**

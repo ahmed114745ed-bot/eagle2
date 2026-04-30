@@ -3,18 +3,19 @@
 namespace Utd\Gifts\Services;
 
 use App\Classes\Enums\NotificationType;
+use App\Contracts\VipRepositoryContract;
 use App\Exceptions\NotInfMoneyException;
-use Utd\Achievements\Jobs\IncreaseDiamondJob;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
+use App\Support\PackageHelper;
+use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
-use App\Contracts\VipRepositoryContract;
-use App\Support\PackageHelper;
 use Throwable;
+use Utd\Achievements\Jobs\IncreaseDiamondJob;
 use Utd\Gifts\Entities\UserGift;
 
 class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftContract
@@ -54,7 +55,7 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
                 dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))
                     ->onQueue('notification');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::build([
                 'driver' => 'single',
                 'path' => storage_path('logs/diamond_upgrade.log'),
@@ -192,7 +193,7 @@ class UpdateUserWhenSendGift implements \App\Contracts\UpdateUserWhenSendGiftCon
                     ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
             })->first();
 
-        throw_if((! $userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
+        throw_if((! $userGift), Exception::class, 'Receiver has reached maximum allowed gifts');
 
         $userGift->quantity -= $number;
 

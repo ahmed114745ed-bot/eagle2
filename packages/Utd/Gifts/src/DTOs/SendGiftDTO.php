@@ -14,99 +14,6 @@ class SendGiftDTO
         public readonly array $metadata = []
     ) {}
 
-    // ============ Factory Methods ============
-
-    /**
-     * إرسال هدية في روم
-     */
-    public static function forRoom(
-        int $giftId,
-        int $senderId,
-        array $receiverIds,
-        int $quantity,
-        int $roomId,
-        ?int $pkId = null,
-        ?int $cpId = null
-    ): self {
-        return new self(
-            giftId: $giftId,
-            senderId: $senderId,
-            receiverIds: $receiverIds,
-            quantity: $quantity,
-            sourceType: 'room',
-            sourceId: $roomId,
-            metadata: [
-                'room_id' => $roomId,
-                'pk_id' => $pkId,
-                'cp_id' => $cpId,
-            ]
-        );
-    }
-
-    /**
-     * إرسال هدية في Moment
-     */
-    public static function forMoment(
-        int $giftId,
-        int $senderId,
-        int $receiverId,
-        int $quantity,
-        int $momentId
-    ): self {
-        return new self(
-            giftId: $giftId,
-            senderId: $senderId,
-            receiverIds: [$receiverId],
-            quantity: $quantity,
-            sourceType: 'moment',
-            sourceId: $momentId,
-            metadata: ['moment_id' => $momentId]
-        );
-    }
-
-    /**
-     * إرسال هدية في Reel
-     */
-    public static function forReel(
-        int $giftId,
-        int $senderId,
-        int $receiverId,
-        int $quantity,
-        int $reelId
-    ): self {
-        return new self(
-            giftId: $giftId,
-            senderId: $senderId,
-            receiverIds: [$receiverId],
-            quantity: $quantity,
-            sourceType: 'reel',
-            sourceId: $reelId,
-            metadata: ['reel_id' => $reelId]
-        );
-    }
-
-    /**
-     * إرسال هدية على البروفايل
-     */
-    public static function forProfile(
-        int $giftId,
-        int $senderId,
-        int $receiverId,
-        int $quantity
-    ): self {
-        return new self(
-            giftId: $giftId,
-            senderId: $senderId,
-            receiverIds: [$receiverId],
-            quantity: $quantity,
-            sourceType: 'profile',
-            sourceId: $receiverId,
-            metadata: []
-        );
-    }
-
-    // ============ Helper Methods ============
-
     public function getTotalReceivers(): int
     {
         return count($this->receiverIds);
@@ -120,11 +27,6 @@ class SendGiftDTO
     public function getMomentId(): ?int
     {
         return $this->metadata['moment_id'] ?? null;
-    }
-
-    public function getReelId(): ?int
-    {
-        return $this->metadata['reel_id'] ?? null;
     }
 
     public function getPkId(): ?int

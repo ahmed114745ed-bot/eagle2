@@ -4,9 +4,9 @@ namespace Utd\Gifts\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Utd\Gifts\Http\Resources\GiftCategoryResource;
 use Illuminate\Http\Request;
 use Utd\Gifts\Entities\GiftCategory;
+use Utd\Gifts\Http\Resources\GiftCategoryResource;
 
 class GiftCategoryController extends Controller
 {

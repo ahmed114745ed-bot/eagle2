@@ -5,7 +5,6 @@ namespace Utd\Gifts\Services;
 use App\Contracts\RoomTopUsersRepositoryContract;
 use App\Models\User;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 use Utd\Gifts\Entities\Gift;
 use Utd\Pk\Jobs\UpdatePkAndSendToZigoJob;
@@ -18,40 +17,6 @@ class LuckyGiftService
     public function __construct()
     {
         $this->roomTopUsersRepository = app(RoomTopUsersRepositoryContract::class);
-
-    }
-
-    public function updateUserInJobs()
-    {
-        $latestId = DB::table('jobs')->latest()->first()?->id;
-
-        DB::table('jobs')
-            ->select(
-                DB::raw('COUNT(*) AS COUNT'),
-                DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(JSON_EXTRACT(payload, '$.data.command'), '\\\u0000userId\\\\\";i:', -1), ';', 1) AS userId"),
-                DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(JSON_EXTRACT(payload, '$.data.command'), '\\\u0000roomId\\\\\";i:', -1), ';', 1) AS roomId"),
-                DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(JSON_EXTRACT(payload, '$.data.command'), '\\\u0000giftId\\\\\";i:', -1), ';', 1) AS giftId"),
-                DB::raw("SUM(SUBSTRING_INDEX(SUBSTRING_INDEX(JSON_EXTRACT(payload, '$.data.command'), '\\\u0000number\\\\\";i:', -1), ';', 1)) AS number"),
-                DB::raw("SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(JSON_EXTRACT(payload, '$.data.command'), 'receiversIds\\\\\";', -1), '}', 1), '}', -1) AS receiverId")
-            )
-            ->whereIn('queue', ['lucky_gift', 'lucky_gift_2', 'lucky_gift_3'])
-            ->when($latestId, function ($q, $latestId) {
-                $q->where('id', '<=', $latestId);
-            })
-            ->groupBy('userId', 'roomId', 'giftId', 'receiverId')
-            ->orderBy('userId')
-            ->orderBy('roomId')
-            ->orderBy('giftId')
-            ->orderBy('receiverId')
-            ->chunk(500, function ($jobs) {
-                $this->calculateReceiversDiamonds($jobs);
-            });
-
-        if ($latestId) {
-            DB::table('jobs')
-                ->whereIn('queue', ['lucky_gift', 'lucky_gift_2', 'lucky_gift_3'])
-                ->where('id', '<=', $latestId)->delete();
-        }
 
     }
 

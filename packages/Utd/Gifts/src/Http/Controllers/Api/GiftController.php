@@ -4,10 +4,10 @@ namespace Utd\Gifts\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Utd\Gifts\Http\Resources\GiftResource;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Utd\Gifts\Http\Resources\GiftResource;
 use Utd\Gifts\Services\GiftService;
 
 class GiftController extends Controller

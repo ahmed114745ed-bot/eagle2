@@ -116,11 +116,4 @@ class GiftService
 
         return true;
     }
-
-    public function updateSwitch($requestSwitch, $giftId, $type)
-    {
-        $gift = $this->giftRepository->giftUpdate($giftId, $type, $requestSwitch);
-
-        return true;
-    }
 }

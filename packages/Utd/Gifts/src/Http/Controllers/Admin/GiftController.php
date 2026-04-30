@@ -12,7 +12,6 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Utd\Gifts\Actions\MoveGiftCategory;
@@ -83,16 +82,6 @@ class GiftController
         $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
 
         return $content->view('lucky_gift', compact('config'));
-    }
-
-    protected function grid2()
-    {
-        $make_rooms_top = settings()->get('close_open_gifts');
-
-        return new Box(
-            title: __('admin.Actions'),
-            content: view('admin.grid.users.closeOpenGifts', compact(['make_rooms_top'])),
-        );
     }
 
     /**

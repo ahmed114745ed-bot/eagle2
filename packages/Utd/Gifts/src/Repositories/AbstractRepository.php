@@ -64,29 +64,12 @@ abstract class AbstractRepository
         return $this->model->with($with)->where($conditions)->select($select);
     }
 
-    public function searchWith(string $search, $column = 'name'): mixed
-    {
-        return $this->model->where($column, 'like', '%'.$search.'%')->select(['name as text', 'id'])->take(10)->get();
-    }
-
     public function delete($id)
     {
         $data = $this->model->find($id);
         if (! $data) {
             return false;
         }
-        $data->delete();
-
-        return true;
-    }
-
-    public function deleteAth($id, $user_id = 0)
-    {
-        $data = $this->model->find($id);
-        if (! $data) {
-            return false;
-        }
-
         $data->delete();
 
         return true;

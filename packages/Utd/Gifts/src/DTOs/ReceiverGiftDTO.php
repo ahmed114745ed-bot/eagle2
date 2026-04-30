@@ -26,11 +26,12 @@ class ReceiverGiftDTO
             receiverLevel: (int) ($user->total_received_level ?? 0),
         );
     }
+
     public static function fromRoom(Room $room): self
     {
         return new self(
             id: (int) ($room->id ?? 0),
-            name: (string) ($room->room_name?? ''),
+            name: (string) ($room->room_name ?? ''),
             avatar: (string) ($room->room_cover ?? ''),
             vipLevel: 0,
             senderLevel: 0,
@@ -41,13 +42,13 @@ class ReceiverGiftDTO
     public function toArray(): array
     {
         return [
-            'id'             => $this->id,
-            'name'           => $this->name,
-            'avatar'         => $this->avatar,
-            'vip_level'      => $this->vipLevel,
-            'sender_level'   => $this->senderLevel,
+            'id' => $this->id,
+            'name' => $this->name,
+            'avatar' => $this->avatar,
+            'vip_level' => $this->vipLevel,
+            'sender_level' => $this->senderLevel,
             'receiver_level' => $this->receiverLevel,
-            'coins'          => $this->coins,
+            'coins' => $this->coins,
         ];
     }
 }

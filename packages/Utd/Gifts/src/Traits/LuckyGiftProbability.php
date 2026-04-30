@@ -8,13 +8,23 @@ trait LuckyGiftProbability
 {
     public function getRandomDuplicate(Collection $collection, int $times, ?array $properties)
     {
-        if ($properties == null) $properties = [70, 20, 10];
+        if ($properties === null) {
+            $properties = [70, 20, 10];
+        }
         [$maxRow, $maxColumn] = $this->getIndexToMax($collection, $times);
 
-        $newItems = $collection->take($maxRow + 1)->map(function ($item, $key) use ($maxRow, $maxColumn) { if($key == $maxRow) return array_slice($item ,0, $maxColumn + 1); return $item;});
+        $newItems = $collection->take($maxRow + 1)->map(function ($item, $key) use ($maxRow, $maxColumn) {
+            if ($key === $maxRow) {
+                return array_slice($item, 0, $maxColumn + 1);
+            }
+
+            return $item;
+        });
 
         $itemCount = $newItems->count();
-        if ($itemCount == 0) return 0;
+        if ($itemCount === 0) {
+            return 0;
+        }
 
         $newProperties = $this->getNewProperties($properties, $itemCount);
 
@@ -22,7 +32,9 @@ trait LuckyGiftProbability
 
         $rowIndexWin = $this->getWinRowIndex($newProperties);
 
-        if ($rowIndexWin == -1) return 0;
+        if ($rowIndexWin === -1) {
+            return 0;
+        }
 
         $winItems = $newItems[$rowIndexWin];
 
@@ -42,6 +54,7 @@ trait LuckyGiftProbability
                 break;
             }
         }
+
         return $rowIndex;
     }
 
@@ -71,7 +84,7 @@ trait LuckyGiftProbability
         $outOfSlice = array_slice($property, $limit);
 
         if (count($outOfSlice) > 0) {
-            $valueToAdd = intval(array_sum($outOfSlice) / count($firstToLimitArr));
+            $valueToAdd = (int) (array_sum($outOfSlice) / count($firstToLimitArr));
             $firstToLimitArr = array_map(function ($item) use ($valueToAdd) {
                 return $item + $valueToAdd;
             }, $firstToLimitArr);
@@ -82,12 +95,12 @@ trait LuckyGiftProbability
 
     private function getIndexToMax(Collection $collection, int $times): array
     {
-        $maxRow    = -1;
+        $maxRow = -1;
         $maxColumn = -1;
         foreach ($collection as $i => $row) {
             foreach ($row as $j => $column) {
                 if ($column <= $times) {
-                    $maxRow    = $i;
+                    $maxRow = $i;
                     $maxColumn = $j;
                 }
             }

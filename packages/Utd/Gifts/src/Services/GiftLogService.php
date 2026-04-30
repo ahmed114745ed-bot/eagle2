@@ -5,20 +5,15 @@ namespace Utd\Gifts\Services;
 use App\Contracts\RoomRepositoryContract;
 use App\Contracts\RoomTopUsersRepositoryContract;
 use App\Contracts\UserRepositoryContract;
-use Utd\Gifts\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
-use Utd\Gifts\Events\GiftBannerEvent;
 use App\Helpers\CacheHelper;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Cp;
 use App\Models\User;
 use App\Support\PackageHelper;
-use Utd\Gifts\DTOs\ReceiverGiftDTO;
 use Carbon\Carbon;
 use Exception;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Promise\Utils;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -27,7 +22,10 @@ use Modules\CP\Http\Services\CpService;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 use Throwable;
 use Utd\Agency\Repositories\UserRepository as AgencyUserRepository;
+use Utd\Gifts\DTOs\ReceiverGiftDTO;
 use Utd\Gifts\Entities\UserGift;
+use Utd\Gifts\Enums\GiftSourceType;
+use Utd\Gifts\Events\GiftBannerEvent;
 use Utd\Gifts\Repositories\GiftLogRepository;
 use Utd\Gifts\Repositories\GiftRepository;
 use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
@@ -294,228 +292,6 @@ class GiftLogService
         });
     }
 
-    public function sendTestGift($request, $updateUserWhenSendGift = null)
-    {
-        return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
-
-            $data = $request;
-            $user = User::orderByDesc('di')->first();
-            $userId = $user->id;
-            $ownerId = $data['owner_id'];
-            $giftId = $data['id'];
-            $number = $data['num'];
-            $type = $data['type'];
-            $giftSourceType = $this->getGiftSourceTypeClass();
-            $sourceType = $giftSourceType ? $giftSourceType::fromType($type)->value : 'default';
-
-            // get the gift data from id in the parameter
-            $gift = $this->giftRepository->findById($giftId);
-            // Validation if gift return null
-            if (! $gift) {
-                return throw new Exception('Gift does not exist or has been removed');
-            }
-
-            // receivers ids
-            $receiversIds = explode(',', $data['toUid']);
-            $numberOfGift = $number * count($receiversIds);
-            $totalPrice = $gift->price * $numberOfGift;
-            $totalPriceForOnlyReceiver = $gift->price * $number;
-            // if user didn't have inf coins throw exception
-            $check = $this->checkGiftAvailability($user, $gift, $number, $type, $totalPrice);
-            if ($check) {
-                return $check;
-            }
-
-            // Get Room Data
-            $repository = $this->getRoomRepository();
-            if (! $repository) {
-                throw new Exception('Room repository not available');
-            }
-            $room = $repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status');
-            // Validation if no room
-            if (! $room) {
-                throw new Exception('room does not exist');
-            }
-
-            // validation if this gift vip < user vip then throw Exception
-            $vip_level = $user->UserVip?->level;
-            if (@$vip_level < $gift->vip_level) {
-                throw new Exception('vip '.$gift->vip_level.' to send this gift');
-            }
-
-            // get received users data
-            $userRepository = $this->getUserRepository();
-            if (! $userRepository) {
-                throw new Exception('User repository not available');
-            }
-            $receivedUsers = $userRepository->getUsers($receiversIds);
-
-            //        $percentageValues = $this->getReceivedAndSanderPercentage();
-            // decrement the user coins
-            $sendPrice = (int) ($totalPrice);
-            if ($type !== 'bag') {
-                $amountBefore = $user->di;
-
-                $userCoinLogHelper = $this->getUserCoinLogHelperClass();
-                $userCoinLogType = $this->getUserCoinLogTypeClass();
-                if ($userCoinLogHelper && $userCoinLogType) {
-                    $userCoinLogHelper::logByType(
-                        $user->id,
-                        -abs($sendPrice),
-                        $amountBefore,
-                        $userCoinLogType::GIFT,
-                        $gift?->name
-                    );
-                }
-
-                if ($updateUserWhenSendGift) {
-                    $updateUserWhenSendGift->send($sendPrice, $user);
-                }
-            } else {
-
-                if ($updateUserWhenSendGift) {
-                    $updateUserWhenSendGift->sendFromBagAndRemoveGift($sendPrice, $user, $giftId, $number);
-                }
-            }
-
-            // increase room session
-            $room->enableSaving = false;
-            $room->session += $totalPrice;
-            $room->save();
-
-            // update family level to the sender user
-
-            if (is_array($receiversIds) && count($receiversIds) > 1) {
-                $to_id = $receiversIds[0];
-                $to = 'الغرفة';
-            } else {
-                $to_id = $receiversIds[0];
-                $to = @$receivedUsers->first()->name;
-            }
-
-            $fromName = $user->name;
-            $sendGiftServices = $this->getSendGiftServiceInstance();
-            if (! $sendGiftServices) {
-                throw new Exception('SendGiftService not available');
-            }
-
-            $jsonSendGiftData =
-                $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego === 1 || ! $request->has('to_zego')));
-            // send to zego if pk not null
-            $commonHelper = $this->getCommonHelperClass();
-            if ($commonHelper) {
-                $promises = $commonHelper::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
-            }
-
-            $cpModel = $this->getCpModelClass();
-            $cpId = null;
-            if ($cpModel) {
-                $cpId = $cpModel::where(function ($query) use ($user) {
-                    $query->where('user_one_id', $user->id)->orWhere('user_two_id', $user->id);
-                })->whereIn('status', [1, 4])->first();
-            }
-            $cpIds = [];
-            // check type of cp
-            if ($cpId !== null) {
-                try {
-                    $cpService = $this->getCpService();
-                    if ($cpService) {
-                        $cpIds = $cpService->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
-                    }
-                    // dd($cpIds);
-                } catch (Exception $e) {
-
-                }
-            }
-
-            if ($room->lastPk !== null) {
-                $updatePkJobClass = $this->getUpdatePkJobClass();
-                if ($updatePkJobClass) {
-                    dispatch(new $updatePkJobClass($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))->onQueue('updatePk');
-                }
-            }
-
-            if ($room->charizma_status) {
-                $charizmaJob = $this->getCharizmaJob($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId);
-                if ($charizmaJob) {
-                    dispatch($charizmaJob)->onQueue('default');
-                }
-            }
-
-            $realPrice = (int) ($number * $gift->price);
-
-            $price = ceil($realPrice);
-
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
-
-            //            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
-            $roomBoomService = $this->getRoomBoomService();
-            if ($roomBoomService) {
-                $roomBoomService->sendGift($room, $totalPrice, $userId);
-            }
-
-            foreach ($receivedUsers as $receivedUser) {
-                $updateUserWhenSendGift->update($price, $receivedUser);
-            }
-
-            $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
-
-            if ($room->mode !== '1' && $room->mode !== '2') {
-                $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
-                $roomTopUsersRepository = $this->getRoomTopUsersRepository();
-                $topUser = null;
-                if ($roomTopUsersRepository) {
-                    $topUser = $roomTopUsersRepository->getRoomTopUser($room->id, ['user' => function ($q) {
-                        $q->withoutAppends();
-                    }]);
-
-                    $fUser = $topUser?->user;
-                    if ($room->top_user_id !== $userId) {
-                        $room->top_user_id = $fUser->id;
-                        $room->save();
-                        $ms1 = [
-                            'messageContent' => [
-                                'message' => 'topSendGifts',
-                                'img' => $fUser?->profile?->avatar,
-                                'id' => $fUser->id,
-                                'name' => $fUser->name,
-                                'has_color_name' => $commonHelper ? $commonHelper::hasInPack($fUser->id, 18) : false,
-                                'frame' => $commonHelper ? ($commonHelper::getUserDress($fUser->id, $fUser->dress_1, 4, 'img2', true) ?: $commonHelper::getUserDress($fUser->id, $fUser->dress_1, 4, 'img1', true)) : null,
-                                'fid' => @$fUser->dress_1,
-                                'vlev' => @$fUser->UserVip->level,
-                            ],
-                        ];
-
-                        $json = json_encode($ms1);
-
-                        if ($commonHelper) {
-                            $commonHelper::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-                        }
-                    }
-                }
-            }
-            // (new RoomAchievementTargetService)->roomTarget($room);
-
-            // CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
-
-            $message = "  {$numberOfGift} x".__('api.sendGift').__('api.value')."{$totalPrice} ".__('api.to')."{$to}";
-            try {
-                Utils::unwrap($promises);
-            } catch (BadResponseException $e) {
-            }
-
-            $commonHelper = $this->getCommonHelperClass();
-            $totalGiftPrice = $commonHelper ? $commonHelper::getConfig('total_gift_price') : 2000;
-            $totalGiftPrice = $totalGiftPrice ?? 2000;
-
-            if ($totalPrice > $totalGiftPrice) {
-                $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
-            }
-
-            return $message;
-        });
-    }
-
     public function giftEvent($gift, $user, $totalPrice, $receivedUser, $receiversIds, $room, $number)
     {
 
@@ -690,11 +466,6 @@ class GiftLogService
         }
     }
 
-    public function userGiftIfo($id, $type, $startDate, $endDate, $perPage, $page)
-    {
-        return $this->giftLogRepository->userGiftInfo($id, $type, $startDate, $endDate, $perPage, $page);
-    }
-
     private function getRoomTopUsersRepository()
     {
         if (app()->bound(RoomTopUsersRepositoryContract::class)) {
@@ -851,11 +622,6 @@ class GiftLogService
     private function getSendGiftServiceInstance()
     {
         return new SendGiftService();
-    }
-
-    private function getUpdateUserWhenSendGiftInstance()
-    {
-        return new UpdateUserWhenSendGift();
     }
 
     private function getCpModelClass()

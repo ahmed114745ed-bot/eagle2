@@ -18,9 +18,7 @@ class GiftLogController extends Controller
      */
     private $instances = [];
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     // Lazy loading via magic method - loads only when accessed
     public function __get($name)

@@ -32,11 +32,6 @@ class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryC
             ->reject(fn ($item) => $item->exp === 0);
     }
 
-    public function getFirstRoomByOwnerId($ownerId)
-    {
-        return $this->model->query()->selectRaw('sender_id, SUM(giftNum * giftPrice) AS total')->where('roomowner_id', $ownerId)->groupBy('sender_id')->orderByDesc('total')->first();
-    }
-
     public function getByAgency($rel, $start, $end, $agencyId, $keywords, $perPage, $page)
     {
         return $this->model
@@ -62,49 +57,6 @@ class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryC
     public function getByReceiver($receiverId, $startDate, $endDate)
     {
         return $this->model->query()->whereBetween('created_at', [$startDate, $endDate])->where('receiver_id', $receiverId);
-    }
-
-    public function sumGiftPriceByReceiver($receiverId, $startDate, $endDate, $date)
-    {
-        return $this->getByReceiver($receiverId, $startDate, $endDate)->whereDate('created_at', $date)->sum('giftPrice');
-    }
-
-    public function totalUsersGiftPrice($receiverIds)
-    {
-        $this->model->query()->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)->whereIn('receiver_id', $receiverIds)->sum('giftPrice');
-    }
-
-    public function getByDaily($userId, $agencyId, $start, $end)
-    {
-        return $this->model->query()
-            ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
-            ->whereBetween('created_at', [$start, $end])
-            ->where('receiver_id', $userId)
-            ->where('agency_id', $agencyId)
-            ->groupBy(DB::raw('date(created_at)'))
-            ->orderBy('date', 'asc')
-            ->get();
-    }
-
-    public function getByDailyNew($userId, $agencyId, $start_at, $end_at)
-    {
-
-        // dd($start_at , $end_at);
-
-        $data = $this->model->query()
-            ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
-            ->whereBetween('created_at', [$start_at, $end_at]) // Applying whereBetween
-            ->where('receiver_id', $userId)
-            ->where('agency_id', $agencyId)->groupBy(DB::raw('date(created_at)'))
-            ->limit(31)->get();
-
-        return $data;
-    }
-
-    public function getByDate($userId, $date)
-    {
-        return $this->model->query()->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total')->groupBy('receiver_id')->where('receiver_id', $userId)->whereDate('created_at', $date)->first();
     }
 
     public function topUser($withRelation, $actionId)
@@ -154,45 +106,5 @@ class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryC
                 $formattedEndDate = Carbon::parse($endDate)->endOfDay();
                 $q->whereBetween('created_at', [$formattedStartDate, $formattedEndDate]);
             })->groupBy('giftId', 'sender_id', 'receiver_id')->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    public function listGiftReceiveLive($userId, $startDate, $endDate, $perPage, $page)
-    {
-        $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
-        $end = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
-
-        return $this->model->query()
-            ->where('receiver_id', $userId)
-            ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
-                $q->whereBetween('created_at', [$start, $end]);
-            })
-            ->whereHas('room', function ($q) {
-                $q->where('type', 'live');
-            })
-            ->selectRaw('sender_id, room_id,created_at,giftId,SUM( giftPrice) AS total')
-            ->groupBy('sender_id', 'room_id', 'giftId', 'created_at')
-            ->orderByDesc('created_at')
-            ->with(['room', 'sender', 'gift'])
-            ->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    public function listGiftReceiveAudio($userId, $startDate, $endDate, $perPage, $page)
-    {
-        $start = $startDate ? Carbon::parse($startDate)->startOfDay() : null;
-        $end = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
-
-        return $this->model->query()
-            ->where('receiver_id', $userId)
-            ->when($start !== null && $end !== null, function ($q) use ($start, $end) {
-                $q->whereBetween('created_at', [$start, $end]);
-            })
-            ->whereHas('room', function ($q) {
-                $q->where('type', 'audio');
-            })
-            ->selectRaw('sender_id,created_at, room_id,giftId,SUM( giftPrice) AS total')
-            ->orderByDesc('created_at')
-            ->groupBy('sender_id', 'room_id', 'giftId', 'created_at')
-            ->with(['room', 'sender', 'gift'])
-            ->paginate($perPage, ['*'], 'page', $page);
     }
 }

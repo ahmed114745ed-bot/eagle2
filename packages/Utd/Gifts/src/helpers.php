@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Cache;
 
-if (!function_exists('getGiftPercentage')) {
+if (! function_exists('getGiftPercentage')) {
     function getGiftPercentage(string $key): float
     {
         $cacheKey = "percentage_{$key}";
@@ -10,7 +10,7 @@ if (!function_exists('getGiftPercentage')) {
         $value = Cache::get($cacheKey);
 
         if ($value === null) {
-            $value = \App\Models\Setting::where('key', $key)->value('value');
+            $value = App\Models\Setting::where('key', $key)->value('value');
             if ($value !== null) {
                 Cache::put($cacheKey, $value);
             }
@@ -18,9 +18,9 @@ if (!function_exists('getGiftPercentage')) {
         if ($value === null) {
             $value = match ($key) {
                 'app_wallet_lucky_gift' => 80,
-                'owner_lucky_gift'      => 10,
-                'host_lucky_gift'       => 10,
-                default                  => 0,
+                'owner_lucky_gift' => 10,
+                'host_lucky_gift' => 10,
+                default => 0,
             };
         }
 
