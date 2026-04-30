@@ -51,7 +51,7 @@ class PaySalariesAction extends Action
                         'year' => date('Y')
                     ],
                     [
-                        'cut_amount' => DB::raw("cut_amount + ?", [$amount]),
+                        'cut_amount' => DB::raw("cut_amount + $amount"),
                         // 'pending_dollar' => DB::raw("pending_dollar - $amount")
                     ]
                 );
@@ -83,7 +83,7 @@ class PaySalariesAction extends Action
                         'year' => date('Y')
                     ],
                     [
-                        'cut_amount' => DB::raw("cut_amount + ?", [$amount]),
+                        'cut_amount' => DB::raw("cut_amount + $amount"),
                     ]
                 );
                 SalaryTrx::query()->create(
