@@ -87,6 +87,7 @@ use App\Admin\Controllers\ReportController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ResetUserSalaryController;
+use App\Admin\Controllers\RewardWinnerGameController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomBackgroundManagerController;
 use App\Admin\Controllers\RoomController;
@@ -689,6 +690,7 @@ Route::group(
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
         Route::get('invitation-code', [InvitationSettingsController::class, 'inviteCode']);
+        Route::resource('reward-winner-games', RewardWinnerGameController::class);
 
 
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
