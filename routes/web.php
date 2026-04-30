@@ -356,11 +356,6 @@ Route::get('/config_cache', function () {
     return Artisan::call('config:cache');
 });
 
-Route::get('/admin/custom-export-users', [
-    \App\Admin\Controllers\ExportController::class,
-    'usersSallaryTargets'
-])->name('custom-export-users');
-
 Route::get('/admin/agency-export-report', [
     \App\Admin\Controllers\ExportController::class,
     'usersAgencyTargets'
