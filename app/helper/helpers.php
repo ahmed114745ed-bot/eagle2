@@ -378,9 +378,34 @@ if (!function_exists('get_file_details')) {
         }
     }
 
+    if (!function_exists('isValidExternalUrl')) {
+        function isValidExternalUrl(string $url): bool
+        {
+            $parsed = parse_url($url);
+            if (!$parsed || !isset($parsed['scheme'], $parsed['host'])) {
+                return false;
+            }
+
+            if (!in_array(strtolower($parsed['scheme']), ['http', 'https'])) {
+                return false;
+            }
+
+            $ip = gethostbyname($parsed['host']);
+            if ($ip === $parsed['host']) {
+                return false;
+            }
+
+            return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+        }
+    }
+
     if (!function_exists('httpImage')) {
         function httpImage($image)
         {
+            if (!isValidExternalUrl($image)) {
+                throw new \InvalidArgumentException('Invalid or blocked URL.');
+            }
+
             $response = http::get($image);
 
             $folder = 'images/' . basename($image);
