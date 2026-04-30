@@ -138,25 +138,32 @@ class EnteranceController extends Controller
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
         $is_auto_preview = (int) Common::getConfig('is_auto_preview');
 
-
         $libraries = ['agora', 'zego', 'tencent', 'utd zego'];
         $liveTypes = ['RTC', 'CDN', 'L3'];
 
         $data = [
-            'agora_app_id' => Crypt::encryptString($agora_app_id),
+            'agora_app_id' => $agora_app_id,
             'zego' => [
-                'server_secret' => Crypt::encryptString($zego_server_secret),
-                'app_id' => Crypt::encryptString($zego_app_id),
-                'app_sign' => Crypt::encryptString($app_sign),
+                'server_secret' => $zego_server_secret,
+                'app_id' => $zego_app_id,
+                'app_sign' => $app_sign,
                 'filter' => $zego_filter_enabled == 1 ? true : false,
                 'live_type' => $liveTypes[@$liveLibrary ?? 0]
             ],
             'library' => $libraries[$library],
             'is_auto_preview' => $is_auto_preview == 1 ? true : false,
-
-
         ];
-        return Common::apiResponse(1, '', $data);
+
+        $zegoEncryptKey = config('app.zego_credential');
+        $encryptedData = openssl_encrypt(
+            json_encode($data),
+            'AES-256-CBC',
+            $zegoEncryptKey,
+            0,
+            substr($zegoEncryptKey, 0, 16)
+        );
+
+        return Common::apiResponse(1, '', $encryptedData);
     }
 
 
