@@ -18,7 +18,10 @@
         "psr-4": {
             "Utd\\Gifts\\": "src/",
             "Utd\\Gifts\\Database\\": "Database/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {
