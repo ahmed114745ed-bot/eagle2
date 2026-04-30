@@ -895,6 +895,8 @@ class UserController extends Controller
 
 
 
+
+
     public function switchAccountAnonymous(Request $request)
     {
         $user = $request->user();

@@ -63,7 +63,7 @@ class SearchRepository implements SearchRepositoryInterface
             }])
             ->addSelect([
                 '*',
-                DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, '{$keywords}', ''))) / CHAR_LENGTH(uuid)) * 100 AS matching_percentage")
+                DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, ?))) / CHAR_LENGTH(?)) * 100 AS matching_percentage", [$keywords, $keywords])
             ])
             ->orderByDesc('matching_percentage')
             ->first();
@@ -118,7 +118,7 @@ class SearchRepository implements SearchRepositoryInterface
             }])
             ->addSelect([
                 '*',
-                DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, '{$keywords}', ''))) / CHAR_LENGTH(uuid)) * 100 AS matching_percentage")
+                DB::raw("((LENGTH(uuid) - LENGTH(REPLACE(uuid, ?))) / CHAR_LENGTH(?)) * 100 AS matching_percentage", [$keywords, $keywords])
             ])
             ->orderByDesc('matching_percentage')
             ->first();
@@ -185,15 +185,15 @@ class SearchRepository implements SearchRepositoryInterface
                 '*',
                 DB::raw("
             CASE
-                WHEN special_id = '{$keywords}' THEN 1000
-                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
-                WHEN uuid = '{$keywords}' THEN 800
-                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
-                WHEN special_id LIKE '%{$keywords}%' THEN 600
-                WHEN uuid LIKE '%{$keywords}%' THEN 500
+                WHEN special_id = ? THEN 1000
+                WHEN special_id LIKE CONCAT(?, '%') THEN 900 - LENGTH(special_id)
+                WHEN uuid = ? THEN 800
+                WHEN uuid LIKE CONCAT(?, '%') THEN 700 - LENGTH(uuid)
+                WHEN special_id LIKE CONCAT('%', ?, '%') THEN 600
+                WHEN uuid LIKE CONCAT('%', ?, '%') THEN 500
                 ELSE 0
             END AS total_score
-        ")
+        ", [$keywords, $keywords, $keywords, $keywords, $keywords, $keywords])
             ])
             ->where(function ($query) use ($keywords) {
                 $query->where('special_id', 'like', "%{$keywords}%")
@@ -222,15 +222,15 @@ class SearchRepository implements SearchRepositoryInterface
                 '*',
                 DB::raw("
             CASE
-                WHEN special_id = '{$keywords}' THEN 1000
-                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
-                WHEN uuid = '{$keywords}' THEN 800
-                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
-                WHEN special_id LIKE '%{$keywords}%' THEN 600
-                WHEN uuid LIKE '%{$keywords}%' THEN 500
+                WHEN special_id = ? THEN 1000
+                WHEN special_id LIKE CONCAT(?, '%') THEN 900 - LENGTH(special_id)
+                WHEN uuid = ? THEN 800
+                WHEN uuid LIKE CONCAT(?, '%') THEN 700 - LENGTH(uuid)
+                WHEN special_id LIKE CONCAT('%', ?, '%') THEN 600
+                WHEN uuid LIKE CONCAT('%', ?, '%') THEN 500
                 ELSE 0
             END AS total_score
-        ")
+        ", [$keywords, $keywords, $keywords, $keywords, $keywords, $keywords])
             ])
             ->with([
                 'profile:id,user_id,avatar',
