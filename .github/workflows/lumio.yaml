@@ -38,9 +38,69 @@ jobs:
           # Rotate job logs if > 50MB
           find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
 
-  run_lumio_migrate:
+  run_lumio_lint:
     runs-on: [self-hosted]
     needs: run_lumio_hub
+    steps:
+    - name: PHP syntax check
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.61.136"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 3m
+        script: |
+          cd /var/www/lumio
+          echo "=== PHP Syntax Check ==="
+          ERRORS=0
+
+          # Check route files (these cause boot failures)
+          for file in routes/web.php routes/api.php routes/channels.php routes/console.php; do
+            if [ -f "$file" ]; then
+              if ! php -l "$file" 2>&1; then
+                ERRORS=$((ERRORS + 1))
+              fi
+            fi
+          done
+
+          # Check config files
+          for file in $(find config/ -name "*.php" -type f 2>/dev/null); do
+            if ! php -l "$file" > /dev/null 2>&1; then
+              echo "SYNTAX ERROR: $file"
+              php -l "$file" 2>&1
+              ERRORS=$((ERRORS + 1))
+            fi
+          done
+
+          # Check app/ PHP files
+          while IFS= read -r file; do
+            if ! php -l "$file" > /dev/null 2>&1; then
+              echo "SYNTAX ERROR: $file"
+              php -l "$file" 2>&1
+              ERRORS=$((ERRORS + 1))
+            fi
+          done < <(find app/ -name "*.php" -type f)
+
+          # Check Modules/ PHP files
+          while IFS= read -r file; do
+            if ! php -l "$file" > /dev/null 2>&1; then
+              echo "SYNTAX ERROR: $file"
+              php -l "$file" 2>&1
+              ERRORS=$((ERRORS + 1))
+            fi
+          done < <(find Modules/ -name "*.php" -type f 2>/dev/null)
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo ""
+            echo "FAILED: Found $ERRORS PHP syntax error(s). Fix before deploying."
+            exit 1
+          fi
+          echo "All PHP files passed syntax check."
+
+  run_lumio_migrate:
+    runs-on: [self-hosted]
+    needs: [run_lumio_hub, run_lumio_lint]
     steps:
     - name: Run database migrations once
       uses: appleboy/ssh-action@v1.2.1
@@ -63,7 +123,7 @@ jobs:
 
   run_lumio_app:
     runs-on: [self-hosted]
-    needs: [run_lumio_hub, run_lumio_migrate]
+    needs: [run_lumio_hub, run_lumio_lint, run_lumio_migrate]
     steps:
     - name: Build and deploy Lumio Octane
       uses: appleboy/ssh-action@v1.2.1
@@ -124,7 +184,7 @@ jobs:
 
   run_lumio_job:
     runs-on: [self-hosted]
-    needs: [run_lumio_hub, run_lumio_migrate, run_lumio_app]
+    needs: [run_lumio_hub, run_lumio_lint, run_lumio_migrate, run_lumio_app]
     steps:
     - name: Build and deploy Lumio jobs
       uses: appleboy/ssh-action@v1.2.1
