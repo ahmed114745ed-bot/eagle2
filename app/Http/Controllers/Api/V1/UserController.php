@@ -893,74 +893,7 @@ class UserController extends Controller
         return Common::apiResponse(1, '', $encryptedData);
     }
 
-    /**
-     * Zego Credential - Encrypted & Secured Version
-     * Returns encrypted credentials with HMAC signature and timestamp for enhanced security
-     */
-    public function zegoCredentialEncrypted()
-    {
-        $zego_feature = \Cache::rememberForever('zego_feature', function () {
-            return \DB::table('settings')->where('key', 'zego_feature')->value('value');
-        });
 
-        if ($zego_feature && $zego_feature == 1) {
-            return Common::apiResponse(0, __('Zego Feature is Disabled, Contact the administration'), null, 403);
-        }
-
-        $ZegoEncryptKey = config('app.zego_credential');
-        $appKey = config('app.key');
-
-        // Get youtube key
-        $keys = Common::getConfFromKey(['youtube_key']);
-        $data = $keys->mapWithKeys(function ($item) {
-            return [$item['name'] => $item['value']];
-        });
-
-        // Get zego data
-        $zegoKeys = Common::zegoData();
-        $zegoData = [
-            'zego_app_id' => isset($zegoKeys['zego_app_id'])
-                ? (int) $zegoKeys['zego_app_id']
-                : null,
-            'app_sign' => $zegoKeys['zego_app_sign'] ?? null,
-        ];
-
-        // Merge collections
-        $data = collect($zegoData)
-            ->filter(fn($v) => !is_null($v))
-            ->merge($data);
-
-        // Add timestamp for preventing replay attacks
-        $timestamp = now()->timestamp;
-        $data->put('timestamp', $timestamp);
-
-        // Convert to JSON
-        $jsonData = json_encode($data->toArray());
-
-        // First layer: AES-256-CBC encryption
-        $encryptedData = openssl_encrypt(
-            $jsonData,
-            'AES-256-CBC',
-            $ZegoEncryptKey,
-            0,
-            substr($ZegoEncryptKey, 0, 16)
-        );
-
-        // Second layer: Base64 encoding
-        $base64Encoded = base64_encode($encryptedData);
-
-        // Generate HMAC signature for integrity verification
-        $signature = hash_hmac('sha256', $base64Encoded, $appKey);
-
-        // Final secure payload
-        $securePayload = [
-            'data' => $base64Encoded,
-            'signature' => $signature,
-            'timestamp' => $timestamp
-        ];
-
-        return Common::apiResponse(1, '', $securePayload);
-    }
 
 
 

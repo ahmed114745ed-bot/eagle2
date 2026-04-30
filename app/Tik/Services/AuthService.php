@@ -438,30 +438,94 @@ class AuthService
     private function storeImageFromUrl(string $url, User $user): ?Profile
     {
         try {
-            if (!isValidExternalUrl($url)) {
-                Log::warning('Blocked SSRF attempt', ['url' => $url]);
+            // Security: Validate URL against SSRF attacks
+            $validation = \App\Helpers\UrlValidator::validateUrl($url, true);
+
+            if (!$validation['valid']) {
+                Log::warning('SSRF attempt blocked in registration', [
+                    'url' => $url,
+                    'error' => $validation['error'],
+                    'user_id' => $user->id,
+                    'ip' => request()->ip()
+                ]);
                 return null;
             }
 
-            $response = Http::get($url);
+            // Only allow HTTPS for external images
+            if (!str_starts_with($url, 'https://')) {
+                Log::warning('Non-HTTPS URL blocked in registration', [
+                    'url' => $url,
+                    'user_id' => $user->id,
+                    'ip' => request()->ip()
+                ]);
+                return null;
+            }
+
+            // Download with security restrictions
+            $response = Http::timeout(10)
+                ->withOptions([
+                    'verify' => true,
+                    'allow_redirects' => [
+                        'max' => 2,
+                        'strict' => true
+                    ]
+                ])
+                ->get($url);
 
             if (!$response->successful() || empty($response->body())) {
-                Log::warning('Failed to download image', ['url' => $url]);
+                Log::warning('Failed to download image', [
+                    'url' => $url,
+                    'status' => $response->status()
+                ]);
                 return null;
             }
 
-            $extension = $this->getExtensionFromUrl($url);
-            $profile   = $this->getOrCreateProfile($user);
+            // Validate content type
+            $contentType = $response->header('Content-Type');
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-            $fileName = "{$profile->id}_{$user->profile_count}.{$extension}";
-            $path     = "profile/{$fileName}";
+            if (!$contentType || !in_array(strtolower($contentType), $allowedTypes)) {
+                Log::warning('Invalid image content type from URL', [
+                    'url' => $url,
+                    'content_type' => $contentType,
+                    'user_id' => $user->id
+                ]);
+                return null;
+            }
 
-            Storage::put($path, $response->body(), config('filesystems.default'));
+            // Validate size (10MB max)
+            $body = $response->body();
+            if (strlen($body) > 10485760) {
+                Log::warning('Image from URL exceeds size limit', [
+                    'url' => $url,
+                    'size' => strlen($body),
+                    'user_id' => $user->id
+                ]);
+                return null;
+            }
 
-            //    Log:: info('Stored profile image from URL', [
-            //         'url' => $url,
-            //         'path' => $path,
-            //     ]);
+            // Map content type to safe extension
+            $safeExtension = match (strtolower($contentType)) {
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'image/gif' => 'gif',
+                'image/webp' => 'webp',
+                default => 'jpg',
+            };
+
+            $profile = $this->getOrCreateProfile($user);
+
+            // Use safe extension instead of URL-derived one
+            $fileName = "{$profile->id}_{$user->profile_count}.{$safeExtension}";
+            $path = "profile/{$fileName}";
+
+            Storage::put($path, $body, config('filesystems.default'));
+
+            Log::info('Stored profile image from URL', [
+                'user_id' => $user->id,
+                'path' => $path,
+                'content_type' => $contentType
+            ]);
 
             $profile->update(['avatar' => $path]);
 
