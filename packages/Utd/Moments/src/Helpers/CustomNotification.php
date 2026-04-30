@@ -5,7 +5,7 @@ namespace Utd\Moments\Helpers;
 use App\Helpers\Common;
 use App\Helpers\CustomNotification as BaseCustomNotification;
 use App\Models\User;
-use App\Services\UserCounterServices;
+use Modules\Public\Http\Services\UserCounterServices;
 use Utd\Gifts\Entities\Gift;
 use Utd\Moments\Entities\Moment;
 
@@ -45,6 +45,6 @@ class CustomNotification extends BaseCustomNotification
             Common::send_firebase_notification($tokens_notfacion, $this->appName($receivedUser->lan), $body, icon: $icon, data: $data, messageType: 'send-moment-gift');
         }
         Common::sendOfficialMessage($receivedUser->id, image: $senderUser->profile->avatar, title: $body, content: $senderUser->name, titleAr: $body, fromUserId: $senderUser->id);
-        (new UserCounterServices)->eventUser($receivedUser, 'official-messages');
+        (new UserCounterServices())->eventUser($receivedUser, 'official-messages');
     }
 }

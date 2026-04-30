@@ -5,7 +5,7 @@ namespace Utd\Gifts\Services;
 use App\Contracts\RoomRepositoryContract;
 use App\Contracts\RoomTopUsersRepositoryContract;
 use App\Contracts\UserRepositoryContract;
-use App\Enums\GiftSourceType;
+use Utd\Gifts\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
 use App\Events\GiftBannerEvent;
 use App\Helpers\CacheHelper;
