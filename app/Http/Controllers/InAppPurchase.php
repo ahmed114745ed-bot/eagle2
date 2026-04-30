@@ -26,7 +26,7 @@ class InAppPurchase extends Controller
      {
          $this->client = new \Google_Client();
 //         $this->client = new Google_Client();
-         $credentialPath = public_path('google_payment.json');
+         $credentialPath = storage_path('app/credentials/google_payment.json');
          if (!file_exists($credentialPath)) {
              throw new \Exception('Google payment credential file does not exist at path: ' . $credentialPath);
          }
@@ -118,7 +118,7 @@ class InAppPurchase extends Controller
 
     public function pay(Request $request)
     {
-        $path = public_path('google_payment.json');
+        $path = storage_path('app/credentials/google_payment.json');
         putenv(sprintf("GOOGLE_APPLICATION_CREDENTIALS=%s", $path));
         $user = $request->user();
 
