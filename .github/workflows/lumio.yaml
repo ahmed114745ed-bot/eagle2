@@ -53,50 +53,54 @@ jobs:
         script: |
           cd /var/www/lumio
           echo "=== PHP Syntax Check ==="
-          ERRORS=0
 
-          # Check route files (these cause boot failures)
-          for file in routes/web.php routes/api.php routes/channels.php routes/console.php; do
-            if [ -f "$file" ]; then
-              if ! php -l "$file" 2>&1; then
+          # Run php -l inside a Docker container (no PHP on host)
+          sudo docker run --rm -v /var/www/lumio:/app -w /app php:8.2-cli bash -c '
+            ERRORS=0
+
+            # Check route files (these cause boot failures)
+            for file in routes/web.php routes/api.php routes/channels.php routes/console.php; do
+              if [ -f "$file" ]; then
+                if ! php -l "$file" 2>&1; then
+                  ERRORS=$((ERRORS + 1))
+                fi
+              fi
+            done
+
+            # Check config files
+            for file in $(find config/ -name "*.php" -type f 2>/dev/null); do
+              if ! php -l "$file" > /dev/null 2>&1; then
+                echo "SYNTAX ERROR: $file"
+                php -l "$file" 2>&1
                 ERRORS=$((ERRORS + 1))
               fi
-            fi
-          done
+            done
 
-          # Check config files
-          for file in $(find config/ -name "*.php" -type f 2>/dev/null); do
-            if ! php -l "$file" > /dev/null 2>&1; then
-              echo "SYNTAX ERROR: $file"
-              php -l "$file" 2>&1
-              ERRORS=$((ERRORS + 1))
-            fi
-          done
+            # Check app/ PHP files
+            while IFS= read -r file; do
+              if ! php -l "$file" > /dev/null 2>&1; then
+                echo "SYNTAX ERROR: $file"
+                php -l "$file" 2>&1
+                ERRORS=$((ERRORS + 1))
+              fi
+            done < <(find app/ -name "*.php" -type f)
 
-          # Check app/ PHP files
-          while IFS= read -r file; do
-            if ! php -l "$file" > /dev/null 2>&1; then
-              echo "SYNTAX ERROR: $file"
-              php -l "$file" 2>&1
-              ERRORS=$((ERRORS + 1))
-            fi
-          done < <(find app/ -name "*.php" -type f)
+            # Check Modules/ PHP files (skip blade templates)
+            while IFS= read -r file; do
+              if ! php -l "$file" > /dev/null 2>&1; then
+                echo "SYNTAX ERROR: $file"
+                php -l "$file" 2>&1
+                ERRORS=$((ERRORS + 1))
+              fi
+            done < <(find Modules/ -name "*.php" ! -name "*.blade.php" -type f 2>/dev/null)
 
-          # Check Modules/ PHP files
-          while IFS= read -r file; do
-            if ! php -l "$file" > /dev/null 2>&1; then
-              echo "SYNTAX ERROR: $file"
-              php -l "$file" 2>&1
-              ERRORS=$((ERRORS + 1))
+            if [ "$ERRORS" -gt 0 ]; then
+              echo ""
+              echo "FAILED: Found $ERRORS PHP syntax error(s). Fix before deploying."
+              exit 1
             fi
-          done < <(find Modules/ -name "*.php" -type f 2>/dev/null)
-
-          if [ "$ERRORS" -gt 0 ]; then
-            echo ""
-            echo "FAILED: Found $ERRORS PHP syntax error(s). Fix before deploying."
-            exit 1
-          fi
-          echo "All PHP files passed syntax check."
+            echo "All PHP files passed syntax check."
+          '
 
   run_lumio_migrate:
     runs-on: [self-hosted]
