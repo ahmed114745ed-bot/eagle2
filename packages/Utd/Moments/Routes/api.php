@@ -25,9 +25,11 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
         Route::apiResource('moment/{moment_id}/like', MomentUserLikesController::class);
         Route::post('moment/{moment_id}/report', [ReportController::class, 'store']);
 
-        Route::get('moments/users/{id}/gifts', [MomentUserGiftsController::class, 'userGift']);
-        Route::apiResource('moment/{moment_id}/gift/', MomentUserGiftsController::class);
-        Route::apiResource('moment/{moment_id}/users/gifts/', MomentUserGiftsController::class);
-        Route::get('moments/{id}/gifts', [MomentUserGiftsController::class, 'getGifts']);
+        Route::middleware('package:gift')->group(function () {
+            Route::get('moments/users/{id}/gifts', [MomentUserGiftsController::class, 'userGift']);
+            Route::apiResource('moment/{moment_id}/gift/', MomentUserGiftsController::class);
+            Route::apiResource('moment/{moment_id}/users/gifts/', MomentUserGiftsController::class);
+            Route::get('moments/{id}/gifts', [MomentUserGiftsController::class, 'getGifts']);
+        });
     }
 );
