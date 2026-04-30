@@ -80,8 +80,7 @@ use App\Models\RoomVisitor;
 use App\Models\User;
 use App\Models\UserSallary;
 use Carbon\Carbon;
-use Database\Seeders\FlagSyrianSeeder;
-use Database\Seeders\WebhookGamesSeeder;
+
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -273,62 +272,6 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
     return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
-Route::get('/run-seeders', function () {
-
-    // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
-    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
-    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    Artisan::call('db:seed', ['--class' => WebhookGamesSeeder::class]);
-    // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/run-permission', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/run-payments', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PaymentGatewaysSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/devices-token-seeder', function () {
-
-    Artisan::call('db:seed', ['--class' => 'DevicesTokenHistories']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/user-join-agency', function () {
-
-    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
 
 
 Route::get('/count-invite-codes', function () {
@@ -362,44 +305,6 @@ Route::get('/count-invite-codes', function () {
 
 
 
-Route::get('/badge-seeders', function () {
-
-    // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'BadgeImageSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/config-badges-seeder', function () {
-    Artisan::call('db:seed', ['--class' => 'ConfigBadgesSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ ConfigBadgesSeeder executed successfully.'
-    ]);
-});
-
-Route::get('/boom-percentage-seeder', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PercentageBoomSeeder']);
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ PercentageBoomSeeder executed successfully.'
-    ]);
-});
-
-Route::get('/update-flag', function () {
-
-    Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ flag updated successfully.'
-    ]);
-});
 Route::get('/clear_clear', function () {
 
     Artisan::call('cache:clear');
@@ -417,14 +322,6 @@ Route::get('/update-user-cut-amount', [SalariesController::class, 'updateUserCut
 Route::get('/count-user-cut-amount', [SalariesController::class, 'countUserCutAmount']);
 
 
-
-
-Route::get('/seed', function () {
-
-    Artisan::call('db:seed');
-
-    return "Seeded!";
-});
 
 Route::get('/change_agencies_type_test', function () {
 
@@ -991,15 +888,6 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
 
 Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
-// Gift Logs: fill total column from gifts table (seeder via web)
-Route::get('/gift-logs-fill-total', function () {
-    Artisan::call('db:seed', ['--class' => \Database\Seeders\FillGiftLogsTotalSeeder::class]);
-    return response()->json([
-        'status'  => 'success',
-        'message' => '✅ FillGiftLogsTotalSeeder executed successfully.',
-        'output'  => Artisan::output(),
-    ]);
-});
 
 // Gift Logs: fix total diff (dry-run preview) — queries DB directly for accuracy
 Route::get('/gift-logs-fix-total-diff/preview', function () {
@@ -1180,13 +1068,6 @@ Route::get('/week-zone', function () {
 });
 
 
-Route::get('update-country-id', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'CleanUpDuplicateCountriesSeeder',
-    ]);
-
-    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
-});
 
 Route::get('remove-new-country', function () {
     User::where('country_id', 488)->update(['country_id' => null]);
@@ -1197,13 +1078,6 @@ Route::get('remove-new-country', function () {
 });
 
 
-Route::get('/fix-agencies-bd', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
-    ]);
-
-    return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
-});
 
 Route::get('assign-super-admin-bd', function () {
     $bds = Bd::whereNull('parent_id')->get();
@@ -2716,23 +2590,6 @@ Route::get('/fix-paid-usd', function () {
 
     return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
 });
-Route::get('make-seeders-for-new-update', function () {
-    $seeder = new \Database\Seeders\WebhookGamesSeeder();
-    $seeder->run();
-
-    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
-Route::get('make-seeders-for-permission', function () {
-    $seeder = new \Database\Seeders\PermissionTypeSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
 
 
 Route::get('/queue-control/{queue}', function ($queue) {
