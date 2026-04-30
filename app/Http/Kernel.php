@@ -41,6 +41,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\ForcePusherRefresh::class,
         \App\Http\Middleware\RefreshThemeConfig::class,
         DisablePjaxForOctane::class,
+        \App\Http\Middleware\SecurityHeaders::class,
     ];
 
     /**
