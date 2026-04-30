@@ -8,6 +8,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Http\Controllers\Controller;
 use App\Models\GameSeat;
 use App\Models\GameSession;
+use App\Models\RewardWinnerGame;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -294,16 +295,15 @@ class NewLeaderCCGameController extends Controller
             $di = $user->di;
             if (!$user) continue;
 
-            if ($index == 0) {
-                // winner
-                $user->di += 500;
-            }
+            $reward = RewardWinnerGame::where('rank', $index)->first();
+            if (!$reward) continue;
 
+            $user->di += $reward->coins;
             $user->save();
 
             UserCoinLogHelper::logByType(
                 $user->id,
-                -abs($request->fees),
+                $reward->coins,
                 $di,
                 UserCoinLogType::COIN_GAME,
                 null,
