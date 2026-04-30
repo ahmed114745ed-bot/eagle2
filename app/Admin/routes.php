@@ -812,12 +812,12 @@ Route::group(
             Route::get('/gift-test', [GiftLogTestController::class, 'showSendGift']);
             Route::post('/gift-test', [GiftLogTestController::class, 'sendGift']);
 
-            Route::get('/pusher-test/{id}', function ($id) {
-                $user = \App\Models\User::findOrFail($id);
-                $token = $user->createToken('broadcast')->plainTextToken;
-
-                return view('test.test-pusher', compact('token'));
-            });
+//            Route::get('/pusher-test/{id}', function ($id) {
+//                $user = \App\Models\User::findOrFail($id);
+//                $token = $user->createToken('broadcast')->plainTextToken;
+//
+//                return view('test.test-pusher', compact('token'));
+//            });
         });
 
         Route::prefix('notifications')->group(function () {

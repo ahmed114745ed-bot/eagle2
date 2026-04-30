@@ -346,12 +346,12 @@ Route::get('/count-invite-codes', function () {
         $accounts = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->get();
 
         $data = [
-            
+
             'count' => $count,
             'accounts' => $accounts,
             'from' => $from->toDateTimeString(),
             'to' => $to->toDateTimeString(),
-            
+
         ];
 
     return response()->json([
@@ -624,7 +624,7 @@ Route::group([
     ],
     'as' => '',
 ], function () {
-    
+
 });
 
 Route::get('/update-rooms', function () {
@@ -698,21 +698,6 @@ Route::get('/test-fcm/{userid}', function ($userId) {
             'data' => $data
         ],
         'fcm_response' => $result
-    ]);
-});
-
-Route::get('/generate-token/{id}', function ($id) {
-    $user = User::find($id);
-
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
-
-    $token = $user->createToken('api_token')->plainTextToken;
-
-    return response()->json([
-        'token' => $token,
-        'user' => $user
     ]);
 });
 
