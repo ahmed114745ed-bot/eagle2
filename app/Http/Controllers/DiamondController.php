@@ -141,4 +141,80 @@ class DiamondController extends Controller
         });
         return 'done!';
     }
+
+    public function userGiftDetails($userId)
+    {
+        $year = request('year') ?? Carbon::now()->year;
+        $month = request('month') ?? Carbon::now()->month;
+
+        $user = User::with('profile', 'agency')->findOrFail($userId);
+
+        $topReceivers = DB::table('gift_logs')
+            ->select('receiver_id', DB::raw('SUM(giftPrice) as total_diamonds'))
+            ->where('sender_id', $userId)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->groupBy('receiver_id')
+            ->orderByDesc('total_diamonds')
+            ->limit(10)
+            ->get();
+
+        $receiversData = User::with('profile')
+            ->whereIn('id', $topReceivers->pluck('receiver_id'))
+            ->get()
+            ->map(function ($receiver) use ($topReceivers) {
+                $diamonds = $topReceivers->firstWhere('receiver_id', $receiver->id)->total_diamonds ?? 0;
+                return [
+                    'id' => $receiver->id,
+                    'uuid' => $receiver->uuid,
+                    'name' => $receiver->name,
+                    'image' => $receiver->profile->avatar ?? '',
+                    'diamonds_sent' => number_format($diamonds),
+                ];
+            });
+
+        $topSenders = DB::table('gift_logs')
+            ->select('sender_id', DB::raw('SUM(giftPrice) as total_diamonds'))
+            ->where('receiver_id', $userId)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->groupBy('sender_id')
+            ->orderByDesc('total_diamonds')
+            ->limit(10)
+            ->get();
+
+        $sendersData = User::with('profile')
+            ->whereIn('id', $topSenders->pluck('sender_id'))
+            ->get()
+            ->map(function ($sender) use ($topSenders) {
+                $diamonds = $topSenders->firstWhere('sender_id', $sender->id)->total_diamonds ?? 0;
+                return [
+                    'id' => $sender->id,
+                    'uuid' => $sender->uuid,
+                    'name' => $sender->name,
+                    'image' => $sender->profile->avatar ?? '',
+                    'diamonds_received' => number_format($diamonds),
+                ];
+            });
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'uuid' => $user->uuid,
+                    'name' => $user->name,
+                    'image' => $user->profile->avatar ?? '',
+                    'agency' => $user->agency ? [
+                        'id' => $user->agency->id,
+                        'name' => $user->agency->name,
+                    ] : null,
+                ],
+                'month' => $month,
+                'year' => $year,
+                'top_receivers' => $receiversData,
+                'top_senders' => $sendersData,
+            ]
+        ]);
+    }
 }

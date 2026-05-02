@@ -739,6 +739,7 @@ Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondControll
 Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
+Route::get('/user-gift-details/{userId}', [\App\Http\Controllers\DiamondController::class, 'userGiftDetails']);
 Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
 
 
