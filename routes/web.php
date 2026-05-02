@@ -34,6 +34,7 @@ use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\ExportController;
+use App\Http\Controllers\Api\V2\AgencyController as ApiAgencyController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\UserController;
@@ -740,6 +741,7 @@ Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class,
 Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
 Route::get('/user-gift-details/{userId}', [\App\Http\Controllers\DiamondController::class, 'userGiftDetails']);
+Route::get('/agency-details/{id}', [ApiAgencyController::class, 'agencyDetails']);
 Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
 
 
