@@ -4,6 +4,7 @@ namespace Modules\HostLevel\Http\Controllers\api;
 
 
 use App\Helpers\Common;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\HostLevel\Http\Services\HostLevelService;
@@ -18,7 +19,11 @@ class HostLevelController extends Controller
 
     public function hostLevel()
     {
-        $user = request()->user();
+        if (request("user")) {
+            $user = User::find(request("user"));
+        }else {
+            $user = request()->user();
+        }
         $data = $this->hostLevelService->hostLevelIndex();
         $rule = $this->hostLevelService->roles();
         $field = "desc_" . app()->getLocale();

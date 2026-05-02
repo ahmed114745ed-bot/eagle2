@@ -742,6 +742,7 @@ Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::cla
 Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
 Route::get('/user-gift-details/{userId}', [\App\Http\Controllers\DiamondController::class, 'userGiftDetails']);
 Route::get('/agency-details/{id}', [ApiAgencyController::class, 'agencyDetails']);
+Route::get('/host-level', [\Modules\HostLevel\Http\Controllers\api\HostLevelController::class, 'hostLevel']);
 Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
 
 
