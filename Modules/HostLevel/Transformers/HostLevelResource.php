@@ -5,6 +5,7 @@ namespace Modules\HostLevel\Transformers;
 
 use App\Helpers\Common;
 use App\Models\GiftLog;
+use App\Models\User;
 use Modules\HostLevel\Entities\HostLevel;
 use Modules\Events\Transformers\WeeklyStarGift;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -14,7 +15,12 @@ class HostLevelResource extends JsonResource
 
     public function toArray($request)
     {
-        $user = request()->user();
+        // $user = request()->user();
+         if (request("user")) {
+            $user = User::find(request("user"));
+        }else {
+            $user = request()->user();
+        }
         $diamonds = $request->userDiamonds ?? 0;
         $remaining = $this->diamonds - $diamonds;
         $nextLevel = $request->nextLevel ?? 0;
