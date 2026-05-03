@@ -1048,8 +1048,13 @@
         .profile-cover-wrapper {
             position: relative;
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            overflow: hidden;
+            overflow: visible;
             margin-bottom: 0;
+        }
+
+        .profile-cover-slideshow {
+            overflow: hidden;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         }
 
         .profile-cover-slideshow {
@@ -1155,8 +1160,14 @@
             border-radius: 50%;
             border: 5px solid #fff;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            object-fit: cover;
+            object-fit: contain;
             background: #fff;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .profile-avatar-img:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 28px rgba(0,0,0,0.25);
         }
 
         .profile-info-card {
@@ -2043,8 +2054,13 @@
             @endif
         </div>
         <div class="profile-avatar-wrapper">
-            <img src="{{ $user->display_image }}" alt="Avatar" class="profile-avatar-img">
+            <img src="{{ $user->display_image }}" alt="Avatar" class="profile-avatar-img" onclick="document.getElementById('avatarFullModal').style.display='flex'">
         </div>
+    </div>
+
+    <!-- Full Image Modal -->
+    <div id="avatarFullModal" onclick="this.style.display='none'" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;justify-content:center;align-items:center;cursor:pointer;">
+        <img src="{{ $user->display_image }}" alt="Full Avatar" onclick="event.stopPropagation()" style="max-width:90vw;max-height:85vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.4);object-fit:contain;background:#fff;">
     </div>
 
     <div class="profile-info-card">
