@@ -793,6 +793,7 @@ class UserController extends MainController
             'senderLevel:id,level,type,img',
             'receiverLevel:id,level,type,img',
             'userSetting',
+            "chargeLevel:id,level,type,img",
         ];
 
         // Only load packs when viewing packs tab

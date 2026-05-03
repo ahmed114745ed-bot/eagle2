@@ -2085,9 +2085,10 @@
                     </button>
                 @endif
             </div>
+        </div>
 
-            {{-- ── User Profile Action Buttons ── --}}
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+        {{-- ── User Profile Action Buttons ── --}}
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
                 @if (\Encore\Admin\Facades\Admin::user()->can('charge-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
                     <button type="button" class="btn btn-sm profile-action-btn" id="btn-transfer-salary"
                             style="background:{{ $user->transfer_salary ? '#fef2f2' : '#ecfdf5' }}; color:{{ $user->transfer_salary ? '#dc2626' : '#059669' }}; border:1px solid {{ $user->transfer_salary ? '#fecaca' : '#a7f3d0' }}; border-radius:8px; font-weight:600; font-size:12px;"
@@ -2139,7 +2140,6 @@
                     </button>
                 @endif
             </div>
-        </div>
 
         <div class="profile-meta-row">
             <div class="profile-meta-chip">
