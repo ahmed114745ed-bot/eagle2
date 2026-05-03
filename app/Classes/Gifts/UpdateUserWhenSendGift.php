@@ -37,11 +37,11 @@ class UpdateUserWhenSendGift
 
             $updateData = [
                 'salary_is_updated' => DB::raw('GREATEST(salary_is_updated, 1)'),
-                'total_diamond_received' => DB::raw("total_diamond_received + ?", [$totalCoins]),
+                'total_diamond_received' => DB::raw("total_diamond_received + {$totalCoins}"),
             ];
 
             if ($user->type_user == 0 && $user->agency_id == 0) {
-                $updateData['exchange_diamonds'] = DB::raw("exchange_diamonds + ?", [$totalCoins]);
+                $updateData['exchange_diamonds'] = DB::raw("exchange_diamonds + {$totalCoins}");
             }
 
             DB::table('users')->where('id', $user->id)->update($updateData);
@@ -86,11 +86,11 @@ class UpdateUserWhenSendGift
             foreach ($users as $user) {
                 $updateData = [
                     'salary_is_updated' => DB::raw('GREATEST(salary_is_updated, 1)'),
-                    'total_diamond_received' => DB::raw("total_diamond_received + ?", [$totalCoins]),
+                    'total_diamond_received' => DB::raw("total_diamond_received + {$totalCoins}"),
                 ];
 
                 if ($user->agency_id == 0) {
-                    $updateData['exchange_diamonds'] = DB::raw("exchange_diamonds + ?", [$totalCoins]);
+                    $updateData['exchange_diamonds'] = DB::raw("exchange_diamonds + {$totalCoins}");
                 }
 
                 DB::table('users')->where('id', $user->id)->update($updateData);
@@ -187,9 +187,9 @@ class UpdateUserWhenSendGift
         $affected = User::where('id', $senderUser->id)
             ->where('di', '>=', $totalCoins)
             ->update([
-                'di' => DB::raw("di - ?", [$totalCoins]),
-                'monthly_diamond_send' => DB::raw("monthly_diamond_send + ?", [$totalCoins]),
-                'total_diamond_send' => DB::raw("total_diamond_send + ?", [$totalCoins])
+                'di' => DB::raw("di - {$totalCoins}"),
+                'monthly_diamond_send' => DB::raw("monthly_diamond_send + {$totalCoins}"),
+                'total_diamond_send' => DB::raw("total_diamond_send + {$totalCoins}")
             ]);
 
         if ($affected === 0) {
@@ -237,8 +237,8 @@ class UpdateUserWhenSendGift
             throw_if((!$userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
 
             $updateData = [
-                'monthly_diamond_send' => DB::raw("monthly_diamond_send + ?", [$totalCoins]),
-                'total_diamond_send' => DB::raw("total_diamond_send + ?", [$totalCoins]),
+                'monthly_diamond_send' => DB::raw("monthly_diamond_send + {$totalCoins}"),
+                'total_diamond_send' => DB::raw("total_diamond_send + {$totalCoins}"),
             ];
 
             DB::table('users')->where('id', $user->id)->update($updateData);
