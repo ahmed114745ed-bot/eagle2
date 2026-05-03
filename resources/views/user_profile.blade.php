@@ -1175,7 +1175,7 @@
 
 
     @php
-        $activeTab = request('tab', 'salary');
+        $activeTab = request('tab', 'packs');
 
     @endphp
         <!-- Navigation Tabs -->
