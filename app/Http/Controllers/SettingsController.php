@@ -93,6 +93,7 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
+        info($request);
         // if (!Admin::user()->can('*')) {
         //     Permission::check('edit-' . $this->permission_name);
         // }
