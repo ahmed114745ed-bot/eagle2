@@ -46,6 +46,24 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
 
     public function handle()
     {
+        // ══════════════════════════════════════════════════════════════
+        // DEDUPLICATION: Prevent duplicate job execution
+        // ══════════════════════════════════════════════════════════════
+        $jobIdentifier = $this->getJobIdentifier();
+
+        // Check if this job was already processed
+        $alreadyProcessed = DB::table('processed_jobs')
+            ->where('job_identifier', $jobIdentifier)
+            ->exists();
+
+        if ($alreadyProcessed) {
+            Log::info('ProcessLuckyGiftPostJob skipped - already processed', [
+                'job_identifier' => $jobIdentifier,
+                'user_id' => $this->payload['user_id'] ?? null,
+            ]);
+            return; // Exit early - job already processed
+        }
+
         try {
             $userId = $this->payload['user_id'] ?? null;
             $roomId = $this->payload['room_id'] ?? null;
@@ -141,12 +159,22 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
                 $this->upgradeRoomLevel($roomId, $totalPrice, $count);
             }
 
+            // ══════════════════════════════════════════════════════════════
+            // Mark job as processed (AFTER successful completion)
+            // ══════════════════════════════════════════════════════════════
+            DB::table('processed_jobs')->insertOrIgnore([
+                'job_identifier' => $jobIdentifier,
+                'job_type' => self::class,
+                'processed_at' => now(),
+            ]);
+
 //            Log::info('ProcessLuckyGiftPostJob completed successfully', [
 //                'user_id' => $userId,
 //                'room_id' => $roomId,
 //                'receivers_count' => count($receiversIds),
 //            ]);
         } catch (\Throwable $e) {
+            // Don't mark as processed if failed - allow retry
             Log::error('ProcessLuckyGiftPostJob failed', [
                 'error' => $e->getMessage(),
                 'payload' => $this->payload,
@@ -300,6 +328,34 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
         }
     }
 
+    /**
+     * Generate unique identifier for this job
+     *
+     * Creates a unique hash based on critical payload fields to identify
+     * duplicate job executions. Uses user_id, receivers, and coins to ensure
+     * the same operation isn't processed twice.
+     *
+     * @return string MD5 hash of critical payload fields
+     */
+    private function getJobIdentifier(): string
+    {
+        // Create identifier from critical fields that make this job unique
+        $criticalData = [
+            'user_id' => $this->payload['user_id'] ?? null,
+            'receivers_ids' => $this->payload['receivers_ids'] ?? [],
+            'coins_for_receiver' => $this->payload['coins_for_receiver'] ?? 0,
+            'room_id' => $this->payload['room_id'] ?? null,
+            'gift_id' => $this->payload['gift_id'] ?? null,
+            'count' => $this->payload['count'] ?? 1,
+            // Add timestamp to make each request unique (even if same params)
+            // This prevents deduplication across different actual requests
+            'user_coins_before' => $this->payload['user_coins_before'] ?? 0,
+            'user_coins_after' => $this->payload['user_coins_after'] ?? 0,
+        ];
+
+        return md5(json_encode($criticalData));
+    }
+
     public function failed(\Throwable $exception)
     {
         Log::error('ProcessLuckyGiftPostJob permanently failed', [
@@ -308,3 +364,4 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
         ]);
     }
 }
+

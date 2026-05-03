@@ -340,9 +340,8 @@ class AgencyController extends MainController
         if ($agency && array_key_exists('app_owner_id', $data) && $agency->app_owner_id != $data['app_owner_id']) {
             $oldOwner = $agency->owner;
             if ($oldOwner != null) {
-                $oldType = $oldOwner->type_user;
-                $oldOwner->agency_id = 0;
-                $oldOwner->type_user = 0;
+                // Use centralized method to remove old owner
+                UserHandling::changeUserAgency($oldOwner, 0, 0);
                 $oldOwner->is_host = 0;
                 $oldOwner->save();
             }
@@ -350,21 +349,11 @@ class AgencyController extends MainController
 
             $newUser = User::find($data['app_owner_id']);
             if ($newUser) {
-                $newUser->agency_id = $agency->id;
-                // if ($agency->Host_agency == 1 && $agency->Shipping_agency == 1) {
-                //     $newUser->type_user = 4;
-                // } elseif ($agency->Host_agency == 1 && $agency->Shipping_agency == 0) {
-                //     $newUser->type_user = 2;
-                // } elseif (
-                //     $agency->Host_agency == 0 && $agency->Shipping_agency == 1
-                // ) {
-                //     $newUser->type_user = 3;
-                // }
-                if ($agency->type == 1) {
-                    $newUser->type_user = 2;
-                }
+                // Determine user type based on agency type
+                $userType = ($agency->type == 1) ? 2 : 0;
 
-
+                // Use centralized method to assign new owner
+                UserHandling::changeUserAgency($newUser, $agency->id, $userType);
                 $newUser->is_host = 1;
                 $newUser->save();
             }
@@ -372,8 +361,6 @@ class AgencyController extends MainController
 
         return parent::update($id);
     }
-
-
 
     /**
      * Make a grid builder.

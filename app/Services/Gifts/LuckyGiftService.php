@@ -92,7 +92,7 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
         $giftPrice = $gift->price;
-        $receiversIds = explode(',', $data['toUid']);
+        $receiversIds = array_map('intval', array_map('trim', explode(',', $data['toUid'])));
         $receiversCount = count($receiversIds);
         $numberOfGift = $number * $receiversCount;
         $totalPrice = $giftPrice * $numberOfGift;
@@ -113,11 +113,13 @@ class LuckyGiftService
 
             if (isset($ownerId)) {
                 $room = Room::withoutAppends()
+                    ->with('microphones')
                     ->where('uid', $ownerId)
                     ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                     ->first();
             } else {
                 $room = Room::withoutAppends()
+                    ->with('microphones')
                     ->where('id', $roomId)
                     ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                     ->first();
@@ -134,7 +136,7 @@ class LuckyGiftService
             
             // FIX 2: Use actual receivers from DB instead of overwriting count
             // This prevents budget calculation from being based on potentially fewer users
-            $receiversIds = $receivedUsers->pluck('id')->map(fn($id) => (string) $id)->all();
+            $receiversIds = $receivedUsers->pluck('id')->all();
             $receiversCount = count($receiversIds);
             
             $isToRoom = $receiversCount > 1;
@@ -321,6 +323,8 @@ class LuckyGiftService
             $number = $number * $count;
             $roomSessionToAdd = $coinsForOwnerTotal * $count;
 
+            // Use the current in-memory balance (already updated by the loop)
+            // DO NOT refresh() here as it would discard in-memory changes
             $responseData['session'] = $room->session_string;
             $responseData['user_coins'] = $user->di;
             $responseData['gift_num'] = $receiversCount * $number * $count;
@@ -346,6 +350,11 @@ class LuckyGiftService
             ];
 
             $responseData['total_pk'] = $coinsForReceiver;
+
+            // CRITICAL: Save user balance changes to DB BEFORE returning response
+            // This ensures subsequent requests see the updated balance
+            $user->enableSaving = true;
+            $user->save();
 
             // Dispatch post-processing job ASYNCHRONOUSLY
             // This prevents worker blocking and reduces response time to < 10s
@@ -431,11 +440,13 @@ class LuckyGiftService
 
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
+                ->with('microphones')
                 ->where('uid', $ownerId)
                 ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
         } else {
             $room = Room::withoutAppends()
+                ->with('microphones')
                 ->where('id', $roomId)
                 ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
@@ -590,11 +601,14 @@ class LuckyGiftService
         
         $coinsForReceiver = $coinsForReceiver * $count;
         $number = $number * $count;
+
+        // Use the current in-memory balance (already updated by the loop)
+        // DO NOT refresh() here as it would discard in-memory changes
         $newUserCoin = $user->di;
 
         // add session to response
         $responseData['session'] = $room->session_string;
-        $responseData['user_coins'] = $userCoins;
+        $responseData['user_coins'] = $newUserCoin;
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
@@ -605,6 +619,11 @@ class LuckyGiftService
             'max_single_win' => $max_single_win,
             'total_win_count' => $total_count_win,
         ];
+
+        // CRITICAL: Save user balance changes to DB BEFORE returning response
+        // This ensures subsequent requests see the updated balance
+        $user->enableSaving = true;
+        $user->save();
 
         // Dispatch post-processing job ASYNCHRONOUSLY
         // This prevents worker blocking and reduces response time to < 10s
@@ -695,8 +714,11 @@ class LuckyGiftService
 
     private function getResponseData2($gift, $room, $user, $receiversIds, $receiverName)
     {
-        
-        $microphones = $room->microphones ?? collect();
+        if (!$room->relationLoaded('microphones')) {
+            $room->load('microphones');
+        }
+
+        $microphones = $room->microphones;
 
         $positions = [];
         $missingReceivers = [];
@@ -717,6 +739,12 @@ class LuckyGiftService
                 'missing_receiver_ids' => $missingReceivers,
                 'total_receivers' => count($receiversIds),
                 'with_records' => count($receiversIds) - count($missingReceivers),
+                'all_microphones' => $microphones->map(fn($m) => [
+                    'position' => $m->position,
+                    'user_id' => $m->user_id,
+                    'user_id_type' => gettype($m->user_id),
+                ])->all(),
+                'requested_receivers_types' => array_map('gettype', $receiversIds),
             ]);
         }
 

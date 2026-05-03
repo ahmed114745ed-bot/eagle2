@@ -41,6 +41,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\ForcePusherRefresh::class,
         \App\Http\Middleware\RefreshThemeConfig::class,
         DisablePjaxForOctane::class,
+        \App\Http\Middleware\SecurityHeaders::class,
     ];
 
     /**
@@ -140,5 +141,6 @@ class Kernel extends HttpKernel
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
         'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
         'verify.utd.signature' => \App\Http\Middleware\VerifyUtdSignature::class,
+        'auth.rate.limit' => \App\Http\Middleware\AuthRateLimiter::class,
     ];
 }

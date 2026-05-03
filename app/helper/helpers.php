@@ -378,14 +378,107 @@ if (!function_exists('get_file_details')) {
         }
     }
 
+    if (!function_exists('isValidExternalUrl')) {
+        function isValidExternalUrl(string $url): bool
+        {
+            $parsed = parse_url($url);
+            if (!$parsed || !isset($parsed['scheme'], $parsed['host'])) {
+                return false;
+            }
+
+            if (!in_array(strtolower($parsed['scheme']), ['http', 'https'])) {
+                return false;
+            }
+
+            $ip = gethostbyname($parsed['host']);
+            if ($ip === $parsed['host']) {
+                return false;
+            }
+
+            return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+        }
+    }
+
     if (!function_exists('httpImage')) {
         function httpImage($image)
         {
-            $response = http::get($image);
+            // Security: Validate URL against SSRF attacks
+            $validation = \App\Helpers\UrlValidator::validateUrl($image, true);
 
-            $folder = 'images/' . basename($image);
-            Storage::disk(\config('filesystems.default'))->put($folder, $response->body());
-            return $folder;
+            if (!$validation['valid']) {
+                \Log::warning('SSRF attempt blocked in httpImage()', [
+                    'url' => $image,
+                    'error' => $validation['error'],
+                    'ip' => request()->ip()
+                ]);
+
+                throw new \Exception('Invalid image URL: ' . $validation['error']);
+            }
+
+            // Only allow HTTPS for external images
+            if (!str_starts_with($image, 'https://')) {
+                throw new \Exception('Only HTTPS URLs are allowed for external images');
+            }
+
+            try {
+                // Set timeout and size limits
+                $response = http::timeout(10)
+                    ->withOptions([
+                        'verify' => true, // Verify SSL certificates
+                        'allow_redirects' => [
+                            'max' => 2, // Limit redirects to prevent redirect-based SSRF
+                            'strict' => true
+                        ]
+                    ])
+                    ->get($image);
+
+                if (!$response->successful()) {
+                    throw new \Exception('Failed to download image: HTTP ' . $response->status());
+                }
+
+                // Validate content type is an image
+                $contentType = $response->header('Content-Type');
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+                if (!$contentType || !in_array(strtolower($contentType), $allowedTypes)) {
+                    throw new \Exception('URL does not return a valid image type');
+                }
+
+                // Validate content size (max 10MB)
+                $contentLength = $response->header('Content-Length');
+                if ($contentLength && $contentLength > 10485760) {
+                    throw new \Exception('Image size exceeds 10MB limit');
+                }
+
+                $body = $response->body();
+                if (strlen($body) > 10485760) {
+                    throw new \Exception('Downloaded image exceeds 10MB limit');
+                }
+
+                // Generate secure filename
+                $hash = hash('sha256', $image . microtime(true));
+                $extension = match ($contentType) {
+                    'image/jpeg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                    default => 'jpg',
+                };
+
+                $folder = 'images/' . substr($hash, 0, 32) . '.' . $extension;
+                Storage::disk(\config('filesystems.default'))->put($folder, $body);
+
+                return $folder;
+
+            } catch (\Exception $e) {
+                \Log::error('httpImage() failed', [
+                    'url' => $image,
+                    'error' => $e->getMessage(),
+                    'ip' => request()->ip()
+                ]);
+
+                throw new \Exception('Failed to process image URL: ' . $e->getMessage());
+            }
         }
     }
 

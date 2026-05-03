@@ -120,7 +120,7 @@ class FreeUserController extends MainController
     {
         $transfer_salary = settings()->get('transfer_salary');
         $stop_invite_code = settings()->get('stop_invite_code');
-        $stop_charge = settings()->get('stop_charge');
+        $stop_charge = Common::getSettingValue('stop_charge') ?? 0;
         $make_rooms_top = settings()->get('make_rooms_top');
         return (new Box(
             title: __('admin.Actions'),

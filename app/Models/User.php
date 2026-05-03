@@ -282,15 +282,15 @@ class User extends Authenticatable
     {
         $date = \Carbon\Carbon::now(getTimezone());
 
-        $record = $this->monthlyDiamondReceive()
-            ->firstOrNew([
+        $this->monthlyDiamondReceive()->updateOrCreate(
+            [
                 'month' => $date->month,
                 'year'  => $date->year,
-            ]);
+            ],
+            []
+        )->increment('monthly_diamond_received', $value);
 
-        $record->monthly_diamond_received = ($record->monthly_diamond_received ?? 0) + $value;
-
-        $record->save();
+        
     }
 
 
@@ -512,6 +512,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserEarnInvitation::class, 'parent_id');
     }
+
+    public function userCodeInvite()
+    {
+        return $this->hasMany(UserCodeInvitation::class, 'user_id');
+    }
+
 
     public function scopeWithoutAppends($query)
     {
