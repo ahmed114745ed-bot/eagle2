@@ -2169,15 +2169,15 @@
 
         <div class="profile-stats-row">
             <div class="profile-stat-box">
-                <span class="profile-stat-value">{{ @$user->salary }}</span>
+                <span class="profile-stat-value">{{ number_format((float)(@$user->salary ?? 0), 2) }}</span>
                 <span class="profile-stat-label">{{ __('Balance') }}</span>
             </div>
             <div class="profile-stat-box">
-                <span class="profile-stat-value">{{ @$user_diamonds }}</span>
+                <span class="profile-stat-value">{{ number_format((float)(@$user_diamonds ?? 0)) }}</span>
                 <span class="profile-stat-label">{{ __('diamonds') }}</span>
             </div>
             <div class="profile-stat-box">
-                <span class="profile-stat-value">{{ @$user->di }}</span>
+                <span class="profile-stat-value">{{ number_format((float)(@$user->di ?? 0)) }}</span>
                 <span class="profile-stat-label">{{ __('coins') }}</span>
             </div>
         </div>
