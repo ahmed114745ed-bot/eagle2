@@ -47,8 +47,8 @@ class DiamondController extends Controller
                 ->where('receiver_id', $user->id)
                 ->where('created_at', '>=', $startDate)
                 ->where('agency_id', $user->agency_id)
-                ->selectRaw('SUM(giftPrice) as total')
-                ->value('total');
+                ->selectRaw('SUM(giftPrice) as total_gift')
+                ->value('total_gift');
 
             // تحديث جدول users
 
