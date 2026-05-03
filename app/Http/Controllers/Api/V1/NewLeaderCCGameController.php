@@ -56,7 +56,17 @@ class NewLeaderCCGameController extends Controller
         }
 
         $user = $request->user();
-        $token = $this->generateToken($user->id);
+
+        if (!$user) {
+            return response()->json(['status' => 0, 'msg' => 'Unauthenticated.'], 401);
+        }
+
+        $room = Room::find((int)$request->roomId);
+        if(!$room) {
+            return response()->json(['status' => 0, 'msg' => 'Room not found.'], 404);
+        }
+
+        $token = $this->generateToken($user);
 
         $url = "https://games.leadercc.com/test/index.html?" . http_build_query([
             'uid' => $user->id,
