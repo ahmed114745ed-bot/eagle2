@@ -62,7 +62,7 @@ class NewLeaderCCGameController extends Controller
         }
 
         $room = Room::find((int)$request->roomId);
-        if(!$room) {
+        if (!$room) {
             return response()->json(['status' => 0, 'msg' => 'Room not found.'], 404);
         }
 
@@ -116,18 +116,17 @@ class NewLeaderCCGameController extends Controller
         return response()->json([
             'errorCode' => 0,
             'data' => [
-                'list' => [
-                    $usersUpMics->map(function ($usersUpMic, $index) {
-                        return [
-                            "uid" => (string)$usersUpMic->user->id,
-                            "location" => $usersUpMic->position, // أو seat لو عندك
-                            "nickname" => $usersUpMic->user->name ?? '',
-                            "avatar" => $usersUpMic->user->avatar ?? '',
-                        ];
-                    })->values()
+                'list' =>
+                $usersUpMics->map(function ($usersUpMic, $index) {
+                    return [
+                        "uid" => (string)$usersUpMic->user->id,
+                        "location" => $usersUpMic->position, // أو seat لو عندك
+                        "nickname" => $usersUpMic->user->name ?? '',
+                        "avatar" => $usersUpMic->user->avatar ?? '',
+                    ];
+                })->values()
 
 
-                ]
             ]
         ]);
     }
@@ -204,8 +203,7 @@ class NewLeaderCCGameController extends Controller
 
         // تحقق إن الكرسي مش متاخد
         $exists = GameSeat::where('room_id', $roomId)
-            ->where('location', $request->location)
-            ->exists();
+            ->where('location', $request->location)->where('orderId', $request->orderId)->where('game_id', $request->gameId)->whereNull('end_rank')->exists();
 
         if ($exists) {
             return response()->json(['errorCode' => 5007]);
@@ -245,7 +243,7 @@ class NewLeaderCCGameController extends Controller
         $uid = (int)$request->uid;
         // 3. Remove user from seat
         GameSeat::where('room_id', $roomId)
-            ->where('user_id', $uid)
+            ->where('user_id', $uid)->where('orderId', $request->orderId)->where('game_id', $request->gameId)
             ->where('location', $request->location)
             ->update(['location' => null]);
 
@@ -299,7 +297,7 @@ class NewLeaderCCGameController extends Controller
         ], $request->sign)) {
             return response()->json(['errorCode' => 5009]);
         }
-
+        $roomId = (int)$request->roomId;
         foreach ($request->rankList as $index => $uid) {
             $user = User::find((int)$uid);
             $di = $user->di;
@@ -318,6 +316,15 @@ class NewLeaderCCGameController extends Controller
                 UserCoinLogType::COIN_GAME,
                 null,
             );
+
+            GameSeat::where('room_id', $roomId)
+                ->where('user_id', $uid)->where('orderId', $request->orderId)->where('game_id', $request->gameId)
+                ->where('location', $request->location)->whereNull('end_rank')->update(
+                    [
+                        'end_rank' => $index + 1,
+                        'coin_reward' => $reward->coins
+                    ]
+                );
         }
 
 
