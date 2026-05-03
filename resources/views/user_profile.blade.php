@@ -2085,6 +2085,60 @@
                     </button>
                 @endif
             </div>
+
+            {{-- ── User Profile Action Buttons ── --}}
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+                @if (\Encore\Admin\Facades\Admin::user()->can('charge-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                    <button type="button" class="btn btn-sm profile-action-btn" id="btn-transfer-salary"
+                            style="background:{{ $user->transfer_salary ? '#fef2f2' : '#ecfdf5' }}; color:{{ $user->transfer_salary ? '#dc2626' : '#059669' }}; border:1px solid {{ $user->transfer_salary ? '#fecaca' : '#a7f3d0' }}; border-radius:8px; font-weight:600; font-size:12px;"
+                            onclick="profileAction('{{ route('users.toggle-transfer-salary', $user->id) }}', this)">
+                        <i class="fa {{ $user->transfer_salary ? 'fa-toggle-off' : 'fa-toggle-on' }}"></i>
+                        {{ $user->transfer_salary ? __('Disable Transfer Salary') : __('Enable Transfer Salary') }}
+                    </button>
+                @endif
+
+                @if (\Encore\Admin\Facades\Admin::user()->can('invite-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                    <button type="button" class="btn btn-sm profile-action-btn" id="btn-invite-code"
+                            style="background:{{ @$user->userSetting->show_invite_code ? '#ecfdf5' : '#fef2f2' }}; color:{{ @$user->userSetting->show_invite_code ? '#059669' : '#dc2626' }}; border:1px solid {{ @$user->userSetting->show_invite_code ? '#a7f3d0' : '#fecaca' }}; border-radius:8px; font-weight:600; font-size:12px;"
+                            onclick="profileAction('{{ route('users.toggle-invite-code', $user->id) }}', this)">
+                        <i class="fa {{ @$user->userSetting->show_invite_code ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                        {{ @$user->userSetting->show_invite_code ? __('Disable Show Invite Code') : __('Enable Show Invite Code') }}
+                    </button>
+                @endif
+
+                @if (\Encore\Admin\Facades\Admin::user()->can('can-Play-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                    <button type="button" class="btn btn-sm profile-action-btn" id="btn-can-play"
+                            style="background:{{ $user->can_play == 2 ? '#ecfdf5' : '#fef2f2' }}; color:{{ $user->can_play == 2 ? '#059669' : '#dc2626' }}; border:1px solid {{ $user->can_play == 2 ? '#a7f3d0' : '#fecaca' }}; border-radius:8px; font-weight:600; font-size:12px;"
+                            onclick="profileAction('{{ route('users.toggle-can-play', $user->id) }}', this)">
+                        <i class="fa {{ $user->can_play == 2 ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
+                        {{ $user->can_play == 2 ? __('Disable Can Play') : __('Enable Can Play') }}
+                    </button>
+                @endif
+
+                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                    <button type="button" class="btn btn-sm"
+                            style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; font-weight:600; font-size:12px;"
+                            onclick="profileActionConfirm('{{ route('users.kick-agency', $user->id) }}', '{{ __('dashboard.chickKickAgency') }}')">
+                        <i class="fa fa-sign-out"></i> {{ __('dashboard.kickAgency') }}
+                    </button>
+                @endif
+
+                @if ($user->family_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-family-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                    <button type="button" class="btn btn-sm"
+                            style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; font-weight:600; font-size:12px;"
+                            onclick="profileActionConfirm('{{ route('users.kick-family', $user->id) }}', '{{ __('dashboard.chickKick') }}')">
+                        <i class="fa fa-sign-out"></i> {{ __('dashboard.kickFamily') }}
+                    </button>
+                @endif
+
+                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('chang-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                    <button type="button" class="btn btn-sm"
+                            style="background:#eef2ff; color:#4f46e5; border:1px solid #c7d2fe; border-radius:8px; font-weight:600; font-size:12px;"
+                            onclick="$('#changeAgencyModal').modal('show')">
+                        <i class="fa fa-exchange"></i> {{ __('dashboard.changeAgency') }}
+                    </button>
+                @endif
+            </div>
         </div>
 
         <div class="profile-meta-row">
@@ -2119,6 +2173,18 @@
                 <span class="profile-stat-label">{{ __('Balance') }}</span>
             </div>
             <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ @$user_diamonds }}</span>
+                <span class="profile-stat-label">{{ __('diamonds') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ @$user->di }}</span>
+                <span class="profile-stat-label">{{ __('coins') }}</span>
+            </div>
+        </div>
+
+        <div class="profile-stats-row">
+            
+            <div class="profile-stat-box">
                 <img src="{{ getImagePath(@$user->senderLevel->img) }}" style="height: 28px;">
                 <span class="profile-stat-label">{{ __('level') }}</span>
             </div>
@@ -2126,13 +2192,10 @@
                 <img src="{{ getImagePath(@$user->receiverLevel->img) }}" style="height: 28px;">
                 <span class="profile-stat-label">{{ __('Receiver Level') }}</span>
             </div>
+           
             <div class="profile-stat-box">
-                <span class="profile-stat-value">{{ @$user_diamonds }}</span>
-                <span class="profile-stat-label">{{ __('diamonds') }}</span>
-            </div>
-            <div class="profile-stat-box">
-                <span class="profile-stat-value">{{ @$user->di }}</span>
-                <span class="profile-stat-label">{{ __('coins') }}</span>
+                 <img src="{{ getImagePath(@$user->chargeLevel->img) }}" style="height: 28px;">
+                <span class="profile-stat-label">{{ __('charge level') }}</span>
             </div>
         </div>
 
@@ -4349,5 +4412,121 @@
 
     });
 
+    // ── Profile Action Buttons (Toggle/Kick) ──
+    function profileAction(url, btn) {
+        Swal.fire({
+            title: '{{ __("Are you sure?") }}',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || LA.token },
+                    success: function(res) {
+                        Swal.fire({ icon: 'success', title: res.message }).then(function() { location.reload(); });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({ icon: 'error', title: xhr.responseJSON?.message || 'Error' });
+                    }
+                });
+            }
+        });
+    }
+
+    function profileActionConfirm(url, msg) {
+        Swal.fire({
+            title: msg,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes") }}',
+            cancelButtonText: '{{ __("Cancel") }}',
+            confirmButtonColor: '#dc2626'
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || LA.token },
+                    success: function(res) {
+                        Swal.fire({ icon: 'success', title: res.message }).then(function() { location.reload(); });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({ icon: 'error', title: xhr.responseJSON?.message || 'Error' });
+                    }
+                });
+            }
+        });
+    }
+
+    // ── Change Agency Modal Submit ──
+    $(document).on('click', '#submitChangeAgency', function() {
+        var agencyId = $('#changeAgencySelect').val();
+        if (!agencyId) {
+            Swal.fire({ icon: 'warning', title: '{{ __("Please select an agency") }}' });
+            return;
+        }
+        $.ajax({
+            url: '{{ route("users.change-agency", $user->id) }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || LA.token },
+            data: { agency_id: agencyId },
+            success: function(res) {
+                $('#changeAgencyModal').modal('hide');
+                Swal.fire({ icon: 'success', title: res.message }).then(function() { location.reload(); });
+            },
+            error: function(xhr) {
+                Swal.fire({ icon: 'error', title: xhr.responseJSON?.message || 'Error' });
+            }
+        });
+    });
+
+    // Init select2 for change agency modal
+    $(document).on('shown.bs.modal', '#changeAgencyModal', function() {
+        $('#changeAgencySelect').select2({
+            placeholder: '{{ __("Select Agency") }}',
+            allowClear: true,
+            dropdownParent: $('#changeAgencyModal'),
+            ajax: {
+                url: '/admin/search/host-agency',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) { return { q: params.term }; },
+                processResults: function(data) {
+                    var items = data.data || data;
+                    return { results: items.map(function(item) { return { id: item.id, text: item.name + ' (' + item.id + ')' }; }) };
+                },
+                cache: true
+            }
+        });
+    });
+
 </script>
+
+{{-- Change Agency Modal --}}
+<div class="modal fade" id="changeAgencyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;">
+                <h5 class="modal-title"><i class="fa fa-exchange"></i> {{ __('dashboard.changeAgency') }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:#fff;opacity:0.9;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>{{ __('Select Agency') }}</label>
+                    <select id="changeAgencySelect" class="form-control" style="width:100%;"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="submitChangeAgency">{{ __('save') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
 
