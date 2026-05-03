@@ -2067,7 +2067,7 @@
         <div class="profile-info-header">
             <div class="profile-name-section">
                 <h1 class="profile-user-name">{{ @$user?->name ?? '' }}</h1>
-                <div class="profile-badges-inline">{!! @$user->userBadgeTop() !!}</div>
+                
             </div>
             <div class="profile-actions-top">
                 <a href="{{ url('admin/users/') }}" class="btn btn-outline-secondary btn-sm">
@@ -2138,6 +2138,10 @@
 
         <div class="profile-badges-row">
             {!! @$user->userBadge() !!}
+        </div>
+        <div class="profile-badges-row">
+            
+            {!! @$user->userBadgeTop() !!}
         </div>
     </div>
 
