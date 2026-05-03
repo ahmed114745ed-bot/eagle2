@@ -187,7 +187,7 @@ class NewLeaderCCGameController extends Controller
         }
 
         // مثال: تحقق من الرصيد
-        if ($user->coins < $request->fees) {
+        if ($user->di < $request->fees) {
             return response()->json(['errorCode' => 5204]);
         }
 
