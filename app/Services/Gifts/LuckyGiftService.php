@@ -323,6 +323,9 @@ class LuckyGiftService
             $number = $number * $count;
             $roomSessionToAdd = $coinsForOwnerTotal * $count;
 
+            // Refresh user to ensure we return the latest balance
+            $user->refresh();
+
             $responseData['session'] = $room->session_string;
             $responseData['user_coins'] = $user->di;
             $responseData['gift_num'] = $receiversCount * $number * $count;
@@ -594,11 +597,13 @@ class LuckyGiftService
         
         $coinsForReceiver = $coinsForReceiver * $count;
         $number = $number * $count;
+        // Refresh user to ensure we return the latest balance
+        $user->refresh();
         $newUserCoin = $user->di;
 
         // add session to response
         $responseData['session'] = $room->session_string;
-        $responseData['user_coins'] = $userCoins;
+        $responseData['user_coins'] = $newUserCoin;  // Fixed: use actual updated balance
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
