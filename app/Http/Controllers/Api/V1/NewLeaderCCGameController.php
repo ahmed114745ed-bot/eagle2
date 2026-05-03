@@ -305,7 +305,7 @@ class NewLeaderCCGameController extends Controller
             $di = $user->di;
             if (!$user) continue;
 
-            $reward = RewardWinnerGame::where('rank', $index)->first();
+            $reward = RewardWinnerGame::where('rank', $index + 1)->first();
             if (!$reward) continue;
 
             $user->di += $reward->coins;
