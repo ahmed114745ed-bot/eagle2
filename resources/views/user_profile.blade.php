@@ -16,7 +16,15 @@
             --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
             --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
             --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
         }
+
+        * { box-sizing: border-box; }
 
         .filter-container {
             background: #ffffff;
@@ -1031,6 +1039,963 @@
             color: #333;
             font-weight: 500;
         }
+
+        /* ═══════════════════════════════════════════
+           MODERN UI POLISH — Enhanced Styling
+           ═══════════════════════════════════════════ */
+
+        /* ── Cover Slideshow ── */
+        .profile-cover-wrapper {
+            position: relative;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            overflow: hidden;
+            margin-bottom: 0;
+        }
+
+        .profile-cover-slideshow {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .cover-slide {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .cover-slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .cover-slide::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 80px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.35));
+            z-index: 3;
+        }
+
+        /* Navigation arrows */
+        .cover-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(4px);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, background 0.3s;
+            font-size: 14px;
+        }
+
+        .profile-cover-wrapper:hover .cover-nav {
+            opacity: 1;
+        }
+
+        .cover-nav:hover {
+            background: rgba(255,255,255,0.45);
+        }
+
+        .cover-prev { left: 14px; }
+        .cover-next { right: 14px; }
+
+        /* Dots indicator */
+        .cover-dots {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 8px;
+        }
+
+        .cover-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.45);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cover-dot.active {
+            background: #fff;
+            transform: scale(1.3);
+            box-shadow: 0 0 6px rgba(255,255,255,0.6);
+        }
+
+        .profile-avatar-wrapper {
+            position: absolute;
+            bottom: -50px;
+            left: 40px;
+            z-index: 10;
+        }
+
+        .profile-avatar-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            object-fit: cover;
+            background: #fff;
+        }
+
+        .profile-info-card {
+            background: #fff;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            padding: 20px 40px 24px;
+            padding-top: 60px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-top: none;
+        }
+
+        .profile-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .profile-name-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-user-name {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .profile-badges-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-actions-top {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .profile-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .profile-meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .profile-meta-chip i {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .meta-sep {
+            color: #cbd5e1;
+            margin: 0 2px;
+        }
+
+        .profile-stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .profile-stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 16px 24px;
+            min-width: 120px;
+            flex: 1;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .profile-stat-box:hover {
+            border-color: var(--primary-color);
+            background: #f0f7ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .profile-stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
+        .profile-stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .profile-badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .flag-image {
+            height: 18px;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 768px) {
+            .profile-cover { height: 140px; }
+            .profile-avatar-wrapper { left: 50%; transform: translateX(-50%); bottom: -40px; }
+            .profile-avatar-img { width: 90px; height: 90px; }
+            .profile-info-card { padding: 56px 20px 20px; text-align: center; }
+            .profile-info-header { justify-content: center; }
+            .profile-name-section { justify-content: center; }
+            .profile-actions-top { justify-content: center; }
+            .profile-meta-row { justify-content: center; }
+            .profile-stats-row { justify-content: center; }
+            .profile-stat-box { min-width: 100px; padding: 12px 16px; }
+            .profile-badges-row { justify-content: center; }
+        }
+
+        /* ── Tabs Navigation ── */
+        .agency-tabs {
+            background: var(--secondary-color);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            border: none;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            gap: 4px;
+            scrollbar-width: none;
+            color: var(--text-secondary-color);
+        }
+
+        .agency-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 11px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: none;
+            border-bottom: none;
+            color: var(--text-secondary-color);
+            opacity: 0.6;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+
+        .tab-btn:hover:not(.active) {
+            opacity: 0.9;
+            background: rgba(255,255,255,0.08);
+            border-bottom-color: transparent !important;
+            text-decoration: none;
+            color: var(--text-secondary-color);
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            color: var(--text-primary-color);
+            background: var(--primary-color);
+        }
+
+        /* ── Cards ── */
+        .card {
+            border: none;
+            border-top: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 18px 24px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .card-body {
+            padding: 20px 24px;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           PREMIUM TABLE STYLES — Polished & Professional
+           ══════════════════════════════════════════════════════ */
+        .data-table,
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+            width: 100%;
+            background: #fff !important;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        /* ── Table Header ── */
+        .data-table th,
+        .table > thead > tr > th {
+            background: linear-gradient(180deg, #f8fafc 0%, #edf1f7 100%) !important;
+            color: #3b4a63 !important;
+            font-weight: 800;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 16px 22px !important;
+            border-bottom: 2px solid #dce3ed !important;
+            border-top: none !important;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .data-table th:first-child,
+        .table > thead > tr > th:first-child {
+            border-radius: var(--radius-md) 0 0 0;
+        }
+
+        .data-table th:last-child,
+        .table > thead > tr > th:last-child {
+            border-radius: 0 var(--radius-md) 0 0;
+        }
+
+        /* ── Table Cells ── */
+        .data-table td,
+        .table > tbody > tr > td {
+            padding: 16px 22px !important;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf0f7 !important;
+            border-top: none !important;
+            color: #334155;
+            font-size: 13.5px;
+            line-height: 1.7;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        /* ── Row Styles ── */
+        .data-table tbody tr,
+        .table > tbody > tr {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fff;
+            position: relative;
+        }
+
+        .data-table tbody tr:nth-child(even),
+        .table > tbody > tr:nth-child(even) {
+            background: #f8f9fd;
+        }
+
+        .data-table tbody tr:hover,
+        .table > tbody > tr:hover {
+            background: linear-gradient(90deg, #eef1ff 0%, #f3f5ff 40%, #f0f2ff 100%) !important;
+            box-shadow: inset 4px 0 0 var(--primary-color, #667eea), 0 2px 8px rgba(99,102,241,0.06);
+            z-index: 1;
+        }
+
+        .data-table tbody tr:hover td,
+        .table > tbody > tr:hover td {
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:last-child td:first-child {
+            border-radius: 0 0 0 var(--radius-md);
+        }
+
+        .data-table tbody tr:last-child td:last-child {
+            border-radius: 0 0 var(--radius-md) 0;
+        }
+
+        /* Override orange text in tbody */
+        .data-table tbody,
+        .table tbody,
+        .data-table tbody tr,
+        .table tbody tr,
+        .data-table tbody tr td,
+        .table tbody tr td,
+        .data-table tbody[style] tr td,
+        .table tbody[style] tr td {
+            color: #334155 !important;
+        }
+
+        /* ── First Column (ID/#) ── */
+        .data-table td:first-child,
+        .table > tbody > tr > td:first-child {
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .data-table td:first-child,
+        .table > tbody > tr > td:first-child {
+            color: #fff;
+        }
+
+        .data-table td:first-child::before,
+        .table > tbody > tr > td:first-child::before {
+            content: '';
+            display: inline-block;
+        }
+
+        .data-table td:first-child,
+        .table > tbody > tr > td:first-child {
+            position: relative;
+        }
+
+        .data-table td:first-child span,
+        .data-table td:first-child {
+            color: #6366f1;
+        }
+
+        /* ID number badge style */
+        .data-table tbody tr td:first-child,
+        .table > tbody > tr > td:first-child {
+            color: #4f46e5;
+            font-variant-numeric: tabular-nums;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* ── Table Wrapper ── */
+        .table-responsive {
+            border-radius: var(--radius-md);
+            border: 1px solid #e4e9f2;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 1px rgba(0,0,0,0.06);
+        }
+
+        /* Table inside cards - remove double borders */
+        .card .table-responsive {
+            margin: 0;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            box-shadow: none;
+            border-top: none;
+        }
+
+        .card .data-table,
+        .card .table {
+            margin-bottom: 0;
+        }
+
+        /* ── Table Links ── */
+        .data-table a,
+        .table a {
+            color: #4f46e5;
+            text-decoration: none;
+            transition: all 0.25s;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .data-table a:hover,
+        .table a:hover {
+            color: #3730a3;
+        }
+
+        .data-table a::after,
+        .table td a::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 1.5px;
+            background: #4f46e5;
+            transition: width 0.3s ease;
+        }
+
+        .data-table a:hover::after,
+        .table td a:hover::after {
+            width: 100%;
+        }
+
+        /* ── Table Images ── */
+        .data-table img,
+        .table img {
+            border-radius: 10px;
+            border: 2px solid #edf0f7;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .data-table img:hover,
+        .table img:hover {
+            transform: scale(1.12);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            border-color: #c7d2fe;
+        }
+
+        /* ── Status Badges ── */
+        .table .text-success {
+            color: #059669 !important;
+            font-weight: 700;
+            background: #ecfdf5;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .table .text-danger {
+            color: #dc2626 !important;
+            font-weight: 700;
+            background: #fef2f2;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .table .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        /* ── Action Buttons in Tables ── */
+        .data-table .btn,
+        .table .btn {
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            letter-spacing: 0.3px;
+            border: none;
+        }
+
+        .data-table .btn:hover,
+        .table .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .data-table .btn:active,
+        .table .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .data-table .btn-info,
+        .table .btn-info {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+        }
+
+        .data-table .btn-info:hover,
+        .table .btn-info:hover {
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            box-shadow: 0 6px 20px rgba(99,102,241,0.3);
+        }
+
+        .data-table .btn-danger,
+        .table .btn-danger {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: #fff;
+        }
+
+        .data-table .btn-danger:hover,
+        .table .btn-danger:hover {
+            background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+            box-shadow: 0 6px 20px rgba(244,63,94,0.3);
+        }
+
+        .data-table .btn-default,
+        .table .btn-default {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .data-table .btn-default:hover,
+        .table .btn-default:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            color: #1e293b;
+        }
+
+        .data-table .d-flex,
+        .table .d-flex {
+            gap: 10px;
+        }
+
+        /* ── User Cell in Tables ── */
+        .data-table .d-flex.align-items-center img,
+        .table .d-flex.align-items-center img {
+            border-radius: 50% !important;
+            border: 2px solid #e0e7ff !important;
+        }
+
+        /* ── Pagination Enhancement ── */
+        .pagination-wrapper,
+        .pagination-container {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            gap: 4px;
+        }
+
+        .pagination > li > a,
+        .pagination > li > span {
+            border-radius: 10px !important;
+            margin: 0 2px !important;
+            border: 1px solid #e4e9f2 !important;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 8px 16px !important;
+            transition: all 0.25s;
+            color: #475569;
+        }
+
+        .pagination > .active > a,
+        .pagination > .active > span {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+            color: #fff !important;
+        }
+
+        .pagination > li > a:hover {
+            background: #eef2ff !important;
+            border-color: #c7d2fe !important;
+            color: #4f46e5 !important;
+            transform: translateY(-1px);
+        }
+
+        /* ── Empty Table State ── */
+        .data-table tbody tr td[colspan],
+        .table tbody tr td[colspan] {
+            padding: 48px 24px !important;
+            color: #94a3b8;
+            font-size: 14px;
+            font-style: italic;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            transition: all 0.25s;
+            font-size: 13px;
+        }
+
+        .btn-info {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-danger {
+            box-shadow: 0 2px 6px rgba(220,53,69,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 12px;
+        }
+
+        /* ── Filter Container ── */
+        .filter-container {
+            background: rgba(0,0,0,0.015);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: none;
+        }
+
+        .form-control {
+            border-radius: var(--radius-sm);
+            border: 1.5px solid rgba(0,0,0,0.1);
+            padding: 8px 14px;
+            font-size: 13px;
+            transition: all 0.25s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+
+        .form-select {
+            border-radius: var(--radius-sm);
+        }
+
+        /* ── Nav Pills (sub-tabs) ── */
+        .nav-pills {
+            gap: 4px;
+            padding: 8px 0;
+        }
+
+        .nav-pills > li > a {
+            border-radius: var(--radius-sm);
+            padding: 8px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .nav-pills > li.active > a {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        /* ── Pagination ── */
+        .pagination-wrapper,
+        .pagination-container {
+            padding: 16px 24px;
+        }
+
+        .pagination > li > a,
+        .pagination > li > span {
+            border-radius: var(--radius-sm) !important;
+            margin: 0 3px !important;
+            border: 1px solid rgba(0,0,0,0.08) !important;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 6px 14px !important;
+            transition: all 0.2s;
+        }
+
+        .pagination > .active > a,
+        .pagination > .active > span {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .pagination > li > a:hover {
+            background: rgba(0,0,0,0.04) !important;
+            transform: translateY(-1px);
+        }
+
+        /* ── Diamond Summary ── */
+        .diamond-summary-box {
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .diamond-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .diamond-count {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        /* ── Loading Indicator ── */
+        #tab-loading {
+            border-radius: var(--radius-md) !important;
+            box-shadow: var(--shadow-lg) !important;
+            font-size: 16px !important;
+            padding: 20px 32px !important;
+            transform: translate(-50%, -50%) !important;
+        }
+
+        /* ── Modals ── */
+        .modal-content {
+            border: none !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25) !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 24px !important;
+        }
+
+        .modal-body {
+            padding: 24px !important;
+        }
+
+        .modal-footer {
+            padding: 16px 24px !important;
+            border-top: 1px solid rgba(0,0,0,0.06) !important;
+            gap: 8px;
+        }
+
+        /* ── Date Filter Row ── */
+        .date-flex-row {
+            gap: 10px;
+            background: rgba(0,0,0,0.015);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .date-flex-row span {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Empty States ── */
+        .empty-state,
+        .empty-table {
+            padding: 48px;
+            border-radius: var(--radius-md);
+        }
+
+        .empty-state i,
+        .empty-table i {
+            font-size: 48px;
+            opacity: 0.4;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p,
+        .empty-table p {
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        /* ── Scrollbar ── */
+        .table-responsive::-webkit-scrollbar,
+        .nav-scroll-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track,
+        .nav-scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb,
+        .nav-scroll-container::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.12);
+            border-radius: 4px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .agency-header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .agency-meta {
+                justify-content: center;
+            }
+
+            .agency-stats {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .agency-tabs {
+                border-radius: var(--radius-sm);
+                padding: 4px;
+            }
+
+            .tab-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .card-header {
+                padding: 14px 18px;
+            }
+
+            .card-body {
+                padding: 16px 18px;
+            }
+
+            .data-table th,
+            .data-table td,
+            .table > thead > tr > th,
+            .table > tbody > tr > td {
+                padding: 10px 12px !important;
+                font-size: 12px;
+            }
+        }
+
+        /* ── Animations ── */
+        .tab-content {
+            animation: fadeInTab 0.3s ease;
+        }
+
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Box Body Spacing ── */
+        .box-body {
+            padding: 16px;
+        }
+
+        .box-body.p-3 {
+            padding: 20px !important;
+        }
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous"/>
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
@@ -1054,122 +2019,109 @@
             {{ $errors->first('msg') }}
         </div>
     @endif
-    <!-- Header Section -->
-    <div class="agency-header">
-        <div class="agency-avatar">
-            <img src="{{ $user->display_image }}"
-                 alt="Agency Logo" class="logo-img">
+    <!-- Header Section - Cover + Profile Card -->
+    <div class="profile-cover-wrapper">
+        @php
+            $coverImages = $covers->count() ? $covers : collect();
+        @endphp
+        <div class="profile-cover-slideshow">
+            @if($coverImages->count() > 0)
+                @foreach($coverImages as $i => $cover)
+                    <div class="cover-slide {{ $i === 0 ? 'active' : '' }}" style="background-image: url('{{ getImagePath($cover->img) }}');"></div>
+                @endforeach
+                @if($coverImages->count() > 1)
+                    <div class="cover-dots">
+                        @foreach($coverImages as $i => $cover)
+                            <span class="cover-dot {{ $i === 0 ? 'active' : '' }}" data-index="{{ $i }}"></span>
+                        @endforeach
+                    </div>
+                    <button class="cover-nav cover-prev" onclick="coverSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <button class="cover-nav cover-next" onclick="coverSlide(1)"><i class="fas fa-chevron-right"></i></button>
+                @endif
+            @else
+                <div class="cover-slide active" style="background-image: var(--brand_background-image); background-color: var(--secondary-color);"></div>
+            @endif
         </div>
-        <div class="agency-info">
-            <h1 class="agency-name">{{ @$user?->name ?? ''}}</h1>
-            <div class="agency-meta">
-                <div class="meta-item">
-                    @if (@$user->uuid == @$user->original_uuid)
-                        <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->original_uuid }}</span>
-                    @else
-                        <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->original_uuid }}</span><br>
-                        <span class="meta-label">{{ __("special uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->uuid_v3 }}</span>
-                    @endif
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">{{__("Phone")}}:</span>
-                    <span class="meta-value">{{ @$user->phone ?? 'N/A' }}</span>
-                    <span class="meta-label">{{ __("country") }}:</span>
-                    <img src="{{ getImagePath(@$user->country->flag) }}"
-                         class="flag-image"
-                         alt="flag Image"
-                         title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
-                </div>
-
-
-            </div>
-            <div class="agency-stats">
-                <div class="agency-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">{{ __('Balance') }}:</span>
-
-                        <span class="meta-value d-block">{{ @$user->salary }}</span>
-                        <!-- <span class="meta-value">{{ $curantBalance }}</span>
-                                <span class="meta-value">{{ $availableBalance }}</span> -->
-
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('level')}}:</span>
-                        <span class="meta-value">
-                                    <img src="{{ getImagePath(@$user->senderLevel->img) }}"
-                                         style="height: 24px;">
-                                </span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('Receiver Level')}}:</span>
-                        <span class="meta-value">
-                                <img src="{{ getImagePath(@$user->receiverLevel->img) }}"
-                                     style="height: 24px;">
-                            </span>
-                    </div>
-
-                </div>
-
-                <div class="agency-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">{{ __('diamonds') }}:</span>
-                        @php
-
-                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->monthly_diamond_received;
-
-                        @endphp
-                        <span class="meta-value">{{ @$user_diamonds }}</span>
-
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('coins')}}:</span>
-                        <span class="meta-value">{{@$user->di }}</span>
-                    </div>
-
-
-                </div>
-            </div>
-            <div class="agency-meta">
-                <div class="meta-item">
-                    <span class="meta-label">{{__('type')}}:</span>
-
-                    {!! @$user->userBadgeTop() !!}
-                </div>
-
-            </div>
-
-            <div class="agency-meta">
-                <div class="meta-item">
-                    <span class="meta-label">{{__('badges')}}:</span>
-                    {!! @$user->userBadge() !!}
-                </div>
-
-            </div>
+        <div class="profile-avatar-wrapper">
+            <img src="{{ $user->display_image }}" alt="Avatar" class="profile-avatar-img">
         </div>
-        <div class="p-3 bg-danger-subtle">
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ url('admin/users/') }}" class="btn btn-light">
+    </div>
+
+    <div class="profile-info-card">
+        <div class="profile-info-header">
+            <div class="profile-name-section">
+                <h1 class="profile-user-name">{{ @$user?->name ?? '' }}</h1>
+                <div class="profile-badges-inline">{!! @$user->userBadgeTop() !!}</div>
+            </div>
+            <div class="profile-actions-top">
+                <a href="{{ url('admin/users/') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
                 @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-
-                    <button type="submit" class="btn btn-info edit_user_item_model_btn">
-                        {{ __('edit') }}
+                    <button type="submit" class="btn btn-primary btn-sm edit_user_item_model_btn">
+                        <i class="fas fa-edit"></i> {{ __('edit') }}
                     </button>
                 @endif
-
                 @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
-                    <button type="button"
-                            class="btn btn-danger remove-bd-btn"
-                            data-id="{{ $user->id }}"
-                            data-url="{{ route('users.remove', $user->id) }}">
+                    <button type="button" class="btn btn-danger btn-sm remove-bd-btn"
+                            data-id="{{ $user->id }}" data-url="{{ route('users.remove', $user->id) }}">
                         {{ __('Remove BD') }}
                     </button>
                 @endif
             </div>
+        </div>
+
+        <div class="profile-meta-row">
+            <div class="profile-meta-chip">
+                <i class="fas fa-id-badge"></i>
+                @if (@$user->uuid == @$user->original_uuid)
+                    <span>{{ @$user->original_uuid }}</span>
+                @else
+                    <span>{{ @$user->original_uuid }}</span>
+                    <span class="meta-sep">|</span>
+                    <span style="opacity:0.7">{{ @$user->uuid_v3 }}</span>
+                @endif
+            </div>
+            <div class="profile-meta-chip">
+                <i class="fas fa-phone"></i>
+                <span>{{ @$user->phone ?? 'N/A' }}</span>
+            </div>
+            <div class="profile-meta-chip">
+                <img src="{{ getImagePath(@$user->country->flag) }}" class="flag-image" alt="flag"
+                     title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
+                <span>{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}</span>
+            </div>
+        </div>
+
+        @php
+            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds : $user->monthly_diamond_received;
+        @endphp
+
+        <div class="profile-stats-row">
+            <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ @$user->salary }}</span>
+                <span class="profile-stat-label">{{ __('Balance') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <img src="{{ getImagePath(@$user->senderLevel->img) }}" style="height: 28px;">
+                <span class="profile-stat-label">{{ __('level') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <img src="{{ getImagePath(@$user->receiverLevel->img) }}" style="height: 28px;">
+                <span class="profile-stat-label">{{ __('Receiver Level') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ @$user_diamonds }}</span>
+                <span class="profile-stat-label">{{ __('diamonds') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ @$user->di }}</span>
+                <span class="profile-stat-label">{{ __('coins') }}</span>
+            </div>
+        </div>
+
+        <div class="profile-badges-row">
+            {!! @$user->userBadge() !!}
         </div>
     </div>
 
@@ -1272,7 +2224,7 @@
                         </thead>
                         @if($packs && $packs->count())
 
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($packs as $index => $pack)
                                 @php
                                     $path = @$pack->ware?->show_img ?? '';
@@ -1368,13 +2320,15 @@
 
 
                                     <td>
-                                        <div class="d-flex">
-                                            <button class="btn btn-info w-100 me-3 edit_item_model_btn"
-                                                    data-id="{{ @$pack->id }}">
-                                                {{ __('dashboard.free') }}
+                                        <div style="display:inline-flex; gap:6px; align-items:center;">
+                                            <button class="btn btn-sm edit_item_model_btn"
+                                                    data-id="{{ @$pack->id }}"
+                                                    style="background:#eef2ff; color:#4f46e5; border:1px solid #c7d2fe; border-radius:8px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                                                <i class="fa fa-clock-o"></i> {{ __('dashboard.free') }}
                                             </button>
-                                            <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
-                                                {{ __('dashboard.delete') }}
+                                            <button class="btn btn-sm delete-btn" data-id="{{ @$pack->id }}"
+                                                    style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                                                <i class="fa fa-trash"></i> {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
                                     </td>
@@ -1425,7 +2379,7 @@
                         </tr>
                         </thead>
                         @if($userVips && $userVips->count())
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($userVips as $index => $userVip)
                                 <tr>
                                     <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
@@ -1485,12 +2439,10 @@
                                     </td>
 
                                     <td>
-                                        <div class="d-flex">
-
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
-                                                {{ __('dashboard.delete') }}
-                                            </button>
-                                        </div>
+                                        <button class="btn btn-sm delete-vip-btn" data-id="{{ @$userVip->id }}"
+                                                style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                                            <i class="fa fa-trash"></i> {{ __('dashboard.delete') }}
+                                        </button>
                                     </td>
 
                                 </tr>
@@ -1591,7 +2543,7 @@
                             </tr>
                             </thead>
                             @if($salaries && $salaries->count())
-                                <tbody style="color: rgb(208, 115, 43);">
+                                <tbody>
                                 @foreach($salaries as $index => $salary)
 
                                     @php
@@ -1835,7 +2787,7 @@
                         </thead>
 
                         @if($walletLogs && $walletLogs->count())
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($walletLogs as $index => $log)
                                 <tr>
                                     <td>{{ $walletLogs->firstItem() + $index }}</td>
@@ -1889,7 +2841,7 @@
                         </thead>
                         @if($badges && $badges->count())
 
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($badges as $index => $badge)
                                 @php
                                     $admin = $badge->admin;
@@ -1927,12 +2879,11 @@
                                     <td>{{ $badge->created_at }}</td>
                                     <td>
                                         @if (($badge->expire == 0) || ($badge->expire >= now()->timestamp) )
-                                            <div class="d-flex">
-                                                <button class="btn btn-danger delete-badge-btn"
-                                                        data-id="{{ @$badge->id }}">
-                                                    {{ __('dashboard.delete') }}
-                                                </button>
-                                            </div>
+                                            <button class="btn btn-sm delete-badge-btn"
+                                                    data-id="{{ @$badge->id }}"
+                                                    style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s;">
+                                                <i class="fa fa-trash"></i> {{ __('dashboard.delete') }}
+                                            </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -2201,7 +3152,7 @@
                             </tr>
                             </thead>
                             @if($usersCoins && $usersCoins->count())
-                                <tbody style="color: rgb(208, 115, 43);">
+                                <tbody>
                                 @foreach($usersCoins as $index => $coin)
                                     <tr>
                                         <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
@@ -2833,6 +3784,44 @@
 
 <script>
 
+
+    // ── Cover Slideshow Auto-Rotation ──
+    var coverCurrentIndex = 0;
+    var coverSlides = document.querySelectorAll('.cover-slide');
+    var coverDots = document.querySelectorAll('.cover-dot');
+    var coverTimer = null;
+
+    function coverGoTo(index) {
+        if (coverSlides.length <= 1) return;
+        coverSlides[coverCurrentIndex].classList.remove('active');
+        if (coverDots.length) coverDots[coverCurrentIndex].classList.remove('active');
+        coverCurrentIndex = (index + coverSlides.length) % coverSlides.length;
+        coverSlides[coverCurrentIndex].classList.add('active');
+        if (coverDots.length) coverDots[coverCurrentIndex].classList.add('active');
+    }
+
+    function coverSlide(direction) {
+        coverGoTo(coverCurrentIndex + direction);
+        coverResetTimer();
+    }
+
+    function coverResetTimer() {
+        if (coverTimer) clearInterval(coverTimer);
+        if (coverSlides.length > 1) {
+            coverTimer = setInterval(function() { coverGoTo(coverCurrentIndex + 1); }, 4000);
+        }
+    }
+
+    // Click on dots
+    coverDots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            coverGoTo(parseInt(this.getAttribute('data-index')));
+            coverResetTimer();
+        });
+    });
+
+    // Start auto-rotation
+    coverResetTimer();
 
     $(document).ready(function () {
 

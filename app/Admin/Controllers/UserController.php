@@ -786,8 +786,8 @@ class UserController extends MainController
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
         $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'received_level', 'phone', 'bio', 'total_diamond_send']);
-
         $with = [
+            'images',
             'profile:id,user_id,avatar,gender',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
             'senderLevel:id,level,type,img',
@@ -805,6 +805,7 @@ class UserController extends MainController
         }
 
         $user = $userQuery->with($with)->findOrFail($id);
+        $covers = $user->images;
 
         // Avoid duplicate wallet calls
         $availableBalance = $curantBalance = wallet_available_by_user($id);
@@ -942,6 +943,7 @@ class UserController extends MainController
      ========================= */
         $data = compact(
             'user',
+            'covers',
             'countries',
             'packs',
             'types',
