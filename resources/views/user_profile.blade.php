@@ -1048,7 +1048,7 @@
         .profile-cover-wrapper {
             position: relative;
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            overflow: visible;
+            overflow: hidden;
             margin-bottom: 0;
         }
 
@@ -1056,7 +1056,6 @@
             position: relative;
             height: 220px;
             overflow: hidden;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         }
 
         .cover-slide {
