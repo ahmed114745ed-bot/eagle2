@@ -323,9 +323,8 @@ class LuckyGiftService
             $number = $number * $count;
             $roomSessionToAdd = $coinsForOwnerTotal * $count;
 
-            // Refresh user to ensure we return the latest balance
-            $user->refresh();
-
+            // Use the current in-memory balance (already updated by the loop)
+            // DO NOT refresh() here as it would discard in-memory changes
             $responseData['session'] = $room->session_string;
             $responseData['user_coins'] = $user->di;
             $responseData['gift_num'] = $receiversCount * $number * $count;
@@ -351,6 +350,11 @@ class LuckyGiftService
             ];
 
             $responseData['total_pk'] = $coinsForReceiver;
+
+            // CRITICAL: Save user balance changes to DB BEFORE returning response
+            // This ensures subsequent requests see the updated balance
+            $user->enableSaving = true;
+            $user->save();
 
             // Dispatch post-processing job ASYNCHRONOUSLY
             // This prevents worker blocking and reduces response time to < 10s
@@ -597,13 +601,14 @@ class LuckyGiftService
         
         $coinsForReceiver = $coinsForReceiver * $count;
         $number = $number * $count;
-        // Refresh user to ensure we return the latest balance
-        $user->refresh();
+
+        // Use the current in-memory balance (already updated by the loop)
+        // DO NOT refresh() here as it would discard in-memory changes
         $newUserCoin = $user->di;
 
         // add session to response
         $responseData['session'] = $room->session_string;
-        $responseData['user_coins'] = $newUserCoin;  // Fixed: use actual updated balance
+        $responseData['user_coins'] = $newUserCoin;
         $responseData['gift_num'] = $receiversCount * $number * $count;
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
@@ -614,6 +619,11 @@ class LuckyGiftService
             'max_single_win' => $max_single_win,
             'total_win_count' => $total_count_win,
         ];
+
+        // CRITICAL: Save user balance changes to DB BEFORE returning response
+        // This ensures subsequent requests see the updated balance
+        $user->enableSaving = true;
+        $user->save();
 
         // Dispatch post-processing job ASYNCHRONOUSLY
         // This prevents worker blocking and reduces response time to < 10s
