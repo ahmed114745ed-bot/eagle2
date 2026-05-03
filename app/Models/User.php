@@ -278,19 +278,19 @@ class User extends Authenticatable
             ->value('monthly_diamond_received') ?? 0;
     }
 
-    public function setMonthlyDiamondReceivedAttribute($value)
+   public function setMonthlyDiamondReceivedAttribute($value)
     {
         $date = \Carbon\Carbon::now(getTimezone());
 
-        $record = $this->monthlyDiamondReceive()
-            ->firstOrNew([
+        $this->monthlyDiamondReceive()->updateOrCreate(
+            [
                 'month' => $date->month,
                 'year'  => $date->year,
-            ]);
+            ],
+            []
+        )->increment('monthly_diamond_received', $value);
 
-        $record->monthly_diamond_received = ($record->monthly_diamond_received ?? 0) + $value;
-
-        $record->save();
+        
     }
 
 
