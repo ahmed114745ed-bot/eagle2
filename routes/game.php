@@ -53,11 +53,11 @@ Route::prefix('utd-game')
 
 
 
-Route::prefix('webhook')->middleware(['auth:sanctum'])
+Route::prefix('webhook')
     ->group(function () {
 
         // Section 1: Generate game launch URL (requires authenticated user)
-        Route::post('url-games', [NewLeaderCCGameController::class, 'urlGames']);
+        Route::post('url-games', [NewLeaderCCGameController::class, 'urlGames'])->middleware(['auth:sanctum']);
 
 
         Route::post('mic-seats', [NewLeaderCCGameController::class, 'usersUpMic']);
