@@ -102,6 +102,8 @@ class ChangeAgencyAction extends RowAction
           
             $userSalaries->update(['is_finished' => 1]);
         }
+        uploadMonthlyDiamondReceive($user->id, 0);
+
     }
 
     private function updatePreviousAgencyJoined(User $user, $agencyId)

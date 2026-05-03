@@ -1032,15 +1032,11 @@ class UserService
     {
         $agencyOwner = $this->agencyRepository->getAgencyByOwnerId($request->user_id);
         if ($agencyOwner) throw new Exception(__('This User is the host Of agency can\'t delete it'));
-        $data = [
-            'agency_id' => $request->agency_id,
-        ];
-        $user = $this->userRepository->update($data, $request->user_id);
-        $userSalary = $this->userSalaryRepository->findByUser($request->user_id);
-        if ($userSalary) {
-            $userSalary->user_agency_id = $request->agency_id;
-            $userSalary->save();
-        }
+
+        $user = $this->userRepository->findOrFail($request->user_id);
+
+        UserHandling::changeUserAgency($user, $request->agency_id);
+
         return true;
     }
 
@@ -1455,4 +1451,5 @@ class UserService
             return $earning->refresh();
         });
     }
+
 }

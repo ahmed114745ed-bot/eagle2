@@ -728,7 +728,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $send_Family,
                 'title' => '',
-                'message' =>  ' {user_name} طلب الاندمام الى عائله',
+                'message' =>  ' {user_name} طلب االانضمام الى عائله',
                 'language' => 'ar'
             ],
             [

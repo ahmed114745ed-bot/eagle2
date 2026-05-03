@@ -1,75 +1,77 @@
 <?php
 
-use App\Models\Room;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Services\UtdService;
-use Illuminate\Http\Request;
-use App\Services\PayPalService;
-use App\Services\CodapayService;
-use Illuminate\Support\Facades\Route;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Http\Controllers\PaySkyController;
-use App\Http\Controllers\StripeController;
-use App\Http\Controllers\PaytabsController;
-use App\Http\Controllers\VersionController;
-use App\Http\Controllers\Api\BadgeController;
-use App\Http\Controllers\Api\V1\PkController;
-use App\Http\Controllers\AppFeatureController;
-use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\CoinController;
-use App\Http\Controllers\Api\V1\GiftController;
-use App\Http\Controllers\Api\V1\HomeController;
-use App\Http\Controllers\Api\V1\PackController;
-use App\Http\Controllers\Api\V1\RoomController;
-use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\HealthCheckController;
-use App\Http\Controllers\NowPaymentsController;
-use App\Http\Controllers\RoomSettingController;
-use App\Http\Controllers\Api\LanguageController;
-use App\Http\Controllers\Api\V1\AgoraController;
-use App\Http\Controllers\Api\V1\ColorController;
-use App\Http\Controllers\Api\V1\EmojiController;
-use App\Http\Controllers\Api\V1\MusicController;
-use App\Http\Controllers\FirebaseAuthController;
-use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V2\AgencyController;
-use App\Http\Controllers\Api\V1\AllGameController;
-use App\Http\Controllers\Api\V1\CountryController;
-use App\Http\Controllers\Api\V1\GiftLogController;
-use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\RankingController;
 use App\Admin\Controllers\AgencySettingsController;
-use App\Http\Controllers\Api\V1\QuestionController;
-use App\Http\Controllers\Api\V1\Ranking2Controller;
-use Modules\Vip\Http\Controllers\Api\VipController;
-use App\Http\Controllers\Api\V1\CommunityController;
-use App\Http\Controllers\Api\V1\GroupChatController;
-use App\Http\Controllers\Api\V1\BackgroundController;
-use App\Http\Controllers\Api\V1\CoinReportController;
-use App\Http\Controllers\Api\V1\ReportUserController;
-use App\Http\Controllers\Api\V1\UploadLinkController;
-use App\Http\Controllers\Api\V1\ChargeLevelController;
-use App\Http\Controllers\Api\V1\GiftCategoryController;
-use App\Http\Controllers\Api\V1\HomeCarouselController;
-use App\Http\Controllers\Api\V1\RoomCategoryController;
-use App\Http\Controllers\Api\V1\Auth\RegisterController;
-use App\Http\Controllers\Api\V1\GooglePaymentController;
-use App\Http\Controllers\Api\V1\PaymentGetWayController;
-use App\Http\Controllers\Api\V1\PaymentMethodController;
-use App\Http\Controllers\Api\V1\StorageUploadController;
-use App\Http\Controllers\Dashboard\StatisticsController;
-use App\Http\Controllers\Api\V1\Room\EnteranceController;
+use App\Helpers\Common;
+use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\FairLuckV5Controller;
+use App\Http\Controllers\Api\LanguageController;
+use App\Http\Controllers\Api\V1\AgoraController;
+use App\Http\Controllers\Api\V1\AllGameController;
+use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\ChargeController;
+use App\Http\Controllers\Api\V1\ChargeLevelController;
+use App\Http\Controllers\Api\V1\CharismaLevelController;
+use App\Http\Controllers\Api\V1\CoinController;
+use App\Http\Controllers\Api\V1\CoinReportController;
+use App\Http\Controllers\Api\V1\ColorController;
+use App\Http\Controllers\Api\V1\CommunityController;
+use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\EmojiController;
+use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V1\GiftCategoryController;
+use App\Http\Controllers\Api\V1\GiftController;
+use App\Http\Controllers\Api\V1\GiftLogController;
+use App\Http\Controllers\Api\V1\GooglePaymentController;
+use App\Http\Controllers\Api\V1\GroupChatController;
+use App\Http\Controllers\Api\V1\HomeCarouselController;
+use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\MusicController;
+use App\Http\Controllers\Api\V1\PackController;
+use App\Http\Controllers\Api\V1\PaymentGetWayController;
+use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\QuestionController;
+use App\Http\Controllers\Api\V1\Ranking2Controller;
+use App\Http\Controllers\Api\V1\RankingController;
+use App\Http\Controllers\Api\V1\ReportUserController;
+use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
+use App\Http\Controllers\Api\V1\RoomCategoryController;
+use App\Http\Controllers\Api\V1\RoomController;
+use App\Http\Controllers\Api\V1\SensitiveWordController;
+use App\Http\Controllers\Api\V1\StorageUploadController;
+use App\Http\Controllers\Api\V1\UploadLinkController;
+use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V2\AgencyController;
+use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\AppFeatureController;
+use App\Http\Controllers\CodapayController;
+use App\Http\Controllers\Dashboard\StatisticsController;
+use App\Http\Controllers\FirebaseAuthController;
+use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\PayPalController;
+use App\Http\Controllers\PaySkyController;
+use App\Http\Controllers\PaytabsController;
+use App\Http\Controllers\RoomSettingController;
+use App\Http\Controllers\StripeController;
+use App\Http\Controllers\UtdController;
+use App\Http\Controllers\VersionController;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Models\Room;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use Modules\Vip\Http\Controllers\Api\VipController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -77,19 +79,19 @@ Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
-    Route::get('test-game-rtm', function () {
-
+    // Protected test route - only accessible in local environment
+    Route::middleware(['local'])->get('test-game-rtm', function () {
         $user = User::find(524);
-        $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
+        $room = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
 
-        $d    = [
+        $d = [
             "messageContent" => [
                 "message" => "SBG",
-                'uImage'  => $user->profile?->avatar ?? 0,
-                'uName'   => $user->name ?? '',
-                'uId'     => $user->id ?? 0,
-                'coins'   => 50000,
-                "gImage"  => @$user->nowGame?->image
+                'uImage' => $user->profile?->avatar ?? 0,
+                'uName' => $user->name ?? '',
+                'uId' => $user->id ?? 0,
+                'coins' => 50000,
+                "gImage" => @$user->nowGame?->image
             ]
         ];
         $json = json_encode($d);
@@ -105,15 +107,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
     Route::get('/fawry/done', [PaymentMethodController::class, 'success']);
     Route::post('utd-paymob-callback', [PaymentMethodController::class, 'utdPayMobCallback'])->middleware('verify.utdFawry.signature');
-    Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
-    Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
-    Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
+    Route::post('paypal-callback', [PayPalController::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
+    Route::get('paypal-return/{orderId}', [PayPalController::class, 'success'])->name('paypal.success');
+    Route::get('paypal-cancel/{orderId}', [PayPalController::class, 'cancel'])->name('paypal.cancel');
 
-    Route::get('codapay-callback', [CodapayService::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
-    Route::get('codapay-success/{id}/{country}', [CodapayService::class, 'success'])->name('codapay.success');
+    Route::get('codapay-callback', [CodapayController::class, 'callback'])->name('codapay.callback')->middleware(['verify.codapay.webhook']);
+    Route::get('codapay-success/{id}/{country}', [CodapayController::class, 'success'])->name('codapay.success');
 
-    Route::get('utd-success/{orderId}', [UtdService::class, 'success'])->name('utd.success');
-    Route::post('utd-callback', [UtdService::class, 'callback'])->middleware(['verify.utdpay.webhook', 'throttle:30,1'])->name('utd.callback');
+    Route::get('utd-success/{orderId}', [UtdController::class, 'success'])->name('utd.success');
+    Route::post('utd-callback', [UtdController::class, 'callback'])->middleware(['verify.utdpay.webhook', 'throttle:30,1'])->name('utd.callback');
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -160,11 +162,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // authorization
     Route::prefix('auth')->group(function () {
         Route::get('all-countries', [CountryController::class, 'index']);
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('recall-account', [AuthController::class, 'recallAccount']);
-        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset']);
-        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode']);
+
+        // Authentication endpoints with strict rate limiting
+        Route::post('register', [AuthController::class, 'register'])->middleware('auth.rate.limit:5,1');
+        Route::post('login', [AuthController::class, 'login'])->middleware('auth.rate.limit:5,1');
+        Route::post('recall-account', [AuthController::class, 'recallAccount'])->middleware('auth.rate.limit:3,1');
+        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset'])->middleware('auth.rate.limit:3,5');
+        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode'])->middleware('auth.rate.limit:5,1');
     });
 
 
@@ -204,6 +208,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
 
             Route::get('zego-credential', [UserController::class, 'zegoCredential']);
+            Route::get('update-zego-agora/v2', [EnteranceController::class, 'libraryAgoraZegoV2']);
 
 
             Route::prefix('config')->group(function () {
@@ -292,13 +297,17 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
             Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
-            Route::post('/firebase/custom-token', [FirebaseAuthController::class, 'loginWithUid']);
+            Route::post('/firebase/custom-token', [FirebaseAuthController::class, 'loginWithUid'])->middleware('auth.rate.limit:10,1');
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
                 Route::get('/payment', [CoinController::class, 'paymentCoin']);
                 Route::get('user-report', [CoinController::class, 'userCoinReport']);
                 Route::get('shipping-agency-report', [CoinController::class, 'shippingAgencyCoinReport']);
+            });
+
+            Route::prefix('charisma-levels')->group(function () {
+                Route::get('/', [CharismaLevelController::class, 'index']);
             });
 
             Route::prefix('users')->group(function () {
@@ -327,10 +336,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
                 Route::get('delete', [UserController::class, 'delete']);
-                Route::post('change_phone', [UserController::class, 'changePhone']);
-                Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
-                Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
-                Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset']);
+                Route::post('change_phone', [UserController::class, 'changePhone'])->middleware('auth.rate.limit:3,5');
+                Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp'])->middleware('auth.rate.limit:3,5');
+                Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp'])->middleware('auth.rate.limit:3,5');
+                Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset'])->middleware('auth.rate.limit:3,5');
             });
 
             Route::prefix('search')->group(function () {
@@ -378,7 +387,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
-
+             Route::get('/bad-words', [SensitiveWordController::class, 'index']);
             Route::prefix('gifts')->withoutMiddleware(['throttle', 'throttle:api'])->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
                 Route::get('/v2', [GiftController::class, 'getByCategory']);
@@ -387,10 +396,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 //todo
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
-                Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post( '/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-                Route::post( '/v7/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);
@@ -641,35 +647,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
 
-            Route::get('/public-test/{ids}', function ($ids) {
-                $title = 'System‑wide Test';
-                $body  = 'This is only a test.';
-
-                $idArray = explode(',', $ids);
-
-                $tokens = User::whereNotNull('notification_id')
-                    ->whereIn('id', $idArray)
-                    ->pluck('notification_id')
-                    ->filter()
-                    ->unique()
-                    ->values()
-                    ->toArray();
-
-                return Common::send_firebase_notification($tokens, $title, $body);
-            });
-
-            Route::get('/send_test_notifications', function () {
-
-                $notificationTokens = DB::table('users')->orderBy('id', 'desc')->limit(100)->pluck('notification_id')->filter()->toArray();
-
-                $title = 'Test';
-                $body = 'Test';
-
-                Common::send_firebase_notification($notificationTokens, $title, $body, '', [], 'vip');
-
-                return "notification sent successfully!";
-            });
-
             Route::get('/unsubscribe-all-from-topic/{topic}', function ($topic) {
                 $tokens = User::whereNotNull('notification_id')
                     ->pluck('notification_id')
@@ -698,37 +675,6 @@ Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController
 
 
 
-Route::get('/public-official-test/{ids}', function ($ids) {
-    $title    = 'System‑wide Test';
-    $body_en  = 'This is only a test.';
-    $body_ar  = 'هذا مجرد اختبار.';
-    $image    = null; // مثال: 'https://example.com/image.jpg'
-    $data     = null; // يجب أن يكون string|null
-    $subType  = null;
-    $type     = 2;
-    $fromUser = null;
-
-    $idArray = explode(',', $ids);
-
-    $users = User::whereIn('id', $idArray)
-        ->get();
-
-    foreach ($users as $user) {
-        Common::sendOfficialMessage(
-            $user->id,
-            $body_en,
-            $title,
-            $type,
-            $subType,
-            $body_ar,
-            $image,
-            $fromUser
-        );
-    }
-
-    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
-});
-
 Route::get('gifts-by-id', function (Request $request) {
     $gift = \App\Models\Gift::find($request->get('id'));
     if (!$gift) {
@@ -747,6 +693,26 @@ Route::get('gifts-by-id', function (Request $request) {
 
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
-Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
-Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
-Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
+
+// Protected dashboard routes with authentication and rate limiting
+Route::middleware(['auth:sanctum', 'throttle:30,1'])->group(function () {
+    Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
+    Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
+    Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
+});
+
+// Queue restart route - protected with authentication, admin check, IP whitelist, and rate limiting
+Route::middleware(['auth:sanctum', 'admin', 'adminIp', 'throttle:3,1'])->get('queue/restart', function () {
+    \Log::warning('Queue restart triggered', [
+        'ip' => request()->ip(),
+        'user_id' => auth()->id(),
+        'time' => now(),
+    ]);
+
+    \Artisan::call('queue:restart');
+    return response()->json([
+        'success' => true,
+        'message' => 'Queue workers restarted successfully',
+        'output' => \Artisan::output()
+    ]);
+});

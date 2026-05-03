@@ -80,8 +80,7 @@ use App\Models\RoomVisitor;
 use App\Models\User;
 use App\Models\UserSallary;
 use Carbon\Carbon;
-use Database\Seeders\FlagSyrianSeeder;
-use Database\Seeders\WebhookGamesSeeder;
+
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -230,39 +229,38 @@ Route::get('/user-salaries-test', function () {
 });
 
 
-Route::get('/clear', function () {
+// Protected cache clearing routes (only accessible in local environment with rate limiting)
+Route::middleware(['local', 'throttle:5,1'])->group(function () {
+    Route::get('/clear', function () {
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('view:clear');
+        Artisan::call('route:clear');
+        Artisan::call('config:cache');
+        Artisan::call('view:cache');
 
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('view:clear');
-    Artisan::call('route:clear');
-    Artisan::call('config:cache');
-    Artisan::call('view:cache');
+        if (strtolower(config('app.env')) == 'production') {
+            Artisan::call('route:cache');
+        }
 
-    if (strtolower(config('app.env')) == 'production') {
-        Artisan::call('route:cache');
-    }
+        return "Cleared!";
+    });
 
-    return "Cleared!";
-});
+    Route::get('/clear-opcache', function () {
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+            return "OPcache cleared!";
+        }
 
-Route::get('/clear-opcache', function () {
+        return "OPcache not enabled.";
+    });
 
-    if (function_exists('opcache_reset')) {
-        opcache_reset();
-        return "OPcache cleared!";
-    }
+    Route::get('/clear-config', function () {
+        Artisan::call('config:clear');
+        Artisan::call('config:cache');
 
-    return "OPcache not enabled.";
-});
-
-Route::get('/clear-config', function () {
-
-    Artisan::call('config:clear');
-    Artisan::call('config:cache');
-
-
-    return "Cleared!";
+        return "Cleared!";
+    });
 });
 
 Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
@@ -273,62 +271,6 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
     return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
-Route::get('/run-seeders', function () {
-
-    // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
-    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
-    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    Artisan::call('db:seed', ['--class' => WebhookGamesSeeder::class]);
-    // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/run-permission', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/run-payments', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PaymentGatewaysSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/devices-token-seeder', function () {
-
-    Artisan::call('db:seed', ['--class' => 'DevicesTokenHistories']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/user-join-agency', function () {
-
-    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
 
 
 Route::get('/count-invite-codes', function () {
@@ -346,12 +288,12 @@ Route::get('/count-invite-codes', function () {
         $accounts = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->get();
 
         $data = [
-            
+
             'count' => $count,
             'accounts' => $accounts,
             'from' => $from->toDateTimeString(),
             'to' => $to->toDateTimeString(),
-            
+
         ];
 
     return response()->json([
@@ -362,46 +304,7 @@ Route::get('/count-invite-codes', function () {
 
 
 
-Route::get('/badge-seeders', function () {
-
-    // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'BadgeImageSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/config-badges-seeder', function () {
-    Artisan::call('db:seed', ['--class' => 'ConfigBadgesSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ ConfigBadgesSeeder executed successfully.'
-    ]);
-});
-
-Route::get('/boom-percentage-seeder', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PercentageBoomSeeder']);
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ PercentageBoomSeeder executed successfully.'
-    ]);
-});
-
-Route::get('/update-flag', function () {
-
-    Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ flag updated successfully.'
-    ]);
-});
-Route::get('/clear_clear', function () {
-
+Route::middleware(['local', 'throttle:5,1'])->get('/clear_clear', function () {
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
     Artisan::call('view:clear');
@@ -409,6 +312,7 @@ Route::get('/clear_clear', function () {
 
     return "Cleared!";
 });
+
 Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
 Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
@@ -418,45 +322,39 @@ Route::get('/count-user-cut-amount', [SalariesController::class, 'countUserCutAm
 
 
 
+// Protected database manipulation routes (only accessible in local environment)
+Route::middleware(['local'])->group(function () {
+    Route::get('/change_agencies_type_test', function () {
+        DB::table('agencies')
+            ->where('type', 0)
+            ->update(['type' => 1]);
 
-Route::get('/seed', function () {
+        return "Done!";
+    });
 
-    Artisan::call('db:seed');
+    Route::get('/change_agencies_type', function () {
+        DB::table('agencies')
+            ->where('Shipping_agency', 1)
+            ->where('Host_agency', 0)
+            ->update(['type' => 2]);
 
-    return "Seeded!";
+        DB::table('agencies')
+            ->where('Host_agency', 1)
+            ->update(['type' => 1]);
+
+        return "agencies types changed successfully!";
+    });
 });
 
-Route::get('/change_agencies_type_test', function () {
+Route::get('admin/auth', function () {
+        return view('checkLogin');
+    })->name('admin/auth');
+        Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
 
-    DB::table('agencies')
-        ->where('type', 0)
-        ->update(['type' => 1]);
-
-    return "Done!";
-});
-
-Route::get('/change_agencies_type', function () {
-
-    DB::table('agencies')
-        ->where('Shipping_agency', 1)
-        ->where('Host_agency', 0)
-        ->update(['type' => 2]);
-
-    DB::table('agencies')
-        ->where('Host_agency', 1)
-        ->update(['type' => 1]);
-
-    return "agencies types changed successfully!";
-});
 
 Route::get('/config_cache', function () {
     return Artisan::call('config:cache');
 });
-
-Route::get('/admin/custom-export-users', [
-    \App\Admin\Controllers\ExportController::class,
-    'usersSallaryTargets'
-])->name('custom-export-users');
 
 Route::get('/admin/agency-export-report', [
     \App\Admin\Controllers\ExportController::class,
@@ -475,27 +373,6 @@ Route::get('delete-account', function () {
 });
 
 Route::get('/', [WelcomeController::class, 'index']);
-
-// Test Pusher Config (for debugging Octane cache issues)
-Route::get('/test-pusher-config', function () {
-    $pusherConfig = getPusherConfig();
-    $laravelConfig = [
-        'key' => config('broadcasting.connections.pusher.key'),
-        'secret' => config('broadcasting.connections.pusher.secret'),
-        'app_id' => config('broadcasting.connections.pusher.app_id'),
-        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-    ];
-
-    return response()->json([
-        'from_helper_function' => $pusherConfig,
-        'from_laravel_config' => $laravelConfig,
-        'cache_info' => [
-            'environment' => app()->environment(),
-            'cache_driver' => config('cache.default'),
-        ],
-        'timestamp' => now()->toDateTimeString(),
-    ], 200, [], JSON_PRETTY_PRINT);
-});
 
 // Override Grid Sortable Route for Octane compatibility (outside admin group)
 Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
@@ -568,18 +445,6 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
 
-        Route::get('/firebase-config', function () {
-            return response()->json([
-                'apiKey' => config('firebase.apiKey'),
-                'authDomain' => config('firebase.authDomain'),
-                'projectId' => config('firebase.projectId'),
-                'storageBucket' => config('firebase.storageBucket'),
-                'messagingSenderId' => config('firebase.messagingSenderId'),
-                'appId' => config('firebase.appId'),
-                'vapidKey' => config('firebase.vapid_key'),
-            ]);
-        });
-
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
     }
 );
@@ -602,7 +467,7 @@ Route::group(
         'as' => 'superadmin.',
     ],
     function () {
-        Route::get('auth/setting', [\Modules\SuperAdmin\Http\Controllers\SuperAdmin\AuthController::class, 'getSetting']);
+        Route::get('auth/setting', [\Modules\SuperAdmin\Http\Controllers\AuthController::class, 'getSetting']);
     }
 );
 
@@ -618,10 +483,7 @@ Route::group([
     ],
     'as' => '',
 ], function () {
-    Route::get('admin/auth', function () {
-        return view('checkLogin');
-    })->name('admin/auth');
-    Route::post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+
 });
 
 Route::get('/update-rooms', function () {
@@ -637,7 +499,7 @@ Route::get('/update-rooms-microphone', function () {
     return "done";
 });
 
-Route::get('/clear-admin-error', function () {
+Route::middleware(['local'])->get('/clear-admin-error', function () {
     session()->forget('error');         // If flashed as 'error'
     session()->forget('danger');        // If flashed as 'danger'
     session()->forget('info');          // If used admin_info()
@@ -654,63 +516,6 @@ Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name(
 
 Route::get('/delete_reward_target', function () {
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
-});
-
-Route::get('/test-fcm/{userid}', function ($userId) {
-    $testToken = 'eLG5n60VSDupE3pAEzjmXo:APA91bEupCIDwqtaS8vwNUyZ-FvOicTqIwZo15INz-cAXFunxijCw2AxqTUSu9UDMB_xrBcTUcFg9NWXgB2n173aZmMqMetdmBO7YSccMSf64JCpJihjeNc';
-
-    $language = 'ar'; // أو 'en'
-    $userLevel = 5; // مستوى افتراضي للاختبار
-
-    // نصوص الإشعار
-    $body_ar = "تهانينا! لقد تم ترقيتك إلى مستوى {$userLevel} كمرسل";
-    $body_en = "Congratulations! You've been upgraded to level {$userLevel} as a sender";
-    $firebaseBody = ($language === 'ar') ? $body_ar : $body_en;
-    $title = ($language === 'ar') ? "ترقية مستوى المرسل" : "Sender level upgraded";
-
-    // صورة افتراضية
-    $icon = "https://example.com/images/vip_badge.png";
-    $data = [
-        'image' => $icon,
-        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-        'type' => 'level_upgrade'
-    ];
-
-    // إرسال الإشعار
-    $result = Common::send_firebase_notification(
-        $testToken,
-        $title,
-        $firebaseBody,
-        icon: $icon,
-        data: $data
-    );
-
-    return response()->json([
-        'success' => true,
-        'message' => 'تم إرسال الإشعار التجريبي',
-        'notification_data' => [
-            'title' => $title,
-            'body' => $firebaseBody,
-            'icon' => $icon,
-            'data' => $data
-        ],
-        'fcm_response' => $result
-    ]);
-});
-
-Route::get('/generate-token/{id}', function ($id) {
-    $user = User::find($id);
-
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
-
-    $token = $user->createToken('api_token')->plainTextToken;
-
-    return response()->json([
-        'token' => $token,
-        'user' => $user
-    ]);
 });
 
 Route::get('/send-notification/{id}', function ($id) {
@@ -732,11 +537,11 @@ Route::get('/send-notification/{id}', function ($id) {
     return "notifaction send successfully!";
 });
 
-Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
-Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
-Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
-Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
-Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
+// Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+// Route::get('/calculate-salary' , [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
+// Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
+// Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
+// Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
 
 
 Route::get('/charge-agency-export-report', [
@@ -1008,15 +813,6 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
 
 Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
-// Gift Logs: fill total column from gifts table (seeder via web)
-Route::get('/gift-logs-fill-total', function () {
-    Artisan::call('db:seed', ['--class' => \Database\Seeders\FillGiftLogsTotalSeeder::class]);
-    return response()->json([
-        'status'  => 'success',
-        'message' => '✅ FillGiftLogsTotalSeeder executed successfully.',
-        'output'  => Artisan::output(),
-    ]);
-});
 
 // Gift Logs: fix total diff (dry-run preview) — queries DB directly for accuracy
 Route::get('/gift-logs-fix-total-diff/preview', function () {
@@ -1088,22 +884,6 @@ Route::get('/gift-logs-fix-total-diff/run', function (\Illuminate\Http\Request $
         'output'  => Artisan::output(),
     ]);
 });
-
-
-Route::get('/test-games', function () {
-
-    $fromDate = request()->get('fromDate');
-    $toDate = request()->get('toDate');
-    $userId = request()->get('userId');
-
-    $records = CoinGameUserAll::where('user_id', $userId)
-        ->whereBetween('created_at', [$fromDate, $toDate])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return $records;
-})->name('test-games');
-
 
 
 
@@ -1197,13 +977,6 @@ Route::get('/week-zone', function () {
 });
 
 
-Route::get('update-country-id', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'CleanUpDuplicateCountriesSeeder',
-    ]);
-
-    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
-});
 
 Route::get('remove-new-country', function () {
     User::where('country_id', 488)->update(['country_id' => null]);
@@ -1214,13 +987,6 @@ Route::get('remove-new-country', function () {
 });
 
 
-Route::get('/fix-agencies-bd', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
-    ]);
-
-    return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
-});
 
 Route::get('assign-super-admin-bd', function () {
     $bds = Bd::whereNull('parent_id')->get();
@@ -1749,7 +1515,6 @@ Route::get('/backfill-roomcup-rewards', function () {
                 'rooms' => [],
             ];
 
-            // chunk(50) بدل get() عشان الذاكرة
             \Modules\RoomBoom\Entities\TotalRoomGift::whereBetween('created_at', [$dayStart, $dayEnd])
                 ->orderBy('id')
                 ->chunk(50, function ($gifts) use (&$dayResults, &$totalProcessed, &$totalRewarded, $dayStart, $dayEnd) {
@@ -2268,10 +2033,6 @@ Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
     return response()->json(['ok' => true]);
 });
 
-Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
-    dd("branch tested successfully!");
-});
-
 Route::get('/octane', function () {
     Cache::store('octane')->clear();
 
@@ -2291,255 +2052,6 @@ Route::get('/sys/signal-flush', function () {
     @touch($triggerFile);
     return response()->json(['status' => 'Signal file created']);
 })->middleware('auth.basic');
-
-Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
-    $secret = config('app.deploy_secret', 'your-secret-token-here');
-
-    $githubSignature = $request->header('X-Hub-Signature-256');
-    $customToken = $request->header('X-Deploy-Token') ?? $request->input('token');
-
-    $authorized = false;
-
-    if ($githubSignature) {
-        $payload = $request->getContent();
-        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
-        $authorized = hash_equals($expectedSignature, $githubSignature);
-    }
-
-    if (!$authorized && $customToken === $secret) {
-        $authorized = true;
-    }
-
-    if (!$authorized) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    $output = [];
-
-    try {
-        $output['git_pull'] = shell_exec('cd ' . base_path() . ' && git pull 2>&1');
-
-        $output['composer'] = shell_exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1');
-
-        \Artisan::call('config:cache');
-        $output['config_cache'] = \Artisan::output();
-
-        \Artisan::call('route:cache');
-        $output['route_cache'] = \Artisan::output();
-
-        \Artisan::call('view:cache');
-        $output['view_cache'] = \Artisan::output();
-
-        \Artisan::call('octane:reload');
-        $output['octane_reload'] = \Artisan::output();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Deployment completed successfully',
-            'output' => $output,
-            'time' => now()->toDateTimeString(),
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'output' => $output,
-        ], 500);
-    }
-})->name('deploy.webhook');
-
-Route::get('/quick-reload/{token}', function ($token) {
-    $secret = config('app.deploy_secret', 'your-secret-token-here');
-
-    if ($token !== $secret) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    \Artisan::call('octane:reload');
-    \Artisan::call('cache:clear');
-
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Octane reloaded & cache cleared',
-        'time' => now()->toDateTimeString(),
-    ]);
-});
-
-
-
-Route::get('/debug/force-pusher-refresh', function () {
-    $timestamp = now()->toDateTimeString();
-
-    Cache::forget('pusher_config');
-    Cache::forget('all_configs');
-
-    Cache::put('pusher_config_changed', $timestamp, 3600);
-
-    \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
-
-    Artisan::call('queue:restart');
-    $queueRestartOutput = Artisan::output();
-
-    $octaneReloadOutput = '';
-    try {
-        Artisan::call('octane:reload');
-        $octaneReloadOutput = Artisan::output();
-    } catch (\Throwable $e) {
-        $octaneReloadOutput = 'Not running or error: ' . $e->getMessage();
-    }
-
-    $freshConfig = getPusherConfig();
-    return response()->json([
-        'success' => true,
-        'message' => '🔄 Pusher config refresh triggered!',
-        'actions_taken' => [
-            '1_cache_cleared' => true,
-            '2_flag_set' => Cache::has('pusher_config_changed'),
-            '3_broadcaster_purged' => true,
-            '4_queue_restart' => trim($queueRestartOutput) ?: 'Signal sent',
-            '5_octane_reload' => trim($octaneReloadOutput) ?: 'Signal sent',
-        ],
-        'fresh_config' => [
-            'app_id' => $freshConfig['app_id'],
-            'app_cluster' => $freshConfig['app_cluster'],
-        ],
-        'next_steps' => [
-            'Supervisor will restart queue workers automatically',
-            'Octane workers will reload automatically',
-            'New broadcasts will use fresh DB config',
-        ],
-        'timestamp' => $timestamp,
-    ], 200, [], JSON_PRETTY_PRINT);
-});
-
-
-
-// ⭐ Test GiftBannerEvent broadcast (via Queue)
-Route::get('/debug/test-gift-banner', function () {
-    $dbConfig = getPusherConfig();
-
-    // Create test gift data
-    $testGift = [
-        'id' => rand(1000, 9999),
-        'name' => 'Test Gift 🎁',
-        'sender' => [
-            'id' => 1,
-            'name' => 'Test Sender',
-        ],
-        'receiver' => [
-            'id' => 2,
-            'name' => 'Test Receiver',
-        ],
-        'count' => 1,
-        'timestamp' => now()->toDateTimeString(),
-        'debug_info' => [
-            'pusher_app_id' => $dbConfig['app_id'],
-            'pusher_cluster' => $dbConfig['app_cluster'],
-        ],
-    ];
-
-    try {
-        // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
-        event(new \App\Events\GiftBannerEvent($testGift));
-
-        return response()->json([
-            'success' => true,
-            'message' => '🎁 GiftBannerEvent dispatched to Queue!',
-            'event' => [
-                'class' => \App\Events\GiftBannerEvent::class,
-                'channel' => 'gift_banner',
-                'broadcast_as' => 'gift_banner',
-                'queue' => 'heavyProcessing (or similar)',
-            ],
-            'test_data' => $testGift,
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
-            ],
-            'next_steps' => [
-                '1. Check Pusher Debug Console for the event',
-                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i gift',
-                '3. If not received, run: /debug/force-pusher-refresh',
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ], 200, [], JSON_PRETTY_PRINT);
-    } catch (\Throwable $e) {
-        // Log::error('GiftBannerEvent failed', [
-        //     'error' => $e->getMessage(),
-        //     'trace' => $e->getTraceAsString(),
-        // ]);
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ], 500, [], JSON_PRETTY_PRINT);
-    }
-});
-
-
-// ⭐ Test UserOnline broadcast (via Queue - PresenceChannel)
-Route::get('/debug/test-user-online', function () {
-    $dbConfig = getPusherConfig();
-
-    // Get a test user (first user or create mock)
-    $userId = request()->get('user_id', 1);
-    $user = \App\Models\User::find($userId);
-
-    if (!$user) {
-        return response()->json([
-            'success' => false,
-            'error' => "User with ID {$userId} not found",
-            'hint' => 'Add ?user_id=123 to specify a different user',
-        ], 404, [], JSON_PRETTY_PRINT);
-    }
-
-    try {
-        // Dispatch UserOnline event (goes through Queue because it implements ShouldBroadcast)
-        event(new \App\Events\UserOnline($user));
-
-        return response()->json([
-            'success' => true,
-            'message' => '👤 UserOnline event dispatched to Queue!',
-            'event' => [
-                'class' => \App\Events\UserOnline::class,
-                'channel' => 'presence-enter-user-room',
-                'channel_type' => 'PresenceChannel',
-            ],
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'uuid' => $user->uuid ?? null,
-            ],
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
-            ],
-            'next_steps' => [
-                '1. Check Pusher Debug Console for the event',
-                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i "UserOnline"',
-                '3. If not received, run: /debug/force-pusher-refresh',
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ], 200, [], JSON_PRETTY_PRINT);
-    } catch (\Throwable $e) {
-        // Log::error('UserOnline failed', [
-        //     'error' => $e->getMessage(),
-        //     'user_id' => $user->id,
-        //     'trace' => $e->getTraceAsString(),
-        // ]);
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ], 500, [], JSON_PRETTY_PRINT);
-    }
-});
 
 Route::get('/time-start-week', function () {
     $date = '2026-02-15';
@@ -2734,28 +2246,6 @@ Route::get('/fix-paid-usd', function () {
 
     return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
 });
-Route::get('make-seeders-for-new-update', function () {
-    $seeder = new \Database\Seeders\WebhookGamesSeeder();
-    $seeder->run();
-
-    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
-Route::get('make-seeders-for-permission', function () {
-    $seeder = new \Database\Seeders\PermissionTypeSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
-Route::get('git-update', function () {
-    
-
-    return 'executed successfully!';
-});
 
 
 Route::get('/queue-control/{queue}', function ($queue) {
@@ -2867,882 +2357,12 @@ Route::get('/fix-gift-logs/run', function () {
         AND gl.giftPrice = gl.giftNum * g.price
     ");
 
-  /*  return response()->json([
-        'message' => "Fixed {$totalUpdated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
-        'records_updated' => $totalUpdated,
-    ]);*/
-});
-
-Route::get('/system-merge-only-duplicates', function (\Illuminate\Http\Request $request) {
-    $shouldExecute = $request->query('fix') == '1';
-    $targetMonth = 3;
-    $targetYear = 2026;
-    $thresholdDate = "2026-03-19 00:00:00";
-
-    $startOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->startOfMonth();
-    $endOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->endOfMonth();
-
-    $report = [
-        'mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
-        'total_users_with_gifts_deleted' => 0,
-        'total_merged_records' => 0,
-        'deleted_gift_count' => 0,
-    ];
-
-    try {
-        DB::transaction(function () use ($shouldExecute, $targetMonth, $targetYear, $startOfMonth, $endOfMonth, $thresholdDate, &$report) {
-
-            // 1. جلب كل المستخدمين الذين لديهم سجلات رواتب هذا الشهر
-            $userIds = DB::table('user_sallaries')
-                ->where('month', $targetMonth)
-                ->where('year', $targetYear)
-                ->distinct()
-                ->pluck('user_id');
-
-            foreach ($userIds as $userId) {
-                $user = DB::table('users')->where('id', $userId)->first();
-                if (!$user || !$user->agency_id) continue;
-
-                $currentAgencyId = $user->agency_id;
-
-                // حساب تاريخ الانضمام
-                $joinRequest = DB::table('agency_join_requests')
-                    ->where('user_id', $userId)
-                    ->where('agency_id', $currentAgencyId)
-                    ->where('status', 1)
-                    ->orderBy('created_at', 'desc')
-                    ->first();
-
-                $joinTime = $joinRequest ? $joinRequest->created_at : $startOfMonth->toDateTimeString();
-                $effectiveStartTime = max($joinTime, $startOfMonth->toDateTimeString());
-
-                // --- [تعديل جوهري]: حذف الهدايا لكل مستخدم سواء عنده مكرر أو لا ---
-                if ($shouldExecute) {
-                    $deleted = DB::table('gift_logs')
-                        ->where('receiver_id', $userId)
-                        ->where('agency_id', $currentAgencyId)
-                        ->where('source_type', 'gift')
-                        ->where('created_at', '>=', $thresholdDate) // من يوم 19
-                        ->delete();
-
-                    if ($deleted > 0) {
-                        $report['deleted_gift_count'] += $deleted;
-                        $report['total_users_with_gifts_deleted']++;
-                    }
-                }
-
-                // 2. معالجة دمج المكررات (كما هي)
-                $currentAgencyRecords = DB::table('user_sallaries')
-                    ->where('user_id', $userId)
-                    ->where('month', $targetMonth)
-                    ->where('year', $targetYear)
-                    ->where('user_agency_id', $currentAgencyId)
-                    ->where('created_at', '>=', $effectiveStartTime)
-                    ->get();
-
-                // حساب الماس الحقيقي (بدون الـ gift المحذوف)
-                $realDiamonds = DB::table('gift_logs')
-                    ->where('receiver_id', $userId)
-                    ->where('agency_id', $currentAgencyId)
-                    ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
-                    ->where(function($q) use ($thresholdDate) {
-                        $q->where(function($sub) {
-                            $sub->where('source_type', '!=', 'gift')->orWhereNull('source_type');
-                        })->orWhere(function($sub) use ($thresholdDate) {
-                            $sub->where('source_type', 'gift')->where('created_at', '<', $thresholdDate);
-                        });
-                    })->sum('giftPrice');
-
-                // إذا وجد مكرر ندمج، وإذا لم يوجد نحدث الماس فقط
-                $primaryRecord = $currentAgencyRecords->first();
-                if ($primaryRecord) {
-                    if ($shouldExecute) {
-                        $updateData = [
-                            'achieved_diamond' => $realDiamonds,
-                        ];
-
-                        if ($currentAgencyRecords->count() > 1) {
-                            $duplicateIds = $currentAgencyRecords->slice(1)->pluck('id')->toArray();
-                            $updateData['cut_amount'] = $currentAgencyRecords->sum('cut_amount');
-
-                            DB::table('user_sallaries')->whereIn('id', $duplicateIds)->delete();
-                            $report['total_merged_records'] += count($duplicateIds);
-                        }
-
-                        DB::table('user_sallaries')->where('id', $primaryRecord->id)->update($updateData);
-
-                        DB::table('monthly_diamond_receives')->updateOrInsert(
-                            ['user_id' => $userId, 'month' => $targetMonth, 'year' => $targetYear],
-                            ['monthly_diamond_received' => $realDiamonds]
-                        );
-                        DB::table('users')->where('id', $userId)->update(['salary_is_updated' => 1]);
-
-                    }
-                }
-            }
-        });
-
-        if ($shouldExecute) {
-            app(\App\Http\Controllers\DiamondController::class)->calculateSalary();
-        }
-
-    } catch (\Exception $e) {
-        return "خطأ: " . $e->getMessage();
-    }
-
-    return "✅ تمت المهمة بنجاح! <br> عدد الهدايا المحذوفة: " . $report['deleted_gift_count'] . " لعدد " . $report['total_users_with_gifts_deleted'] . " مستخدمين.";
-});
-
-Route::get('v2/system-merge-only-duplicates', function (\Illuminate\Http\Request $request) {
-    $shouldExecute = $request->query('fix') == '1';
-    $targetMonth = 3;
-    $targetYear = 2026;
-    $thresholdDate = "2026-03-19 00:00:00";
-
-    $startOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->startOfMonth();
-    $endOfMonth = \Carbon\Carbon::create($targetYear, $targetMonth, 1)->endOfMonth();
-
-       DB::table('gift_logs')
-            ->where('source_type', 'gift')
-            ->where('created_at', '>=', $thresholdDate)
-            ->delete();
-
-    $report = [
-        'mode' => $shouldExecute ? 'LIVE EXECUTION' : 'PREVIEW MODE',
-        'gifts_to_delete' => 0,
-        'users_count' => 0,
-        'users_details' => [],
-    ];
-
-    // عدد الهدايا اللي هتتحذف
-    $report['gifts_to_delete'] = DB::table('gift_logs')
-        ->where('source_type', 'gift')
-        ->where('created_at', '>=', $thresholdDate)
-        ->count();
-
-    $users = DB::table('users')->where('agency_id', '!=', null)->where('agency_id', '>', 0)->get();
-    $report['users_count'] = $users->count();
-
-    foreach ($users as $user) {
-        if (!$user || !$user->agency_id) continue;
-
-        $currentAgencyId = $user->agency_id;
-
-        $joinRequest = DB::table('agency_join_requests')
-            ->where('user_id', $user->id)
-            ->where('agency_id', $currentAgencyId)
-            ->where('status', 1)
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        $joinTime = $joinRequest ? $joinRequest->created_at : $startOfMonth->toDateTimeString();
-        $effectiveStartTime = max($joinTime, $startOfMonth->toDateTimeString());
-
-        // الماس بدون الهدايا اللي هتتحذف
-        $realDiamonds = DB::table('gift_logs')
-            ->where('receiver_id', $user->id)
-            ->where('agency_id', $currentAgencyId)
-            ->whereBetween('created_at', [$effectiveStartTime, $endOfMonth])
-            ->sum('giftPrice');
-
-        $totalCutAmount = DB::table('user_sallaries')
-            ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
-             ->where('user_agency_id', $currentAgencyId)
-            ->sum('cut_amount');
-
-        $salaryRecordsCount = DB::table('user_sallaries')
-            ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
-             ->where('user_agency_id', $currentAgencyId)
-            ->count();
-
-        $currentDiamond = DB::table('monthly_diamond_receives')
-            ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
-            ->value('monthly_diamond_received');
-
-        // نضيف في التقرير لو فيه تغيير
-        if ($salaryRecordsCount > 1 || $currentDiamond != $realDiamonds) {
-            $report['users_details'][] = [
-                'user_id' => $user->id,
-                'agency_id' => $currentAgencyId,
-                'salary_records' => $salaryRecordsCount,
-                'total_cut' => $totalCutAmount,
-                'current_diamond' => $currentDiamond,
-                'real_diamond' => $realDiamonds,
-            ];
-        }
-
-        if ($shouldExecute) {
-            DB::table('monthly_diamond_receives')->updateOrInsert(
-                ['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear],
-                ['monthly_diamond_received' => $realDiamonds]
-            );
-
-            DB::table('user_sallaries')
-                ->where(['user_id' => $user->id, 'month' => $targetMonth, 'year' => $targetYear])
-                ->delete();
-
-            DB::table('user_sallaries')->insert([
-                'user_id' => $user->id,
-                'month' => $targetMonth,
-                'year' => $targetYear,
-                'user_agency_id' => $currentAgencyId,
-                'achieved_diamond' => $realDiamonds,
-                'cut_amount' => $totalCutAmount,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            DB::table('users')->where('id', $user->id)->update(['salary_is_updated' => 1]);
-        }
-    }
-
-    return response()->json($report);
-});
-
-Route::get('/direct-recovery', function (Request $request) {
-    $isLive = $request->query('fix') == '1';
-    $zonesCoins = (int) DB::table('settings')->where('key', 'zones_coins')->value('value') ?? 30000;
-    $bugDate = '2026-03-01';
-    $targetMonth = 3;
-    $targetYear = 2026;
-
-    $report = [
-        'mode' => $isLive ? 'LIVE EXECUTION' : 'PREVIEW MODE',
-        'timestamp' => now()->toDateTimeString(),
-        'zones_coins' => $zonesCoins,
-        'bug_date' => $bugDate,
-        'summary' => [
-            'total_debtors' => 0,
-            'total_debt_usd' => 0,
-            'total_debt_coins' => 0,
-            'total_recovered_coins' => 0,
-            'total_unrecoverable_coins' => 0,
-            'agencies_affected' => 0,
-            'users_affected' => 0,
-        ],
-        'debtors' => [],
-        'errors' => [],
-    ];
-
-    DB::beginTransaction();
-
-    try {
-        // ================================================================
-        // Step 1: Fetch all debtors (users with negative salary balance)
-        // ================================================================
-        $debtors = DB::select("
-            SELECT user_id,
-                   SUM(sallary) as total_earned,
-                   SUM(cut_amount) as total_cut,
-                   SUM(sallary) - SUM(cut_amount) as total_debt
-            FROM user_sallaries
-            WHERE month = ? AND year = ?
-            GROUP BY user_id
-            HAVING total_debt < 0
-            ORDER BY total_debt ASC
-        ", [$targetMonth, $targetYear]);
-
-        $report['summary']['total_debtors'] = count($debtors);
-
-        // ================================================================
-        // Step 2: Process each debtor
-        // ================================================================
-        foreach ($debtors as $debtor) {
-            $debtUsd = abs($debtor->total_debt);
-            $debtCoins = (int) ($debtUsd * $zonesCoins);
-            $remaining = $debtCoins;
-
-            $debtorDetail = [
-                'user_id' => $debtor->user_id,
-                'total_earned_usd' => round($debtor->total_earned, 2),
-                'total_cut_usd' => round($debtor->total_cut, 2),
-                'debt_usd' => round($debtUsd, 2),
-                'debt_coins' => $debtCoins,
-                'traces' => [],
-                'recovered_coins' => 0,
-                'unrecoverable_coins' => 0,
-                'status' => 'pending',
-            ];
-
-            $report['summary']['total_debt_usd'] += $debtUsd;
-            $report['summary']['total_debt_coins'] += $debtCoins;
-
-            // Get user info
-            $user = DB::table('users')->where('id', $debtor->user_id)->first();
-            $debtorDetail['user_name'] = $user->name ?? 'N/A';
-            $debtorDetail['user_uuid'] = $user->uuid ?? 'N/A';
-
-            // ================================================================
-            // Scenario A: Trace charges to agencies
-            // ================================================================
-            $agencyCharges = DB::table('charges')
-                ->where('charger_id', $debtor->user_id)
-                ->where('charger_type', 'user')
-                ->where('user_type', 'agency')
-                ->where('created_at', '>=', $bugDate)
-                ->orderByDesc('amount')
-                ->get();
-
-            foreach ($agencyCharges as $charge) {
-                if ($remaining <= 0) break;
-
-                $agencyId = $charge->user_id;
-                $chargeAmount = (int) $charge->amount;
-                $deductAmount = min($remaining, $chargeAmount);
-
-                // Get agency info
-                $agency = DB::table('agencies')->where('id', $agencyId)->first();
-                if (!$agency) continue;
-
-                $agencyCoins = (int) $agency->coins;
-                $canDeduct = min($deductAmount, $agencyCoins);
-
-                $trace = [
-                    'type' => 'agency_charge',
-                    'target_id' => $agencyId,
-                    'target_name' => $agency->name ?? 'N/A',
-                    'charge_amount' => $chargeAmount,
-                    'requested_deduction' => $deductAmount,
-                    'agency_balance_before' => $agencyCoins,
-                    'deducted_amount' => $canDeduct,
-                    'agency_balance_after' => $agencyCoins - $canDeduct,
-                    'status' => $canDeduct >= $deductAmount ? 'success' : 'insufficient_balance',
-                ];
-
-                if ($isLive && $canDeduct > 0) {
-                    DB::statement("
-                        UPDATE agencies
-                        SET coins = CAST(coins AS SIGNED) - ?
-                        WHERE id = ?
-                    ", [$canDeduct, $agencyId]);
-                }
-
-                $remaining -= $canDeduct;
-                $debtorDetail['recovered_coins'] += $canDeduct;
-                $debtorDetail['traces'][] = $trace;
-
-                if ($canDeduct < $deductAmount) {
-                    $report['summary']['agencies_affected']++;
-                }
-            }
-
-            // ================================================================
-            // Scenario B: Trace gifts to users
-            // ================================================================
-            if ($remaining > 0) {
-                // 1. جلب المستلمين والمبالغ التي حصلوا عليها من المديون
-                $gifts = DB::select("
-                    SELECT receiver_id, SUM(giftPrice) as total_sent
-                    FROM gift_logs
-                    WHERE sender_id = ?
-                    AND created_at >= ?
-                    AND created_at < '2026-04-01'
-                    GROUP BY receiver_id
-                    ORDER BY total_sent DESC
-                    LIMIT 100
-                ", [$debtor->user_id, $bugDate]);
-
-                foreach ($gifts as $gift) {
-                    if ($remaining <= 0) break;
-
-                    $receiverId = $gift->receiver_id;
-                    $giftAmount = (int) $gift->total_sent;
-                    $deductAmount = min($remaining, $giftAmount);
-
-                    // 2. البحث في جدول الماسات الشهرية للمستلم
-                    $monthlyRecord = DB::table('monthly_diamond_receives')
-                        ->where('user_id', $receiverId)
-                        ->where('month', $targetMonth)
-                        ->where('year', $targetYear)
-                        ->first();
-
-                    if (!$monthlyRecord) continue;
-
-                    // الرصيد القابل للخصم هو ما استلمه فعلياً هذا الشهر
-                    $currentMonthlyDiamonds = (int) $monthlyRecord->monthly_diamond_received;
-                    $canDeduct = min($deductAmount, $currentMonthlyDiamonds);
-
-                    $trace = [
-                        'type' => 'monthly_gift_recovery',
-                        'target_id' => $receiverId,
-                        'target_name' => DB::table('users')->where('id', $receiverId)->value('name') ?? 'N/A',
-                        'gift_amount' => $giftAmount,
-                        'requested_deduction' => $deductAmount,
-                        'monthly_diamonds_before' => $currentMonthlyDiamonds,
-                        'deducted_amount' => $canDeduct,
-                        'status' => $canDeduct >= $deductAmount ? 'success' : 'partial_from_monthly',
-                    ];
-
-                    if ($isLive && $canDeduct > 0) {
-                        // 3. التحديث الفعلي في جدول الماسات الشهرية وليس جدول المستخدمين
-                        DB::table('monthly_diamond_receives')
-                            ->where('id', $monthlyRecord->id)
-                            ->update([
-                                'monthly_diamond_received' => DB::raw("monthly_diamond_received - $canDeduct")
-                            ]);
-                    }
-
-                    $remaining -= $canDeduct;
-                    $debtorDetail['recovered_coins'] += $canDeduct;
-                    $debtorDetail['traces'][] = $trace;
-                }
-            }
-
-            // ================================================================
-            // Scenario C: Trace charges to other users
-            // ================================================================
-            if ($remaining > 0) {
-                $userCharges = DB::table('charges')
-                    ->where('charger_id', $debtor->user_id)
-                    ->where('charger_type', 'user')
-                    ->where('user_type', 'user')
-                    ->where('created_at', '>=', $bugDate)
-                    ->orderByDesc('amount')
-                    ->get();
-
-                foreach ($userCharges as $charge) {
-                    if ($remaining <= 0) break;
-
-                    $chargeRecipientId = $charge->user_id;
-                    $chargeAmount = (int) $charge->amount;
-                    $deductAmount = min($remaining, $chargeAmount);
-
-                    // Get recipient info
-                    $recipient = DB::table('users')->where('id', $chargeRecipientId)->first();
-                    if (!$recipient) continue;
-
-                    $recipientDi = (int) $recipient->di;
-                    $canDeduct = min($deductAmount, $recipientDi);
-
-                    $trace = [
-                        'type' => 'charge_to_user',
-                        'target_id' => $chargeRecipientId,
-                        'target_name' => $recipient->name ?? 'N/A',
-                        'charge_amount' => $chargeAmount,
-                        'requested_deduction' => $deductAmount,
-                        'recipient_di_before' => $recipientDi,
-                        'deducted_amount' => $canDeduct,
-                        'recipient_di_after' => $recipientDi - $canDeduct,
-                        'status' => $canDeduct >= $deductAmount ? 'success' : 'insufficient_balance',
-                    ];
-
-                    if ($isLive && $canDeduct > 0) {
-                        DB::statement("
-                            UPDATE users
-                            SET di = CAST(di AS SIGNED) - ?
-                            WHERE id = ?
-                        ", [$canDeduct, $chargeRecipientId]);
-                    }
-
-                    $remaining -= $canDeduct;
-                    $debtorDetail['recovered_coins'] += $canDeduct;
-                    $debtorDetail['traces'][] = $trace;
-
-                    if ($canDeduct < $deductAmount) {
-                        $report['summary']['users_affected']++;
-                    }
-                }
-            }
-
-            // ================================================================
-            // Final Status: Update debtor's salary record with recovered amount
-            // ================================================================
-            $debtorDetail['unrecoverable_coins'] = $remaining;
-            $debtorDetail['recovery_rate'] = $debtCoins > 0
-                ? round(($debtorDetail['recovered_coins'] / $debtCoins) * 100, 2)
-                : 0;
-            $debtorDetail['status'] = $remaining <= 0 ? 'fully_recovered' : 'partially_recovered';
-
-            // Convert recovered coins to USD for cut_amount update
-            // cut_amount should be in USD, not coins
-            $recoveredUsd = $debtorDetail['recovered_coins'] > 0
-                ? round($debtorDetail['recovered_coins'] / $zonesCoins, 2)
-                : 0;
-
-            // Update the debtor's salary record to increase cut_amount by recovered USD amount
-            // This shows that the recovered amount has been deducted from their debt
-            if ($isLive && $recoveredUsd > 0) {
-                DB::table('user_sallaries')
-                    ->where('user_id', $debtor->user_id)
-                    ->where('month', $targetMonth)
-                    ->where('year', $targetYear)
-                    ->update([
-                        'cut_amount' => DB::raw("CAST(cut_amount AS SIGNED) + " . $recoveredUsd),
-                    ]);
-            }
-
-            $report['summary']['total_recovered_coins'] += $debtorDetail['recovered_coins'];
-            $report['summary']['total_unrecoverable_coins'] += $remaining;
-
-            $report['debtors'][] = $debtorDetail;
-        }
-        app(\App\Http\Controllers\DiamondController::class)->calculateSalary();
-
-
-        // Commit or rollback
-        if ($isLive) {
-            DB::commit();
-            $report['execution_status'] = 'COMMITTED';
-        } else {
-            DB::rollBack();
-            $report['execution_status'] = 'ROLLED BACK (Preview Mode)';
-        }
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        $report['execution_status'] = 'ERROR - ROLLED BACK';
-        $report['errors'][] = [
-            'message' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ];
-    }
-
-    // ================================================================
-    // Generate HTML Report (RTL)
-    // ================================================================
-    $html = '<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الاسترجاع المباشر - Direct Recovery System</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .header {
-            background: linear-gradient(135deg, #0f3460 0%, #533483 100%);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        }
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #00d9ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .header .meta { color: #aaa; font-size: 0.9em; }
-        .mode-badge {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-        .mode-preview { background: #f39c12; color: #000; }
-        .mode-live { background: #e74c3c; color: #fff; }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .summary-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .summary-card .value {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .summary-card .label { color: #888; font-size: 0.9em; }
-        .value-danger { color: #e74c3c; }
-        .value-success { color: #2ecc71; }
-        .value-warning { color: #f39c12; }
-        .value-info { color: #3498db; }
-
-        .section {
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .section h2 {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            font-size: 0.9em;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: right;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        th {
-            background: rgba(0,0,0,0.3);
-            font-weight: 600;
-            color: #00d9ff;
-        }
-        tr:hover { background: rgba(255,255,255,0.05); }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-        .status-success { background: #2ecc71; color: #000; }
-        .status-partial { background: #f39c12; color: #000; }
-        .status-insufficient { background: #e74c3c; color: #fff; }
-
-        .action-btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-top: 20px;
-            margin-left: 10px;
-        }
-        .action-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .download-btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-top: 20px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 30px;
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .trace-item {
-            background: rgba(255,255,255,0.02);
-            border-right: 3px solid #00d9ff;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-        }
-
-        .trace-item .type { color: #00d9ff; font-weight: bold; }
-        .trace-item .status { margin-top: 8px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>💰 نظام الاسترجاع المباشر</h1>
-            <div class="meta">
-                <p>الفترة المستهدفة: <strong>' . $bugDate . ' إلى 2026-03-31</strong></p>
-                <p>وقت التقرير: <strong>' . $report['timestamp'] . '</strong></p>
-                <p>معدل التحويل (zones_coins): <strong>' . number_format($zonesCoins) . '</strong></p>
-            </div>
-            <span class="mode-badge ' . ($isLive ? 'mode-live' : 'mode-preview') . '">
-                ' . ($isLive ? '⚡ وضع التنفيذ الفعلي' : '👁️ وضع المعاينة') . '
-            </span>
-        </div>
-
-        <div class="summary-grid">
-            <div class="summary-card">
-                <div class="value value-warning">' . number_format($report['summary']['total_debtors']) . '</div>
-                <div class="label">👥 إجمالي المدينين</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-danger">$' . number_format($report['summary']['total_debt_usd'], 2) . '</div>
-                <div class="label">💸 إجمالي الديون (USD)</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-success">' . number_format($report['summary']['total_recovered_coins']) . '</div>
-                <div class="label">✅ الماسات المستردة</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-danger">' . number_format($report['summary']['total_unrecoverable_coins']) . '</div>
-                <div class="label">❌ الماسات غير المستردة</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-info">' . number_format($report['summary']['agencies_affected']) . '</div>
-                <div class="label">🏢 الوكالات المتأثرة</div>
-            </div>
-            <div class="summary-card">
-                <div class="value value-info">' . number_format($report['summary']['users_affected']) . '</div>
-                <div class="label">👤 المستخدمون المتأثرون</div>
-            </div>
-        </div>';
-
-    // Debtors Table
-    if (!empty($report['debtors'])) {
-        $html .= '
-        <div class="section">
-            <h2>📊 تفاصيل المدينين</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>معرف المستخدم</th>
-                        <th>الاسم</th>
-                        <th>الدين (USD)</th>
-                        <th>الدين (ماسات)</th>
-                        <th>المستردة</th>
-                        <th>غير المستردة</th>
-                        <th>نسبة الاسترجاع</th>
-                        <th>الحالة</th>
-                    </tr>
-                </thead>
-                <tbody>';
-
-        $i = 0;
-        foreach ($report['debtors'] as $debtor) {
-            $i++;
-            $statusClass = $debtor['status'] == 'fully_recovered' ? 'status-success' : 'status-partial';
-            $html .= '
-                    <tr>
-                        <td>' . $i . '</td>
-                        <td>' . $debtor['user_id'] . '</td>
-                        <td>' . htmlspecialchars($debtor['user_name']) . '</td>
-                        <td style="color: #e74c3c;">$' . number_format($debtor['debt_usd'], 2) . '</td>
-                        <td>' . number_format($debtor['debt_coins']) . '</td>
-                        <td style="color: #2ecc71;">' . number_format($debtor['recovered_coins']) . '</td>
-                        <td style="color: #e74c3c;">' . number_format($debtor['unrecoverable_coins']) . '</td>
-                        <td>' . $debtor['recovery_rate'] . '%</td>
-                        <td><span class="status-badge ' . $statusClass . '">' . $debtor['status'] . '</span></td>
-                    </tr>';
-        }
-
-        $html .= '
-                </tbody>
-            </table>
-        </div>';
-
-        // Detailed Traces
-        $html .= '
-        <div class="section">
-            <h2>🔍 تفاصيل التتبع</h2>';
-
-        foreach ($report['debtors'] as $debtor) {
-            if (empty($debtor['traces'])) continue;
-
-            $html .= '
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: #00d9ff; margin-bottom: 15px;">المستخدم: ' . htmlspecialchars($debtor['user_name']) . ' (ID: ' . $debtor['user_id'] . ')</h3>';
-
-            foreach ($debtor['traces'] as $trace) {
-                $statusColor = $trace['status'] == 'success' ? '#2ecc71' : '#e74c3c';
-                $html .= '
-                <div class="trace-item">
-                    <div class="type">📍 ' . ucfirst(str_replace('_', ' ', $trace['type'])) . '</div>
-                    <div style="margin-top: 8px; color: #aaa;">
-                        <p>الهدف: <strong>' . htmlspecialchars($trace['target_name']) . '</strong> (ID: ' . $trace['target_id'] . ')</p>
-                        <p>المبلغ المطلوب: <strong>' . number_format($trace['requested_deduction']) . '</strong> ماسة</p>
-                        <p>المبلغ المستردة: <strong style="color: #2ecc71;">' . number_format($trace['deducted_amount']) . '</strong> ماسة</p>
-                        <p>الحالة: <span style="color: ' . $statusColor . '; font-weight: bold;">' . $trace['status'] . '</span></p>
-                    </div>
-                </div>';
-            }
-
-            $html .= '</div>';
-        }
-
-        $html .= '</div>';
-    }
-
-    // Action Buttons
-    if (!$isLive) {
-        $html .= '
-        <div style="text-align: center; margin: 40px 0;">
-            <p style="color: #f39c12; font-size: 1.2em; margin-bottom: 20px;">
-                ⚠️ هذا تقرير معاينة فقط. لم يتم تنفيذ أي تغييرات.
-            </p>
-            <a href="?fix=1" class="action-btn" onclick="return confirm(\'هل أنت متأكد من تنفيذ الاسترجاع؟ هذا الإجراء لا يمكن التراجع عنه!\');">
-                🚀 تنفيذ الاسترجاع الآن
-            </a>
-            <a href="/direct-recovery/export" class="download-btn">
-                📥 تحميل التقرير (CSV)
-            </a>
-        </div>';
-    } else {
-        $html .= '
-        <div style="text-align: center; margin: 40px 0;">
-            <p style="color: #2ecc71; font-size: 1.5em;">
-                ✅ تم تنفيذ الاسترجاع بنجاح!
-            </p>
-            <a href="/direct-recovery/export" class="download-btn">
-                📥 تحميل التقرير (CSV)
-            </a>
-        </div>';
-    }
-
-    $html .= '
-        <div class="footer">
-            <p>Direct Recovery System v1.0</p>
-            <p>Generated at ' . $report['timestamp'] . '</p>
-        </div>
-    </div>
-</body>
-</html>';
-
-    return response($html)->header('Content-Type', 'text/html; charset=utf-8');
-});
-
-// ================================================================
-// Direct Recovery V2 - Dispatch Job
-// ================================================================
-Route::get('/direct-recovery-v2', function () {
-    \App\Jobs\DirectRecoveryJob::dispatch();
     return response()->json([
-        'status' => 'dispatched',
-        'message' => 'DirectRecoveryJob has been queued. Check public/direct_recovery_report.html for the report.',
+        'message' => "Fixed {$updated} records. giftPrice, receiver_obtain, app_profit_coins updated to 10%.",
+        'records_updated' => $updated,
     ]);
 });
 
-Route::get('/agency-recovery', function () {
-    \App\Jobs\AgencyRecoveryJob::dispatch();
-    return response()->json([
-        'status' => 'dispatched',
-        'message' => 'AgencyRecoveryJob has been queued. Check public/agency_recovery_report.html for the report.',
-    ]);
-});
-
-Route::get('/recovery-cycle', function () {
-    \App\Jobs\RecoveryCycleJob::dispatch();
-    return response()->json([
-        'status' => 'dispatched',
-        'message' => 'RecoveryCycleJob started. Check public/recovery_cycle_report.html for progress.',
-    ]);
-});
-
-
-Route::get('test-push-succ', function () {
-
-    dd('test successfully!---------');
-});
 
 Route::get('/fix-charges-usd', function () {
     $dryRun = request()->get('fix') != '1';
@@ -3893,28 +2513,6 @@ Route::get('/fix-charges-usd', function () {
         'stats' => $stats,
         'samples' => $samples,
     ], 200, [], JSON_PRETTY_PRINT);
-});
-
-
-
-Route::get('/d', function () {
-    dd('test push2 successfully!--------- shami');
-    return response()->json([
-        'status' => 'ok',
-    ]);
-});
-Route::get('/master-recovery', function () {
-    // Delete old reports
-    @unlink(public_path('master_recovery_report.html'));
-    @unlink(public_path('master_recovery_deductions.csv'));
-    @unlink(public_path('direct_recovery_report.html'));
-    @unlink(public_path('agency_recovery_report.html'));
-
-    \App\Jobs\MasterRecoveryJob::dispatch();
-    return response()->json([
-        'status' => 'dispatched',
-        'message' => 'MasterRecoveryJob started. Check /master_recovery_report.html for progress, /master_recovery_deductions.csv for the deductions sheet.',
-    ]);
 });
 
 

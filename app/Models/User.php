@@ -100,6 +100,7 @@ class User extends Authenticatable
         'sender_level' => 'integer',
         'charge_status' => 'boolean',
         'transfer_salary' => 'boolean',
+        'salary_is_updated' => 'boolean',
     ];
 
     protected $appends = [
@@ -511,6 +512,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserEarnInvitation::class, 'parent_id');
     }
+
+    public function userCodeInvite()
+    {
+        return $this->hasMany(UserCodeInvitation::class, 'user_id');
+    }
+
 
     public function scopeWithoutAppends($query)
     {

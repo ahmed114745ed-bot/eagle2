@@ -3,7 +3,6 @@
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AdminAuthController;
-use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
@@ -32,6 +31,7 @@ use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\CharismaLevelController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\CoinGameUserAllController;
 use App\Admin\Controllers\CoinLogReportsController;
@@ -87,6 +87,7 @@ use App\Admin\Controllers\ReportController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ResetUserSalaryController;
+use App\Admin\Controllers\RewardWinnerGameController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomBackgroundManagerController;
 use App\Admin\Controllers\RoomController;
@@ -97,10 +98,10 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\RouteController;
 use App\Admin\Controllers\ScaffoldController;
+use App\Admin\Controllers\SensitiveWordController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
-use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\SuperPackageController;
@@ -118,6 +119,7 @@ use App\Admin\Controllers\UsersChargeController;
 use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\UserWalletController;
+use App\Admin\Controllers\UtdPayGatewayController;
 use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\WalletTransactionController;
@@ -162,7 +164,7 @@ Route::group([
     ],
 ], function () {
 
-    Route::get('change-password-view', [App\Admin\Controllers\AuthController::class, 'changePasswordView'])
+    Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
         ->name('admin.change-password-view');
 });
 
@@ -193,18 +195,30 @@ Route::group(
 
 Admin::routes();
 
-// Override the vendor LogController with our custom one that shows login tracking columns
-Route::group([
-    'prefix' => config('admin.route.prefix'),
-    'middleware' => config('admin.route.middleware'),
-], function () {
-    Route::resource('auth/logs', \App\Admin\Controllers\LogController::class, ['only' => ['index', 'destroy']])->names('admin.auth.logs');
-});
-
 $routes = collect(app('router')->getRoutes()->get());
 $filtered = $routes->reject(function ($route) {
     return str_starts_with($route->getName() ?? '', 'admin.auth.roles.');
 });
+
+
+Route::group(
+    [
+        'prefix'        => config('admin.route.prefix'),
+        'namespace'     => config('admin.route.namespace'),
+        'middleware'    => [
+            'web',
+            'admin.auth',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as'            => config('admin.route.prefix') . '.',
+    ],
+    function () {
+
+        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
+    }
+);
 
 
 
@@ -347,7 +361,6 @@ Route::group(
         Route::resource('all-games', AllGameController::class);
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
-        Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         Route::resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {
             Route::get('/', [BlackListUsersController::class, 'index']);
@@ -372,7 +385,7 @@ Route::group(
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
         Route::put('wares/toggle-enable/{id}', [WareController::class, 'toggleEnable']);
-
+        Route::resource('percentage-games', PercentageGameController::class);
         Route::resource('test-pusher', TestPusherController::class);
         Route::resource('report_user', ReportUserController::class)->middleware('web-agency-feature');
         // Route::resource('coupons', 'CouponController');
@@ -447,6 +460,7 @@ Route::group(
         ])->middleware('web-agency-feature');
         // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
+        Route::resource('sensitive-words', SensitiveWordController::class);
 
 
         Route::get('/soon', 'AllStatisticController@index2');
@@ -668,8 +682,6 @@ Route::group(
         Route::get('admin-rewards-histories', [SuperAdminRewardControllerHistory::class, 'index']);
         Route::get('admin-rewards-histories/{id}', [SuperAdminRewardControllerHistory::class, 'getRewards']);
 
-        Route::get('charges-reports-stats', [ChargeReportController::class, 'getStats'])->name('charge-reports.stats');
-
         Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
         Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
 
@@ -678,6 +690,7 @@ Route::group(
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
         Route::get('invitation-code', [InvitationSettingsController::class, 'inviteCode']);
+        Route::resource('reward-winner-games', RewardWinnerGameController::class);
 
 
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
@@ -719,11 +732,10 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-        Route::resource('charges-settings', ChargesSettingController::class);
+        Route::resource('charisma-levels', CharismaLevelController::class);
         Route::resource('room-settings', RoomSettingsController::class);
-
+        Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
-        Route::post('save-settings', [SettingController::class, 'saveSettings'])->name('saveSettings');
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
 
@@ -750,8 +762,10 @@ Route::group(
         Route::resource('coin-game-users-reports', CoinGameUserAllController::class);
         Route::get('coin-game-users/details', [CoinGameUserAllController::class, 'index_details']);
         Route::get('coin-game-users/show', [CoinGameUserAllController::class, 'showAll']);
+        Route::get('coin-game-users/round-orders', [CoinGameUserAllController::class, 'roundOrders']);
         Route::get('coin-game-users/ajax', [CoinGameUserAllController::class, 'ajaxTotals'])
             ->name('coin-game-users.ajax');
+        Route::get('coin-game-users/details-ajax', [CoinGameUserAllController::class, 'ajaxDetailsTotals']);
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
@@ -800,12 +814,12 @@ Route::group(
             Route::get('/gift-test', [GiftLogTestController::class, 'showSendGift']);
             Route::post('/gift-test', [GiftLogTestController::class, 'sendGift']);
 
-            Route::get('/pusher-test/{id}', function ($id) {
-                $user = \App\Models\User::findOrFail($id);
-                $token = $user->createToken('broadcast')->plainTextToken;
-
-                return view('test.test-pusher', compact('token'));
-            });
+//            Route::get('/pusher-test/{id}', function ($id) {
+//                $user = \App\Models\User::findOrFail($id);
+//                $token = $user->createToken('broadcast')->plainTextToken;
+//
+//                return view('test.test-pusher', compact('token'));
+//            });
         });
 
         Route::prefix('notifications')->group(function () {
@@ -823,7 +837,6 @@ Route::group(
         });
         Route::get('fairluck', [FairLuckSettingsController::class, 'index'])->name('fairluck.index');
         Route::post('fairluck/save-settings', [FairLuckSettingsController::class, 'saveSettings'])->name('fairluck.save-settings');
-        Route::post('app-settings/update', [\App\Admin\Controllers\ChargesSettingController::class, 'saveSettings'])->name('admin.app.settings.update');
     }
 );
 
@@ -833,10 +846,4 @@ Route::group([
     'middleware' => ['web', 'admin'],
 ], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
-
 });
-
-    Route::get('init-coin-rates', [\App\Admin\Controllers\SettingController::class, 'initCoinRates']);
-    Route::get('backfill-charges', [\App\Admin\Controllers\SettingController::class, 'backfillCharges'])->name('admin.backfill-charges');
-    Route::get('init-user-coin-rates', [\App\Admin\Controllers\SettingController::class, 'initUserCoinRates'])->name('admin.init-user-coin-rates');
-    

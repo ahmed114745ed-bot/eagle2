@@ -67,6 +67,12 @@ class ChargeController extends Controller
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
+        $limitWithdrawal = (int) (Common::getSettingValue('limit_daily_withdrawal') ?? 1);
+
+        if(floatval($request->usd) < $limitWithdrawal){
+            return Common::apiResponse(0, __('api_responses.min_withdrawal_amount', ['amount' => $limitWithdrawal]), 422);
+        }
+
         $types = [
             'user' => [$this, 'chargeToUser'],
             'agency' => [$this, 'chargeToAgency']
@@ -114,7 +120,7 @@ class ChargeController extends Controller
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
 
-        Common::checkUserAgencyFrozen($from);
+        // Common::checkUserAgencyFrozen($from);
 
         if ($to->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
@@ -126,13 +132,13 @@ class ChargeController extends Controller
             return Common::apiResponse(0, 'This value is not allowed', 422);
         }
 
-        
-        $rate = \App\Services\CoinRateService::getUserTransferRate();
+        if (!$usd)  return Common::apiResponse(0, 'not found', 404);
+
+        $rate = Common::getCoinsValue('user_coins');
 
         if (!$rate)  return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
-        
-        $calc = \App\Services\ChargeCalculationService::calculate($usd, 'usd', $rate);
-        $coins = $calc['total_coins'];
+
+        $coins = $usd * $rate;
 
         $totalSalary = $from->salary;
         $roomSalary = $from->ownerRoom?->salary;
@@ -144,7 +150,7 @@ class ChargeController extends Controller
         DB::beginTransaction();
         try {
 
-            $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd, $calc);
+            $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd);
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
 
             DB::commit();
@@ -189,9 +195,9 @@ class ChargeController extends Controller
         if ($from->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
-
+        Log::info("ChargeToAgency: User {$from->id} is trying to charge agency {$toId} with amount {$request->amount}");
         Common::checkUserAgencyFrozen($from);
-
+        Log::info("ChargeToAgency: User {$from->id} passed agency frozen check");
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
 
@@ -214,13 +220,12 @@ class ChargeController extends Controller
         if (!$usd || !$to) {
             return Common::apiResponse(0, 'not found', 404);
         }
-        $rate = \App\Services\CoinRateService::getUserTransferRate();
+        $rate = Common::getCoinsValue('shipping_coins');
 
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
         }
-        $calc = \App\Services\ChargeCalculationService::calculate($usd, 'usd', $rate);
-        $coins = $calc['total_coins'];
+        $coins = $usd * $rate;
         $totalSalary = $from->salary;
         $roomSalary = $from->ownerRoom?->salary;
         if ($totalSalary < $usd) {
@@ -230,10 +235,10 @@ class ChargeController extends Controller
         }
         DB::beginTransaction();
         try {
-            $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd, $calc);
+            $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
 
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
-
+            CustomNotification::hostSalary($to, $from,  $usd);
             DB::commit();
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
@@ -301,6 +306,14 @@ class ChargeController extends Controller
         if ($stop_all_charge === 1) {
             return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
         }
+
+        $limitWithdrawal = (int) (Common::getSettingValue('limit_daily_withdrawal') ?? 1);
+
+        if($request->amount < $limitWithdrawal){
+            return Common::apiResponse(0, __('api_responses.min_withdrawal_amount', ['amount' => $limitWithdrawal]), 422);
+        }
+
+         
         $types = [
             'user' => [$this, 'ChargeDollarForOwner_to_users'],
             'agency' => [$this, 'ChargeDollarForOwner_to_agency']
@@ -476,7 +489,7 @@ class ChargeController extends Controller
         $from = $request->user();
         if (!$request->id || !$request->amount) return Common::apiResponse(false, 'missing_params');
         if ($request->amount < 0) return Common::apiResponse(false, 'value not allow');
-      
+
         $toUser = null;
         $to = null;
 
@@ -505,7 +518,7 @@ class ChargeController extends Controller
                 return Common::apiResponse(0, __('api_responses.charge_agent_to_agent_disabled'), 403);
             }
         }
-        
+
 
         try {
             $this->chargeService->chargeAgencyToAnother($from, $request);

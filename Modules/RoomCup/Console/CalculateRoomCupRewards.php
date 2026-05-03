@@ -231,6 +231,9 @@ class CalculateRoomCupRewards extends Command
                 }
             }
         }
+
+        // Reset session for all rooms that had gifts in this period
+        $this->resetRoomSessions();
     }
 
     private function logStart(Carbon $start, Carbon $end): void
@@ -331,9 +334,7 @@ class CalculateRoomCupRewards extends Command
                 }
 
                 RoomCupReward::create($reward);
-                $room->update(['session' => null]);
 
-                info($room->session);
                 $amountBefore = Common::getCurrentBalance($reward['user_id']);
                 $this->line("🪙 Adding {$reward['amount']} to user {$reward['user_id']} (balance before: {$amountBefore})");
                 $this->logRoomCup("Adding reward to user {$reward['user_id']}: Amount={$reward['amount']}, Balance before={$amountBefore}");
@@ -424,5 +425,10 @@ class CalculateRoomCupRewards extends Command
         }
         $str = implode(",", $adm_arr);
         $room->update(['room_admin' => $str]);
+    }
+
+    private function resetRoomSessions(): void
+    {
+         Room::update(['session' => null]);
     }
 }

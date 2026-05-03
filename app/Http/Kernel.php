@@ -8,6 +8,7 @@ use App\Http\Middleware\AuthenticateWeb;
 use App\Http\Middleware\CheckLoginAdmin;
 use App\Http\Middleware\AgencyMiddleware;
 use App\Http\Middleware\AdminIpMiddleware;
+use App\Http\Middleware\DisablePjaxForOctane;
 use Modules\SuperAdmin\Http\Middleware\PreviewSuperAdmin;
 use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
@@ -39,6 +40,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\OctaneCacheClearing::class,
         \App\Http\Middleware\ForcePusherRefresh::class,
         \App\Http\Middleware\RefreshThemeConfig::class,
+        DisablePjaxForOctane::class,
+        \App\Http\Middleware\SecurityHeaders::class,
     ];
 
     /**
@@ -139,5 +142,6 @@ class Kernel extends HttpKernel
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
         'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
         'verify.utd.signature' => \App\Http\Middleware\VerifyUtdSignature::class,
+        'auth.rate.limit' => \App\Http\Middleware\AuthRateLimiter::class,
     ];
 }

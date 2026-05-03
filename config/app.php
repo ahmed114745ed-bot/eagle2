@@ -231,7 +231,8 @@ return [
         App\Providers\ConfigServiceProvider::class,
         //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
+        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
+        App\Providers\SanctumServiceProvider::class
 
     ],
 

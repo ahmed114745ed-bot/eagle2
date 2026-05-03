@@ -9,10 +9,53 @@ use Illuminate\Support\Facades\Log;
 trait DashBoardTrait {
 
     function store_img(UploadedFile $file, $folder = null ){
-        $name =  Str::random(25);
+        // Check if file is valid
+        if (!$file->isValid()) {
+            throw new \Exception('Invalid file upload');
+        }
+
+        // Security: Validate file size (10MB max)
+        $maxSize = 10485760; // 10MB
+        if ($file->getSize() > $maxSize) {
+            throw new \Exception('File size exceeds maximum allowed size of 10MB');
+        }
+
+        // Security: Validate MIME type (images only)
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $mimeType = $file->getMimeType();
+
+        if (!in_array($mimeType, $allowedMimes)) {
+            throw new \Exception('Invalid file type. Only images (JPG, PNG, GIF, WebP) are allowed');
+        }
+
+        // Security: Map MIME type to safe extension (don't trust client extension)
+        $safeExtension = match ($mimeType) {
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            default => throw new \Exception('Unsupported image format'),
+        };
+
+        // Log suspicious activity if client extension doesn't match
+        $clientExtension = strtolower($file->getClientOriginalExtension());
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if ($clientExtension && !in_array($clientExtension, $allowedExtensions)) {
+            Log::warning('Suspicious file extension detected in dashboard upload', [
+                'client_extension' => $clientExtension,
+                'mime_type' => $mimeType,
+                'safe_extension' => $safeExtension,
+                'ip' => request()->ip()
+            ]);
+        }
+
+        // Generate secure filename using hash
+        $hash = hash('sha256', Str::random(40) . microtime(true));
+        $name = substr($hash, 0, 32);
+
         return $file->storeAs(
             $folder,
-            $name . "." . $file->getClientOriginalExtension(),
+            $name . "." . $safeExtension,
             'gcs'
         );
     }
@@ -115,12 +158,53 @@ trait DashBoardTrait {
 
     protected function store_music($file, $folder)
     {
-        
-        $name =  Str::random(25);
+        // Check if file is valid
+        if (!$file->isValid()) {
+            throw new \Exception('Invalid file upload');
+        }
+
+        // Security: Validate file size (50MB max for audio)
+        $maxSize = 52428800; // 50MB
+        if ($file->getSize() > $maxSize) {
+            throw new \Exception('File size exceeds maximum allowed size of 50MB');
+        }
+
+        // Security: Validate MIME type (audio only)
+        $allowedMimes = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/x-m4a'];
+        $mimeType = $file->getMimeType();
+
+        if (!in_array($mimeType, $allowedMimes)) {
+            throw new \Exception('Invalid file type. Only audio files (MP3, WAV, OGG, M4A) are allowed');
+        }
+
+        // Security: Map MIME type to safe extension
+        $safeExtension = match ($mimeType) {
+            'audio/mpeg', 'audio/mp3' => 'mp3',
+            'audio/wav' => 'wav',
+            'audio/ogg' => 'ogg',
+            'audio/mp4', 'audio/x-m4a' => 'm4a',
+            default => throw new \Exception('Unsupported audio format'),
+        };
+
+        // Log suspicious activity if client extension doesn't match
+        $clientExtension = strtolower($file->getClientOriginalExtension());
+        $allowedExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
+        if ($clientExtension && !in_array($clientExtension, $allowedExtensions)) {
+            Log::warning('Suspicious file extension detected in music upload', [
+                'client_extension' => $clientExtension,
+                'mime_type' => $mimeType,
+                'safe_extension' => $safeExtension,
+                'ip' => request()->ip()
+            ]);
+        }
+
+        // Generate secure filename using hash
+        $hash = hash('sha256', Str::random(40) . microtime(true));
+        $name = substr($hash, 0, 32);
 
         return $file->storeAs(
             $folder,
-            $name . "." . $file->getClientOriginalExtension()
+            $name . "." . $safeExtension
         );
     }
 }

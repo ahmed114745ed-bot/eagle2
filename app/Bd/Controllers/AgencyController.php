@@ -316,13 +316,19 @@ class AgencyController extends MainController
     }
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
     {
+        // Whitelist allowed column names to prevent SQL injection
+        $allowedColumns = ['receiver_id', 'sender_id', 'roomowner_id', 'user_id'];
+        if (!in_array($keywords, $allowedColumns, true)) {
+            throw new \InvalidArgumentException('Invalid column name');
+        }
+
         return GiftLog::query()
             ->whereHas($rel)
             ->with($rel)
             ->where('agency_id', $agencyId)
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->selectRaw("SUM(giftPrice) as exp, $keywords")
+            ->selectRaw("SUM(giftPrice) as exp, " . $keywords)
             ->groupBy($keywords)
             ->havingRaw("exp > 0")
             ->orderByRaw("exp DESC")
@@ -796,19 +802,19 @@ class AgencyController extends MainController
                 $agencyId = $form->model()->id;
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
 
-                $user->update([
-                    'type_user' => 0,
-                    'agency_id' => 0,
-                    'is_host' => 0,
-                ]);
-                uploadMonthlyDiamondReceive($originalOwnerId, 0);
+                // Use centralized method to remove old owner
+                \App\Facades\UserHandling::changeUserAgency($user, 0, 0);
+                $user->is_host = 0;
+                $user->save();
             }
 
-            User::where('id', intval($appOwnerId))->update([
-                'type_user' => 2,
-                'is_host' => 1,
-                'agency_id' => $form->model()->id,
-            ]);
+            $newOwner = User::find(intval($appOwnerId));
+            if ($newOwner) {
+                // Use centralized method to assign new owner
+                \App\Facades\UserHandling::changeUserAgency($newOwner, $form->model()->id, 2);
+                $newOwner->is_host = 1;
+                $newOwner->save();
+            }
         });
     }
 
@@ -817,11 +823,13 @@ class AgencyController extends MainController
         $form->saved(function (Form $form) {
             $appOwnerId = intval($form->model()->app_owner_id);
 
-            User::where('id', $appOwnerId)->update([
-                'type_user' => 2,
-                'is_host' => 1,
-                'agency_id' => $form->model()->id,
-            ]);
+            $owner = User::find($appOwnerId);
+            if ($owner) {
+                // Use centralized method to assign owner
+                \App\Facades\UserHandling::changeUserAgency($owner, $form->model()->id, 2);
+                $owner->is_host = 1;
+                $owner->save();
+            }
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,

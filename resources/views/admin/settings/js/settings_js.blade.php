@@ -402,6 +402,47 @@ window.toggleBackgroundInput = function() {
     document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
 }
 
+window.toggleBodyThemeSection = function(isChecked) {
+    var group = document.getElementById('background_body_theme_group');
+    if (group) {
+        group.style.display = isChecked ? 'block' : 'none';
+    }
+    // If unchecked, also hide the sub-fields
+    if (!isChecked) {
+        var colorGroup = document.getElementById('background_body_theme_color_group');
+        var imageGroup = document.getElementById('background_body_theme_image_group');
+        var gradientGroup = document.getElementById('background_body_theme_gradient_group');
+        if (colorGroup) colorGroup.style.display = 'none';
+        if (imageGroup) imageGroup.style.display = 'none';
+        if (gradientGroup) gradientGroup.style.display = 'none';
+    } else {
+        // If checked, show the correct sub-field based on current select value
+        toggleBodyThemeBackgroundInput();
+    }
+}
+
+window.toggleBodyThemeBackgroundInput = function() {
+    var select = document.getElementById('background_body_theme');
+    if (!select) return;
+    var type = select.value;
+    var colorGroup = document.getElementById('background_body_theme_color_group');
+    var imageGroup = document.getElementById('background_body_theme_image_group');
+    var gradientGroup = document.getElementById('background_body_theme_gradient_group');
+    if (colorGroup) colorGroup.style.display = type === 'color' ? 'block' : 'none';
+    if (imageGroup) imageGroup.style.display = type === 'image' ? 'block' : 'none';
+    if (gradientGroup) gradientGroup.style.display = type === 'gradient' ? 'block' : 'none';
+}
+
+// Listen for bootstrap-switch changes on is_body_theme_enabled
+$(document).on('switchChange.bootstrapSwitch', 'input[name="is_body_theme_enabled"]', function(event, state) {
+    toggleBodyThemeSection(state);
+});
+
+// Also listen for regular change event as fallback
+$(document).on('change', 'input[name="is_body_theme_enabled"]', function() {
+    toggleBodyThemeSection(this.checked);
+});
+
 window.toggleBrandBackgroundInput = function() {
     const type = document.getElementById("brand_background_type").value;
     document.getElementById("brand_background_color_group").style.display = type === "color" ? "block" : "none";

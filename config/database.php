@@ -58,9 +58,19 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // ✅ الجزء 1: تقليل Pool Size
+            // تحديد عدد الـ connections في كل Octane container
+            // بدل unlimited connections، نحدد maximum 10 connections
+            // 5 containers × 10 = 50 max connections (بدل 130)
+            'pool' => [
+                'min' => env('DB_POOL_MIN', 2),
+                'max' => env('DB_POOL_MAX', 10),
+            ],
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
                 PDO::ATTR_TIMEOUT => env('DB_CONNECTION_TIMEOUT', 10),
+                // ✅ Heartbeat to detect stale connections
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION sql_mode='STRICT_TRANS_TABLES'",
             ]) : [],
         ],
 
@@ -133,6 +143,9 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_DB', '0'),
+            'read_timeout' => 2.0,
+            'timeout' => 2.0,
+            'retry_after' => 5000,
         ],
 
         'cache' => [
@@ -141,6 +154,18 @@ return [
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
+            'read_timeout' => 2.0,
+            'timeout' => 2.0,
+        ],
+
+        'session' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_SESSION_DB', '2'),
+            'read_timeout' => 2.0,
+            'timeout' => 2.0,
         ],
 
     ],

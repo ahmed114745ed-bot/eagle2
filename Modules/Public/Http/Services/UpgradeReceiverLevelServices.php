@@ -20,7 +20,7 @@ class UpgradeReceiverLevelServices
     {
         $config = Common::getConfig('upload_moment') ?? 0;
         $this->addDiamond($user, $diamonds, $config);
-        $this->earnedDiamond($user->id,$diamonds,'upload_moment',$config);
+        $this->earnedDiamond($user->id, $diamonds, 'upload_moment', $config);
     }
 
     public function  addDiamond(User &$user, $diamonds, $config)
@@ -30,14 +30,14 @@ class UpgradeReceiverLevelServices
         $this->checkUserLevelUpgrated($user);
         $user->save();
     }
-    public function earnedDiamond($userId,$diamond,$actionType,$config,$type=null)
+    public function earnedDiamond($userId, $diamond, $actionType, $config, $type = null)
     {
-        $diamonds = $diamond ==null? $config:$diamond;
+        $diamonds = $diamond == null ? $config : $diamond;
         EarnedDiamond::create([
-            'action_mode' =>$actionType,
-            'diamonds' =>$diamonds,
-            'type'=>$type,
-            'user_id'=>$userId,
+            'action_mode' => $actionType,
+            'diamonds' => $diamonds,
+            'type' => $type,
+            'user_id' => $userId,
         ]);
     }
 
@@ -47,24 +47,23 @@ class UpgradeReceiverLevelServices
         $subReceivedLevel = $user->sub_receiver_level;
 
         $receiverLevel = (new UpdateUserWhenSendGift())->getReceiverLevel($user->total_received_diamonds, 0, $subReceivedLevel);
-   
-       
+
+
         $user->received_level = $receiverLevel;
 
 
         if ($receiverLevel > $oldReceiverLevel) {
             $hadNotRewards = $this->hadNotRewards($user->id, $user->total_received_level);
             if ($hadNotRewards) {
-                dispatch(new RewardWinnerLevel($user->id,$receiverLevel,1))->onQueue('level_rewards');
+                dispatch(new RewardWinnerLevel($user->id, $receiverLevel, 1))->onQueue('level_rewards');
             }
         }
     }
 
     private function hadNotRewards(int $userId, int $senderLevel)
     {
-        return !WinnerLevelInterval::query()->whereHas('levelInterval',function ($query)  {
+        return !WinnerLevelInterval::query()->whereHas('levelInterval', function ($query) {
             $query->where('type', 1);
         })->where('min', '<=', $senderLevel)->where('max', '>=', $senderLevel)->where('user_id', $userId)->exists();
     }
-
 }

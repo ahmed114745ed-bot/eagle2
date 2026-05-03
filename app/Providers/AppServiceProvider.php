@@ -247,6 +247,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Config::set([
+            'charisma.format' => (bool) ($settings['charisma_format'] ?? false),
             'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
             'themes.secondaryColor' => $settings['secondary_color'] ?? '#1A1A1A',
             'themes.textPrimaryColor' => $settings['text_primary_color'] ?? '#fdf8f8',

@@ -70,7 +70,9 @@ class LeaderCCgameController extends Controller
                 'avatar'   => getImagePath($user->profile->avatar),
                 'coin'     => $user->di,
                 'vipLevel' => $user->UserVip->level ?? 0,
-               
+                'water' => @$user->gamePercentage->percentageGame->percentage_game ?? 2.00,
+
+
             ]);
         });
     }
@@ -110,7 +112,7 @@ class LeaderCCgameController extends Controller
                     return $this->json(4004, 'Insufficient game coins');
                 }
 
-
+                $amountBefore = $user->di;
                 $user->di = $type == 1 ? ($user->di - $coin) : ($user->di + $coin);
                 $user->save();
                 $amount = abs($coin);
@@ -118,11 +120,11 @@ class LeaderCCgameController extends Controller
                 UserCoinLogHelper::logByType(
                     $user->id,
                     $sign * $amount,
-                    $user->di,
+                    $amountBefore,
                     UserCoinLogType::COIN_GAME,
                     null,
                 );
-                
+
                 DB::table('coin_game_users')->insert([
                     'user_id'          => $user->id,
                     'coins'            => $coin,
@@ -196,6 +198,7 @@ class LeaderCCgameController extends Controller
                 if (!$user) return $this->json(4005, 'user not found');
 
                 $coin = abs((int)$request->coin);
+                $amountBefore = $user->di;
                 $user->di += $coin;
                 $user->save();
                 $amount = abs($coin);
@@ -203,7 +206,7 @@ class LeaderCCgameController extends Controller
                 UserCoinLogHelper::logByType(
                     $user->id,
                     $sign * $amount,
-                    $user->di,
+                    $amountBefore,
                     UserCoinLogType::COIN_GAME,
                     null,
                 );
@@ -211,7 +214,7 @@ class LeaderCCgameController extends Controller
                     'user_id'    => $user->id,
                     'coins'      => $coin,
                     'app_profit_coins' => $coin,
-                    'type'       => 1, 
+                    'type'       => 1,
                     'game_id'    => $request->gameId,
                     'round_id'   => $request->roundId,
                     'order_id'   => $request->orderId,

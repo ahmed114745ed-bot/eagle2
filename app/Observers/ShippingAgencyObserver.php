@@ -39,18 +39,16 @@ class ShippingAgencyObserver
         if ($originalOwnerId) {
             $oldOwner = User::find($originalOwnerId);
             if ($oldOwner) {
-                $oldOwner->update(['agency_id' => 0]);
                 MilestoneHelper::removeReward($oldOwner, 'charge-agency-owner');
-                info('update 2 charge-agency-owner milestone');
+                info('remove charge-agency-owner milestone from old owner');
             }
         }
 
         if ($newOwnerId) {
             $newUser = User::find($newOwnerId);
             if ($newUser) {
-                $newUser->update(['agency_id' => $agency->id]);
                 MilestoneHelper::grantMilestoneToUser($newUser, 'charge-agency-owner');
-                info('update 2 charge-agency-owner milestone');
+                info('grant charge-agency-owner milestone to new owner');
             }
         }
     }
