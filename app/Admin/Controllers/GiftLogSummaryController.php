@@ -82,265 +82,7 @@ class GiftLogSummaryController extends MainController
                 });
             });
 
-        // Add custom table & filter styling
-        \Encore\Admin\Facades\Admin::style('
-            /* ===== Modern Table Styling ===== */
-            .box {
-                border-radius: 16px !important;
-                border: none !important;
-                box-shadow: 0 4px 24px rgba(0,0,0,0.06) !important;
-            }
-
-            /* Table */
-            .table {
-                border-collapse: separate !important;
-                border-spacing: 0 !important;
-                margin: 0 !important;
-            }
-            .table > thead > tr > th {
-                background: linear-gradient(135deg, #f8fafc, #eef2ff) !important;
-                color: #4338ca !important;
-                font-weight: 700 !important;
-                font-size: 12px !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.8px !important;
-                padding: 16px 20px !important;
-                border-bottom: 2px solid #c7d2fe !important;
-                border-top: none !important;
-                white-space: nowrap !important;
-            }
-            .table > tbody > tr {
-                transition: all 0.2s ease !important;
-            }
-            .table > tbody > tr:hover {
-                background: linear-gradient(135deg, #eef2ff, #f5f3ff) !important;
-            }
-            .table > tbody > tr > td {
-                padding: 14px 20px !important;
-                border-bottom: 1px solid #f1f5f9 !important;
-                border-top: none !important;
-                vertical-align: middle !important;
-                font-size: 13px !important;
-                color: #334155 !important;
-            }
-            .table > tbody > tr:last-child > td {
-                border-bottom: none !important;
-            }
-
-            /* Pagination footer */
-            .box > .box-footer {
-                background: #f8fafc !important;
-                border-top: 1px solid #e2e8f0 !important;
-                padding: 12px 20px !important;
-            }
-            .pagination {
-                margin: 0 !important;
-            }
-            .pagination > li > a,
-            .pagination > li > span {
-                border: none !important;
-                border-radius: 8px !important;
-                margin: 0 3px !important;
-                font-weight: 600 !important;
-                font-size: 13px !important;
-                padding: 8px 14px !important;
-                color: #6366f1 !important;
-                background: #f1f5f9 !important;
-                transition: all 0.2s !important;
-            }
-            .pagination > .active > a,
-            .pagination > .active > span {
-                background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
-                color: #fff !important;
-                box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important;
-            }
-            .pagination > li > a:hover {
-                background: #e0e7ff !important;
-                color: #4338ca !important;
-            }
-
-            /* Empty state */
-            .table > tbody > tr > td[colspan] {
-                text-align: center !important;
-                padding: 48px 24px !important;
-                color: #94a3b8 !important;
-                font-size: 15px !important;
-            }
-
-            /* ===== Filter Styling ===== */
-            #filter-box,
-            .filter-box {
-                border: 1px solid #e2e8f0 !important;
-                border-radius: 14px !important;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
-                padding: 20px !important;
-                background: #fff !important;
-                overflow: visible !important;
-            }
-            #filter-box .form-group,
-            .filter-box .form-group {
-                margin-bottom: 15px !important;
-            }
-            #filter-box label,
-            .filter-box label {
-                font-weight: 600 !important;
-                margin-bottom: 8px !important;
-                color: #475569 !important;
-                font-size: 12px !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.5px !important;
-            }
-            #filter-box .form-control,
-            .filter-box .form-control {
-                border: 1.5px solid #e2e8f0 !important;
-                border-radius: 10px !important;
-                padding: 10px 14px !important;
-                font-size: 13px !important;
-                transition: border-color 0.2s, box-shadow 0.2s !important;
-            }
-            #filter-box .form-control:focus,
-            .filter-box .form-control:focus {
-                border-color: #6366f1 !important;
-                box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
-            }
-
-            /* Filter Search Button */
-            #filter-box .btn-primary,
-            .filter-box .btn-primary,
-            #filter-box .submit,
-            .box-body .btn-primary {
-                background: #4f46e5 !important;
-                background-image: linear-gradient(135deg, #6366f1, #4f46e5) !important;
-                border: none !important;
-                border-radius: 10px !important;
-                padding: 10px 28px !important;
-                font-weight: 700 !important;
-                font-size: 14px !important;
-                color: #ffffff !important;
-                box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important;
-                cursor: pointer !important;
-            }
-            #filter-box .btn-primary:hover,
-            .filter-box .btn-primary:hover {
-                background: #4338ca !important;
-                background-image: linear-gradient(135deg, #4f46e5, #4338ca) !important;
-                box-shadow: 0 6px 16px rgba(99,102,241,0.4) !important;
-            }
-
-            /* Filter Reset Button */
-            #filter-box .btn-default,
-            .filter-box .btn-default,
-            #filter-box a.btn {
-                border: 2px solid #cbd5e1 !important;
-                border-radius: 10px !important;
-                padding: 10px 28px !important;
-                font-weight: 700 !important;
-                font-size: 14px !important;
-                color: #475569 !important;
-                background: #ffffff !important;
-                cursor: pointer !important;
-            }
-            #filter-box .btn-default:hover,
-            .filter-box .btn-default:hover {
-                background: #f1f5f9 !important;
-                border-color: #94a3b8 !important;
-                color: #1e293b !important;
-            }
-
-            /* Filter footer with buttons */
-            #filter-box .box-footer,
-            .filter-box .box-footer {
-                background: #f8fafc !important;
-                border-top: 1px solid #e2e8f0 !important;
-                padding: 16px 20px !important;
-                border-radius: 0 0 14px 14px !important;
-                display: flex !important;
-                justify-content: flex-end !important;
-                gap: 10px !important;
-                overflow: visible !important;
-            }
-
-            /* Force button colors with max specificity */
-            body .content-wrapper .box .box-body form .box-footer .btn.btn-primary.submit,
-            body .box .box-body form .btn-primary,
-            body .box-body form button.btn-primary,
-            body form .btn.btn-primary {
-                background: #4f46e5 !important;
-                background-image: linear-gradient(135deg, #6366f1, #4f46e5) !important;
-                color: #ffffff !important;
-                border: none !important;
-                border-radius: 10px !important;
-                padding: 10px 28px !important;
-                font-weight: 700 !important;
-                font-size: 14px !important;
-                box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important;
-            }
-            body .content-wrapper .box .box-body form .box-footer .btn.btn-default,
-            body .box .box-body form .btn-default,
-            body .box-body form a.btn-default,
-            body form .btn.btn-default {
-                background: #ffffff !important;
-                color: #475569 !important;
-                border: 2px solid #cbd5e1 !important;
-                border-radius: 10px !important;
-                padding: 10px 28px !important;
-                font-weight: 700 !important;
-                font-size: 14px !important;
-            }
-
-            /* Nav tabs */
-            .nav-tabs-custom {
-                border-radius: 14px !important;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
-                border: none !important;
-                overflow: hidden !important;
-            }
-            .nav-tabs-custom > .nav-tabs {
-                border-bottom: 2px solid #e2e8f0 !important;
-                background: #fff !important;
-                padding: 4px 8px 0 !important;
-            }
-            .nav-tabs-custom > .nav-tabs > li > a {
-                border: none !important;
-                border-radius: 10px 10px 0 0 !important;
-                padding: 12px 22px !important;
-                font-weight: 600 !important;
-                font-size: 13px !important;
-                color: #64748b !important;
-                margin-right: 4px !important;
-                transition: all 0.2s !important;
-            }
-            .nav-tabs-custom > .nav-tabs > li > a:hover {
-                background: #f1f5f9 !important;
-                color: #4338ca !important;
-            }
-            .nav-tabs-custom > .nav-tabs > li.active > a {
-                background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
-                color: #fff !important;
-                border: none !important;
-                box-shadow: 0 -2px 12px rgba(99,102,241,0.2) !important;
-            }
-        ');
-
-
-
-        // Force button styles via JS as fallback
-        \Encore\Admin\Facades\Admin::script("
-            setTimeout(function() {
-                // Style Search/Submit buttons
-                document.querySelectorAll('.btn-primary, .submit, button[type=submit]').forEach(function(btn) {
-                    if (btn.closest('form') && !btn.closest('.nav')) {
-                        btn.style.cssText = 'background: linear-gradient(135deg, #6366f1, #4f46e5) !important; color: #fff !important; border: none !important; border-radius: 10px !important; padding: 10px 28px !important; font-weight: 700 !important; font-size: 14px !important; box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important; cursor: pointer !important;';
-                    }
-                });
-                // Style Reset buttons
-                document.querySelectorAll('.btn-default, a.btn').forEach(function(btn) {
-                    if (btn.closest('form') && !btn.closest('.nav')) {
-                        btn.style.cssText = 'background: #fff !important; color: #475569 !important; border: 2px solid #cbd5e1 !important; border-radius: 10px !important; padding: 10px 28px !important; font-weight: 700 !important; font-size: 14px !important; cursor: pointer !important;';
-                    }
-                });
-            }, 200);
-        ");
+        // No custom CSS overrides - use dashboard theme colors (var(--primary-color))
 
         $grid->disableCreateButton();
         $grid->disableActions();
@@ -388,10 +130,11 @@ class GiftLogSummaryController extends MainController
                     $query->whereBetween('created_at', [$startOfMonth, $endOfMonth]);
                 }
 
+                $sortDir = request()->input('sort_dir', 'desc');
                 $query->select($column, DB::raw('SUM(giftPrice) as total'))
                     ->whereHas($relation, function ($q) {})
                     ->groupBy($column)
-                    ->orderByDesc('total');
+                    ->orderBy('total', $sortDir === 'asc' ? 'asc' : 'desc');
             });
     }
 
@@ -493,6 +236,7 @@ class GiftLogSummaryController extends MainController
     protected function buildRankingSubTabs(): string
     {
         $subTab = request()->input('ranking_type', 'receiver');
+        $sortDir = request()->input('sort_dir', 'desc');
 
         $receiverActive = $subTab === 'receiver'
             ? 'background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;box-shadow:0 4px 12px rgba(99,102,241,0.3);border:none;'
@@ -501,20 +245,40 @@ class GiftLogSummaryController extends MainController
             ? 'background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 4px 12px rgba(245,158,11,0.3);border:none;'
             : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;';
 
-        $receiverUrl = request()->fullUrlWithQuery(['filter' => 'monthly_ranking', 'ranking_type' => 'receiver']);
-        $senderUrl = request()->fullUrlWithQuery(['filter' => 'monthly_ranking', 'ranking_type' => 'sender']);
+        $descActive = $sortDir === 'desc'
+            ? 'background:var(--primary-color,#334155);color:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
+            : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;';
+        $ascActive = $sortDir === 'asc'
+            ? 'background:var(--primary-color,#334155);color:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
+            : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;';
+
+        $receiverUrl = request()->fullUrlWithQuery(['filter' => 'monthly_ranking', 'ranking_type' => 'receiver', 'sort_dir' => $sortDir]);
+        $senderUrl = request()->fullUrlWithQuery(['filter' => 'monthly_ranking', 'ranking_type' => 'sender', 'sort_dir' => $sortDir]);
+        $descUrl = request()->fullUrlWithQuery(['filter' => 'monthly_ranking', 'ranking_type' => $subTab, 'sort_dir' => 'desc']);
+        $ascUrl = request()->fullUrlWithQuery(['filter' => 'monthly_ranking', 'ranking_type' => $subTab, 'sort_dir' => 'asc']);
 
         $receiverLabel = __('Receiver');
         $senderLabel = __('Sender');
+        $descLabel = __('Highest First');
+        $ascLabel = __('Lowest First');
 
         return <<<HTML
-        <div style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:16px 24px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+        <div style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:16px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
             <div style="display:flex;gap:8px;">
                 <a href="{$receiverUrl}" style="display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:10px;font-weight:700;font-size:13px;text-decoration:none;transition:all 0.2s;{$receiverActive}">
                     <i class="fas fa-download" style="font-size:12px;"></i> {$receiverLabel}
                 </a>
                 <a href="{$senderUrl}" style="display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:10px;font-weight:700;font-size:13px;text-decoration:none;transition:all 0.2s;{$senderActive}">
                     <i class="fas fa-upload" style="font-size:12px;"></i> {$senderLabel}
+                </a>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+                <span style="font-size:12px;color:#94a3b8;font-weight:600;margin-right:4px;"><i class="fas fa-sort" style="margin-right:3px;"></i> Sort:</span>
+                <a href="{$descUrl}" style="display:inline-flex;align-items:center;gap:5px;padding:8px 18px;border-radius:8px;font-weight:600;font-size:12px;text-decoration:none;transition:all 0.2s;{$descActive}">
+                    <i class="fas fa-sort-amount-down" style="font-size:11px;"></i> {$descLabel}
+                </a>
+                <a href="{$ascUrl}" style="display:inline-flex;align-items:center;gap:5px;padding:8px 18px;border-radius:8px;font-weight:600;font-size:12px;text-decoration:none;transition:all 0.2s;{$ascActive}">
+                    <i class="fas fa-sort-amount-up" style="font-size:11px;"></i> {$ascLabel}
                 </a>
             </div>
         </div>

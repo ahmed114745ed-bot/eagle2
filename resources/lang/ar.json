@@ -834,6 +834,8 @@
     "Show sensitive word":"عرض الكلمة الحساسة",
     "Family": "العائلة",
     "Monthly Ranking":"الترتيب الشهري",
+    "Highest First":"الأعلى أولاً",
+    "Lowest First":"الأقل أولاً",
     "pending": "قيد الانتظار",
     "accepted": "تمت الموافقة",
     "denied": "تم الرفض",
