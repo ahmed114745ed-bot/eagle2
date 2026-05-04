@@ -18,7 +18,7 @@
                     $url = $defaultImage;
                 }
                 $showUrl = url('admin/users/' . $areaManager->id);
-                  $image = "<img src='{$url}' style='width: 80px; height: 70px; object-fit: cover; border-radius: 0;'>";
+                  $image = "<img src='" . e($url) . "' style='width: 80px; height: 70px; object-fit: cover; border-radius: 0;'>";
             @endphp
             <div class="col" style="display: flex; justify-content: center;">
                 <a href="{{$showUrl}}"
