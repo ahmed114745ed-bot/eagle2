@@ -563,6 +563,17 @@ class UserController extends MainController
                 $agencyId = request('agency_id', $agency_id);
                 $timezone = Common::timeZone();
 
+                \Log::info('Gift Log Request', [
+                    'user_id' => $id,
+                    'gift_type' => $giftType,
+                    'start_at' => $start,
+                    'end_at' => $end,
+                    'user_agency_id' => $user->agency_id,
+                    'requested_agency_id' => request('agency_id'),
+                    'final_agency_id' => $agencyId,
+                    'timezone' => $timezone,
+                ]);
+
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
                     ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
@@ -583,17 +594,26 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
+                \Log::info('Gift Logs Retrieved', [
+                    'total_records' => $giftSLogs->total(),
+                    'current_page' => $giftSLogs->currentPage(),
+                    'per_page' => $giftSLogs->perPage(),
+                ]);
+
                 // For receiver: just sum giftPrice
                 // For sender: calculate SUM(total * giftNum)
                 if ($giftType === 'receiver') {
                     $totalGiftCoins = (clone $giftBaseQuery)->sum('giftPrice') ?? 0;
+                    \Log::info('Total Gift Coins (Receiver)', ['total' => $totalGiftCoins]);
                 } else {
                     $totalGiftCoins = (clone $giftBaseQuery)
                         ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
                         ->value('total') ?? 0;
+                    \Log::info('Total Gift Coins (Sender)', ['total' => $totalGiftCoins]);
                 }
 
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
+                \Log::info('Total Diamonds', ['diamonds' => $diamonds]);
 
                 break;
 
