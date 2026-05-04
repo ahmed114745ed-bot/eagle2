@@ -559,7 +559,8 @@ class UserController extends MainController
                 $giftType = request('gift_type', 'receiver');
                 $start = request('start_at');
                 $end = request('end_at');
-                $agencyId = request('agency_id', $user?->agency_id);
+                $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
+                $agencyId = request('agency_id', $agency_id);
                 $timezone = Common::timeZone();
 
                 $giftBaseQuery = GiftLog::query()
@@ -666,6 +667,7 @@ class UserController extends MainController
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
+
 
 
 

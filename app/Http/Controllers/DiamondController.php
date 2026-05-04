@@ -54,6 +54,13 @@ class DiamondController extends Controller
 
             $monthlyDiamond = $totalReceived ?? 0;
             uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
+           
+            DB::table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'salary_is_updated' => 1,
+                ]);
+
         }
 
         // $totalReceived = DB::table('gift_logs')
