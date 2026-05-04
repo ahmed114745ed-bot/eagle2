@@ -40,7 +40,7 @@ class DiamondController extends Controller
 
             $startDate = $startOfMonth;
             if ($join && Carbon::parse($join->join_date, $timezone)->greaterThan($startOfMonth)) {
-                $startDate = Carbon::parse($join->join_date, $timezone);
+                $startDate = Carbon::parse($join->join_date, $timezone)->setTimezone('UTC');
             }
 
             $totalReceived = DB::table('gift_logs')

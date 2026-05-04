@@ -875,31 +875,17 @@ class UserController extends MainController
 
                 $timezone = Common::timeZone();
 
-                \Log::info('Gift Log Request', [
-                    'user_id' => $id,
-                    'gift_type' => $giftType,
-                    'start_at' => $start,
-                    'end_at' => $end,
-                    'user_agency_id' => $user->agency_id,
-                    'requested_agency_id' => request('agency_id'),
-                    'final_agency_id' => $agencyId,
-                    'timezone' => $timezone,
-                    'agency_filter_will_apply' => !empty($agencyId),
-                ]);
+                // Convert dates to UTC for database query
+                $startUtc = $start && $end ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
+                $endUtc = $start && $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
 
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
                     ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
-                    ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
-                        Carbon::parse($start, $timezone)->startOfDay()->utc(),
-                        Carbon::parse($end, $timezone)->endOfDay()->utc(),
-                    ]))
+                    ->when($startUtc && $endUtc, fn($q) => $q->whereBetween('created_at', [$startUtc, $endUtc]))
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
 
-                \Log::info('Gift Query SQL', [
-                    'sql' => $giftBaseQuery->toSql(),
-                    'bindings' => $giftBaseQuery->getBindings(),
-                ]);
+             
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
@@ -912,11 +898,17 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
-                // Calculate total diamonds sent/received: SUM(total * giftNum)
-                // This represents the actual amount of diamonds in each transaction
-                $totalGiftCoins = (clone $giftBaseQuery)
-                    ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
-                    ->value('total') ?? 0;
+           
+
+                // For receiver: just sum giftPrice
+                // For sender: calculate SUM(total * giftNum)
+                if ($giftType === 'receiver') {
+                    $totalGiftCoins = (clone $giftBaseQuery)->sum('giftPrice') ?? 0;
+                } else {
+                    $totalGiftCoins = (clone $giftBaseQuery)
+                        ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
+                        ->value('total') ?? 0;
+                }
 
                 // Keep totalGiftPrice for backward compatibility (sum of giftPrice column)
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');

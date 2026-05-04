@@ -38,11 +38,14 @@ class GiftLogRepository extends AbstractRepository
 
     public function getByAgency($rel, $start, $end, $agencyId, $keywords, $perPage, $page)
     {
+        $startUtc = $start instanceof \Carbon\Carbon ? $start->copy()->utc() : $start;
+        $endUtc = $end instanceof \Carbon\Carbon ? $end->copy()->utc() : $end;
+
         return $this->model
             ->where('agency_id', $agencyId)
             ->whereHas($rel)
             ->with($rel)
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('created_at', [$startUtc, $endUtc])
             ->selectRaw("sum(giftPrice) as exp, $keywords")
             ->groupBy($keywords)
             ->orderByRaw("exp desc")
@@ -60,7 +63,10 @@ class GiftLogRepository extends AbstractRepository
     }
     public function getByReceiver($receiverId, $startDate, $endDate)
     {
-        return $this->model->query()->whereBetween('created_at', [$startDate, $endDate])->where("receiver_id", $receiverId);
+        $startUtc = $startDate instanceof \Carbon\Carbon ? $startDate->copy()->utc() : $startDate;
+        $endUtc = $endDate instanceof \Carbon\Carbon ? $endDate->copy()->utc() : $endDate;
+
+        return $this->model->query()->whereBetween('created_at', [$startUtc, $endUtc])->where("receiver_id", $receiverId);
     }
 
     public function sumGiftPriceByReceiver($receiverId, $startDate, $endDate, $date)
@@ -74,31 +80,43 @@ class GiftLogRepository extends AbstractRepository
             ->whereYear('created_at', now()->year)->whereIn("receiver_id", $receiverIds)->sum('giftPrice');
     }
 
-    public function getByDaily($userId, $agencyId, $start, $end)
+    public function getByDaily($userId, $agencyId, $start, $end, $timezone = null)
     {
+        $startUtc = $start instanceof \Carbon\Carbon ? $start->copy()->utc() : $start;
+        $endUtc = $end instanceof \Carbon\Carbon ? $end->copy()->utc() : $end;
+
+        $tz = $timezone ?? getTimezone();
+        $offset = \Carbon\Carbon::now($tz)->format('P'); 
+
         return $this->model->query()
-            ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
-            ->whereBetween('created_at', [$start, $end])
+            ->selectRaw("sum(giftPrice) as diamonds, max(CONVERT_TZ(created_at, '+00:00', ?)) as date", [$offset])
+            ->whereBetween('created_at', [$startUtc, $endUtc])
             ->where('receiver_id', $userId)
             ->where('agency_id', $agencyId)
-            ->groupBy(\DB::raw('date(created_at)'))
+            ->groupBy(\DB::raw("DATE(CONVERT_TZ(created_at, '+00:00', '$offset'))"))
             ->orderBy('date', 'asc')
             ->get();
     }
 
 
-    public function getByDailyNew($userId, $agencyId, $start_at, $end_at)
+    public function getByDailyNew($userId, $agencyId, $start_at, $end_at, $timezone = null)
     {
+        // Ensure dates are in UTC for database query
+        $startUtc = $start_at instanceof \Carbon\Carbon ? $start_at->copy()->utc() : $start_at;
+        $endUtc = $end_at instanceof \Carbon\Carbon ? $end_at->copy()->utc() : $end_at;
 
-
-        // dd($start_at , $end_at);
+        // Get timezone offset for MySQL CONVERT_TZ
+        $tz = $timezone ?? getTimezone();
+        $offset = \Carbon\Carbon::now($tz)->format('P'); // e.g., "+02:00"
 
         $data = $this->model->query()
-            ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
-            ->whereBetween('created_at', [$start_at, $end_at]) // Applying whereBetween
+            ->selectRaw("sum(giftPrice) as diamonds, max(CONVERT_TZ(created_at, '+00:00', ?)) as date", [$offset])
+            ->whereBetween('created_at', [$startUtc, $endUtc])
             ->where('receiver_id', $userId)
-            ->where('agency_id', $agencyId)->groupBy(\DB::raw('date(created_at)'))
-            ->limit(31)->get();
+            ->where('agency_id', $agencyId)
+            ->groupBy(\DB::raw("DATE(CONVERT_TZ(created_at, '+00:00', '$offset'))"))
+            ->limit(31)
+            ->get();
 
         return $data;
     }
