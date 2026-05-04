@@ -151,7 +151,7 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
+        Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin')->middleware('throttle:admin-login');
     }
 );
 
