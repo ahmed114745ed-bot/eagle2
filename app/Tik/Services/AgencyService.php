@@ -721,12 +721,12 @@ class AgencyService
 
         // $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
         // $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
-        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
+        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate, $timezone);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
-            //$data->day = Carbon::parse($data->date)->day;
-            $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
+            // Date is already in the correct timezone from repository
+            $data->day = Carbon::parse($data->date)->day;
             return $data;
         });
         $dailyTimes = $dailyTimes->map(function ($data) use ($timezone) {
