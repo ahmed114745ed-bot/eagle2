@@ -1993,7 +1993,7 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
-Route::get('/run-lucky-gift-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-test', function () {
     Artisan::call('cache:clear');
     $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 
@@ -2014,7 +2014,7 @@ Route::get('/run-lucky-gift-test', function () {
     ]);
 });
 
-Route::get('/run-lucky-gift-unit-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
     $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
         ' --filter SendLuckyGift2FeatureTest';
 
