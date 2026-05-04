@@ -3483,7 +3483,7 @@
                                         if (!isImageExists($url)) {
                                             $url = $defaultImage;
                                         }
-                                        $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                        $image = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                         $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
                                     @endphp
 
@@ -3500,7 +3500,7 @@
                                              if (!isImageExists($url)) {
                                                  $url = $defaultImage;
                                              }
-                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByImage = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                              $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
                                          }
 
@@ -3515,7 +3515,7 @@
                                              if (!isImageExists($url)) {
                                                  $url = $defaultImage;
                                              }
-                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByImage = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                              $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
                                          }
                                      }

@@ -984,14 +984,15 @@
                                 if (!isImageExists($url)) $url = $defaultImage;
                                 $image = handleShowImageWithTypes($receiverUser->id, $url, 40, 40);
                                 $showUrl = url("admin/users/{$receiverUser->id}");
-                                $name =$receiverUser->name ??'';
+                                $name = e($receiverUser->name ?? '');
+                                $uuid = e($receiverUser->uuid ?? '');
                                 $receiverHtml = "
                                     <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                                         <div style='display: flex; align-items: center; gap: 10px;'>
                                             {$image}
                                             <div>
                                                 <span style='text-decoration: underline; cursor: pointer;'>{$name}</span><br>
-                                                <span style='color: #aaa; font-size: smaller;'>UUID: {$receiverUser->uuid}</span>
+                                                <span style='color: #aaa; font-size: smaller;'>UUID: {$uuid}</span>
                                             </div>
                                         </div>
                                     </a>
