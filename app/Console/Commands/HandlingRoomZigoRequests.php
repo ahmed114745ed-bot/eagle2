@@ -85,7 +85,7 @@ class HandlingRoomZigoRequests extends Command
                 $rawValue = Redis::get($cleanKey);
 
 
-                $item = @unserialize($rawValue);
+                $item = @unserialize($rawValue, ['allowed_classes' => false]);
 
                 // Ensure $item is an array
                 if ($item === false || !is_array($item)) {

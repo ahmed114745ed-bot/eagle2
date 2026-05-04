@@ -98,7 +98,7 @@ class InAppPurchase extends Controller
 
         if ($jsonData !== false) {
             $data = base64_encode(serialize($jsonData));
-            $data = unserialize(base64_decode($data));
+            $data = unserialize(base64_decode($data), ['allowed_classes' => false]);
             $merchantId = $data['merchantInfo']['merchantId'];
             $merchantName = $data['merchantInfo']['merchantName'];
 

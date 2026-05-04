@@ -37,7 +37,7 @@ class RedisService
     {
         $data = Redis::get($key);
 
-        return $data ? unserialize($data) : null;
+        return $data ? unserialize($data, ['allowed_classes' => false]) : null;
     }
 
 
