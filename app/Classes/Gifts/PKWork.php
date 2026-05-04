@@ -16,7 +16,7 @@ class PKWork implements RoomJobInterface
     {
         $room = Room::query()->find($roomJob->room_id);
         if(!$room) throw \Exception('Room not found');
-        $userIds = unserialize($roomJob->data);
+        $userIds = unserialize($roomJob->data, ['allowed_classes' => false]);
         $earnedCoinsPerUser = $roomJob->coins;
         $lastPk =
             Pk::query()->where('room_id', $room->id)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first();
