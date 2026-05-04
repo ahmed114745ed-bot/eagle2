@@ -890,13 +890,16 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
-                // Calculate total diamonds sent/received: SUM(total * giftNum)
-                // This represents the actual amount of diamonds in each transaction
-                $totalGiftCoins = (clone $giftBaseQuery)
-                    ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
-                    ->value('total') ?? 0;
+                // For receiver: just sum giftPrice
+                // For sender: calculate SUM(total * giftNum)
+                if ($giftType === 'receiver') {
+                    $totalGiftCoins = (clone $giftBaseQuery)->sum('giftPrice') ?? 0;
+                } else {
+                    $totalGiftCoins = (clone $giftBaseQuery)
+                        ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
+                        ->value('total') ?? 0;
+                }
 
-                // Keep totalGiftPrice for backward compatibility (sum of giftPrice column)
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
 
                 break;
