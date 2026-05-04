@@ -2023,6 +2023,17 @@
         .box-body.p-3 {
             padding: 20px !important;
         }
+
+        /* ── Profile Actions Dropdown ── */
+        .profile-dropdown-menu.show-dropdown {
+            display: block !important;
+            animation: dropdownFadeIn 0.2s ease;
+        }
+
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous"/>
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
@@ -2085,80 +2096,120 @@
                 <h1 class="profile-user-name">{{ @$user?->name ?? '' }}</h1>
                 
             </div>
-            <div class="profile-actions-top">
-                <a href="{{ url('admin/users/') }}" class="btn btn-outline-secondary btn-sm">
+            <div class="profile-actions-top" style="display: flex; align-items: center; gap: 8px;">
+                <a href="{{ url('admin/users/') }}" class="btn btn-outline-secondary btn-sm"
+                   style="border-radius: 8px; font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 5px;">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
-                @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                    <button type="submit" class="btn btn-primary btn-sm edit_user_item_model_btn">
-                        <i class="fas fa-edit"></i> {{ __('edit') }}
+
+                {{-- Actions Dropdown Menu --}}
+                <div class="dropdown" style="position: relative;">
+                    <button class="btn btn-sm" type="button" id="profileActionsDropdown"
+                            onclick="document.getElementById('profileDropdownMenu').classList.toggle('show-dropdown')"
+                            style="background: linear-gradient(135deg, #1e293b, #334155); color: #fff; border: none; border-radius: 10px; padding: 8px 18px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.2s;"
+                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.25)'"
+                            onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'">
+                        <i class="fas fa-ellipsis-v" style="font-size: 14px;"></i>
+                        {{ __('Actions') }}
                     </button>
-                @endif
-                @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
-                    <button type="button" class="btn btn-danger btn-sm remove-bd-btn"
-                            data-id="{{ $user->id }}" data-url="{{ route('users.remove', $user->id) }}">
-                        {{ __('Remove BD') }}
-                    </button>
-                @endif
+
+                    <div id="profileDropdownMenu" class="profile-dropdown-menu"
+                         style="display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 260px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); z-index: 1000; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+
+                        {{-- Edit & Remove BD Section --}}
+                        <div style="padding: 8px;">
+                            @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" class="edit_user_item_model_btn"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fas fa-edit" style="width: 18px; text-align: center; color: #818cf8;"></i>
+                                    {{ __('edit') }}
+                                </a>
+                            @endif
+
+                            @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                <a href="javascript:void(0)" class="remove-bd-btn" data-id="{{ $user->id }}" data-url="{{ route('users.remove', $user->id) }}"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fca5a5; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(239,68,68,0.15)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fas fa-trash-alt" style="width: 18px; text-align: center; color: #ef4444;"></i>
+                                    {{ __('Remove BD') }}
+                                </a>
+                            @endif
+                        </div>
+
+                        {{-- Divider --}}
+                        <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 0 14px;"></div>
+
+                        {{-- Toggle Actions Section --}}
+                        <div style="padding: 8px;">
+                            @if (\Encore\Admin\Facades\Admin::user()->can('charge-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" onclick="profileAction('{{ route('users.toggle-transfer-salary', $user->id) }}', this)"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fa {{ $user->transfer_salary ? 'fa-toggle-off' : 'fa-toggle-on' }}" style="width: 18px; text-align: center; color: {{ $user->transfer_salary ? '#ef4444' : '#34d399' }};"></i>
+                                    {{ $user->transfer_salary ? __('Disable Transfer Salary') : __('Enable Transfer Salary') }}
+                                </a>
+                            @endif
+
+                            @if (\Encore\Admin\Facades\Admin::user()->can('invite-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" onclick="profileAction('{{ route('users.toggle-invite-code', $user->id) }}', this)"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fa {{ @$user->userSetting->show_invite_code ? 'fa-toggle-on' : 'fa-toggle-off' }}" style="width: 18px; text-align: center; color: {{ @$user->userSetting->show_invite_code ? '#34d399' : '#ef4444' }};"></i>
+                                    {{ @$user->userSetting->show_invite_code ? __('Disable Show Invite Code') : __('Enable Show Invite Code') }}
+                                </a>
+                            @endif
+
+                            @if (\Encore\Admin\Facades\Admin::user()->can('can-Play-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" onclick="profileAction('{{ route('users.toggle-can-play', $user->id) }}', this)"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fa {{ $user->can_play == 2 ? 'fa-toggle-on' : 'fa-toggle-off' }}" style="width: 18px; text-align: center; color: {{ $user->can_play == 2 ? '#34d399' : '#ef4444' }};"></i>
+                                    {{ $user->can_play == 2 ? __('Disable Can Play') : __('Enable Can Play') }}
+                                </a>
+                            @endif
+                        </div>
+
+                        {{-- Kick & Change Agency Section --}}
+                        @if (($user->agency_id >= 1) || ($user->family_id >= 1))
+                            <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 0 14px;"></div>
+                            <div style="padding: 8px;">
+                                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                    <a href="javascript:void(0)" onclick="profileActionConfirm('{{ route('users.kick-agency', $user->id) }}', '{{ __('dashboard.chickKickAgency') }}')"
+                                       style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fca5a5; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                       onmouseover="this.style.background='rgba(239,68,68,0.15)'" onmouseout="this.style.background='transparent'">
+                                        <i class="fa fa-sign-out" style="width: 18px; text-align: center; color: #ef4444;"></i>
+                                        {{ __('dashboard.kickAgency') }}
+                                    </a>
+                                @endif
+
+                                @if ($user->family_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-family-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                    <a href="javascript:void(0)" onclick="profileActionConfirm('{{ route('users.kick-family', $user->id) }}', '{{ __('dashboard.chickKick') }}')"
+                                       style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fca5a5; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                       onmouseover="this.style.background='rgba(239,68,68,0.15)'" onmouseout="this.style.background='transparent'">
+                                        <i class="fa fa-sign-out" style="width: 18px; text-align: center; color: #ef4444;"></i>
+                                        {{ __('dashboard.kickFamily') }}
+                                    </a>
+                                @endif
+
+                                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('chang-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                    <a href="javascript:void(0)" onclick="$('#changeAgencyModal').modal('show'); document.getElementById('profileDropdownMenu').classList.remove('show-dropdown');"
+                                       style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #93c5fd; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                       onmouseover="this.style.background='rgba(59,130,246,0.15)'" onmouseout="this.style.background='transparent'">
+                                        <i class="fa fa-exchange" style="width: 18px; text-align: center; color: #60a5fa;"></i>
+                                        {{ __('dashboard.changeAgency') }}
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
 
-        {{-- ── User Profile Action Buttons ── --}}
-        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
-                @if (\Encore\Admin\Facades\Admin::user()->can('charge-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
-                    <button type="button" class="btn btn-sm profile-action-btn" id="btn-transfer-salary"
-                            style="background:{{ $user->transfer_salary ? '#fef2f2' : '#ecfdf5' }}; color:{{ $user->transfer_salary ? '#dc2626' : '#059669' }}; border:1px solid {{ $user->transfer_salary ? '#fecaca' : '#a7f3d0' }}; border-radius:8px; font-weight:600; font-size:12px;"
-                            onclick="profileAction('{{ route('users.toggle-transfer-salary', $user->id) }}', this)">
-                        <i class="fa {{ $user->transfer_salary ? 'fa-toggle-off' : 'fa-toggle-on' }}"></i>
-                        {{ $user->transfer_salary ? __('Disable Transfer Salary') : __('Enable Transfer Salary') }}
-                    </button>
-                @endif
-
-                @if (\Encore\Admin\Facades\Admin::user()->can('invite-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
-                    <button type="button" class="btn btn-sm profile-action-btn" id="btn-invite-code"
-                            style="background:{{ @$user->userSetting->show_invite_code ? '#ecfdf5' : '#fef2f2' }}; color:{{ @$user->userSetting->show_invite_code ? '#059669' : '#dc2626' }}; border:1px solid {{ @$user->userSetting->show_invite_code ? '#a7f3d0' : '#fecaca' }}; border-radius:8px; font-weight:600; font-size:12px;"
-                            onclick="profileAction('{{ route('users.toggle-invite-code', $user->id) }}', this)">
-                        <i class="fa {{ @$user->userSetting->show_invite_code ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                        {{ @$user->userSetting->show_invite_code ? __('Disable Show Invite Code') : __('Enable Show Invite Code') }}
-                    </button>
-                @endif
-
-                @if (\Encore\Admin\Facades\Admin::user()->can('can-Play-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
-                    <button type="button" class="btn btn-sm profile-action-btn" id="btn-can-play"
-                            style="background:{{ $user->can_play == 2 ? '#ecfdf5' : '#fef2f2' }}; color:{{ $user->can_play == 2 ? '#059669' : '#dc2626' }}; border:1px solid {{ $user->can_play == 2 ? '#a7f3d0' : '#fecaca' }}; border-radius:8px; font-weight:600; font-size:12px;"
-                            onclick="profileAction('{{ route('users.toggle-can-play', $user->id) }}', this)">
-                        <i class="fa {{ $user->can_play == 2 ? 'fa-toggle-on' : 'fa-toggle-off' }}"></i>
-                        {{ $user->can_play == 2 ? __('Disable Can Play') : __('Enable Can Play') }}
-                    </button>
-                @endif
-
-                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
-                    <button type="button" class="btn btn-sm"
-                            style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; font-weight:600; font-size:12px;"
-                            onclick="profileActionConfirm('{{ route('users.kick-agency', $user->id) }}', '{{ __('dashboard.chickKickAgency') }}')">
-                        <i class="fa fa-sign-out"></i> {{ __('dashboard.kickAgency') }}
-                    </button>
-                @endif
-
-                @if ($user->family_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-family-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
-                    <button type="button" class="btn btn-sm"
-                            style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px; font-weight:600; font-size:12px;"
-                            onclick="profileActionConfirm('{{ route('users.kick-family', $user->id) }}', '{{ __('dashboard.chickKick') }}')">
-                        <i class="fa fa-sign-out"></i> {{ __('dashboard.kickFamily') }}
-                    </button>
-                @endif
-
-                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('chang-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
-                    <button type="button" class="btn btn-sm"
-                            style="background:#eef2ff; color:#4f46e5; border:1px solid #c7d2fe; border-radius:8px; font-weight:600; font-size:12px;"
-                            onclick="$('#changeAgencyModal').modal('show')">
-                        <i class="fa fa-exchange"></i> {{ __('dashboard.changeAgency') }}
-                    </button>
-                @endif
-            </div>
-
         <div class="profile-meta-row">
-            <div class="profile-meta-chip">
+            <div class="profile-meta-chip" style="cursor: pointer; transition: all 0.2s;" title="Click to copy"
+                 onclick="var t='{{ @$user->original_uuid }}'; navigator.clipboard.writeText(t); var el=this; el.style.background='#ecfdf5'; el.style.borderColor='#a7f3d0'; setTimeout(function(){el.style.background=''; el.style.borderColor='';},1000);">
                 <i class="fas fa-id-badge"></i>
                 @if (@$user->uuid == @$user->original_uuid)
                     <span>{{ @$user->original_uuid }}</span>
@@ -2167,6 +2218,7 @@
                     <span class="meta-sep">|</span>
                     <span style="opacity:0.7">{{ @$user->uuid_v3 }}</span>
                 @endif
+                <i class="fas fa-copy" style="font-size: 10px; color: #94a3b8; margin-left: 4px;"></i>
             </div>
             <div class="profile-meta-chip">
                 <i class="fas fa-phone"></i>
@@ -2177,6 +2229,35 @@
                      title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
                 <span>{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}</span>
             </div>
+
+            {{-- Agency --}}
+            @if(@$user->agency)
+                @php
+                    $agencyImg = getImagePath(@$user->agency->img) ?? asset('images/icon-agency.jpg');
+                    if (!isImageExists($agencyImg)) $agencyImg = asset('images/icon-agency.jpg');
+                    $agencyProfileUrl = route('admin.agency.profile', ['id' => @$user->agency->id ?? 0]);
+                @endphp
+                <a href="{{ $agencyProfileUrl }}" class="profile-meta-chip" style="text-decoration: none; background: #eef2ff; border-color: #c7d2fe; cursor: pointer; transition: all 0.2s;"
+                   onmouseover="this.style.borderColor='#6366f1'; this.style.boxShadow='0 2px 8px rgba(99,102,241,0.15)'"
+                   onmouseout="this.style.borderColor='#c7d2fe'; this.style.boxShadow='none'">
+                    <img src="{{ $agencyImg }}" style="width: 22px; height: 22px; border-radius: 6px; object-fit: cover; border: 1px solid #c7d2fe;">
+                    <span style="font-weight: 600; color: #4f46e5;">{{ @$user->agency->name }}</span>
+                    <span style="font-size: 10px; color: #94a3b8; background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">{{ __('agency') }}</span>
+                </a>
+            @endif
+
+            {{-- Shipping Agency --}}
+            @if(@$user->shippingAgency)
+                @php
+                    $shipImg = getImagePath(@$user->shippingAgency->img) ?? asset('images/icon-agency.jpg');
+                    if (!isImageExists($shipImg)) $shipImg = asset('images/icon-agency.jpg');
+                @endphp
+                <div class="profile-meta-chip" style="background: #fff7ed; border-color: #fed7aa;">
+                    <img src="{{ $shipImg }}" style="width: 22px; height: 22px; border-radius: 6px; object-fit: cover; border: 1px solid #fed7aa;">
+                    <span style="font-weight: 600; color: #c2410c;">{{ @$user->shippingAgency->name }}</span>
+                    <span style="font-size: 10px; color: #94a3b8; background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">{{ __('shipping') }}</span>
+                </div>
+            @endif
         </div>
 
         @php
@@ -2216,10 +2297,11 @@
         </div>
 
         <div class="profile-badges-row">
+            <span class="meta-label">{{__('badges')}}:</span>
             {!! @$user->userBadge() !!}
         </div>
         <div class="profile-badges-row">
-            
+            <span class="meta-label">{{__('type')}}:</span>
             {!! @$user->userBadgeTop() !!}
         </div>
     </div>
@@ -4276,9 +4358,6 @@
                         </div>
                         <h4 style="margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('Edit User') }}</h4>
                     </div>
-                    <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            style="background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 14px; opacity: 1; filter: brightness(10);">
-                    </button>
                 </div>
 
                 <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST"
@@ -4408,6 +4487,15 @@
 
 <script>
 
+
+    // ── Close Profile Dropdown on Outside Click ──
+    document.addEventListener('click', function(e) {
+        var dropdown = document.getElementById('profileDropdownMenu');
+        var btn = document.getElementById('profileActionsDropdown');
+        if (dropdown && btn && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show-dropdown');
+        }
+    });
 
     // ── Cover Slideshow Auto-Rotation ──
     var coverCurrentIndex = 0;
