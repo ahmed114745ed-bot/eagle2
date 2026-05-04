@@ -5056,7 +5056,17 @@
                     type: 'POST',
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || LA.token },
                     success: function(res) {
-                        Swal.fire({ icon: 'success', title: res.message }).then(function() { location.reload(); });
+                        // Toggle the icon between on/off
+                        var $btn = $(btn);
+                        var $icon = $btn.find('i.fa');
+                        if ($icon.hasClass('fa-toggle-on')) {
+                            $icon.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+                            $icon.css('color', '#ef4444');
+                        } else {
+                            $icon.removeClass('fa-toggle-off').addClass('fa-toggle-on');
+                            $icon.css('color', '#34d399');
+                        }
+                        Swal.fire({ icon: 'success', title: res.message });
                     },
                     error: function(xhr) {
                         Swal.fire({ icon: 'error', title: xhr.responseJSON?.message || 'Error' });
