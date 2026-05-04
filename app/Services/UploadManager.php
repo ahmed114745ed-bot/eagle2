@@ -102,7 +102,14 @@ class UploadManager
      */
     private function cleanFolder($folder)
     {
-        return '/'.trim(str_replace('..', '', $folder), '/');
+        $folder = str_replace("\0", '', $folder);
+        $clean = $folder;
+        do {
+            $folder = $clean;
+            $clean = str_replace(['..', '//'], ['', '/'], $folder);
+        } while ($clean !== $folder);
+
+        return '/'.trim($clean, '/');
     }
 
     /**
