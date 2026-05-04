@@ -327,7 +327,7 @@ class LuckyGiftService
             // DO NOT refresh() here as it would discard in-memory changes
             $responseData['session'] = $room->session_string;
             $responseData['user_coins'] = $user->di;
-            $responseData['gift_num'] = $receiversCount * $number * $count;
+            $responseData['gift_num'] = $receiversCount * $number;
             $responseData['total_price'] = $totalPrice;
             $responseData['cashback_percentage'] = $total_cashback_percentage;
             $responseData['total_user_win'] = $total_user_win;
@@ -609,7 +609,7 @@ class LuckyGiftService
         // add session to response
         $responseData['session'] = $room->session_string;
         $responseData['user_coins'] = $newUserCoin;
-        $responseData['gift_num'] = $receiversCount * $number * $count;
+        $responseData['gift_num'] = $receiversCount * $number;
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
         $responseData['total_user_win'] = $total_user_win;

@@ -38,6 +38,7 @@
         "laravel-admin-extensions/multi-language": "^0.0.6",
         "laravel/framework": "^10.0",
         "laravel/nightwatch": "^1.24",
+        "laravel/octane": "^2.0",
         "laravel/sanctum": "^3.3.3",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
@@ -100,7 +101,8 @@
     "extra": {
         "laravel": {
             "dont-discover": [
-                "laravel/telescope"
+                "laravel/telescope",
+                "barryvdh/laravel-debugbar"
             ]
         }
     },
