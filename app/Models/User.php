@@ -1787,16 +1787,12 @@ class User extends Authenticatable
                 ?? $badge->badge?->images?->first()?->image
                 ?? $badge->badge?->image;
             $url = getImagePath($badgeImage);
-            $name = e($badge->badge?->name ?? '');
-            $bid = $badge->badge?->id ?? 0;
+            
 
             if ($url) {
                 $html .= '<div style="display:inline-flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 14px 6px 6px;">'
                     . handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain')
-                    . '<div style="display:flex;flex-direction:column;line-height:1.2;">'
-                    . '<span style="font-weight:600;font-size:12px;color:#334155;">' . $name . '</span>'
-                    . '<span style="font-size:10px;color:#94a3b8;">(id:' . $bid . ')</span>'
-                    . '</div></div>';
+                    . '</div>';
             }
         }
         $html .= '</div>';
@@ -1815,16 +1811,11 @@ class User extends Authenticatable
                 ?? $badge->badge?->images?->first()?->image
                 ?? $badge->badge?->image;
             $url = getImagePath($badgeImage);
-            $name = e($badge->badge?->name ?? '');
-            $bid = $badge->badge?->id ?? 0;
 
             if ($url) {
                 $html .= '<div style="display:inline-flex;align-items:center;gap:8px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:6px 14px 6px 6px;">'
                     . handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain')
-                    . '<div style="display:flex;flex-direction:column;line-height:1.2;">'
-                    . '<span style="font-weight:600;font-size:12px;color:#92400e;">' . $name . '</span>'
-                    . '<span style="font-size:10px;color:#b45309;">(id:' . $bid . ')</span>'
-                    . '</div></div>';
+                    . '</div>';
             }
         }
         $html .= '</div>';
