@@ -561,6 +561,12 @@ class UserController extends MainController
                 $end = request('end_at');
                 $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
                 $agencyId = request('agency_id', $agency_id);
+
+                // Convert empty string or "0" to null to ensure filter doesn't apply with falsy values
+                if ($agencyId === '' || $agencyId === '0' || $agencyId === 0) {
+                    $agencyId = null;
+                }
+
                 $timezone = Common::timeZone();
 
                 \Log::info('Gift Log Request', [
@@ -572,6 +578,7 @@ class UserController extends MainController
                     'requested_agency_id' => request('agency_id'),
                     'final_agency_id' => $agencyId,
                     'timezone' => $timezone,
+                    'agency_filter_will_apply' => !empty($agencyId),
                 ]);
 
                 $giftBaseQuery = GiftLog::query()
@@ -582,6 +589,11 @@ class UserController extends MainController
                         Carbon::parse($end, $timezone)->endOfDay()->utc(),
                     ]))
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
+
+                \Log::info('Gift Query SQL', [
+                    'sql' => $giftBaseQuery->toSql(),
+                    'bindings' => $giftBaseQuery->getBindings(),
+                ]);
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
