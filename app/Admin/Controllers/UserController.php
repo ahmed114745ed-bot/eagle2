@@ -867,8 +867,27 @@ class UserController extends MainController
                 $giftType = request('gift_type', 'receiver');
                 $start = request('start_at');
                 $end = request('end_at');
-                $agencyId = request('agency_id', $user?->agency_id);
+                $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
+                $agencyId = request('agency_id', $agency_id);
+
+                // Convert empty string or "0" to null to ensure filter doesn't apply with falsy values
+                if ($agencyId === '' || $agencyId === '0' || $agencyId === 0) {
+                    $agencyId = null;
+                }
+
                 $timezone = Common::timeZone();
+
+                \Log::info('Gift Log Request', [
+                    'user_id' => $id,
+                    'gift_type' => $giftType,
+                    'start_at' => $start,
+                    'end_at' => $end,
+                    'user_agency_id' => $user->agency_id,
+                    'requested_agency_id' => request('agency_id'),
+                    'final_agency_id' => $agencyId,
+                    'timezone' => $timezone,
+                    'agency_filter_will_apply' => !empty($agencyId),
+                ]);
 
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
@@ -878,6 +897,11 @@ class UserController extends MainController
                         Carbon::parse($end, $timezone)->endOfDay()->utc(),
                     ]))
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
+
+                \Log::info('Gift Query SQL', [
+                    'sql' => $giftBaseQuery->toSql(),
+                    'bindings' => $giftBaseQuery->getBindings(),
+                ]);
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
@@ -890,17 +914,26 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
+                \Log::info('Gift Logs Retrieved', [
+                    'total_records' => $giftSLogs->total(),
+                    'current_page' => $giftSLogs->currentPage(),
+                    'per_page' => $giftSLogs->perPage(),
+                ]);
+
                 // For receiver: just sum giftPrice
                 // For sender: calculate SUM(total * giftNum)
                 if ($giftType === 'receiver') {
                     $totalGiftCoins = (clone $giftBaseQuery)->sum('giftPrice') ?? 0;
+                    \Log::info('Total Gift Coins (Receiver)', ['total' => $totalGiftCoins]);
                 } else {
                     $totalGiftCoins = (clone $giftBaseQuery)
                         ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
                         ->value('total') ?? 0;
+                    \Log::info('Total Gift Coins (Sender)', ['total' => $totalGiftCoins]);
                 }
 
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
+                \Log::info('Total Diamonds', ['diamonds' => $diamonds]);
 
                 break;
 
@@ -978,6 +1011,7 @@ class UserController extends MainController
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
+
 
 
 

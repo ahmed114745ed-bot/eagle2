@@ -30,7 +30,7 @@ class SetDataFromJob extends Command
             if ($type == 'string') {
                 $value = Redis::get($cleanKey);
                 if ($value !== false || $value === 'b:0;') {
-                    $unserializedValue = @unserialize($value);
+                    $unserializedValue = @unserialize($value, ['allowed_classes' => false]);
                     $value = $unserializedValue;
                 }
                 // Check if $value is an array before accessing array keys
