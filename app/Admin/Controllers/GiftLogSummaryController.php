@@ -89,28 +89,6 @@ class GiftLogSummaryController extends MainController
                 border-radius: 16px !important;
                 border: none !important;
                 box-shadow: 0 4px 24px rgba(0,0,0,0.06) !important;
-                overflow: hidden !important;
-            }
-            .box-header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                padding: 18px 24px !important;
-                border: none !important;
-            }
-            .box-header .box-title {
-                color: #fff !important;
-                font-weight: 700 !important;
-                font-size: 16px !important;
-                letter-spacing: 0.3px !important;
-            }
-            .box-header .btn-group .btn {
-                background: rgba(255,255,255,0.15) !important;
-                border: 1px solid rgba(255,255,255,0.25) !important;
-                color: #fff !important;
-                border-radius: 8px !important;
-                backdrop-filter: blur(4px) !important;
-            }
-            .box-header .btn-group .btn:hover {
-                background: rgba(255,255,255,0.25) !important;
             }
 
             /* Table */
@@ -131,15 +109,11 @@ class GiftLogSummaryController extends MainController
                 border-top: none !important;
                 white-space: nowrap !important;
             }
-            .table > thead > tr > th:first-child {
-                padding-left: 24px !important;
-            }
             .table > tbody > tr {
                 transition: all 0.2s ease !important;
             }
             .table > tbody > tr:hover {
                 background: linear-gradient(135deg, #eef2ff, #f5f3ff) !important;
-                transform: scale(1.002) !important;
             }
             .table > tbody > tr > td {
                 padding: 14px 20px !important;
@@ -149,15 +123,12 @@ class GiftLogSummaryController extends MainController
                 font-size: 13px !important;
                 color: #334155 !important;
             }
-            .table > tbody > tr > td:first-child {
-                padding-left: 24px !important;
-            }
             .table > tbody > tr:last-child > td {
                 border-bottom: none !important;
             }
 
-            /* Pagination */
-            .box-footer {
+            /* Pagination footer */
+            .box > .box-footer {
                 background: #f8fafc !important;
                 border-top: 1px solid #e2e8f0 !important;
                 padding: 12px 20px !important;
@@ -188,11 +159,6 @@ class GiftLogSummaryController extends MainController
                 color: #4338ca !important;
             }
 
-            /* Grid tools */
-            .grid-row-actions, .column-selector {
-                border-radius: 8px !important;
-            }
-
             /* Empty state */
             .table > tbody > tr > td[colspan] {
                 text-align: center !important;
@@ -201,17 +167,21 @@ class GiftLogSummaryController extends MainController
                 font-size: 15px !important;
             }
 
-            /* Filter styling */
+            /* ===== Filter Styling ===== */
+            #filter-box,
             .filter-box {
                 border: 1px solid #e2e8f0 !important;
                 border-radius: 14px !important;
                 box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
                 padding: 20px !important;
                 background: #fff !important;
+                overflow: visible !important;
             }
+            #filter-box .form-group,
             .filter-box .form-group {
                 margin-bottom: 15px !important;
             }
+            #filter-box label,
             .filter-box label {
                 font-weight: 600 !important;
                 margin-bottom: 8px !important;
@@ -220,46 +190,102 @@ class GiftLogSummaryController extends MainController
                 text-transform: uppercase !important;
                 letter-spacing: 0.5px !important;
             }
+            #filter-box .form-control,
             .filter-box .form-control {
                 border: 1.5px solid #e2e8f0 !important;
                 border-radius: 10px !important;
                 padding: 10px 14px !important;
                 font-size: 13px !important;
-                transition: all 0.2s !important;
+                transition: border-color 0.2s, box-shadow 0.2s !important;
             }
+            #filter-box .form-control:focus,
             .filter-box .form-control:focus {
                 border-color: #6366f1 !important;
                 box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
             }
-            .filter-box .select2-container--default .select2-selection--single {
-                border: 1.5px solid #e2e8f0 !important;
-                border-radius: 10px !important;
-                height: 40px !important;
-            }
-            .filter-box .btn-primary {
-                background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+
+            /* Filter Search Button */
+            #filter-box .btn-primary,
+            .filter-box .btn-primary,
+            #filter-box .submit,
+            .box-body .btn-primary {
+                background: #4f46e5 !important;
+                background-image: linear-gradient(135deg, #6366f1, #4f46e5) !important;
                 border: none !important;
                 border-radius: 10px !important;
-                padding: 10px 24px !important;
-                font-weight: 600 !important;
-                box-shadow: 0 4px 12px rgba(99,102,241,0.25) !important;
-                transition: all 0.2s !important;
+                padding: 10px 28px !important;
+                font-weight: 700 !important;
+                font-size: 14px !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important;
+                cursor: pointer !important;
             }
+            #filter-box .btn-primary:hover,
             .filter-box .btn-primary:hover {
-                transform: translateY(-1px) !important;
-                box-shadow: 0 6px 16px rgba(99,102,241,0.35) !important;
+                background: #4338ca !important;
+                background-image: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+                box-shadow: 0 6px 16px rgba(99,102,241,0.4) !important;
             }
-            .filter-box .btn-default {
-                border: 1.5px solid #e2e8f0 !important;
+
+            /* Filter Reset Button */
+            #filter-box .btn-default,
+            .filter-box .btn-default,
+            #filter-box a.btn {
+                border: 2px solid #cbd5e1 !important;
                 border-radius: 10px !important;
-                padding: 10px 24px !important;
-                font-weight: 600 !important;
-                color: #64748b !important;
-                transition: all 0.2s !important;
+                padding: 10px 28px !important;
+                font-weight: 700 !important;
+                font-size: 14px !important;
+                color: #475569 !important;
+                background: #ffffff !important;
+                cursor: pointer !important;
             }
+            #filter-box .btn-default:hover,
             .filter-box .btn-default:hover {
                 background: #f1f5f9 !important;
-                border-color: #cbd5e1 !important;
+                border-color: #94a3b8 !important;
+                color: #1e293b !important;
+            }
+
+            /* Filter footer with buttons */
+            #filter-box .box-footer,
+            .filter-box .box-footer {
+                background: #f8fafc !important;
+                border-top: 1px solid #e2e8f0 !important;
+                padding: 16px 20px !important;
+                border-radius: 0 0 14px 14px !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                gap: 10px !important;
+                overflow: visible !important;
+            }
+
+            /* Force button colors with max specificity */
+            body .content-wrapper .box .box-body form .box-footer .btn.btn-primary.submit,
+            body .box .box-body form .btn-primary,
+            body .box-body form button.btn-primary,
+            body form .btn.btn-primary {
+                background: #4f46e5 !important;
+                background-image: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+                color: #ffffff !important;
+                border: none !important;
+                border-radius: 10px !important;
+                padding: 10px 28px !important;
+                font-weight: 700 !important;
+                font-size: 14px !important;
+                box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important;
+            }
+            body .content-wrapper .box .box-body form .box-footer .btn.btn-default,
+            body .box .box-body form .btn-default,
+            body .box-body form a.btn-default,
+            body form .btn.btn-default {
+                background: #ffffff !important;
+                color: #475569 !important;
+                border: 2px solid #cbd5e1 !important;
+                border-radius: 10px !important;
+                padding: 10px 28px !important;
+                font-weight: 700 !important;
+                font-size: 14px !important;
             }
 
             /* Nav tabs */
@@ -297,6 +323,24 @@ class GiftLogSummaryController extends MainController
         ');
 
 
+
+        // Force button styles via JS as fallback
+        \Encore\Admin\Facades\Admin::script("
+            setTimeout(function() {
+                // Style Search/Submit buttons
+                document.querySelectorAll('.btn-primary, .submit, button[type=submit]').forEach(function(btn) {
+                    if (btn.closest('form') && !btn.closest('.nav')) {
+                        btn.style.cssText = 'background: linear-gradient(135deg, #6366f1, #4f46e5) !important; color: #fff !important; border: none !important; border-radius: 10px !important; padding: 10px 28px !important; font-weight: 700 !important; font-size: 14px !important; box-shadow: 0 4px 12px rgba(99,102,241,0.3) !important; cursor: pointer !important;';
+                    }
+                });
+                // Style Reset buttons
+                document.querySelectorAll('.btn-default, a.btn').forEach(function(btn) {
+                    if (btn.closest('form') && !btn.closest('.nav')) {
+                        btn.style.cssText = 'background: #fff !important; color: #475569 !important; border: 2px solid #cbd5e1 !important; border-radius: 10px !important; padding: 10px 28px !important; font-weight: 700 !important; font-size: 14px !important; cursor: pointer !important;';
+                    }
+                });
+            }, 200);
+        ");
 
         $grid->disableCreateButton();
         $grid->disableActions();
