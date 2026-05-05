@@ -746,7 +746,11 @@ class UserController extends MainController
         unset(request()['level']);
         unset(request()['worth']);
 
-        return $this->form()->update($id);
+        $this->form()->update($id);
+       
+
+        admin_toastr(trans('admin.update_succeeded'));
+        return redirect(admin_url('users'));
     }
 
 
@@ -886,7 +890,7 @@ class UserController extends MainController
                     ->when($startUtc && $endUtc, fn($q) => $q->whereBetween('created_at', [$startUtc, $endUtc]))
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
 
-
+             
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
@@ -899,7 +903,7 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
-
+           
 
                 // For receiver: just sum giftPrice
                 // For sender: calculate SUM(total * giftNum)
@@ -1202,7 +1206,7 @@ class UserController extends MainController
             $model = $form->model();
             $user_id = $model->id;
             $form->model()->uuid = $form->original_uuid;
-
+            
             if ($form->oldDiValue != $oldDiValue) {
                 $form->di = $oldDiValue;
             }
