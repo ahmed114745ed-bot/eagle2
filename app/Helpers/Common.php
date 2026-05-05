@@ -589,6 +589,9 @@ class Common
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 
+
+
+
     public static function uploadProfileUser($folder, $file, $id, $count)
     {
         // Validate file is uploaded file instance
@@ -905,7 +908,7 @@ class Common
     }
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
-  
+
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
         $isGroup = false;
@@ -977,9 +980,8 @@ class Common
             $payload['android']['notification']['image'] = $data['image'];
         } else {
             $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
-            $payload['android']['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg'; 
-
-          }
+            $payload['android']['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+        }
 
         $headers = [
             'Authorization' => 'Bearer ' . $api_access_key,
@@ -994,7 +996,7 @@ class Common
         ]);
 
         $result = json_decode($result);
- 
+
         //remove group with $key if is group
         if ($result  && $isGroup) {
             self::removeGroupName($key, $token, $tokens, $api_access_key);
@@ -2790,6 +2792,117 @@ class Common
         return [];
     }
 
+
+    /**
+     * ─────────────────────────────────────────────────────────────────
+     *  Upload & Optimize Image/GIF (async via Queue)
+     * ─────────────────────────────────────────────────────────────────
+     *
+     *  Usage:
+     *    // Profile image → resize 512px, compress, WebP, generate thumbnail
+     *    $path = Common::uploadOptimized('profile', $img, 'profile', Profile::class, $profile->id, 'avatar');
+     *
+     *    // Room cover → resize 1024px, compress, WebP
+     *    $path = Common::uploadOptimized('rooms', $file, 'room', Room::class, $room->id, 'room_cover');
+     *
+     *    // General image → no model update, just optimize
+     *    $path = Common::uploadOptimized('images', $file, 'general');
+     *
+     * @param string      $folder     Storage folder (e.g. 'profile', 'rooms', 'images')
+     * @param mixed       $file       UploadedFile instance
+     * @param string      $context    Optimization context: profile|room|banner|gift|general
+     * @param string|null $modelClass Model class to update after optimization (e.g. App\Models\Profile)
+     * @param int|null    $modelId    Model ID to update
+     * @param string|null $column     Model column to store the new path
+     * @param string|null $disk       Storage disk (null = default)
+     * @return string|false           Storage path or false on failure
+     */
+    public static function uploadOptimized(
+        string  $folder,
+        $file,
+        string  $context = 'general',
+        ?string $modelClass = null,
+        ?int    $modelId = null,
+        ?string $column = null,
+        ?string $disk = null
+    ): string|false {
+        if (!$file || !$file->isValid()) {
+            return false;
+        }
+
+        // Step 1: Upload original immediately (fast response to user)
+        $path = self::upload($folder, $file, $disk);
+
+        if (!$path) {
+            return false;
+        }
+
+        // Step 2: Dispatch optimization job to queue (async)
+        \App\Jobs\OptimizeMediaJob::dispatch(
+            storagePath: $path,
+            folder: $folder,
+            context: $context,
+            modelClass: $modelClass,
+            modelId: $modelId,
+            column: $column,
+        )->onQueue('optimization-images');
+
+        return $path;
+    }
+
+    /**
+     * Validate an uploaded image/GIF file before processing.
+     *
+     * @param mixed  $file    UploadedFile
+     * @param string $context profile|room|banner|gift|general
+     * @return array ['valid' => bool, 'error' => string|null]
+     */
+    public static function validateMedia($file, string $context = 'general'): array
+    {
+        if (!$file instanceof \Illuminate\Http\UploadedFile) {
+            return ['valid' => false, 'error' => 'Not a valid upload file.'];
+        }
+
+        if (!$file->isValid()) {
+            return ['valid' => false, 'error' => 'Uploaded file is corrupted.'];
+        }
+
+        $ext  = strtolower($file->getClientOriginalExtension());
+        $mime = $file->getMimeType();
+        $size = $file->getSize();
+
+        // Allowed types
+        $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        if (!in_array($ext, $allowed)) {
+            return ['valid' => false, 'error' => "File type '{$ext}' not allowed."];
+        }
+
+        // MIME check
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!in_array($mime, $allowedMimes)) {
+            return ['valid' => false, 'error' => "Invalid MIME type: {$mime}"];
+        }
+
+        // Size limits
+        $maxSize = ($ext === 'gif') ? 8 * 1024 * 1024 : 5 * 1024 * 1024;
+        if ($size > $maxSize) {
+            $maxMB = $maxSize / 1024 / 1024;
+            return ['valid' => false, 'error' => "File too large. Max: {$maxMB}MB"];
+        }
+
+        // Verify image readable
+        $info = @getimagesize($file->getPathname());
+        if ($info === false) {
+            return ['valid' => false, 'error' => 'File is not a valid image.'];
+        }
+
+        // Max dimensions
+        if ($info[0] > 6000 || $info[1] > 6000) {
+            return ['valid' => false, 'error' => 'Image dimensions too large. Max: 6000px.'];
+        }
+
+        return ['valid' => true, 'error' => null];
+    }
 
     public static function getRoleAuthId($userId)
     {

@@ -29,6 +29,7 @@ use App\Models\RoomCategory;
 use App\Models\RoomMicrophone;
 use App\Models\User;
 use App\Repositories\Room\RoomRepoInterface;
+use App\Rules\ImageSizeRule;
 use App\Services\RoomService;
 use App\Tik\Services\RoomRepoService;
 use App\Traits\MultiQueryPagination;
@@ -149,6 +150,14 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
+
+        $validator = Validator::make($request->all(), [
+            'room_cover' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,gif', new ImageSizeRule(),],
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
 
         $request['show']  = true;
         $request['numid'] = rand(111111, 999999);
@@ -1927,54 +1936,53 @@ class RoomController extends Controller
     }
     protected function removeBlock(Request $request)
     {
-         $validator = Validator::make($request->all(), [
-                'room_id' => 'required|integer|exists:rooms,id',
-                'user_id' => 'required|integer|exists:users,id',
-            ]);
+        $validator = Validator::make($request->all(), [
+            'room_id' => 'required|integer|exists:rooms,id',
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
 
-            if ($validator->fails()) {
-                return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+
+            $userId = $request->user()->id;
+            $room = Room::findOrFail($request->room_id);
+
+            if ($room->uid != $userId) {
+                return Common::apiResponse(0, 'you do not have permission', 400);
             }
 
-            try {
+            $ids = array_filter(explode(',', $room->room_black));
+            $userToRemove = $request->user_id;
 
-                $userId = $request->user()->id;
-                $room = Room::findOrFail($request->room_id);
+            $found = false;
 
-                if ($room->uid != $userId) {
-                    return Common::apiResponse(0, 'you do not have permission', 400);
+            $ids = array_values(array_filter($ids, function ($entry) use ($userToRemove, &$found) {
+
+                $parts = explode('#', $entry);
+                $id = $parts[0] ?? null;
+
+                if ($id == $userToRemove) {
+                    $found = true;
+                    return false;
                 }
 
-                $ids = array_filter(explode(',', $room->room_black));
-                $userToRemove = $request->user_id;
+                return true;
+            }));
 
-                $found = false;
-
-                $ids = array_values(array_filter($ids, function ($entry) use ($userToRemove, &$found) {
-
-                    $parts = explode('#', $entry);
-                    $id = $parts[0] ?? null;
-
-                    if ($id == $userToRemove) {
-                        $found = true;
-                        return false;
-                    }
-
-                    return true;
-                }));
-
-                if (!$found) {
-                    return Common::apiResponse(0, 'this user not in black list', 400);
-                }
-
-                $room->room_black = implode(',', $ids);
-                $room->save();
-
-                return Common::apiResponse(true, 'block removed', 200);
-
-            } catch (Exception $e) {
-                return Common::apiResponse(0, $e->getMessage(), 422);
+            if (!$found) {
+                return Common::apiResponse(0, 'this user not in black list', 400);
             }
+
+            $room->room_black = implode(',', $ids);
+            $room->save();
+
+            return Common::apiResponse(true, 'block removed', 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
     }
     public function roomUserDetails($id)
     {

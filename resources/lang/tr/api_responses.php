@@ -155,6 +155,8 @@ return [
     'frozen' => 'Yükleme geçici olarak durduruldu. Lütfen yönetimle iletişime geçin.',
     'frozen_agency' => 'Ajans cüzdanı geçici olarak donduruldu',
     'min_withdrawal_amount' => ':amount değerinden daha az transfer yapamazsınız',
+    'image_too_large' => 'Resim boyutu 5MB\'ı geçmemelidir',
+    'gif_too_large' => 'GIF resim boyutu 8MB\'ı geçmemelidir',
 
 
 ];

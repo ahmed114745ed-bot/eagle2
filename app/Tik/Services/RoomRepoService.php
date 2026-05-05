@@ -109,12 +109,33 @@ class RoomRepoService
             }
         }
 
+        // if ($request->hasFile('room_cover')) {
+        //     $room->room_cover = WebPHelper::uploadWebp(
+        //         $request->file('room_cover'),
+        //         'rooms',
+        //         'room_cover',
+        //         async: true  // Convert to WebP asynchronously
+        //     );
+
+
+        // } 
+
+       
+
         if ($request->hasFile('room_cover')) {
-            $room->room_cover = WebPHelper::uploadWebp(
-                $request->file('room_cover'),
+            // Validate image
+            $validation = Common::validateMedia($request->file('room_cover'), 'room');
+            if (!$validation['valid']) {
+                throw new \Exception($validation['error']);
+            }
+
+            $room->room_cover = Common::uploadOptimized(
                 'rooms',
-                'room_cover',
-                async: true  // Convert to WebP asynchronously
+                $request->file('room_cover'),
+                'room',
+                Room::class,
+                $room->id,
+                'room_cover'
             );
         } else {
             $room->room_cover = $request->room_cover;
@@ -675,11 +696,18 @@ class RoomRepoService
         }
 
         if ($request->hasFile('room_cover')) {
-            $room->room_cover = WebPHelper::uploadWebp(
-                $request->file('room_cover'),
+            $validation = Common::validateMedia($request->file('room_cover'), 'room');
+            if (!$validation['valid']) {
+                return Common::apiResponse(false, $validation['error'], null, 422);
+            }
+
+            $room->room_cover = Common::uploadOptimized(
                 'rooms',
-                'room_cover',
-                async: true  // Convert to WebP asynchronously
+                $request->file('room_cover'),
+                'room',
+                Room::class,
+                $room->id,
+                'room_cover'
             );
         }
 
