@@ -123,11 +123,13 @@ class OptimizeMediaJob implements ShouldQueue
                 }
             }
 
-            // If nothing worked, skip optimization — keep original file
+            // If nothing worked, skip optimization — keep original file but still update model
             if (!$converted) {
                 Log::warning('OptimizeMediaJob: No conversion tool available, keeping original', [
                     'path' => $this->storagePath,
                 ]);
+                // Still update model with original path
+                $this->updateModel($this->storagePath);
                 return;
             }
 
@@ -142,11 +144,11 @@ class OptimizeMediaJob implements ShouldQueue
                 $disk->delete($this->storagePath);
             }
 
-            // Update model if specified
-            $this->updateModel($newPath);
-
             // ── Generate multiple versions (thumb, medium, large) ──
-            $this->generateMultipleVersions($disk, $tempOutput, $pathInfo['filename'] . '.webp');
+            $versions = $this->generateMultipleVersions($disk, $tempOutput, $pathInfo['filename'] . '.webp');
+
+            // Update model with new path + version paths
+            $this->updateModel($newPath, $versions);
         } finally {
             @unlink($tempInput);
             @unlink($tempOutput);
@@ -228,17 +230,23 @@ class OptimizeMediaJob implements ShouldQueue
      *    profile/versions/abc123_medium.webp       ← 512px
      *    profile/versions/abc123_large.webp        ← 1024px
      */
-    private function generateMultipleVersions($disk, string $sourcePath, string $fileName): void
+    private function generateMultipleVersions($disk, string $sourcePath, string $fileName): array
     {
-        $versions = [
+        $sizes = [
             'thumb'  => 150,
             'medium' => 512,
             'large'  => 1024,
         ];
 
-        foreach ($versions as $name => $width) {
-            $this->generateVersion($disk, $sourcePath, $fileName, $name, $width);
+        $paths = [];
+        foreach ($sizes as $name => $width) {
+            $path = $this->generateVersion($disk, $sourcePath, $fileName, $name, $width);
+            if ($path) {
+                $paths[$name] = $path;
+            }
         }
+
+        return $paths;
     }
 
     /**
@@ -362,11 +370,25 @@ class OptimizeMediaJob implements ShouldQueue
             if ($model) {
                 // Original path
                 $model->{$this->column} = $newPath;
-                // Versions (if using JSON column)
-                if (!empty($versions)) {
-                    $model->setAttribute($this->column . '_versions', $versions);
+
+                // Save version paths to dedicated columns:
+                // avatar_thumb, avatar_medium, avatar_large
+                foreach ($versions as $size => $path) {
+                    $colName = 'avatar_' . $size; // avatar_thumb, avatar_medium, avatar_large
+                    if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), $colName)) {
+                        $model->{$colName} = $path;
+                    }
                 }
+
                 $model->save();
+
+                Log::info('OptimizeMediaJob: Model updated', [
+                    'model'    => $this->modelClass,
+                    'id'       => $this->modelId,
+                    'column'   => $this->column,
+                    'newPath'  => $newPath,
+                    'versions' => $versions,
+                ]);
             }
         }
     }

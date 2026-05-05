@@ -82,6 +82,13 @@ class EnterRoomCollection extends JsonResource
                 'family_name'  => @$this->family->name ?? '',
                 'family_level' => @$this->family->level ?? [],
             ],
+
+            'avatar' => [
+                'original' => $this->room_cover ?? '',
+                'thumbnail' =>  $this->avatar_thumb ?? Common::getImageUrl($this->room_cover, 'thumbnail'),
+                'medium' => $this->avatar_medium ?? Common::getImageUrl($this->room_cover, 'medium'),
+                'large' => $this->avatar_large ?? Common::getImageUrl($this->room_cover, 'large'),
+            ],
             "is_pk"               => (@$pks[0]) && $pks[0]->end_at >= now() ? $pks[0]->status : 0,
             "show_pk"             => @$this->is_show_pk ?? 0,
             'top_user'            => new \stdClass(),

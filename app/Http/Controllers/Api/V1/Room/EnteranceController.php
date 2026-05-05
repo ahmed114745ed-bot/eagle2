@@ -327,7 +327,7 @@ class EnteranceController extends Controller
             return \DB::table('settings')->where('key', 'zego_feature')->value('value');
         });
 
-        if ($zego_feature && $zego_feature == 1)    return Common::apiResponse(0, __('Zego Feature is Disabled, Contact the administration'), null, 403);  
+        if ($zego_feature && $zego_feature == 1)    return Common::apiResponse(0, __('Zego Feature is Disabled, Contact the administration'), null, 403);
         $user     = $request->user();
         $roomId   = (int)$request->input('room_id');
         $roomPass = $request->input('room_pass');
@@ -612,7 +612,21 @@ class EnteranceController extends Controller
 
             if ($request->hasFile('room_cover')) {
 
-                $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+                //  $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+
+                $validation = Common::validateMedia($request->file('room_cover'), 'room');
+                if (!$validation['valid']) {
+                    return Common::apiResponse(false, $validation['error'], null, 404);
+                }
+
+                $room->room_cover = Common::uploadOptimized(
+                    'rooms',
+                    $request->file('room_cover'),
+                    'room',
+                    Room::class,
+                    $room->id,
+                    'room_cover'
+                );
             }
 
             if ($request->free_mic) {
