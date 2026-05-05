@@ -746,8 +746,11 @@ class UserController extends MainController
         unset(request()['level']);
         unset(request()['worth']);
 
+        $this->form()->update($id);
 
-        return $this->form()->update($id);
+        admin_toastr(trans('admin.update_succeeded'));
+
+        return redirect(admin_url('users'));
     }
 
 
