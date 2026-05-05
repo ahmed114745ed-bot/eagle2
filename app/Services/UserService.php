@@ -464,6 +464,7 @@ class UserService
         UserFollowHelper::updateCounts($unFollower);
 
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
+         Cache::forget("data_user_{$unFollower->id}");
         return Common::apiResponse(true, 'unFollow done', null, 200);
     }
 
