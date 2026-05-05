@@ -2028,12 +2028,12 @@ Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
     return response('<pre>' . e($output) . '</pre>');
 });
 
-Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
-    if (class_exists(\Barryvdh\Debugbar\Facades\Debugbar::class)) {
-        \Barryvdh\Debugbar\Facades\Debugbar::info('Viewport:', $request->all());
-    }
-    return response()->json(['ok' => true]);
-});
+// Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
+//     if (class_exists(\Barryvdh\Debugbar\Facades\Debugbar::class)) {
+//         \Barryvdh\Debugbar\Facades\Debugbar::info('Viewport:', $request->all());
+//     }
+//     return response()->json(['ok' => true]);
+// });
 
 Route::get('/octane', function () {
     Cache::store('octane')->clear();
