@@ -15,7 +15,7 @@ class CharismaWork implements RoomJobInterface
     {
         $room = Room::query()->find($roomJob->room_id);
         if(!$room) throw new \Exception('Room not found');
-        $userIds = unserialize($roomJob->data);
+        $userIds = unserialize($roomJob->data, ['allowed_classes' => false]);
         $earnedCoinsPerUser = $roomJob->coins;
 
         $data =(new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $userIds, $earnedCoinsPerUser);

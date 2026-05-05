@@ -47,13 +47,20 @@ class DiamondController extends Controller
                 ->where('receiver_id', $user->id)
                 ->where('created_at', '>=', $startDate)
                 ->where('agency_id', $user->agency_id)
-                ->selectRaw('SUM(giftPrice) as total')
-                ->value('total');
+                ->selectRaw('SUM(giftPrice) as total_gift')
+                ->value('total_gift');
 
             // تحديث جدول users
 
             $monthlyDiamond = $totalReceived ?? 0;
             uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
+           
+            DB::table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'salary_is_updated' => 1,
+                ]);
+
         }
 
         // $totalReceived = DB::table('gift_logs')
