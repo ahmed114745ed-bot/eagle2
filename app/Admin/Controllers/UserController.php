@@ -747,9 +747,10 @@ class UserController extends MainController
         unset(request()['worth']);
 
         $this->form()->update($id);
+       
 
         admin_toastr(trans('admin.update_succeeded'));
-
+         \Log::info("User #{$id} updated by admin " . Auth::user()->id);
         return redirect(admin_url('users'));
     }
 
