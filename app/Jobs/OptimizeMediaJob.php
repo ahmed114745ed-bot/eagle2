@@ -98,7 +98,6 @@ class OptimizeMediaJob implements ShouldQueue
                 $encoded = $image->toWebp($quality);
                 file_put_contents($tempOutput, $encoded->toString());
                 $converted = true;
-
             } catch (\Throwable $e) {
                 Log::info('Intervention Image not available, trying FFmpeg', ['error' => $e->getMessage()]);
             }
@@ -146,8 +145,8 @@ class OptimizeMediaJob implements ShouldQueue
             // Update model if specified
             $this->updateModel($newPath);
 
-            // ── Generate thumbnail in same folder ──
-            $this->generateThumbnail($disk, $tempOutput, $pathInfo['filename'] . '.webp');
+            // ── Generate multiple versions (thumb, medium, large) ──
+            $this->generateMultipleVersions($disk, $tempOutput, $pathInfo['filename'] . '.webp');
         } finally {
             @unlink($tempInput);
             @unlink($tempOutput);
@@ -221,27 +220,82 @@ class OptimizeMediaJob implements ShouldQueue
 
     /**
      * ─────────────────────────────────────────────
-     *  🔲 Generate Thumbnail (150px)
+     *  🔲 Generate Multiple Versions (thumb, medium, large)
      * ─────────────────────────────────────────────
+     *  Storage structure:
+     *    profile/abc123.webp                       ← Original optimized
+     *    profile/versions/abc123_thumb.webp        ← 150px
+     *    profile/versions/abc123_medium.webp       ← 512px
+     *    profile/versions/abc123_large.webp        ← 1024px
      */
-    private function generateThumbnail($disk, string $sourcePath, string $fileName): void
+    private function generateMultipleVersions($disk, string $sourcePath, string $fileName): void
     {
-        $tempThumb = sys_get_temp_dir() . '/' . uniqid('thumb_', true) . '.webp';
+        $versions = [
+            'thumb'  => 150,
+            'medium' => 512,
+            'large'  => 1024,
+        ];
+
+        foreach ($versions as $name => $width) {
+            $this->generateVersion($disk, $sourcePath, $fileName, $name, $width);
+        }
+    }
+
+    /**
+     * Generate a single version at a specific width
+     */
+    private function generateVersion($disk, string $sourcePath, string $fileName, string $versionName, int $width): ?string
+    {
+        $tempFile = sys_get_temp_dir() . '/' . uniqid("ver_{$versionName}_", true) . '.webp';
 
         try {
-            $manager = new ImageManager(new Driver());
-            $thumb = $manager->read($sourcePath);
-            $thumb->scaleDown(width: 150);
+            $generated = false;
 
-            $encoded = $thumb->toWebp(70);
-            file_put_contents($tempThumb, $encoded->toString());
+            // Method 1: Intervention Image
+            try {
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($sourcePath);
+                $image->scaleDown(width: $width);
 
-            $thumbPath = $this->folder . '/thumbnails/' . $fileName;
-            $disk->put($thumbPath, file_get_contents($tempThumb));
+                $encoded = $image->toWebp(70);
+                file_put_contents($tempFile, $encoded->toString());
+                $generated = true;
+            } catch (\Throwable $e) {
+                // Intervention not available
+            }
+
+            // Method 2: FFmpeg fallback
+            if (!$generated) {
+                $ffmpeg = $this->findFfmpeg();
+                if ($ffmpeg) {
+                    $cmd = sprintf(
+                        '%s -y -i %s -vf "scale=\'min(%d,iw)\':-1" -c:v libwebp -q:v 70 -preset picture %s 2>&1',
+                        escapeshellarg($ffmpeg),
+                        escapeshellarg($sourcePath),
+                        $width,
+                        escapeshellarg($tempFile)
+                    );
+                    exec($cmd, $output, $returnCode);
+                    $generated = ($returnCode === 0 && file_exists($tempFile));
+                }
+            }
+
+            if (!$generated) {
+                return null;
+            }
+
+            // Build version path: folder/versions/filename_thumb.webp
+            $nameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
+            $versionPath = $this->folder . '/versions/' . $nameWithoutExt . '_' . $versionName . '.webp';
+
+            $disk->put($versionPath, file_get_contents($tempFile));
+
+            return $versionPath;
         } catch (\Throwable $e) {
-            Log::warning('Thumbnail generation failed', ['error' => $e->getMessage()]);
+            Log::warning("Version generation failed: {$versionName}", ['error' => $e->getMessage()]);
+            return null;
         } finally {
-            @unlink($tempThumb);
+            @unlink($tempFile);
         }
     }
 
@@ -290,12 +344,28 @@ class OptimizeMediaJob implements ShouldQueue
     /**
      * Update the model column with the new optimized path
      */
-    private function updateModel(string $newPath): void
+    // private function updateModel(string $newPath): void
+    // {
+    //     if ($this->modelClass && $this->modelId && $this->column) {
+    //         $model = $this->modelClass::find($this->modelId);
+    //         if ($model) {
+    //             $model->{$this->column} = $newPath;
+    //             $model->save();
+    //         }
+    //     }
+    // }
+
+    private function updateModel(string $newPath, array $versions = []): void
     {
         if ($this->modelClass && $this->modelId && $this->column) {
             $model = $this->modelClass::find($this->modelId);
             if ($model) {
+                // Original path
                 $model->{$this->column} = $newPath;
+                // Versions (if using JSON column)
+                if (!empty($versions)) {
+                    $model->setAttribute($this->column . '_versions', $versions);
+                }
                 $model->save();
             }
         }

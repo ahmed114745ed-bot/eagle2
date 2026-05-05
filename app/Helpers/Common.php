@@ -2904,6 +2904,65 @@ class Common
         return ['valid' => true, 'error' => null];
     }
 
+    /**
+     * ─────────────────────────────────────────────
+     *  🖼️ Get Image URL with version support
+     * ─────────────────────────────────────────────
+     *  Convention-based: builds version path from original path
+     *
+     *  Original: profile/abc123.webp
+     *  Thumb:    profile/versions/abc123_thumb.webp
+     *  Medium:   profile/versions/abc123_medium.webp
+     *  Large:    profile/versions/abc123_large.webp
+     *
+     * @param string|null $path    Original storage path
+     * @param string      $size    Size: 'original', 'thumb', 'medium', 'large'
+     * @return string              Full URL or empty string
+     */
+    public static function getImageUrl(string $path, string $size = 'medium'): string
+    {
+        if (!$path) {
+            return '';
+        }
+        if ($size === 'original') {
+            return Storage::url($path);
+        }
+        $pathInfo = pathinfo($path);
+        $versionPath = $pathInfo['dirname'] . '/versions/'
+            . $pathInfo['filename'] . '_' . $size . '.'
+            . $pathInfo['extension'];
+        // Check if exists, fallback to original
+        if (Storage::exists($versionPath)) {
+            return Storage::url($versionPath);
+        }
+        return Storage::url($path);
+    }
+
+    /**
+     * Get all image versions as an array (for API responses)
+     *
+     * @param string|null $path  Original storage path
+     * @return array             ['original' => url, 'thumb' => url, 'medium' => url, 'large' => url]
+     */
+    public static function getImageVersions(?string $path): array
+    {
+        if (!$path) {
+            return [
+                'original'  => '',
+                'thumb' => '',
+                'medium'    => '',
+                'large'     => '',
+            ];
+        }
+
+        return [
+            'original'  => self::getImageUrl($path, 'original'),
+            'thumb' => self::getImageUrl($path, 'thumb'),
+            'medium'    => self::getImageUrl($path, 'medium'),
+            'large'     => self::getImageUrl($path, 'large'),
+        ];
+    }
+
     public static function getRoleAuthId($userId)
     {
         $userId = $userId ?? auth()->id();
