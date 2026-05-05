@@ -421,6 +421,7 @@ class UserService
             ]);
           //  $this->handleFollowBack($request->user(), $receiver);
             dispatch(new FollowJob($request->user(), $receiver))->onQueue('default');
+            Cache::forget("data_user_{$request->user_id}");
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);
         }
