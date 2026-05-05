@@ -94,13 +94,48 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
                 }
             }
 
+            // DISABLED: user->save() in sendLuckyGiftV2 (line 357) already persists balance changes
+            // Calling updateUserCoinsAndDiamond here causes DUPLICATE DEDUCTION because:
+            // 1. sendLuckyGiftV2 deducts from user->di and saves to DB
+            // 2. updateUserCoins calculates difference and applies it again to DB
+            // Result: balance deducted TWICE (e.g., 1000 becomes 2000 deduction)
+
+            // if ($userId && $totalDiamond > 0) {
+            //     try {
+            //         $userCoinsBefore = $this->payload['user_coins_before'] ?? $this->payload['user_coin_before'] ?? 0;
+            //         $userCoinsAfter = $this->payload['user_coins_after'] ?? $this->payload['user_coin_after'] ?? 0;
+            //         $this->updateUserCoinsAndDiamond($userId, $userCoinsBefore, $userCoinsAfter, $totalDiamond, $senderLevel);
+            //     } catch (\Throwable $e) {
+            //         Log::warning('Failed to update user coins in ProcessLuckyGiftPostJob', [
+            //             'user_id' => $userId,
+            //             'error' => $e->getMessage(),
+            //         ]);
+            //     }
+            // }
+
+            // Instead, only update total_diamond_send and sender_level (without touching balance)
             if ($userId && $totalDiamond > 0) {
                 try {
-                    $userCoinsBefore = $this->payload['user_coins_before'] ?? $this->payload['user_coin_before'] ?? 0;
-                    $userCoinsAfter = $this->payload['user_coins_after'] ?? $this->payload['user_coin_after'] ?? 0;
-                    $this->updateUserCoinsAndDiamond($userId, $userCoinsBefore, $userCoinsAfter, $totalDiamond, $senderLevel);
+                    $updateData = [
+                        'total_diamond_send' => DB::raw("total_diamond_send + {$totalDiamond}"),
+                    ];
+
+                    if ($senderLevel !== null) {
+                        $updateData['sender_level'] = $senderLevel;
+                    }
+
+                    DB::table('users')
+                        ->where('id', $userId)
+                        ->update($updateData);
+
+                    Log::channel('lucky_gift_receiver_issue')->error('UPDATED total_diamond_send + sender_level ONLY (no balance change)', [
+                        'user_id' => $userId,
+                        'total_diamond' => $totalDiamond,
+                        'sender_level' => $senderLevel,
+                        'timestamp' => now()->toDateTimeString(),
+                    ]);
                 } catch (\Throwable $e) {
-                    Log::warning('Failed to update user coins in ProcessLuckyGiftPostJob', [
+                    Log::warning('Failed to update total_diamond_send in ProcessLuckyGiftPostJob', [
                         'user_id' => $userId,
                         'error' => $e->getMessage(),
                     ]);
