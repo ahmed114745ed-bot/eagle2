@@ -54,13 +54,7 @@ class MainController extends AdminController
     {
         Permission::check('edit-' . $this->permission_name);
 
-        // Call parent update (saves the form)
-        $response = parent::update($id);
-
-        // After update, redirect to index (list) instead of show page
-        // This fixes the Octane redirect issue
-        $resourcePath = request()->segment(1) . '/' . request()->segment(2);
-        return redirect(admin_url($resourcePath));
+       return parent::update($id);
     }
 
     public function show($id, Content $content)
