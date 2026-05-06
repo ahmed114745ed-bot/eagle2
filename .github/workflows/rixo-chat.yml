@@ -35,7 +35,7 @@ jobs:
     needs: run_rixo_chat_hub
     environment: rixo-prod
     steps:
-    - name: build and deploy unified stack
+    - name: build images in parallel and deploy stack
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.96.67"
@@ -45,13 +45,25 @@ jobs:
         command_timeout: 30m
         script: |
           cd /var/www/rixo-chat
-          
-          sudo docker build -t rixo-chat-octa:${{ github.sha }} -f Dockerfile-octana .
-          sudo docker build -t rixo-chat-job:${{ github.sha }} -f Dockerfile-jobs .
-          
+
+          sudo docker build -t rixo-chat-octa:${{ github.sha }} -f Dockerfile-octana . &
+          PID_OCTA=$!
+          sudo docker build -t rixo-chat-job:${{ github.sha }} -f Dockerfile-jobs . &
+          PID_JOB=$!
+
+          wait $PID_OCTA
+          OCTA_EXIT=$?
+          wait $PID_JOB
+          JOB_EXIT=$?
+
+          if [ $OCTA_EXIT -ne 0 ] || [ $JOB_EXIT -ne 0 ]; then
+            echo "Build failed! octa=$OCTA_EXIT job=$JOB_EXIT"
+            exit 1
+          fi
+
           export OCTA_IMAGE=rixo-chat-octa:${{ github.sha }}
           export JOB_IMAGE=rixo-chat-job:${{ github.sha }}
-          
+
           sudo -E docker stack deploy -c rixo-deployment.yml rixo
 
   cleanup_images:

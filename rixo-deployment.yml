@@ -32,12 +32,29 @@ services:
     networks:
       - app-network
     deploy:
-      replicas: 2
+      replicas: 1
       resources:
         limits:
           memory: 2G
         reservations:
           memory: 1500M
+
+  rixo-chat-cron:
+    image: ${JOB_IMAGE}
+    command: ["php", "/app/artisan", "schedule:work"]
+    volumes:
+      - /var/www/rixo-chat/.env:/app/.env
+      - /var/www/rixo-chat/gcp.json:/app/docker/gcp.json
+      - /var/www/rixo-chat/storage:/app/storage
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
 
   rixo-chat-zigo-worker:
     image: ${JOB_IMAGE}
