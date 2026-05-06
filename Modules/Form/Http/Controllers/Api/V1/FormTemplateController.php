@@ -1,1 +1,66 @@
-<?php\n\nnamespace Modules\\Form\\Http\\Controllers\\Api\\V1;\n\nuse App\\Http\\Controllers\\Controller;\nuse App\\Models\\FormTemplate;\nuse Illuminate\Http\\Request;\n\nclass FormTemplateController extends Controller\n{\n    /**\n     * Display a listing of the resource.\n     */\n    public function index()\n    {\n        return FormTemplate::all();\n    }\n\n    /**\n     * Store a newly created resource in storage.\n     */\n    public function store(Request $request)\n    {\n        $validatedData = $request->validate([\n            \'name\' => \'required|string|max:255\',\n            \'description\' => \'nullable|string\',\n        ]);\n\n        $formTemplate = FormTemplate::create($validatedData);\n\n        return response()->json($formTemplate, 201);\n    }\n\n    /**\n     * Display the specified resource.\n     */\n    public function show(FormTemplate $formTemplate)\n    {\n        return $formTemplate;\n    }\n\n    /**\n     * Update the specified resource in storage.\n     */\n    public function update(Request $request, FormTemplate $formTemplate)\n    {\n        $validatedData = $request->validate([\n            \'name\' => \'string|max:255\',\n            \'description\' => \'nullable|string\',\n        ]);\n\n        $formTemplate->update($validatedData);\n\n        return response()->json($formTemplate);\n    }\n\n    /**\n     * Remove the specified resource from storage.\n     */\n    public function destroy(FormTemplate $formTemplate)\n    {\n        $formTemplate->delete();\n\n        return response()->json(null, 204);\n    }\n}\n
+<?php
+
+namespace Modules\Form\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Models\FormTemplate;
+use Illuminate\Http\Request;
+
+class FormTemplateController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return FormTemplate::all();
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $formTemplate = FormTemplate::create($validatedData);
+
+        return response()->json($formTemplate, 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(FormTemplate $formTemplate)
+    {
+        return $formTemplate;
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, FormTemplate $formTemplate)
+    {
+        $validatedData = $request->validate([
+            'name' => 'string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $formTemplate->update($validatedData);
+
+        return response()->json($formTemplate);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(FormTemplate $formTemplate)
+    {
+        $formTemplate->delete();
+
+        return response()->json(null, 204);
+    }
+}

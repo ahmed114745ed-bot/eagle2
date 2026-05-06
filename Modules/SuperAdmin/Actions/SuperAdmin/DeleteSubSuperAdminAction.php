@@ -17,8 +17,6 @@ class DeleteSubSuperAdminAction extends RowAction
 
     public function handle(Model $model, Request $request)
     {
-        ]);
-        
         try {
             $OldUserAppId = User::find($model->app_id);
             if ($OldUserAppId) {
@@ -51,9 +49,6 @@ class DeleteSubSuperAdminAction extends RowAction
     public function html()
     {
         $key = $this->getKey();
-        
-        // Log لتتبع المشكلة
-        ]);
         
         return <<<HTML
         <a href="javascript:void(0);" 

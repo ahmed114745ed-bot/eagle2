@@ -9,7 +9,6 @@ class HandleController extends BaseHandleController
 {
     public function handleAction(Request $request)
     {
-        ]);
         
         return parent::handleAction($request);
     }

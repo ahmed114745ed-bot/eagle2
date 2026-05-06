@@ -2626,6 +2626,13 @@ Route::get('/fix-charges-usd', function () {
             }
         });
 
+    return response()->json([
+        'status' => $dryRun ? 'preview' : 'executed',
+        'stats' => $stats,
+        'samples' => $samples,
+    ]);
+});
+
 // ================================================================
 // Direct Recovery V2 - Dispatch Job
 // ================================================================
@@ -3470,14 +3477,11 @@ Route::get('/update-user-monthly-diamonds/{id}', function ($id) {
     ]);
 });
 
-use App\Models\Setting;
-
-
 Route::get('/set-lucky-version-7', function () {
 
     $version = 4;
 
-    Setting::updateOrCreate(
+    \App\Models\Setting::updateOrCreate(
         ['key' => 'lucky_gift_version'],
         ['value' => $version]
     );
