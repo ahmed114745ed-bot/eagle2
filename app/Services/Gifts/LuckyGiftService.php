@@ -44,14 +44,17 @@ class LuckyGiftService
     {
     }
 
-    private function acquireUserLock(int $userId, int $timeoutSeconds = 30): \Illuminate\Contracts\Cache\Lock
+    private function acquireUserLock(int $userId, int $timeoutSeconds = 5): \Illuminate\Contracts\Cache\Lock
     {
          $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
 
-         try {
-             $lock->block(15);
-         } catch (LockTimeoutException $e) {
-             throw new InvalidArgumentException(__('api_responses.try_again'));
+         // Non-blocking lock - immediate response instead of waiting
+         if (!$lock->get()) {
+             Log::channel('lucky_gift')->warning('Lock timeout - gift already in progress', [
+                 'user_id' => $userId,
+                 'lock_key' => "lucky_gift_lock:user:{$userId}",
+             ]);
+             throw new InvalidArgumentException(__('api_responses.gift_in_progress'));
          }
 
          return $lock;
