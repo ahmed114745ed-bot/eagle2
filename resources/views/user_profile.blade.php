@@ -3827,7 +3827,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($charges as $index => $charge)
+@forelse($charges ?? [] as $index => $charge)
                             @php
                                 if($chargeTabType == 'receiver') {
                                     $userCharges = Common::getChargerInfo($charge);
