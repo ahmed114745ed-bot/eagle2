@@ -10,6 +10,7 @@ use App\Models\Admin;
 use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\LiveTime;
+use App\Models\UserSallary;
 use App\Helpers\UserCommon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
@@ -720,12 +721,12 @@ class AgencyService
 
         // $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
         // $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
-        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate);
+        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $agencyId, $startDate, $endDate, $timezone);
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
-            //$data->day = Carbon::parse($data->date)->day;
-            $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
+            // Date is already in the correct timezone from repository
+            $data->day = Carbon::parse($data->date)->day;
             return $data;
         });
         $dailyTimes = $dailyTimes->map(function ($data) use ($timezone) {
@@ -1046,11 +1047,11 @@ class AgencyService
     public function deleteAgency($id)
     {
         $agency = $this->agencyRepository->findOrFail($id);
-        $data = [
-            'agency_id' => 0,
-            'type_user' => 0,
-        ];
-        $this->userRepository->update($data, $agency->app_owner_id);
+        $owner = User::find($agency->app_owner_id);
+        if ($owner) {
+            // Use centralized method to remove owner
+            \App\Facades\UserHandling::changeUserAgency($owner, 0, 0);
+        }
         $agency->delete();
         return true;
     }
@@ -1069,6 +1070,14 @@ class AgencyService
 
     public function createAgencyUtd($request)
     {
+        $existingAgency = $this->agencyRepository->getAgencyByOwnerIdAndType($request->app_owner_id, $request->type);
+        if ($existingAgency) {
+            throw new Exception(__('This user is already an owner of a :type agency: :name', [
+                'type' => $request->type == 1 ? 'host' : 'shipping',
+                'name' => $existingAgency->name
+            ]));
+        }
+
         if ($request->hasFile('img')) {
 
             $image = Common::upload('agency', $request->file('img'));
@@ -1095,12 +1104,12 @@ class AgencyService
             $userType = 3;
         }
 
-        $data = [
-            'agency_id' =>  $agency->id,
-            'type_user' => $userType,
-            'monthly_diamond_received' => 0,
-        ];
-        $this->userRepository->update($data, $request->app_owner_id);
+        $owner = User::find($request->app_owner_id);
+        if ($owner) {
+            // Use centralized method to assign owner
+            \App\Facades\UserHandling::changeUserAgency($owner, $agency->id, $userType);
+        }
+
         return true;
     }
 
@@ -1110,14 +1119,20 @@ class AgencyService
         $agency = $this->agencyRepository->findOrFail($id);
 
         if ($agency->app_owner_id != $request->app_owner_id) {
-            $data = [
-                'agency_id' => 0,
-                'type_user' => 0,
-                'monthly_diamond_received' => 0,
-            ];
-            $this->userRepository->update($data, $agency->app_owner_id);
-            $user = User::find($agency->app_owner_id);
-            Admin::where('username', $user->uuid)->delete();
+            $existingAgency = $this->agencyRepository->getAgencyByOwnerIdAndType($request->app_owner_id, $request->type);
+            if ($existingAgency && $existingAgency->id != $id) {
+                throw new Exception(__('This user is already an owner of a :type agency: :name', [
+                    'type' => $request->type == 1 ? 'host' : 'shipping',
+                    'name' => $existingAgency->name
+                ]));
+            }
+
+            $oldOwner = User::find($agency->app_owner_id);
+            if ($oldOwner) {
+                // Use centralized method to remove old owner
+                \App\Facades\UserHandling::changeUserAgency($oldOwner, 0, 0);
+                Admin::where('username', $oldOwner->uuid)->delete();
+            }
             //Common::createUserAdmin($request->app_owner_id);
         }
 
@@ -1128,12 +1143,11 @@ class AgencyService
             $userType = 3;
         }
 
-        $data = [
-            'agency_id' =>  $agency->id,
-            'type_user' => $userType,
-            'monthly_diamond_received' => 0,
-        ];
-        $this->userRepository->update($data, $request->app_owner_id);
+        $newOwner = User::find($request->app_owner_id);
+        if ($newOwner) {
+            // Use centralized method to assign new owner
+            \App\Facades\UserHandling::changeUserAgency($newOwner, $agency->id, $userType);
+        }
         $dataAgency = [
             'app_owner_id' => $request->app_owner_id,
             'name' => $request->name,

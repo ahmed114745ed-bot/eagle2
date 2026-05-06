@@ -270,7 +270,7 @@ class MyDataResource extends JsonResource
 
         ];
 
-        $data['auth_token'] = $this->auth_token;
+//        $data['auth_token'] = $this->auth_token;
         if (isset($this->is_mic)) {
             $data['is_mic'] = $this->is_mic;
         }
@@ -297,15 +297,15 @@ class MyDataResource extends JsonResource
     //     $gold_level             = $user->total_sender_level;
     //     $vipsData = Vip::collectionBuilder()->get();
     //     $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
-        
+
     //     $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
-       
+
     //     $diamondSend             = $user->total_sender_diamonds;
 
     //     $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
-       
+
     //     $next_gold_num = $nextGoldData['next_exp'];
-        
+
     //     $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
     //     $st = (int)$next_gold_num - (int)($current_gold_num);
     //     $sc = (int)$senderNum - (int)($current_gold_num);

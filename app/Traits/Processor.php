@@ -73,13 +73,80 @@ trait  Processor
     {
         if ($image == null) return $old_image ?? 'def.png';
 
+        // Security: If $image is a URL string, validate it against SSRF
+        if (is_string($image) && (str_starts_with($image, 'http://') || str_starts_with($image, 'https://'))) {
+            $validation = \App\Helpers\UrlValidator::validateUrl($image, true);
+
+            if (!$validation['valid']) {
+                \Log::warning('SSRF attempt blocked in file_uploader', [
+                    'url' => $image,
+                    'error' => $validation['error'],
+                    'ip' => request()->ip()
+                ]);
+                throw new \Exception('Invalid image URL: ' . $validation['error']);
+            }
+
+            // Only allow HTTPS
+            if (!str_starts_with($image, 'https://')) {
+                throw new \Exception('Only HTTPS URLs are allowed');
+            }
+
+            // Use HTTP client instead of file_get_contents to prevent stream wrapper attacks
+            try {
+                $response = \Http::timeout(10)
+                    ->withOptions([
+                        'verify' => true,
+                        'allow_redirects' => ['max' => 2, 'strict' => true]
+                    ])
+                    ->get($image);
+
+                if (!$response->successful()) {
+                    throw new \Exception('Failed to download image');
+                }
+
+                $content = $response->body();
+                if (strlen($content) > 10485760) { // 10MB limit
+                    throw new \Exception('Image exceeds size limit');
+                }
+            } catch (\Exception $e) {
+                \Log::error('file_uploader download failed', [
+                    'url' => $image,
+                    'error' => $e->getMessage()
+                ]);
+                throw $e;
+            }
+        } elseif (is_string($image)) {
+            // Security: Block dangerous PHP stream wrappers
+            $dangerousWrappers = ['php://', 'file://', 'phar://', 'data://', 'glob://', 'expect://'];
+            foreach ($dangerousWrappers as $wrapper) {
+                if (str_starts_with(strtolower($image), $wrapper)) {
+                    \Log::warning('Blocked dangerous stream wrapper in file_uploader', [
+                        'wrapper' => $wrapper,
+                        'input' => $image,
+                        'ip' => request()->ip()
+                    ]);
+                    throw new \Exception('Invalid file path');
+                }
+            }
+
+            // If it's a local file path, read it safely
+            if (file_exists($image) && is_file($image)) {
+                $content = file_get_contents($image);
+            } else {
+                throw new \Exception('File not found');
+            }
+        } else {
+            // Assume it's file content already
+            $content = $image;
+        }
+
         if (isset($old_image)) Storage::disk(self::getDisk())->delete($dir . $old_image);
 
         $imageName = \Carbon\Carbon::now()->toDateString() . "-" . uniqid() . "." . $format;
         if (!Storage::disk(self::getDisk())->exists($dir)) {
             Storage::disk(self::getDisk())->makeDirectory($dir);
         }
-        Storage::disk(self::getDisk())->put($dir . $imageName, file_get_contents($image));
+        Storage::disk(self::getDisk())->put($dir . $imageName, $content);
 
         return $imageName;
     }

@@ -1,19 +1,17 @@
 <?php
 
+use App\Bd\Controllers\AgencyController;
 use App\Bd\Controllers\AuthController;
 use App\Bd\Controllers\BdSalariesController;
 use App\Bd\Controllers\ChargeController;
-use App\Bd\Controllers\MultiLanguageController;
-use Illuminate\Support\Facades\Route;
 use App\Bd\Controllers\HomeController;
-use App\Bd\Controllers\WalletController;
-// use App\Bd\Controllers\RequestAgencyController;
-// use App\Bd\Controllers\ChargeController;
-// use App\Bd\Controllers\BdSalariesController;
-use App\Bd\Controllers\AgencyController;
-use App\Bd\Controllers\UserController;
-use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Bd\Controllers\MultiLanguageController;
 use App\Bd\Controllers\RequestAgencyController;
+use App\Bd\Controllers\UserController;
+use App\Bd\Controllers\WalletController;
+use Illuminate\Support\Facades\Route;
+use KevinSoft\MultiLanguage\MultiLanguage;
+use Modules\Form\Http\Controllers\FormRequestController;
 
 
 
@@ -82,5 +80,11 @@ Route::group(
         Route::post('/locale', MultiLanguageController::class . '@locale');
 
         Route::resource('/request-agencies', RequestAgencyController::class);
+
+
+        Route::prefix('requests')->group(function () {
+            Route::post('{id}/approve', [FormRequestController::class, 'approve'])->name('requests.approve');
+            Route::post('{id}/reject', [FormRequestController::class, 'reject'])->name('requests.reject');
+        });
     }
 );

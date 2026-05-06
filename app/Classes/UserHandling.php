@@ -84,9 +84,37 @@ class UserHandling
 
         // }
     }
+    /**
+     * Centralized method to change user's agency.
+     * ALWAYS use this method when changing agency_id to ensure salary handling.
+     *
+     * @param User $user The user whose agency is being changed
+     * @param int|null $newAgencyId The new agency ID (null or 0 to remove from agency)
+     * @param int|null $newUserType The new user type (1=host, 2=agency_owner, etc.)
+     * @return void
+     */
+    public function changeUserAgency(User &$user, ?int $newAgencyId, ?int $newUserType = null): void
+    {
+        // Close salary records from old agency if user had one
+        if ($user->agency_id != 0 && $user->agency_id != null) {
+            $this->handleUserSalaries($user, $user->agency_id);
+        }
+
+        // Update agency_id and type_user
+        $user->agency_id = $newAgencyId ?? 0;
+
+        if ($newUserType !== null) {
+            $user->type_user = $newUserType;
+        }
+
+        $user->save();
+
+        // Reset monthly diamond receive
+        uploadMonthlyDiamondReceive($user->id, 0);
+    }
+
     public function kickUserFromAgency(User &$user, $isApp = 0, $agencyId = null): void
     {
-        
         $this->handleUserSalaries($user, $agencyId);
         $this->clearUserAgencyLogs($user, $agencyId);
         $this->updateUserJoinedAgency($user, $isApp);

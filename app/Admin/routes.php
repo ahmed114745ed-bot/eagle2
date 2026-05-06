@@ -87,6 +87,7 @@ use App\Admin\Controllers\ReportController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ResetUserSalaryController;
+use App\Admin\Controllers\RewardWinnerGameController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomBackgroundManagerController;
 use App\Admin\Controllers\RoomController;
@@ -150,7 +151,7 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
+        Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin')->middleware('throttle:admin-login');
     }
 );
 
@@ -384,7 +385,7 @@ Route::group(
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
         Route::put('wares/toggle-enable/{id}', [WareController::class, 'toggleEnable']);
-
+        Route::resource('percentage-games', PercentageGameController::class);
         Route::resource('test-pusher', TestPusherController::class);
         Route::resource('report_user', ReportUserController::class)->middleware('web-agency-feature');
         // Route::resource('coupons', 'CouponController');
@@ -689,6 +690,7 @@ Route::group(
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
         Route::get('invitation-code', [InvitationSettingsController::class, 'inviteCode']);
+        Route::resource('reward-winner-games', RewardWinnerGameController::class);
 
 
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
@@ -730,7 +732,7 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-        Route::resource('charisma-levels', CharismaLevelController::class);
+        Route::resource('charisma-levels', CharismaLevelController::class)->middleware('charisma.badge');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
@@ -812,12 +814,12 @@ Route::group(
             Route::get('/gift-test', [GiftLogTestController::class, 'showSendGift']);
             Route::post('/gift-test', [GiftLogTestController::class, 'sendGift']);
 
-            Route::get('/pusher-test/{id}', function ($id) {
-                $user = \App\Models\User::findOrFail($id);
-                $token = $user->createToken('broadcast')->plainTextToken;
-
-                return view('test.test-pusher', compact('token'));
-            });
+//            Route::get('/pusher-test/{id}', function ($id) {
+//                $user = \App\Models\User::findOrFail($id);
+//                $token = $user->createToken('broadcast')->plainTextToken;
+//
+//                return view('test.test-pusher', compact('token'));
+//            });
         });
 
         Route::prefix('notifications')->group(function () {
@@ -844,4 +846,12 @@ Route::group([
     'middleware' => ['web', 'admin'],
 ], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
+
+    // User Profile Actions
+    Route::post('users/{id}/toggle-transfer-salary', [\App\Admin\Controllers\UserController::class, 'toggleTransferSalary'])->name('users.toggle-transfer-salary');
+    Route::post('users/{id}/toggle-invite-code', [\App\Admin\Controllers\UserController::class, 'toggleInviteCode'])->name('users.toggle-invite-code');
+    Route::post('users/{id}/toggle-can-play', [\App\Admin\Controllers\UserController::class, 'toggleCanPlay'])->name('users.toggle-can-play');
+    Route::post('users/{id}/kick-agency', [\App\Admin\Controllers\UserController::class, 'kickAgency'])->name('users.kick-agency');
+    Route::post('users/{id}/kick-family', [\App\Admin\Controllers\UserController::class, 'kickFamily'])->name('users.kick-family');
+    Route::post('users/{id}/change-agency', [\App\Admin\Controllers\UserController::class, 'changeAgency'])->name('users.change-agency');
 });

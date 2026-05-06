@@ -7,6 +7,7 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Services\UserService;
 use App\Models\Agency;
 use App\Models\Bd;
+use App\Models\Country;
 use App\Models\ShippingAgency;
 use App\Models\User;
 use Encore\Admin\Facades\Admin;
@@ -413,13 +414,17 @@ class FormRequestController extends MainController
                 'message' => __('user_already_has_agency'),
             ], 400);
         }
+        $bd = Bd::find($request->bd_id);
 
+        // Resolve country_id: prefer owner's, fallback to BD's
+        $countryId = @$owner?->country?->id ?? @$bd?->country?->id ?? null;
+        
         Agency::create([
             'name' => $request->name,
             'phone' => $request->whatsapp_number,
             'app_owner_id' => $owner->id,
-            'bd_id' => $request->bd_id,
-            'country_id' => $owner->country_id,
+            'bd_id' => $bd?->id,
+            'country_id' => $countryId,
         ]);
         $request->update(['status' => 'approved']);
         $owner->type_user = 2;
@@ -506,13 +511,20 @@ class FormRequestController extends MainController
             ], 400);
         }
 
+        $bd = Bd::find($request->bd_id);
+
+        // Resolve country_id: prefer owner's, fallback to BD's
+        $countryId = @$owner?->country?->id ?? @$bd?->country?->id ?? null;
+
         ShippingAgency::create([
             'name' => $request->name,
             'phone' => $request->whatsapp_number,
             'app_owner_id' => $owner->id,
-            'bd_id' => $request->bd_id,
-            'country_id' => $owner->country_id,
+            'bd_id' => $bd?->id,
+            'country_id' => $countryId,
+            'type'=> 2,
         ]);
+        
 
         MilestoneHelper::grantMilestoneToUser($owner, 'charge-agency-owner');
         $request->update(['status' => 'approved']);

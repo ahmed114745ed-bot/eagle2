@@ -421,6 +421,7 @@ class UserService
             ]);
           //  $this->handleFollowBack($request->user(), $receiver);
             dispatch(new FollowJob($request->user(), $receiver))->onQueue('default');
+            Cache::forget("data_user_{$request->user_id}");
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);
         }
@@ -464,6 +465,7 @@ class UserService
         UserFollowHelper::updateCounts($unFollower);
 
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
+         Cache::forget("data_user_{$unFollower->id}");
         return Common::apiResponse(true, 'unFollow done', null, 200);
     }
 
@@ -1032,15 +1034,11 @@ class UserService
     {
         $agencyOwner = $this->agencyRepository->getAgencyByOwnerId($request->user_id);
         if ($agencyOwner) throw new Exception(__('This User is the host Of agency can\'t delete it'));
-        $data = [
-            'agency_id' => $request->agency_id,
-        ];
-        $user = $this->userRepository->update($data, $request->user_id);
-        $userSalary = $this->userSalaryRepository->findByUser($request->user_id);
-        if ($userSalary) {
-            $userSalary->user_agency_id = $request->agency_id;
-            $userSalary->save();
-        }
+
+        $user = $this->userRepository->findOrFail($request->user_id);
+
+        UserHandling::changeUserAgency($user, $request->agency_id);
+
         return true;
     }
 
@@ -1455,4 +1453,5 @@ class UserService
             return $earning->refresh();
         });
     }
+
 }

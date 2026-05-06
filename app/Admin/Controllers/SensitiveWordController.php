@@ -19,7 +19,7 @@ class SensitiveWordController extends MainController
      * @var string
      */
     protected $title = 'Sensitive Word';
-
+    public $permission_name = 'sensitive-word';
 
     public function index(Content $content)
     {

@@ -137,7 +137,7 @@ class FormTemplateController extends Controller
 
     public function edit($id, Content $content)
     {
-    
+
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
@@ -167,178 +167,177 @@ class FormTemplateController extends Controller
 
         try {
 
-        $formTemplate = FormTemplate::findOrFail($id);
+            $formTemplate = FormTemplate::findOrFail($id);
 
-        \Log::channel('single')->info('Current Template Data BEFORE update:', [
-            'id' => $formTemplate->id,
-            'title' => $formTemplate->getRawOriginal('title'),
-            'form_type' => $formTemplate->form_type,
-            'description' => $formTemplate->getRawOriginal('description'),
-        ]);
-
-        try {
-            $validated = $request->validate([
-                'title' => 'required|array',
-                'title.*' => 'required|string',
-                'form_type' => 'required|string',
-                'description' => 'nullable|array',
-                'sections' => 'required|array',
+            \Log::channel('single')->info('Current Template Data BEFORE update:', [
+                'id' => $formTemplate->id,
+                'title' => $formTemplate->getRawOriginal('title'),
+                'form_type' => $formTemplate->form_type,
+                'description' => $formTemplate->getRawOriginal('description'),
             ]);
-            \Log::channel('single')->info('Validation PASSED', $validated);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::channel('single')->error('Validation FAILED', ['errors' => $e->errors()]);
-            throw $e;
-        }
 
-        $allFieldNames = [];
-        foreach ($request->sections as $sectionData) {
-            
-            if (isset($sectionData['fields'])) {
-                foreach ($sectionData['fields'] as $fieldData) {
-                    $name = trim($fieldData['name'] ?? '');
-                    if ($name !== '') {
-                        if (in_array($name, $allFieldNames)) {
-                            \Log::channel('single')->warning('Duplicate field name detected: ' . $name);
-                            return back()->withErrors(['duplicate_field' => "حقل '$name' مكرر داخل نفس النموذج."])->withInput();
-                        }
-                        $allFieldNames[] = $name;
-                    }
-                }
-            }
-        }
-
-        // Update form template basic info
-        \Log::channel('single')->info('Attempting to update template basic info:', [
-            'title' => $request->title,
-            'form_type' => $request->form_type,
-            'description' => $request->description,
-        ]);
-
-        $updateResult = $formTemplate->update([
-            'title' => $request->title,
-            'form_type' => $request->form_type,
-            'description' => $request->description,
-        ]);
-
-        \Log::channel('single')->info('Template update() result: ' . ($updateResult ? 'TRUE' : 'FALSE'));
-        
-        // Reload and verify
-        $formTemplate->refresh();
-        \Log::channel('single')->info('Template Data AFTER update:', [
-            'title' => $formTemplate->getRawOriginal('title'),
-            'form_type' => $formTemplate->form_type,
-            'description' => $formTemplate->getRawOriginal('description'),
-            'dirty' => $formTemplate->getDirty(),
-            'wasChanged' => $formTemplate->wasChanged(),
-        ]);
-
-        // Delete old sections and fields (cascade will handle fields)
-        \Log::channel('single')->info('Deleting old sections for template ID: ' . $id);
-        $oldSectionsCount = $formTemplate->sections()->count();
-        $formTemplate->sections()->delete();
-        \Log::channel('single')->info('Deleted ' . $oldSectionsCount . ' old sections');
-
-        // Create new sections and fields
-        if ($request->has('sections')) {
-            foreach ($request->sections as $sectionData) {
-                // Create section
-                $section = FormSection::create([
-                    'form_template_id' => $formTemplate->id,
-                    'title' => $sectionData['title'],
-                    'section_order' => $sectionData['order'],
-                    'is_visible' => true,
-                    'can_not_delete' => $sectionData['can_not_delete']
+            try {
+                $validated = $request->validate([
+                    'title' => 'required|array',
+                    'title.*' => 'required|string',
+                    'form_type' => 'required|string',
+                    'description' => 'nullable|array',
+                    'sections' => 'required|array',
                 ]);
+                \Log::channel('single')->info('Validation PASSED', $validated);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                \Log::channel('single')->error('Validation FAILED', ['errors' => $e->errors()]);
+                throw $e;
+            }
 
-                // Create fields for this section
+            $allFieldNames = [];
+            foreach ($request->sections as $sectionData) {
+
                 if (isset($sectionData['fields'])) {
                     foreach ($sectionData['fields'] as $fieldData) {
-                        $fieldType = $fieldData['type'] ?? 'text';
-                        $options = null;
-                        $dataSource = null;
-                        $widgetId = null;
-                        $widgetConfig = null;
-
-                        // ============================================
-                        // Handle Custom Widget Fields
-                        // ============================================
-                        if ($fieldType === 'custom' && isset($fieldData['widget_id'])) {
-                            $widgetId = $fieldData['widget_id'];
-                            $widget = \Modules\Form\Entities\CustomFieldWidget::find($widgetId);
-                            if ($widget) {
-                                $widgetConfig = $widget->default_config;
+                        $name = trim($fieldData['name'] ?? '');
+                        if ($name !== '') {
+                            if (in_array($name, $allFieldNames)) {
+                                \Log::channel('single')->warning('Duplicate field name detected: ' . $name);
+                                return back()->withErrors(['duplicate_field' => "حقل '$name' مكرر داخل نفس النموذج."])->withInput();
                             }
+                            $allFieldNames[] = $name;
                         }
-                        // ============================================
-                        // Handle Select/Checkbox/Radio Fields
-                        // ============================================
-                        elseif (in_array($fieldType, ['select', 'checkbox', 'radio'])) {
-                            // Check if options_type is provided
-                            if (isset($fieldData['options_type'])) {
-
-                                // Custom Options
-                                if ($fieldData['options_type'] === 'custom') {
-                                    // Process custom options from the form
-                                    // Format: sections[X][fields][Y][options][Z][label][locale] & [value]
-                                    if (isset($fieldData['options']) && is_array($fieldData['options'])) {
-                                        $processedOptions = [];
-
-                                        foreach ($fieldData['options'] as $optionData) {
-                                            if (isset($optionData['value']) && !empty($optionData['value'])) {
-                                                $processedOptions[] = [
-                                                    'label' => $optionData['label'] ?? [],  // Multi-language labels
-                                                    'value' => $optionData['value']
-                                                ];
-                                            }
-                                        }
-
-                                        $options = !empty($processedOptions) ? $processedOptions : null;
-                                    }
-                                }
-                                // Predefined Data Source
-                                elseif ($fieldData['options_type'] === 'predefined') {
-                                    if (isset($fieldData['data_source']) && !empty($fieldData['data_source'])) {
-                                        $dataSource = $fieldData['data_source'];
-                                    }
-                                }
-                            } elseif ($fieldData['options_type'] === 'predefined' && isset($fieldData['data_source'])) {
-                                $dataSource = $fieldData['data_source'];
-                            }
-                        }
-                        // ============================================
-                        // Create Field Record
-                        // ============================================
-                        FormField::create([
-                            'section_id' => $section->id,
-                            'field_label' => $fieldData['label'],
-                            'field_name' => trim($fieldData['name']),
-                            'field_type' => $fieldType,
-                            'widget_id' => $widgetId,
-                            'widget_config' => $widgetConfig,
-                            'placeholder' => $fieldData['placeholder'] ?? null,
-                            'options' => $options,
-                            'data_source' => $dataSource,
-                            'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
-                            'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
-                            'field_order' => $fieldData['order'],
-                            'can_not_delete' =>  $fieldData['can_not_delete']
-                        ]);
                     }
                 }
             }
-        }
 
-        \Log::channel('single')->info('========== FORM TEMPLATE UPDATE COMPLETED SUCCESSFULLY ==========');
-        \Log::channel('single')->info('New sections count: ' . $formTemplate->sections()->count());
-        \Log::channel('single')->info('Final template state:', [
-            'id' => $formTemplate->id,
-            'title' => $formTemplate->getRawOriginal('title'),
-            'form_type' => $formTemplate->form_type,
-        ]);
+            // Update form template basic info
+            \Log::channel('single')->info('Attempting to update template basic info:', [
+                'title' => $request->title,
+                'form_type' => $request->form_type,
+                'description' => $request->description,
+            ]);
 
-        admin_success(__('Form template updated successfully!'));
-        return redirect(admin_url('form-templates'));
+            $updateResult = $formTemplate->update([
+                'title' => $request->title,
+                'form_type' => $request->form_type,
+                'description' => $request->description,
+            ]);
 
+            \Log::channel('single')->info('Template update() result: ' . ($updateResult ? 'TRUE' : 'FALSE'));
+
+            // Reload and verify
+            $formTemplate->refresh();
+            \Log::channel('single')->info('Template Data AFTER update:', [
+                'title' => $formTemplate->getRawOriginal('title'),
+                'form_type' => $formTemplate->form_type,
+                'description' => $formTemplate->getRawOriginal('description'),
+                'dirty' => $formTemplate->getDirty(),
+                'wasChanged' => $formTemplate->wasChanged(),
+            ]);
+
+            // Delete old sections and fields (cascade will handle fields)
+            \Log::channel('single')->info('Deleting old sections for template ID: ' . $id);
+            $oldSectionsCount = $formTemplate->sections()->count();
+            $formTemplate->sections()->delete();
+            \Log::channel('single')->info('Deleted ' . $oldSectionsCount . ' old sections');
+
+            // Create new sections and fields
+            if ($request->has('sections')) {
+                foreach ($request->sections as $sectionData) {
+                    // Create section
+                    $section = FormSection::create([
+                        'form_template_id' => $formTemplate->id,
+                        'title' => $sectionData['title'],
+                        'section_order' => $sectionData['order'],
+                        'is_visible' => true,
+                        'can_not_delete' => $sectionData['can_not_delete']
+                    ]);
+
+                    // Create fields for this section
+                    if (isset($sectionData['fields'])) {
+                        foreach ($sectionData['fields'] as $fieldData) {
+                            $fieldType = $fieldData['type'] ?? 'text';
+                            $options = null;
+                            $dataSource = null;
+                            $widgetId = null;
+                            $widgetConfig = null;
+
+                            // ============================================
+                            // Handle Custom Widget Fields
+                            // ============================================
+                            if ($fieldType === 'custom' && isset($fieldData['widget_id'])) {
+                                $widgetId = $fieldData['widget_id'];
+                                $widget = \Modules\Form\Entities\CustomFieldWidget::find($widgetId);
+                                if ($widget) {
+                                    $widgetConfig = $widget->default_config;
+                                }
+                            }
+                            // ============================================
+                            // Handle Select/Checkbox/Radio Fields
+                            // ============================================
+                            elseif (in_array($fieldType, ['select', 'checkbox', 'radio'])) {
+                                // Check if options_type is provided
+                                if (isset($fieldData['options_type'])) {
+
+                                    // Custom Options
+                                    if ($fieldData['options_type'] === 'custom') {
+                                        // Process custom options from the form
+                                        // Format: sections[X][fields][Y][options][Z][label][locale] & [value]
+                                        if (isset($fieldData['options']) && is_array($fieldData['options'])) {
+                                            $processedOptions = [];
+
+                                            foreach ($fieldData['options'] as $optionData) {
+                                                if (isset($optionData['value']) && !empty($optionData['value'])) {
+                                                    $processedOptions[] = [
+                                                        'label' => $optionData['label'] ?? [],  // Multi-language labels
+                                                        'value' => $optionData['value']
+                                                    ];
+                                                }
+                                            }
+
+                                            $options = !empty($processedOptions) ? $processedOptions : null;
+                                        }
+                                    }
+                                    // Predefined Data Source
+                                    elseif ($fieldData['options_type'] === 'predefined') {
+                                        if (isset($fieldData['data_source']) && !empty($fieldData['data_source'])) {
+                                            $dataSource = $fieldData['data_source'];
+                                        }
+                                    }
+                                } elseif ($fieldData['options_type'] === 'predefined' && isset($fieldData['data_source'])) {
+                                    $dataSource = $fieldData['data_source'];
+                                }
+                            }
+                            // ============================================
+                            // Create Field Record
+                            // ============================================
+                            FormField::create([
+                                'section_id' => $section->id,
+                                'field_label' => $fieldData['label'],
+                                'field_name' => trim($fieldData['name']),
+                                'field_type' => $fieldType,
+                                'widget_id' => $widgetId,
+                                'widget_config' => $widgetConfig,
+                                'placeholder' => $fieldData['placeholder'] ?? null,
+                                'options' => $options,
+                                'data_source' => $dataSource,
+                                'is_required' => isset($fieldData['required']) && $fieldData['required'] == '1',
+                                'is_enabled' => isset($fieldData['enabled']) && $fieldData['enabled'] == '1',
+                                'field_order' => $fieldData['order'],
+                                'can_not_delete' =>  $fieldData['can_not_delete']
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            \Log::channel('single')->info('========== FORM TEMPLATE UPDATE COMPLETED SUCCESSFULLY ==========');
+            \Log::channel('single')->info('New sections count: ' . $formTemplate->sections()->count());
+            \Log::channel('single')->info('Final template state:', [
+                'id' => $formTemplate->id,
+                'title' => $formTemplate->getRawOriginal('title'),
+                'form_type' => $formTemplate->form_type,
+            ]);
+
+            admin_success(__('Form template updated successfully!'));
+            return redirect(admin_url('form-templates'));
         } catch (\Exception $e) {
             \Log::channel('single')->error('========== FORM TEMPLATE UPDATE FAILED ==========');
             \Log::channel('single')->error('Error Message: ' . $e->getMessage());
@@ -348,7 +347,7 @@ class FormTemplateController extends Controller
         }
     }
 
-   
+
 
 
     public function destroy(FormTemplate $formTemplate)
@@ -402,6 +401,7 @@ class FormTemplateController extends Controller
 
     public function storeSubmission(Request $request, string $type)
     {
+
         $template = FormTemplate::where('form_type', $type)->firstOrFail();
 
         $data = $request->except('_token');
@@ -435,6 +435,7 @@ class FormTemplateController extends Controller
             'country' => $request->country_id,
             'created_at' => now(),
         ]);
+
         if (!$save) {
             return response()->json([
                 'success' => false,

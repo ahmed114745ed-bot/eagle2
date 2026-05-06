@@ -40,10 +40,9 @@ class AcceptAgencyAction extends RowAction
         $additionalInfo->save();
         $appOwnerId = $agency->app_owner_id;
         $user = User::find($appOwnerId);
-        $user->type_user = 2;
-        $user->agency_id = $agency->id;
-        $user->save();
-         uploadMonthlyDiamondReceive($user->id, 0);
+
+        \App\Facades\UserHandling::changeUserAgency($user, $agency->id, 2);
+
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
@@ -68,4 +67,5 @@ function pu(val) {
 </script>
 ';
     }
+
 }

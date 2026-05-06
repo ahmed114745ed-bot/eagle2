@@ -733,11 +733,11 @@ class UserRepository extends Repository
             ->with('profile')
             ->select(
                 'users.*',
-                DB::raw("(6371 * acos(cos(radians($latitude))
+                DB::raw("(6371 * acos(cos(radians(?))
                 * cos(radians(users.lat))
-                * cos(radians(users.long) - radians($longitude))
-                + sin(radians($latitude))
-                * sin(radians(users.lat)))) AS distance")
+                * cos(radians(users.long) - radians(?))
+                + sin(radians(?))
+                * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
             )->whereNotNull('lat')->whereNotNull('long')
             ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
             ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $userId)])
@@ -756,11 +756,11 @@ class UserRepository extends Repository
         if (($latitude != null) && ($longitude != null)) {
             $builder = $builder->select(
                 'users.*',
-                DB::raw("(6371 * acos(cos(radians($latitude))
+                DB::raw("(6371 * acos(cos(radians(?))
                     * cos(radians(users.lat))
-                    * cos(radians(users.long) - radians($longitude))
-                    + sin(radians($latitude))
-                    * sin(radians(users.lat)))) AS distance")
+                    * cos(radians(users.long) - radians(?))
+                    + sin(radians(?))
+                    * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
             )->whereNotNull('lat')->whereNotNull('long');
         }
 

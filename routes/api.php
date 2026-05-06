@@ -80,19 +80,19 @@ Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCal
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
-    Route::get('test-game-rtm', function () {
-
+    // Protected test route - only accessible in local environment
+    Route::middleware(['local'])->get('test-game-rtm', function () {
         $user = User::find(524);
-        $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
+        $room = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
 
-        $d    = [
+        $d = [
             "messageContent" => [
                 "message" => "SBG",
-                'uImage'  => $user->profile?->avatar ?? 0,
-                'uName'   => $user->name ?? '',
-                'uId'     => $user->id ?? 0,
-                'coins'   => 50000,
-                "gImage"  => @$user->nowGame?->image
+                'uImage' => $user->profile?->avatar ?? 0,
+                'uName' => $user->name ?? '',
+                'uId' => $user->id ?? 0,
+                'coins' => 50000,
+                "gImage" => @$user->nowGame?->image
             ]
         ];
         $json = json_encode($d);
@@ -163,11 +163,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // authorization
     Route::prefix('auth')->group(function () {
         Route::get('all-countries', [CountryController::class, 'index']);
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('recall-account', [AuthController::class, 'recallAccount']);
-        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset']);
-        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode']);
+
+        // Authentication endpoints with strict rate limiting
+        Route::post('register', [AuthController::class, 'register'])->middleware('auth.rate.limit:5,1');
+        Route::post('login', [AuthController::class, 'login'])->middleware('auth.rate.limit:5,1');
+        Route::post('recall-account', [AuthController::class, 'recallAccount'])->middleware('auth.rate.limit:3,1');
+        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset'])->middleware('auth.rate.limit:3,5');
+        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode'])->middleware('auth.rate.limit:5,1');
     });
 
 
@@ -208,6 +210,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
 
             Route::get('zego-credential', [UserController::class, 'zegoCredential']);
+            Route::get('update-zego-agora/v2', [EnteranceController::class, 'libraryAgoraZegoV2']);
 
 
             Route::prefix('config')->group(function () {
@@ -296,7 +299,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
             Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
-            Route::post('/firebase/custom-token', [FirebaseAuthController::class, 'loginWithUid']);
+            Route::post('/firebase/custom-token', [FirebaseAuthController::class, 'loginWithUid'])->middleware('auth.rate.limit:10,1');
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
@@ -305,7 +308,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('shipping-agency-report', [CoinController::class, 'shippingAgencyCoinReport']);
             });
 
-            Route::prefix('charisma-levels')->group(function () {
+            Route::prefix('charisma-levels')->middleware('charisma.badge')->group(function () {
                 Route::get('/', [CharismaLevelController::class, 'index']);
             });
 
@@ -335,10 +338,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
                 Route::get('delete', [UserController::class, 'delete']);
-                Route::post('change_phone', [UserController::class, 'changePhone']);
-                Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
-                Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
-                Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset']);
+                Route::post('change_phone', [UserController::class, 'changePhone'])->middleware('auth.rate.limit:3,5');
+                Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp'])->middleware('auth.rate.limit:3,5');
+                Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp'])->middleware('auth.rate.limit:3,5');
+                Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset'])->middleware('auth.rate.limit:3,5');
             });
 
             Route::prefix('search')->group(function () {
@@ -395,7 +398,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 //todo
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
-                Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky', 'throttle:lucky-gift']);
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);
@@ -646,35 +649,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
 
-            Route::get('/public-test/{ids}', function ($ids) {
-                $title = 'System‑wide Test';
-                $body  = 'This is only a test.';
-
-                $idArray = explode(',', $ids);
-
-                $tokens = User::whereNotNull('notification_id')
-                    ->whereIn('id', $idArray)
-                    ->pluck('notification_id')
-                    ->filter()
-                    ->unique()
-                    ->values()
-                    ->toArray();
-
-                return Common::send_firebase_notification($tokens, $title, $body);
-            });
-
-            Route::get('/send_test_notifications', function () {
-
-                $notificationTokens = DB::table('users')->orderBy('id', 'desc')->limit(100)->pluck('notification_id')->filter()->toArray();
-
-                $title = 'Test';
-                $body = 'Test';
-
-                Common::send_firebase_notification($notificationTokens, $title, $body, '', [], 'vip');
-
-                return "notification sent successfully!";
-            });
-
             Route::get('/unsubscribe-all-from-topic/{topic}', function ($topic) {
                 $tokens = User::whereNotNull('notification_id')
                     ->pluck('notification_id')
@@ -703,37 +677,6 @@ Route::match(['get', 'post'], '/paytabs/return/{payment_id}', [PayTabsController
 
 
 
-Route::get('/public-official-test/{ids}', function ($ids) {
-    $title    = 'System‑wide Test';
-    $body_en  = 'This is only a test.';
-    $body_ar  = 'هذا مجرد اختبار.';
-    $image    = null; // مثال: 'https://example.com/image.jpg'
-    $data     = null; // يجب أن يكون string|null
-    $subType  = null;
-    $type     = 2;
-    $fromUser = null;
-
-    $idArray = explode(',', $ids);
-
-    $users = User::whereIn('id', $idArray)
-        ->get();
-
-    foreach ($users as $user) {
-        Common::sendOfficialMessage(
-            $user->id,
-            $body_en,
-            $title,
-            $type,
-            $subType,
-            $body_ar,
-            $image,
-            $fromUser
-        );
-    }
-
-    return response()->json(['message' => 'تم إرسال الإشعارات بنجاح']);
-});
-
 Route::get('gifts-by-id', function (Request $request) {
     $gift = \App\Models\Gift::find($request->get('id'));
     if (!$gift) {
@@ -752,12 +695,22 @@ Route::get('gifts-by-id', function (Request $request) {
 
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
-Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
-Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
-Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
 
-// Queue restart route
-Route::get('queue/restart', function () {
+// Protected dashboard routes with authentication and rate limiting
+Route::middleware(['auth:sanctum', 'throttle:30,1'])->group(function () {
+    Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
+    Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
+    Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
+});
+
+// Queue restart route - protected with authentication, admin check, IP whitelist, and rate limiting
+Route::middleware(['auth:sanctum', 'admin', 'adminIp', 'throttle:3,1'])->get('queue/restart', function () {
+    \Log::warning('Queue restart triggered', [
+        'ip' => request()->ip(),
+        'user_id' => auth()->id(),
+        'time' => now(),
+    ]);
+
     \Artisan::call('queue:restart');
     return response()->json([
         'success' => true,

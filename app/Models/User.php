@@ -282,15 +282,15 @@ class User extends Authenticatable
     {
         $date = \Carbon\Carbon::now(getTimezone());
 
-        $record = $this->monthlyDiamondReceive()
-            ->firstOrNew([
+        $this->monthlyDiamondReceive()->updateOrCreate(
+            [
                 'month' => $date->month,
                 'year'  => $date->year,
-            ]);
+            ],
+            []
+        )->increment('monthly_diamond_received', $value);
 
-        $record->monthly_diamond_received = ($record->monthly_diamond_received ?? 0) + $value;
-
-        $record->save();
+        
     }
 
 
@@ -512,6 +512,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserEarnInvitation::class, 'parent_id');
     }
+
+    public function userCodeInvite()
+    {
+        return $this->hasMany(UserCodeInvitation::class, 'user_id');
+    }
+
 
     public function scopeWithoutAppends($query)
     {
@@ -1775,20 +1781,21 @@ class User extends Authenticatable
 
         $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'regular'))->active()->with("badge.images")->get();
 
-        $html = '<div class="user-type-badges">';
+        $html = '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
         foreach ($userBadges as $badge) {
             $badgeImage = $badge->badge?->images?->firstWhere('language', app()->getLocale())?->image
                 ?? $badge->badge?->images?->first()?->image
                 ?? $badge->badge?->image;
             $url = getImagePath($badgeImage);
+            
 
             if ($url) {
-                $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
+                $html .= '<div style="display:inline-flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:6px 14px 6px 6px;">'
+                    . handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain')
+                    . '</div>';
             }
         }
-
         $html .= '</div>';
-
 
         return $html;
     }
@@ -1798,7 +1805,7 @@ class User extends Authenticatable
 
         $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'top'))->active()->with("badge.images")->get();
 
-        $html = '<div class="user-type-badges">';
+        $html = '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
         foreach ($userBadges as $badge) {
             $badgeImage = $badge->badge?->images?->firstWhere('language', app()->getLocale())?->image
                 ?? $badge->badge?->images?->first()?->image
@@ -1806,12 +1813,12 @@ class User extends Authenticatable
             $url = getImagePath($badgeImage);
 
             if ($url) {
-                $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
+                $html .= '<div style="display:inline-flex;align-items:center;gap:8px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:6px 14px 6px 6px;">'
+                    . handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain')
+                    . '</div>';
             }
         }
-
         $html .= '</div>';
-
 
         return $html;
     }

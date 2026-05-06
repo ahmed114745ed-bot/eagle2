@@ -68,17 +68,23 @@ class AgencyObserver
         if ($originalOwnerId) {
             $oldOwner = User::find($originalOwnerId);
             if ($oldOwner) {
-                $oldOwner->update(['agency_id' => 0, 'is_host'  => 0]);
+                UserHandling::changeUserAgency($oldOwner, 0, 0);
+                $oldOwner->is_host = 0;
+                $oldOwner->save();
+
                 MilestoneHelper::removeReward($oldOwner, 'host-agency-owner');
                 $this->updatePreviousAgencyJoined($oldOwner, $agency->id);
-                info('update host-agency-owner milestone');
+                info('remove host-agency-owner milestone from old owner');
             }
         }
 
         if ($newOwnerId) {
             $newUser = User::find($newOwnerId);
             if ($newUser) {
-                $newUser->update(['agency_id' => $agency->id, 'is_host'  => 1]);
+                UserHandling::changeUserAgency($newUser, $agency->id, 2);
+                $newUser->is_host = 1;
+                $newUser->save();
+
                 MilestoneHelper::grantMilestoneToUser($newUser, 'host-agency-owner');
 
                 $exists = UsersJoinedAgency::where([
@@ -96,7 +102,7 @@ class AgencyObserver
                         'status' => 'Joined',
                     ]);
                 }
-                info('update 2 host-agency-owner milestone');
+                info('grant host-agency-owner milestone to new owner');
             }
         }
 
@@ -112,13 +118,22 @@ class AgencyObserver
     {
         //            if ($agency->Host_agency) {
         AgencyJoinRequest::query()->where('agency_id', $agency->id)->delete();
+
+        $owner = User::find($agency->app_owner_id);
+        if ($owner) {
+            // Use centralized method to remove owner from agency
+            UserHandling::changeUserAgency($owner, 0, 0);
+        }
+
         UserHandling::kickOfAllUsersFromAgency($agency);
         User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);
         $joinedAgency = UsersJoinedAgency::where(['agency_id' => $agency->id])->get();
         if ($joinedAgency) UsersJoinedAgency::where('agency_id', $agency->id)->update(['leave_date' => now(), 'status' => 'delete agency from admin']);
-        $user = User::find($agency->app_owner_id);
-        Admin::where('username', $user->uuid)->delete();
-        MilestoneHelper::removeReward($user, 'host-agency-owner');
+
+        if ($owner) {
+            Admin::where('username', $owner->uuid)->delete();
+            MilestoneHelper::removeReward($owner, 'host-agency-owner');
+        }
         info('delete host-agency-owner milestone');
         //            }
     }
@@ -149,4 +164,5 @@ class AgencyObserver
             ]);
         }
     }
+
 }

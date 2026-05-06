@@ -69,7 +69,7 @@ class LuckyGiftService
         $gifts    = Gift::query()->whereIn('id', $giftIds)->get();
         foreach ($jobs as $job) {
             $receiverIds = $job->receiverId . '}';
-            $receiverIds = unserialize($receiverIds);
+            $receiverIds = unserialize($receiverIds, ['allowed_classes' => false]);
             $roomId      = $job->roomId;
             $userId      = $job->userId;
             $giftId      = $job->giftId;

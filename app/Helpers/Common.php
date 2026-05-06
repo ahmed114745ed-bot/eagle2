@@ -533,33 +533,114 @@ class Common
 
     public static function upload($folder, $file, $disk = null)
     {
+        // Validate file is uploaded file instance
+        if (!($file instanceof \Illuminate\Http\UploadedFile)) {
+            throw new \Exception('Invalid file upload');
+        }
+
+        // Check if file is valid
+        if (!$file->isValid()) {
+            throw new \Exception('Invalid file upload');
+        }
+
+        // Security: Validate file size (10MB max)
+        $maxSize = 10485760; // 10MB
+        if ($file->getSize() > $maxSize) {
+            throw new \Exception('File size exceeds maximum allowed size of 10MB');
+        }
+
+        // Security: Validate MIME type (images only)
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $mimeType = $file->getMimeType();
+
+        if (!in_array($mimeType, $allowedMimes)) {
+            throw new \Exception('Invalid file type. Only images (JPG, PNG, GIF, WebP) are allowed');
+        }
+
+        // Security: Map MIME type to safe extension (don't trust client extension)
+        $safeExtension = match ($mimeType) {
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            default => throw new \Exception('Unsupported image format'),
+        };
+
+        // Log suspicious activity if client extension doesn't match
+        $clientExtension = strtolower($file->getClientOriginalExtension());
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if ($clientExtension && !in_array($clientExtension, $allowedExtensions)) {
+            \Log::warning('Suspicious file extension detected', [
+                'client_extension' => $clientExtension,
+                'mime_type' => $mimeType,
+                'safe_extension' => $safeExtension,
+                'ip' => request()->ip()
+            ]);
+        }
+
+        // Generate secure filename using hash
+        $hash = hash('sha256', Str::random(40) . microtime(true));
+        $fileName = substr($hash, 0, 32) . '.' . $safeExtension;
+
+        // Store file
         $config = $disk ?: config('filesystems.default');
-        $extension = $file->getClientOriginalExtension();
-        $fileName = Str::random(10) . '.' . $extension;
         $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, $config);
+
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 
     public static function uploadProfileUser($folder, $file, $id, $count)
     {
-        $extension = $file->getClientOriginalExtension();
-        if (!$extension) {
-            $mime = $file->getMimeType();
-
-            $extension = match ($mime) {
-                'image/jpeg' => 'jpg',
-                'image/png'  => 'png',
-                'image/gif'  => 'gif',
-                'image/webp' => 'webp',
-                default      => 'jpg',
-            };
-
-            // Log::warning('File extension missing, fallback used', [
-            //     'mime' => $mime,
-            //     'used_extension' => $extension,
-            // ]);
+        // Validate file is uploaded file instance
+        if (!($file instanceof \Illuminate\Http\UploadedFile)) {
+            throw new \Exception('Invalid file upload');
         }
-        $fileName = $id . '_' . $count . '.' . $extension;
+
+        // Check if file is valid
+        if (!$file->isValid()) {
+            throw new \Exception('Invalid file upload');
+        }
+
+        // Security: Validate file size (10MB max)
+        $maxSize = 10485760; // 10MB
+        if ($file->getSize() > $maxSize) {
+            throw new \Exception('File size exceeds maximum allowed size of 10MB');
+        }
+
+        // Security: Validate MIME type (images only)
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $mimeType = $file->getMimeType();
+
+        if (!in_array($mimeType, $allowedMimes)) {
+            throw new \Exception('Invalid file type. Only images (JPG, PNG, GIF, WebP) are allowed');
+        }
+
+        // Security: Map MIME type to safe extension (don't trust client extension)
+        $safeExtension = match ($mimeType) {
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            default => throw new \Exception('Unsupported image format'),
+        };
+
+        // Log suspicious activity if client extension doesn't match
+        $clientExtension = strtolower($file->getClientOriginalExtension());
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if ($clientExtension && !in_array($clientExtension, $allowedExtensions)) {
+            \Log::warning('Suspicious file extension detected in profile upload', [
+                'client_extension' => $clientExtension,
+                'mime_type' => $mimeType,
+                'safe_extension' => $safeExtension,
+                'user_id' => $id,
+                'ip' => request()->ip()
+            ]);
+        }
+
+        // Generate filename with user ID and safe extension
+        $fileName = $id . '_' . $count . '.' . $safeExtension;
+
+        // Store file
         $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
@@ -1344,7 +1425,7 @@ class Common
     public static function fireBaseFactory()
     {
         return (new Factory)
-            ->withServiceAccount(public_path('firebase_credentials.json'))
+            ->withServiceAccount(storage_path('app/credentials/firebase_credentials.json'))
             ->withDatabaseUri('https://yay-chat-c2333-default-rtdb.firebaseio.com');
     }
 

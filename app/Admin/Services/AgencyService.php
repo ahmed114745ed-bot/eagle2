@@ -8,21 +8,16 @@ class AgencyService
 {
     /**
      * @param $agency
-     * @param $name
      * @return string
      */
     function adminAgencyData($agency): string
     {
         if (! @$agency) {
-            return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>unknown agency</span>
-            </div>
-        ";
+            return '<span class="ug-no-agency"><i class="fa fa-minus-circle"></i> ' . __('Unknown agency') . '</span>';
         }
-        $cacheKey = "agency_image_{$agency->id}";
-        $image = Cache::remember($cacheKey, 3600, function () use ($agency){
 
+        $cacheKey = "agency_card_image_{$agency->id}";
+        $imageUrl = Cache::remember($cacheKey, 3600, function () use ($agency) {
             $path = @$agency->img;
             $defaultImage = asset("images/icon-agency.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -31,20 +26,56 @@ class AgencyService
                 $url = $defaultImage;
             }
 
-            return handleShowImageWithTypes($agency->id, $url, 40, 40, 0);
+            return $url;
         });
 
         $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+        $name = e($agency->name ?? __('No name'));
+        $id = $agency->id;
 
-        $name = $agency->name ?? __('No name');
-        return "<a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            {$image}
-                            <div style='display: flex; flex-direction: column;'>
-                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
-                                <span style='font-size: smaller;'>ID: {$agency->id}</span>
-                            </div>
-                        </div>
-                    </a>";
+        return <<<HTML
+        <a href="{$profileUrl}" class="ug-agency-card">
+            <img src="{$imageUrl}" class="ug-agency-avatar" alt="{$name}">
+            <div>
+                <div class="ug-agency-name">{$name}</div>
+                <div class="ug-agency-id">ID: {$id}</div>
+            </div>
+        </a>
+        HTML;
+    }
+
+
+    function adminShippingAgencyData($agency): string
+    {
+        if (! @$agency) {
+            return '<span class="ug-no-agency"><i class="fa fa-minus-circle"></i> ' . __('Unknown agency') . '</span>';
+        }
+
+        $cacheKey = "shipping_agency_card_image_{$agency->id}";
+        $imageUrl = Cache::remember($cacheKey, 3600, function () use ($agency) {
+            $path = @$agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return $url;
+        });
+
+        $profileUrl = url('admin/shipping-agencies/profile', ['id' => $agency->id]);
+        $name = e($agency->name ?? __('No name'));
+        $id = $agency->id;
+
+        return <<<HTML
+        <a href="{$profileUrl}" class="ug-agency-card">
+            <img src="{$imageUrl}" class="ug-agency-avatar" alt="{$name}">
+            <div>
+                <div class="ug-agency-name">{$name}</div>
+                <div class="ug-agency-id"><i class="fa fa-truck" style="font-size:10px;margin-right:3px;"></i>ID: {$id}</div>
+            </div>
+        </a>
+        HTML;
     }
 }

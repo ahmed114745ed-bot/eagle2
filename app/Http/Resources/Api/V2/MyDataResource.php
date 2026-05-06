@@ -181,7 +181,7 @@ class MyDataResource extends JsonResource
             'achievement_images' => $achievement_images,
         ];
 
-        $data['auth_token'] = $this->auth_token;
+//        $data['auth_token'] = $this->auth_token;
         if (isset($this->is_mic)) {
             $data['is_mic'] = $this->is_mic;
         }

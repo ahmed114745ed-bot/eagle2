@@ -70,7 +70,9 @@ class LeaderCCgameController extends Controller
                 'avatar'   => getImagePath($user->profile->avatar),
                 'coin'     => $user->di,
                 'vipLevel' => $user->UserVip->level ?? 0,
-               
+                'water' => @$user->gamePercentage->percentageGame->percentage_game ?? 2.00,
+
+
             ]);
         });
     }
@@ -122,7 +124,7 @@ class LeaderCCgameController extends Controller
                     UserCoinLogType::COIN_GAME,
                     null,
                 );
-                
+
                 DB::table('coin_game_users')->insert([
                     'user_id'          => $user->id,
                     'coins'            => $coin,
@@ -212,7 +214,7 @@ class LeaderCCgameController extends Controller
                     'user_id'    => $user->id,
                     'coins'      => $coin,
                     'app_profit_coins' => $coin,
-                    'type'       => 1, 
+                    'type'       => 1,
                     'game_id'    => $request->gameId,
                     'round_id'   => $request->roundId,
                     'order_id'   => $request->orderId,

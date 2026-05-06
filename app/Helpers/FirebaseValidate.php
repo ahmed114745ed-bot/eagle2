@@ -14,7 +14,7 @@ class FirebaseValidate
      */
     public static function validateIdToken($idToken)
     {
-        $credentialPath = public_path('firebase_credentials.json');
+        $credentialPath = storage_path('app/credentials/firebase_credentials.json');
 
         $factory = (new Factory())->withServiceAccount($credentialPath);
         $auth = $factory->createAuth();

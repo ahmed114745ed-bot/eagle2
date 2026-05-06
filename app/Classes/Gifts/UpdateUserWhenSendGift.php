@@ -135,9 +135,9 @@ class UpdateUserWhenSendGift
                 ])->error("Error in checkUserLevelUpgrated for user {$user->id}: " . $e->getMessage());
             }
 
-            uploadMonthlyDiamondReceive(
+            incrementMonthlyDiamond(
                 $user->id,
-                $userMeta['monthly_diamond_received'] + $totalCoins
+                $totalCoins  
             );
         }
     }
