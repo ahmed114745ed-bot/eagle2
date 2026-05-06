@@ -82,11 +82,12 @@ jobs:
         command_timeout: 5m
         script: |
           CURRENT="${{ github.sha }}"
+          sudo docker container prune -f 2>/dev/null || true
           for REPO in rixo-chat-octa rixo-chat-job; do
             echo "Cleaning old $REPO images (keeping current: $CURRENT)..."
             sudo docker images "$REPO" --format '{{.Tag}}' | grep -v "$CURRENT" | while read TAG; do
               echo "  Removing $REPO:$TAG"
-              sudo docker rmi "$REPO:$TAG" 2>/dev/null || true
+              sudo docker rmi -f "$REPO:$TAG" 2>/dev/null || true
             done
           done
           sudo docker image prune -f 2>/dev/null || true
