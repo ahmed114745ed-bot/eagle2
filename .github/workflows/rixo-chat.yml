@@ -2,6 +2,9 @@ name: SSh-rixo-chat-pipline
 on:
   push:
     branches: ["rixo-chat"]
+concurrency:
+  group: rixo-chat-deploy
+  cancel-in-progress: false
 
 jobs:
   run_rixo_chat_hub:
@@ -23,12 +26,9 @@ jobs:
 
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh || source /home/${{ secrets.USERNAME }}/hub.sh
 
-          threshold=80
-          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
-          if [ $current -gt $threshold ]; then
-            echo "Disk space high ($current%), pruning docker assets..."
-            sudo docker system prune -a -f
-          fi
+          sudo docker builder prune -f 2>/dev/null || true
+          sudo docker image prune -f 2>/dev/null || true
+          echo "Disk space before: $(df -h / | tail -1)"
 
   deploy_rixo_stack:
     runs-on: [self-hosted]
@@ -66,13 +66,13 @@ jobs:
 
           sudo -E docker stack deploy -c rixo-deployment.yml rixo
 
-  cleanup_images:
+  cleanup:
     runs-on: [self-hosted]
     needs: deploy_rixo_stack
     if: always()
     environment: rixo-prod
     steps:
-    - name: prune dangling images
+    - name: Remove old Docker images
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.96.67"
@@ -81,5 +81,14 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 5m
         script: |
-          sleep 30
-          sudo docker image prune -f
+          CURRENT="${{ github.sha }}"
+          for REPO in rixo-chat-octa rixo-chat-job; do
+            echo "Cleaning old $REPO images (keeping current: $CURRENT)..."
+            sudo docker images "$REPO" --format '{{.Tag}}' | grep -v "$CURRENT" | while read TAG; do
+              echo "  Removing $REPO:$TAG"
+              sudo docker rmi "$REPO:$TAG" 2>/dev/null || true
+            done
+          done
+          sudo docker image prune -f 2>/dev/null || true
+          sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
+          echo "Disk space after cleanup: $(df -h / | tail -1)"
