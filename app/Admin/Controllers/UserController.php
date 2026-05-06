@@ -38,7 +38,6 @@ use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
 use Illuminate\Support\Facades\Cache;
 use Modules\Badge\Entities\UserBadge;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
@@ -1183,14 +1182,6 @@ class UserController extends MainController
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
 
-
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-            $(document).ready(function () {
-                alert(" يملك هذا المستخدم وكالة   . الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم");
-            });
-        </script>');
-        }
         $form->html('<div class="full-column-width">');
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
         $form->html('</div>');
@@ -1226,8 +1217,8 @@ class UserController extends MainController
 
 
                 if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                    admin()->error(__('يملك هذا المستخدم وكالة. الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم'));
+                    return false;
                 }
 
 
