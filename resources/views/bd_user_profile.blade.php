@@ -2110,7 +2110,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($giftSLogs as $index => $giftSLog)
+                        @foreach($giftSLogs ?? [] as $index => $giftSLog)
                             @php
                                 $userImageDefault = asset('images/businessman-icon.jpg');
                                 $defaultImage = asset("images/background_room.jpg");

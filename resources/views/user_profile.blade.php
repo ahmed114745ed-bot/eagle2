@@ -3567,10 +3567,7 @@
     </div>
 </div>
 
-@if($activeTab == 'user-coins')
-
-    <div class="tab-content" id="user-coins-tab"
-         style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
+    <div class="tab-content {{ $activeTab == 'user-coins' ? '' : 'd-none' }}" id="user-coins-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -3760,10 +3757,8 @@
             </div>
         </div>
     </div>
-@endif
 
-@if($activeTab == 'charge')
-    <div class="tab-content active" id="charge-tab">
+    <div class="tab-content {{ $activeTab == 'charge' ? '' : 'd-none' }}" id="charge-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #be123c 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -3916,10 +3911,8 @@
             @endif
         </div>
     </div>
-@endif
 
-@if($activeTab == 'gift-log')
-    <div class="tab-content active" id="gift-log-tab">
+    <div class="tab-content {{ $activeTab == 'gift-log' ? '' : 'd-none' }}" id="gift-log-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -4102,7 +4095,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($giftSLogs as $index => $giftSLog)
+                        @foreach($giftSLogs ?? [] as $index => $giftSLog)
                             @php
                                 $userImageDefault = asset('images/businessman-icon.jpg');
                                 $defaultImage = asset("images/background_room.jpg");
@@ -4278,7 +4271,7 @@
             </div>
         </div>
     </div>
-@endif
+
 
 <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
