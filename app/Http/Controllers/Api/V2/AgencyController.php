@@ -84,7 +84,15 @@ class AgencyController extends Controller
         }
 
         try {
-            $agency = $this->agencyService->find($id);
+            // Cache for 10 minutes (600 seconds) as recommended by DevOps report
+            // This fixes the 1.1s-8.7s latency issue for agencies/details/{id}
+            $year = request('year') ?? \Carbon\Carbon::now()->year;
+            $month = request('month') ?? \Carbon\Carbon::now()->month;
+            $cacheKey = "agency_details_{$id}_{$year}_{$month}";
+
+            $agency = Cache::remember($cacheKey, 600, function () use ($id) {
+                return $this->agencyService->find($id);
+            });
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -103,7 +111,17 @@ class AgencyController extends Controller
         }
 
         try {
-            $agency = $this->agencyService->find($id);
+            // Cache for 10 minutes (600 seconds) as recommended by DevOps report
+            // This fixes the 0.3s-6.5s latency issue for agencies/history/{id}
+            // Cache key includes year/month since history changes monthly
+            $year = request('year') ?? \Carbon\Carbon::now()->year;
+            $month = request('month') ?? \Carbon\Carbon::now()->month;
+            $cacheKey = "agency_history_{$id}_{$year}_{$month}";
+
+            $agency = Cache::remember($cacheKey, 600, function () use ($id) {
+                return $this->agencyService->find($id);
+            });
+
             request()->is_onwer_agency = ($user->id !=  $agency->app_owner_id);
         } catch (\Exception $exception) {
 
@@ -127,7 +145,16 @@ class AgencyController extends Controller
     {
         $user = $request->user();
         try {
-            $response = $this->agencyService->agencyTarget($user->agency_id, $user, $request);
+            // Cache for 10 minutes (600 seconds) as recommended by DevOps report
+            // This fixes the 1.0s-5.3s latency issue for agencies/target-details/{id}
+            // Cache key includes year/month since target changes monthly
+            $year = request('year') ?? \Carbon\Carbon::now()->year;
+            $month = request('month') ?? \Carbon\Carbon::now()->month;
+            $cacheKey = "agency_target_{$user->agency_id}_{$year}_{$month}";
+
+            $response = Cache::remember($cacheKey, 600, function () use ($user, $request) {
+                return $this->agencyService->agencyTarget($user->agency_id, $user, $request);
+            });
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
