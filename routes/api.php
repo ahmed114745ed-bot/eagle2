@@ -500,6 +500,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             // end user api
 
+            
+
             //start rankin
             Route::prefix('ranking')->group(function () {
                 Route::post('/', [RankingController::class, 'ranking2']);
