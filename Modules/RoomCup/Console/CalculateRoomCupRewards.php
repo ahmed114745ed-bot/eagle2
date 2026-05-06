@@ -429,6 +429,6 @@ class CalculateRoomCupRewards extends Command
 
     private function resetRoomSessions(): void
     {
-         Room::update(['session' => null]);
+         Room::update(['session' => 0]);
     }
 }
