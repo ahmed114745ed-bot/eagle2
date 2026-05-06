@@ -41,6 +41,7 @@ services:
 
   rixo-chat-cron:
     image: ${JOB_IMAGE}
+    init: true
     command: ["php", "/app/artisan", "schedule:work"]
     volumes:
       - /var/www/rixo-chat/.env:/app/.env
