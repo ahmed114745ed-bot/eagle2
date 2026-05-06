@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom;
@@ -61,8 +62,18 @@ class ChatRoomController extends Controller
     public function index(Request $request)
     {
         $uuid = $request->keyword;
-        $response = $this->chatRoomService->getChatRooms($request->user(), $uuid);
+        $user = $request->user();
 
+        // Cache for 2 minutes (120 seconds) to fix 4.3s latency reported in DevOps report
+        // Short TTL because chat data changes frequently
+        // Skip cache if searching by keyword (uuid)
+        if ($uuid) {
+            $response = $this->chatRoomService->getChatRooms($user, $uuid);
+        } else {
+            $response = \Cache::remember("chat_rooms_{$user->id}", 120, function () use ($user, $uuid) {
+                return $this->chatRoomService->getChatRooms($user, $uuid);
+            });
+        }
 
         if (!$response['success']) {
             return response()->json($response['message'], $response['status']);

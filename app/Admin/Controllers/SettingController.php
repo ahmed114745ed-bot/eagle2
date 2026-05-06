@@ -16,6 +16,7 @@ use Encore\Admin\Layout\Content;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class SettingController extends MainController
 {
@@ -296,6 +297,8 @@ class SettingController extends MainController
             Cache::forget('charisma_format');
             Cache::put('charisma_format', $request->value, now()->addYear());
 
+            Config::set('charisma.format', (bool) $request->value);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -313,6 +316,8 @@ class SettingController extends MainController
 
             Cache::forget('charisma_badge');
             Cache::put('charisma_badge', $request->value, now()->addYear());
+
+            Config::set('charisma.badge', (bool) $request->value);
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {

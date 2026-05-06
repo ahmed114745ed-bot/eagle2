@@ -22,7 +22,7 @@
                 $url = $defaultImage;
             }
             $showUrl = url('admin/users/' . $user->id);
-              $image = "<img src='{$url}' style='width: 80px; height: 70px; object-fit: cover; border-radius: 0;'>";
+              $image = "<img src='" . e($url) . "' style='width: 80px; height: 70px; object-fit: cover; border-radius: 0;'>";
         @endphp
                  <a href="{{$showUrl}}" style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
 

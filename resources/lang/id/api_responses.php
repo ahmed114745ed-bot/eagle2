@@ -124,6 +124,7 @@ return [
     'canNotCharge' =>'Anda tidak dapat mengisi, agen Anda tidak aktif',
     'disabled_version' => 'Silakan hapus aplikasi dan unduh ulang dari toko yang tersedia di perangkat Anda.',
      "try_again" => 'Silakan coba lagi',
+     "gift_in_progress" => 'Sedang memproses hadiah sebelumnya, mohon tunggu sebentar',
      "validation_error" => 'Kesalahan validasi',
      'success' => 'Berhasil',
      "giftNotFound" => 'Hadiah tidak ditemukan',

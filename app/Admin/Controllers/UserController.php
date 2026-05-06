@@ -38,7 +38,6 @@ use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
 use Illuminate\Support\Facades\Cache;
 use Modules\Badge\Entities\UserBadge;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
@@ -867,17 +866,27 @@ class UserController extends MainController
                 $giftType = request('gift_type', 'receiver');
                 $start = request('start_at');
                 $end = request('end_at');
-                $agencyId = request('agency_id');
+                $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
+                $agencyId = request('agency_id', $agency_id);
+
+                // Convert empty string or "0" to null to ensure filter doesn't apply with falsy values
+                if ($agencyId === '' || $agencyId === '0' || $agencyId === 0) {
+                    $agencyId = null;
+                }
+
                 $timezone = Common::timeZone();
+
+                // Convert dates to UTC for database query
+                $startUtc = $start && $end ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
+                $endUtc = $start && $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
 
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
                     ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
-                    ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
-                        Carbon::parse($start, $timezone)->startOfDay()->utc(),
-                        Carbon::parse($end, $timezone)->endOfDay()->utc(),
-                    ]))
+                    ->when($startUtc && $endUtc, fn($q) => $q->whereBetween('created_at', [$startUtc, $endUtc]))
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
+
+             
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
@@ -890,13 +899,18 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
-                // Calculate total diamonds sent/received: SUM(total * giftNum)
-                // This represents the actual amount of diamonds in each transaction
-                $totalGiftCoins = (clone $giftBaseQuery)
-                    ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
-                    ->value('total') ?? 0;
+           
 
-                // Keep totalGiftPrice for backward compatibility (sum of giftPrice column)
+                // For receiver: just sum giftPrice
+                // For sender: calculate SUM(total * giftNum)
+                if ($giftType === 'receiver') {
+                    $totalGiftCoins = (clone $giftBaseQuery)->sum('giftPrice') ?? 0;
+                } else {
+                    $totalGiftCoins = (clone $giftBaseQuery)
+                        ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
+                        ->value('total') ?? 0;
+                }
+
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
 
                 break;
@@ -975,6 +989,7 @@ class UserController extends MainController
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
+
 
 
 
@@ -1167,14 +1182,6 @@ class UserController extends MainController
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
 
-
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-            $(document).ready(function () {
-                alert(" يملك هذا المستخدم وكالة   . الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم");
-            });
-        </script>');
-        }
         $form->html('<div class="full-column-width">');
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
         $form->html('</div>');
@@ -1210,8 +1217,8 @@ class UserController extends MainController
 
 
                 if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                    admin()->error(__('يملك هذا المستخدم وكالة. الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم'));
+                    return false;
                 }
 
 
