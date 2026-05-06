@@ -137,7 +137,7 @@ jobs:
         command_timeout: 5m
         script: |
           CURRENT=${{ github.sha }}
-          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'jo.*(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
+          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E '^(jo|jo-job):' | grep -v "$CURRENT" | grep -v '<none>'); do
             sudo docker rmi "$img" 2>/dev/null || true
           done
           sudo docker image prune -f 2>/dev/null || true
