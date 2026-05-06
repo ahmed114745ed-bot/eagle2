@@ -23,11 +23,15 @@ class CharismaBadgeMiddleware
         });
 
         if (!$charismaBadge) {
-            return response()->json([
-                'status' => 0,
-                'message' => 'Charisma badge feature is currently disabled.',
-                'data' => [],
-            ], 403);
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'Charisma badge feature is currently disabled.',
+                    'data' => [],
+                ], 403);
+            }
+
+            abort(404);
         }
 
         return $next($request);
