@@ -62,7 +62,7 @@ jobs:
 
   run_fihoochat_app:
     runs-on: [self-hosted]
-    needs: [run_fihoochat_hub, run_fihoochat_migrate]
+    needs: run_fihoochat_migrate
     environment: fihoochat-prod
     steps:
     - name: Build and deploy fihoochat Octane
@@ -117,10 +117,10 @@ jobs:
 
   run_fihoochat_job:
     runs-on: [self-hosted]
-    needs: [run_fihoochat_hub, run_fihoochat_migrate, run_fihoochat_app]
+    needs: run_fihoochat_migrate
     environment: fihoochat-prod
     steps:
-    - name: Build and deploy fihoochat jobs
+    - name: Build and deploy fihoochat jobs + cron
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.193.220"
@@ -162,6 +162,28 @@ jobs:
           fi
           echo "Verified: fihoochat-job is running $RUNNING_IMAGE"
 
+          if sudo docker service inspect fihoochat-cron >/dev/null 2>&1; then
+            echo "Updating fihoochat-cron service..."
+            sudo docker service update \
+              --image fihoochat-job:${{ github.sha }} \
+              fihoochat-cron
+          else
+            echo "Creating fihoochat-cron service..."
+            sudo docker service create \
+              --name fihoochat-cron \
+              --init \
+              --replicas 1 \
+              --limit-memory 512m \
+              --reserve-memory 256m \
+              --network app-network \
+              --mount type=bind,src=/var/www/fihoochat/gcp.json,dst=/app/docker/gcp.json \
+              --mount type=bind,src=/var/www/fihoochat/public/settings.json,dst=/app/public/settings.json \
+              --mount type=bind,src=/var/www/fihoochat/storage,dst=/app/storage \
+              fihoochat-job:${{ github.sha }} \
+              php /app/artisan schedule:work
+          fi
+          echo "Cron service ready."
+
   run_fihoochat_cleanup:
     runs-on: [self-hosted]
     needs: [run_fihoochat_app, run_fihoochat_job]
@@ -178,7 +200,6 @@ jobs:
         command_timeout: 5m
         script: |
           CURRENT=${{ github.sha }}
-          sudo docker service rm fihoochat-charizma-worker 2>/dev/null || true
           for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'fihoochat-(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
             sudo docker rmi "$img" 2>/dev/null || true
           done
@@ -186,4 +207,3 @@ jobs:
           sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
           USAGE=$(df -h / | awk 'NR==2{print $5}')
           echo "Disk usage after cleanup: $USAGE"
-
