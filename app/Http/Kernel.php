@@ -127,6 +127,7 @@ class Kernel extends HttpKernel
         'local' => \App\Http\Middleware\LocalOnly::class,
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
+        'charisma.badge' => \App\Http\Middleware\CharismaBadgeMiddleware::class,
         'room.cup' => \App\Http\Middleware\RoomCupMiddleware::class,
         'room.boom' => \App\Http\Middleware\RoomBoomMiddleware::class,
         'pk.live' => \App\Http\Middleware\PkLiveMiddleware::class,
