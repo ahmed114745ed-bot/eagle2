@@ -54,6 +54,28 @@
                 }
                 return true;
             })->values()->all();
+
+            // Helper closures (Octane-safe: variables, not global functions)
+            $hasPermission = function($permission) {
+                if (Admin::user()->can('*')) {
+                    return true;
+                }
+
+                if (is_null($permission)) {
+                    return true;
+                }
+
+                return Admin::user()->can('browse-' . $permission);
+            };
+
+            $hasVisibleChildren = function($children) use ($hasPermission) {
+                foreach ($children as $child) {
+                    if ($hasPermission($child['permission'] ?? null)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
         @endphp
 
         <ul class="crs-menu">
@@ -146,33 +168,12 @@
                             ],
                         ],
                     ];
-
-                    function hasPermission($permission) {
-                        if (Admin::user()->can('*')) {
-                            return true;
-                        }
-
-                        if (is_null($permission)) {
-                            return true;
-                        }
-
-                        return Admin::user()->can('browse-' . $permission);
-                    }
-
-                    function hasVisibleChildren($children) {
-                        foreach ($children as $child) {
-                            if (hasPermission($child['permission'] ?? null)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
                 @endphp
 
                 @foreach($superadminLinks as $link)
 
                     @if(isset($link['children']))
-                        @if(hasVisibleChildren($link['children']))
+                        @if($hasVisibleChildren($link['children']))
                             <li class="crs-tree crs-item">
                                 <a href="#" class="crs-link crs-toggle">
                                     @if(str_contains($link['icon'] ?? '', 'fa-'))
@@ -185,7 +186,7 @@
                                 </a>
                                 <ul class="crs-submenu">
                                     @foreach($link['children'] as $child)
-                                        @if(hasPermission($child['permission'] ?? null))
+                                        @if($hasPermission($child['permission'] ?? null))
                                             <li class="crs-item">
                                                 <a href="{{ superadmin_url($child['uri']) }}" class="crs-link crs-leaf">
                                                     @if(str_contains($child['icon'] ?? '', 'fa-'))
@@ -203,7 +204,7 @@
                             </li>
                         @endif
                     @else
-                        {{-- @if(hasPermission($link['permission'] ?? null))
+                        {{-- @if($hasPermission($link['permission'] ?? null))
                             <li class="crs-item">
                                 <a href="{{ superadmin_url($link['uri']) }}" class="crs-link crs-leaf">
                                     @if(str_contains($link['icon'] ?? '', 'fa-'))
@@ -216,7 +217,7 @@
                             </li>
                         @endif --}}
 
-                        @if(hasPermission($link['permission'] ?? null))
+                        @if($hasPermission($link['permission'] ?? null))
                             @php
                                 $icon = is_array($link['icon'] ?? null)
                                     ? ($link['icon'][0] ?? '')
@@ -311,26 +312,11 @@
                             ],
                         ],
                     ];
-
-                    function hasPermission($permission) {
-                        if (Admin::user()->can('*')) return true;
-                        if (is_null($permission)) return true;
-                        return Admin::user()->can('browse-' . $permission);
-                    }
-
-                    function hasVisibleChildren($children) {
-                        foreach ($children as $child) {
-                            if (hasPermission($child['permission'] ?? null)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
                 @endphp
 
                 @foreach($areaManagerLinks as $link)
                     @if(isset($link['children']))
-                        @if(hasVisibleChildren($link['children']))
+                        @if($hasVisibleChildren($link['children']))
                             <li class="crs-tree crs-item">
                                 <a href="#" class="crs-link crs-toggle">
                                     @if(str_contains($link['icon'] ?? '', 'fa-'))
@@ -343,7 +329,7 @@
                                 </a>
                                 <ul class="crs-submenu">
                                     @foreach($link['children'] as $child)
-                                        @if(hasPermission($child['permission'] ?? null))
+                                        @if($hasPermission($child['permission'] ?? null))
                                             <li class="crs-item">
                                                 <a href="{{ areaManager_url($child['uri']) }}"
                                                    class="crs-link crs-leaf">
@@ -362,7 +348,7 @@
                             </li>
                         @endif
                     @else
-                        @if(hasPermission($link['permission'] ?? null))
+                        @if($hasPermission($link['permission'] ?? null))
                             <li class="crs-item">
                                 <a href="{{ areaManager_url((string) ($link['uri'] ?? '')) }}" class="crs-link crs-leaf">
                                     @if(is_string($link['icon'] ?? null) && str_contains($link['icon'], 'fa-'))

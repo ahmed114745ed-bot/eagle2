@@ -3,6 +3,7 @@
 use Modules\AgencyApp\Http\Controllers\web\RequestAgencyController;
 use Modules\AgencyApp\Http\Controllers\web\RecommendationAgencyController;
 use Modules\AgencyApp\Http\Controllers\web\RequestAgencyFilterationController;
+use Modules\AgencyApp\Http\Controllers\web\HostReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,3 +32,5 @@ Route::group([
     Route::resource('request-agencies-filteration', RequestAgencyFilterationController::class);
     Route::resource('recommendation-agencies', RecommendationAgencyController::class);
 });
+
+    Route::get('host-reports', [HostReportController::class, 'dailyReport']);

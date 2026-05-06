@@ -1692,7 +1692,7 @@
                                         if (!isImageExists($url)) {
                                             $url = $defaultImage;
                                         }
-                                        $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                        $image = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                         $profileUrl = route('bd.agency.profile', ['id' => @$agency->id ?? 0]);
                                     @endphp
 
@@ -1709,7 +1709,7 @@
                                             if (!isImageExists($url)) {
                                                 $url = $defaultImage;
                                             }
-                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                            $kickedByImage = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                             $kickedByUrl = url("bd/users/profile/" . ($kickedBy->id) ?? 0);
                                         }
 
@@ -1724,7 +1724,7 @@
                                             if (!isImageExists($url)) {
                                                 $url = $defaultImage;
                                             }
-                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                            $kickedByImage = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                             $kickedByUrl = '#';
                                         }
                                     }
@@ -2110,7 +2110,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($giftSLogs as $index => $giftSLog)
+                        @foreach($giftSLogs ?? [] as $index => $giftSLog)
                             @php
                                 $userImageDefault = asset('images/businessman-icon.jpg');
                                 $defaultImage = asset("images/background_room.jpg");

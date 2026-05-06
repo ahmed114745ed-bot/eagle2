@@ -21,6 +21,8 @@ trait UserLevel
             ->where('type', 1);
     }
 
+   
+
     public function totalSenderLevels()
     {
         return $this->belongsTo(Vip::class, 'total_sender_level', 'level')
@@ -36,7 +38,7 @@ trait UserLevel
     public function chargeLevel()
     {
         return $this->belongsTo(Vip::class, 'charge_level', 'level')
-            ->where('type', 4);
+            ->where('type', 5);
     }
     public function getNextSenderLevelInfoAttribute(): array
     {

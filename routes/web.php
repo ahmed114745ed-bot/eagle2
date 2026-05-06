@@ -539,7 +539,7 @@ Route::get('/send-notification/{id}', function ($id) {
     return "notifaction send successfully!";
 });
 
-// Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+ Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
 // Route::get('/calculate-salary' , [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 // Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 // Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
@@ -2112,7 +2112,7 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
-Route::get('/run-lucky-gift-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-test', function () {
     Artisan::call('cache:clear');
     $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 
@@ -2133,7 +2133,7 @@ Route::get('/run-lucky-gift-test', function () {
     ]);
 });
 
-Route::get('/run-lucky-gift-unit-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
     $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
         ' --filter SendLuckyGift2FeatureTest';
 

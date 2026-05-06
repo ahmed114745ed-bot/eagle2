@@ -38,7 +38,6 @@ use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
 use Illuminate\Support\Facades\Cache;
 use Modules\Badge\Entities\UserBadge;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
@@ -785,13 +784,15 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'received_level', 'phone', 'bio', 'total_diamond_send']);
-
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'exchange_diamonds','received_level', 'phone', 'bio', 'total_diamond_send', 'agency_id', 'family_id', 'can_play', 'charge_level', 'transfer_salary', 'online']);
         $with = [
+            'images',
             'profile:id,user_id,avatar,gender',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
             'senderLevel:id,level,type,img',
             'receiverLevel:id,level,type,img',
+            'userSetting',
+            "chargeLevel:id,level,type,img",
         ];
 
         // Only load packs when viewing packs tab
@@ -805,6 +806,7 @@ class UserController extends MainController
         }
 
         $user = $userQuery->with($with)->findOrFail($id);
+        $covers = $user->images;
 
         // Avoid duplicate wallet calls
         $availableBalance = $curantBalance = wallet_available_by_user($id);
@@ -864,17 +866,27 @@ class UserController extends MainController
                 $giftType = request('gift_type', 'receiver');
                 $start = request('start_at');
                 $end = request('end_at');
-                $agencyId = request('agency_id');
+                $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
+                $agencyId = request('agency_id', $agency_id);
+
+                // Convert empty string or "0" to null to ensure filter doesn't apply with falsy values
+                if ($agencyId === '' || $agencyId === '0' || $agencyId === 0) {
+                    $agencyId = null;
+                }
+
                 $timezone = Common::timeZone();
+
+                // Convert dates to UTC for database query
+                $startUtc = $start && $end ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
+                $endUtc = $start && $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
 
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
                     ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
-                    ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
-                        Carbon::parse($start, $timezone)->startOfDay()->utc(),
-                        Carbon::parse($end, $timezone)->endOfDay()->utc(),
-                    ]))
+                    ->when($startUtc && $endUtc, fn($q) => $q->whereBetween('created_at', [$startUtc, $endUtc]))
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
+
+             
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
@@ -887,13 +899,18 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
-                // Calculate total diamonds sent/received: SUM(total * giftNum)
-                // This represents the actual amount of diamonds in each transaction
-                $totalGiftCoins = (clone $giftBaseQuery)
-                    ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
-                    ->value('total') ?? 0;
+           
 
-                // Keep totalGiftPrice for backward compatibility (sum of giftPrice column)
+                // For receiver: just sum giftPrice
+                // For sender: calculate SUM(total * giftNum)
+                if ($giftType === 'receiver') {
+                    $totalGiftCoins = (clone $giftBaseQuery)->sum('giftPrice') ?? 0;
+                } else {
+                    $totalGiftCoins = (clone $giftBaseQuery)
+                        ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
+                        ->value('total') ?? 0;
+                }
+
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
 
                 break;
@@ -940,8 +957,11 @@ class UserController extends MainController
         /* =========================
      | VIEW
      ========================= */
+        $permission = $this->permission_name;
+
         $data = compact(
             'user',
+            'covers',
             'countries',
             'packs',
             'types',
@@ -963,11 +983,13 @@ class UserController extends MainController
             'activeTab',
             'availableBalance',
             'curantBalance',
-            'totalGiftCoins'
+            'totalGiftCoins',
+            'permission'
         );
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
+
 
 
 
@@ -1160,14 +1182,6 @@ class UserController extends MainController
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
 
-
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-            $(document).ready(function () {
-                alert(" يملك هذا المستخدم وكالة   . الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم");
-            });
-        </script>');
-        }
         $form->html('<div class="full-column-width">');
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
         $form->html('</div>');
@@ -1203,8 +1217,8 @@ class UserController extends MainController
 
 
                 if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                    admin()->error(__('يملك هذا المستخدم وكالة. الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم'));
+                    return false;
                 }
 
 
@@ -1483,5 +1497,187 @@ class UserController extends MainController
     {
         UserBadge::where('id', $id)->delete();
         return redirect()->back();
+    }
+
+    /**
+     * Toggle transfer salary for a user (profile action)
+     */
+    public function toggleTransferSalary($id)
+    {
+        $user = User::findOrFail($id);
+        $user->transfer_salary = !$user->transfer_salary;
+        $user->save();
+
+        $msg = $user->transfer_salary
+            ? __('Enabled Transfer Salary!')
+            : __('Disabled Transfer Salary!');
+
+        return response()->json(['status' => true, 'message' => $msg]);
+    }
+
+    /**
+     * Toggle invite code visibility for a user (profile action)
+     */
+    public function toggleInviteCode($id)
+    {
+        $user = User::findOrFail($id);
+        $userSetting = $user->userSetting;
+
+        if (!$userSetting) {
+            return response()->json(['status' => false, 'message' => __('User setting not found')], 404);
+        }
+
+        $userSetting->show_invite_code = !$userSetting->show_invite_code;
+        $userSetting->save();
+
+        $msg = $userSetting->show_invite_code
+            ? __('Show invite code has been enabled!')
+            : __('Show invite code has been disabled!');
+
+        return response()->json(['status' => true, 'message' => $msg]);
+    }
+
+    /**
+     * Toggle can play for a user (profile action)
+     */
+    public function toggleCanPlay($id)
+    {
+        $user = User::findOrFail($id);
+        $user->can_play = $user->can_play == 2 ? 3 : 2;
+        $user->save();
+
+        if ($user->online) {
+            $can_play = $user->can_play ?? 0;
+            $show_invite_code = $user->show_invite_code ?? 0;
+            broadcast(new \App\Events\UserStatus(
+                $can_play == 2,
+                $show_invite_code == 1,
+                $user->id
+            ));
+        }
+
+        $msg = $user->can_play == 2
+            ? __('Can play has been enabled!')
+            : __('Can play has been disabled!');
+
+        return response()->json(['status' => true, 'message' => $msg]);
+    }
+
+    /**
+     * Kick user from agency (profile action)
+     */
+    public function kickAgency($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (\App\Facades\UserHandling::checkIfUserOwnerOfAgency($user)) {
+            return response()->json(['status' => false, 'message' => __('This user is the agency owner and cannot be deleted')], 422);
+        }
+
+        \App\Facades\UserHandling::kickUserFromAgency($user);
+
+        return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
+    }
+
+    /**
+     * Kick user from family (profile action)
+     */
+    public function kickFamily($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (\App\Facades\UserHandling::checkIfUserOwnerOfFamily($user->id)) {
+            return response()->json(['status' => false, 'message' => __('This User is the host Of family can\'t delete it go to remove family first')], 422);
+        }
+
+        $user->family_id = null;
+        \App\Models\FamilyUser::where('user_id', $user->id)->delete();
+        $user->save();
+
+        return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
+    }
+
+    /**
+     * Change user agency (profile action)
+     */
+    public function changeAgency($id, Request $request)
+    {
+        $request->validate([
+            'agency_id' => 'required|exists:agencies,id',
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $agencyOwner = Agency::where('owner_id', $id)
+            ->orWhere('app_owner_id', $id)
+            ->exists();
+
+        if ($agencyOwner) {
+            return response()->json(['status' => false, 'message' => __('This user is the agency owner and cannot be deleted')], 422);
+        }
+
+        return DB::transaction(function () use ($user, $request) {
+            $oldAgencyId = $user->agency_id;
+
+            uploadMonthlyDiamondReceive($user->id, 0);
+
+            // Handle salaries
+            $timezone = getTimezone();
+            $currentMonth = now($timezone)->month;
+            $currentYear = now($timezone)->year;
+            $userSalary = UserSallary::where('user_id', $user->id)
+                ->where('user_agency_id', $oldAgencyId)
+                ->where('month', $currentMonth)
+                ->where('year', $currentYear)
+                ->where('is_finished', 0)
+                ->first();
+            if ($userSalary) {
+                $userSalary->update(['is_finished' => 1]);
+            }
+
+            // Clear agency logs
+            GiftLog::where('receiver_id', $user->id)
+                ->where('agency_id', $oldAgencyId)
+                ->update(['is_finished' => 1]);
+            \App\Models\AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $oldAgencyId])->delete();
+
+            // Update previous agency joined
+            $checkAgencyUser = UsersJoinedAgency::where([
+                'user_id' => $user->id,
+                'agency_id' => $oldAgencyId,
+            ])->whereNull('leave_date')->first();
+
+            if ($checkAgencyUser) {
+                $checkAgencyUser->update([
+                    'leave_date' => now(),
+                    'status' => 'change agency by admin',
+                    'kicked_by_admin' => Auth::id()
+                ]);
+            } else {
+                UsersJoinedAgency::create([
+                    'user_id' => $user->id,
+                    'agency_id' => $oldAgencyId,
+                    'type' => 2,
+                    'join_date' => now(),
+                    'leave_date' => now(),
+                    'status' => 'change agency by admin',
+                    'kicked_by_admin' => Auth::id(),
+                ]);
+            }
+
+            // Create new join record
+            UsersJoinedAgency::create([
+                'user_id' => $user->id,
+                'agency_id' => $request->agency_id,
+                'type' => 2,
+                'join_date' => now(),
+                'status' => 'Joined',
+            ]);
+
+            $user->agency_id = $request->agency_id;
+            $user->save();
+
+            return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
+        });
     }
 }

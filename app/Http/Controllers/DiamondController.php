@@ -22,51 +22,78 @@ class DiamondController extends Controller
     public function calculateMonthlyDiamondReceived()
     {
         $timezone = getTimezone();
-        $startOfMonth = \Carbon\Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC');
+        $date = Carbon::now($timezone);
+        $currentMonth = $date->month;
+        $currentYear = $date->year;
+        $startOfMonth = Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC');
 
-        $users = DB::table('users')
+        $processedCount = 0;
+        $updatedCount = 0;
+        $skippedCount = 0;
+
+        DB::table('users')
             ->select('id', 'agency_id')
             ->whereNotNull('agency_id')
             ->where('agency_id', '>', 0)
             ->whereIn('type_user', [1, 2])
-            ->get();
+            ->orderBy('id')
+            ->chunk(500, function ($users) use ($timezone, $startOfMonth, $currentMonth, $currentYear, &$processedCount, &$updatedCount, &$skippedCount) {
+                foreach ($users as $user) {
+                    try {
+                        $join = DB::table('users_joined_agencies')
+                            ->where('user_id', $user->id)
+                            ->where('agency_id', $user->agency_id)
+                            ->orderByDesc('join_date')
+                            ->first();
 
-        foreach ($users as $user) {
-            $join = DB::table('users_joined_agencies')
-                ->where('user_id', $user->id)
-                ->where('agency_id', $user->agency_id)
-                ->orderByDesc('join_date')
-                ->first();
+                        $startDate = $startOfMonth;
+                        if ($join && Carbon::parse($join->join_date, $timezone)->greaterThan($startOfMonth)) {
+                            $startDate = Carbon::parse($join->join_date, $timezone)->setTimezone('UTC');
+                        }
 
-            $startDate = $startOfMonth;
-            if ($join && Carbon::parse($join->join_date, $timezone)->greaterThan($startOfMonth)) {
-                $startDate = Carbon::parse($join->join_date, $timezone);
-            }
+                        $totalReceived = DB::table('gift_logs')
+                            ->where('receiver_id', $user->id)
+                            ->where('created_at', '>=', $startDate)
+                            ->where('agency_id', $user->agency_id)
+                            ->selectRaw('SUM(giftPrice) as total')
+                            ->value('total');
 
-            $totalReceived = DB::table('gift_logs')
-                ->where('receiver_id', $user->id)
-                ->where('created_at', '>=', $startDate)
-                ->where('agency_id', $user->agency_id)
-                ->selectRaw('SUM(giftPrice) as total')
-                ->value('total');
+                        $newMonthlyDiamond = $totalReceived ?? 0;
 
-            // تحديث جدول users
+                        $currentRecord = MonthlyDiamondReceive::where('user_id', $user->id)
+                            ->where('month', $currentMonth)
+                            ->where('year', $currentYear)
+                            ->first();
 
-            $monthlyDiamond = $totalReceived ?? 0;
-            uploadMonthlyDiamondReceive($user->id, $monthlyDiamond);
-        }
+                        $oldMonthlyDiamond = $currentRecord ? $currentRecord->monthly_diamond_received : 0;
 
-        // $totalReceived = DB::table('gift_logs')
-        //     ->where('receiver_id', $user->id)
-        //     ->where('created_at', '>=', $startDate)
-        //     ->where('agency_id', $user->agency_id)
-        //     ->selectRaw('SUM(giftPrice) as total')
-        //     ->value('total');
-        // $totalDiamond = $totalReceived ?? 0;
-        // uploadMonthlyDiamondReceive($user->id, $totalDiamond);
-         return response()->json([
+                        if ($newMonthlyDiamond != $oldMonthlyDiamond) {
+                            uploadMonthlyDiamondReceive($user->id, $newMonthlyDiamond);
+
+                            DB::table('users')
+                                ->where('id', $user->id)
+                                ->update([
+                                    'salary_is_updated' => 1,
+                                ]);
+
+                            $updatedCount++;
+                        } else {
+                            $skippedCount++;
+                        }
+
+                        $processedCount++;
+                    } catch (\Throwable $e) {
+                        Log::error("Failed to calculate monthly diamond for user {$user->id}: " . $e->getMessage());
+                    }
+                }
+            });
+
+        return response()->json([
             'status' => true,
-            'message' => 'تم تحديث الماس الشهري لجميع المستخدمين (type_user = 0).'
+            'message' => "تم معالجة {$processedCount} مستخدم - تم التحديث: {$updatedCount} - تم تخطيهم: {$skippedCount}",
+            'processed_count' => $processedCount,
+            'updated_count' => $updatedCount,
+            'skipped_count' => $skippedCount
         ]);
     }
 
