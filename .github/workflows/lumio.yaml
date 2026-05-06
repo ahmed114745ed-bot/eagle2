@@ -270,6 +270,7 @@ jobs:
         command_timeout: 5m
         script: |
           CURRENT=${{ github.sha }}
+          sudo docker container prune -f 2>/dev/null || true
 
           # Remove legacy charizma-worker service if it exists
           # (now handled by supervisord inside lumio-job containers)
@@ -278,7 +279,7 @@ jobs:
           # Remove old tagged images (keep only current)
           for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'lumio-(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
             echo "Removing old image: $img"
-            sudo docker rmi "$img" 2>/dev/null || true
+            sudo docker rmi -f "$img" 2>/dev/null || true
           done
 
           # Prune dangling images
