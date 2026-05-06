@@ -2315,54 +2315,37 @@
     <div class="agency-tabs">
 
         <a href="?tab=packs"
-           data-pjax
            class="tab-btn {{ $activeTab === 'packs' ? 'active' : '' }}"
            data-target="packs-tab">
             {{ __('packs') }}
         </a>
 
-        <a href="?tab=vips" data-pjax class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
+        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
            data-target="vips-tab">{{ __('vips') }}</a>
 
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=level" data-pjax class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
+            <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
         @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
+            <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
                data-target="salary-tab">{{ __('prof_reports') }}</a>
         @endif
-        <a href="?tab=charge" data-pjax class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
+        <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
-        <a href="?tab=gift-log" data-pjax class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+        <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
-        <a href="?tab=user-agency" data-pjax class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
+        <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
            data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-        <a href="?tab=user-coins" data-pjax class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
+        <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
            data-target="user-coins-tab">{{ __('User Coins') }}</a>
-        <a href="?tab=badges" data-pjax class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
+        <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
            data-target="badges-tab">{{ __('badges') }}</a>
 
-        <a href="?tab=wallet_logs" data-pjax class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
+        <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
            data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
     </div>
-    <div id="tab-loading" style="
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            /* transform: translate(-50%, -50%); */
-            background: var(--primary-color);
-            color: var(--text-primary-color);
-            z-index: 9999;
-            padding: 30px 40px;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        ">
-        {{ __('Loading...') }}
-    </div>
+    {{-- tab-loading removed - tabs now switch client-side without reload --}}
 
     <!-- packs Section -->
 
@@ -4697,15 +4680,26 @@
 
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Remove active class from all buttons and content
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            // Add active class to clicked button and corresponding content
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.classList.add('d-none');
+                c.style.display = 'none';
+            });
             btn.classList.add('active');
             const target = btn.getAttribute('data-target');
-            document.getElementById(target).classList.add('active');
+            const targetEl = document.getElementById(target);
+            if (targetEl) {
+                targetEl.classList.add('active');
+                targetEl.classList.remove('d-none');
+                targetEl.style.display = 'block';
+            }
+            const href = btn.getAttribute('href');
+            if (href) {
+                history.pushState(null, '', window.location.pathname + href);
+            }
         });
     });
 
