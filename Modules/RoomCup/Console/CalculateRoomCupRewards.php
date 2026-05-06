@@ -427,8 +427,8 @@ class CalculateRoomCupRewards extends Command
         $room->update(['room_admin' => $str]);
     }
 
-    private function resetRoomSessions(): void
+    private static function resetRoomSessions(): void
     {
-         Room::update(['session' => 0]);
+         Room::query()->update(['session' => 0]);
     }
 }
