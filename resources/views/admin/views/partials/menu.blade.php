@@ -63,7 +63,7 @@
     $isVisible = ($hasRoles || $hasPermission|| $allPermission || $anyChildExists );
 
     // إخفاء charisma-levels إذا كانت الميزة مغلقة
-    if (Arr::get($item, 'uri') == 'charisma-levels' && !config('charisma.format', false)) {
+    if (Arr::get($item, 'uri') == 'charisma-levels' && !config('charisma.badge', false)) {
         $isVisible = false;
     }
 

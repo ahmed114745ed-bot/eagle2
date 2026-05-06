@@ -317,6 +317,8 @@ class SettingController extends MainController
             Cache::forget('charisma_badge');
             Cache::put('charisma_badge', $request->value, now()->addYear());
 
+            Config::set('charisma.badge', (bool) $request->value);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

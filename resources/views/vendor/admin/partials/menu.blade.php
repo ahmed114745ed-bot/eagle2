@@ -132,7 +132,7 @@ $isVisible =
     );
 
 // إخفاء charisma-levels إذا كانت الميزة مغلقة
-if ($uri === 'charisma-levels' && !config('charisma.format', false)) {
+if ($uri === 'charisma-levels' && !config('charisma.badge', false)) {
     $isVisible = false;
 }
 @endphp
