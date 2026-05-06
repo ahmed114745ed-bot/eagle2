@@ -269,25 +269,28 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 5m
         script: |
-          CURRENT=${{ github.sha }}
+          CURRENT="${{ github.sha }}"
+
+          # Get previous image SHA from Swarm (keep N-1 for rollback safety)
+          OCTA_PREV=$(sudo docker service inspect lumio-octa --format '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null | grep -oE '[a-f0-9]{40}' || echo "")
+          JOB_PREV=$(sudo docker service inspect lumio-job --format '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null | grep -oE '[a-f0-9]{40}' || echo "")
+          echo "Keeping: current=$CURRENT octa_prev=$OCTA_PREV job_prev=$JOB_PREV"
+
           sudo docker container prune -f 2>/dev/null || true
 
           # Remove legacy charizma-worker service if it exists
-          # (now handled by supervisord inside lumio-job containers)
           sudo docker service rm lumio-charizma-worker 2>/dev/null || true
 
-          # Remove old tagged images (keep only current)
-          for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep -E 'lumio-(octa|job):' | grep -v "$CURRENT" | grep -v '<none>'); do
-            echo "Removing old image: $img"
-            sudo docker rmi -f "$img" 2>/dev/null || true
+          for REPO in lumio-octa lumio-job; do
+            sudo docker images "$REPO" --format '{{.Tag}}' | while read TAG; do
+              [ "$TAG" = "$CURRENT" ] && continue
+              [ -n "$OCTA_PREV" ] && [ "$TAG" = "$OCTA_PREV" ] && continue
+              [ -n "$JOB_PREV" ] && [ "$TAG" = "$JOB_PREV" ] && continue
+              echo "  Removing $REPO:$TAG"
+              sudo docker rmi -f "$REPO:$TAG" 2>/dev/null || true
+            done
           done
 
-          # Prune dangling images
           sudo docker image prune -f 2>/dev/null || true
-
-          # Prune build cache older than 24h
           sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
-
-          # Disk check
-          USAGE=$(df -h / | awk 'NR==2{print $5}')
-          echo "Disk usage after cleanup: $USAGE"
+          echo "Disk: $(df -h / | awk 'NR==2{print $5}')"
