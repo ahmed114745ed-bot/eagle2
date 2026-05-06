@@ -270,7 +270,7 @@ body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFo
 <table class="table table-sm mb-0">
 <tr><td>Spins</td><td><strong>{$this->fmt($hour->total ?? 0)}</strong></td></tr>
 <tr><td>Wins</td><td>{$this->fmt($hour->wins ?? 0)}</td></tr>
-<tr><td>Unique Users</td><td>{$hour->unique_users ?? 0}</td></tr>
+<tr><td>Unique Users</td><td>{$this->fmt($hour->unique_users ?? 0)}</td></tr>
 <tr><td>Total Bet</td><td>{$this->fmt($hour->total_bet ?? 0)}</td></tr>
 <tr><td>Net P&L</td><td class="text-danger">{$this->fmt($hour->net_profit ?? 0)}</td></tr>
 </table></div></div></div>
