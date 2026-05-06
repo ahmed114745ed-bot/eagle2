@@ -188,9 +188,9 @@ jobs:
 
   run_lumio_job:
     runs-on: [self-hosted]
-    needs: [run_lumio_hub, run_lumio_lint, run_lumio_migrate, run_lumio_app]
+    needs: [run_lumio_hub, run_lumio_lint, run_lumio_migrate]
     steps:
-    - name: Build and deploy Lumio jobs
+    - name: Build and deploy Lumio jobs + cron
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
@@ -207,7 +207,7 @@ jobs:
             echo "Attempt $attempt: updating lumio-job..."
             if sudo docker service update \
               --image lumio-job:${{ github.sha }} \
-              --replicas 3 \
+              --replicas 1 \
               --limit-cpu 5.0 \
               --limit-memory 2.5gb \
               --reserve-memory 1.0gb \
@@ -235,9 +235,25 @@ jobs:
           fi
           echo "Verified: lumio-job is running $RUNNING_IMAGE"
 
-          # NOTE: charizma handler (app:handling-room-zigo-requests) runs inside
-          # lumio-job containers via supervisord (program:room-zigo-handler in
-          # docker/supervisor.conf). No separate Docker service needed.
+          if sudo docker service inspect lumio-cron >/dev/null 2>&1; then
+            echo "Updating lumio-cron service..."
+            sudo docker service update \
+              --image lumio-job:${{ github.sha }} \
+              lumio-cron
+          else
+            echo "Creating lumio-cron service..."
+            sudo docker service create \
+              --name lumio-cron \
+              --init \
+              --replicas 1 \
+              --limit-memory 512m \
+              --reserve-memory 256m \
+              --network app-network \
+              --mount type=bind,src=/var/www/lumio/storage,dst=/app/storage \
+              lumio-job:${{ github.sha }} \
+              php /app/artisan schedule:work
+          fi
+          echo "Cron service ready."
 
   run_lumio_cleanup:
     runs-on: [self-hosted]
