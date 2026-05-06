@@ -23,12 +23,7 @@ jobs:
           test -f gcp.json || echo '{}' > gcp.json
           sudo docker builder prune -f 2>/dev/null || true
           sudo docker image prune -f 2>/dev/null || true
-          AVAIL_KB=$(df --output=avail / | tail -1 | tr -d ' ')
-          if [ "$AVAIL_KB" -lt 10485760 ]; then
-            echo "Low disk space (${AVAIL_KB}KB free). Pruning old images..."
-            sudo docker image prune -a --filter "until=168h" -f 2>/dev/null || true
-          fi
-          echo "Disk space: $(df -h / | tail -1)"
+          echo "Disk space before: $(df -h / | tail -1)"
   run_for-developer_app:
     runs-on: [self-hosted]
     needs: run_for-developer_hub
@@ -69,4 +64,28 @@ jobs:
           echo "Build succeeded. Updating service..."
           sudo docker service update --image for-developer-job:${{ github.sha }} for-developer-job
           sudo docker image prune -f 2>/dev/null || true
+  cleanup:
+    runs-on: [self-hosted]
+    needs: run_for-developer_job
+    if: always()
+    steps:
+    - name: Remove old Docker images
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          CURRENT="${{ github.sha }}"
+          for REPO in for-developer-octa for-developer-job; do
+            echo "Cleaning old $REPO images (keeping current: $CURRENT)..."
+            sudo docker images "$REPO" --format '{{.Tag}}' | grep -v "$CURRENT" | while read TAG; do
+              echo "  Removing $REPO:$TAG"
+              sudo docker rmi "$REPO:$TAG" 2>/dev/null || true
+            done
+          done
+          sudo docker image prune -f 2>/dev/null || true
+          echo "Disk space after cleanup: $(df -h / | tail -1)"
 
