@@ -4674,24 +4674,11 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => {
-                c.classList.remove('active');
-                c.classList.add('d-none');
-                c.style.display = 'none';
-            });
-            btn.classList.add('active');
-            const target = btn.getAttribute('data-target');
-            const targetEl = document.getElementById(target);
-            if (targetEl) {
-                targetEl.classList.add('active');
-                targetEl.classList.remove('d-none');
-                targetEl.style.display = 'block';
-            }
+            // Navigate to the tab URL so the server can load the correct data
             const href = btn.getAttribute('href');
             if (href) {
-                history.pushState(null, '', window.location.pathname + href);
+                e.preventDefault();
+                window.location.href = window.location.pathname + href;
             }
         });
     });
