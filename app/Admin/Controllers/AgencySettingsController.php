@@ -45,7 +45,7 @@ class AgencySettingsController extends MainController
         $hoursDays = Common::getSettingValue('hours_days');
         $transfer_salary = settings()->get('transfer_salary');
         $stop_invite_code = settings()->get('stop_invite_code');
-        $stop_charge = settings()->get('stop_charge');
+        $stop_charge = Common::getSettingValue('stop_charge') ?? 0;
         $make_rooms_top = settings()->get('make_rooms_top');
         $make_gift_top = settings()->get('close_open_gifts');
         $remaining_diamonds_action = Common::getSettingValue('remaining_diamonds_action') ?? 0;

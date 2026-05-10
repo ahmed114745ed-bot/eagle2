@@ -1424,7 +1424,7 @@ trait CalcsTrait
     {
         $where = 'user_id|fromUid = ' . $user_id;
         $where .= ' and status = ' . $status;
-        $id = DB::table('cps')->whereRaw($where)->whereRaw("`user_id` = {$fromUid} OR `fromUid` = {$fromUid}")->value('id');
+        $id = DB::table('cps')->whereRaw($where)->whereRaw("`user_id` = ? OR `fromUid` = ?", [$fromUid, $fromUid])->value('id');
         return $id;
     }
 

@@ -141,7 +141,13 @@ class Ranking
 
     private function getQueryResults($query, $keywords, $limit)
     {
-        return $query->selectRaw("sum(giftPrice) as exp, $keywords")
+        // Whitelist allowed column names to prevent SQL injection
+        $allowedColumns = ['receiver_id', 'sender_id', 'roomowner_id', 'user_id'];
+        if (!in_array($keywords, $allowedColumns, true)) {
+            throw new \InvalidArgumentException('Invalid column name');
+        }
+
+        return $query->selectRaw("sum(giftPrice) as exp, " . $keywords)
             ->groupBy($keywords)->orderByRaw("exp desc")
             ->limit($limit)->get()->reject(function ($q) {
                 return $q->exp == 0;

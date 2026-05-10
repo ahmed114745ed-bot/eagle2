@@ -70,7 +70,7 @@ class AdminNotificationHelper
         $projectId = env('FIREBASE_PROJECT_NAME'); 
 
         $client = new Google_Client();
-        $firebaseConfigPath = public_path('firebase_credentials.json');
+        $firebaseConfigPath = storage_path('app/credentials/firebase_credentials.json');
         $client->setAuthConfig($firebaseConfigPath);
 
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');

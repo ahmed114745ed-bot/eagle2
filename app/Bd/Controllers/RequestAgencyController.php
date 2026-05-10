@@ -2,19 +2,16 @@
 
 namespace App\Bd\Controllers;
 
-use App\Models\Agency;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
+
+use App\Admin\Services\UserService;
 use App\Services\AppFeatureService;
-use App\Admin\Actions\AcceptAgencyAction;
-use App\Admin\Actions\RefuseAgencyAction;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Content;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Widgets\Table as WidgetsTable;
-use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Modules\Form\Entities\FormRequest;
+use Modules\Form\Services\FormRenderService;
 
 class RequestAgencyController extends AdminController
 {
@@ -25,271 +22,285 @@ class RequestAgencyController extends AdminController
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
 
-
     public function index(Content $content)
     {
-        return $content
-            ->header(trans('request-agencies'))
-            ->row(function ($row) {
-                $row->column(12, $this->grid());
-            });
+        $type = 'host_agency';
+
+        $content->row($this->getGrid($type)->render());
+
+        return $content;
     }
 
-
-
-
-    /**
-     * Show interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
-    public function show($id, Content $content)
+    protected function getGrid($type)
     {
-        return parent::show($id, $content
-            ->title(trans('Request agencies'))
-            ->body($this->detail($id)));
-    }
 
-    /**
-     * Edit interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
-    public function edit($id, Content $content)
-    {
-        return parent::edit($id, $content
-            ->title(trans('Request agencies'))
-            ->body($this->form()->edit($id)));
-    }
+        $grid = new Grid(new FormRequest());
 
-    public function create(Content $content)
-    {
-        return parent::create($content
-            ->title(trans('Request agencies'))
-            ->body($this->form()));
-    }
-
-
-   
-    protected function grid()
-    {
-        $grid = new Grid(new Agency());
         $grid->model()
-            ->where('bd_id', Auth::user()->id)
-            ->where('status', 0)->orderByDesc("id")
-            ->whereHas('additionalInfo', function ($query) {
-                $query->where('status', 0);
+            ->select(['id', 'name', 'bd_id', 'whatsapp_number', 'submitted_by', 'form_template_type', 'status'])
+            ->with([
+                'user',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'template',
+                'bd'
+            ])->where('bd_id', auth()->id())
+            ->where('form_template_type', $type)->orderByDesc('id');
+
+        $grid->column('user', __('user'))
+            ->display(function ($name) {
+
+                $user = $this->user;
+                if (!$user) {
+                    return '';
+                }
+
+                return app(UserService::class)->adminUserAvatar($user);
             });
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('owner.uuid', __('uuid'));
+
+        $grid->column('name', __('name'));
+
+        if ($type != 'bd_form' && $type != 'shipping_agency') {
+            $grid->column('bd_id', __('Bd'))->display(function ($name) {
+                if (request()->filled('_export_')) {
+                    return $name;
+                }
+                if (!$this->bd) {
+                    return '-';
+                }
+
+                $id = $this->bd->id ?? '-';
+                $name = $this->bd?->username ?? 'غير معروف';
+                $path = $this->bd?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                $image = handleShowImageWithTypes($this->bd?->id, $url, 40, 40);
+                $showUrl = url("admin/usersBd/{$this->bd?->id}");
+
+                return "
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <div>
+                           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                            </a>
+                            <span style='font-size: smaller;'>ID: $id</span>
+                        </div>
+                    </div>
+                ";
             });
-        });
-        $grid->column('id', __('Id'));
-        $grid->column('owner.name', trans('name'))->display(function ($name) {
-            $uid = @$this->owner->uuid;
-            $path = @$this?->owner->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $grid->column('whatsapp_number', __('whatsapp_number'))->display(fn($v) => $v ?? '-');
+        }
+        if ($type == 'bd_form') {
+            $grid->column('country', __('country'))->display(fn($v) => $v ?? '-');
+        }
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
+        Admin::style('
+            .grid-table .label-default {
+                background-color: var(--primary-color) !important;
+                color: #fff !important;
+            }
+        ');
+
+        $grid->column('status', __('status'))->label([
+            'pending' => 'default',
+            'approved' => 'success',
+            'rejected' => 'danger'
+        ])->display(function ($status) {
+            return __($status);
+        });
+
+        $grid->column('actions', __('Actions'))->display(function () {
+            $approveUrl = url("bd/requests/{$this->id}/approve");
+            $rejectUrl = url("bd/requests/{$this->id}/reject");
+            $showUrl = url("bd/request-agencies/{$this->id}");
+
+            if ($this->status === 'rejected') {
+                return '<span class="text-danger">' . __('Rejected') . '</span>';
             }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->owner) ? url("admin/users/{$this->owner->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
-        });
-
-        $grid->column('name', __('agency'))->display(function () {
-            $name = @$this->name ?? '';
-            $path = @$this->img;
-            $defaultImage = asset("images/icon-agency.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <span>$name</span>
-            </div>
-        ";
-        });
-        $grid->column('phone', __('whats app'));
-        $grid->column('additionalInfo.country', __('country'));
-        $grid->column('additionalInfo.gmail', __('Email'));
-        $grid->column('additionalInfo.video', __('video'))->display(function () {
-            // Assuming you have a 'video_path' field in your model
-            $videoPath = 'https://storage.googleapis.com/tik-chat/' . $this->additionalInfo?->video;
-
-            // You can customize the HTML to embed the video
-            return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
-        });
-        // $grid->column('additionalInfo.face_image_nationalId', __('face nationalId'))->image ('https://storage.googleapis.com/tik-chat/',30);
-
-        $grid->column('additionalInfo.face_image_nationalId', __('face nationalId'))->display(function () {
-            $img = $this->additionalInfo?->face_image_nationalId;
-            if ($img == null || $img == '') {
-                return 'No image founded';
+            if ($this->status === 'approved') {
+                return '<span class="text-success">' . __('Approved') . '</span>';
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
-            return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
+            $approveText = __('Approved');
+            $rejectText = __('Reject');
+            $viewText = __('Preview');
+
+            $html = '';
+            ///  if (Admin::user()->can('show-' . $this->permission_name) || Admin::user()->can('*')) {
+            $html .= <<<HTML
+                    <a href="{$showUrl}" class="btn btn-info btn-sm me-1">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                HTML;
+            //  }
+
+            // if (Admin::user()->can('approve-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $html .= <<<HTML
+                    <button class="btn btn-success btn-sm approve-btn me-1" data-url="{$approveUrl}">
+                        <i class="fa fa-check"></i>
+                    </button>
+                HTML;
+            // }
+
+            // if (Admin::user()->can('reject-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+            $html .= <<<HTML
+                    <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">
+                        ✖
+                    </button>
+                HTML;
+            // }
+
+            return $html;
         });
-        $grid->column('additionalInfo.back_image_nationalId', __('back nationalId'))->display(function () {
-            $img = $this->additionalInfo?->back_image_nationalId;
-            if ($img == null || $img == '') {
-                return 'No image founded';
+
+        Admin::script("
+            function initFormRequestActions() {
+
+                function sendRequest(url) {
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': LA.token,
+                            'Accept': 'application/json',
+                        },
+                    }).then(res => res.json());
+                }
+
+                function handleAction(button, actionType) {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+
+                        const messages = {
+                            approve: {
+                                title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                                confirm: 'نعم',
+                                cancel: 'إلغاء',
+                                color: '#28a745'
+                            },
+                            reject: {
+                                title: 'هل أنت متأكد من رفض هذا الطلب؟',
+                                confirm: 'نعم',
+                                cancel: 'إلغاء',
+                                color: '#dc3545'
+                            },
+                            success: {
+                                en: 'Action completed successfully!',
+                                ar: 'تمت العملية بنجاح!',
+                                hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                                tr: 'İşlem başarıyla tamamlandı!'
+                            },
+                            error: {
+                                en: 'An error occurred!',
+                                ar: 'حدث خطأ أثناء العملية',
+                                hi: 'एक त्रुटि हुई!',
+                                tr: 'İşlem sırasında hata oluştu!'
+                            }
+                        };
+
+                        const locale = document.documentElement.lang || 'ar';
+
+                        Swal.fire({
+                            title: messages[actionType].title,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: messages[actionType].confirm,
+                            cancelButtonText: messages[actionType].cancel,
+                            confirmButtonColor: messages[actionType].color,
+                            cancelButtonColor: '#6c757d',
+                        }).then((result) => {
+                            if (result.value) {
+                                const url = button.dataset.url;
+
+                                Swal.fire({
+                                    title: 'جاري التنفيذ...',
+                                    allowOutsideClick: false,
+                                    didOpen: () => Swal.showLoading()
+                                });
+
+                                sendRequest(url)
+                                    .then(res => {
+                                        Swal.close();
+
+                                        if (res.success) {
+                                            Swal.fire({
+                                                title: res.message || messages.success[locale],
+                                                icon: res.icon || 'success', // 💡 Use icon from backend
+                                                timer: 2000,
+                                                showConfirmButton: false
+                                            });
+
+                                            // Reload grid without full refresh
+                                            $.pjax.reload('#pjax-container');
+                                        } else {
+                                            Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                                        }
+                                    })
+                                    .catch((err) => {
+                                        console.error('Fetch error:', err);
+                                        Swal.fire('خطأ', messages.error[locale], 'error');
+                                    });
+                            }
+                        });
+                    });
+                }
+
+                document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+                document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
-            return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
-        });
+            initFormRequestActions();
+
+            $(document).off('pjax:end').on('pjax:end', function() {
+                initFormRequestActions();
+            });
+        ");
 
 
-        $grid->column('additionalInfo.salary', __('salary'))->display(function ($salary) {
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
-                      
-                        <span>{$salary}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        });
-        $grid->column('additionalInfo.host', __('host'));
-        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function ($name) {
-            $uid = @$this->additionalInfo->user->uuid;
-            $path = @$this?->additionalInfo->user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->additionalInfo->user) ? url("admin/users/{$this->additionalInfo->user->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
-        });
-        $grid->column('additionalInfo.history_app_info', __('The platform you worked on'));
-        $grid->actions(function ($actions) {
-            $model = $actions->row;
-            $actions->disableEdit();
-            $actions->disableView();
-            $actions->disableDelete();
-            $actions->add(new AcceptAgencyAction($model->id));
-            $actions->add(new RefuseAgencyAction($model->id));
-        });
+        $grid->disableActions();
         $grid->disableCreateButton();
-
-        // $grid->tools(function (Grid\Tools $tools) {
-        //     $url = '/admin/request-agencies-filteration';
-        //     $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
-        //     $tools->append($button);
-        // });
+        $grid->disableExport();
+        $grid->disableColumnSelector();
+        $grid->disableRowSelector();
 
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
+
+    public function show($id, Content $content)
     {
-        $show = new Show(Agency::findOrFail($id));
-
-        $show->field('id', __('Id'));
-        $show->field('owner_id', __('Owner id'));
-        $show->field('name', __('Name'));
-        $show->field('notice', __('Notice'));
-        $show->field('status', __('Status'));
-        $show->field('phone', __('Phone'));
-        $show->field('url', __('Url'));
-        $show->field('img', __('Img'));
-        $show->field('contents', __('Contents'));
-        $show->field('created_at', __('Created at'));
-        $show->field('updated_at', __('Updated at'));
-        $show->field('old_usd', __('Old usd'));
-        $show->field('target_usd', __('Target usd'));
-        $show->field('target_token_usd', __('Target token usd'));
-        $show->field('app_owner_id', __('App owner id'));
-        $show->field('salary', __('Salary'));
-        $show->field('Shipping_agency', __('Shipping agency'));
-        $show->field('Host_agency', __('Host agency'));
-        $show->field('agency_manger_id', __('Agency manger id'));
-        $show->field('agency_dash_manger_id', __('Agency dash manger id'));
-        $show->field('deleted_at', __('Deleted at'));
-        $show->field('monthly_target', __('Monthly target'));
-        $show->field('password', __('Password'));
-
-        return $show;
+        return parent::show(
+            $id,
+            $content
+                ->title(trans(''))
+                ->body($this->detail($id))
+        );
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
+    protected function detail($id)
     {
-        $form = new Form(new Agency());
-        $this->disableFormTools($form);
+        $show = new Show(FormRequest::findOrFail($id));
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
 
+        $renderer = new FormRenderService();
 
-        $form->number('owner_id', __('Owner id'));
-        $form->text('name', __('Name'));
-        $form->text('notice', __('Notice'))->default('notice');
-        $form->switch('status', __('Status'))->default(1);
-        $form->mobile('phone', __('Phone'));
-        $form->url('url', __('Url'));
-        $form->image('img', __('Img'));
-        $form->textarea('contents', __('Contents'));
-        $form->decimal('old_usd', __('Old usd'));
-        $form->decimal('target_usd', __('Target usd'));
-        $form->decimal('target_token_usd', __('Target token usd'));
-        $form->number('app_owner_id', __('App owner id'));
-        $form->decimal('salary', __('Salary'))->default(0.00);
-        $form->number('Shipping_agency', __('Shipping agency'));
-        $form->number('Host_agency', __('Host agency'));
-        $form->number('agency_manger_id', __('Agency manger id'));
-        $form->number('agency_dash_manger_id', __('Agency dash manger id'));
-        $form->decimal('monthly_target', __('Monthly target'))->default(1000000);
-        $form->password('password', __('Password'));
+        $show->field('data', __('dodo'))->as(function ($jsonData) use ($renderer) {
+            $data = json_decode($jsonData, true);
+            return $renderer->renderFormData($data);
+        })->unescape();
 
-        return $form;
+        return $show;
     }
 }

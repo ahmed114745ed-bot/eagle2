@@ -690,8 +690,8 @@ ease;
 
                                     @php
                                         // generate unique IDs for each input & label
-                                        $inputId = $field->field_name . '_input';
-                                        $labelId = $field->field_name . '_label';
+                                        $inputId = 'file_' . $section->id . '_' . $field->id . '_input';
+                                        $labelId = 'file_' . $section->id . '_' . $field->id . '_label';
                                     @endphp
 
                                     <div class="file-upload" style="position: relative; display: inline-block;">

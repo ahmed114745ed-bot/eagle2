@@ -895,6 +895,8 @@ class UserController extends Controller
 
 
 
+
+
     public function switchAccountAnonymous(Request $request)
     {
         $user = $request->user();
@@ -950,8 +952,8 @@ class UserController extends Controller
         $UserCodeInvitation = UserCodeInvitation::where("user_id", $userId);
         if ($parentInvitations != null) {
             $data = [
-                "totalEarned"  => $parentInvitations->sum("parent_percentage"),
-                "earnedDay"    => $parentInvitations->whereDate("created_at", date("Y-m-d"))->sum("parent_percentage"),
+                "totalEarned"  => $parentInvitations->sum("amount"),
+                "earnedDay"    => $parentInvitations->whereDate("created_at", date("Y-m-d"))->sum("amount"),
                 "TotalInvited" => $UserCodeInvitation->count(),
                 "invitedDay"   => $UserCodeInvitation->whereDate("created_at", date("Y-m-d"))->count(),
             ];
@@ -1637,7 +1639,12 @@ class UserController extends Controller
     public function rooms(Request $request, $id = null)
     {
         return TryCatchHelper::handle(function () use ($id, $request) {
-            return $this->userService->getUserRooms($id ?? $request->user()->id);
+            $userId = $id ?? $request->user()->id;
+            // Cache for 5 minutes (300 seconds) to fix 3s-4s latency reported in DevOps report
+            // User rooms don't change frequently
+            return Cache::remember("user_rooms_{$userId}", 300, function () use ($userId) {
+                return $this->userService->getUserRooms($userId);
+            });
         });
     }
 

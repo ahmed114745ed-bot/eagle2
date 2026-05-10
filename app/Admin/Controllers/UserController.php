@@ -8,6 +8,7 @@ use App\Models\Pack;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
+use App\Models\Setting;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
@@ -37,7 +38,6 @@ use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
 use Illuminate\Support\Facades\Cache;
 use Modules\Badge\Entities\UserBadge;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
@@ -120,13 +120,6 @@ class UserController extends MainController
 
         $content = $content->title(__($this->title));
 
-        // Conditionally add the first row
-        // if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
-        //     $content = $content->row(function (Row $row) {
-        //         $row->column(12, $this->grid2());
-        //     });
-        // }
-
         // Add the second row unconditionally
         $content = $content->row(function ($row) {
             $row->column(12, $this->grid());
@@ -135,21 +128,6 @@ class UserController extends MainController
         return $content;
     }
 
-
-    protected function grid2()
-    {
-        $transfer_salary = settings()->get('transfer_salary');
-        $stop_invite_code = settings()->get('stop_invite_code');
-        $stop_charge = settings()->get('stop_charge');
-        $make_rooms_top = settings()->get('make_rooms_top');
-        $make_gift_top = settings()->get('close_open_gifts');
-
-
-        return (new Box(
-            title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary', 'make_gift_top'])),
-        ));
-    }
 
     protected function grid()
     {
@@ -161,6 +139,7 @@ class UserController extends MainController
         $grid->model()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id', 'transfer_salary', 'is_bd'])
+            ->withCount(['sameDeviceUsers' => fn($q) => $q->whereNotNull('device_token')])
             ->with([
                 'profile',
                 'agency',
@@ -169,6 +148,7 @@ class UserController extends MainController
                 'senderLevel',
                 'receiverLevel',
                 'monthlyDiamondReceive',
+                'shippingAgency',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
 
@@ -219,15 +199,17 @@ class UserController extends MainController
         } else {
             $grid->model()->orderByDesc('id');
         }
+
+        // ─── Quick Search ───
         $grid->quickSearch();
+
+        // ─── Filters ───
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
             $filter->column(1 / 2, function ($filter) {
-                // $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
-
                 $filter->where(function ($query) {
-                    $input = $this->input; // adjust as per your framework
+                    $input = $this->input;
                     $query->where('family_id', $input)
                         ->orWhereHas('family', function ($q) use ($input) {
                             $q->where('name', 'like', "%{$input}%");
@@ -249,9 +231,8 @@ class UserController extends MainController
                 });
 
                 $filter->column(1 / 2, function ($filter) {
-                    $locale = app()->getLocale(); // 'ar', 'en', etc.
+                    $locale = app()->getLocale();
                     $column = $locale === 'ar' ? 'name' : 'e_name';
-
                     $countries = \App\Models\Country::query()->pluck($column, 'id');
 
                     $filter->where(function ($query) {
@@ -262,97 +243,119 @@ class UserController extends MainController
                 });
             });
         });
-        $grid->column('id', __('Id'));
+
+        // ─── Columns ───
+        $grid->column('id', __('Id'))->display(function ($value) {
+            return "<span class='ug-id-badge'>{$value}</span>";
+        });
+
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($value) {
-                return number_format($value);
+                $formatted = number_format($value);
+                $color = $value > 10000 ? '#10b981' : ($value > 1000 ? '#f59e0b' : '#6b7280');
+                return "<div class='ug-coins'>
+                            <i class='fa fa-diamond' style='color:{$color};margin-right:4px;'></i>
+                            <span style='color:{$color};font-weight:700;'>{$formatted}</span>
+                        </div>";
             });
         }
 
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
-
-                $user = $this;
-                if (!$user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
-
-
-        $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
-
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
+        });
 
         $grid->column('agency_id', __('Agency'))
             ->display(function () {
                 $agency = $this->agency;
                 if (!$agency) {
-                    return '';
+                    return '<span class="ug-no-agency"><i class="fa fa-minus-circle"></i> ' . __('None') . '</span>';
                 }
-
                 return app(AgencyService::class)->adminAgencyData($agency);
             });
 
-        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
-        Admin::style("
-            .modal-dialog {
-                max-width: 90%;
-            }
-
-            .modal-body {
-                max-height: 70vh !important;
-                overflow-y: auto !important;
-            }
-        ");
+        $grid->column('shipping_agency_id', __('shipping agency'))
+            ->display(function () {
+                $agency = $this->shippingAgency;
+                if (!$agency) {
+                    return '<span class="ug-no-agency"><i class="fa fa-minus-circle"></i> ' . __('None') . '</span>';
+                }
+                return app(AgencyService::class)->adminShippingAgencyData($agency);
+            });
 
         $grid->column('custom_button2', __('accounts number'))->display(function () {
-            $count = $this->sameDeviceUsers()->count();
-            return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
+            $count = (int) ($this->same_device_users_count ?? 0);
+            $badgeClass = $count > 1 ? 'ug-device-warn' : 'ug-device-ok';
+            $icon = $count > 1 ? 'fa-exclamation-triangle' : 'fa-mobile';
+            return "<button class='ug-device-btn {$badgeClass} show-same-device-modal' data-user-id='{$this->id}'>
+                        <i class='fa {$icon}'></i>
+                        <span class='ug-device-count'>{$count}</span>
+                    </button>";
         });
 
         $grid->column('versions', __('versions'))->modal(__('versions'), function () {
             $data = [
-                ['iOS', $this->ios_version],
-                ['Huawei', $this->huawei_version],
-                ['Android', $this->android_version],
+                ['iOS', $this->ios_version ?? '—'],
+                ['Huawei', $this->huawei_version ?? '—'],
+                ['Android', $this->android_version ?? '—'],
             ];
 
             return new Table(
-                [__('Name'), __('Version')], // headers
-                $data                        // rows
+                [__('Name'), __('Version')],
+                $data
             );
         });
+
         $permission = $this->permission_name;
 
+        // ─── Inject all styles ───
+        Admin::style(UserService::adminUserCardStyles() . $this->gridStyles());
+
+        // ─── Script for same-device modal ───
         Admin::script("
-            // Initial modal open
             $(document).on('click', '.show-same-device-modal', function() {
                 var userId = $(this).data('user-id');
                 loadSameDeviceUsers(userId, 1);
             });
 
-            // Pagination click
             $(document).on('click', '.ajax-pagination', function(e) {
                 e.preventDefault();
                 var userId = $(this).data('user-id');
                 var page = $(this).data('page');
-
                 if (!$(this).parent().hasClass('disabled') && !$(this).parent().hasClass('active')) {
                     loadSameDeviceUsers(userId, page);
                 }
             });
 
             function loadSameDeviceUsers(userId, page) {
-                $('#sameDeviceUsersModal .modal-body').html('<div class=\"text-center\"><i class=\"fa fa-spinner fa-spin fa-2x\"></i></div>');
+                $('#sameDeviceUsersModal .modal-body').html('<div class=\"ug-loader\"><i class=\"fa fa-spinner fa-spin fa-2x\"></i><p>" . __('Loading') . "...</p></div>');
                 $('#sameDeviceUsersModal').modal('show');
-
                 $.get('/admin/users/' + userId + '/same-device-users-table', { page: page }, function(html) {
                     $('#sameDeviceUsersModal .modal-body').html(html);
                 });
             }
+
+            // Copy to clipboard fallback
+            if (typeof copyToClipboard === 'undefined') {
+                window.copyToClipboard = function(elemId) {
+                    var text = document.getElementById(elemId).textContent;
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(function() {
+                            toastr.success('" . __('Copied!') . "');
+                        });
+                    } else {
+                        var ta = document.createElement('textarea');
+                        ta.value = text;
+                        document.body.appendChild(ta);
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        toastr.success('" . __('Copied!') . "');
+                    }
+                };
+            }
         ");
 
-
+        // ─── Actions ───
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
@@ -360,13 +363,10 @@ class UserController extends MainController
                 $actions->add(new ChargeSwitchAction());
             }
             if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
-
                 $actions->add(new InviteSwitchAction());
             }
             if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
-
-                $row = $actions->row; // force load
-
+                $row = $actions->row;
                 $actions->add(new \App\Admin\Actions\CanPlaySwitchAction($row['can_play']));
             }
             if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
@@ -381,12 +381,9 @@ class UserController extends MainController
             if ($model->phone == '+201000100010') {
                 $actions->disableDelete();
             }
-
             if (!Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
-
-
             if (!Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableEdit();
             }
@@ -394,20 +391,327 @@ class UserController extends MainController
                 $actions->disableView();
             }
         });
-       // if (config('app.env') == 'production') $grid->disableCreateButton();
+
+        if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableRowSelector();
 
         return $grid;
     }
 
+    /**
+     * Modern grid CSS styles for users table
+     */
+    protected function gridStyles(): string
+    {
+        return '
+            /* ═══════════════════════════════════════════
+               USERS GRID — Clean Modern UI
+               ═══════════════════════════════════════════ */
+
+            /* ── Table Styles ── */
+            .grid-table {
+                border-collapse: separate !important;
+                border-spacing: 0 !important;
+            }
+            .grid-table > thead > tr > th {
+                background: #f8fafc !important;
+                color: #475569 !important;
+                font-weight: 700 !important;
+                font-size: 12px !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.8px !important;
+                padding: 14px 16px !important;
+                border-bottom: 2px solid #e2e8f0 !important;
+                white-space: nowrap;
+            }
+            .grid-table > tbody > tr {
+                transition: background 0.2s ease;
+            }
+            .grid-table > tbody > tr > td {
+                padding: 12px 16px !important;
+                vertical-align: middle !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+            }
+            .grid-table > tbody > tr:nth-child(even) > td {
+                background: #fafbfd;
+            }
+            .grid-table > tbody > tr:hover > td {
+                background: #f0f4ff !important;
+            }
+
+            /* ── ID Badge ── */
+            .ug-id-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 44px;
+                padding: 4px 10px;
+                background: #eef2ff;
+                color: #4338ca;
+                font-weight: 700;
+                font-size: 12px;
+                border-radius: 6px;
+                letter-spacing: 0.3px;
+                border: 1px solid #c7d2fe;
+            }
+
+            /* ── Coins ── */
+            .ug-coins {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 6px 14px;
+                background: #fffbeb;
+                border: 1px solid #fde68a;
+                border-radius: 20px;
+                font-size: 13px;
+            }
+
+            /* ── No Agency Label ── */
+            .ug-no-agency {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                color: #94a3b8;
+                font-size: 12px;
+                font-style: italic;
+            }
+
+            /* ── Agency Card Enhancement ── */
+            .ug-agency-card {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 12px;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+                border: 1px solid #e8ecf3;
+                text-decoration: none;
+                color: inherit;
+                transition: all 0.25s ease;
+            }
+            .ug-agency-card:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+                border-color: #667eea;
+                text-decoration: none;
+                color: inherit;
+            }
+            .ug-agency-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                object-fit: cover;
+                border: 2px solid #e0e5f0;
+            }
+            .ug-agency-card:hover .ug-agency-avatar {
+                border-color: #667eea;
+            }
+            .ug-agency-name {
+                font-weight: 600;
+                font-size: 13px;
+                color: #1e293b;
+            }
+            .ug-agency-id {
+                font-size: 11px;
+                color: #94a3b8;
+                font-family: monospace;
+            }
+
+            /* ── Device Button ── */
+            .ug-device-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 7px 16px;
+                border-radius: 20px;
+                border: none;
+                font-weight: 700;
+                font-size: 13px;
+                cursor: pointer;
+                transition: all 0.25s ease;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            }
+            .ug-device-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            }
+            .ug-device-ok {
+                background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+                color: #065f46;
+            }
+            .ug-device-ok:hover {
+                background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+            }
+            .ug-device-warn {
+                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                color: #92400e;
+            }
+            .ug-device-warn:hover {
+                background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+            }
+            .ug-device-count {
+                font-size: 14px;
+                font-weight: 800;
+            }
+
+            /* ── Version Chips ── */
+            .ug-versions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .ug-version-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 10px;
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 11px;
+                color: #475569;
+                font-weight: 600;
+                font-family: monospace;
+                white-space: nowrap;
+                transition: all 0.2s;
+            }
+            .ug-version-chip:hover {
+                background: #e2e8f0;
+                border-color: #cbd5e1;
+            }
+
+            /* ── Action Buttons ── */
+            .grid-row-actions .btn {
+                border-radius: 8px !important;
+                margin: 1px !important;
+                padding: 4px 8px !important;
+                font-size: 12px !important;
+                transition: all 0.2s !important;
+            }
+            .grid-row-actions .btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+            }
+
+            /* ── Pagination ── */
+            .box-footer .pagination > li > a,
+            .box-footer .pagination > li > span {
+                border-radius: 8px !important;
+                margin: 0 2px !important;
+                border: 1px solid #e2e8f0 !important;
+                color: #475569;
+                font-weight: 600;
+                transition: all 0.2s;
+            }
+            .box-footer .pagination > .active > a,
+            .box-footer .pagination > .active > span {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                border-color: transparent !important;
+                color: #fff !important;
+            }
+            .box-footer .pagination > li > a:hover {
+                background: #f1f5f9 !important;
+                border-color: #667eea !important;
+                color: #667eea !important;
+            }
+
+            /* ── Quick Search ── */
+            .quick-search .form-control {
+                border-radius: 10px !important;
+                border: 2px solid #e2e8f0 !important;
+                padding: 8px 16px !important;
+                transition: border-color 0.3s;
+            }
+            .quick-search .form-control:focus {
+                border-color: #667eea !important;
+                box-shadow: 0 0 0 3px rgba(102,126,234,0.15) !important;
+            }
+
+            /* ── Modal Styles ── */
+            .modal-dialog {
+                max-width: 90%;
+            }
+            .modal-content {
+                border: none !important;
+                border-radius: 16px !important;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.2) !important;
+                overflow: hidden;
+            }
+            .modal-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                color: #fff !important;
+                border-bottom: none !important;
+                padding: 18px 24px !important;
+            }
+            .modal-header .modal-title {
+                color: #fff !important;
+                font-weight: 700 !important;
+            }
+            .modal-header .close {
+                color: #fff !important;
+                opacity: 0.8 !important;
+                text-shadow: none !important;
+                font-size: 28px !important;
+            }
+            .modal-header .close:hover {
+                opacity: 1 !important;
+            }
+            .modal-body {
+                max-height: 70vh !important;
+                overflow-y: auto !important;
+                padding: 24px !important;
+            }
+
+            /* ── Loader ── */
+            .ug-loader {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 40px;
+                gap: 12px;
+                color: #667eea;
+            }
+            .ug-loader p {
+                color: #94a3b8;
+                font-size: 14px;
+                margin: 0;
+            }
+
+            /* ── Responsive ── */
+            @media (max-width: 1200px) {
+                .auc-name { max-width: 120px; }
+            }
+
+            /* ── Smooth Scrollbar ── */
+            .modal-body::-webkit-scrollbar { width: 6px; }
+            .modal-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+            .modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+            .modal-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+            /* ── Button Circle ── */
+            .btn-circle {
+                width: 30px;
+                height: 30px;
+                font-size: 15px;
+                border-radius: 50%;
+                text-align: center;
+            }
+        ';
+    }
+
     public function stop_charge(Request $request)
     {
-        if ($request->stop_charge == "false") {
-            settings()->set("stop_charge", "0");
-        } else {
-            settings()->set("stop_charge", "1");
-        }
+        $value = $request->stop_charge == "false" ? "0" : "1";
+
+        Setting::updateOrCreate(
+            ['key' => 'stop_charge'],
+            ['value' => $value]
+        );
+
+        Cache::forget('stop_charge');
     }
 
     public function make_rooms_top(Request $request)
@@ -480,13 +784,15 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email','sender_level', 'received_level', 'phone', 'bio','total_diamond_send']);
-
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'exchange_diamonds','received_level', 'phone', 'bio', 'total_diamond_send', 'agency_id', 'family_id', 'can_play', 'charge_level', 'transfer_salary', 'online']);
         $with = [
+            'images',
             'profile:id,user_id,avatar,gender',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
             'senderLevel:id,level,type,img',
             'receiverLevel:id,level,type,img',
+            'userSetting',
+            "chargeLevel:id,level,type,img",
         ];
 
         // Only load packs when viewing packs tab
@@ -500,6 +806,7 @@ class UserController extends MainController
         }
 
         $user = $userQuery->with($with)->findOrFail($id);
+        $covers = $user->images;
 
         // Avoid duplicate wallet calls
         $availableBalance = $curantBalance = wallet_available_by_user($id);
@@ -650,8 +957,11 @@ class UserController extends MainController
         /* =========================
      | VIEW
      ========================= */
+        $permission = $this->permission_name;
+
         $data = compact(
             'user',
+            'covers',
             'countries',
             'packs',
             'types',
@@ -673,8 +983,14 @@ class UserController extends MainController
             'activeTab',
             'availableBalance',
             'curantBalance',
-            'totalGiftCoins'
+            'totalGiftCoins',
+            'permission'
         );
+
+        // For AJAX tab requests, return only the rendered view (no admin layout)
+        if (request()->ajax() && request()->has('tab')) {
+            return view('user_profile', $data)->render();
+        }
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
@@ -871,14 +1187,6 @@ class UserController extends MainController
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
 
-
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-            $(document).ready(function () {
-                alert(" يملك هذا المستخدم وكالة   . الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم");
-            });
-        </script>');
-        }
         $form->html('<div class="full-column-width">');
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
         $form->html('</div>');
@@ -914,8 +1222,8 @@ class UserController extends MainController
 
 
                 if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                    admin()->error(__('يملك هذا المستخدم وكالة. الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم'));
+                    return false;
                 }
 
 
@@ -1043,7 +1351,7 @@ class UserController extends MainController
     public function updateUsers(Request $request)
     {
         $user = User::findOrFail($request->id);
-        
+
         $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
             'uuid' => ['sometimes', Rule::unique('users', 'uuid')->ignore($user->id)],
@@ -1061,9 +1369,9 @@ class UserController extends MainController
         $user->email = $request->filled('email') ? $request->input('email') : null;
         $user->phone = $request->filled('phone') ? $request->input('phone') : null;
         $user->bio = $request->input('bio', $user->bio);
-        $user->country_id = $request->filled('country_id') ? $request->input('country_id') : null;        
+        $user->country_id = $request->filled('country_id') ? $request->input('country_id') : null;
         $user->save();
-        
+
 
         // Update or create profile
         $profile = $user->profile;
@@ -1071,17 +1379,17 @@ class UserController extends MainController
             $profile = new Profile();
             $profile->user_id = $user->id;
         }
-        
+
         if ($request->has('gender')) {
             $profile->gender = $request->input('gender');
         }
-        
+
         if ($request->hasFile('image')) {
             $profile->avatar = Common::upload('images', $request->file('image'));
         }
-        
+
         $profile->save();
-        
+
         return Redirect::back();
     }
 
@@ -1194,5 +1502,187 @@ class UserController extends MainController
     {
         UserBadge::where('id', $id)->delete();
         return redirect()->back();
+    }
+
+    /**
+     * Toggle transfer salary for a user (profile action)
+     */
+    public function toggleTransferSalary($id)
+    {
+        $user = User::findOrFail($id);
+        $user->transfer_salary = !$user->transfer_salary;
+        $user->save();
+
+        $msg = $user->transfer_salary
+            ? __('Enabled Transfer Salary!')
+            : __('Disabled Transfer Salary!');
+
+        return response()->json(['status' => true, 'message' => $msg]);
+    }
+
+    /**
+     * Toggle invite code visibility for a user (profile action)
+     */
+    public function toggleInviteCode($id)
+    {
+        $user = User::findOrFail($id);
+        $userSetting = $user->userSetting;
+
+        if (!$userSetting) {
+            return response()->json(['status' => false, 'message' => __('User setting not found')], 404);
+        }
+
+        $userSetting->show_invite_code = !$userSetting->show_invite_code;
+        $userSetting->save();
+
+        $msg = $userSetting->show_invite_code
+            ? __('Show invite code has been enabled!')
+            : __('Show invite code has been disabled!');
+
+        return response()->json(['status' => true, 'message' => $msg]);
+    }
+
+    /**
+     * Toggle can play for a user (profile action)
+     */
+    public function toggleCanPlay($id)
+    {
+        $user = User::findOrFail($id);
+        $user->can_play = $user->can_play == 2 ? 3 : 2;
+        $user->save();
+
+        if ($user->online) {
+            $can_play = $user->can_play ?? 0;
+            $show_invite_code = $user->show_invite_code ?? 0;
+            broadcast(new \App\Events\UserStatus(
+                $can_play == 2,
+                $show_invite_code == 1,
+                $user->id
+            ));
+        }
+
+        $msg = $user->can_play == 2
+            ? __('Can play has been enabled!')
+            : __('Can play has been disabled!');
+
+        return response()->json(['status' => true, 'message' => $msg]);
+    }
+
+    /**
+     * Kick user from agency (profile action)
+     */
+    public function kickAgency($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (\App\Facades\UserHandling::checkIfUserOwnerOfAgency($user)) {
+            return response()->json(['status' => false, 'message' => __('This user is the agency owner and cannot be deleted')], 422);
+        }
+
+        \App\Facades\UserHandling::kickUserFromAgency($user);
+
+        return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
+    }
+
+    /**
+     * Kick user from family (profile action)
+     */
+    public function kickFamily($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (\App\Facades\UserHandling::checkIfUserOwnerOfFamily($user->id)) {
+            return response()->json(['status' => false, 'message' => __('This User is the host Of family can\'t delete it go to remove family first')], 422);
+        }
+
+        $user->family_id = null;
+        \App\Models\FamilyUser::where('user_id', $user->id)->delete();
+        $user->save();
+
+        return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
+    }
+
+    /**
+     * Change user agency (profile action)
+     */
+    public function changeAgency($id, Request $request)
+    {
+        $request->validate([
+            'agency_id' => 'required|exists:agencies,id',
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $agencyOwner = Agency::where('owner_id', $id)
+            ->orWhere('app_owner_id', $id)
+            ->exists();
+
+        if ($agencyOwner) {
+            return response()->json(['status' => false, 'message' => __('This user is the agency owner and cannot be deleted')], 422);
+        }
+
+        return DB::transaction(function () use ($user, $request) {
+            $oldAgencyId = $user->agency_id;
+
+            uploadMonthlyDiamondReceive($user->id, 0);
+
+            // Handle salaries
+            $timezone = getTimezone();
+            $currentMonth = now($timezone)->month;
+            $currentYear = now($timezone)->year;
+            $userSalary = UserSallary::where('user_id', $user->id)
+                ->where('user_agency_id', $oldAgencyId)
+                ->where('month', $currentMonth)
+                ->where('year', $currentYear)
+                ->where('is_finished', 0)
+                ->first();
+            if ($userSalary) {
+                $userSalary->update(['is_finished' => 1]);
+            }
+
+            // Clear agency logs
+            GiftLog::where('receiver_id', $user->id)
+                ->where('agency_id', $oldAgencyId)
+                ->update(['is_finished' => 1]);
+            \App\Models\AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $oldAgencyId])->delete();
+
+            // Update previous agency joined
+            $checkAgencyUser = UsersJoinedAgency::where([
+                'user_id' => $user->id,
+                'agency_id' => $oldAgencyId,
+            ])->whereNull('leave_date')->first();
+
+            if ($checkAgencyUser) {
+                $checkAgencyUser->update([
+                    'leave_date' => now(),
+                    'status' => 'change agency by admin',
+                    'kicked_by_admin' => Auth::id()
+                ]);
+            } else {
+                UsersJoinedAgency::create([
+                    'user_id' => $user->id,
+                    'agency_id' => $oldAgencyId,
+                    'type' => 2,
+                    'join_date' => now(),
+                    'leave_date' => now(),
+                    'status' => 'change agency by admin',
+                    'kicked_by_admin' => Auth::id(),
+                ]);
+            }
+
+            // Create new join record
+            UsersJoinedAgency::create([
+                'user_id' => $user->id,
+                'agency_id' => $request->agency_id,
+                'type' => 2,
+                'join_date' => now(),
+                'status' => 'Joined',
+            ]);
+
+            $user->agency_id = $request->agency_id;
+            $user->save();
+
+            return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
+        });
     }
 }

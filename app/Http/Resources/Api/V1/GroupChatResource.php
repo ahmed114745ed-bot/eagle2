@@ -38,7 +38,7 @@ class GroupChatResource extends JsonResource
             'uuid' => @$this->user?->uuid ?? '',
             'name' => @$this->user?->name ?? '',
             'profile' => [
-                'image' => @$this->user->profile->avatar ?? '',
+                'image' => $this->user?->profile?->avatar ?? '',
                 // 'age' => Carbon::parse(@$this->user->profile->birthday)->age,
                  'gender' => $this->user?->gender ?? 0,
             ],

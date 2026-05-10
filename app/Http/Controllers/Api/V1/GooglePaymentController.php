@@ -23,7 +23,7 @@ class GooglePaymentController extends Controller
     public function purchased(Request $request)
     {
         // Set the path to your service account JSON file
-        $serviceAccountFile = public_path('r-star-shop-23ba690c77fe.json');
+        $serviceAccountFile = storage_path('app/credentials/r-star-shop-23ba690c77fe.json');
         // Set the scopes
         $scopes = ['https://www.googleapis.com/auth/sqlservice.admin'];
 

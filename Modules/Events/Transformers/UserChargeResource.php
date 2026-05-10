@@ -45,7 +45,7 @@ class UserChargeResource extends JsonResource
                 'user_id'   => $this->id,
                 'uuid'      => $this->uuid ?? 0,
                 'name'      => $this->name ?? '',
-                'avatar'    => $this->profile->avatar ?? '',
+                'avatar'    => $this->profile?->avatar ?? '',
                 'amount'    => $TotalAmount ?? 0,
                 'next_target' => $next_target->diamonds ?? $this->monthly_diamond_received ,
                 'remaining' => $this->monthly_diamond_received

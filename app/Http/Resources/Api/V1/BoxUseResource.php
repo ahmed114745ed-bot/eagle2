@@ -35,7 +35,7 @@ class BoxUseResource extends JsonResource
             'user' => [
                 'id'        => $this->user->id,
                 'uuid'      => $this->user->uuid,
-                'image'     => $this->user->profile->avatar,
+                'image'     => $this->user?->profile?->avatar ?? '',
                 'name'      => $this->user->name,
                 'is_follow'            => @(bool)Common::IsFollow(@$request->user()->id, $this->user->id), // user data  ----
             ],

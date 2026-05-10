@@ -129,7 +129,7 @@ class RegisterController extends Controller
      */
     public function validateFirebaseOtp($credential): void
     {
-        $credentialPath = public_path('firebase_credentials.json');
+        $credentialPath = storage_path('app/credentials/firebase_credentials.json');
 
         $factory         = (new Factory())->withServiceAccount($credentialPath);
         $auth            = $factory->createAuth();

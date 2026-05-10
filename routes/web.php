@@ -81,8 +81,7 @@ use App\Models\RoomVisitor;
 use App\Models\User;
 use App\Models\UserSallary;
 use Carbon\Carbon;
-use Database\Seeders\FlagSyrianSeeder;
-use Database\Seeders\WebhookGamesSeeder;
+
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -231,39 +230,38 @@ Route::get('/user-salaries-test', function () {
 });
 
 
-Route::get('/clear', function () {
+// Protected cache clearing routes (only accessible in local environment with rate limiting)
+Route::middleware(['local', 'throttle:5,1'])->group(function () {
+    Route::get('/clear', function () {
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('view:clear');
+        Artisan::call('route:clear');
+        Artisan::call('config:cache');
+        Artisan::call('view:cache');
 
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('view:clear');
-    Artisan::call('route:clear');
-    Artisan::call('config:cache');
-    Artisan::call('view:cache');
+        if (strtolower(config('app.env')) == 'production') {
+            Artisan::call('route:cache');
+        }
 
-    if (strtolower(config('app.env')) == 'production') {
-        Artisan::call('route:cache');
-    }
+        return "Cleared!";
+    });
 
-    return "Cleared!";
-});
+    Route::get('/clear-opcache', function () {
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+            return "OPcache cleared!";
+        }
 
-Route::get('/clear-opcache', function () {
+        return "OPcache not enabled.";
+    });
 
-    if (function_exists('opcache_reset')) {
-        opcache_reset();
-        return "OPcache cleared!";
-    }
+    Route::get('/clear-config', function () {
+        Artisan::call('config:clear');
+        Artisan::call('config:cache');
 
-    return "OPcache not enabled.";
-});
-
-Route::get('/clear-config', function () {
-
-    Artisan::call('config:clear');
-    Artisan::call('config:cache');
-
-
-    return "Cleared!";
+        return "Cleared!";
+    });
 });
 
 Route::get("download-charge-agency/{agencyId}", function ($agencyId) {
@@ -274,62 +272,6 @@ Route::get("download-charge-agency-transactions/{agencyId}", function ($agencyId
     return Excel::download(new AgencyChargeTransactions($agencyId), 'shipping_agency.xlsx');
 });
 
-Route::get('/run-seeders', function () {
-
-    // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'CleanUpDuplicateCountriesSeeder']);
-    Artisan::call('db:seed', ['--class' => 'DefaultSuperAdminBdSeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
-    Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
-    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    Artisan::call('db:seed', ['--class' => WebhookGamesSeeder::class]);
-    // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/run-permission', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/run-payments', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PaymentGatewaysSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/devices-token-seeder', function () {
-
-    Artisan::call('db:seed', ['--class' => 'DevicesTokenHistories']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/user-join-agency', function () {
-
-    Artisan::call('db:seed', ['--class' => 'UserJoinAgency']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
 
 
 Route::get('/count-invite-codes', function () {
@@ -347,12 +289,12 @@ Route::get('/count-invite-codes', function () {
         $accounts = UserCodeInvitation::query()->whereBetween('created_at', [$from, $to])->get();
 
         $data = [
-            
+
             'count' => $count,
             'accounts' => $accounts,
             'from' => $from->toDateTimeString(),
             'to' => $to->toDateTimeString(),
-            
+
         ];
 
     return response()->json([
@@ -363,46 +305,7 @@ Route::get('/count-invite-codes', function () {
 
 
 
-Route::get('/badge-seeders', function () {
-
-    // Run multiple seeders one by one
-    Artisan::call('db:seed', ['--class' => 'BadgeImageSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ All seeders executed successfully.'
-    ]);
-});
-
-Route::get('/config-badges-seeder', function () {
-    Artisan::call('db:seed', ['--class' => 'ConfigBadgesSeeder']);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ ConfigBadgesSeeder executed successfully.'
-    ]);
-});
-
-Route::get('/boom-percentage-seeder', function () {
-
-    Artisan::call('db:seed', ['--class' => 'PercentageBoomSeeder']);
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ PercentageBoomSeeder executed successfully.'
-    ]);
-});
-
-Route::get('/update-flag', function () {
-
-    Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => '✅ flag updated successfully.'
-    ]);
-});
-Route::get('/clear_clear', function () {
-
+Route::middleware(['local', 'throttle:5,1'])->get('/clear_clear', function () {
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
     Artisan::call('view:clear');
@@ -410,6 +313,7 @@ Route::get('/clear_clear', function () {
 
     return "Cleared!";
 });
+
 Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
 Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
@@ -419,35 +323,28 @@ Route::get('/count-user-cut-amount', [SalariesController::class, 'countUserCutAm
 
 
 
+// Protected database manipulation routes (only accessible in local environment)
+Route::middleware(['local'])->group(function () {
+    Route::get('/change_agencies_type_test', function () {
+        DB::table('agencies')
+            ->where('type', 0)
+            ->update(['type' => 1]);
 
-Route::get('/seed', function () {
+        return "Done!";
+    });
 
-    Artisan::call('db:seed');
+    Route::get('/change_agencies_type', function () {
+        DB::table('agencies')
+            ->where('Shipping_agency', 1)
+            ->where('Host_agency', 0)
+            ->update(['type' => 2]);
 
-    return "Seeded!";
-});
+        DB::table('agencies')
+            ->where('Host_agency', 1)
+            ->update(['type' => 1]);
 
-Route::get('/change_agencies_type_test', function () {
-
-    DB::table('agencies')
-        ->where('type', 0)
-        ->update(['type' => 1]);
-
-    return "Done!";
-});
-
-Route::get('/change_agencies_type', function () {
-
-    DB::table('agencies')
-        ->where('Shipping_agency', 1)
-        ->where('Host_agency', 0)
-        ->update(['type' => 2]);
-
-    DB::table('agencies')
-        ->where('Host_agency', 1)
-        ->update(['type' => 1]);
-
-    return "agencies types changed successfully!";
+        return "agencies types changed successfully!";
+    });
 });
 
 Route::get('admin/auth', function () {
@@ -459,11 +356,6 @@ Route::get('admin/auth', function () {
 Route::get('/config_cache', function () {
     return Artisan::call('config:cache');
 });
-
-Route::get('/admin/custom-export-users', [
-    \App\Admin\Controllers\ExportController::class,
-    'usersSallaryTargets'
-])->name('custom-export-users');
 
 Route::get('/admin/agency-export-report', [
     \App\Admin\Controllers\ExportController::class,
@@ -482,27 +374,6 @@ Route::get('delete-account', function () {
 });
 
 Route::get('/', [WelcomeController::class, 'index']);
-
-// Test Pusher Config (for debugging Octane cache issues)
-Route::get('/test-pusher-config', function () {
-    $pusherConfig = getPusherConfig();
-    $laravelConfig = [
-        'key' => config('broadcasting.connections.pusher.key'),
-        'secret' => config('broadcasting.connections.pusher.secret'),
-        'app_id' => config('broadcasting.connections.pusher.app_id'),
-        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-    ];
-
-    return response()->json([
-        'from_helper_function' => $pusherConfig,
-        'from_laravel_config' => $laravelConfig,
-        'cache_info' => [
-            'environment' => app()->environment(),
-            'cache_driver' => config('cache.default'),
-        ],
-        'timestamp' => now()->toDateTimeString(),
-    ], 200, [], JSON_PRETTY_PRINT);
-});
 
 // Override Grid Sortable Route for Octane compatibility (outside admin group)
 Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
@@ -575,18 +446,6 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
 
-        Route::get('/firebase-config', function () {
-            return response()->json([
-                'apiKey' => config('firebase.apiKey'),
-                'authDomain' => config('firebase.authDomain'),
-                'projectId' => config('firebase.projectId'),
-                'storageBucket' => config('firebase.storageBucket'),
-                'messagingSenderId' => config('firebase.messagingSenderId'),
-                'appId' => config('firebase.appId'),
-                'vapidKey' => config('firebase.vapid_key'),
-            ]);
-        });
-
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
     }
 );
@@ -625,7 +484,7 @@ Route::group([
     ],
     'as' => '',
 ], function () {
-    
+
 });
 
 Route::get('/update-rooms', function () {
@@ -641,7 +500,7 @@ Route::get('/update-rooms-microphone', function () {
     return "done";
 });
 
-Route::get('/clear-admin-error', function () {
+Route::middleware(['local'])->get('/clear-admin-error', function () {
     session()->forget('error');         // If flashed as 'error'
     session()->forget('danger');        // If flashed as 'danger'
     session()->forget('info');          // If used admin_info()
@@ -658,63 +517,6 @@ Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name(
 
 Route::get('/delete_reward_target', function () {
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
-});
-
-Route::get('/test-fcm/{userid}', function ($userId) {
-    $testToken = 'eLG5n60VSDupE3pAEzjmXo:APA91bEupCIDwqtaS8vwNUyZ-FvOicTqIwZo15INz-cAXFunxijCw2AxqTUSu9UDMB_xrBcTUcFg9NWXgB2n173aZmMqMetdmBO7YSccMSf64JCpJihjeNc';
-
-    $language = 'ar'; // أو 'en'
-    $userLevel = 5; // مستوى افتراضي للاختبار
-
-    // نصوص الإشعار
-    $body_ar = "تهانينا! لقد تم ترقيتك إلى مستوى {$userLevel} كمرسل";
-    $body_en = "Congratulations! You've been upgraded to level {$userLevel} as a sender";
-    $firebaseBody = ($language === 'ar') ? $body_ar : $body_en;
-    $title = ($language === 'ar') ? "ترقية مستوى المرسل" : "Sender level upgraded";
-
-    // صورة افتراضية
-    $icon = "https://example.com/images/vip_badge.png";
-    $data = [
-        'image' => $icon,
-        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-        'type' => 'level_upgrade'
-    ];
-
-    // إرسال الإشعار
-    $result = Common::send_firebase_notification(
-        $testToken,
-        $title,
-        $firebaseBody,
-        icon: $icon,
-        data: $data
-    );
-
-    return response()->json([
-        'success' => true,
-        'message' => 'تم إرسال الإشعار التجريبي',
-        'notification_data' => [
-            'title' => $title,
-            'body' => $firebaseBody,
-            'icon' => $icon,
-            'data' => $data
-        ],
-        'fcm_response' => $result
-    ]);
-});
-
-Route::get('/generate-token/{id}', function ($id) {
-    $user = User::find($id);
-
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
-
-    $token = $user->createToken('api_token')->plainTextToken;
-
-    return response()->json([
-        'token' => $token,
-        'user' => $user
-    ]);
 });
 
 Route::get('/send-notification/{id}', function ($id) {
@@ -736,14 +538,11 @@ Route::get('/send-notification/{id}', function ($id) {
     return "notifaction send successfully!";
 });
 
-Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
-Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
-Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
-Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
-Route::get('/user-gift-details/{userId}', [\App\Http\Controllers\DiamondController::class, 'userGiftDetails']);
-Route::get('/agency-details/{id}', [ApiAgencyController::class, 'agencyDetails']);
-Route::get('/host-level', [\Modules\HostLevel\Http\Controllers\api\HostLevelController::class, 'hostLevel']);
-Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
+ Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+// Route::get('/calculate-salary' , [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
+// Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
+// Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
+// Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
 
 
 Route::get('/charge-agency-export-report', [
@@ -1015,15 +814,6 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
 
 Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
-// Gift Logs: fill total column from gifts table (seeder via web)
-Route::get('/gift-logs-fill-total', function () {
-    Artisan::call('db:seed', ['--class' => \Database\Seeders\FillGiftLogsTotalSeeder::class]);
-    return response()->json([
-        'status'  => 'success',
-        'message' => '✅ FillGiftLogsTotalSeeder executed successfully.',
-        'output'  => Artisan::output(),
-    ]);
-});
 
 // Gift Logs: fix total diff (dry-run preview) — queries DB directly for accuracy
 Route::get('/gift-logs-fix-total-diff/preview', function () {
@@ -1095,22 +885,6 @@ Route::get('/gift-logs-fix-total-diff/run', function (\Illuminate\Http\Request $
         'output'  => Artisan::output(),
     ]);
 });
-
-
-Route::get('/test-games', function () {
-
-    $fromDate = request()->get('fromDate');
-    $toDate = request()->get('toDate');
-    $userId = request()->get('userId');
-
-    $records = CoinGameUserAll::where('user_id', $userId)
-        ->whereBetween('created_at', [$fromDate, $toDate])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return $records;
-})->name('test-games');
-
 
 
 
@@ -1204,13 +978,6 @@ Route::get('/week-zone', function () {
 });
 
 
-Route::get('update-country-id', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'CleanUpDuplicateCountriesSeeder',
-    ]);
-
-    return 'CleanUpDuplicateCountriesSeeder has been executed successfully!';
-});
 
 Route::get('remove-new-country', function () {
     User::where('country_id', 488)->update(['country_id' => null]);
@@ -1221,13 +988,6 @@ Route::get('remove-new-country', function () {
 });
 
 
-Route::get('/fix-agencies-bd', function () {
-    Artisan::call('db:seed', [
-        '--class' => 'Database\\Seeders\\FixAgenciesBdByCountrySeeder'
-    ]);
-
-    return "Seeder FixAgenciesBdByCountrySeeder تم تشغيله ✅";
-});
 
 Route::get('assign-super-admin-bd', function () {
     $bds = Bd::whereNull('parent_id')->get();
@@ -2420,7 +2180,7 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
-Route::get('/run-lucky-gift-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-test', function () {
     Artisan::call('cache:clear');
     $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 
@@ -2441,7 +2201,7 @@ Route::get('/run-lucky-gift-test', function () {
     ]);
 });
 
-Route::get('/run-lucky-gift-unit-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
     $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
         ' --filter SendLuckyGift2FeatureTest';
 
@@ -2458,10 +2218,6 @@ Route::get('/run-lucky-gift-unit-test', function () {
 Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
     Debugbar::info('Viewport:', $request->all());
     return response()->json(['ok' => true]);
-});
-
-Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
-    dd("branch tested");
 });
 
 Route::get('/octane', function () {
@@ -2483,261 +2239,6 @@ Route::get('/sys/signal-flush', function () {
     @touch($triggerFile);
     return response()->json(['status' => 'Signal file created']);
 })->middleware('auth.basic');
-
-Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
-    $secret = config('app.deploy_secret', 'your-secret-token-here');
-
-    $githubSignature = $request->header('X-Hub-Signature-256');
-    $customToken = $request->header('X-Deploy-Token') ?? $request->input('token');
-
-    $authorized = false;
-
-    if ($githubSignature) {
-        $payload = $request->getContent();
-        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
-        $authorized = hash_equals($expectedSignature, $githubSignature);
-    }
-
-    if (!$authorized && $customToken === $secret) {
-        $authorized = true;
-    }
-
-    if (!$authorized) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    $output = [];
-
-    try {
-        $output['git_pull'] = shell_exec('cd ' . base_path() . ' && git pull 2>&1');
-
-        $output['composer'] = shell_exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1');
-
-        \Artisan::call('migrate', ['--force' => true]);
-        $output['migrate'] = \Artisan::output();
-
-        \Artisan::call('optimize:clear');
-        $output['optimize_clear'] = \Artisan::output();
-
-        \Artisan::call('config:cache');
-        $output['config_cache'] = \Artisan::output();
-
-        \Artisan::call('route:cache');
-        $output['route_cache'] = \Artisan::output();
-
-        \Artisan::call('view:cache');
-        $output['view_cache'] = \Artisan::output();
-
-        \Artisan::call('octane:reload');
-        $output['octane_reload'] = \Artisan::output();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Deployment completed successfully',
-            'output' => $output,
-            'time' => now()->toDateTimeString(),
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'output' => $output,
-        ], 500);
-    }
-})->name('deploy.webhook');
-
-Route::get('/quick-reload/{token}', function ($token) {
-    $secret = config('app.deploy_secret', 'your-secret-token-here');
-
-    if ($token !== $secret) {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
-
-    \Artisan::call('octane:reload');
-    \Artisan::call('cache:clear');
-
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Octane reloaded & cache cleared',
-        'time' => now()->toDateTimeString(),
-    ]);
-});
-
-
-
-Route::get('/debug/force-pusher-refresh', function () {
-    $timestamp = now()->toDateTimeString();
-
-    Cache::forget('pusher_config');
-    Cache::forget('all_configs');
-
-    Cache::put('pusher_config_changed', $timestamp, 3600);
-
-    \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
-
-    Artisan::call('queue:restart');
-    $queueRestartOutput = Artisan::output();
-
-    $octaneReloadOutput = '';
-    try {
-        Artisan::call('octane:reload');
-        $octaneReloadOutput = Artisan::output();
-    } catch (\Throwable $e) {
-        $octaneReloadOutput = 'Not running or error: ' . $e->getMessage();
-    }
-
-    $freshConfig = getPusherConfig();
-    return response()->json([
-        'success' => true,
-        'message' => '🔄 Pusher config refresh triggered!',
-        'actions_taken' => [
-            '1_cache_cleared' => true,
-            '2_flag_set' => Cache::has('pusher_config_changed'),
-            '3_broadcaster_purged' => true,
-            '4_queue_restart' => trim($queueRestartOutput) ?: 'Signal sent',
-            '5_octane_reload' => trim($octaneReloadOutput) ?: 'Signal sent',
-        ],
-        'fresh_config' => [
-            'app_id' => $freshConfig['app_id'],
-            'app_cluster' => $freshConfig['app_cluster'],
-        ],
-        'next_steps' => [
-            'Supervisor will restart queue workers automatically',
-            'Octane workers will reload automatically',
-            'New broadcasts will use fresh DB config',
-        ],
-        'timestamp' => $timestamp,
-    ], 200, [], JSON_PRETTY_PRINT);
-});
-
-
-
-// ⭐ Test GiftBannerEvent broadcast (via Queue)
-Route::get('/debug/test-gift-banner', function () {
-    $dbConfig = getPusherConfig();
-
-    // Create test gift data
-    $testGift = [
-        'id' => rand(1000, 9999),
-        'name' => 'Test Gift 🎁',
-        'sender' => [
-            'id' => 1,
-            'name' => 'Test Sender',
-        ],
-        'receiver' => [
-            'id' => 2,
-            'name' => 'Test Receiver',
-        ],
-        'count' => 1,
-        'timestamp' => now()->toDateTimeString(),
-        'debug_info' => [
-            'pusher_app_id' => $dbConfig['app_id'],
-            'pusher_cluster' => $dbConfig['app_cluster'],
-        ],
-    ];
-
-    try {
-        // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
-        event(new \App\Events\GiftBannerEvent($testGift));
-
-        return response()->json([
-            'success' => true,
-            'message' => '🎁 GiftBannerEvent dispatched to Queue!',
-            'event' => [
-                'class' => \App\Events\GiftBannerEvent::class,
-                'channel' => 'gift_banner',
-                'broadcast_as' => 'gift_banner',
-                'queue' => 'heavyProcessing (or similar)',
-            ],
-            'test_data' => $testGift,
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
-            ],
-            'next_steps' => [
-                '1. Check Pusher Debug Console for the event',
-                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i gift',
-                '3. If not received, run: /debug/force-pusher-refresh',
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ], 200, [], JSON_PRETTY_PRINT);
-    } catch (\Throwable $e) {
-        // Log::error('GiftBannerEvent failed', [
-        //     'error' => $e->getMessage(),
-        //     'trace' => $e->getTraceAsString(),
-        // ]);
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ], 500, [], JSON_PRETTY_PRINT);
-    }
-});
-
-
-// ⭐ Test UserOnline broadcast (via Queue - PresenceChannel)
-Route::get('/debug/test-user-online', function () {
-    $dbConfig = getPusherConfig();
-
-    // Get a test user (first user or create mock)
-    $userId = request()->get('user_id', 1);
-    $user = \App\Models\User::find($userId);
-
-    if (!$user) {
-        return response()->json([
-            'success' => false,
-            'error' => "User with ID {$userId} not found",
-            'hint' => 'Add ?user_id=123 to specify a different user',
-        ], 404, [], JSON_PRETTY_PRINT);
-    }
-
-    try {
-        // Dispatch UserOnline event (goes through Queue because it implements ShouldBroadcast)
-        event(new \App\Events\UserOnline($user));
-
-        return response()->json([
-            'success' => true,
-            'message' => '👤 UserOnline event dispatched to Queue!',
-            'event' => [
-                'class' => \App\Events\UserOnline::class,
-                'channel' => 'presence-enter-user-room',
-                'channel_type' => 'PresenceChannel',
-            ],
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'uuid' => $user->uuid ?? null,
-            ],
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
-            ],
-            'next_steps' => [
-                '1. Check Pusher Debug Console for the event',
-                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i "UserOnline"',
-                '3. If not received, run: /debug/force-pusher-refresh',
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ], 200, [], JSON_PRETTY_PRINT);
-    } catch (\Throwable $e) {
-        // Log::error('UserOnline failed', [
-        //     'error' => $e->getMessage(),
-        //     'user_id' => $user->id,
-        //     'trace' => $e->getTraceAsString(),
-        // ]);
-
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-        ], 500, [], JSON_PRETTY_PRINT);
-    }
-});
 
 Route::get('/time-start-week', function () {
     $date = '2026-02-15';
@@ -2932,23 +2433,6 @@ Route::get('/fix-paid-usd', function () {
 
     return "Updated: {$updated} | Skipped: {$skipped} | Errors: {$errors}";
 });
-Route::get('make-seeders-for-new-update', function () {
-    $seeder = new \Database\Seeders\WebhookGamesSeeder();
-    $seeder->run();
-
-    $seeder = new \Database\Seeders\RoomBoomMediaSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
-Route::get('make-seeders-for-permission', function () {
-    $seeder = new \Database\Seeders\PermissionTypeSeeder();
-    $seeder->run();
-
-    return 'seeders have been executed successfully!';
-});
-
 
 
 Route::get('/queue-control/{queue}', function ($queue) {
@@ -3066,11 +2550,6 @@ Route::get('/fix-gift-logs/run', function () {
     ]);
 });
 
-
-Route::get('test-push-succ', function () {
-
-    dd('test successfully!---------');
-});
 
 Route::get('/fix-charges-usd', function () {
     $dryRun = request()->get('fix') != '1';

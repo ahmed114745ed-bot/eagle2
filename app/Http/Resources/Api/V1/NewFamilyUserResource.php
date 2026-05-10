@@ -30,8 +30,8 @@ class NewFamilyUserResource extends JsonResource
                 'id_image'             => @$this->user->specialId?->ware?->show_img ?? '',
                 'special_id'          =>  @$this->user->specialId?->ware?->id ?? 0,
                 'profile'   => [
-                    'image'     => @$this->user->profile->avatar?:'',
-                    'gender'    => @$this->user->profile->gender ?? 0,
+                    'image'     => $this->user?->profile?->avatar?:'',
+                    'gender'    => $this->user?->profile?->gender ?? 0,
                     'age'       => @Carbon::parse ($this->user?->profile?->birthday)->age ?? 0,
                     'country'   => @$this->user->country?:'',
                     // 'sender_img' => $this->user->getImageReceiverOrSender('sender_id',2)->img,

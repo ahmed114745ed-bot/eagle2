@@ -40,7 +40,7 @@ class ShippingAgencyObserver
             $oldOwner = User::find($originalOwnerId);
             if ($oldOwner) {
                 MilestoneHelper::removeReward($oldOwner, 'charge-agency-owner');
-                info('update 2 charge-agency-owner milestone');
+                info('remove charge-agency-owner milestone from old owner');
             }
         }
 
@@ -48,7 +48,7 @@ class ShippingAgencyObserver
             $newUser = User::find($newOwnerId);
             if ($newUser) {
                 MilestoneHelper::grantMilestoneToUser($newUser, 'charge-agency-owner');
-                info('update 2 charge-agency-owner milestone');
+                info('grant charge-agency-owner milestone to new owner');
             }
         }
     }

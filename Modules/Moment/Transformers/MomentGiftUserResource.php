@@ -17,10 +17,10 @@ class MomentGiftUserResource extends JsonResource
     {
 
         $data = [
-            'id'   => @$this->user->id,
-            'uuid' => @$this->user->uuid,
-            'name' => @$this->user->name ?: '',
-            'image' => @$this->user->profile->avatar ?? '',
+            'id'   => $this->user?->id,
+            'uuid' => $this->user?->uuid,
+            'name' => $this->user?->name ?: '',
+            'image' => $this->user?->profile?->avatar ?? '',
             'level' => Common::level_center(@$this->user),
              'total_num_gift'=> (int)$this->num,
 

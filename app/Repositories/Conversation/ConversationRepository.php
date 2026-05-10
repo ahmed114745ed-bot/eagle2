@@ -191,7 +191,7 @@ class ConversationRepository extends BaseRepository
         if ($created) {
             if (array_key_exists('file', $data)) {
                 foreach ($data['file'] as $file) {
-                    $fileName = Carbon::now()->format('YmdHis').'-'.$file->getClientOriginalName();
+                    $fileName = Carbon::now()->format('YmdHis').'-'.Str::uuid().'.'.$file->getClientOriginalExtension();
                     $path = Str::finish('', '/').$fileName;
                     
                     $content = File::get($file->getRealPath());
