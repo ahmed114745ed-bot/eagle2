@@ -47,6 +47,20 @@ ALTER TABLE `live_times`
 ALTER TABLE `gift_logs`
   ADD INDEX `idx_gl_cp_id_created` (`cp_id`, `created_at`);
 
+-- ──────────────────────────────────────────────────────────────
+-- 5. bd_agency_host_sallaries (2,579 rows on Rixo)
+--    Fixes: agencies/* endpoints taking 1-8.7 seconds
+--    Root cause: ZERO indexes beyond PK, joins full-scan every time
+-- ──────────────────────────────────────────────────────────────
+ALTER TABLE `bd_agency_host_sallaries`
+  ADD INDEX `idx_bahs_agency_created` (`agency_id`, `created_at`);
+
+ALTER TABLE `bd_agency_host_sallaries`
+  ADD INDEX `idx_bahs_bd_id` (`bd_id`);
+
+ALTER TABLE `bd_agency_host_sallaries`
+  ADD INDEX `idx_bahs_bd_year_amount` (`bd_id`, `year`, `amount`);
+
 -- ============================================================
 -- VERIFICATION — Run after applying indexes to confirm
 -- ============================================================
@@ -55,3 +69,4 @@ SHOW INDEX FROM `official_messages` WHERE Key_name LIKE 'idx_om%';
 SHOW INDEX FROM `user_official_messages` WHERE Key_name LIKE 'idx_uom%';
 SHOW INDEX FROM `live_times` WHERE Key_name LIKE 'idx_lt%';
 SHOW INDEX FROM `gift_logs` WHERE Key_name LIKE 'idx_gl%';
+SHOW INDEX FROM `bd_agency_host_sallaries` WHERE Key_name LIKE 'idx_bahs%';
