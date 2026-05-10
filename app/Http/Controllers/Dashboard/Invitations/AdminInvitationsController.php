@@ -15,7 +15,7 @@ class AdminInvitationsController extends Controller
 
     public function index()
     {
-        $users = User::whereHas('codeInvitations')->with('codeInvitations')->withCount('codeInvitations')->withSum('codeInvitationsEarn','parent_percentage')->get();
+        $users = User::whereHas('codeInvitations')->with('codeInvitations')->withCount('codeInvitations')->withSum('codeInvitationsEarn','amount')->get();
         return AdminInvitationsResource::collection($users);
     }
 
@@ -35,7 +35,7 @@ class AdminInvitationsController extends Controller
             if($user){
                 $parent_percentage = UserEarnInvitation::where('user_id', $invitations)->where('parent_id', $userId)->get();
                 $data [] = [
-                    'parent_percentage' => $parent_percentage->sum('parent_percentage'),
+                    'parent_percentage' => $parent_percentage->sum('amount'),
                     'user'=>[
                         'id'                  => $user->id,
                         'uuid'                => $user->uuid,

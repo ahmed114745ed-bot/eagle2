@@ -952,8 +952,8 @@ class UserController extends Controller
         $UserCodeInvitation = UserCodeInvitation::where("user_id", $userId);
         if ($parentInvitations != null) {
             $data = [
-                "totalEarned"  => $parentInvitations->sum("parent_percentage"),
-                "earnedDay"    => $parentInvitations->whereDate("created_at", date("Y-m-d"))->sum("parent_percentage"),
+                "totalEarned"  => $parentInvitations->sum("amount"),
+                "earnedDay"    => $parentInvitations->whereDate("created_at", date("Y-m-d"))->sum("amount"),
                 "TotalInvited" => $UserCodeInvitation->count(),
                 "invitedDay"   => $UserCodeInvitation->whereDate("created_at", date("Y-m-d"))->count(),
             ];
