@@ -1,3 +1,7 @@
+---
+description: Create a new Laravel package under packages/Utd/ following UTD project conventions
+---
+
 # Create UTD Package
 
 Guide for creating a new Laravel package in this project under `packages/Utd/`.
