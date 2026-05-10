@@ -19,7 +19,9 @@ class ConvertImageToWebPJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
-    public $backoff = [1, 2, 5];
+    public $backoff = [10, 30, 60];
+    public $timeout = 120;
+    public $maxExceptions = 2;
 
     protected string $originalPath;
     protected string $folder;
@@ -147,6 +149,14 @@ class ConvertImageToWebPJob implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
+        // Log the failure with details for debugging (most common: missing GD/Imagick, corrupt images, disk space)
+        Log::error('ConvertImageToWebPJob failed permanently', [
+            'path' => $this->originalPath,
+            'folder' => $this->folder,
+            'disk' => $this->disk,
+            'error' => $exception->getMessage(),
+            'file' => $exception->getFile() . ':' . $exception->getLine(),
+        ]);
         // Keep original file if conversion fails - better to have original than nothing
     }
 }
