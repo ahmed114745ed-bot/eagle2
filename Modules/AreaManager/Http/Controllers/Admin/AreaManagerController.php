@@ -606,14 +606,7 @@ class AreaManagerController extends MainController
         $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
         $prefix = dashboardName();
         $subAreaManagers = $areaManager->subAreaManager()->with('appUser')->paginate(10, ['*'], 'sub_super_admin_page');
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
-                break;
-            case 'charge':
-
-                break;
-        }
+        $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
 
         return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'subAreaManagers', 'charges'));
     }
