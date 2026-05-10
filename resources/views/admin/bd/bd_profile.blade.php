@@ -1,1073 +1,817 @@
 
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-
-:root {
-        --primary-color: {{ config('themes.primaryColor') }};
-        --secondary-color: {{ config('themes.secondaryColor') }};
-        --text-primary-color: {{ config('themes.textPrimaryColor') }};
-        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
-        --box-background-color: {{ config('themes.boxBackgroundColor') }};
-        --table-background-color: {{ config('themes.tableBackGroundColor')}}
-        --background-image: {{ config('themes.backgroundImage') }};
-        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
-        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
-        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
-        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
-        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
-
-
-        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
-        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
-        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    :root {
+        --primary: {{ config('themes.primaryColor', '#6366f1') }};
+        --primary-light: {{ config('themes.primaryColor', '#6366f1') }}18;
+        --primary-medium: {{ config('themes.primaryColor', '#6366f1') }}30;
     }
-.stat-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 57px;
-    color: white;
-    font-size: 20px;
-    margin-bottom: 6px;
-}
 
-.stat-icon.bg-blue {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-}
+    .bd-profile, .bd-profile * { box-sizing: border-box; }
 
-.stat-icon.bg-green {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-}
-
-.stat-info {
-    flex: 1;
-}
-
-.stat-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2c3e50;
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 13px;
-    color: #7f8c8d;
-    margin-top: 5px;
-}
-
-.section-box {
-    background: var(--secondary-color);
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-
-.section-header h4 {
-    margin: 0;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.section-header .text-yellow {
-    color: #f39c12;
-}
-
-.section-header .text-red {
-    color: #e74c3c;
-}
-
-
-.number-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    background: #ecf0f1;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 13px;
-}
-
-.number-badge.warning {
-    background: #fef9e7;
-    color: #f39c12;
-}
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 0;
-    color: #95a5a6;
-}
-
-.empty-state i {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-.empty-state p {
-    margin: 0;
-    font-size: 14px;
-}
-
-.empty-table {
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #95a5a6;
-    background: white;
-    border-radius: 8px;
-    margin: 15px 0;
-}
-
-.empty-table i {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-.empty-table p {
-    margin: 0;
-    font-size: 14px;
-}
-.agency-profile-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-    /* background: var(--secondary-color); */
-    /* filter: brightness(0.85); */
-
-}
-
-.agency-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.agency-avatar .logo-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.agency-info {
-    flex: 1;
-}
-
-.agency-name {
-    margin: 0 0 10px 0;
-    color: #2c3e50;
-    font-size: 28px;
-    font-weight: 700;
-}
-
-.agency-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px;
-}
-
-.meta-label {
-    font-weight: 600;
-    color: #7f8c8d;
-}
-
-.meta-value {
-    color: #34495e;
-}
-
-.meta-uuid {
-    color: #95a5a6;
-    font-size: 0.9em;
-}
-
-.agency-stats {
-    display: flex;
-    gap: 15px;
-}
-
-.stat-card {
-    background: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    text-align: center;
-    min-width: 200px;
-
-}
-
-.stat-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #3498db;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: #7f8c8d;
-    text-transform: none;
-    letter-spacing: 0.5px;
-}
-
-.ltr .btn-back {
-    position: absolute;
-    top: 5px;
-    right: 20px;
-    background: #ecf0f1;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    color: #7f8c8d;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.btn-back:hover {
-    background: #d6e0e3;
-    color: #34495e;
-}
-
-.notice-section {
-    background: #fff8e1;
-    border-left: 4px solid #ffc107;
-    padding: 15px;
-    border-radius: 0 6px 6px 0;
-    margin-bottom: 25px;
-}
-
-.notice-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    color: #ff9800;
-    font-weight: 600;
-}
-
-.notice-content {
-    color: #5d4037;
-    line-height: 1.5;
-}
-
-.top-performers-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-@media (max-width: 768px) {
-    .top-performers-section {
-        grid-template-columns: 1fr;
+    .bd-profile {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: #1a1a2e !important;
+        -webkit-font-smoothing: antialiased;
     }
-}
 
-.stats-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.section-title {
-    margin: 0;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #2c3e50;
-}
-
-.avatar-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 15px;
-}
-
-.avatar-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.2s;
-}
-
-.avatar-item:hover {
-    transform: translateY(-3px);
-}
-
-.avatar-img-container {
-    position: relative;
-    width: 60px;
-    height: 60px;
-    margin-bottom: 8px;
-}
-
-.avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.avatar-badge {
-    position: absolute;
-    bottom: -5px;
-    right: -5px;
-    background: #e74c3c;
-    color: white;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: bold;
-    border: 2px solid white;
-}
-
-.avatar-badge.admin {
-    background: #27ae60;
-}
-
-.avatar-name {
-    font-size: 12px;
-    text-align: center;
-    max-width: 80px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 0;
-    color: #95a5a6;
-}
-
-.empty-state i {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-.empty-state p {
-    margin: 0;
-    font-size: 14px;
-}
-
-.agency-tabs {
-    display: flex;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 20px;
-    overflow-x: auto;
-}
-
-.tab-btn {
-    padding: 12px 20px;
-    background: none;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-weight: 600;
-
-    cursor: pointer;
-    transition: all 0.3s;
-    white-space: nowrap;
-}
-
-.tab-btn.active {
-    color:var(--primary-color);
-    border-bottom-color: var(--primary-color);
-}
-
-.tab-btn:hover:not(.active) {
-    color: #34495e;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    margin-bottom: 30px;
-}
-
-.card-header h3 {
-    margin: 0;
-    font-size: 18px;
-    color: #2c3e50;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--secondary-color);
-}
-
-
-.table-section {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--secondary-color);
-}
-
-.data-table th {
-    /* text-align: left; */
-    padding: 12px 15px;
-    background: var(--secondary-color);
-
-    font-weight: 600;
-    text-transform: none;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-}
-
-.data-table td {
-    width: 262px;
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    vertical-align: middle;
-}
-
-.data-table tr:last-child td {
-    border-bottom: none;
-}
-
-.data-table tr:hover {
-    background: #f8f9fa;
-}
-
-.user-cell {
-    /* display: flex; */
-    align-items: center;
-    gap: 10px;
-}
-
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-.user-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.user-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.user-info strong {
-    font-size: 14px;
-}
-
-.user-info small {
-    font-size: 11px;
-    color: #95a5a6;
-}
-
-.role-badge {
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: white;
-}
-
-.role-badge.owner {
-    background: #9b59b6;
-}
-
-.role-badge.admin {
-    background: #27ae60;
-}
-
-.btn-action {
-    padding: 5px 10px;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.btn-action:hover {
-    background: #2980b9;
-}
-
-.empty-table {
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #95a5a6;
-}
-
-.empty-table i {
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-
-.empty-table p {
-    margin: 0;
-    font-size: 14px;
-}
-
-.user-avatar,
-.supporter-avatar {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-.supporters-avatars {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-.user-info-cell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-
-.pagination-wrapper {
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    border-top: 1px solid #eee;
-     background: var(--secondary-color);
-}
-
-
-
-    .target-card-section-1{
-        /* display: inline-flex; */
-        width: 100%;
-        padding-top: 26px;
-        margin-bottom: 35px;
-
+    .bd-profile, .bd-profile *, .bd-profile a, .bd-profile span, .bd-profile td, .bd-profile th,
+    .bd-profile h1, .bd-profile h2, .bd-profile h3, .bd-profile h4, .bd-profile p, .bd-profile label,
+    .bd-profile strong, .bd-profile small, .bd-profile div {
+        color: #1a1a2e;
     }
-    .card-target-filter{
-        display: inline;
-        width: 34%;
-        left: 33px;
+
+    /* ═══════════════════════════════════════
+       HERO HEADER
+    ═══════════════════════════════════════ */
+    .bd-hero {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px -3px rgba(0,0,0,0.08);
+        overflow: hidden;
+        margin-bottom: 24px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .bd-hero-banner {
+        height: 120px;
+        background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 50%, #a855f7 100%);
+        position: relative;
+    }
+
+    .bd-hero-banner::after {
+        content: '';
         position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
-    .card-target-filter .form-group {
-        margin-bottom: 16px;
-        right: 20px;
-        position: relative;
-        top: 10px;
-    }
-    .card-target-filter button {
-        position: relative;
-        left: -49px;
-        bottom: -29px;
-    }
-    .card-target-filter-phone{
-        width: 51%;
-        margin-bottom: 27px;
+
+    .bd-hero-content {
+        padding: 0 32px 28px;
         position: relative;
     }
-    .card-target-filter-phone .form-group {
-        margin-bottom: 16px;
-        right: 20px;
-        position: relative;
-        top: 10px;
-    }
-    .card-target-filter-phone button {
-        position: relative;
-        left: -49px;
-        bottom: -29px;
+
+    .bd-hero-avatar {
+        margin-top: -50px;
+        display: inline-block;
     }
 
-    .target-card-stat{
-        width: 50%;
-    }
-    .filter-form{
-        border-radius: 13px;
-        height: 165px;
-
-    }
-
-    .card-target-filter-phone{
-        /* display: none; */
-    }
-    .card-target-filter{
-        display: none;
-    }
-    @media (max-width: 768px) {
-    .stats-row {
-        flex-direction: column;
-        width: 108%;
-
+    .bd-hero-avatar img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        object-fit: cover;
+        background: #e2e8f0;
     }
 
-    .avatar-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    .bd-hero-info {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-top: 16px;
+        flex-wrap: wrap;
+        gap: 16px;
     }
 
-    .target-card-section-1 {
-            display: grid;
-            width: 100%;
-            padding-top: 26px;
-            margin-bottom: 35px;
-        }
-
-
-    .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 118px;
-            color: white;
-            font-size: 20px;
-            margin-bottom: 6px;
-
+    .bd-hero-name {
+        font-size: 26px;
+        font-weight: 800;
+        color: #1a1a2e !important;
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
     }
 
-
-    .target-card-stat {
-         width: 92%;
-
+    .bd-hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
     }
-    .card-target-filter{
-        display: none;
+
+    .bd-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #4a5568 !important;
     }
-    .card-target-filter-phone {
+
+    .bd-meta-item i {
+        font-size: 12px;
+        color: var(--primary) !important;
+        width: 16px;
+        text-align: center;
+    }
+
+    .bd-meta-item strong {
+        color: #1a1a2e !important;
+        font-weight: 600;
+    }
+
+    .bd-btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #fff;
+        color: #4a5568 !important;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .bd-btn-back:hover {
+        background: #f8fafc;
+        color: #1a1a2e !important;
+        border-color: #cbd5e1;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        text-decoration: none;
+    }
+
+    /* ═══════════════════════════════════════
+       STATS CARDS
+    ═══════════════════════════════════════ */
+    .bd-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .bd-stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+    .bd-stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+    }
+
+    .bd-stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .bd-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: white !important;
+    }
+
+    .bd-stat-icon.profit { background: linear-gradient(135deg, #10b981, #059669); }
+    .bd-stat-icon.count { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+    .bd-stat-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .bd-stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1a1a2e !important;
+        line-height: 1.2;
+    }
+
+    /* ═══════════════════════════════════════
+       TABS
+    ═══════════════════════════════════════ */
+    .bd-tabs-nav {
+        display: flex;
+        gap: 4px;
+        background: #fff;
+        border-radius: 16px;
+        padding: 6px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 24px;
+        width: fit-content;
+    }
+
+    .bd-tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a5568 !important;
+        text-decoration: none;
+        transition: all 0.25s;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .bd-tab-btn:hover {
+        color: #1a1a2e !important;
+        background: #f1f5f9;
+        text-decoration: none;
+    }
+
+    .bd-tab-btn.active {
+        background: var(--primary) !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+    }
+
+    .bd-tab-btn.active i { color: white !important; }
+
+    .bd-tab-btn i {
+        font-size: 14px;
+        color: var(--primary) !important;
+    }
+
+    .bd-tab-content { display: none; animation: bdFadeSlide 0.3s ease; }
+    .bd-tab-content.active { display: block; }
+
+    @keyframes bdFadeSlide {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════
+       CONTENT CARDS
+    ═══════════════════════════════════════ */
+    .bd-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 24px;
+    }
+
+    .bd-card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .bd-card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1a2e !important;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .bd-card-title i {
+        color: var(--primary) !important;
+        font-size: 16px;
+    }
+
+    .bd-count-pill {
+        background: var(--primary);
+        color: white !important;
+        padding: 4px 14px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* Filter Bar */
+    .bd-filter-bar {
+        padding: 16px 24px;
+        background: #fafbfc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .bd-filter-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .bd-filter-group {
+        min-width: 150px;
+    }
+
+    .bd-filter-group label {
         display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #4a5568 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .bd-filter-group select {
         width: 100%;
-        left: 0px;
-        position: relative;
-        margin-bottom: 31px;
-
+        height: 38px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-size: 13px;
+        font-family: inherit;
+        color: #1a1a2e !important;
+        background: #fff;
+        transition: all 0.2s;
     }
-    .card-target-filter-phone  .col-md-7{
-       float: none;
+
+    .bd-filter-group select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-light);
     }
 
-    .card-target-filter-phone .form-control {
-            display: block;
-            width: 89%;
-            padding: 6px 12px;
-            font-size: 14px;
-            line-height: 1.42857143;
-            color: var(--text-secondary-color) !important;
-            background-color: #fff;
-            background-image: none;
-            border: 1px solid var(--primary-hover-alpha) !important;
-            border-radius: 4px;
-        }
+    .bd-btn-filter {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: var(--primary);
+        color: white !important;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
 
-        .card-target-filter-phone .filter-form {
-            border-radius: 13px;
-            height: 238px;
-        }
+    .bd-btn-filter:hover { opacity: 0.9; }
 
-        .card-target-filter-phone .align-items-end{
-            display: grid;
-        }
+    /* ═══════════════════════════════════════
+       TABLE
+    ═══════════════════════════════════════ */
+    .bd-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        .card-target-filter-phone button {
-            left: -224px;
+    .bd-table thead th {
+        padding: 12px 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #4a5568 !important;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+    }
 
-        }
-}
-    </style>
+    .bd-table tbody td {
+        padding: 14px 20px;
+        font-size: 14px;
+        color: #1a1a2e !important;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
 
+    .bd-table tbody tr { transition: background 0.15s; }
+    .bd-table tbody tr:hover { background: #fafbfe; }
+    .bd-table tbody tr:last-child td { border-bottom: none; }
 
-<body>
+    /* User Cell */
+    .bd-user-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-<div class="agency-profile-container">
+    .bd-user-cell img {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e2e8f0;
+        flex-shrink: 0;
+    }
 
-<!-- Header Section -->
-<div class="agency-header">
-    <div class="agency-avatar">
-        <img src="{{ $bd->display_image }}" alt="Agency Logo" class="logo-img">
-    </div>
-    <div class="agency-info">
-        <h1 class="agency-name">{{ $bd->username ??'' }}</h1>
-        <div class="agency-meta">
-            <div class="meta-item">
-                <span class="meta-label">{{ __("ID") }}:</span>
-                <span class="meta-value">{{ $bd->id }}</span>
+    .bd-user-cell-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #1a1a2e !important;
+    }
+
+    .bd-user-cell-id {
+        font-size: 11px;
+        color: #4a5568 !important;
+        margin-top: 1px;
+    }
+
+    .bd-user-cell a {
+        text-decoration: none;
+        color: #1a1a2e !important;
+    }
+
+    .bd-user-cell a:hover .bd-user-cell-name {
+        color: var(--primary) !important;
+    }
+
+    /* Status */
+    .bd-status-active {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #ecfdf5;
+        color: #065f46 !important;
+        border: 1px solid #a7f3d0;
+    }
+
+    .bd-status-inactive {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #fef2f2;
+        color: #991b1b !important;
+        border: 1px solid #fecaca;
+    }
+
+    .bd-paid-yes {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        background: #ecfdf5;
+        color: #065f46 !important;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid #a7f3d0;
+    }
+
+    .bd-paid-no {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 12px;
+        background: #fffbeb;
+        color: #92400e !important;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid #fde68a;
+    }
+
+    /* Empty */
+    .bd-empty {
+        padding: 48px 24px;
+        text-align: center;
+    }
+
+    .bd-empty i {
+        font-size: 48px;
+        color: #cbd5e1;
+        margin-bottom: 12px;
+    }
+
+    .bd-empty p {
+        font-size: 14px;
+        color: #4a5568 !important;
+    }
+
+    /* Pagination */
+    .bd-pagination {
+        padding: 16px 24px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    @media (max-width: 768px) {
+        .bd-profile { padding: 16px; }
+        .bd-hero-content { padding: 0 20px 20px; }
+        .bd-hero-banner { height: 90px; }
+        .bd-hero-avatar img { width: 80px; height: 80px; }
+        .bd-hero-avatar { margin-top: -40px; }
+        .bd-hero-name { font-size: 22px; }
+        .bd-stats-grid { grid-template-columns: 1fr; }
+        .bd-tabs-nav { width: 100%; overflow-x: auto; }
+        .bd-tab-btn { flex: 1; justify-content: center; font-size: 13px; padding: 10px 14px; }
+        .bd-filter-row { flex-direction: column; }
+        .bd-filter-group { width: 100%; }
+    }
+</style>
+
+<div class="bd-profile">
+
+    {{-- ══════════════ HERO HEADER ══════════════ --}}
+    <div class="bd-hero">
+        <div class="bd-hero-banner"></div>
+        <div class="bd-hero-content">
+            <div class="bd-hero-avatar">
+                <img src="{{ $bd->display_image }}" alt="{{ $bd->username ?? '' }}">
             </div>
-            <div class="meta-item">
-                <span class="meta-label">{{ __("username") }}:</span>
-                <span class="meta-value">{{ $bd->username ?? '' }}</span>
+            <div class="bd-hero-info">
+                <div>
+                    <h1 class="bd-hero-name">{{ $bd->username ?? '' }}</h1>
+                    <div class="bd-hero-meta">
+                        <div class="bd-meta-item">
+                            <i class="fas fa-hashtag"></i>
+                            <span>ID: <strong>{{ $bd->id }}</strong></span>
+                        </div>
+                        <div class="bd-meta-item">
+                            <i class="fas fa-user"></i>
+                            <span>{{ __("username") }}: <strong>{{ $bd->username ?? '' }}</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ url('admin/usersBd') }}" class="bd-btn-back">
+                    <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
+                </a>
             </div>
         </div>
     </div>
-    <a href="{{ url('admin/usersBd') }}" class="btn-back">
-        <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
-    </a>
-</div>
 
-<div class="top-performers-section">
-
-            <div class="performers-card">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-star"></i>
-                        {{ __('total proft') }}
-                    </h2>
-                </div>
-                    <div class="avatar-grid">
-
-
-                            <a href="#" >
-                               {{  truncateAndTrim( $bd->total_salary)  }}
-                            </a>
-                    </div>
-
+    {{-- ══════════════ STATS ══════════════ --}}
+    <div class="bd-stats-grid">
+        <div class="bd-stat-card">
+            <div class="bd-stat-header">
+                <div class="bd-stat-icon profit"><i class="fas fa-dollar-sign"></i></div>
+                <span class="bd-stat-label">{{ __('total proft') }}</span>
             </div>
-
-            <div class="performers-card">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <!-- <i class="fas fa-star"></i> -->
-                        {{ __('Agency Count') }}
-                    </h2>
-                </div>
-
-
-                    <div class="avatar-grid">
-
-
-                            <a href="#" >
-                               {{ $bd->agencies_count  }}
-                            </a>
-                    </div>
-
-            </div>
+            <div class="bd-stat-value">{{ truncateAndTrim($bd->total_salary) }}</div>
         </div>
-
-
-
-
-<!-- Tabs Navigation -->
-@php $activeTab = request('tab', 'agencies'); @endphp
-
-<div class="agency-tabs">
-    <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
-    <a href="?tab=transactions" class="tab-btn {{ $activeTab === 'transactions' ? 'active' : '' }}">{{ __('transactions') }}</a>
-    <a href="?tab=target_history" class="tab-btn {{ $activeTab === 'target_history' ? 'active' : '' }}">{{ __('Target History') }}</a>
-
-
-</div>
-
-<!-- Loading Overlay -->
-<div id="tab-loading" style="display: none; position: fixed; top: 50%; left: 50%; background: var(--primary-color); color: var(--text-primary-color); z-index: 9999; padding: 30px 40px; border-radius: 10px; font-size: 20px; font-weight: bold; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);">
-    {{ __('Loading...') }}
-</div>
-
-<!-- Members Tab -->
-@if($activeTab === 'agencies')
-    <div class="tab-content active" id="members-tab">
-        <div class="card">
-            <div class="card-header">
-                <h3>{{ __('Agencies') }}</h3>
-                <span class="badge count-badge">{{ optional($agencies)->total() ?? 0 }}</span>
+        <div class="bd-stat-card">
+            <div class="bd-stat-header">
+                <div class="bd-stat-icon count"><i class="fas fa-building"></i></div>
+                <span class="bd-stat-label">{{ __('Agency Count') }}</span>
             </div>
+            <div class="bd-stat-value">{{ $bd->agencies_count }}</div>
+        </div>
+    </div>
+
+    @php $activeTab = request('tab', 'agencies'); @endphp
+
+    {{-- ══════════════ TABS NAV ══════════════ --}}
+    <div class="bd-tabs-nav">
+        <a href="?tab=agencies" class="bd-tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}" data-target="agencies-tab">
+            <i class="fas fa-building"></i> {{ __('agencies') }}
+        </a>
+        <a href="?tab=transactions" class="bd-tab-btn {{ $activeTab === 'transactions' ? 'active' : '' }}" data-target="transactions-tab">
+            <i class="fas fa-exchange-alt"></i> {{ __('transactions') }}
+        </a>
+        <a href="?tab=target_history" class="bd-tab-btn {{ $activeTab === 'target_history' ? 'active' : '' }}" data-target="target_history-tab">
+            <i class="fas fa-history"></i> {{ __('Target History') }}
+        </a>
+    </div>
+
+    {{-- ══════════════ AGENCIES TAB ══════════════ --}}
+    <div class="bd-tab-content {{ $activeTab === 'agencies' ? 'active' : '' }}" id="agencies-tab">
+        <div class="bd-card">
+            <div class="bd-card-header">
+                <h4 class="bd-card-title"><i class="fas fa-building"></i> {{ __('Agencies') }}</h4>
+                <span class="bd-count-pill">{{ optional($agencies)->total() ?? 0 }}</span>
+            </div>
+
             @if($agencies && $agencies->count())
                 <div class="table-responsive">
-                    <table class="data-table">
+                    <table class="bd-table">
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('owner') }}</th>
-                                <th>{{ __('Status') }}</th>
-                            </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Name') }}</th>
+                            <th>{{ __('owner') }}</th>
+                            <th>{{ __('Status') }}</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @foreach($agencies as $index => $agency)
-                                <tr>
-                                    <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
-                                    <td class="user-cell">
-                                            <div class="user-avatar">
-                                                <a href=" {{ url('admin/agencies/profile/' .$agency->id) }}">
-                                                    <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ??'' }}">
-                                                </a>
-                                            </div>
-                                            <div class="user-info">
-                                                <strong>
-                                                    <a href="{{url('admin/agencies/profile/' .$agency->id) }}">
-                                                        {{ $agency->name ??'' }}
-                                                    </a>
-                                                </strong>
-                                            </div>
-                                        </td>
-
-                                        <td class="user-cell">
-                                            <div class="user-avatar">
-                                                <a href="{{ url('admin/users/'. $agency->owner?->id ) }}">
-                                                    <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ??'' }}">
-                                                </a>
-                                            </div>
-                                            <div class="user-info">
-                                                <strong>
-                                                    <a href="{{ url('admin/users/'.$agency->owner?->id) }}">
-                                                        {{ $agency->owner?->name ??'' }}
-                                                    </a>
-                                                </strong>
-                                            </div>
-                                        </td>
-                                        <td class="">
-                                            @if($agency->status == 1)
-                                                <span style="color:green;" title="Active">&#10004;</span> {{-- ✔ --}}
-                                            @else
-                                                <span style="color:red;" title="Inactive">&#10008;</span> {{-- ✖ --}}
-                                            @endif
-                                        </td>
-
-
-                                </tr>
-                            @endforeach
+                        @foreach($agencies as $index => $agency)
+                            <tr>
+                                <td style="color:#4a5568; font-weight:600;">{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
+                                <td>
+                                    <div class="bd-user-cell">
+                                        <a href="{{ url('admin/agencies/profile/' . $agency->id) }}">
+                                            <img src="{{ getImagePath($agency->img) }}" alt="{{ $agency->name ?? '' }}">
+                                        </a>
+                                        <div>
+                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}">
+                                                <div class="bd-user-cell-name">{{ $agency->name ?? '' }}</div>
+                                            </a>
+                                            <div class="bd-user-cell-id">ID: {{ $agency->id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="bd-user-cell">
+                                        <a href="{{ url('admin/users/' . $agency->owner?->id) }}">
+                                            <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="{{ $agency->owner?->name ?? '' }}">
+                                        </a>
+                                        <div>
+                                            <a href="{{ url('admin/users/' . $agency->owner?->id) }}">
+                                                <div class="bd-user-cell-name">{{ $agency->owner?->name ?? '' }}</div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if($agency->status == 1)
+                                        <span class="bd-status-active"><i class="fas fa-check-circle"></i> {{ __('Active') }}</span>
+                                    @else
+                                        <span class="bd-status-inactive"><i class="fas fa-times-circle"></i> {{ __('Inactive') }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-wrapper">
+                <div class="bd-pagination">
                     {{ $agencies->appends(['tab' => 'agencies'])->links('vendor.pagination.default') }}
                 </div>
             @else
-                <div class="empty-table">
-                    <i class="fas fa-users-slash"></i>
+                <div class="bd-empty">
+                    <i class="fas fa-building"></i>
                     <p>{{ __('No agencies found') }}</p>
                 </div>
             @endif
         </div>
     </div>
-@endif
 
-@if($activeTab === 'transactions')
-
-<div class="tab-content active" id="members-tab">
-        <div class="card">
-            <div class="card-header">
-                <h3>{{ __('transactions') }}</h3>
-                <span class="badge count-badge">{{ optional($transactions)->total() ?? 0 }}</span>
+    {{-- ══════════════ TRANSACTIONS TAB ══════════════ --}}
+    <div class="bd-tab-content {{ $activeTab === 'transactions' ? 'active' : '' }}" id="transactions-tab">
+        <div class="bd-card">
+            <div class="bd-card-header">
+                <h4 class="bd-card-title"><i class="fas fa-exchange-alt"></i> {{ __('transactions') }}</h4>
+                <span class="bd-count-pill">{{ optional($transactions)->total() ?? 0 }}</span>
             </div>
-<!-- Charges Tab -->
-@if($transactions && $transactions->count())
 
-    <div class="table-responsive">
-        <table class="data-table" id="charge">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <!-- <th>{{ __('Name') }}</th> -->
-                    <th>{{ __('receiver') }}</th>
-                    <th>{{ __('usd') }}</th>
-                    <th>{{ __('amount') }}</th>
-                    <th>{{ __('Created') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($transactions as $index => $charge)
-                    @php
-                        // تحديد المستخدم (charger) مع التحقق من وجوده
-                        $user = null;
-                        $userImage = null;
-                        $userName = 'N/A';
-                        $userUrl = '#';
+            @if($transactions && $transactions->count())
+                <div class="table-responsive">
+                    <table class="bd-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('receiver') }}</th>
+                            <th>{{ __('usd') }}</th>
+                            <th>{{ __('amount') }}</th>
+                            <th>{{ __('Created') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($transactions as $index => $charge)
+                            @php
+                                $receiverHtml = '';
 
-                        if ($charge->charger_type === 'dash' && $charge->user_type === 'dash') {
-                            $user = $charge->admin;
-                        } else {
-                            $user = $charge->sender;
-                        }
+                                if ($charge->receiveragency) {
+                                    $agency = $charge->receiveragency;
+                                    if ($agency) {
+                                        $cacheKey = "agency_image_{$agency->id}";
+                                        $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
+                                            $path = @$agency->img;
+                                            $defaultImage = asset("images/icon-agency.jpg");
+                                            $url = getImagePath($path) ?? $defaultImage;
+                                            if (!isImageExists($url)) $url = $defaultImage;
+                                            return handleShowImageWithTypes($agency->id, $url, 40, 40);
+                                        });
+                                        $name = $agency->name ?? '';
+                                        $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+                                        $receiverHtml = "
+                                            <a href='{$profileUrl}' style='text-decoration:none;color:inherit;'>
+                                                <div style='display:flex;align-items:center;gap:10px;'>
+                                                    {$image}
+                                                    <div>
+                                                        <div style='font-weight:600;color:#1a1a2e;'>{$name}</div>
+                                                        <div style='font-size:11px;color:#4a5568;'>ID: {$agency->id}</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        ";
+                                    }
+                                } else {
+                                    $receiverUser = null;
+                                    if ($charge->user_id) {
+                                        $receiverUser = \App\Models\User::find($charge->user_id);
+                                    }
 
-                        if ($user) {
-                            $userImage = $user->avatar ?? ($user->profile->avatar ?? null);
-                            $userName = $user->name ?? 'N/A';
-
-                            if ($charge->charger_type === 'dash' && $charge->user_type === 'dash') {
-                                $userUrl = url("admin/admins/{$user->id}");
-                            } else {
-                                $userUrl = url("admin/users/{$user->id}");
-                            }
-                        }
-
-                        // تحديد المستلم (receiver) مع التحقق من وجوده
-                        $receiverHtml = '';
-
-                        if ($charge->receiveragency) {
-                            $agency = $charge->receiveragency;
-                            if ($agency) {
-                                $cacheKey = "agency_image_{$agency->id}";
-                                $image = \Cache::remember($cacheKey, 3600, function () use ($agency) {
-                                    $path = @$agency->img;
-                                    $defaultImage = asset("images/icon-agency.jpg");
-                                    $url = getImagePath($path) ?? $defaultImage;
-                                    if (!isImageExists($url)) $url = $defaultImage;
-                                    return handleShowImageWithTypes($agency->id, $url, 40, 40);
-                                });
-                               $name = $agency->name ?? '';
-                                $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
-                                $receiverHtml = "
-                                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
-                                        <div style='display: flex; align-items: center; gap: 10px;'>
-                                            {$image}
-                                            <div style='display: flex; flex-direction: column;'>
-                                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
-                                                <span style='font-size: smaller;'>ID: {$agency->id}</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                ";
-                            }
-                        } else {
-                            $receiverUser = null;
-                            if ($charge->user_id) {
-                                $receiverUser = \App\Models\User::find($charge->user_id);
-                            }
-
-                            if ($receiverUser) {
-                                $path = $receiverUser->profile?->avatar ?? null;
-                                $defaultImage = asset("images/businessman-icon.jpg");
-                                $url = getImagePath($path) ?? $defaultImage;
-                                if (!isImageExists($url)) $url = $defaultImage;
-                                $image = handleShowImageWithTypes($receiverUser->id, $url, 40, 40);
-                                $showUrl = url("admin/users/{$receiverUser->id}");
-                                $name = e($receiverUser->name ?? '');
-                                $uuid = e($receiverUser->uuid ?? '');
-                                $receiverHtml = "
-                                    <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
-                                        <div style='display: flex; align-items: center; gap: 10px;'>
-                                            {$image}
-                                            <div>
-                                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span><br>
-                                                <span style='color: #aaa; font-size: smaller;'>UUID: {$uuid}</span>
-                                            </div>
-                                        </div>
-                                    </a>
-                                ";
-                            } else {
-                                $receiverHtml = '<span class="text-danger">' . __('Unknown') . '</span>';
-                            }
-                        }
-                    @endphp
-                    <tr>
-                        <td>{{ $transactions->firstItem() + $index }}</td>
-                        <!-- <td>
-                            <a href="{{ $userUrl }}" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
-                                <img src="{{ getImagePath($userImage) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%;">
-                                <span>{{ $userName }}</span>
-                            </a>
-                        </td> -->
-                        <td>{!! $receiverHtml !!}</td>
-                        <td>{{ number_format($charge->usd ?? 0, 2) }}</td>
-                        <td>{{ number_format($charge->amount ?? 0, 2) }}</td>
-                        <td>{{ $charge->created_at }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    <div class="pagination-wrapper">
-        {{ $transactions->appends(['tab' => 'transactions'])->links('vendor.pagination.default') }}
-    </div>
-@else
-    <!-- <div class="empty-table">
-        <i class="fas fa-info-circle"></i>
-        <p>{{ __('No transactions found') }}</p>
-    </div> -->
-@endif
-</div>
-</div>
-@endif
-
-
-
-
-@if($activeTab === 'target_history')
-<div class="tab-content active" id="target-history-tab">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="card-title">{{ __('Target History') }}</h4>
-
-            <form method="GET" class="form-inline">
-                <input type="hidden" name="tab" value="target_history">
-
-                <select name="month" class="form-control mr-2">
-                    @foreach(range(1,12) as $m)
-                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
-                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                        </option>
-                    @endforeach
-                </select>
-
-                <select name="year" class="form-control mr-2">
-                    @foreach(range(now()->year-5, now()->year) as $y)
-                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
-                            {{ $y }}
-                        </option>
-                    @endforeach
-                </select>
-
-                <button type="submit" class="btn btn-primary">{{ __('Filter') }}</button>
-            </form>
+                                    if ($receiverUser) {
+                                        $path = $receiverUser->profile?->avatar ?? null;
+                                        $defaultImage = asset("images/businessman-icon.jpg");
+                                        $url = getImagePath($path) ?? $defaultImage;
+                                        if (!isImageExists($url)) $url = $defaultImage;
+                                        $image = handleShowImageWithTypes($receiverUser->id, $url, 40, 40);
+                                        $showUrl = url("admin/users/{$receiverUser->id}");
+                                        $name = e($receiverUser->name ?? '');
+                                        $uuid = e($receiverUser->uuid ?? '');
+                                        $receiverHtml = "
+                                            <a href='{$showUrl}' style='text-decoration:none;color:inherit;'>
+                                                <div style='display:flex;align-items:center;gap:10px;'>
+                                                    {$image}
+                                                    <div>
+                                                        <div style='font-weight:600;color:#1a1a2e;'>{$name}</div>
+                                                        <div style='font-size:11px;color:#4a5568;'>UUID: {$uuid}</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        ";
+                                    } else {
+                                        $receiverHtml = '<span style="color:#dc2626;">' . __('Unknown') . '</span>';
+                                    }
+                                }
+                            @endphp
+                            <tr>
+                                <td style="color:#4a5568; font-weight:600;">{{ $transactions->firstItem() + $index }}</td>
+                                <td>{!! $receiverHtml !!}</td>
+                                <td style="font-weight:600;">{{ number_format($charge->usd ?? 0, 2) }}</td>
+                                <td style="font-weight:600;">{{ number_format($charge->amount ?? 0, 2) }}</td>
+                                <td style="color:#4a5568;">{{ $charge->created_at }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bd-pagination">
+                    {{ $transactions->appends(['tab' => 'transactions'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="bd-empty">
+                    <i class="fas fa-exchange-alt"></i>
+                    <p>{{ __('No transactions found') }}</p>
+                </div>
+            @endif
         </div>
+    </div>
 
-        @if($target_history && $target_history->count())
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
+    {{-- ══════════════ TARGET HISTORY TAB ══════════════ --}}
+    <div class="bd-tab-content {{ $activeTab === 'target_history' ? 'active' : '' }}" id="target_history-tab">
+        <div class="bd-card">
+            <div class="bd-card-header">
+                <h4 class="bd-card-title"><i class="fas fa-history"></i> {{ __('Target History') }}</h4>
+            </div>
+
+            <div class="bd-filter-bar">
+                <form method="GET">
+                    <input type="hidden" name="tab" value="target_history">
+                    <div class="bd-filter-row">
+                        <div class="bd-filter-group">
+                            <label>{{ __('Month') }}</label>
+                            <select name="month">
+                                @foreach(range(1,12) as $m)
+                                    <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="bd-filter-group">
+                            <label>{{ __('Year') }}</label>
+                            <select name="year">
+                                @foreach(range(now()->year-5, now()->year) as $y)
+                                    <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                        {{ $y }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div style="padding-bottom:2px;">
+                            <button type="submit" class="bd-btn-filter">
+                                <i class="fas fa-filter"></i> {{ __('Filter') }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            @if($target_history && $target_history->count())
+                <div class="table-responsive">
+                    <table class="bd-table">
+                        <thead>
                         <tr>
                             <th>#</th>
                             <th>{{ __('Agency ID') }}</th>
@@ -1077,63 +821,61 @@
                             <th>{{ __('Is Paid') }}</th>
                             <th>{{ __('Created At') }}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         @foreach($target_history as $index => $item)
                             <tr>
-                                <td>{{ $target_history->firstItem() + $index }}</td>
-                                <td>{{ $item->agency_id }}</td>
-                                <td>{{  truncateAndTrim( $item->amount)  }}</td>
+                                <td style="color:#4a5568; font-weight:600;">{{ $target_history->firstItem() + $index }}</td>
+                                <td style="font-weight:600;">{{ $item->agency_id }}</td>
+                                <td style="font-weight:600;">{{ truncateAndTrim($item->amount) }}</td>
                                 <td>{{ $item->month }}</td>
                                 <td>{{ $item->year }}</td>
-                                <td>{{ $item->is_paid ? __('Yes') : __('No') }}</td>
-                                <td>{{ $item->created_at }}</td>
+                                <td>
+                                    @if($item->is_paid)
+                                        <span class="bd-paid-yes"><i class="fas fa-check"></i> {{ __('Yes') }}</span>
+                                    @else
+                                        <span class="bd-paid-no"><i class="fas fa-clock"></i> {{ __('No') }}</span>
+                                    @endif
+                                </td>
+                                <td style="color:#4a5568;">{{ $item->created_at }}</td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="pagination-wrapper">
-                {{ $target_history->appends(request()->except('page'))->links('vendor.pagination.default') }}
-            </div>
-        @else
-            <div class="empty-table">
-                <i class="fas fa-calendar-times"></i>
-                <p>{{ __('No target history found') }}</p>
-            </div>
-        @endif
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bd-pagination">
+                    {{ $target_history->appends(request()->except('page'))->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="bd-empty">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>{{ __('No target history found') }}</p>
+                </div>
+            @endif
+        </div>
     </div>
-</div>
-@endif
 
 </div>
 
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const selectedTab = urlParams.get('tab') || 'members';
-
-            const allTabs = document.querySelectorAll('.tab-btn');
-            const allTabContents = document.querySelectorAll('[id$="-tab"]');
-
-            let targetElement = null;
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedTab = urlParams.get('tab') || 'agencies';
+        const allTabs = document.querySelectorAll('.bd-tab-btn');
 
         allTabs.forEach(tab => {
             const target = tab.getAttribute('data-target');
             const content = document.getElementById(target);
+            if (!content) return;
 
-            if (target.startsWith(selectedTab)) {
+            if (target === selectedTab + '-tab') {
                 tab.classList.add('active');
-                if (content) { content.style.display = 'block'; content.classList.add('active'); }
+                content.style.display = 'block';
+                content.classList.add('active');
             } else {
                 tab.classList.remove('active');
-                if (content) { content.style.display = 'none'; content.classList.remove('active'); }
+                content.style.display = 'none';
+                content.classList.remove('active');
             }
 
             tab.addEventListener('click', function (e) {
@@ -1154,155 +896,4 @@
             });
         });
     });
-
-
-
-
-        $(document).ready(function () {
-            console.log("Document ready");
-
-function showLoader() {
-    console.log("Showing loader");
-    Swal.fire({
-        title: 'Loading...',  // تغيير النص ليوضح الرسالة
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-}
-
-function showSuccess(message, callback = null) {
-    console.log("Showing success:", message);
-    Swal.fire({
-        icon: 'success',  // استبدال type بـ icon
-        title: message,
-        confirmButtonText: 'OK'
-    }).then(() => {
-        console.log("Success confirmed");
-        if (callback) {
-            console.log("Running success callback");
-            callback();
-        }
-    });
-}
-
-function showError(message) {
-    console.log("Showing error:", message);
-    Swal.fire({
-        icon: 'error',  // استبدال type بـ icon
-        title: message,
-        confirmButtonText: 'OK'
-    });
-}
-
-function confirmAction(message, onConfirm) {
-    console.log("Confirm action:", message);
-    Swal.fire({
-        title: message,
-        icon: 'question',  // استبدال type بـ icon
-        showCancelButton: true,
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'Cancel'
-    }).then(result => {
-        console.log("Confirmation result:", result);
-        console.log("isConfirmed:", result.isConfirmed);
-
-        if (result.value) {
-            console.log("User confirmed action");
-            onConfirm();
-        } else {
-            console.log("User cancelled action");
-        }
-    });
-}
-
-
-    // قبول الطلب
-    $('.accept-btn').click(function () {
-        const id = $(this).data('id');
-        console.log("Accept clicked, ID:", id);
-        confirmAction('{{ __("are_you_sure_accept") }}', () => {
-            showLoader();
-            $.post(`/admin/agencies/accept_join/${id}`, {
-                _token: '{{ csrf_token() }}'
-            }, function (response) {
-                Swal.close();
-                console.log("Accept response:", response);
-                if (response.status) {
-                    showSuccess(response.message, () => {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('tab', 'requests');
-                        window.location.href = url.toString();
-                    });
-                } else {
-                    showError(response.message);
-                }
-            }).fail(function (xhr) {
-                Swal.close();
-                console.error("Accept failed", xhr);
-                const res = xhr.responseJSON;
-                showError(res?.message ?? '{{ __("failed_accept_request") }}');
-            });
-        });
-    });
-
-    // رفض الطلب
-    $('.reject-btn').click(function () {
-        const id = $(this).data('id');
-        console.log("Reject clicked, ID:", id);
-        confirmAction('{{ __("are_you_sure_reject") }}', () => {
-            showLoader();
-            $.post(`/admin/agencies/reject_join/${id}`, {
-                _token: '{{ csrf_token() }}'
-            }, function (response) {
-                Swal.close();
-                console.log("Reject response:", response);
-                if (response.status) {
-                    showSuccess(response.message, () => {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('tab', 'requests');
-                        window.location.href = url.toString();
-                    });
-                } else {
-                    showError(response.message);
-                }
-            }).fail(function (xhr) {
-                Swal.close();
-                console.error("Reject failed", xhr);
-                const res = xhr.responseJSON;
-                showError(res?.message ?? '{{ __("failed_reject_request") }}');
-            });
-        });
-    });
-
-    // ترقية إلى Admin
-    $('.make-admin-btn').click(function () {
-        const id = $(this).data('id');
-        console.log("Make admin clicked, ID:", id);
-        confirmAction('{{ __("are_you_sure_make_admin") }}', () => {
-            showLoader();
-            $.post(`/admin/agencies/admin/${id}`, {
-                _token: '{{ csrf_token() }}'
-            }, function (response) {
-                Swal.close();
-                console.log("Make admin response:", response);
-                if (response.status) {
-                    showSuccess(response.message, () => {
-                        location.reload();
-                    });
-                } else {
-                    showError(response.message);
-                }
-            }).fail(function (xhr) {
-                Swal.close();
-                console.error("Make admin failed", xhr);
-                const res = xhr.responseJSON;
-                showError(res?.message ?? '{{ __("failed_make_admin") }}');
-            });
-        });
-    });
-});
-
 </script>
-

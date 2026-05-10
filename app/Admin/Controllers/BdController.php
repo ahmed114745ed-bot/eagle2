@@ -586,41 +586,29 @@ class BdController extends MainController
         }
         $bd->display_image = $imageUrl;
 
-        $agencies = $transactions = $target_history = null;
+        $agencies = $bd->agencies()->paginate(10, ['*'], 'agencies_page');
 
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $bd->agencies()->paginate(10, ['*'], 'agencies_page');
-                break;
+        $transactions = $bd->transactions()
+            ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+            ->with('receiveragency')
+            ->latest()
+            ->paginate(10, ['*'], 'transactions_page');
 
-            case 'transactions':
-                $transactions = $bd->transactions()
-                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
-                    ->with('receiveragency')
-                    ->latest()
-                    ->paginate(10, ['*'], 'transactions_page');
-                break;
-
-            case 'target_history':
-                $target_history = BdAgencyHostSallary::select(
-                    'id',
-                    'bd_id',
-                    'agency_id',
-                    // 'salary',
-                    'amount',
-                    'month',
-                    'year',
-                    'bd_user_id',
-                    'created_at'
-                )
-                    ->where('bd_id', $bd->id)
-                    ->where('bd_id', $bd->id)
-                    ->where('amount', '!=', 0)
-                    ->where('year', $year)
-                    ->latest()
-                    ->paginate(10, ['*'], 'target_history_page');
-                break;
-        }
+        $target_history = BdAgencyHostSallary::select(
+            'id',
+            'bd_id',
+            'agency_id',
+            'amount',
+            'month',
+            'year',
+            'bd_user_id',
+            'created_at'
+        )
+            ->where('bd_id', $bd->id)
+            ->where('amount', '!=', 0)
+            ->where('year', $year)
+            ->latest()
+            ->paginate(10, ['*'], 'target_history_page');
 
         return view('admin.bd.bd_profile', compact('bd', 'agencies', 'transactions', 'target_history'));
     }
