@@ -19,8 +19,10 @@ class ParentUserResource extends JsonResource
             'uuid' => $this->uuid,
             'name' => $this->name,
             'codeInvitations' => $this->codeInvitations->count(),
-            'codeInvitationsEarn' => $this->codeInvitationsEarn->sum('parent_percentage'),
+            'codeInvitationsEarn' => $this->codeInvitationsEarn->sum('amount'),
             'created_at' => $this->created_at
         ];
     }
 }
+
+

@@ -38,7 +38,6 @@ use App\Admin\Selectable\ImageColors;
 use App\Admin\Services\AgencyService;
 use Illuminate\Support\Facades\Cache;
 use Modules\Badge\Entities\UserBadge;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
@@ -785,7 +784,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'received_level', 'phone', 'bio', 'total_diamond_send', 'agency_id', 'family_id', 'can_play', 'charge_level', 'transfer_salary', 'online']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'exchange_diamonds','received_level', 'phone', 'bio', 'total_diamond_send', 'agency_id', 'family_id', 'can_play', 'charge_level', 'transfer_salary', 'online']);
         $with = [
             'images',
             'profile:id,user_id,avatar,gender',
@@ -869,27 +868,25 @@ class UserController extends MainController
                 $end = request('end_at');
                 $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
                 $agencyId = request('agency_id', $agency_id);
+
+                // Convert empty string or "0" to null to ensure filter doesn't apply with falsy values
+                if ($agencyId === '' || $agencyId === '0' || $agencyId === 0) {
+                    $agencyId = null;
+                }
+
                 $timezone = Common::timeZone();
 
-                \Log::info('Gift Log Request', [
-                    'user_id' => $id,
-                    'gift_type' => $giftType,
-                    'start_at' => $start,
-                    'end_at' => $end,
-                    'user_agency_id' => $user->agency_id,
-                    'requested_agency_id' => request('agency_id'),
-                    'final_agency_id' => $agencyId,
-                    'timezone' => $timezone,
-                ]);
+                // Convert dates to UTC for database query
+                $startUtc = $start && $end ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
+                $endUtc = $start && $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
 
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
                     ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
-                    ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
-                        Carbon::parse($start, $timezone)->startOfDay()->utc(),
-                        Carbon::parse($end, $timezone)->endOfDay()->utc(),
-                    ]))
+                    ->when($startUtc && $endUtc, fn($q) => $q->whereBetween('created_at', [$startUtc, $endUtc]))
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
+
+             
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
@@ -902,26 +899,19 @@ class UserController extends MainController
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 
-                \Log::info('Gift Logs Retrieved', [
-                    'total_records' => $giftSLogs->total(),
-                    'current_page' => $giftSLogs->currentPage(),
-                    'per_page' => $giftSLogs->perPage(),
-                ]);
+           
 
                 // For receiver: just sum giftPrice
                 // For sender: calculate SUM(total * giftNum)
                 if ($giftType === 'receiver') {
                     $totalGiftCoins = (clone $giftBaseQuery)->sum('giftPrice') ?? 0;
-                    \Log::info('Total Gift Coins (Receiver)', ['total' => $totalGiftCoins]);
                 } else {
                     $totalGiftCoins = (clone $giftBaseQuery)
                         ->selectRaw('SUM(CAST(total AS DECIMAL(20,2)) * CAST(giftNum AS DECIMAL(20,2))) as total')
                         ->value('total') ?? 0;
-                    \Log::info('Total Gift Coins (Sender)', ['total' => $totalGiftCoins]);
                 }
 
                 $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
-                \Log::info('Total Diamonds', ['diamonds' => $diamonds]);
 
                 break;
 
@@ -996,6 +986,11 @@ class UserController extends MainController
             'totalGiftCoins',
             'permission'
         );
+
+        // For AJAX tab requests, return only the rendered view (no admin layout)
+        if (request()->ajax() && request()->has('tab')) {
+            return view('user_profile', $data)->render();
+        }
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
@@ -1192,14 +1187,6 @@ class UserController extends MainController
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
 
-
-        if (Session::has('show_alert')) {
-            $form->html('<script>
-            $(document).ready(function () {
-                alert(" يملك هذا المستخدم وكالة   . الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم");
-            });
-        </script>');
-        }
         $form->html('<div class="full-column-width">');
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
         $form->html('</div>');
@@ -1235,8 +1222,8 @@ class UserController extends MainController
 
 
                 if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
-                    session()->flash('show_alert', 'Your alert message');
-                    return redirect()->back();
+                    admin()->error(__('يملك هذا المستخدم وكالة. الرجاء مسح الوكالة واخراج المضيفين اولا قبل تغيير نوع المستخدم'));
+                    return false;
                 }
 
 

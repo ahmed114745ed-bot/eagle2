@@ -5,7 +5,7 @@
 //use Illuminate\Support\Facades\Route;
 //use App\Http\Controllers\utd\BanController;
 //use App\Http\Controllers\utd\BoxController;
-//use App\Admin\Controllers\SettingController;
+use App\Admin\Controllers\SettingController;
 //use App\Http\Controllers\utd\RoomController;
 //use App\Http\Controllers\Api\V1\PkController;
 //use App\Http\Controllers\utd\ColorController;
@@ -33,7 +33,7 @@
 //use App\Http\Controllers\utd\CountryController;
 //use App\Http\Controllers\utd\MomentsController;
 //use App\Http\Controllers\utd\PkEventController;
-//use App\Admin\Controllers\ZegoFeatureController;
+use App\Admin\Controllers\ZegoFeatureController;
 //use App\Http\Controllers\Api\V1\OfferController;
 //use App\Http\Controllers\utd\ExchangeController;
 //use App\Http\Controllers\utd\InterestController;
@@ -104,7 +104,7 @@
 //
 //// 'utd.decreptHeader'
 //// utd apis
-//Route::middleware([])->group(function () {
+Route::middleware([])->group(function () {
 //    //configs
 //    Route::prefix('configs')->group(function () {
 //        Route::get('/all', [ConfigController::class, 'index']);
@@ -112,7 +112,7 @@
 //        Route::get('/category', [ConfigController::class, "config"]);
 //    });
 //
-//    Route::post('zego-action', [ZegoFeatureController::class, 'zegoKey']);
+  Route::post('zego-action', [ZegoFeatureController::class, 'zegoKey']);
 //
 //    Route::prefix('families')->group(function () {
 //        Route::get('/', [FamilyController::class, 'index']);
@@ -516,17 +516,17 @@
 //        Route::get('/ware-vips', [VipController::class, 'getWareVip']);
 //        Route::post('/delete-ware', [VipController::class, 'deleteWare']);
 //    });
-//    Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
-//    Route::post('/update-room-boom', [SettingController::class, 'updateRoomBoom']);
-//    Route::post('/update-remaining-diamonds', [SettingController::class, 'updateRemainingDiamonds']);
-//    Route::post('/update-host-level', [SettingController::class, 'updateHostLevel']);
-//    Route::post('/update-pk-live', [SettingController::class, 'updatePkLive']);
-//    Route::post('/update-lucky-gifts', [SettingController::class, 'updateLuckyGifts']);
-//    Route::post('/update-is-theme-enabled', [SettingController::class, 'updateIsThemeEnabled']);
-//    Route::post('/update-room-mode', [SettingController::class, 'updateRoomMode']);
-//    Route::post('/update-charisma-format', [SettingController::class, 'updateCharismaFormat']);
+  Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
+  Route::post('/update-room-boom', [SettingController::class, 'updateRoomBoom']);
+  Route::post('/update-remaining-diamonds', [SettingController::class, 'updateRemainingDiamonds']);  
+  Route::post('/update-host-level', [SettingController::class, 'updateHostLevel']);
+  Route::post('/update-pk-live', [SettingController::class, 'updatePkLive']);
+  Route::post('/update-lucky-gifts', [SettingController::class, 'updateLuckyGifts']);
+  Route::post('/update-is-theme-enabled', [SettingController::class, 'updateIsThemeEnabled']);
+  Route::post('/update-room-mode', [SettingController::class, 'updateRoomMode']);
+  Route::post('/update-charisma-format', [SettingController::class, 'updateCharismaFormat']);
 //
-//        Route::post('/update-charisma-badge', [SettingController::class, 'updateCharismaBadge']);
+  Route::post('/update-charisma-badge', [SettingController::class, 'updateCharismaBadge']);
 //
 //
 //
@@ -943,7 +943,7 @@
 //    Route::get('/wares-event', [RewardLevelIntervalController::class, 'wareInterval']);
 //    Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
 //    Route::get('/gift-event', [WeeklyEventController::class, 'gifts']);
-//});
+});
 //
 //Route::prefix('transaction-request-problem')->group(function () {
 //    Route::get('/', [AdminCheckController::class, 'all']);

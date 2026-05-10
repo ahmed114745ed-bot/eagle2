@@ -2315,54 +2315,37 @@
     <div class="agency-tabs">
 
         <a href="?tab=packs"
-           data-pjax
            class="tab-btn {{ $activeTab === 'packs' ? 'active' : '' }}"
            data-target="packs-tab">
             {{ __('packs') }}
         </a>
 
-        <a href="?tab=vips" data-pjax class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
+        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
            data-target="vips-tab">{{ __('vips') }}</a>
 
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=level" data-pjax class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
+            <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
         @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
+            <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
                data-target="salary-tab">{{ __('prof_reports') }}</a>
         @endif
-        <a href="?tab=charge" data-pjax class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
+        <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
-        <a href="?tab=gift-log" data-pjax class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+        <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
-        <a href="?tab=user-agency" data-pjax class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
+        <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
            data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-        <a href="?tab=user-coins" data-pjax class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
+        <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
            data-target="user-coins-tab">{{ __('User Coins') }}</a>
-        <a href="?tab=badges" data-pjax class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
+        <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
            data-target="badges-tab">{{ __('badges') }}</a>
 
-        <a href="?tab=wallet_logs" data-pjax class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
+        <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
            data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
     </div>
-    <div id="tab-loading" style="
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            /* transform: translate(-50%, -50%); */
-            background: var(--primary-color);
-            color: var(--text-primary-color);
-            z-index: 9999;
-            padding: 30px 40px;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        ">
-        {{ __('Loading...') }}
-    </div>
+    {{-- tab-loading removed - tabs now switch client-side without reload --}}
 
     <!-- packs Section -->
 
@@ -3584,10 +3567,7 @@
     </div>
 </div>
 
-@if($activeTab == 'user-coins')
-
-    <div class="tab-content" id="user-coins-tab"
-         style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
+    <div class="tab-content {{ $activeTab == 'user-coins' ? '' : 'd-none' }}" id="user-coins-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -3777,10 +3757,8 @@
             </div>
         </div>
     </div>
-@endif
 
-@if($activeTab == 'charge')
-    <div class="tab-content active" id="charge-tab">
+    <div class="tab-content {{ $activeTab == 'charge' ? '' : 'd-none' }}" id="charge-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #be123c 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -3849,7 +3827,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($charges as $index => $charge)
+@forelse($charges ?? [] as $index => $charge)
                             @php
                                 if($chargeTabType == 'receiver') {
                                     $userCharges = Common::getChargerInfo($charge);
@@ -3933,10 +3911,8 @@
             @endif
         </div>
     </div>
-@endif
 
-@if($activeTab == 'gift-log')
-    <div class="tab-content active" id="gift-log-tab">
+    <div class="tab-content {{ $activeTab == 'gift-log' ? '' : 'd-none' }}" id="gift-log-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -4119,7 +4095,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($giftSLogs as $index => $giftSLog)
+                        @foreach($giftSLogs ?? [] as $index => $giftSLog)
                             @php
                                 $userImageDefault = asset('images/businessman-icon.jpg');
                                 $defaultImage = asset("images/background_room.jpg");
@@ -4295,7 +4271,7 @@
             </div>
         </div>
     </div>
-@endif
+
 
 <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
@@ -4696,17 +4672,97 @@
     });
 
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Remove active class from all buttons and content
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    // Mark the initially loaded tab as already loaded (data is in the page)
+    (function() {
+        var initialTab = '{{ $activeTab }}';
+        var initialEl = document.getElementById(initialTab + '-tab');
+        if (initialEl) initialEl.dataset.loaded = 'true';
+        // Level tab is always fully rendered (no server data needed)
+        var levelEl = document.getElementById('level-tab');
+        if (levelEl) levelEl.dataset.loaded = 'true';
+    })();
 
-            // Add active class to clicked button and corresponding content
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Switch tabs visually
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.classList.add('d-none');
+                c.style.display = 'none';
+            });
             btn.classList.add('active');
-            const target = btn.getAttribute('data-target');
-            document.getElementById(target).classList.add('active');
+
+            var target = btn.getAttribute('data-target');
+            var targetEl = document.getElementById(target);
+            var href = btn.getAttribute('href');
+
+            if (targetEl) {
+                targetEl.classList.add('active');
+                targetEl.classList.remove('d-none');
+                targetEl.style.display = 'block';
+            }
+
+            // Update URL without reload
+            if (href) {
+                history.pushState(null, '', window.location.pathname + href);
+            }
+
+            // If tab content not loaded yet, fetch via AJAX
+            if (targetEl && !targetEl.dataset.loaded) {
+                targetEl.innerHTML = '<div style="text-align:center;padding:60px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--primary-color);"></i><p style="margin-top:12px;color:#94a3b8;font-size:14px;">{{ __("Loading") }}...</p></div>';
+
+                $.ajax({
+                    url: window.location.pathname + href,
+                    type: 'GET',
+                    success: function(html) {
+                        var $parsed = $('<div>').append($.parseHTML(html, document, true));
+                        var $newContent = $parsed.find('#' + target);
+                        if ($newContent.length) {
+                            $(targetEl).html($newContent.html());
+                            targetEl.dataset.loaded = 'true';
+                            // Re-initialize select2 inside loaded tab if needed
+                            $(targetEl).find('#agency_id').each(function() {
+                                if (!$(this).data('select2')) {
+                                    $(this).select2({
+                                        placeholder: 'Select agency',
+                                        allowClear: true,
+                                        ajax: {
+                                            url: '/api/search/host-agency',
+                                            dataType: 'json',
+                                            delay: 250,
+                                            data: function(params) { return { q: params.term, page: params.page || 1 }; },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.data.map(function(item) { return { id: item.id, text: item.name }; }),
+                                                    pagination: { more: data.next_page_url !== null }
+                                                };
+                                            },
+                                            cache: true
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}</p></div>';
+                        }
+                    },
+                    error: function() {
+                        targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}. {{ __("Please try again") }}.</p></div>';
+                    }
+                });
+            }
         });
+    });
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var selectedTab = urlParams.get('tab') || 'packs';
+        var tabBtn = document.querySelector('.tab-btn[data-target="' + selectedTab + '-tab"]');
+        if (tabBtn) tabBtn.click();
     });
 
 

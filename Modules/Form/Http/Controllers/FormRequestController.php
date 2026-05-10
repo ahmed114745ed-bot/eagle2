@@ -522,7 +522,9 @@ class FormRequestController extends MainController
             'app_owner_id' => $owner->id,
             'bd_id' => $bd?->id,
             'country_id' => $countryId,
+            'type'=> 2,
         ]);
+        
 
         MilestoneHelper::grantMilestoneToUser($owner, 'charge-agency-owner');
         $request->update(['status' => 'approved']);
