@@ -354,7 +354,7 @@
                                 </div>
                             </td>
                             <td><strong>{{ $gift->giftNum }}</strong></td>
-                            <td><strong>{{ $gift->giftPrice }}</strong></td>
+                            <td><strong>{{ number_format($gift->giftPrice) }}</strong></td>
                             <td><span class="user-cell-meta">{{ Carbon::parse($gift->created_at)->format('Y-m-d H:i') }}</span></td>
                         </tr>
                     @empty
@@ -637,7 +637,7 @@
                         </td>
                         <td>
                             <div style="line-height:1.6;">
-                                <div><strong>{{ number_format($box->coins) }}</strong> <img src="{{ asset('images/diamond.jpg') }}" alt="" class="diamond-icon"></div>
+                                <div><strong>{{ number_format($box->coins) }}</strong> <img src="{{ asset('images/coin.jpg') }}" alt="" class="diamond-icon"></div>
                                 <div style="font-size:12px;color:#64748b;">{{ __('Used') }}: {{ number_format($box->used_coins) }}</div>
                                 <div style="font-size:12px;color:#10b981;">{{ __('Remains') }}: {{ number_format($box->unused_coins) }}</div>
                             </div>
