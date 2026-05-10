@@ -399,6 +399,18 @@
     .modal-body { padding: 24px; }
     .modal-footer { border-top: 1px solid #f1f5f9; padding: 14px 24px; }
 
+    /* ── HIDDEN TAB PANEL ─────────────────────── */
+    .am-hidden { display: none !important; }
+
+    .am-tab-panel {
+        animation: amFadeIn .25s ease;
+    }
+
+    @keyframes amFadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
     /* ── RESPONSIVE ────────────────────────────── */
     @media (max-width: 768px) {
         .am-header-top { flex-direction: column; align-items: center; text-align: center; }
@@ -480,67 +492,60 @@
     </div>
 
     {{-- ═══════════ TAB: AGENCIES ═══════════ --}}
-    @if($activeTab === 'agencies')
-        <div class="tab-content active" id="members-tab">
-            <div class="am-card">
-                <div class="am-card-header">
-                    <h4 class="am-card-title"><i class="fas fa-building"></i> {{ __('Agencies') }}</h4>
-                    <span class="am-count-badge">{{ optional($agencies)->total() ?? 0 }}</span>
-                </div>
-                @if($agencies && $agencies->count())
-                    <div class="table-responsive">
-                        <table class="am-table">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('owner') }}</th>
-                                <th>{{ __('Status') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($agencies as $index => $agency)
-                                <tr>
-                                    <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
-                                    <td>
-                                        <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="am-user-cell">
-                                            <img src="{{ getImagePath($agency->img) }}" alt="">
-                                            <div>
-                                                <span class="am-user-name">{{ $agency->name ?? '' }}</span>
-                                            </div>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="{{ url('admin/users/' . $agency->owner?->id) }}" class="am-user-cell">
-                                            <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="">
-                                            <div>
-                                                <span class="am-user-name">{{ $agency->owner?->name ?? '' }}</span>
-                                            </div>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        @if($agency->status == 1)
-                                            <span class="am-status-active"><i class="fas fa-check-circle"></i> {{ __('Active') }}</span>
-                                        @else
-                                            <span class="am-status-inactive"><i class="fas fa-times-circle"></i> {{ __('Inactive') }}</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="am-pagination">{{ $agencies->appends(['tab' => 'agencies'])->links('vendor.pagination.default') }}</div>
-                @else
-                    <div class="am-empty"><i class="fas fa-building"></i><p>{{ __('No agencies found') }}</p></div>
-                @endif
+    <div class="am-tab-panel {{ $activeTab === 'agencies' ? '' : 'am-hidden' }}" id="members-tab">
+        <div class="am-card">
+            <div class="am-card-header">
+                <h4 class="am-card-title"><i class="fas fa-building"></i> {{ __('Agencies') }}</h4>
+                <span class="am-count-badge">{{ optional($agencies)->total() ?? 0 }}</span>
             </div>
+            @if($agencies && $agencies->count())
+                <div class="table-responsive">
+                    <table class="am-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Name') }}</th>
+                            <th>{{ __('owner') }}</th>
+                            <th>{{ __('Status') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($agencies as $index => $agency)
+                            <tr>
+                                <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
+                                <td>
+                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="am-user-cell">
+                                        <img src="{{ getImagePath($agency->img) }}" alt="">
+                                        <div><span class="am-user-name">{{ $agency->name ?? '' }}</span></div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ url('admin/users/' . $agency->owner?->id) }}" class="am-user-cell">
+                                        <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}" alt="">
+                                        <div><span class="am-user-name">{{ $agency->owner?->name ?? '' }}</span></div>
+                                    </a>
+                                </td>
+                                <td>
+                                    @if($agency->status == 1)
+                                        <span class="am-status-active"><i class="fas fa-check-circle"></i> {{ __('Active') }}</span>
+                                    @else
+                                        <span class="am-status-inactive"><i class="fas fa-times-circle"></i> {{ __('Inactive') }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="am-pagination">{{ $agencies->appends(['tab' => 'agencies'])->links('vendor.pagination.default') }}</div>
+            @else
+                <div class="am-empty"><i class="fas fa-building"></i><p>{{ __('No agencies found') }}</p></div>
+            @endif
         </div>
-    @endif
+    </div>
 
     {{-- ═══════════ TAB: COUNTRY MANAGER ═══════════ --}}
-    @if($activeTab === 'superAdmin')
-        <div class="tab-content active" id="superAdmin-tab">
+    <div class="am-tab-panel {{ $activeTab === 'superAdmin' ? '' : 'am-hidden' }}" id="superAdmin-tab">
             <div class="am-card">
                 <div class="am-card-header">
                     <h4 class="am-card-title"><i class="fas fa-globe"></i> {{ __('country manager') }}</h4>
@@ -603,11 +608,9 @@
                 @endif
             </div>
         </div>
-    @endif
 
     {{-- ═══════════ TAB: CHARGE REPORTS ═══════════ --}}
-    @if($activeTab == 'charge')
-        <div class="tab-content active" id="charge-tab">
+    <div class="am-tab-panel {{ $activeTab == 'charge' ? '' : 'am-hidden' }}" id="charge-tab">
             <div class="am-card">
                 <div class="am-card-header">
                     <h4 class="am-card-title"><i class="fas fa-file-invoice-dollar"></i> {{ __('Charge Reports') }}</h4>
@@ -679,11 +682,9 @@
                 @endif
             </div>
         </div>
-    @endif
 
     {{-- ═══════════ TAB: EMPLOYEES COUNTRY MANAGER ═══════════ --}}
-    @if($activeTab === 'users')
-        <div class="tab-content active" id="users-tab">
+    <div class="am-tab-panel {{ $activeTab === 'users' ? '' : 'am-hidden' }}" id="users-tab">
             <div class="am-card">
                 <div class="am-card-header">
                     <h4 class="am-card-title"><i class="fas fa-users-gear"></i> {{ __('Employees Country Manager') }}</h4>
@@ -754,7 +755,6 @@
                 @endif
             </div>
         </div>
-    @endif
 
 </div>
 
@@ -815,16 +815,35 @@
     const DASHBOARD_PREFIX = "{{ request()->segment(1) }}";
 
     document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedTab = urlParams.get('tab') || 'members';
         const allTabs = document.querySelectorAll('.am-tab');
+        const allPanels = document.querySelectorAll('.am-tab-panel');
 
         allTabs.forEach(tab => {
             tab.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.getElementById('tab-loading').style.display = 'block';
-                allTabs.forEach(t => t.style.pointerEvents = 'none');
-                setTimeout(() => { window.location.href = tab.getAttribute('href'); }, 300);
+                const targetId = this.getAttribute('data-target');
+
+                // Update active tab
+                allTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show/hide panels with animation
+                allPanels.forEach(panel => {
+                    if (panel.id === targetId) {
+                        panel.classList.remove('am-hidden');
+                        panel.style.animation = 'none';
+                        panel.offsetHeight; // trigger reflow
+                        panel.style.animation = '';
+                    } else {
+                        panel.classList.add('am-hidden');
+                    }
+                });
+
+                // Update URL without reload
+                const url = new URL(window.location.href);
+                const tabParam = new URLSearchParams(this.getAttribute('href').replace('?', ''));
+                url.searchParams.set('tab', tabParam.get('tab'));
+                window.history.replaceState({}, '', url.toString());
             });
         });
     });
