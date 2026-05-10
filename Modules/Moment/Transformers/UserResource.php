@@ -28,7 +28,7 @@ class UserResource extends JsonResource
             'id'                 => @$this->id, // both
             'uuid'               => @$this->uuid ?? '', // both
             'name'               => @$this->name ?: '', // both
-            'image'              => @$this->profile->avatar ?: '', // both
+            'image'              => $this->profile?->avatar ?: '', // both
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'receiver_level'     => $this->receiverLevel?->level ?? 0, // both
@@ -55,8 +55,8 @@ class UserResource extends JsonResource
             ],
             'type_user'            => intval(@$this->type_user) ?: 0, // both
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
-            'age'    => Carbon::parse(@$this->profile->birthday)->age,
-            'gender' => @$this->profile->gender ?? 1,
+            'age'    => Carbon::parse($this->profile?->birthday)->age,
+            'gender' => $this->profile?->gender ?? 1,
             'is_follow'            => $this->is_follow,
             'is_friend'            => $this->isFriends(),
             'image_color'          => @$this->color_image ?? '',
