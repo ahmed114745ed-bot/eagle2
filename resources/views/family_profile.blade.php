@@ -535,10 +535,10 @@
 
     {{-- Navigation Tabs --}}
     <div class="agency-tabs">
-        <a href="?tab=members" data-pjax class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">
+        <a href="?tab=members" class="tab-btn {{ $activeTab == 'members' ? 'active' : '' }}" data-target="members-tab">
             <i class="fas fa-users"></i> {{ __('members') }}
         </a>
-        <a href="?tab=targets" data-pjax class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">
+        <a href="?tab=targets" class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">
             <i class="fas fa-bullseye"></i> {{ __('Targets') }}
         </a>
     </div>
@@ -811,55 +811,43 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
 <script>
-    function handleTabSwitching() {
+    document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const selectedTab = urlParams.get('tab') || 'members';
-
         const allTabs = document.querySelectorAll('.tab-btn');
-        let targetElement = null;
 
         allTabs.forEach(tab => {
             const target = tab.getAttribute('data-target');
             const content = document.getElementById(target);
-
             if (!content) return;
 
             if (target === selectedTab + '-tab') {
                 tab.classList.add('active');
-                content.classList.remove('d-none');
                 content.style.display = 'block';
-                targetElement = content;
+                content.classList.add('active');
             } else {
                 tab.classList.remove('active');
-                content.classList.add('d-none');
                 content.style.display = 'none';
+                content.classList.remove('active');
             }
+
+            tab.addEventListener('click', function (e) {
+                e.preventDefault();
+                allTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                allTabs.forEach(t => {
+                    const panelId = t.getAttribute('data-target');
+                    const panel = document.getElementById(panelId);
+                    if (!panel) return;
+                    if (panelId === target) { panel.style.display = 'block'; panel.classList.add('active'); }
+                    else { panel.style.display = 'none'; panel.classList.remove('active'); }
+                });
+                const url = new URL(window.location.href);
+                const tabParam = new URLSearchParams(this.getAttribute('href').replace('?', ''));
+                url.searchParams.set('tab', tabParam.get('tab'));
+                window.history.replaceState({}, '', url.toString());
+            });
         });
-
-        if (targetElement) {
-            setTimeout(() => {
-                targetElement.scrollIntoView({ behavior: 'smooth' });
-            }, 300);
-        }
-    }
-
-    // Initialize PJAX
-    $(document).pjax('a[data-pjax]', '#pjax-container');
-
-    $(document).on('pjax:start', function () {
-        document.getElementById('tab-loading').style.display = 'block';
-        document.querySelectorAll('.tab-btn').forEach(t => t.style.pointerEvents = 'none');
-    });
-
-    $(document).on('pjax:end', function () {
-        document.getElementById('tab-loading').style.display = 'none';
-        document.querySelectorAll('.tab-btn').forEach(t => t.style.pointerEvents = '');
-        handleTabSwitching();
-        bindActionButtons();
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        handleTabSwitching();
     });
 
     function showLoader() {

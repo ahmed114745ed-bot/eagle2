@@ -1124,53 +1124,38 @@
 
             let targetElement = null;
 
-            allTabs.forEach(tab => {
-                const target = tab.getAttribute('data-target');
-                const content = document.getElementById(target);
+        allTabs.forEach(tab => {
+            const target = tab.getAttribute('data-target');
+            const content = document.getElementById(target);
 
-                if (target.startsWith(selectedTab)) {
-                    tab.classList.add('active');
-                    content.style.display = 'block';
-                    targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
-                } else {
-                    tab.classList.remove('active');
-                    content.style.display = 'none';
-                }
+            if (target.startsWith(selectedTab)) {
+                tab.classList.add('active');
+                if (content) { content.style.display = 'block'; content.classList.add('active'); }
+            } else {
+                tab.classList.remove('active');
+                if (content) { content.style.display = 'none'; content.classList.remove('active'); }
+            }
 
-                tab.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.getElementById('tab-loading').style.display = 'block';
-                    allTabs.forEach(t => t.style.pointerEvents = 'none');
-                    const href = tab.getAttribute('href');
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 300);
+            tab.addEventListener('click', function (e) {
+                e.preventDefault();
+                allTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                allTabs.forEach(t => {
+                    const panelId = t.getAttribute('data-target');
+                    const panel = document.getElementById(panelId);
+                    if (!panel) return;
+                    if (panelId === target) { panel.style.display = 'block'; panel.classList.add('active'); }
+                    else { panel.style.display = 'none'; panel.classList.remove('active'); }
                 });
-            });
-
-    if (targetElement) {
-        setTimeout(() => {
-            targetElement.scrollIntoView({ behavior: 'smooth' });
-        }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
-    }
-});
-
-
-
-
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove active class from all buttons and content
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-                // Add active class to clicked button and corresponding content
-                btn.classList.add('active');
-                const target = btn.getAttribute('data-target');
-                document.getElementById(target).classList.add('active');
+                const url = new URL(window.location.href);
+                const tabParam = new URLSearchParams(this.getAttribute('href').replace('?', ''));
+                url.searchParams.set('tab', tabParam.get('tab'));
+                window.history.replaceState({}, '', url.toString());
             });
         });
+    });
+
+
 
 
         $(document).ready(function () {
