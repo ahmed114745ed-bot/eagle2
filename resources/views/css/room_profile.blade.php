@@ -455,7 +455,7 @@
         background: #f8fafc;
         border-bottom: 2px solid #e8ecf1;
         white-space: nowrap;
-        text-align: left;
+        text-align: start;
     }
 
     .table tbody td {
