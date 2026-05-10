@@ -128,6 +128,7 @@ return [
     'canNotCharge'                                               => 'Yükleme yapamazsınız, ajansınız kapalı',
     'disabled_version'                                           => 'Lütfen uygulamayı silin ve Google Play\'den tekrar indirin, anlayışınız için teşekkür ederiz',
     "try_again"                                                 => 'Lütfen tekrar deneyin',
+    "gift_in_progress"                                           => 'Önceki hediye işleniyor, lütfen bir dakika bekleyin',
     'success'                                                    => "Başarıyla tamamlandı",
     "giftNotFound"                                               => "Hediye bulunamadı",
     "insufficient"                                               => "Yetersiz bakiye, lütfen bakiye yüklemeye gidin!",

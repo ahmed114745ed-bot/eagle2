@@ -16,7 +16,15 @@
             --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
             --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
             --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
         }
+
+        * { box-sizing: border-box; }
 
         .filter-container {
             background: #ffffff;
@@ -1031,6 +1039,1001 @@
             color: #333;
             font-weight: 500;
         }
+
+        /* ═══════════════════════════════════════════
+           MODERN UI POLISH — Enhanced Styling
+           ═══════════════════════════════════════════ */
+
+        /* ── Cover Slideshow ── */
+        .profile-cover-wrapper {
+            position: relative;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            overflow: visible;
+            margin-bottom: 0;
+        }
+
+        .profile-cover-slideshow {
+            overflow: hidden;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .profile-cover-slideshow {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .cover-slide {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .cover-slide.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        .cover-slide::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 80px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.35));
+            z-index: 3;
+        }
+
+        /* Navigation arrows */
+        .cover-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(4px);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s, background 0.3s;
+            font-size: 14px;
+        }
+
+        .profile-cover-wrapper:hover .cover-nav {
+            opacity: 1;
+        }
+
+        .cover-nav:hover {
+            background: rgba(255,255,255,0.45);
+        }
+
+        .cover-prev { left: 14px; }
+        .cover-next { right: 14px; }
+
+        /* Dots indicator */
+        .cover-dots {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 8px;
+        }
+
+        .cover-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.45);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cover-dot.active {
+            background: #fff;
+            transform: scale(1.3);
+            box-shadow: 0 0 6px rgba(255,255,255,0.6);
+        }
+
+        .profile-avatar-wrapper {
+            position: absolute;
+            bottom: -50px;
+            left: 40px;
+            z-index: 10;
+        }
+
+        .profile-avatar-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            object-fit: contain;
+            background: #fff;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .profile-avatar-img:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 28px rgba(0,0,0,0.25);
+        }
+
+        .profile-info-card {
+            background: #fff;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            padding: 20px 40px 24px;
+            padding-top: 60px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-top: none;
+        }
+
+        .profile-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .profile-name-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-user-name {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .profile-badges-inline {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-actions-top {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .profile-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .profile-meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .profile-meta-chip i {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .meta-sep {
+            color: #cbd5e1;
+            margin: 0 2px;
+        }
+
+        .profile-stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .profile-stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 16px 24px;
+            min-width: 120px;
+            flex: 1;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .profile-stat-box:hover {
+            border-color: var(--primary-color);
+            background: #f0f7ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .profile-stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.2;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .profile-stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .profile-badges-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .flag-image {
+            height: 18px;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 768px) {
+            .profile-cover { height: 140px; }
+            .profile-avatar-wrapper { left: 50%; transform: translateX(-50%); bottom: -40px; }
+            .profile-avatar-img { width: 90px; height: 90px; }
+            .profile-info-card { padding: 56px 16px 20px; text-align: center; }
+            .profile-info-header { justify-content: center; }
+            .profile-name-section { justify-content: center; }
+            .profile-actions-top { justify-content: center; }
+            .profile-meta-row { justify-content: center; }
+            .profile-stats-row { justify-content: center; gap: 8px; }
+            .profile-stat-box { min-width: 80px; padding: 10px 8px; flex: 1 1 calc(33.33% - 8px); }
+            .profile-stat-value { font-size: 14px !important; }
+            .profile-stat-label { font-size: 9px !important; }
+            .profile-badges-row { justify-content: center; }
+            .profile-meta-chip { font-size: 11px; padding: 4px 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .profile-stats-row { gap: 6px; }
+            .profile-stat-box { min-width: 70px; padding: 8px 6px; }
+            .profile-stat-value { font-size: 12px !important; }
+            .profile-stat-label { font-size: 8px !important; }
+            .profile-info-card { padding: 56px 10px 16px; }
+            .agency-profile-container { padding: 10px; }
+        }
+
+        /* ── Tabs Navigation ── */
+        .agency-tabs {
+            background: var(--secondary-color);
+            border-radius: var(--radius-md);
+            padding: 8px;
+            border: none;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 24px;
+            gap: 4px;
+            scrollbar-width: none;
+            color: var(--text-secondary-color);
+        }
+
+        .agency-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 11px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            border: none;
+            border-bottom: none;
+            color: var(--text-secondary-color);
+            opacity: 0.6;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+
+        .tab-btn:hover:not(.active) {
+            opacity: 0.9;
+            background: rgba(255,255,255,0.08);
+            border-bottom-color: transparent !important;
+            text-decoration: none;
+            color: var(--text-secondary-color);
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            color: var(--text-primary-color);
+            background: var(--primary-color);
+        }
+
+        /* ── Cards ── */
+        .card {
+            border: none;
+            border-top: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 18px 24px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .card-body {
+            padding: 20px 24px;
+        }
+
+        /* ══════════════════════════════════════════════════════
+           PREMIUM TABLE STYLES — Polished & Professional
+           ══════════════════════════════════════════════════════ */
+        .data-table,
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+            width: 100%;
+            background: #fff !important;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        /* ── Table Header ── */
+        .data-table th,
+        .table > thead > tr > th {
+            background: linear-gradient(180deg, #f8fafc 0%, #edf1f7 100%) !important;
+            color: #3b4a63 !important;
+            font-weight: 800;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 16px 22px !important;
+            border-bottom: 2px solid #dce3ed !important;
+            border-top: none !important;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .data-table th:first-child,
+        .table > thead > tr > th:first-child {
+            border-radius: var(--radius-md) 0 0 0;
+        }
+
+        .data-table th:last-child,
+        .table > thead > tr > th:last-child {
+            border-radius: 0 var(--radius-md) 0 0;
+        }
+
+        /* ── Table Cells ── */
+        .data-table td,
+        .table > tbody > tr > td {
+            padding: 16px 22px !important;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf0f7 !important;
+            border-top: none !important;
+            color: #334155;
+            font-size: 13.5px;
+            line-height: 1.7;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        /* ── Row Styles ── */
+        .data-table tbody tr,
+        .table > tbody > tr {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fff;
+            position: relative;
+        }
+
+        .data-table tbody tr:nth-child(even),
+        .table > tbody > tr:nth-child(even) {
+            background: #f8f9fd;
+        }
+
+        .data-table tbody tr:hover,
+        .table > tbody > tr:hover {
+            background: linear-gradient(90deg, #eef1ff 0%, #f3f5ff 40%, #f0f2ff 100%) !important;
+            box-shadow: inset 4px 0 0 var(--primary-color, #667eea), 0 2px 8px rgba(99,102,241,0.06);
+            z-index: 1;
+        }
+
+        .data-table tbody tr:hover td,
+        .table > tbody > tr:hover td {
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:last-child td:first-child {
+            border-radius: 0 0 0 var(--radius-md);
+        }
+
+        .data-table tbody tr:last-child td:last-child {
+            border-radius: 0 0 var(--radius-md) 0;
+        }
+
+        /* Override orange text in tbody */
+        .data-table tbody,
+        .table tbody,
+        .data-table tbody tr,
+        .table tbody tr,
+        .data-table tbody tr td,
+        .table tbody tr td,
+        .data-table tbody[style] tr td,
+        .table tbody[style] tr td {
+            color: #334155 !important;
+        }
+
+        /* ── First Column (ID/#) ── */
+        .data-table td:first-child,
+        .table > tbody > tr > td:first-child {
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .data-table td:first-child,
+        .table > tbody > tr > td:first-child {
+            color: #fff;
+        }
+
+        .data-table td:first-child::before,
+        .table > tbody > tr > td:first-child::before {
+            content: '';
+            display: inline-block;
+        }
+
+        .data-table td:first-child,
+        .table > tbody > tr > td:first-child {
+            position: relative;
+        }
+
+        .data-table td:first-child span,
+        .data-table td:first-child {
+            color: #6366f1;
+        }
+
+        /* ID number badge style */
+        .data-table tbody tr td:first-child,
+        .table > tbody > tr > td:first-child {
+            color: #4f46e5;
+            font-variant-numeric: tabular-nums;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* ── Table Wrapper ── */
+        .table-responsive {
+            border-radius: var(--radius-md);
+            border: 1px solid #e4e9f2;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 1px rgba(0,0,0,0.06);
+        }
+
+        /* Table inside cards - remove double borders */
+        .card .table-responsive {
+            margin: 0;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            box-shadow: none;
+            border-top: none;
+        }
+
+        .card .data-table,
+        .card .table {
+            margin-bottom: 0;
+        }
+
+        /* ── Table Links ── */
+        .data-table a,
+        .table a {
+            color: #4f46e5;
+            text-decoration: none;
+            transition: all 0.25s;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .data-table a:hover,
+        .table a:hover {
+            color: #3730a3;
+        }
+
+        .data-table a::after,
+        .table td a::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 0;
+            height: 1.5px;
+            background: #4f46e5;
+            transition: width 0.3s ease;
+        }
+
+        .data-table a:hover::after,
+        .table td a:hover::after {
+            width: 100%;
+        }
+
+        /* ── Table Images ── */
+        .data-table img,
+        .table img {
+            border-radius: 10px;
+            border: 2px solid #edf0f7;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .data-table img:hover,
+        .table img:hover {
+            transform: scale(1.12);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            border-color: #c7d2fe;
+        }
+
+        /* ── Status Badges ── */
+        .table .text-success {
+            color: #059669 !important;
+            font-weight: 700;
+            background: #ecfdf5;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .table .text-danger {
+            color: #dc2626 !important;
+            font-weight: 700;
+            background: #fef2f2;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .table .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        /* ── Action Buttons in Tables ── */
+        .data-table .btn,
+        .table .btn {
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 18px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            letter-spacing: 0.3px;
+            border: none;
+        }
+
+        .data-table .btn:hover,
+        .table .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .data-table .btn:active,
+        .table .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .data-table .btn-info,
+        .table .btn-info {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+        }
+
+        .data-table .btn-info:hover,
+        .table .btn-info:hover {
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            box-shadow: 0 6px 20px rgba(99,102,241,0.3);
+        }
+
+        .data-table .btn-danger,
+        .table .btn-danger {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: #fff;
+        }
+
+        .data-table .btn-danger:hover,
+        .table .btn-danger:hover {
+            background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+            box-shadow: 0 6px 20px rgba(244,63,94,0.3);
+        }
+
+        .data-table .btn-default,
+        .table .btn-default {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .data-table .btn-default:hover,
+        .table .btn-default:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            color: #1e293b;
+        }
+
+        .data-table .d-flex,
+        .table .d-flex {
+            gap: 10px;
+        }
+
+        /* ── User Cell in Tables ── */
+        .data-table .d-flex.align-items-center img,
+        .table .d-flex.align-items-center img {
+            border-radius: 50% !important;
+            border: 2px solid #e0e7ff !important;
+        }
+
+        /* ── Pagination Enhancement ── */
+        .pagination-wrapper,
+        .pagination-container {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination {
+            gap: 4px;
+        }
+
+        .pagination > li > a,
+        .pagination > li > span {
+            border-radius: 10px !important;
+            margin: 0 2px !important;
+            border: 1px solid #e4e9f2 !important;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 8px 16px !important;
+            transition: all 0.25s;
+            color: #475569;
+        }
+
+        .pagination > .active > a,
+        .pagination > .active > span {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+            color: #fff !important;
+        }
+
+        .pagination > li > a:hover {
+            background: #eef2ff !important;
+            border-color: #c7d2fe !important;
+            color: #4f46e5 !important;
+            transform: translateY(-1px);
+        }
+
+        /* ── Empty Table State ── */
+        .data-table tbody tr td[colspan],
+        .table tbody tr td[colspan] {
+            padding: 48px 24px !important;
+            color: #94a3b8;
+            font-size: 14px;
+            font-style: italic;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            transition: all 0.25s;
+            font-size: 13px;
+        }
+
+        .btn-info {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-danger {
+            box-shadow: 0 2px 6px rgba(220,53,69,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 12px;
+        }
+
+        /* ── Filter Container ── */
+        .filter-container {
+            background: rgba(0,0,0,0.015);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: none;
+        }
+
+        .form-control {
+            border-radius: var(--radius-sm);
+            border: 1.5px solid rgba(0,0,0,0.1);
+            padding: 8px 14px;
+            font-size: 13px;
+            transition: all 0.25s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+        }
+
+        .form-select {
+            border-radius: var(--radius-sm);
+        }
+
+        /* ── Nav Pills (sub-tabs) ── */
+        .nav-pills {
+            gap: 4px;
+            padding: 8px 0;
+        }
+
+        .nav-pills > li > a {
+            border-radius: var(--radius-sm);
+            padding: 8px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .nav-pills > li.active > a {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        /* ── Pagination ── */
+        .pagination-wrapper,
+        .pagination-container {
+            padding: 16px 24px;
+        }
+
+        .pagination > li > a,
+        .pagination > li > span {
+            border-radius: var(--radius-sm) !important;
+            margin: 0 3px !important;
+            border: 1px solid rgba(0,0,0,0.08) !important;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 6px 14px !important;
+            transition: all 0.2s;
+        }
+
+        .pagination > .active > a,
+        .pagination > .active > span {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .pagination > li > a:hover {
+            background: rgba(0,0,0,0.04) !important;
+            transform: translateY(-1px);
+        }
+
+        /* ── Diamond Summary ── */
+        .diamond-summary-box {
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .diamond-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .diamond-count {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        /* ── Loading Indicator ── */
+        #tab-loading {
+            border-radius: var(--radius-md) !important;
+            box-shadow: var(--shadow-lg) !important;
+            font-size: 16px !important;
+            padding: 20px 32px !important;
+            transform: translate(-50%, -50%) !important;
+        }
+
+        /* ── Modals ── */
+        .modal-content {
+            border: none !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25) !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 24px !important;
+        }
+
+        .modal-body {
+            padding: 24px !important;
+        }
+
+        .modal-footer {
+            padding: 16px 24px !important;
+            border-top: 1px solid rgba(0,0,0,0.06) !important;
+            gap: 8px;
+        }
+
+        /* ── Date Filter Row ── */
+        .date-flex-row {
+            gap: 10px;
+            background: rgba(0,0,0,0.015);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .date-flex-row span {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Empty States ── */
+        .empty-state,
+        .empty-table {
+            padding: 48px;
+            border-radius: var(--radius-md);
+        }
+
+        .empty-state i,
+        .empty-table i {
+            font-size: 48px;
+            opacity: 0.4;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p,
+        .empty-table p {
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        /* ── Scrollbar ── */
+        .table-responsive::-webkit-scrollbar,
+        .nav-scroll-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track,
+        .nav-scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb,
+        .nav-scroll-container::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.12);
+            border-radius: 4px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .agency-header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .agency-meta {
+                justify-content: center;
+            }
+
+            .agency-stats {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .agency-tabs {
+                border-radius: var(--radius-sm);
+                padding: 4px;
+            }
+
+            .tab-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .card-header {
+                padding: 14px 18px;
+            }
+
+            .card-body {
+                padding: 16px 18px;
+            }
+
+            .data-table th,
+            .data-table td,
+            .table > thead > tr > th,
+            .table > tbody > tr > td {
+                padding: 10px 12px !important;
+                font-size: 12px;
+            }
+        }
+
+        /* ── Animations ── */
+        .tab-content {
+            animation: fadeInTab 0.3s ease;
+        }
+
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Box Body Spacing ── */
+        .box-body {
+            padding: 16px;
+        }
+
+        .box-body.p-3 {
+            padding: 20px !important;
+        }
+
+        /* ── Profile Actions Dropdown ── */
+        .profile-dropdown-menu.show-dropdown {
+            display: block !important;
+            animation: dropdownFadeIn 0.2s ease;
+        }
+
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous"/>
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
@@ -1054,198 +2057,322 @@
             {{ $errors->first('msg') }}
         </div>
     @endif
-    <!-- Header Section -->
-    <div class="agency-header">
-        <div class="agency-avatar">
-            <img src="{{ $user->display_image }}"
-                 alt="Agency Logo" class="logo-img">
+    <!-- Header Section - Cover + Profile Card -->
+    <div class="profile-cover-wrapper">
+        @php
+            $coverImages = $covers->count() ? $covers : collect();
+        @endphp
+        <div class="profile-cover-slideshow">
+            @if($coverImages->count() > 0)
+                @foreach($coverImages as $i => $cover)
+                    <div class="cover-slide {{ $i === 0 ? 'active' : '' }}" style="background-image: url('{{ getImagePath($cover->img) }}');"></div>
+                @endforeach
+                @if($coverImages->count() > 1)
+                    <div class="cover-dots">
+                        @foreach($coverImages as $i => $cover)
+                            <span class="cover-dot {{ $i === 0 ? 'active' : '' }}" data-index="{{ $i }}"></span>
+                        @endforeach
+                    </div>
+                    <button class="cover-nav cover-prev" onclick="coverSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <button class="cover-nav cover-next" onclick="coverSlide(1)"><i class="fas fa-chevron-right"></i></button>
+                @endif
+            @else
+                <div class="cover-slide active" style="background-image: var(--brand_background-image); background-color: var(--secondary-color);"></div>
+            @endif
         </div>
-        <div class="agency-info">
-            <h1 class="agency-name">{{ @$user?->name ?? ''}}</h1>
-            <div class="agency-meta">
-                <div class="meta-item">
-                    @if (@$user->uuid == @$user->original_uuid)
-                        <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->original_uuid }}</span>
-                    @else
-                        <span class="meta-label">{{ __("uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->original_uuid }}</span><br>
-                        <span class="meta-label">{{ __("special uuid") }}:</span>
-                        <span class="meta-value">{{ @$user->uuid_v3 }}</span>
-                    @endif
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">{{__("Phone")}}:</span>
-                    <span class="meta-value">{{ @$user->phone ?? 'N/A' }}</span>
-                    <span class="meta-label">{{ __("country") }}:</span>
-                    <img src="{{ getImagePath(@$user->country->flag) }}"
-                         class="flag-image"
-                         alt="flag Image"
-                         title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
-                </div>
-
-
-            </div>
-            <div class="agency-stats">
-                <div class="agency-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">{{ __('Balance') }}:</span>
-
-                        <span class="meta-value d-block">{{ @$user->salary }}</span>
-                        <!-- <span class="meta-value">{{ $curantBalance }}</span>
-                                <span class="meta-value">{{ $availableBalance }}</span> -->
-
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('level')}}:</span>
-                        <span class="meta-value">
-                                    <img src="{{ getImagePath(@$user->senderLevel->img) }}"
-                                         style="height: 24px;">
-                                </span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('Receiver Level')}}:</span>
-                        <span class="meta-value">
-                                <img src="{{ getImagePath(@$user->receiverLevel->img) }}"
-                                     style="height: 24px;">
-                            </span>
-                    </div>
-
-                </div>
-
-                <div class="agency-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">{{ __('diamonds') }}:</span>
-                        @php
-
-                            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds :$user->monthly_diamond_received;
-
-                        @endphp
-                        <span class="meta-value">{{ @$user_diamonds }}</span>
-
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">{{__('coins')}}:</span>
-                        <span class="meta-value">{{@$user->di }}</span>
-                    </div>
-
-
-                </div>
-            </div>
-            <div class="agency-meta">
-                <div class="meta-item">
-                    <span class="meta-label">{{__('type')}}:</span>
-
-                    {!! @$user->userBadgeTop() !!}
-                </div>
-
-            </div>
-
-            <div class="agency-meta">
-                <div class="meta-item">
-                    <span class="meta-label">{{__('badges')}}:</span>
-                    {!! @$user->userBadge() !!}
-                </div>
-
-            </div>
+        <div class="profile-avatar-wrapper">
+            <img src="{{ $user->display_image }}" alt="Avatar" class="profile-avatar-img" onclick="document.getElementById('avatarFullModal').style.display='flex'">
         </div>
-        <div class="p-3 bg-danger-subtle">
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ url('admin/users/') }}" class="btn btn-light">
+    </div>
+
+    <!-- Full Image Modal -->
+    <div id="avatarFullModal" onclick="this.style.display='none'" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;justify-content:center;align-items:center;cursor:pointer;">
+        <img src="{{ $user->display_image }}" alt="Full Avatar" onclick="event.stopPropagation()" style="max-width:90vw;max-height:85vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.4);object-fit:contain;background:#fff;">
+    </div>
+
+    <div class="profile-info-card">
+        <div class="profile-info-header">
+            <div class="profile-name-section">
+                <h1 class="profile-user-name">{{ @$user?->name ?? '' }}</h1>
+                
+            </div>
+            <div class="profile-actions-top" style="display: flex; align-items: center; gap: 8px;">
+                <a href="{{ url('admin/users/') }}" class="btn btn-outline-secondary btn-sm"
+                   style="border-radius: 8px; font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 5px;">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
-                @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                    <button type="submit" class="btn btn-info edit_user_item_model_btn">
-                        {{ __('edit') }}
+                {{-- Actions Dropdown Menu --}}
+                <div class="dropdown" style="position: relative;">
+                    <button class="btn btn-sm" type="button" id="profileActionsDropdown"
+                            onclick="document.getElementById('profileDropdownMenu').classList.toggle('show-dropdown')"
+                            style="background: linear-gradient(135deg, #1e293b, #334155); color: #fff; border: none; border-radius: 10px; padding: 8px 18px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.2s;"
+                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.25)'"
+                            onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'">
+                        <i class="fas fa-ellipsis-v" style="font-size: 14px;"></i>
+                        {{ __('Actions') }}
                     </button>
-                @endif
 
-                @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
-                    <button type="button"
-                            class="btn btn-danger remove-bd-btn"
-                            data-id="{{ $user->id }}"
-                            data-url="{{ route('users.remove', $user->id) }}">
-                        {{ __('Remove BD') }}
-                    </button>
-                @endif
+                    <div id="profileDropdownMenu" class="profile-dropdown-menu"
+                         style="display: none; position: absolute; top: calc(100% + 8px); right: 0; min-width: 260px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); z-index: 1000; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+
+                        {{-- Edit & Remove BD Section --}}
+                        <div style="padding: 8px;">
+                            @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" class="edit_user_item_model_btn"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fas fa-edit" style="width: 18px; text-align: center; color: #818cf8;"></i>
+                                    {{ __('edit') }}
+                                </a>
+                            @endif
+
+                            @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                <a href="javascript:void(0)" class="remove-bd-btn" data-id="{{ $user->id }}" data-url="{{ route('users.remove', $user->id) }}"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fca5a5; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(239,68,68,0.15)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fas fa-trash-alt" style="width: 18px; text-align: center; color: #ef4444;"></i>
+                                    {{ __('Remove BD') }}
+                                </a>
+                            @endif
+                        </div>
+
+                        {{-- Divider --}}
+                        <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 0 14px;"></div>
+
+                        {{-- Toggle Actions Section --}}
+                        <div style="padding: 8px;">
+                            @if (\Encore\Admin\Facades\Admin::user()->can('charge-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" onclick="profileAction('{{ route('users.toggle-transfer-salary', $user->id) }}', this)"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fa {{ $user->transfer_salary ? 'fa-toggle-off' : 'fa-toggle-on' }}" style="width: 18px; text-align: center; color: {{ $user->transfer_salary ? '#ef4444' : '#34d399' }};"></i>
+                                    {{ $user->transfer_salary ? __('Disable Transfer Salary') : __('Enable Transfer Salary') }}
+                                </a>
+                            @endif
+
+                            @if (\Encore\Admin\Facades\Admin::user()->can('invite-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" onclick="profileAction('{{ route('users.toggle-invite-code', $user->id) }}', this)"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fa {{ @$user->userSetting->show_invite_code ? 'fa-toggle-on' : 'fa-toggle-off' }}" style="width: 18px; text-align: center; color: {{ @$user->userSetting->show_invite_code ? '#34d399' : '#ef4444' }};"></i>
+                                    {{ @$user->userSetting->show_invite_code ? __('Disable Show Invite Code') : __('Enable Show Invite Code') }}
+                                </a>
+                            @endif
+
+                            @if (\Encore\Admin\Facades\Admin::user()->can('can-Play-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                <a href="javascript:void(0)" onclick="profileAction('{{ route('users.toggle-can-play', $user->id) }}', this)"
+                                   style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #e2e8f0; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                   onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                                    <i class="fa {{ $user->can_play == 2 ? 'fa-toggle-on' : 'fa-toggle-off' }}" style="width: 18px; text-align: center; color: {{ $user->can_play == 2 ? '#34d399' : '#ef4444' }};"></i>
+                                    {{ $user->can_play == 2 ? __('Disable Can Play') : __('Enable Can Play') }}
+                                </a>
+                            @endif
+                        </div>
+
+                        {{-- Kick & Change Agency Section --}}
+                        @if (($user->agency_id >= 1) || ($user->family_id >= 1))
+                            <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 0 14px;"></div>
+                            <div style="padding: 8px;">
+                                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                    <a href="javascript:void(0)" onclick="profileActionConfirm('{{ route('users.kick-agency', $user->id) }}', '{{ __('dashboard.chickKickAgency') }}')"
+                                       style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fca5a5; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                       onmouseover="this.style.background='rgba(239,68,68,0.15)'" onmouseout="this.style.background='transparent'">
+                                        <i class="fa fa-sign-out" style="width: 18px; text-align: center; color: #ef4444;"></i>
+                                        {{ __('dashboard.kickAgency') }}
+                                    </a>
+                                @endif
+
+                                @if ($user->family_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('kick-family-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                    <a href="javascript:void(0)" onclick="profileActionConfirm('{{ route('users.kick-family', $user->id) }}', '{{ __('dashboard.chickKick') }}')"
+                                       style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #fca5a5; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                       onmouseover="this.style.background='rgba(239,68,68,0.15)'" onmouseout="this.style.background='transparent'">
+                                        <i class="fa fa-sign-out" style="width: 18px; text-align: center; color: #ef4444;"></i>
+                                        {{ __('dashboard.kickFamily') }}
+                                    </a>
+                                @endif
+
+                                @if ($user->agency_id >= 1 && (\Encore\Admin\Facades\Admin::user()->can('chang-agency-switch-' . $permission) || \Encore\Admin\Facades\Admin::user()->can('*')))
+                                    <a href="javascript:void(0)" onclick="$('#changeAgencyModal').modal('show'); document.getElementById('profileDropdownMenu').classList.remove('show-dropdown');"
+                                       style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; text-decoration: none; color: #93c5fd; font-size: 13px; font-weight: 600; transition: all 0.15s;"
+                                       onmouseover="this.style.background='rgba(59,130,246,0.15)'" onmouseout="this.style.background='transparent'">
+                                        <i class="fa fa-exchange" style="width: 18px; text-align: center; color: #60a5fa;"></i>
+                                        {{ __('dashboard.changeAgency') }}
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <div class="profile-meta-row">
+            <div class="profile-meta-chip" style="cursor: pointer; transition: all 0.2s;" title="Click to copy"
+                 onclick="var t='{{ @$user->original_uuid }}'; navigator.clipboard.writeText(t); var el=this; el.style.background='#ecfdf5'; el.style.borderColor='#a7f3d0'; setTimeout(function(){el.style.background=''; el.style.borderColor='';},1000);">
+                <i class="fas fa-id-badge"></i>
+                @if (@$user->uuid == @$user->original_uuid)
+                    <span>{{ @$user->original_uuid }}</span>
+                @else
+                    <span>{{ @$user->original_uuid }}</span>
+                    <span class="meta-sep">|</span>
+                    <span style="opacity:0.7">{{ @$user->uuid_v3 }}</span>
+                @endif
+                <i class="fas fa-copy" style="font-size: 10px; color: #94a3b8; margin-left: 4px;"></i>
+            </div>
+            <div class="profile-meta-chip">
+                <i class="fas fa-phone"></i>
+                <span>{{ @$user->phone ?? 'N/A' }}</span>
+            </div>
+            <div class="profile-meta-chip">
+                <img src="{{ getImagePath(@$user->country->flag) }}" class="flag-image" alt="flag"
+                     title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
+                <span>{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}</span>
+            </div>
+
+            {{-- Agency --}}
+            @if(@$user->agency)
+                @php
+                    $agencyImg = getImagePath(@$user->agency->img) ?? asset('images/icon-agency.jpg');
+                    if (!isImageExists($agencyImg)) $agencyImg = asset('images/icon-agency.jpg');
+                    $agencyProfileUrl = route('admin.agency.profile', ['id' => @$user->agency->id ?? 0]);
+                @endphp
+                <a href="{{ $agencyProfileUrl }}" class="profile-meta-chip" style="text-decoration: none; background: #eef2ff; border-color: #c7d2fe; cursor: pointer; transition: all 0.2s;"
+                   onmouseover="this.style.borderColor='#6366f1'; this.style.boxShadow='0 2px 8px rgba(99,102,241,0.15)'"
+                   onmouseout="this.style.borderColor='#c7d2fe'; this.style.boxShadow='none'">
+                    <img src="{{ $agencyImg }}" style="width: 22px; height: 22px; border-radius: 6px; object-fit: cover; border: 1px solid #c7d2fe;">
+                    <span style="font-weight: 600; color: #4f46e5;">{{ @$user->agency->name }}</span>
+                    <span style="font-size: 10px; color: #94a3b8; background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">{{ __('agency') }}</span>
+                </a>
+            @endif
+
+            {{-- Shipping Agency --}}
+            @if(@$user->shippingAgency)
+                @php
+                    $shipImg = getImagePath(@$user->shippingAgency->img) ?? asset('images/icon-agency.jpg');
+                    if (!isImageExists($shipImg)) $shipImg = asset('images/icon-agency.jpg');
+                @endphp
+                <div class="profile-meta-chip" style="background: #fff7ed; border-color: #fed7aa;">
+                    <img src="{{ $shipImg }}" style="width: 22px; height: 22px; border-radius: 6px; object-fit: cover; border: 1px solid #fed7aa;">
+                    <span style="font-weight: 600; color: #c2410c;">{{ @$user->shippingAgency->name }}</span>
+                    <span style="font-size: 10px; color: #94a3b8; background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">{{ __('shipping') }}</span>
+                </div>
+            @endif
+        </div>
+
+        @php
+            $user_diamonds = (in_array($user->type_user, [0,3])) ? $user->exchange_diamonds : $user->monthly_diamond_received;
+        @endphp
+
+        <div class="profile-stats-row">
+            <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ number_format((float)(@$user->salary ?? 0), 2) }}</span>
+                <span class="profile-stat-label">{{ __('Balance') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ number_format((float)(@$user_diamonds ?? 0)) }}</span>
+                <span class="profile-stat-label">{{ __('diamonds') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <span class="profile-stat-value">{{ number_format((float)(@$user->di ?? 0)) }}</span>
+                <span class="profile-stat-label">{{ __('coins') }}</span>
+            </div>
+        </div>
+
+        <div class="profile-stats-row">
+            
+            <div class="profile-stat-box">
+                <img src="{{ getImagePath(@$user->senderLevel->img) }}" style="height: 28px;">
+                <span class="profile-stat-label">{{ __('level') }}</span>
+            </div>
+            <div class="profile-stat-box">
+                <img src="{{ getImagePath(@$user->receiverLevel->img) }}" style="height: 28px;">
+                <span class="profile-stat-label">{{ __('Receiver Level') }}</span>
+            </div>
+           
+            <div class="profile-stat-box">
+                 <img src="{{ getImagePath(@$user->chargeLevel->img) }}" style="height: 28px;">
+                <span class="profile-stat-label">{{ __('charge level') }}</span>
+            </div>
+        </div>
+
+        <div class="profile-badges-row">
+            <span class="meta-label">{{__('badges')}}:</span>
+            {!! @$user->userBadge() !!}
+        </div>
+        <div class="profile-badges-row">
+            <span class="meta-label">{{__('type')}}:</span>
+            {!! @$user->userBadgeTop() !!}
         </div>
     </div>
 
 
     @php
-        $activeTab = request('tab', 'salary');
+        $activeTab = request('tab', 'packs');
 
     @endphp
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
 
         <a href="?tab=packs"
-           data-pjax
            class="tab-btn {{ $activeTab === 'packs' ? 'active' : '' }}"
            data-target="packs-tab">
             {{ __('packs') }}
         </a>
 
-        <a href="?tab=vips" data-pjax class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
+        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
            data-target="vips-tab">{{ __('vips') }}</a>
 
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=level" data-pjax class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
+            <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
         @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
+            <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
                data-target="salary-tab">{{ __('prof_reports') }}</a>
         @endif
-        <a href="?tab=charge" data-pjax class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
+        <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
-        <a href="?tab=gift-log" data-pjax class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+        <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
-        <a href="?tab=user-agency" data-pjax class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
+        <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
            data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-        <a href="?tab=user-coins" data-pjax class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
+        <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
            data-target="user-coins-tab">{{ __('User Coins') }}</a>
-        <a href="?tab=badges" data-pjax class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
+        <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
            data-target="badges-tab">{{ __('badges') }}</a>
 
-        <a href="?tab=wallet_logs" data-pjax class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
+        <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
            data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
     </div>
-    <div id="tab-loading" style="
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            /* transform: translate(-50%, -50%); */
-            background: var(--primary-color);
-            color: var(--text-primary-color);
-            z-index: 9999;
-            padding: 30px 40px;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        ">
-        {{ __('Loading...') }}
-    </div>
+    {{-- tab-loading removed - tabs now switch client-side without reload --}}
 
     <!-- packs Section -->
 
     <div class="tab-content {{ $activeTab === 'packs' ? '' : 'd-none' }}" id="packs-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-box-open" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('pack') }}</h4>
+                    </div>
+                    @if($packs && $packs->count())
+                        <span style="background: rgba(255,255,255,0.2); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);">
+                            {{ $packs->total() }} {{ __('total') }}
+                        </span>
+                    @endif
+                </div>
             </div>
-            <div class="box-body">
+            <div class="box-body" style="padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
                 <div class="nav-scroll-container">
-
-                    <ul class="nav nav-pills">
+                    <ul class="nav nav-pills" style="gap: 6px;">
                         @foreach($types as $id => $name)
                             <li class="{{ $type == $id ? 'active' : '' }}">
                                 <a href="{{ request()->fullUrlWithQuery(['type' => $id, 'pack_page' => 1]) }}"
-                                   class="charge_action">
+                                   class="charge_action" style="border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600;">
                                     {{ __($name) }}
                                 </a>
                             </li>
@@ -1255,24 +2382,39 @@
             </div>
 
             <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="table table-bordered table-hover align-middle data-table" id="pack">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('created by') }}</th>
-                            <th>{{ __('get type') }}</th>
-                            <th>{{ __('type') }}</th>
-                            <th>{{ __('img') }}</th>
-                            <th>{{ __('expire') }}</th>
-                            <th>{{ __('receive_type') }}</th>
-                            <th>{{ __('action') }}</th>
-
+                <div class="box-body" style="padding: 0;">
+                    <table class="table table-hover align-middle data-table" id="pack" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                        <thead>
+                        <tr style="background: #eef2ff;">
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-user-edit" style="margin-right: 4px; color: #6366f1;"></i>{{ __('created by') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-layer-group" style="margin-right: 4px; color: #8b5cf6;"></i>{{ __('get type') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-tag" style="margin-right: 4px; color: #a855f7;"></i>{{ __('type') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-image" style="margin-right: 4px; color: #ec4899;"></i>{{ __('img') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-clock" style="margin-right: 4px; color: #ef4444;"></i>{{ __('expire') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-exchange-alt" style="margin-right: 4px; color: #3b82f6;"></i>{{ __('receive_type') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #312e81; border-bottom: 2px solid #c7d2fe;">
+                                <i class="fas fa-cog" style="margin-right: 4px; opacity: 0.5;"></i>{{ __('action') }}
+                            </th>
                         </tr>
                         </thead>
                         @if($packs && $packs->count())
 
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($packs as $index => $pack)
                                 @php
                                     $path = @$pack->ware?->show_img ?? '';
@@ -1296,90 +2438,124 @@
                                     $uid = optional($admin)->id ?? 0;
                                     $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
-                                <tr>
-                                    <td>{{ $packs->firstItem() + $index }}</td>
-                                    <td>
+                                <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f3f4f6;"
+                                    onmouseover="this.style.backgroundColor='#eef2ff'" onmouseout="this.style.backgroundColor='transparent'">
+                                    <td style="padding: 14px 16px; font-weight: 600; color: #6b7280; font-size: 13px;">
+                                        <span style="background: #f3f4f6; padding: 3px 10px; border-radius: 6px;">
+                                            {{ $packs->firstItem() + $index }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
                                         @if ($admin && @$pack->receive_type == 'wares-dash-dedicate')
                                             <a href="{{ $url ?? '#' }}" target="_blank"
-                                               style="display: inline-flex; align-items: center; text-decoration: none;">
+                                               style="display: inline-flex; align-items: center; text-decoration: none; gap: 8px; background: #f8fafc; padding: 4px 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
                                                 <img src="{{ $image }}" width="30" height="30"
-                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                <span>{{ $name }} ({{ $uid }})</span>
+                                                     style="object-fit: cover; border-radius: 50%; border: 2px solid #e0e7ff;">
+                                                <span style="font-weight: 600; color: #4f46e5; font-size: 12px;">{{ $name }} <small style="color:#94a3b8;">(id:{{ $uid }})</small></span>
                                             </a>
                                         @else
-
+                                            <span style="color: #cbd5e1; font-size: 12px;">—</span>
                                         @endif
-
                                     </td>
-                                    <td>{{ $pack->getTypeGet() }}</td>
-
-                                    <td>{{ $pack->getType() }}</td>
-                                    <td>
-                                        <img src="{{ getImagePath(@$path) }}" width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-
+                                    <td style="padding: 14px 16px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; color: #16a34a; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                            <i class="fas fa-inbox" style="font-size: 10px;"></i>
+                                            {{ $pack->getTypeGet() }}
+                                        </span>
                                     </td>
-                                    <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :$pack->days  }}</td>
-                                    {{-- <td>{{ $pack->receive_type }}</td> --}}
-                                    <td>
-                                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                                            {{-- Always show type --}}
-                                            <span style="font-weight: 600; color: #444;">
-                                                    {{ @$pack->receive_type ?? '' }}
-                                                </span>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #faf5ff; color: #7c3aed; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                            <i class="fas fa-cube" style="font-size: 10px;"></i>
+                                            {{ $pack->getType() }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <img src="{{ getImagePath(@$path) }}" width="38" height="38"
+                                             style="object-fit: cover; border-radius: 10px; border: 2px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        @php
+                                            $expireDisplay = (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') : $pack->days;
+                                            $isExpired = (!empty($pack->expire) && $pack->expire !== '0' && \Carbon\Carbon::parse($pack->expire)->isPast());
+                                        @endphp
+                                        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+                                            {{ $isExpired ? 'background: #fef2f2; color: #dc2626;' : 'background: #ecfdf5; color: #059669;' }}">
+                                            <i class="fas {{ $isExpired ? 'fa-times-circle' : 'fa-check-circle' }}" style="font-size: 11px;"></i>
+                                            {{ $expireDisplay }}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                                            @php
+                                                $rType = @$pack->receive_type ?? '';
+                                                $typeBg = '#eef2ff'; $typeColor = '#4f46e5'; $typeIcon = 'fa-tag';
+                                                if (Str::contains($rType, 'send')) { $typeBg = '#eff6ff'; $typeColor = '#2563eb'; $typeIcon = 'fa-paper-plane'; }
+                                                elseif ($rType === 'wares-dash-dedicate') { $typeBg = '#f0fdf4'; $typeColor = '#16a34a'; $typeIcon = 'fa-user-shield'; }
+                                                elseif ($rType === 'purchase') { $typeBg = '#fef3c7'; $typeColor = '#d97706'; $typeIcon = 'fa-shopping-cart'; }
+                                            @endphp
+                                            <span style="display: inline-flex; align-items: center; gap: 5px; background: {{ $typeBg }}; color: {{ $typeColor }}; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; width: fit-content;">
+                                                <i class="fas {{ $typeIcon }}" style="font-size: 10px;"></i>
+                                                {{ $rType }}
+                                            </span>
 
-                                            {{-- If receive_type contains "send", show sender below --}}
                                             @if(@$pack->sender && Str::contains(@$pack->receive_type, 'send'))
                                                 @php
                                                     $name = @$pack->sender->name ?? 'Unknown User';
                                                     $showUrl = url("admin/users/" . @$pack->sender->id);
                                                 @endphp
-
                                                 <a href="{{ $showUrl }}"
-                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
-                                                        <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
-                                                            sender:
-                                                        </span>
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
-                                                            {{ $name }}
-                                                        </span>
+                                                   style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: #f0f9ff; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; transition: all 0.2s;">
+                                                    <i class="fas fa-user" style="font-size: 10px; color: #3b82f6;"></i>
+                                                    <span style="font-size: 11px; color: #64748b; font-weight: 600;">sender:</span>
+                                                    <span style="font-size: 12px; color: #2563eb; font-weight: 700;">{{ $name }}</span>
                                                 </a>
                                             @elseif($pack->receive_type == 'wares-dash-dedicate' && $pack->admin)
                                                 @php
                                                     $name = @$pack->admin->name ?? 'Unknown User';
                                                     $showUrl = url("admin/auth/users/" . @$pack->admin->id);
                                                 @endphp
-
                                                 <a href="{{ $showUrl }}"
-                                                   style="text-decoration: none; color: #28a745; display: inline-block;">
-                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
-                                                        admin:
-                                                    </span>
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
-                                                        {{ $name }}
-                                                    </span>
+                                                   style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: #f0fdf4; padding: 4px 10px; border-radius: 6px; border: 1px solid #bbf7d0; transition: all 0.2s;">
+                                                    <i class="fas fa-user-shield" style="font-size: 10px; color: #16a34a;"></i>
+                                                    <span style="font-size: 11px; color: #64748b; font-weight: 600;">admin:</span>
+                                                    <span style="font-size: 12px; color: #16a34a; font-weight: 700;">{{ $name }}</span>
                                                 </a>
-
                                             @endif
                                         </div>
                                     </td>
 
-
-                                    <td>
-                                        <div class="d-flex">
-                                            <button class="btn btn-info w-100 me-3 edit_item_model_btn"
-                                                    data-id="{{ @$pack->id }}">
-                                                {{ __('dashboard.free') }}
+                                    <td style="padding: 14px 16px;">
+                                        <div style="display: inline-flex; gap: 6px; align-items: center;">
+                                            <button class="btn btn-sm edit_item_model_btn"
+                                                    data-id="{{ @$pack->id }}"
+                                                    style="background: linear-gradient(135deg, #eef2ff, #e0e7ff); color: #4f46e5; border: 1px solid #c7d2fe; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;"
+                                                    onmouseover="this.style.background='#4f46e5'; this.style.color='#fff'; this.style.borderColor='#4f46e5'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(79,70,229,0.3)'"
+                                                    onmouseout="this.style.background='linear-gradient(135deg, #eef2ff, #e0e7ff)'; this.style.color='#4f46e5'; this.style.borderColor='#c7d2fe'; this.style.transform='none'; this.style.boxShadow='none'">
+                                                <i class="fas fa-clock" style="font-size: 11px;"></i> {{ __('dashboard.free') }}
                                             </button>
-                                            <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
-                                                {{ __('dashboard.delete') }}
+                                            <button class="btn btn-sm delete-btn" data-id="{{ @$pack->id }}"
+                                                    style="background: linear-gradient(135deg, #fef2f2, #fee2e2); color: #dc2626; border: 1px solid #fecaca; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;"
+                                                    onmouseover="this.style.background='#dc2626'; this.style.color='#fff'; this.style.borderColor='#dc2626'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(220,38,38,0.3)'"
+                                                    onmouseout="this.style.background='linear-gradient(135deg, #fef2f2, #fee2e2)'; this.style.color='#dc2626'; this.style.borderColor='#fecaca'; this.style.transform='none'; this.style.boxShadow='none'">
+                                                <i class="fas fa-trash-alt" style="font-size: 11px;"></i> {{ __('dashboard.delete') }}
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
+                            </tbody>
+                        @else
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="padding: 48px 24px; text-align: center; border: none;">
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                            <div style="width: 64px; height: 64px; background: #eef2ff; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-box-open" style="font-size: 28px; color: #6366f1; opacity: 0.5;"></i>
+                                            </div>
+                                            <p style="margin: 0; color: #9ca3af; font-size: 14px; font-weight: 500;">{{ __('No packs found') }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         @endif
 
@@ -1387,14 +2563,16 @@
                 </div>
             </div>
 
-            <div class="pagination-wrapper">
-                {{ $packs?->appends([
-                     'type'        => $type,
-                    'vip_page' => $userVips?->currentPage(),
-                    'salary_page' => $salaries?->currentPage(),
-                    'gift_page' => $giftSLogs?->currentPage(),
-                ])->links('vendor.pagination.default') }}
-            </div>
+            @if($packs && $packs->count())
+                <div class="pagination-wrapper" style="padding: 16px 24px; border-top: 1px solid #f3f4f6;">
+                    {{ $packs?->appends([
+                         'type'        => $type,
+                        'vip_page' => $userVips?->currentPage(),
+                        'salary_page' => $salaries?->currentPage(),
+                        'gift_page' => $giftSLogs?->currentPage(),
+                    ])->links('vendor.pagination.default') }}
+                </div>
+            @endif
 
 
         </div>
@@ -1404,47 +2582,103 @@
     <!-- vips Section -->
 
     <div class="tab-content {{ $activeTab == 'vips' ? '' : 'd-none' }}" id="vips-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-crown" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('vips') }}</h4>
+                    </div>
+                    @if($userVips && $userVips->count())
+                        <span style="background: rgba(255,255,255,0.25); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);">
+                            {{ $userVips->total() }} {{ __('total') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
             <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="table table-bordered table-hover align-middle data-table" id="vip">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('level') }}</th>
-                            <th>{{ __('expire') }}</th>
-                            <th>{{ __('qty') }}</th>
-                            <th>{{ __('total Price') }}</th>
-                            <th>{{ __('receive_type') }}</th>
-                            <th>{{ __('action') }}</th>
-
+                <div class="box-body" style="padding: 0;">
+                    <table class="table table-hover align-middle data-table" id="vip" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                        <thead>
+                        <tr style="background: #fffbeb;">
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e; border-bottom: 2px solid #fde68a;">
+                                <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e; border-bottom: 2px solid #fde68a;">
+                                <i class="fas fa-star" style="margin-right: 4px; color: #f59e0b;"></i>{{ __('level') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e; border-bottom: 2px solid #fde68a;">
+                                <i class="fas fa-clock" style="margin-right: 4px; color: #ef4444;"></i>{{ __('expire') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e; border-bottom: 2px solid #fde68a;">
+                                <i class="fas fa-cubes" style="margin-right: 4px; color: #8b5cf6;"></i>{{ __('qty') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e; border-bottom: 2px solid #fde68a;">
+                                <i class="fas fa-coins" style="margin-right: 4px; color: #10b981;"></i>{{ __('total Price') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e; border-bottom: 2px solid #fde68a;">
+                                <i class="fas fa-exchange-alt" style="margin-right: 4px; color: #3b82f6;"></i>{{ __('receive_type') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #92400e; border-bottom: 2px solid #fde68a;">
+                                <i class="fas fa-cog" style="margin-right: 4px; opacity: 0.5;"></i>{{ __('action') }}
+                            </th>
                         </tr>
                         </thead>
                         @if($userVips && $userVips->count())
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($userVips as $index => $userVip)
-                                <tr>
-                                    <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
-                                    <td>{{ $userVip->level }}</td>
-                                    <td>
-                                        {{
-                                            (!empty($userVip->expire) && $userVip->expire != '0')
-                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s')
-                                                : $userVip->days
-                                        }}
+                                <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f3f4f6;"
+                                    onmouseover="this.style.backgroundColor='#fffbeb'" onmouseout="this.style.backgroundColor='transparent'">
+                                    <td style="padding: 14px 16px; font-weight: 600; color: #6b7280; font-size: 13px;">
+                                        <span style="background: #f3f4f6; padding: 3px 10px; border-radius: 6px;">
+                                            {{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}
+                                        </span>
                                     </td>
-                                    <td>{{ @$userVip->qty ?? 0 }}</td>
-                                    <td>{{ @$userVip->total ?? 0 }}</td>
-                                    <td>
-                                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                                            {{-- Always show type --}}
-                                            <span style="font-weight: 600; color: #444;">
-                                                    {{ @$userVip->receive_type ?? '' }}
-                                                </span>
+                                    <td style="padding: 14px 16px;">
+                                        <div style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 5px 14px; border-radius: 20px; font-weight: 700; color: #92400e; font-size: 13px;">
+                                            <i class="fas fa-crown" style="font-size: 11px; color: #f59e0b;"></i>
+                                            {{ $userVip->level }}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        @php
+                                            $expireDisplay = (!empty($userVip->expire) && $userVip->expire != '0')
+                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s')
+                                                : $userVip->days;
+                                            $isExpired = (!empty($userVip->expire) && $userVip->expire != '0' && \Carbon\Carbon::parse($userVip->expire)->isPast());
+                                        @endphp
+                                        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+                                            {{ $isExpired ? 'background: #fef2f2; color: #dc2626;' : 'background: #ecfdf5; color: #059669;' }}">
+                                            <i class="fas {{ $isExpired ? 'fa-times-circle' : 'fa-check-circle' }}" style="font-size: 11px;"></i>
+                                            {{ $expireDisplay }}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="font-weight: 700; color: #374151; font-size: 14px;">{{ @$userVip->qty ?? 0 }}</span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <div style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: #059669; font-size: 14px;">
+                                            <i class="fas fa-coins" style="font-size: 11px; color: #f59e0b;"></i>
+                                            {{ @$userVip->total ?? 0 }}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                                            {{-- Receive type badge --}}
+                                            @php
+                                                $rType = @$userVip->receive_type ?? '';
+                                                $typeBg = '#eef2ff'; $typeColor = '#4f46e5'; $typeIcon = 'fa-tag';
+                                                if ($rType === 'send-vip') { $typeBg = '#eff6ff'; $typeColor = '#2563eb'; $typeIcon = 'fa-paper-plane'; }
+                                                elseif ($rType === 'admin-dedicate') { $typeBg = '#f0fdf4'; $typeColor = '#16a34a'; $typeIcon = 'fa-user-shield'; }
+                                                elseif ($rType === 'purchase') { $typeBg = '#fef3c7'; $typeColor = '#d97706'; $typeIcon = 'fa-shopping-cart'; }
+                                            @endphp
+                                            <span style="display: inline-flex; align-items: center; gap: 5px; background: {{ $typeBg }}; color: {{ $typeColor }}; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; width: fit-content;">
+                                                <i class="fas {{ $typeIcon }}" style="font-size: 10px;"></i>
+                                                {{ $rType }}
+                                            </span>
 
                                             {{-- If send-vip, show sender below --}}
                                             @if(@$userVip->receive_type === 'send-vip' && @$userVip->sender)
@@ -1452,16 +2686,11 @@
                                                     $name = @$userVip->sender->name ?? 'Unknown User';
                                                     $showUrl = url("admin/users/" . @$userVip->sender->id);
                                                 @endphp
-
                                                 <a href="{{ $showUrl }}"
-                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
-                                                        <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
-                                                            sender:
-                                                        </span>
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
-                                                            {{ $name }}
-                                                        </span>
+                                                   style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: #f0f9ff; padding: 4px 10px; border-radius: 6px; border: 1px solid #bfdbfe; transition: all 0.2s;">
+                                                    <i class="fas fa-user" style="font-size: 10px; color: #3b82f6;"></i>
+                                                    <span style="font-size: 11px; color: #64748b; font-weight: 600;">sender:</span>
+                                                    <span style="font-size: 12px; color: #2563eb; font-weight: 700;">{{ $name }}</span>
                                                 </a>
                                             @endif
                                             @if(@$userVip->receive_type === 'admin-dedicate' && @$userVip->admin)
@@ -1469,38 +2698,46 @@
                                                     $name = @$userVip->admin->name ?? 'Unknown Admin';
                                                     $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
                                                 @endphp
-
                                                 <a href="{{ $showUrl }}"
-                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
-                                                        <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
-                                                            sender:
-                                                        </span>
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
-                                                            {{ $name }}
-                                                        </span>
+                                                   style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: #f0fdf4; padding: 4px 10px; border-radius: 6px; border: 1px solid #bbf7d0; transition: all 0.2s;">
+                                                    <i class="fas fa-user-shield" style="font-size: 10px; color: #16a34a;"></i>
+                                                    <span style="font-size: 11px; color: #64748b; font-weight: 600;">admin:</span>
+                                                    <span style="font-size: 12px; color: #16a34a; font-weight: 700;">{{ $name }}</span>
                                                 </a>
                                             @endif
                                         </div>
                                     </td>
 
-                                    <td>
-                                        <div class="d-flex">
-
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
-                                                {{ __('dashboard.delete') }}
-                                            </button>
-                                        </div>
+                                    <td style="padding: 14px 16px;">
+                                        <button class="btn btn-sm delete-vip-btn" data-id="{{ @$userVip->id }}"
+                                                style="background: linear-gradient(135deg, #fef2f2, #fee2e2); color: #dc2626; border: 1px solid #fecaca; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;"
+                                                onmouseover="this.style.background='#dc2626'; this.style.color='#fff'; this.style.borderColor='#dc2626'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(220,38,38,0.3)'"
+                                                onmouseout="this.style.background='linear-gradient(135deg, #fef2f2, #fee2e2)'; this.style.color='#dc2626'; this.style.borderColor='#fecaca'; this.style.transform='none'; this.style.boxShadow='none'">
+                                            <i class="fas fa-trash-alt" style="font-size: 11px;"></i> {{ __('dashboard.delete') }}
+                                        </button>
                                     </td>
 
                                 </tr>
                             @endforeach
                             </tbody>
+                        @else
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" style="padding: 48px 24px; text-align: center; border: none;">
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                            <div style="width: 64px; height: 64px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-crown" style="font-size: 28px; color: #f59e0b; opacity: 0.5;"></i>
+                                            </div>
+                                            <p style="margin: 0; color: #9ca3af; font-size: 14px; font-weight: 500;">{{ __('No VIP records found') }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
                         @endif
                     </table>
 
-                    @if($userVips)
-                        <div class="pagination-container">
+                    @if($userVips && $userVips->count())
+                        <div class="pagination-container" style="padding: 16px 24px; border-top: 1px solid #f3f4f6;">
                             {{ $userVips->appends([
                                 'tab' => 'vips',
                                 'vip_page' => $userVips->currentPage(),
@@ -1515,24 +2752,38 @@
     </div>
 
     <div class="tab-content" id="salary-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('user wallet') }}</h4>
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-wallet" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('user wallet') }}</h4>
+                    </div>
+                    @if($salaries && $salaries->count())
+                        <span style="background: rgba(255,255,255,0.2); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);">
+                            {{ $salaries->total() }} {{ __('total') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
             <div class="box-body p-3">
-                    <div class="card mb-4">
+                    <div class="card mb-4" style="border: 1px solid #d1fae5; border-radius: 10px; box-shadow: none;">
                         <div class="card-body">
                             <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
                                   class="form-horizontal" pjax-container="">
                                 <input type="hidden" name="tab" value="salary">
-                                <div class="filter-container">
+                                <div class="filter-container" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
                                     <div class="filter-content">
                                         <div class="filter-group">
-                                            <label class="form-label">{{ __('year') }}</label>
+                                            <label class="form-label" style="font-weight: 600; font-size: 12px; color: #065f46;">
+                                                <i class="fas fa-calendar-alt" style="margin-right: 4px; color: #10b981;"></i>{{ __('year') }}
+                                            </label>
                                             <div class="input-group input-group-sm">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-calendar"></i>
+                                                <div class="input-group-addon" style="background: #ecfdf5; border-color: #a7f3d0;">
+                                                    <i class="fa fa-calendar" style="color: #10b981;"></i>
                                                 </div>
                                                 <select class="form-control form-select year" name="year">
                                                     <option value="">{{ __('Select Year') }}</option>
@@ -1543,10 +2794,12 @@
                                             </div>
                                         </div>
                                         <div class="filter-group">
-                                            <label class="form-label">{{ __('month') }}</label>
+                                            <label class="form-label" style="font-weight: 600; font-size: 12px; color: #065f46;">
+                                                <i class="fas fa-calendar-day" style="margin-right: 4px; color: #10b981;"></i>{{ __('month') }}
+                                            </label>
                                             <div class="input-group input-group-sm">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-calendar"></i>
+                                                <div class="input-group-addon" style="background: #ecfdf5; border-color: #a7f3d0;">
+                                                    <i class="fa fa-calendar" style="color: #10b981;"></i>
                                                 </div>
                                                 <select class="form-control form-select month" name="month">
                                                     <option value="">{{ __('Select Month') }}</option>
@@ -1557,12 +2810,14 @@
                                             </div>
                                         </div>
                                         <div class="filter-actions">
-                                            <button class="btn btn-info submit btn-sm">
-                                                <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
+                                            <button class="btn btn-sm" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;"
+                                                    onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(16,185,129,0.3)'"
+                                                    onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+                                                <i class="fa fa-search"></i> {{__('Search')}}
                                             </button>
                                             <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
-                                               class="btn btn-default btn-sm">
-                                                <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
+                                               class="btn btn-default btn-sm" style="border-radius: 8px; padding: 8px 18px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                                <i class="fa fa-undo"></i> {{__('Reset')}}
                                             </a>
                                         </div>
                                     </div>
@@ -1572,111 +2827,160 @@
                     </div>
 
                 <div class="table-responsive">
-                    <div class="box-body ">
-                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
-                            <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('agency') }}</th>
-                                <th>{{ __('salary') }}</th>
-                                <th>{{ __('Withdraw') }}</th>
-                                <th>{{ __('net salary') }}</th>
-                                <th>{{ __('days') }}</th>
-                                <th>{{ __('hours') }}</th>
-                                <th>{{ __('Moments') }}</th>
-                                <th>{{ __('Reels') }}</th>
-                                <th>{{ __('diamonds') }}</th>
-                                <th>{{ __('date') }}</th>
-
+                    <div class="box-body" style="padding: 0;">
+                        <table class="table table-hover align-middle data-table" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                            <thead>
+                            <tr style="background: #ecfdf5;">
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-building" style="margin-right: 4px; color: #10b981;"></i>{{ __('agency') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-money-bill-wave" style="margin-right: 4px; color: #059669;"></i>{{ __('salary') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-hand-holding-usd" style="margin-right: 4px; color: #ef4444;"></i>{{ __('Withdraw') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-wallet" style="margin-right: 4px; color: #8b5cf6;"></i>{{ __('net salary') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-calendar-check" style="margin-right: 4px; color: #3b82f6;"></i>{{ __('days') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-clock" style="margin-right: 4px; color: #f59e0b;"></i>{{ __('hours') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-camera" style="margin-right: 4px; color: #ec4899;"></i>{{ __('Moments') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-film" style="margin-right: 4px; color: #f43f5e;"></i>{{ __('Reels') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-gem" style="margin-right: 4px; color: #6366f1;"></i>{{ __('diamonds') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #065f46; border-bottom: 2px solid #a7f3d0;">
+                                    <i class="fas fa-calendar" style="margin-right: 4px; color: #64748b;"></i>{{ __('date') }}
+                                </th>
                             </tr>
                             </thead>
                             @if($salaries && $salaries->count())
-                                <tbody style="color: rgb(208, 115, 43);">
+                                <tbody>
                                 @foreach($salaries as $index => $salary)
-
                                     @php
                                         $agency = $salary->agency;
                                         $name = $agency->name ?? '';
-
                                         $path = @$agency->img;
                                         $defaultImage = asset("images/icon-agency.jpg");
                                         $url = getImagePath($path) ?? $defaultImage;
-
-                                        if (!isImageExists($url)) {
-                                            $url = $defaultImage;
-                                        }
-
+                                        if (!isImageExists($url)) { $url = $defaultImage; }
                                         $image = handleShowImageWithTypes($user->id, $url, 40, 40);
                                         $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
-
                                         $extras = json_decode($salary->extras, true);
                                         $moment = $extras['moment'] ?? [];
                                         $reel = $extras['reel'] ?? [];
-
                                         $momentUpload = $moment['upload'] ?? '0/0';
                                         $momentLikes = $moment['likes'] ?? '0/0';
                                         $momentComments = $moment['comments'] ?? '0/0';
-
                                         $reelUpload = $reel['upload'] ?? '0/0';
                                         $reelLikes = $reel['likes'] ?? '0/0';
                                         $reelComments = $reel['comments'] ?? '0/0';
-
-
                                     @endphp
-
-                                    <tr>
-                                        <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
-                                        <td>
-                                            <a href="{{ $profileUrl }}" style="text-decoration: none; color: inherit;">
-                                                <div style="display: flex; align-items: center; gap: 10px;">
-                                                    {!! $image !!}
-                                                    <div style="display: flex; flex-direction: column;">
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                        <span
-                                                            style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
-                                                    </div>
+                                    <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f3f4f6;"
+                                        onmouseover="this.style.backgroundColor='#ecfdf5'" onmouseout="this.style.backgroundColor='transparent'">
+                                        <td style="padding: 14px 16px;">
+                                            <span style="background: #f3f4f6; padding: 3px 10px; border-radius: 6px; font-weight: 600; color: #6b7280; font-size: 13px;">
+                                                {{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <a href="{{ $profileUrl }}" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; background: #f8fafc; padding: 4px 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                                {!! $image !!}
+                                                <div style="display: flex; flex-direction: column;">
+                                                    <span style="font-weight: 600; color: #059669; font-size: 13px;">{{ $name }}</span>
+                                                    <small style="color: #94a3b8; font-size: 11px;">ID: {{ @$agency->id ?? 0 }}</small>
                                                 </div>
                                             </a>
                                         </td>
-
-
-                                        <td>{{truncateAndTrim($salary->sallary)}}</td>
-                                        <td>{{ $salary->cut_amount}}</td>
-                                        <td>{{ truncateAndTrim($salary->sallary - $salary->cut_amount) }}</td>
-                                        <td>{{ $salary->days }}</td>
-                                        <td>{{ $salary->hours }}</td>
-                                        <td>
-                                            <div style="line-height: 1.6;">
-                                                <ul style="margin-left: 8px;">
-                                                    <li><b>{{ __('Uploads:') }}</b> {{ $momentUpload }}</li>
-                                                    <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
-                                                    <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
-                                                </ul>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 13px;">
+                                                <i class="fas fa-dollar-sign" style="font-size: 10px;"></i>
+                                                {{ number_format(truncateAndTrim($salary->sallary)) }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef2f2; color: #dc2626; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 13px;">
+                                                <i class="fas fa-minus-circle" style="font-size: 10px;"></i>
+                                                {{ number_format($salary->cut_amount) }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; color: #16a34a; padding: 5px 14px; border-radius: 20px; font-weight: 800; font-size: 13px; border: 1px solid #bbf7d0;">
+                                                <i class="fas fa-check-circle" style="font-size: 11px;"></i>
+                                                {{ number_format(truncateAndTrim($salary->sallary - $salary->cut_amount)) }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="font-weight: 700; color: #374151; font-size: 14px;">{{ $salary->days }}</span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: #d97706; font-size: 13px;">
+                                                <i class="fas fa-hourglass-half" style="font-size: 10px;"></i>
+                                                {{ $salary->hours }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 12px;">
+                                            <div style="background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 8px; padding: 8px 10px; font-size: 11px; line-height: 1.8; min-width: 90px;">
+                                                <div><i class="fas fa-upload" style="width: 14px; color: #ec4899;"></i> <b>{{ $momentUpload }}</b></div>
+                                                <div><i class="fas fa-heart" style="width: 14px; color: #f43f5e;"></i> <b>{{ $momentLikes }}</b></div>
+                                                <div><i class="fas fa-comment" style="width: 14px; color: #a855f7;"></i> <b>{{ $momentComments }}</b></div>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div style="line-height: 1.6;">
-                                                <ul style="margin-left: 8px;">
-                                                    <li><b>{{ __('Uploads:') }}</b> {{ $reelUpload }}</li>
-                                                    <li><b>{{ __('Likes:') }}</b> {{ $reelLikes }}</li>
-                                                    <li><b>{{ __('Comments:') }}</b> {{ $reelComments }}</li>
-                                                </ul>
+                                        <td style="padding: 14px 12px;">
+                                            <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 8px 10px; font-size: 11px; line-height: 1.8; min-width: 90px;">
+                                                <div><i class="fas fa-upload" style="width: 14px; color: #f43f5e;"></i> <b>{{ $reelUpload }}</b></div>
+                                                <div><i class="fas fa-heart" style="width: 14px; color: #e11d48;"></i> <b>{{ $reelLikes }}</b></div>
+                                                <div><i class="fas fa-comment" style="width: 14px; color: #be123c;"></i> <b>{{ $reelComments }}</b></div>
                                             </div>
                                         </td>
-                                        <td>{{ $salary->achieved_diamond }}</td>
-                                        <td>{{ $salary->month .'/'. $salary->year }}</td>
+                                        <td style="padding: 14px 16px;">
+                                            <div style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: #6366f1; font-size: 14px;">
+                                                <i class="fas fa-gem" style="font-size: 11px; color: #818cf8;"></i>
+                                                {{ $salary->achieved_diamond }}
+                                            </div>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                                <i class="fas fa-calendar-alt" style="font-size: 10px; color: #94a3b8;"></i>
+                                                {{ $salary->month .'/'. $salary->year }}
+                                            </span>
+                                        </td>
                                     </tr>
                                 @endforeach
+                                </tbody>
+                            @else
+                                <tbody>
+                                    <tr>
+                                        <td colspan="11" style="padding: 48px 24px; text-align: center; border: none;">
+                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                                <div style="width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-wallet" style="font-size: 28px; color: #10b981; opacity: 0.5;"></i>
+                                                </div>
+                                                <p style="margin: 0; color: #9ca3af; font-size: 14px; font-weight: 500;">{{ __('No salary records found') }}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             @endif
                         </table>
 
-                        @if($salaries)
-                            <div class="pagination-container">
+                        @if($salaries && $salaries->count())
+                            <div class="pagination-container" style="padding: 16px 24px; border-top: 1px solid #f3f4f6;">
                                 {{ $salaries->appends([
                                     'tab' => 'salary',
-                                    'year' => request('year'),  // preserve filters
+                                    'year' => request('year'),
                                     'month' => request('month'),
                                 ])->links('vendor.pagination.bootstrap-4') }}
                             </div>
@@ -1689,36 +2993,71 @@
     </div>
 
     <div class="tab-content" id="level-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title text-left">{{ __('level') }}</h4>
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                        <i class="fas fa-layer-group" style="font-size: 18px; color: #fff;"></i>
+                    </div>
+                    <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('level') }}</h4>
+                </div>
             </div>
             <div class="box-body p-3">
-                <div class="card mb-4">
-                    <div class="card-body">
+                <div class="card mb-4" style="border: 1px solid #e0e7ff; border-radius: 12px; box-shadow: none; overflow: hidden;">
+                    <div class="card-body" style="padding: 28px;">
                         <form action="{{ url('/admin/edit-level') }}" id="user_level_update_form" method="POST"
-                              enctype="multipart/form-data" class="level-form">
+                              enctype="multipart/form-data" class="level-form" style="padding: 0;">
                             @csrf
-                            <div class="row" style="justify-content:space-evenly">
-                                <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
-                                <div class=" col-lg-6 form-Roles mb-3">
-                                    <label class="form-label level-label"> {{ __('Sender Level') }}</label>
-                                    <input type="number" min="0" value="{{ $user->total_sender_level }}"
-                                           class="form-control "
-                                           id="total_sender_level" name="total_sender_level" required>
+                            <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
+                            <div class="row" style="gap: 0;">
+                                <div class="col-lg-6 mb-4">
+                                    <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 12px; padding: 20px; transition: all 0.2s;"
+                                         onmouseover="this.style.borderColor='#6366f1'; this.style.boxShadow='0 4px 16px rgba(99,102,241,0.15)'"
+                                         onmouseout="this.style.borderColor='#c7d2fe'; this.style.boxShadow='none'">
+                                        <label class="form-label" style="font-weight: 700; font-size: 13px; color: #4338ca; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                            <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #6366f1, #4f46e5); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-arrow-up" style="color: #fff; font-size: 14px;"></i>
+                                            </div>
+                                            {{ __('Sender Level') }}
+                                        </label>
+                                        <input type="number" min="0" value="{{ $user->total_sender_level }}"
+                                               class="form-control" id="total_sender_level" name="total_sender_level" required
+                                               style="border: 2px solid #c7d2fe; border-radius: 10px; padding: 12px 16px; font-size: 16px; font-weight: 700; color: #4338ca; background: #fff; transition: all 0.2s;"
+                                               onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.15)'"
+                                               onblur="this.style.borderColor='#c7d2fe'; this.style.boxShadow='none'">
+                                    </div>
                                 </div>
 
-                                <div class=" col-lg-6 form-Roles mb-3">
-                                    <label class="form-label level-label"> {{ __('Received Level') }}</label>
-                                    <input type="number" min="0" value="{{ $user->total_received_level }}"
-                                           class="form-control "
-                                           id="total_received_level" name="total_received_level" required>
+                                <div class="col-lg-6 mb-4">
+                                    <div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 20px; transition: all 0.2s;"
+                                         onmouseover="this.style.borderColor='#8b5cf6'; this.style.boxShadow='0 4px 16px rgba(139,92,246,0.15)'"
+                                         onmouseout="this.style.borderColor='#e9d5ff'; this.style.boxShadow='none'">
+                                        <label class="form-label" style="font-weight: 700; font-size: 13px; color: #6d28d9; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                            <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-arrow-down" style="color: #fff; font-size: 14px;"></i>
+                                            </div>
+                                            {{ __('Received Level') }}
+                                        </label>
+                                        <input type="number" min="0" value="{{ $user->total_received_level }}"
+                                               class="form-control" id="total_received_level" name="total_received_level" required
+                                               style="border: 2px solid #e9d5ff; border-radius: 10px; padding: 12px 16px; font-size: 16px; font-weight: 700; color: #6d28d9; background: #fff; transition: all 0.2s;"
+                                               onfocus="this.style.borderColor='#8b5cf6'; this.style.boxShadow='0 0 0 3px rgba(139,92,246,0.15)'"
+                                               onblur="this.style.borderColor='#e9d5ff'; this.style.boxShadow='none'">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" type="button"
-                                        data-bs-dismiss="modal">{{ __('cancel') }} </button>
-                                <button class="btn btn-primary " type="submit">{{ __('save') }} </button>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid #f1f5f9; margin-top: 8px;">
+                                <button class="btn btn-sm" type="button" data-bs-dismiss="modal"
+                                        style="background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 24px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;"
+                                        onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
+                                    <i class="fas fa-times" style="font-size: 11px;"></i> {{ __('cancel') }}
+                                </button>
+                                <button class="btn btn-sm" type="submit"
+                                        style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(99,102,241,0.3);"
+                                        onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 20px rgba(99,102,241,0.4)'"
+                                        onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(99,102,241,0.3)'">
+                                    <i class="fas fa-save" style="font-size: 12px;"></i> {{ __('save') }}
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -1728,240 +3067,319 @@
     </div>
 
     <div class="tab-content {{ $activeTab == 'wallet_logs' ? 'active show' : 'd-none' }}" id="wallet-logs-tab">
-        <div class="box-body">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">
-                    {{ __('wallet-transactions') }}
-                </h4>
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-receipt" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('wallet-transactions') }}</h4>
+                    </div>
+                    @if($walletLogs && $walletLogs->count())
+                        <span style="background: rgba(255,255,255,0.2); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);">
+                            {{ $walletLogs->total() }} {{ __('total') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
-
-            <div class="card">
-
-                <div class="card mb-4">
+            <div class="box-body p-3">
+                <div class="card mb-4" style="border: 1px solid #ccfbf1; border-radius: 10px; box-shadow: none;">
                     <div class="card-body">
                         <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
                               class="form-horizontal gift-log-form" pjax-container="">
                             <input type="hidden" name="tab" value="wallet_logs">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="box-body">
-                                        <div class="fields-group">
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">{{__("year")}}</label>
-                                                <div class="col-sm-8">
-                                                    <div class="input-group input-group-sm">
-                                                        <div class="input-group-addon">
-                                                            <i class="fa fa-calendar"></i>
-                                                        </div>
-                                                        <select class="form-control year wallet-filter-select" name="year">
-                                                            <option value="">{{ __('Select Year') }}</option>
-                                                            @for($y = now()->year; $y >= now()->year - 5; $y--)
-                                                                <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>{{ $y }}</option>
-                                                            @endfor
-                                                        </select>
-                                                    </div>
-                                                </div>
+                            <div class="filter-container" style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 10px;">
+                                <div class="filter-content">
+                                    <div class="filter-group">
+                                        <label class="form-label" style="font-weight: 600; font-size: 12px; color: #134e4a;">
+                                            <i class="fas fa-calendar-alt" style="margin-right: 4px; color: #14b8a6;"></i>{{__("year")}}
+                                        </label>
+                                        <div class="input-group input-group-sm">
+                                            <div class="input-group-addon" style="background: #f0fdfa; border-color: #99f6e4;">
+                                                <i class="fa fa-calendar" style="color: #14b8a6;"></i>
                                             </div>
-
+                                            <select class="form-control year wallet-filter-select" name="year">
+                                                <option value="">{{ __('Select Year') }}</option>
+                                                @for($y = now()->year; $y >= now()->year - 5; $y--)
+                                                    <option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="box-body">
-                                        <div class="fields-group">
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">{{__('month')}}</label>
-                                                <div class="col-sm-8">
-                                                    <div class="input-group input-group-sm">
-                                                        <div class="input-group-addon">
-                                                            <i class="fa fa-calendar"></i>
-                                                        </div>
-                                                        <select class="form-control month wallet-filter-select" name="month">
-                                                            <option value="">{{ __('Select Month') }}</option>
-                                                            @for($m = 1; $m <= 12; $m++)
-                                                                <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>{{ $m }} - {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}</option>
-                                                            @endfor
-                                                        </select>
-                                                    </div>
-                                                </div>
+                                    <div class="filter-group">
+                                        <label class="form-label" style="font-weight: 600; font-size: 12px; color: #134e4a;">
+                                            <i class="fas fa-calendar-day" style="margin-right: 4px; color: #14b8a6;"></i>{{__('month')}}
+                                        </label>
+                                        <div class="input-group input-group-sm">
+                                            <div class="input-group-addon" style="background: #f0fdfa; border-color: #99f6e4;">
+                                                <i class="fa fa-calendar" style="color: #14b8a6;"></i>
                                             </div>
-
+                                            <select class="form-control month wallet-filter-select" name="month">
+                                                <option value="">{{ __('Select Month') }}</option>
+                                                @for($m = 1; $m <= 12; $m++)
+                                                    <option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>{{ $m }} - {{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- /.box-body -->
-                            <div class="box-footer">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="col-md-2"></div>
-                                        <div class="col-md-8">
-                                            <div class="btn-group pull-left">
-                                                <button class="btn btn-info submit btn-sm">
-                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
-                                                </button>
-                                            </div>
-                                            <div class="btn-group pull-left" style="margin-left: 10px;">
-                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=wallet_logs') }}"
-                                                   class="btn btn-default btn-sm">
-                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
-                                                </a>
-                                            </div>
-                                        </div>
+                                    <div class="filter-actions">
+                                        <button class="btn btn-sm" style="background: linear-gradient(135deg, #14b8a6, #0d9488); color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-search"></i> {{__('Search')}}
+                                        </button>
+                                        <a href="{{ url('admin/users/' . $user->id. '?'.'tab=wallet_logs') }}"
+                                           class="btn btn-default btn-sm" style="border-radius: 8px; padding: 8px 18px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                            <i class="fa fa-undo"></i> {{__('Reset')}}
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-                <div class="box-body">
 
-
-                    <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('Type') }}</th>
-                            <!-- <th>{{ __('Type') }}</th> -->
-                            <th>{{ __('Amount') }}</th>
-                            <th>{{ __('amount before') }}</th>
-                            <th>{{ __('amount after') }}</th>
-                            <th>{{ __('Created at') }}</th>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle data-table" id="walletLogs" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                        <thead>
+                        <tr style="background: #f0fdfa;">
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #134e4a; border-bottom: 2px solid #99f6e4;">
+                                <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #134e4a; border-bottom: 2px solid #99f6e4;">
+                                <i class="fas fa-exchange-alt" style="margin-right: 4px; color: #14b8a6;"></i>{{ __('Type') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #134e4a; border-bottom: 2px solid #99f6e4;">
+                                <i class="fas fa-coins" style="margin-right: 4px; color: #f59e0b;"></i>{{ __('Amount') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #134e4a; border-bottom: 2px solid #99f6e4;">
+                                <i class="fas fa-wallet" style="margin-right: 4px; color: #6366f1;"></i>{{ __('amount before') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #134e4a; border-bottom: 2px solid #99f6e4;">
+                                <i class="fas fa-balance-scale" style="margin-right: 4px; color: #10b981;"></i>{{ __('amount after') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #134e4a; border-bottom: 2px solid #99f6e4;">
+                                <i class="fas fa-calendar" style="margin-right: 4px; color: #64748b;"></i>{{ __('Created at') }}
+                            </th>
                         </tr>
                         </thead>
-
                         @if($walletLogs && $walletLogs->count())
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($walletLogs as $index => $log)
-                                <tr>
-                                    <td>{{ $walletLogs->firstItem() + $index }}</td>
-                                    <td>{{ __("wallet." . $log->operation) }}</td>
-
-                                    <!-- <td>{{ $log->type }}</td> -->
-                                    <td>{{ number_format($log->amount, 2) }}</td>
-                                    <td>{{ number_format($log->before_amount, 2) }}</td>
-                                    <td>{{ number_format($log->after_amount, 2) }}</td>
-                                    <td>{{ $log->created_at }}</td>
+                                <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f3f4f6;"
+                                    onmouseover="this.style.backgroundColor='#f0fdfa'" onmouseout="this.style.backgroundColor='transparent'">
+                                    <td style="padding: 14px 16px;">
+                                        <span style="background: #f3f4f6; padding: 3px 10px; border-radius: 6px; font-weight: 600; color: #6b7280; font-size: 13px;">
+                                            {{ $walletLogs->firstItem() + $index }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #f0fdfa; color: #0d9488; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                            <i class="fas fa-tag" style="font-size: 10px;"></i>{{ __("wallet." . $log->operation) }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        @php $wAmt = $log->amount; @endphp
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 14px; border-radius: 20px; font-weight: 800; font-size: 13px; border: 1px solid {{ $wAmt < 0 ? '#fecaca' : '#bbf7d0' }}; background: {{ $wAmt < 0 ? '#fef2f2' : '#f0fdf4' }}; color: {{ $wAmt < 0 ? '#dc2626' : '#16a34a' }};">
+                                            <i class="fas {{ $wAmt < 0 ? 'fa-arrow-down' : 'fa-arrow-up' }}" style="font-size: 10px;"></i>
+                                            {{ number_format($wAmt, 2) }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="font-weight: 700; color: #6366f1; font-size: 13px;">{{ number_format($log->before_amount, 2) }}</span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 13px;">
+                                            <i class="fas fa-coins" style="font-size: 10px;"></i>{{ number_format($log->after_amount, 2) }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                            <i class="fas fa-calendar-alt" style="font-size: 10px; color: #94a3b8;"></i>{{ $log->created_at }}
+                                        </span>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
+                        @else
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" style="padding: 48px 24px; text-align: center; border: none;">
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                            <div style="width: 64px; height: 64px; background: #f0fdfa; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-receipt" style="font-size: 28px; color: #14b8a6; opacity: 0.5;"></i>
+                                            </div>
+                                            <p style="margin: 0; color: #9ca3af; font-size: 14px; font-weight: 500;">{{ __('No wallet transactions found') }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
                         @endif
-
                     </table>
                 </div>
             </div>
 
-            <div class="pagination-wrapper">
-                {{ $walletLogs?->appends([
-                    'tab'         => 'wallet_logs',
-                    'wallet_logs_page' => $walletLogs?->currentPage(),
-                ])->links('vendor.pagination.default') }}
-            </div>
-
+            @if($walletLogs && $walletLogs->count())
+                <div class="pagination-wrapper" style="padding: 16px 24px; border-top: 1px solid #f3f4f6;">
+                    {{ $walletLogs?->appends([
+                        'tab'         => 'wallet_logs',
+                        'wallet_logs_page' => $walletLogs?->currentPage(),
+                    ])->links('vendor.pagination.default') }}
+                </div>
+            @endif
         </div>
-
     </div>
 
     <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('badges') }}</h4>
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-award" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('badges') }}</h4>
+                    </div>
+                    @if($badges && $badges->count())
+                        <span style="background: rgba(255,255,255,0.2); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);">
+                            {{ $badges->total() }} {{ __('total') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
-
             <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="table table-bordered table-hover align-middle data-table" id="badge">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('created by') }}</th>
-                            <th>{{ __('expire') }}</th>
-                            <th>{{ __('receive_type') }}</th>
-                            <th>{{ __('created_at') }}</th>
-                            <th>{{ __('action') }}</th>
-
+                <div class="box-body" style="padding: 0;">
+                    <table class="table table-hover align-middle data-table" id="badge" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                        <thead>
+                        <tr style="background: #fdf2f8;">
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #831843; border-bottom: 2px solid #fbcfe8;">
+                                <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #831843; border-bottom: 2px solid #fbcfe8;">
+                                <i class="fas fa-user-edit" style="margin-right: 4px; color: #ec4899;"></i>{{ __('created by') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #831843; border-bottom: 2px solid #fbcfe8;">
+                                <i class="fas fa-clock" style="margin-right: 4px; color: #ef4444;"></i>{{ __('expire') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #831843; border-bottom: 2px solid #fbcfe8;">
+                                <i class="fas fa-exchange-alt" style="margin-right: 4px; color: #8b5cf6;"></i>{{ __('receive_type') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #831843; border-bottom: 2px solid #fbcfe8;">
+                                <i class="fas fa-calendar" style="margin-right: 4px; color: #64748b;"></i>{{ __('created_at') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #831843; border-bottom: 2px solid #fbcfe8;">
+                                <i class="fas fa-cog" style="margin-right: 4px; opacity: 0.5;"></i>{{ __('action') }}
+                            </th>
                         </tr>
                         </thead>
                         @if($badges && $badges->count())
-
-                            <tbody style="color: rgb(208, 115, 43);">
+                            <tbody>
                             @foreach($badges as $index => $badge)
                                 @php
                                     $admin = $badge->admin;
-
-                                $image = $admin->avatar ?? '';
-                                $defaultImage = asset("images/businessman-icon.jpg");
-                                $imagePath = getImagePath($image);
-                                $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
-
-                                $nameRaw = optional($admin)->name ?? @$admin->username;
-                                $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
-
-                                $uid = optional($admin)->id ?? 0;
-                                $url = $admin ? url("admin/auth/users/" . $uid) : '#';
+                                    $image = $admin->avatar ?? '';
+                                    $defaultImage = asset("images/businessman-icon.jpg");
+                                    $imagePath = getImagePath($image);
+                                    $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
+                                    $nameRaw = optional($admin)->name ?? @$admin->username;
+                                    $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
+                                    $uid = optional($admin)->id ?? 0;
+                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
-                                <tr>
-                                    <td>{{ $badges->firstItem() + $index }}</td>
-                                    <td>
-                                        @if ($admin )
+                                <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f3f4f6;"
+                                    onmouseover="this.style.backgroundColor='#fdf2f8'" onmouseout="this.style.backgroundColor='transparent'">
+                                    <td style="padding: 14px 16px;">
+                                        <span style="background: #f3f4f6; padding: 3px 10px; border-radius: 6px; font-weight: 600; color: #6b7280; font-size: 13px;">
+                                            {{ $badges->firstItem() + $index }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        @if ($admin)
                                             <a href="{{ $url ?? '#' }}" target="_blank"
-                                               style="display: inline-flex; align-items: center; text-decoration: none;">
+                                               style="display: inline-flex; align-items: center; text-decoration: none; gap: 8px; background: #f8fafc; padding: 4px 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
                                                 <img src="{{ $image }}" width="30" height="30"
-                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                <span>{{ $name }} ({{ $uid }})</span>
+                                                     style="object-fit: cover; border-radius: 50%; border: 2px solid #fbcfe8;">
+                                                <span style="font-weight: 600; color: #db2777; font-size: 12px;">{{ $name }} <small style="color:#94a3b8;">({{ $uid }})</small></span>
                                             </a>
                                         @else
-
+                                            <span style="color: #cbd5e1; font-size: 12px;">—</span>
                                         @endif
-
                                     </td>
-                                    <td>{{ (!empty($badge->expire) && $badge->expire !== '0') ? \Carbon\Carbon::parse($badge->expire)->format('Y-m-d H:i:s') :$badge->days  }}</td>
-
-
-                                    <td>{{ $badge->receive_type }}</td>
-                                    <td>{{ $badge->created_at }}</td>
-                                    <td>
-                                        @if (($badge->expire == 0) || ($badge->expire >= now()->timestamp) )
-                                            <div class="d-flex">
-                                                <button class="btn btn-danger delete-badge-btn"
-                                                        data-id="{{ @$badge->id }}">
-                                                    {{ __('dashboard.delete') }}
-                                                </button>
-                                            </div>
+                                    <td style="padding: 14px 16px;">
+                                        @php
+                                            $expireDisplay = (!empty($badge->expire) && $badge->expire !== '0') ? \Carbon\Carbon::parse($badge->expire)->format('Y-m-d H:i:s') : $badge->days;
+                                            $isExpired = (!empty($badge->expire) && $badge->expire !== '0' && \Carbon\Carbon::parse($badge->expire)->isPast());
+                                        @endphp
+                                        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+                                            {{ $isExpired ? 'background: #fef2f2; color: #dc2626;' : 'background: #ecfdf5; color: #059669;' }}">
+                                            <i class="fas {{ $isExpired ? 'fa-times-circle' : 'fa-check-circle' }}" style="font-size: 11px;"></i>
+                                            {{ $expireDisplay }}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #faf5ff; color: #7c3aed; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                            <i class="fas fa-tag" style="font-size: 10px;"></i>{{ $badge->receive_type }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                            <i class="fas fa-calendar-alt" style="font-size: 10px; color: #94a3b8;"></i>{{ $badge->created_at }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        @if (($badge->expire == 0) || ($badge->expire >= now()->timestamp))
+                                            <button class="btn btn-sm delete-badge-btn" data-id="{{ @$badge->id }}"
+                                                    style="background: linear-gradient(135deg, #fef2f2, #fee2e2); color: #dc2626; border: 1px solid #fecaca; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;"
+                                                    onmouseover="this.style.background='#dc2626'; this.style.color='#fff'; this.style.borderColor='#dc2626'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(220,38,38,0.3)'"
+                                                    onmouseout="this.style.background='linear-gradient(135deg, #fef2f2, #fee2e2)'; this.style.color='#dc2626'; this.style.borderColor='#fecaca'; this.style.transform='none'; this.style.boxShadow='none'">
+                                                <i class="fas fa-trash-alt" style="font-size: 11px;"></i> {{ __('dashboard.delete') }}
+                                            </button>
                                         @endif
                                     </td>
                                 </tr>
                             @endforeach
                             </tbody>
+                        @else
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" style="padding: 48px 24px; text-align: center; border: none;">
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                            <div style="width: 64px; height: 64px; background: #fdf2f8; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-award" style="font-size: 28px; color: #ec4899; opacity: 0.5;"></i>
+                                            </div>
+                                            <p style="margin: 0; color: #9ca3af; font-size: 14px; font-weight: 500;">{{ __('No badges found') }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
                         @endif
-
                     </table>
                 </div>
             </div>
 
-            <div class="pagination-wrapper">
-                {{ $badges?->appends([
-                    'tab'         => 'badges',
-                     'type'        => $type,
-                    'badges_page' => $badges?->currentPage(),
-                ])->links('vendor.pagination.default') }}
-            </div>
-
-
+            @if($badges && $badges->count())
+                <div class="pagination-wrapper" style="padding: 16px 24px; border-top: 1px solid #f3f4f6;">
+                    {{ $badges?->appends([
+                        'tab'         => 'badges',
+                         'type'        => $type,
+                        'badges_page' => $badges?->currentPage(),
+                    ])->links('vendor.pagination.default') }}
+                </div>
+            @endif
         </div>
-
     </div>
 
     <div class="tab-content" id="user-agency-tab"
          style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0369a1 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                        <i class="fas fa-history" style="font-size: 18px; color: #fff;"></i>
+                    </div>
+                    <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px;">{{ __('Agency join logs') }}</h4>
+                </div>
             </div>
             <div class="box-body p-3">
                 <div class="card mb-4">
@@ -2001,16 +3419,30 @@
 
                 <div class="table-responsive">
                     <div class="box-body ">
-                        <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
-                            <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('agency') }}</th>
-                                <th>{{ __('status') }}</th>
-                                <th>{{ __('kicked By') }}</th>
-                                <th>{{ __('kicked By status') }}</th>
-                                <th>{{ __('Join date') }}</th>
-                                <th>{{ __('Leave date') }}</th>
+                        <table class="table table-hover align-middle data-table" id="user-agency" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                            <thead>
+                            <tr style="background: #f0f9ff;">
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0c4a6e; border-bottom: 2px solid #bae6fd;">
+                                    <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0c4a6e; border-bottom: 2px solid #bae6fd;">
+                                    <i class="fas fa-building" style="margin-right: 4px; color: #0ea5e9;"></i>{{ __('agency') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0c4a6e; border-bottom: 2px solid #bae6fd;">
+                                    <i class="fas fa-info-circle" style="margin-right: 4px; color: #8b5cf6;"></i>{{ __('status') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0c4a6e; border-bottom: 2px solid #bae6fd;">
+                                    <i class="fas fa-user-slash" style="margin-right: 4px; color: #ef4444;"></i>{{ __('kicked By') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0c4a6e; border-bottom: 2px solid #bae6fd;">
+                                    <i class="fas fa-shield-alt" style="margin-right: 4px; color: #f59e0b;"></i>{{ __('kicked By status') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0c4a6e; border-bottom: 2px solid #bae6fd;">
+                                    <i class="fas fa-sign-in-alt" style="margin-right: 4px; color: #10b981;"></i>{{ __('Join date') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #0c4a6e; border-bottom: 2px solid #bae6fd;">
+                                    <i class="fas fa-sign-out-alt" style="margin-right: 4px; color: #dc2626;"></i>{{ __('Leave date') }}
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -2034,7 +3466,7 @@
                                         if (!isImageExists($url)) {
                                             $url = $defaultImage;
                                         }
-                                        $image = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                        $image = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                         $profileUrl = route('admin.agency.profile', ['id' => @$agency->id ?? 0]);
                                     @endphp
 
@@ -2051,7 +3483,7 @@
                                              if (!isImageExists($url)) {
                                                  $url = $defaultImage;
                                              }
-                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByImage = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                              $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
                                          }
 
@@ -2066,7 +3498,7 @@
                                              if (!isImageExists($url)) {
                                                  $url = $defaultImage;
                                              }
-                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByImage = "<img src='" . e($url) . "' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
                                              $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
                                          }
                                      }
@@ -2087,7 +3519,17 @@
                                                 </div>
                                             </a>
                                         </td>
-                                        <td>{{ $userJoinAgency->status }}</td>
+                                        <td>
+                                            @php
+                                                $st = $userJoinAgency->status;
+                                                $stBg = '#ecfdf5'; $stColor = '#059669'; $stIcon = 'fa-check-circle';
+                                                if ($st === 'kick off') { $stBg = '#fef2f2'; $stColor = '#dc2626'; $stIcon = 'fa-times-circle'; }
+                                                elseif ($st === 'leave') { $stBg = '#fef3c7'; $stColor = '#d97706'; $stIcon = 'fa-sign-out-alt'; }
+                                            @endphp
+                                            <span style="display:inline-flex;align-items:center;gap:4px;background:{{ $stBg }};color:{{ $stColor }};padding:4px 12px;border-radius:6px;font-weight:600;font-size:12px;">
+                                                <i class="fas {{ $stIcon }}" style="font-size:10px;"></i>{{ $st }}
+                                            </span>
+                                        </td>
                                         <td>
                                             @if(!empty($kickedBy) && !empty($kickedBy->id))
                                                 <a href="{{ $kickedByUrl ?? '#' }}" target="_blank"
@@ -2125,13 +3567,15 @@
     </div>
 </div>
 
-@if($activeTab == 'user-coins')
-
-    <div class="tab-content" id="user-coins-tab"
-         style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
+    <div class="tab-content {{ $activeTab == 'user-coins' ? '' : 'd-none' }}" id="user-coins-tab">
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                        <i class="fas fa-coins" style="font-size: 18px; color: #fff;"></i>
+                    </div>
+                    <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px;">{{ __('Users Coins Logs') }}</h4>
+                </div>
             </div>
             <div class="box-body p-3">
                 <div class="card mb-4">
@@ -2184,61 +3628,115 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <div class="box-body ">
-                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
-                            <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('type') }}</th>
-                                <th>{{ __('sub type') }}</th>
-                                <th>{{ __('Item Name') }}</th>
-                                <th>{{ __('balance before') }}</th>
-                                <th>{{ __('amount') }}</th>
-                                <th>{{ __('balance yet') }}</th>
-                                <th>{{ __('from date') }}</th>
-                                <th>{{ __('to date') }}</th>
-                                <!-- <th>{{ __('action') }}</th> -->
+                    <div class="box-body" style="padding: 0;">
+                        <table class="table table-hover align-middle data-table" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                            <thead>
+                            <tr style="background: #fffbeb;">
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-tag" style="margin-right: 4px; color: #f59e0b;"></i>{{ __('type') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-layer-group" style="margin-right: 4px; color: #d97706;"></i>{{ __('sub type') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-cube" style="margin-right: 4px; color: #8b5cf6;"></i>{{ __('Item Name') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-wallet" style="margin-right: 4px; color: #6366f1;"></i>{{ __('balance before') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-coins" style="margin-right: 4px; color: #10b981;"></i>{{ __('amount') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-balance-scale" style="margin-right: 4px; color: #3b82f6;"></i>{{ __('balance yet') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-calendar-alt" style="margin-right: 4px; color: #059669;"></i>{{ __('from date') }}
+                                </th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #78350f; border-bottom: 2px solid #fde68a;">
+                                    <i class="fas fa-calendar-check" style="margin-right: 4px; color: #ef4444;"></i>{{ __('to date') }}
+                                </th>
                             </tr>
                             </thead>
                             @if($usersCoins && $usersCoins->count())
-                                <tbody style="color: rgb(208, 115, 43);">
+                                <tbody>
                                 @foreach($usersCoins as $index => $coin)
-                                    <tr>
-                                        <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
-                                        <td>{{ $coin->type }}</td>
-                                        <td>{{ @$coin->sub_type ?? 0 }}</td>
-                                        <td>{{ @$coin->item_name ?? '' }}</td>
-                                        <td>{{ @$coin->amount_before ?? 0 }}</td>
-                                        <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
-                                            {{ $coin->amount ?? 0 }}
+                                    <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f3f4f6;"
+                                        onmouseover="this.style.backgroundColor='#fffbeb'" onmouseout="this.style.backgroundColor='transparent'">
+                                        <td style="padding: 14px 16px;">
+                                            <span style="background: #f3f4f6; padding: 3px 10px; border-radius: 6px; font-weight: 600; color: #6b7280; font-size: 13px;">
+                                                {{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                                <i class="fas fa-tag" style="font-size: 10px;"></i>{{ $coin->type }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #faf5ff; color: #7c3aed; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                                <i class="fas fa-layer-group" style="font-size: 10px;"></i>{{ @$coin->sub_type ?? 0 }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px; font-weight: 600; color: #374151; font-size: 13px;">
+                                            {{ @$coin->item_name ?? '' }}
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="font-weight: 700; color: #6366f1; font-size: 13px;">{{ number_format(@$coin->amount_before ?? 0) }}</span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            @php $amt = $coin->amount ?? 0; @endphp
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; padding: 5px 14px; border-radius: 20px; font-weight: 800; font-size: 13px; border: 1px solid {{ $amt < 0 ? '#fecaca' : '#bbf7d0' }}; background: {{ $amt < 0 ? '#fef2f2' : '#f0fdf4' }}; color: {{ $amt < 0 ? '#dc2626' : '#16a34a' }};">
+                                                <i class="fas {{ $amt < 0 ? 'fa-arrow-down' : 'fa-arrow-up' }}" style="font-size: 10px;"></i>
+                                                {{ number_format($amt) }}
+                                            </span>
                                             @if($coin->sub_type == 'coin_game_users')
-                                                <br>
-                                                <small class="d-block text-muted text-success">
-                                                    {{  $coin->helper_amount }} {{  __('profit') }}
-                                                </small>
-                                                <br>
-                                                <small class="d-block text-muted text-danger">
-                                                    {{ $coin->amount  - $coin->helper_amount }}  {{  __('loss')}}
-                                                </small>
+                                                <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">
+                                                    <small style="display: inline-flex; align-items: center; gap: 3px; color: #059669; font-weight: 600; font-size: 11px;">
+                                                        <i class="fas fa-plus-circle" style="font-size: 9px;"></i> {{ $coin->helper_amount }} {{ __('profit') }}
+                                                    </small>
+                                                    <small style="display: inline-flex; align-items: center; gap: 3px; color: #dc2626; font-weight: 600; font-size: 11px;">
+                                                        <i class="fas fa-minus-circle" style="font-size: 9px;"></i> {{ $coin->amount - $coin->helper_amount }} {{ __('loss') }}
+                                                    </small>
+                                                </div>
                                             @endif
                                         </td>
-                                        <td>
-
-                                            {{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0)}}
-
-
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 13px;">
+                                                <i class="fas fa-coins" style="font-size: 10px;"></i>
+                                                {{ number_format(($coin->amount_before ?? 0) + ($coin->amount ?? 0)) }}
+                                            </span>
                                         </td>
-                                        <td>{{ \Carbon\Carbon::parse($coin->from_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($coin->to_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
-                                        <td>
-                                            <div class="d-flex">
-                                                <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
-                                                {{ __('dashboard.delete') }}
-                                                </button> -->
-                                            </div>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                                <i class="fas fa-calendar-alt" style="font-size: 10px; color: #94a3b8;"></i>
+                                                {{ \Carbon\Carbon::parse($coin->from_date)->format('Y-m-d H:i:s') ?? '0' }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 14px 16px;">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                                <i class="fas fa-calendar-check" style="font-size: 10px; color: #94a3b8;"></i>
+                                                {{ \Carbon\Carbon::parse($coin->to_date)->format('Y-m-d H:i:s') ?? '0' }}
+                                            </span>
                                         </td>
                                     </tr>
                                 @endforeach
+                                </tbody>
+                            @else
+                                <tbody>
+                                    <tr>
+                                        <td colspan="9" style="padding: 48px 24px; text-align: center; border: none;">
+                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                                <div style="width: 64px; height: 64px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-coins" style="font-size: 28px; color: #f59e0b; opacity: 0.5;"></i>
+                                                </div>
+                                                <p style="margin: 0; color: #9ca3af; font-size: 14px; font-weight: 500;">{{ __('No coins logs found') }}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             @endif
                         </table>
@@ -2259,57 +3757,77 @@
             </div>
         </div>
     </div>
-@endif
 
-@if($activeTab == 'charge')
-    <div class="tab-content active" id="charge-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">{{ __('Charge Reports') }}</h4>
+    <div class="tab-content {{ $activeTab == 'charge' ? '' : 'd-none' }}" id="charge-tab">
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #be123c 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-bolt" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('Charge Reports') }}</h4>
+                    </div>
+                    @if($charges instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                        <span style="background: rgba(255,255,255,0.2); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);">
+                            {{ $charges->total() }} {{ __('total') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
-            <div class="box-body">
+            <div class="box-body" style="padding: 12px 20px; background: #fff5f6; border-bottom: 1px solid #fecdd3;">
                 <div class="nav-scroll-container">
-                    <ul class="nav nav-pills">
-
+                    <ul class="nav nav-pills" style="gap: 6px;">
                         <li class="{{ $chargeTabType == 'receiver' ? 'active' : '' }}">
                             <a class="nav-link @if($chargeTabType == 'receiver') active @endif"
-                               href="?tab=charge&type=receiver"
-                               role="tab">
-                                {{ __('Receiver') }}
+                               href="?tab=charge&type=receiver" role="tab"
+                               style="border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-download" style="font-size: 10px;"></i> {{ __('Receiver') }}
                             </a>
                         </li>
                         <li class="{{ $chargeTabType == 'charger' ? 'active' : '' }}">
                             <a class="nav-link @if($chargeTabType == 'charger') active @endif"
-                               href="?tab=charge&type=charger"
-                               role="tab">
-                                {{ __('Charger') }}
+                               href="?tab=charge&type=charger" role="tab"
+                               style="border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-upload" style="font-size: 10px;"></i> {{ __('Charger') }}
                             </a>
                         </li>
-
                     </ul>
                 </div>
+            </div>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>
+                    <table class="table table-hover align-middle" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                        <thead>
+                        <tr style="background: #fff1f2;">
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #881337; border-bottom: 2px solid #fecdd3;">
+                                <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #881337; border-bottom: 2px solid #fecdd3;">
+                                <i class="fas fa-user" style="margin-right: 4px; color: #f43f5e;"></i>
                                 @if($chargeTabType == 'receiver')
                                     {{ __('Charger') }}
                                 @else
                                     {{ __('Receiver') }}
                                 @endif
                             </th>
-                            <th>{{ __('Type') }}</th>
-                            <th>{{ __('Amount') }}</th>
-                            <th>{{ __('usd') }}</th>
-                            <th>{{ __('Created at') }}</th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #881337; border-bottom: 2px solid #fecdd3;">
+                                <i class="fas fa-tag" style="margin-right: 4px; color: #a855f7;"></i>{{ __('Type') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #881337; border-bottom: 2px solid #fecdd3;">
+                                <i class="fas fa-coins" style="margin-right: 4px; color: #f59e0b;"></i>{{ __('Amount') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #881337; border-bottom: 2px solid #fecdd3;">
+                                <i class="fas fa-dollar-sign" style="margin-right: 4px; color: #10b981;"></i>{{ __('usd') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #881337; border-bottom: 2px solid #fecdd3;">
+                                <i class="fas fa-calendar" style="margin-right: 4px; color: #64748b;"></i>{{ __('Created at') }}
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($charges as $index => $charge)
+@forelse($charges ?? [] as $index => $charge)
                             @php
                                 if($chargeTabType == 'receiver') {
                                     $userCharges = Common::getChargerInfo($charge);
@@ -2321,66 +3839,112 @@
                                   $type = $userCharges['type'] ?? '-';
                                   $image = $userCharges['image'] ?? asset('images/businessman-icon.jpg');
                             @endphp
-                            <tr>
-                                <td>{{ @$charge->id ?? 0 }}</td>
-                                <td>
+                            <tr style="transition: all 0.2s ease; border-bottom: 1px solid #f3f4f6;"
+                                onmouseover="this.style.backgroundColor='#fff1f2'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 14px 16px;">
+                                    <span style="background: #f3f4f6; padding: 3px 10px; border-radius: 6px; font-weight: 600; color: #6b7280; font-size: 13px;">
+                                        {{ @$charge->id ?? 0 }}
+                                    </span>
+                                </td>
+                                <td style="padding: 14px 16px;">
                                     <a href="{{ $userCharges['url'] ?? '#' }}" target="_blank"
-                                       style="display: inline-flex; align-items: center; text-decoration: none;">
-                                        <img src="{{ getImagePath( $image) }}" width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $name }} ({{ $uid }})</span>
+                                       style="display: inline-flex; align-items: center; text-decoration: none; gap: 8px; background: #f8fafc; padding: 4px 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                        <img src="{{ getImagePath($image) }}" width="32" height="32"
+                                             style="object-fit: cover; border-radius: 50%; border: 2px solid #fecdd3;">
+                                        <div style="display: flex; flex-direction: column;">
+                                            <span style="font-weight: 600; color: #e11d48; font-size: 12px;">{{ $name }}</span>
+                                            <small style="color: #94a3b8; font-size: 10px;">{{ $uid }}</small>
+                                        </div>
                                     </a>
                                 </td>
-                                <td>{{ $type }} </td>
-                                <td>{{ $charge->amount }} </td>
-                                <td>{{ $formattedUsd = number_format((float)$charge->usd, 2) }}</td>
-                                <td>{{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}</td>
+                                <td style="padding: 14px 16px;">
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #faf5ff; color: #7c3aed; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                        <i class="fas fa-cube" style="font-size: 10px;"></i>
+                                        {{ $type }}
+                                    </span>
+                                </td>
+                                <td style="padding: 14px 16px;">
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #d97706; padding: 5px 14px; border-radius: 20px; font-weight: 800; font-size: 13px; border: 1px solid #fde68a;">
+                                        <i class="fas fa-coins" style="font-size: 11px;"></i>
+                                        {{ number_format($charge->amount) }}
+                                    </span>
+                                </td>
+                                <td style="padding: 14px 16px;">
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 13px;">
+                                        <i class="fas fa-dollar-sign" style="font-size: 10px;"></i>
+                                        {{ number_format((float)$charge->usd, 2) }}
+                                    </span>
+                                </td>
+                                <td style="padding: 14px 16px;">
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                        <i class="fas fa-calendar-alt" style="font-size: 10px; color: #94a3b8;"></i>
+                                        {{ \Carbon\Carbon::parse($charge->created_at)->format('Y-m-d H:i') }}
+                                    </span>
+                                </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="6" style="padding: 48px 24px; text-align: center; border: none;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                        <div style="width: 64px; height: 64px; background: #fff1f2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-bolt" style="font-size: 28px; color: #f43f5e; opacity: 0.5;"></i>
+                                        </div>
+                                        <p style="margin: 0; color: #9ca3af; font-size: 14px; font-weight: 500;">{{ __('No charge records found') }}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
                         </tbody>
                     </table>
                 </div>
 
-            </div>
-
             {{-- Pagination --}}
-            @if($charges instanceof \Illuminate\Pagination\LengthAwarePaginator)
-                <div class="pagination-container mt-3">
+            @if($charges instanceof \Illuminate\Pagination\LengthAwarePaginator && $charges->count())
+                <div class="pagination-container" style="padding: 16px 24px; border-top: 1px solid #f3f4f6;">
                     {{ $charges->appends([
                         'tab' => 'charge',
                         'type' => $chargeTabType,
                         'receiver_page' => request('receiver_page'),
                         'charger_page' => request('charger_page'),
-                        // other tabs' pages if needed
                     ])->links('vendor.pagination.bootstrap-4') }}
                 </div>
             @endif
         </div>
     </div>
-@endif
 
-@if($activeTab == 'gift-log')
-    <div class="tab-content active" id="gift-log-tab">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">{{ __('gift Reports') }}</h4>
+    <div class="tab-content {{ $activeTab == 'gift-log' ? '' : 'd-none' }}" id="gift-log-tab">
+        <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
+            <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%); padding: 18px 24px; border: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-gift" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 class="card-title" style="text-align: left; margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('gift Reports') }}</h4>
+                    </div>
+                    @if($giftSLogs instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                        <span style="background: rgba(255,255,255,0.2); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);">
+                            {{ $giftSLogs->total() }} {{ __('total') }}
+                        </span>
+                    @endif
+                </div>
             </div>
 
             <div class="box-body p-3">
-                <div class="nav-scroll-container mb-3">
-                    <ul class="nav nav-pills">
+                <div class="nav-scroll-container mb-3" style="background: #faf5ff; padding: 8px 16px; border-radius: 10px; border: 1px solid #e9d5ff;">
+                    <ul class="nav nav-pills" style="gap: 6px;">
                         <li class="{{ $giftType == 'receiver' ? 'active' : '' }}">
                             <a class="nav-link @if($giftType == 'receiver') active @endif"
-                               href="?tab=gift-log&gift_type=receiver"
-                               role="tab">
-                                {{ __('received gift') }}
+                               href="?tab=gift-log&gift_type=receiver" role="tab"
+                               style="border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-download" style="font-size: 10px;"></i> {{ __('received gift') }}
                             </a>
                         </li>
                         <li class="{{ $giftType == 'sender' ? 'active' : '' }}">
                             <a class="nav-link @if($giftType == 'sender') active @endif"
-                               href="?tab=gift-log&gift_type=sender"
-                               role="tab">
-                                {{ __('sent gift') }}
+                               href="?tab=gift-log&gift_type=sender" role="tab"
+                               style="border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-upload" style="font-size: 10px;"></i> {{ __('sent gift') }}
                             </a>
                         </li>
                     </ul>
@@ -2496,24 +4060,42 @@
                 @endif
                 <!-- Table -->
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}</th>
-                            <th>{{ __('room') }}</th>
-                            <th>{{ __('moment') }}</th>
-                            <th>{{ __('gift') }}</th>
+                    <table class="table table-hover align-middle" style="margin-bottom: 0; border-collapse: separate; border-spacing: 0;">
+                        <thead>
+                        <tr style="background: #faf5ff;">
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-hashtag" style="margin-right: 4px; opacity: 0.5;"></i>#
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-user" style="margin-right: 4px; color: #8b5cf6;"></i>{{ $giftType == 'receiver' ? __('Sender') : __('Receiver') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-door-open" style="margin-right: 4px; color: #6366f1;"></i>{{ __('room') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-camera" style="margin-right: 4px; color: #ec4899;"></i>{{ __('moment') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-gift" style="margin-right: 4px; color: #a855f7;"></i>{{ __('gift') }}
+                            </th>
                             @if($giftType == 'receiver')
-                                <th>{{ __('agency') }}</th>
+                                <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                    <i class="fas fa-building" style="margin-right: 4px; color: #10b981;"></i>{{ __('agency') }}
+                                </th>
                             @endif
-                            <th>{{ __('quantity') }}</th>
-                            <th>{{ __('price') }}</th>
-                            <th>{{ __('Created at') }}</th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-sort-numeric-up" style="margin-right: 4px; color: #3b82f6;"></i>{{ __('quantity') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-coins" style="margin-right: 4px; color: #f59e0b;"></i>{{ __('price') }}
+                            </th>
+                            <th style="padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4c1d95; border-bottom: 2px solid #ddd6fe;">
+                                <i class="fas fa-calendar" style="margin-right: 4px; color: #64748b;"></i>{{ __('Created at') }}
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($giftSLogs as $index => $giftSLog)
+                        @foreach($giftSLogs ?? [] as $index => $giftSLog)
                             @php
                                 $userImageDefault = asset('images/businessman-icon.jpg');
                                 $defaultImage = asset("images/background_room.jpg");
@@ -2654,9 +4236,21 @@
                                         @endif
                                     </td>
                                 @endif
-                                <td>{{ $giftSLog->giftNum }}</td>
-                                <td>{{  $giftSLog->giftPrice}}</td>
-                                <td>{{ \Carbon\Carbon::parse($giftSLog->created_at)->timezone(getTimezone())->format('Y-m-d H:i') }}</td>
+                                <td>
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 6px; font-weight: 700; font-size: 13px;">
+                                        <i class="fas fa-times" style="font-size: 9px;"></i>{{ $giftSLog->giftNum }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #fef3c7; color: #d97706; padding: 5px 14px; border-radius: 20px; font-weight: 800; font-size: 13px; border: 1px solid #fde68a;">
+                                        <i class="fas fa-coins" style="font-size: 11px;"></i>{{ number_format($giftSLog->giftPrice) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                        <i class="fas fa-calendar-alt" style="font-size: 10px; color: #94a3b8;"></i>{{ \Carbon\Carbon::parse($giftSLog->created_at)->timezone(getTimezone())->format('Y-m-d H:i') }}
+                                    </span>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -2677,7 +4271,7 @@
             </div>
         </div>
     </div>
-@endif
+
 
 <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
@@ -2730,95 +4324,131 @@
 
 <div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
-        <div class="modal-content border-0">
-            <div class="modal-content position-relative">
-                <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
-                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content" style="border: none; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); overflow: hidden;">
+            <div class="position-relative">
+                {{-- Modal Header --}}
+                <div style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%); padding: 20px 28px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 42px; height: 42px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                            <i class="fas fa-user-edit" style="font-size: 18px; color: #fff;"></i>
+                        </div>
+                        <h4 style="margin: 0; color: #fff; font-weight: 700; font-size: 17px; letter-spacing: 0.3px;">{{ __('Edit User') }}</h4>
+                    </div>
                 </div>
 
                 <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST"
                       enctype="multipart/form-data">
                     @csrf
-                    <div class="modal-body p-0">
+                    <div class="modal-body" style="padding: 28px;">
+                        <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
+                        <div class="row">
+                            <div class="col-lg-6 mb-4 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-user" style="font-size: 11px; color: #6366f1;"></i> {{ __('Name') }}
+                                </label>
+                                <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}"
+                                       style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.2s;"
+                                       onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.12)'"
+                                       onblur="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none'">
+                            </div>
 
-                        <div class="p-4">
-                            <div class="row flex-evenly">
-                                <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
+                            <div class="col-lg-6 mb-4 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-id-badge" style="font-size: 11px; color: #6366f1;"></i> {{ __('uuid') }}
+                                </label>
+                                <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}"
+                                       style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.2s;"
+                                       onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.12)'"
+                                       onblur="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none'">
+                            </div>
 
-                                <div class="col-lg-6 mb-3 form-group">
-                                    <label class="form-label">{{ __('Name') }}</label>
-                                    <input type="text" name="name" class="form-control"
-                                           value="{{ old('name', $user->name ?? '') }}">
+                            <div class="col-lg-6 mb-4 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-envelope" style="font-size: 11px; color: #6366f1;"></i> {{ __('email') }}
+                                </label>
+                                <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}"
+                                       style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.2s;"
+                                       onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.12)'"
+                                       onblur="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none'">
+                            </div>
+
+                            <div class="col-lg-6 mb-4 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-phone" style="font-size: 11px; color: #6366f1;"></i> {{ __('phone') }}
+                                </label>
+                                <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone ?? '') }}"
+                                       style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.2s;"
+                                       onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.12)'"
+                                       onblur="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none'">
+                            </div>
+
+                            <div class="col-lg-12 mb-4 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-venus-mars" style="font-size: 11px; color: #ec4899;"></i> {{ __('Gender') }}
+                                </label>
+                                <select class="form-select" name="gender"
+                                        style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 10px 14px; font-size: 14px;">
+                                    <option value="">{{ __('Choose gender') }}</option>
+                                    <option value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>
+                                        {{ __('female') }}
+                                    </option>
+                                    <option value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>
+                                        {{ __('male') }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-6 mb-4 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-camera" style="font-size: 11px; color: #8b5cf6;"></i> {{ __('image') }}
+                                </label>
+                                <input class="form-control" name="image" accept="image/*" type="file"
+                                       style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 8px 14px; font-size: 13px;">
+                                <div style="margin-top: 12px; display: inline-block;">
+                                    <img src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
+                                         class="rounded" id="img_edit" alt="{{ $user->name ?? '' }}"
+                                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 3px solid #e0e7ff; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                                 </div>
+                            </div>
 
-                                <div class="col-lg-6 mb-3 form-group">
-                                    <label class="form-label">{{ __('uuid') }}</label>
-                                    <input type="text" name="uuid" class="form-control"
-                                           value="{{ old('uuid', $user->uuid ?? '') }}">
-                                </div>
+                            <div class="col-lg-12 mb-4 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-globe" style="font-size: 11px; color: #0ea5e9;"></i> {{ __('Country') }}
+                                </label>
+                                <select class="form-select" name="country_id" id="country_id"
+                                        style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 10px 14px; font-size: 14px;">
+                                    @foreach($countries as $id => $name)
+                                        <option value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
+                                            {{ $name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                                <div class="col-lg-6 mb-3 form-group">
-                                    <label class="form-label">{{ __('email') }}</label>
-                                    <input type="email" name="email" class="form-control"
-                                           value="{{ old('email', $user->email ?? '') }}">
-                                </div>
-
-                                <div class="col-lg-6 mb-3 form-group">
-                                    <label class="form-label">{{ __('phone') }}</label>
-                                    <input type="text" name="phone" class="form-control"
-                                           value="{{ old('phone', $user->phone ?? '') }}">
-                                </div>
-
-                                <div class="mb-3 col-lg-12 form-group">
-                                    <label class="form-label">{{ __('Gender') }}</label>
-                                    <select class="form-select col-lg-6" name="gender">
-                                        <option value="">{{ __('Choose gender') }}</option>
-                                        <option
-                                            value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>{{ __('female') }}</option>
-                                        <option
-                                            value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>{{ __('male') }}</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-lg-6 form-group mb-3">
-                                    <label class="form-label">{{ __('image') }}</label>
-                                    <input class="form-control" name="image" accept="image/*" type="file"/>
-                                    <div class="mt-2">
-                                        <img
-                                            src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
-                                            class="rounded"
-                                            style="width: 100px; height: 100px"
-                                            id="img_edit"
-                                            alt="{{ $user->name ?? '' }}">
-                                    </div>
-                                </div>
-
-                                <div class="mb-3 col-lg-12 form-group">
-                                    <label class="form-label">{{ __('Country') }}</label>
-                                    <select class="form-select col-lg-6" name="country_id" id="country_id">
-                                        @foreach($countries as $id => $name)
-                                            <option
-                                                value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
-                                                {{ $name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="mb-3 col-lg-12 form-group">
-                                    <label class="form-label">{{ __('bio') }}</label>
-                                    <textarea class="form-control" cols="10" name="bio"
-                                              rows="2">{{ old('bio', $user->bio ?? '') }}</textarea>
-                                </div>
+                            <div class="col-lg-12 mb-3 form-group">
+                                <label class="form-label" style="font-weight: 600; font-size: 12px; color: #4338ca; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                    <i class="fas fa-pen-fancy" style="font-size: 11px; color: #f59e0b;"></i> {{ __('bio') }}
+                                </label>
+                                <textarea class="form-control" cols="10" name="bio" rows="2"
+                                          style="border: 2px solid #e0e7ff; border-radius: 10px; padding: 10px 14px; font-size: 14px; resize: vertical; transition: all 0.2s;"
+                                          onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 0 0 3px rgba(99,102,241,0.12)'"
+                                          onblur="this.style.borderColor='#e0e7ff'; this.style.boxShadow='none'">{{ old('bio', $user->bio ?? '') }}</textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary cancel_user_item_model_btn" type="button"
-                                data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                        <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; padding: 16px 28px; border-top: 1px solid #f1f5f9; background: #f8fafc;">
+                        <button class="btn cancel_user_item_model_btn" type="button" data-bs-dismiss="modal"
+                                style="background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 24px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;"
+                                onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
+                            <i class="fas fa-times" style="font-size: 11px;"></i> {{ __('Cancel') }}
+                        </button>
+                        <button class="btn" type="submit"
+                                style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; border: none; border-radius: 10px; padding: 10px 24px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(99,102,241,0.3);"
+                                onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 20px rgba(99,102,241,0.4)'"
+                                onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(99,102,241,0.3)'">
+                            <i class="fas fa-save" style="font-size: 12px;"></i> {{ __('edit') }}
+                        </button>
                     </div>
                 </form>
             </div>
@@ -2833,6 +4463,53 @@
 
 <script>
 
+
+    // ── Close Profile Dropdown on Outside Click ──
+    document.addEventListener('click', function(e) {
+        var dropdown = document.getElementById('profileDropdownMenu');
+        var btn = document.getElementById('profileActionsDropdown');
+        if (dropdown && btn && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show-dropdown');
+        }
+    });
+
+    // ── Cover Slideshow Auto-Rotation ──
+    var coverCurrentIndex = 0;
+    var coverSlides = document.querySelectorAll('.cover-slide');
+    var coverDots = document.querySelectorAll('.cover-dot');
+    var coverTimer = null;
+
+    function coverGoTo(index) {
+        if (coverSlides.length <= 1) return;
+        coverSlides[coverCurrentIndex].classList.remove('active');
+        if (coverDots.length) coverDots[coverCurrentIndex].classList.remove('active');
+        coverCurrentIndex = (index + coverSlides.length) % coverSlides.length;
+        coverSlides[coverCurrentIndex].classList.add('active');
+        if (coverDots.length) coverDots[coverCurrentIndex].classList.add('active');
+    }
+
+    function coverSlide(direction) {
+        coverGoTo(coverCurrentIndex + direction);
+        coverResetTimer();
+    }
+
+    function coverResetTimer() {
+        if (coverTimer) clearInterval(coverTimer);
+        if (coverSlides.length > 1) {
+            coverTimer = setInterval(function() { coverGoTo(coverCurrentIndex + 1); }, 4000);
+        }
+    }
+
+    // Click on dots
+    coverDots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            coverGoTo(parseInt(this.getAttribute('data-index')));
+            coverResetTimer();
+        });
+    });
+
+    // Start auto-rotation
+    coverResetTimer();
 
     $(document).ready(function () {
 
@@ -2995,17 +4672,97 @@
     });
 
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Remove active class from all buttons and content
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    // Mark the initially loaded tab as already loaded (data is in the page)
+    (function() {
+        var initialTab = '{{ $activeTab }}';
+        var initialEl = document.getElementById(initialTab + '-tab');
+        if (initialEl) initialEl.dataset.loaded = 'true';
+        // Level tab is always fully rendered (no server data needed)
+        var levelEl = document.getElementById('level-tab');
+        if (levelEl) levelEl.dataset.loaded = 'true';
+    })();
 
-            // Add active class to clicked button and corresponding content
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Switch tabs visually
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.classList.add('d-none');
+                c.style.display = 'none';
+            });
             btn.classList.add('active');
-            const target = btn.getAttribute('data-target');
-            document.getElementById(target).classList.add('active');
+
+            var target = btn.getAttribute('data-target');
+            var targetEl = document.getElementById(target);
+            var href = btn.getAttribute('href');
+
+            if (targetEl) {
+                targetEl.classList.add('active');
+                targetEl.classList.remove('d-none');
+                targetEl.style.display = 'block';
+            }
+
+            // Update URL without reload
+            if (href) {
+                history.pushState(null, '', window.location.pathname + href);
+            }
+
+            // If tab content not loaded yet, fetch via AJAX
+            if (targetEl && !targetEl.dataset.loaded) {
+                targetEl.innerHTML = '<div style="text-align:center;padding:60px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--primary-color);"></i><p style="margin-top:12px;color:#94a3b8;font-size:14px;">{{ __("Loading") }}...</p></div>';
+
+                $.ajax({
+                    url: window.location.pathname + href,
+                    type: 'GET',
+                    success: function(html) {
+                        var $parsed = $('<div>').append($.parseHTML(html, document, true));
+                        var $newContent = $parsed.find('#' + target);
+                        if ($newContent.length) {
+                            $(targetEl).html($newContent.html());
+                            targetEl.dataset.loaded = 'true';
+                            // Re-initialize select2 inside loaded tab if needed
+                            $(targetEl).find('#agency_id').each(function() {
+                                if (!$(this).data('select2')) {
+                                    $(this).select2({
+                                        placeholder: 'Select agency',
+                                        allowClear: true,
+                                        ajax: {
+                                            url: '/api/search/host-agency',
+                                            dataType: 'json',
+                                            delay: 250,
+                                            data: function(params) { return { q: params.term, page: params.page || 1 }; },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.data.map(function(item) { return { id: item.id, text: item.name }; }),
+                                                    pagination: { more: data.next_page_url !== null }
+                                                };
+                                            },
+                                            cache: true
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}</p></div>';
+                        }
+                    },
+                    error: function() {
+                        targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}. {{ __("Please try again") }}.</p></div>';
+                    }
+                });
+            }
         });
+    });
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var selectedTab = urlParams.get('tab') || 'packs';
+        var tabBtn = document.querySelector('.tab-btn[data-target="' + selectedTab + '-tab"]');
+        if (tabBtn) tabBtn.click();
     });
 
 
@@ -3340,5 +5097,131 @@
 
     });
 
+    // ── Profile Action Buttons (Toggle/Kick) ──
+    function profileAction(url, btn) {
+        Swal.fire({
+            title: '{{ __("Are you sure?") }}',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || LA.token },
+                    success: function(res) {
+                        // Toggle the icon between on/off
+                        var $btn = $(btn);
+                        var $icon = $btn.find('i.fa');
+                        if ($icon.hasClass('fa-toggle-on')) {
+                            $icon.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+                            $icon.css('color', '#ef4444');
+                        } else {
+                            $icon.removeClass('fa-toggle-off').addClass('fa-toggle-on');
+                            $icon.css('color', '#34d399');
+                        }
+                        Swal.fire({ icon: 'success', title: res.message });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({ icon: 'error', title: xhr.responseJSON?.message || 'Error' });
+                    }
+                });
+            }
+        });
+    }
+
+    function profileActionConfirm(url, msg) {
+        Swal.fire({
+            title: msg,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '{{ __("Yes") }}',
+            cancelButtonText: '{{ __("Cancel") }}',
+            confirmButtonColor: '#dc2626'
+        }).then(function(result) {
+            if (result.value) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || LA.token },
+                    success: function(res) {
+                        Swal.fire({ icon: 'success', title: res.message }).then(function() { location.reload(); });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({ icon: 'error', title: xhr.responseJSON?.message || 'Error' });
+                    }
+                });
+            }
+        });
+    }
+
+    // ── Change Agency Modal Submit ──
+    $(document).on('click', '#submitChangeAgency', function() {
+        var agencyId = $('#changeAgencySelect').val();
+        if (!agencyId) {
+            Swal.fire({ icon: 'warning', title: '{{ __("Please select an agency") }}' });
+            return;
+        }
+        $.ajax({
+            url: '{{ route("users.change-agency", $user->id) }}',
+            type: 'POST',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || LA.token },
+            data: { agency_id: agencyId },
+            success: function(res) {
+                $('#changeAgencyModal').modal('hide');
+                Swal.fire({ icon: 'success', title: res.message }).then(function() { location.reload(); });
+            },
+            error: function(xhr) {
+                Swal.fire({ icon: 'error', title: xhr.responseJSON?.message || 'Error' });
+            }
+        });
+    });
+
+    // Init select2 for change agency modal
+    $(document).on('shown.bs.modal', '#changeAgencyModal', function() {
+        $('#changeAgencySelect').select2({
+            placeholder: '{{ __("Select Agency") }}',
+            allowClear: true,
+            dropdownParent: $('#changeAgencyModal'),
+            ajax: {
+                url: '/admin/search/host-agency',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) { return { q: params.term }; },
+                processResults: function(data) {
+                    var items = data.data || data;
+                    return { results: items.map(function(item) { return { id: item.id, text: item.name + ' (' + item.id + ')' }; }) };
+                },
+                cache: true
+            }
+        });
+    });
+
 </script>
+
+{{-- Change Agency Modal --}}
+<div class="modal fade" id="changeAgencyModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;">
+                <h5 class="modal-title"><i class="fa fa-exchange"></i> {{ __('dashboard.changeAgency') }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:#fff;opacity:0.9;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>{{ __('Select Agency') }}</label>
+                    <select id="changeAgencySelect" class="form-control" style="width:100%;"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="submitChangeAgency">{{ __('save') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
 

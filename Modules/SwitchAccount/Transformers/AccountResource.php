@@ -29,7 +29,7 @@ class AccountResource extends JsonResource
         $total_unread_message =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id', 'not Like', $this->id)->where('status', 'not Like', 'seen')->count();
         return [
             'id'            =>  $this->id,
-            'image'         =>  $this->profile->avatar,
+            'image'         =>  $this->profile?->avatar,
             'name'          =>  $this->name,
             'uuid'          => $this->uuid,
             'user_type'     => $this->type_user,

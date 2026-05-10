@@ -79,7 +79,7 @@ class OpenSuperBoxJob implements ShouldQueue
             if ($type == 'string') {
                 $value = Redis::get($cleanKey);
                 if ($value !== false || $value === 'b:0;') {
-                    $unserializedValue = @unserialize($value);
+                    $unserializedValue = @unserialize($value, ['allowed_classes' => false]);
                     $value = $unserializedValue;
                 }
                 $value['created_at'] =now();
@@ -100,7 +100,7 @@ class OpenSuperBoxJob implements ShouldQueue
             if ($type == 'string') {
                 $value = Redis::get($cleanKey);
                 if ($value !== false || $value === 'b:0;') {
-                    $unserializedValue = @unserialize($value);
+                    $unserializedValue = @unserialize($value, ['allowed_classes' => false]);
                     $value = $unserializedValue;
                 }
                 $value['updated_at'] =now();

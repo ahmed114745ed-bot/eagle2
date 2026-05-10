@@ -1299,6 +1299,18 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                 ],
             ],
+            [
+                'name' => 'Sensitive Word',
+                'sort' => 51,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 51],
+                ],
+                'permissions' => [
+                    ['key' => 'sensitive-word', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                ],
+            ],
         ];
 
 

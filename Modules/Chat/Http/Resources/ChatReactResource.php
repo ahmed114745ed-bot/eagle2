@@ -25,7 +25,7 @@ class ChatReactResource extends JsonResource
                 'id'   =>$user->id ,
                 'uuid'   =>$user->uuid ,
                 'name' =>$user->name ?? '',
-                'img'  =>$user->profile->avatar ?? null,
+                'img'  =>$user->profile?->avatar ?? null,
             ];
         }
         else{

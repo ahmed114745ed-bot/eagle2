@@ -22,10 +22,10 @@ class GameRankingResource extends JsonResource
             'coins' => $this->exp,
 
             'user'      => [
-                'id'      => @$this->user->id ?? 0,
-                'uuid'    => @$this->user->uuid ?? 0,
-                'name'    => @$this->user->name ?? '',
-                'image'   => @$this->user->profile?->avatar ?? '',
+                'id'      => $this->user?->id ?? 0,
+                'uuid'    => $this->user?->uuid ?? 0,
+                'name'    => $this->user?->name ?? '',
+                'image'   => $this->user?->profile?->avatar ?? '',
             ]
 
         ];

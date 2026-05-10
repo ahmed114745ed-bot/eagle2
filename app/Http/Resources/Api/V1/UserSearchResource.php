@@ -41,9 +41,9 @@ class UserSearchResource extends JsonResource
             'name'=>@$this->name?:'',
             'visit_time' => '',
             'profile'=> [
-                'image' => @$this->profile->avatar,
-                'age' => Carbon::parse (@$this->profile->birthday)->age,
-                'gender'=>(integer)@$this->profile->gender ?? 1 ,
+                'image' => $this->profile?->avatar,
+                'age' => Carbon::parse($this->profile?->birthday)->age,
+                'gender'=>(integer)($this->profile?->gender ?? 1),
             ],
             'frame'=>Common::getUserDress($this->id,$this->dress_1,4,'img2', true)?:Common::getUserDress($this->id,$this->dress_1,4,'img1', true),
             'frame_id'=>@$this->dress_1,

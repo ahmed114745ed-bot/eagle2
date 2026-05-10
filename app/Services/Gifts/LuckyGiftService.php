@@ -44,14 +44,17 @@ class LuckyGiftService
     {
     }
 
-    private function acquireUserLock(int $userId, int $timeoutSeconds = 30): \Illuminate\Contracts\Cache\Lock
+    private function acquireUserLock(int $userId, int $timeoutSeconds = 5): \Illuminate\Contracts\Cache\Lock
     {
          $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
 
-         try {
-             $lock->block(15);
-         } catch (LockTimeoutException $e) {
-             throw new InvalidArgumentException(__('api_responses.try_again'));
+         // Non-blocking lock - immediate response instead of waiting
+         if (!$lock->get()) {
+             Log::channel('lucky_gift')->warning('Lock timeout - gift already in progress', [
+                 'user_id' => $userId,
+                 'lock_key' => "lucky_gift_lock:user:{$userId}",
+             ]);
+             throw new InvalidArgumentException(__('api_responses.gift_in_progress'));
          }
 
          return $lock;
@@ -323,9 +326,11 @@ class LuckyGiftService
             $number = $number * $count;
             $roomSessionToAdd = $coinsForOwnerTotal * $count;
 
+            // Use the current in-memory balance (already updated by the loop)
+            // DO NOT refresh() here as it would discard in-memory changes
             $responseData['session'] = $room->session_string;
             $responseData['user_coins'] = $user->di;
-            $responseData['gift_num'] = $receiversCount * $number * $count;
+            $responseData['gift_num'] = $receiversCount * $number;
             $responseData['total_price'] = $totalPrice;
             $responseData['cashback_percentage'] = $total_cashback_percentage;
             $responseData['total_user_win'] = $total_user_win;
@@ -348,6 +353,11 @@ class LuckyGiftService
             ];
 
             $responseData['total_pk'] = $coinsForReceiver;
+
+            // CRITICAL: Save user balance changes to DB BEFORE returning response
+            // This ensures subsequent requests see the updated balance
+            $user->enableSaving = true;
+            $user->save();
 
             // Dispatch post-processing job ASYNCHRONOUSLY
             // This prevents worker blocking and reduces response time to < 10s
@@ -594,12 +604,15 @@ class LuckyGiftService
         
         $coinsForReceiver = $coinsForReceiver * $count;
         $number = $number * $count;
+
+        // Use the current in-memory balance (already updated by the loop)
+        // DO NOT refresh() here as it would discard in-memory changes
         $newUserCoin = $user->di;
 
         // add session to response
         $responseData['session'] = $room->session_string;
-        $responseData['user_coins'] = $userCoins;
-        $responseData['gift_num'] = $receiversCount * $number * $count;
+        $responseData['user_coins'] = $newUserCoin;
+        $responseData['gift_num'] = $receiversCount * $number;
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
         $responseData['total_user_win'] = $total_user_win;
@@ -609,6 +622,11 @@ class LuckyGiftService
             'max_single_win' => $max_single_win,
             'total_win_count' => $total_count_win,
         ];
+
+        // CRITICAL: Save user balance changes to DB BEFORE returning response
+        // This ensures subsequent requests see the updated balance
+        $user->enableSaving = true;
+        $user->save();
 
         // Dispatch post-processing job ASYNCHRONOUSLY
         // This prevents worker blocking and reduces response time to < 10s

@@ -42,7 +42,7 @@ class AgencyMonthlyHostResource extends JsonResource
             'id' => $this->id,
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'image' => $this->profile->avatar,
+            'image' => $this->profile?->avatar,
             'monthly_diamond' => $this->monthly_diamond_received,
             'last_month_diamond' => $last_month_di,
             'date_of_join' => $join_date,

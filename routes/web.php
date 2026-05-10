@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Performance Fix: LeaderCC spam — 10.5% of all requests (1,047 out of 10K)
+ * hit /leader-cc-game/* without the /api/ prefix and return 404.
+ * This wastes PHP workers and pollutes access logs.
+ * Return 200 OK to stop the game provider from endlessly retrying.
+ */
+Route::prefix('leader-cc-game')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
+    Route::any('{any}', function () {
+        return response()->json(['errorCode' => 0, 'errorMsg' => 'ok', 'data' => []]);
+    })->where('any', '.*');
+});
+
 // V7 FairLuck Monitor (temp, public, obscured path)
 Route::get('monitor/v7/3305d927f49322e0', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'dashboard']);
 Route::get('monitor/v7/3305d927f49322e0/api', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'apiStats']);
@@ -2179,7 +2191,7 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
-Route::get('/run-lucky-gift-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-test', function () {
     Artisan::call('cache:clear');
     $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 
@@ -2200,7 +2212,7 @@ Route::get('/run-lucky-gift-test', function () {
     ]);
 });
 
-Route::get('/run-lucky-gift-unit-test', function () {
+Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
     $command = 'php ' . escapeshellarg(base_path('vendor/bin/phpunit')) .
         ' --filter SendLuckyGift2FeatureTest';
 

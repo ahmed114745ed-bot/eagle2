@@ -84,8 +84,9 @@ class CoinService
                 $sessionUrl = $this->createStripePayment($settings, $data);
                 return Common::apiResponse(1, 'ok', $sessionUrl, 200);
             } elseif ($paymentMethod == 'fawry') {
-                $Active = config('is_fawry_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                if (!$this->validateGateway('is_fawry_active', 'services.fawry', ['fawry_secret', 'fawry_merchant_code', 'fawry_return_url', 'fawry_url', 'fawry_webhook_url'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 $newFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
@@ -95,8 +96,9 @@ class CoinService
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } elseif ($paymentMethod == 'utd_fawry') {
-                $Active = config('is_utd_fawry_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                if (!$this->validateGateway('is_utd_fawry_active', 'services.utd_fawry', ['utd_fawry_secret', 'utd_fawry_merchant_code', 'utd_url', 'utd_fawry_return_url', 'utd_fawry_url'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 $oldFawryService = new FawryPaymentService();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "expenses"];
 
@@ -106,8 +108,9 @@ class CoinService
                 }
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } elseif ($paymentMethod == 'utd_paymob') {
-                $Active = config('is_utd_paymob_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                if (!$this->validateGateway('is_utd_paymob_active', 'services.utd_paymob', ['utd_paymob_secret', 'utd_paymob_merchant_code', 'utd_url', 'utd_paymob_return_url', 'utd_paymob_url'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 $paymobService = new PaymobPaymentService();
 
                 $paymentUrl = $paymobService->createPaymentLink(
@@ -121,14 +124,18 @@ class CoinService
 
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else if ($paymentMethod == 'opay') {
+                if (!$this->validateGateway('is_opay_active', 'nafezly-payments', ['OPAY_CURRENCY', 'OPAY_SECRET_KEY', 'OPAY_PUBLIC_KEY', 'OPAY_MERCHANT_ID', 'OPAY_COUNTRY_CODE', 'OPAY_BASE_URL', 'OPAY_WEBHOOK_URL'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 $opay = new OPayController();
                 return $opay->make($data, $user);
             } else if ($paymentMethod == 'zinipay') {
                 $ziniPayService = new ZiniPaymentService();
                 return $ziniPayService->makePayment($log->id, $coin->usd, $user);
             } else if ($paymentMethod == 'paypal') {
-                $Active = config('is_paypal_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                if (!$this->validateGateway('is_paypal_active', 'paypal', ['base_url', 'client_id', 'client_secret', 'currency', 'webhook_id'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 //                $paypalService = new PayPalService();
                 //                $paymentLink = $paypalService->create($log->id, $coin->usd, $user);
                 // $paymentLink = $paypalService->createOrder($log->id, $coin->usd, $user);
@@ -136,14 +143,15 @@ class CoinService
 
                 return Common::apiResponse(1, 'ok', $bladeUrl, 200);
             } else if ($paymentMethod == 'google_pay') {
-                $Active = config('is_google_pay_active');
-                if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                if (!$this->validateGateway('is_google_pay_active', 'googlePay', ['payment_url', 'node_server_name'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 $googlePayService = new GooglePayService();
                 return $googlePayService->initiatePayment($log->id, $log->trx, $request->purchaseToken);
             } elseif ($paymentMethod == 'codapay') {
-                $active = config('is_codapay_active');
-
-                if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                if (!$this->validateGateway('is_codapay_active', 'codapay', ['base_url', 'api_key', 'project_id', 'country', 'pay_type', 'currency'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 $codapayService = new CodapayService();
 
                 $paymentUrl = $codapayService->initiatePayment($log->id, $coin->usd, $user->id);
@@ -152,9 +160,9 @@ class CoinService
                 }
                 return Common::apiResponse(1, $paymentUrl, $paymentUrl, 200);
             } elseif ($paymentMethod == 'utd') {
-                $active = config('is_utd_active');
-
-                if (! $active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                if (!$this->validateGateway('is_utd_active', 'utd', ['base_url', 'api_key', 'project_id', 'webhook_secret'])) {
+                    return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
+                }
                 $utdService = new UtdService();
 
                 $paymentUrl = $utdService->initiatePayment($log->id, $coin->usd, $user);
@@ -265,6 +273,17 @@ class CoinService
         return $this->coinLogRepository->getShippingAgencyCoinLogs($id);
     }
 
+
+    private function validateGateway(string $activeKey, string $configGroup, array $requiredKeys): bool
+    {
+        if (!config($activeKey)) return false;
+
+        foreach ($requiredKeys as $key) {
+            if (empty(config("{$configGroup}.{$key}"))) return false;
+        }
+
+        return true;
+    }
 
     private function getStripeSettings(): array
     {

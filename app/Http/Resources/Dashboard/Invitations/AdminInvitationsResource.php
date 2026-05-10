@@ -27,7 +27,7 @@ class AdminInvitationsResource extends JsonResource
         return [
             'user'              => $user,
             'invitations_count' => $this->code_invitations_count,
-            'total_earn'        => $this->code_invitations_earn_sum_parent_percentage,
+            'total_earn'        => $this->code_invitations_earn_sum_amount,
             'updated_at'        => $this->code_invitations,
         ];
     }

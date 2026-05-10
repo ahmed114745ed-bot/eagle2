@@ -28,9 +28,9 @@ class ChatRoomPusherV2Resource extends JsonResource
 
         return [
             'id'             => $this->id,
-            'user_id'        => $user2->id,
-            'name'           => $user2->name,
-            'img'            => @$user2->profile->avatar,
+            'user_id'        => $user2?->id,
+            'name'           => $user2?->name,
+            'img'            => $user2?->profile?->avatar,
             'chat_id'        => $this->id,
             'type'           => $this->type,
             'unread_message' => $total_unread_message,

@@ -10,9 +10,9 @@ class TopUsersRankResource extends JsonResource
     {
         return [
             'id' => $this->user_id,
-            'name' => @$this->user->name ?? '',
-            'uuid' => @$this->user->uuid,
-            'img' => $this->user->profile->avatar ?? '',
+            'name' => $this->user?->name ?? '',
+            'uuid' => $this->user?->uuid,
+            'img' => $this->user?->profile?->avatar ?? '',
             'total_gift' => (int) ($this->total_gift ?? 0),
         ];
     }

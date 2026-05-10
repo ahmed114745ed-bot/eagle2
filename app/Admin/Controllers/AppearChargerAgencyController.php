@@ -528,56 +528,40 @@ class AppearChargerAgencyController extends MainController
         });
 
         $agencyId = $agency->id;
-        $charges = null;
-        $resiveds = null;
-        $coinLogs = null;
 
-        switch ($tab) {
-            case 'charges':
-                $charges = Charge::where('charger_type', 'agency')
-                    ->where('charger_id', $agencyId);
+        // Load charges (sent transactions)
+        $chargesQuery = Charge::where('charger_type', 'agency')
+            ->where('charger_id', $agencyId);
 
-                $relations = [];
-
-                if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
-                    $charges->where('user_type', $request->filter_by);
-                    $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
-                }
-                if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
-                    $charges->where('user_id', $request->filter_id);
-                }
-
-                if (!empty($relations)) {
-                    $charges->with($relations);
-                }
-
-                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
-                break;
-
-            case 'resived':
-                $resiveds = Charge::where('user_id', $agencyId)
-                    ->where('user_type', 'agency');
-
-                if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
-                    $resiveds->where('charger_type', $request->sender_type);
-                }
-                if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
-                    $resiveds->where('charger_id', $request->sender_id);
-                }
-
-                $resiveds = $resiveds->with(['sender'])
-                    ->latest()
-                    ->paginate(10, ['*'], 'resived_page');
-                break;
-
-
-            case 'coinsLog':
-                $coinLogs = CoinLog::where('user_id', $agencyId)
-                    ->where('user_type', 'shipping_agency')
-                    ->latest()
-                    ->paginate(10, ['*'], 'resived_page');
-                break;
+        $relations = [];
+        if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
+            $chargesQuery->where('user_type', $request->filter_by);
+            $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
         }
+        if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
+            $chargesQuery->where('user_id', $request->filter_id);
+        }
+        if (!empty($relations)) {
+            $chargesQuery->with($relations);
+        }
+        $charges = $chargesQuery->latest()->paginate(10, ['*'], 'charges_page');
+
+        // Load received transactions
+        $resivedsQuery = Charge::where('user_id', $agencyId)
+            ->where('user_type', 'agency');
+        if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
+            $resivedsQuery->where('charger_type', $request->sender_type);
+        }
+        if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
+            $resivedsQuery->where('charger_id', $request->sender_id);
+        }
+        $resiveds = $resivedsQuery->with(['sender'])->latest()->paginate(10, ['*'], 'resived_page');
+
+        // Load coin logs
+        $coinLogs = CoinLog::where('user_id', $agencyId)
+            ->where('user_type', 'shipping_agency')
+            ->latest()
+            ->paginate(10, ['*'], 'coins_page');
 
         $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
         $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');

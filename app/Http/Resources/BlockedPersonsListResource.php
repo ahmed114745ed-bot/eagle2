@@ -16,8 +16,8 @@ class BlockedPersonsListResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'uuid' => $this->blockedPerson->uuid,
-            'name' => $this->blockedPerson->name,
+            'uuid' => $this->blockedPerson?->uuid,
+            'name' => $this->blockedPerson?->name,
             'created_at' => $this->created_at ?? '',
         ];
 

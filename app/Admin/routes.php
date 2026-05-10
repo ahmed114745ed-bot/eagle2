@@ -151,7 +151,7 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
+        Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin')->middleware('throttle:admin-login');
     }
 );
 
@@ -732,7 +732,7 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-        Route::resource('charisma-levels', CharismaLevelController::class);
+        Route::resource('charisma-levels', CharismaLevelController::class)->middleware('charisma.badge');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
@@ -846,4 +846,12 @@ Route::group([
     'middleware' => ['web', 'admin'],
 ], function () {
     Route::post('users/removeBd/{id}', [\App\Admin\Controllers\UserController::class, 'removeBD'])->name('users.remove');
+
+    // User Profile Actions
+    Route::post('users/{id}/toggle-transfer-salary', [\App\Admin\Controllers\UserController::class, 'toggleTransferSalary'])->name('users.toggle-transfer-salary');
+    Route::post('users/{id}/toggle-invite-code', [\App\Admin\Controllers\UserController::class, 'toggleInviteCode'])->name('users.toggle-invite-code');
+    Route::post('users/{id}/toggle-can-play', [\App\Admin\Controllers\UserController::class, 'toggleCanPlay'])->name('users.toggle-can-play');
+    Route::post('users/{id}/kick-agency', [\App\Admin\Controllers\UserController::class, 'kickAgency'])->name('users.kick-agency');
+    Route::post('users/{id}/kick-family', [\App\Admin\Controllers\UserController::class, 'kickFamily'])->name('users.kick-family');
+    Route::post('users/{id}/change-agency', [\App\Admin\Controllers\UserController::class, 'changeAgency'])->name('users.change-agency');
 });

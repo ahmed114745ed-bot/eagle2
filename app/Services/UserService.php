@@ -421,6 +421,7 @@ class UserService
             ]);
           //  $this->handleFollowBack($request->user(), $receiver);
             dispatch(new FollowJob($request->user(), $receiver))->onQueue('default');
+            Cache::forget("data_user_{$request->user_id}");
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);
         }
@@ -464,6 +465,7 @@ class UserService
         UserFollowHelper::updateCounts($unFollower);
 
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
+         Cache::forget("data_user_{$unFollower->id}");
         return Common::apiResponse(true, 'unFollow done', null, 200);
     }
 
