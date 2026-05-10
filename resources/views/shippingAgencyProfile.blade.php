@@ -944,28 +944,47 @@ $(document).ready(function() {
 });
 </script>
 
+<style>
+    @keyframes saFadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedTab = (urlParams.get('tab') || 'charges') + '-tab';
     const allTabs = document.querySelectorAll('.sa-tab');
-    let targetElement = null;
+    const allPanels = ['charges-tab', 'resived-tab', 'coinsLog-tab'];
 
     allTabs.forEach(tab => {
-        const target = tab.getAttribute('data-target');
-        const content = document.getElementById(target);
-        if (target === selectedTab) { tab.classList.add('active'); content.style.display = 'block'; targetElement = content; }
-        else { tab.classList.remove('active'); content.style.display = 'none'; }
-
         tab.addEventListener('click', function (e) {
             e.preventDefault();
-            document.getElementById('tab-loading').style.display = 'block';
-            allTabs.forEach(t => t.style.pointerEvents = 'none');
-            setTimeout(() => { window.location.href = tab.getAttribute('href'); }, 300);
+            const targetId = this.getAttribute('data-target');
+
+            // Update active tab
+            allTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Show/hide panels with animation
+            allPanels.forEach(panelId => {
+                const panel = document.getElementById(panelId);
+                if (!panel) return;
+                if (panelId === targetId) {
+                    panel.style.display = 'block';
+                    panel.style.animation = 'none';
+                    panel.offsetHeight; // trigger reflow
+                    panel.style.animation = 'saFadeIn .25s ease';
+                } else {
+                    panel.style.display = 'none';
+                }
+            });
+
+            // Update URL without reload
+            const url = new URL(window.location.href);
+            const tabParam = new URLSearchParams(this.getAttribute('href').replace('?', ''));
+            url.searchParams.set('tab', tabParam.get('tab'));
+            window.history.replaceState({}, '', url.toString());
         });
     });
-
-    if (targetElement) { setTimeout(() => { targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400); }
 });
 </script>
 </body>
