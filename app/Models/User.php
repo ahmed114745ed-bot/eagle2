@@ -1950,7 +1950,8 @@ class User extends Authenticatable
     }
     public function bdSalaries()
     {
-        return $this->hasMany(BDSallary::class, 'bd_id');
+        return PackageHelper::checkRelation($this, 'bd', 'hasMany')
+            ?? $this->hasMany(\Utd\Bd\Entities\BdSalary::class, 'bd_id');
     }
 
     public function getBdSalaryAttribute()
@@ -1963,6 +1964,10 @@ class User extends Authenticatable
 
     public function incrementCutAmountInBdSallary(int $amount)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return false;
+        }
+
         $lastBdSalary = $this->bdSalaries()->latest()->first();
 
         if ($lastBdSalary) {

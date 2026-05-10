@@ -3,9 +3,9 @@
 namespace Modules\AreaManager\Http\Controllers;
 
 use App\Models\Agency;
-use App\Models\BdAgencyHostSallary;
+use Utd\Bd\Entities\BdAgencyHostSallary;
 use App\Models\Charge;
-use App\Models\BdSalary;
+use Utd\Bd\Entities\BdSalary;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Controllers\AdminController;
+use App\Support\PackageHelper;
 
 
 
@@ -34,6 +35,9 @@ class BdSalariesController extends AdminController
      */
     public function index(Content $content)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return $content->header(trans('salaries'))->description('BD package is not installed.');
+        }
         $appID = Auth::user()->id;
 
         $netSalary = BdSalary::where('bd_id', $appID)

@@ -106,7 +106,7 @@ return [
 
         'bd_users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Bd::class,
+            'model' => Utd\Bd\Entities\Bd::class,
         ],
         // 'users' => [
         //     'driver' => 'database',

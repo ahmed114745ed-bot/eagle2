@@ -3,7 +3,7 @@
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
 use App\Admin\Controllers\MainController;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\Country;
 use Carbon\Carbon;
 use Utd\Chat\Entities\ChatMessage;
@@ -244,7 +244,23 @@ class SuperAdminStatisticController extends MainController
             ->sum('achieved_diamond');
 
         //others
-        $bdCount = Bd::where('parent_id', auth()->id())->where('country_id', $countryID)->count();
+        $bdCount = 0;
+        $totalBDSalary = 0;
+        $totalBDCut = 0;
+        $averageAgenciesPerBD = 0;
+        if (PackageHelper::isInstalled('bd')) {
+            $bdCount = Bd::where('parent_id', auth()->id())->where('country_id', $countryID)->count();
+
+            $totalSalaries = BD::where('parent_id', auth()->id())->where('country_id', $countryID)
+                ->withSum('salaries', 'salary')
+                ->withSum('salaries', 'cut_amount')
+                ->withCount('agencies')
+                ->get();
+
+            $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
+            $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
+            $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
+        }
         $diAuth = Auth::user()->di;
         $totals = Charge::selectRaw("
                 SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
@@ -259,16 +275,6 @@ class SuperAdminStatisticController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
-
-        $totalSalaries = BD::where('parent_id', auth()->id())->where('country_id', $countryID)
-            ->withSum('salaries', 'salary')
-            ->withSum('salaries', 'cut_amount')
-            ->withCount('agencies')
-            ->get();
-
-        $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
-        $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
-        $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
 
         return $content
             ->title(__('Home'))
@@ -640,16 +646,18 @@ class SuperAdminStatisticController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($countryID, $bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
-                    $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
+                if (PackageHelper::isInstalled('bd')) {
+                    $row->column(12, function ($column) use ($countryID, $bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
+                        $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
-                    $column->row(function (Row $row) use ($countryID, $bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
-                        $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', admin_url("usersBD"), $bdCount));
-                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', admin_url("bd-salaries"), number_format($totalBDSalary)));
-                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', admin_url("bd-salaries"), number_format($totalBDCut)));
-                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', admin_url("bd-salaries"), number_format($averageAgenciesPerBD)));
+                        $column->row(function (Row $row) use ($countryID, $bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
+                            $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', admin_url("usersBD"), $bdCount));
+                            $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', admin_url("bd-salaries"), number_format($totalBDSalary)));
+                            $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', admin_url("bd-salaries"), number_format($totalBDCut)));
+                            $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', admin_url("bd-salaries"), number_format($averageAgenciesPerBD)));
+                        });
                     });
-                });
+                }
 
                 $row->column(12, function ($column) use ($game) {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('game') . "</h3>");

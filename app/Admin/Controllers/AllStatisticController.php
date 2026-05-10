@@ -15,7 +15,7 @@ use App\Models\GameChargeHistory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use Carbon\Carbon;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Room\Entities\Room;
@@ -616,6 +616,15 @@ class AllStatisticController extends MainController
 
     public function getBdStats()
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return response()->json([
+                'bdCount' => 0,
+                'totalBDSalary' => 0,
+                'totalBDCut' => 0,
+                'averageAgenciesPerBD' => 0,
+            ]);
+        }
+
         $countryID = $this->countryId();
 
         $bdCount = Bd::when($countryID, fn($q) => $q->where('country_id', $countryID))->count();

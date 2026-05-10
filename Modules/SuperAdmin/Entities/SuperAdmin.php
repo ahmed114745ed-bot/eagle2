@@ -5,9 +5,10 @@ namespace Modules\SuperAdmin\Entities;
 use App\Models\Admin;
 use App\Models\AdminUser;
 use App\Models\Agency;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\Country;
 use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\CreatedByTrait;
 use DB;
 use Exception;
@@ -114,8 +115,10 @@ class SuperAdmin extends Model
                 ->first();
 
             if ($defaultSuperAdmin) {
-                Bd::where('parent_id', $superAdmin->id)
-                    ->update(['parent_id' => $defaultSuperAdmin->id]);
+                if (PackageHelper::isInstalled('bd')) {
+                    Bd::where('parent_id', $superAdmin->id)
+                        ->update(['parent_id' => $defaultSuperAdmin->id]);
+                }
             } else {
 
                 throw new Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
@@ -139,20 +142,24 @@ class SuperAdmin extends Model
 
             if ($model->default) {
                 static::query()->update(['default' => 0]);
-                Bd::where(function ($query) {
-                    $query->whereNull('parent_id')
-                        ->orWhere('parent_id', 0);
-                })->update(['parent_id' => $model->id]);
+                if (PackageHelper::isInstalled('bd')) {
+                    Bd::where(function ($query) {
+                        $query->whereNull('parent_id')
+                            ->orWhere('parent_id', 0);
+                    })->update(['parent_id' => $model->id]);
+                }
             }
         });
 
         self::updating(function ($model) {
             if ($model->default) {
                 static::where('id', '!=', $model->id)->update(['default' => 0]);
-                Bd::where(function ($query) {
-                    $query->whereNull('parent_id')
-                        ->orWhere('parent_id', 0);
-                })->update(['parent_id' => $model->id]);
+                if (PackageHelper::isInstalled('bd')) {
+                    Bd::where(function ($query) {
+                        $query->whereNull('parent_id')
+                            ->orWhere('parent_id', 0);
+                    })->update(['parent_id' => $model->id]);
+                }
             }
 
             if ($model->app_id) {

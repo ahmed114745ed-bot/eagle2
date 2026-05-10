@@ -209,7 +209,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         Nwidart\Modules\LaravelModulesServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
-        App\Bd\BdServiceProvider::class,
+        Utd\Bd\BdServiceProvider::class,
         App\Providers\TimeServiceProvider::class,
         Modules\AreaManager\Providers\AreaManagerServiceProvider::class,
         Modules\SuperAdmin\Providers\SuperAdminServiceProvider::class,

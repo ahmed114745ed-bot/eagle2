@@ -17,7 +17,7 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\BdSalaryMigrationController;
+use Utd\Bd\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\SettingsController;
@@ -26,7 +26,7 @@ use App\Http\Controllers\TestsController;
 use App\Http\Controllers\WelcomeController;
 use App\Jobs\UpdateUserFollowCountsJob;
 use App\Models\Ban;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\CoinGameUserAll;
 use App\Models\Country;
 use App\Models\DeleteAccount;
@@ -730,6 +730,9 @@ Route::get('/fix-agencies-bd', function () {
 });
 
 Route::get('assign-super-admin-bd', function () {
+    if (!PackageHelper::isInstalled('bd')) {
+        return "BD package is not installed.";
+    }
     $bds = Bd::whereNull('parent_id')->get();
 
     foreach ($bds as $bd) {
@@ -952,27 +955,29 @@ Route::get('remove-minus', function () {
         //         DB::table('user_sallaries')->insert($insertData);
         //     });
 
-        DB::table('bd_sallaries')
-            ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
-            ->groupBy('bd_id', 'agency_id')
-            ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
-            ->orderBy('bd_id')
-            ->chunk(100, function ($bds) use ($currentMonth, $currentYear) {
-                $insertData = [];
-                foreach ($bds as $bd) {
-                    $insertData[] = [
-                        'bd_id' => $bd->bd_id,
-                        'agency_id' => $bd->agency_id,
-                        'cut_amount' => ($bd->total_sallary - $bd->total_cut_amount),
-                        'month' => $currentMonth,
-                        'year' => $currentYear,
-                        'sallary' => 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-                DB::table('bd_sallaries')->insert($insertData);
-            });
+        if (PackageHelper::isInstalled('bd')) {
+            DB::table('bd_sallaries')
+                ->select('bd_id', 'agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))
+                ->groupBy('bd_id', 'agency_id')
+                ->havingRaw('SUM(sallary) - SUM(cut_amount) < 0')
+                ->orderBy('bd_id')
+                ->chunk(100, function ($bds) use ($currentMonth, $currentYear) {
+                    $insertData = [];
+                    foreach ($bds as $bd) {
+                        $insertData[] = [
+                            'bd_id' => $bd->bd_id,
+                            'agency_id' => $bd->agency_id,
+                            'cut_amount' => ($bd->total_sallary - $bd->total_cut_amount),
+                            'month' => $currentMonth,
+                            'year' => $currentYear,
+                            'sallary' => 0,
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+                    DB::table('bd_sallaries')->insert($insertData);
+                });
+        }
 
         DB::table('agency_sallaries')
             ->select('agency_id', DB::raw('SUM(sallary) as total_sallary'), DB::raw('SUM(cut_amount) as total_cut_amount'))

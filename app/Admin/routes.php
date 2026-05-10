@@ -18,8 +18,6 @@ use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\BanTypeController;
-use App\Admin\Controllers\BdController;
-use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\ChangeCountryRequestController;
@@ -474,13 +472,6 @@ Route::group(
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
-        Route::resource('usersBd', BdController::class);
-        Route::resource('user-Bds', BdController::class);
-        Route::resource('usersBd-settings', BdSelectController::class);
-
-        Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
-        Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
-        Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
         Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
@@ -658,7 +649,6 @@ Route::group(
 
         Route::get('/pusher-channels', [PusherStatisticsController::class, 'index'])->name('pusher.channels.index');
 
-        Route::get('professional-bd', [BdController::class, 'professionalBd']);
 
 
         Route::post('/set-preview-area-manager', function () {

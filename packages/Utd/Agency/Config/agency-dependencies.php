@@ -31,7 +31,7 @@ return [
             'setting' => App\Models\Setting::class,
             'language' => App\Models\Language::class,
             'payment_gateway' => App\Models\PaymentGateway::class,
-            'bd' => App\Models\Bd::class,
+            'bd' => Utd\Bd\Entities\Bd::class,
             'user_target' => App\Models\UserTarget::class,
             'gift' => Utd\Gifts\Entities\Gift::class,
             'room' => Utd\Room\Entities\Room::class,

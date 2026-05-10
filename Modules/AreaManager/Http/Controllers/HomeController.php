@@ -2,7 +2,8 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
+use App\Support\PackageHelper;
 use App\Models\CoinLog;
 use App\Models\GameChargeHistory;
 use App\Models\GameWallet;
@@ -246,7 +247,23 @@ class HomeController extends MainController
             ->sum('achieved_diamond');
 
         //others
-        $bdCount = Bd::whereIn('parent_id', $superAdmins)->whereIn('country_id', $countries)->count();
+        $bdCount = 0;
+        $totalBDSalary = 0;
+        $totalBDCut = 0;
+        $averageAgenciesPerBD = 0;
+        if (PackageHelper::isInstalled('bd')) {
+            $bdCount = Bd::whereIn('parent_id', $superAdmins)->whereIn('country_id', $countries)->count();
+
+            $totalSalaries = BD::whereIn('parent_id', $superAdmins)->whereIn('country_id', $countries)
+                ->withSum('salaries', 'salary')
+                ->withSum('salaries', 'cut_amount')
+                ->withCount('agencies')
+                ->get();
+
+            $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
+            $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
+            $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
+        }
         $diAuth = Auth::user()->di;
         $totals = Charge::selectRaw("
                 SUM(CASE WHEN user_type = ? AND user_id = ? THEN amount ELSE 0 END) as total_charges,
@@ -261,16 +278,6 @@ class HomeController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
-
-        $totalSalaries = BD::whereIn('parent_id', $superAdmins)->whereIn('country_id', $countries)
-            ->withSum('salaries', 'salary')
-            ->withSum('salaries', 'cut_amount')
-            ->withCount('agencies')
-            ->get();
-
-        $totalBDSalary = $totalSalaries->sum('salaries_sum_salary');
-        $totalBDCut = $totalSalaries->sum('salaries_sum_cut_amount');
-        $averageAgenciesPerBD = $totalSalaries->avg('agencies_count');
 
         return parent::index($content
             ->title(__('Home'))
@@ -642,16 +649,18 @@ class HomeController extends MainController
                         });
                     });
                 });
-                $row->column(12, function ($column) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
-                    $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
+                if (PackageHelper::isInstalled('bd')) {
+                    $row->column(12, function ($column) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
+                        $column->row("<h3 style='margin:10px 0;'>💼 " . __('BD') . "</h3>");
 
-                    $column->row(function (Row $row) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
-                        $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', 'areaManager/usersBD', $bdCount));
-                        $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'areaManager/bd-salaries', number_format($totalBDSalary)));
-                        $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'areaManager/bd-salaries', number_format($totalBDCut)));
-                        $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'areaManager/usersBD', number_format($averageAgenciesPerBD)));
+                        $column->row(function (Row $row) use ($bdCount, $totalBDSalary, $totalBDCut, $averageAgenciesPerBD) {
+                            $row->column(3, new InfoBox(__('Bd Count'), 'briefcase', 'aqua', 'areaManager/usersBD', $bdCount));
+                            $row->column(3, new InfoBox(__('Total BD Salary'), 'wallet', 'green', 'areaManager/bd-salaries', number_format($totalBDSalary)));
+                            $row->column(3, new InfoBox(__('Total Cut Amount'), 'money-bill-wave', 'red', 'areaManager/bd-salaries', number_format($totalBDCut)));
+                            $row->column(3, new InfoBox(__('Average Agencies Per BD'), 'briefcase', 'aqua', 'areaManager/usersBD', number_format($averageAgenciesPerBD)));
+                        });
                     });
-                });
+                }
 
                 $row->column(12, function ($column) use ($game) {
                     $column->row("<h3 style='margin:10px 0;'>💼 " . __('game') . "</h3>");
@@ -1190,6 +1199,15 @@ class HomeController extends MainController
 
     public function getBdStats(): JsonResponse
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return response()->json([
+                'bdCount' => 0,
+                'totalBDSalary' => 0,
+                'totalBDCut' => 0,
+                'averageAgenciesPerBD' => 0,
+            ]);
+        }
+
         $countries = $this->countries();
         $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
         $superAdmins = SuperAdmin::where('parent_id', $authId)->pluck('id')->toArray();

@@ -215,55 +215,6 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('bd_sallaries')) {
-            Schema::create('bd_sallaries', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('bd_id')->default(0);
-                $table->unsignedBigInteger('agency_id')->default(0);
-                $table->double('sallary', 15, 2)->default(0);
-                $table->float('cut_amount')->default(0);
-                $table->integer('month')->default(0);
-                $table->integer('year')->default(0);
-                $table->boolean('is_paid')->default(0);
-                $table->decimal('total_agency_sallary', 15, 2)->default(0);
-                $table->decimal('total_users_sallary', 15, 2)->default(0);
-                $table->decimal('total_diamond', 15, 2)->default(0);
-                $table->timestamps();
-
-                $table->index('bd_id');
-            });
-        }
-
-        if (! Schema::hasTable('bd_agency_host_sallaries')) {
-            Schema::create('bd_agency_host_sallaries', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('bd_id');
-                $table->unsignedBigInteger('agency_id');
-                $table->unsignedBigInteger('user_id');
-                $table->unsignedBigInteger('bd_user_id')->nullable();
-                $table->decimal('salary', 15, 2)->default(0);
-                $table->integer('add_month');
-                $table->integer('add_year');
-                $table->timestamps();
-
-                $table->index(['bd_id', 'agency_id']);
-            });
-        }
-
-        if (! Schema::hasTable('bd_salaries')) {
-            Schema::create('bd_salaries', function (Blueprint $table) {
-                $table->id();
-                $table->unsignedBigInteger('bd_id');
-                $table->unsignedBigInteger('bd_user_id')->nullable();
-                $table->decimal('salary', 15, 2)->default(0);
-                $table->integer('month');
-                $table->integer('year');
-                $table->timestamps();
-
-                $table->index('bd_id');
-            });
-        }
-
         if (Schema::hasTable('users')) {
             Schema::table('users', function (Blueprint $table) {
                 if (! Schema::hasColumn('users', 'agency_id')) {
@@ -305,9 +256,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bd_salaries');
-        Schema::dropIfExists('bd_agency_host_sallaries');
-        Schema::dropIfExists('bd_sallaries');
         Schema::dropIfExists('users_joined_agencies');
         Schema::dropIfExists('agency_user_jobs');
         Schema::dropIfExists('leave_agency_requests');

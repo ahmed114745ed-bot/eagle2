@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Models\Scopes\HostAgencyScope;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Bd\Entities\Bd;
 use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -188,7 +190,8 @@ class Charge extends Model
 
     public function bd()
     {
-        return $this->belongsTo(Bd::class, 'charger_id');
+        return PackageHelper::checkRelation($this, 'bd', 'belongsTo')
+            ?? $this->belongsTo(Bd::class, 'charger_id');
     }
 
 

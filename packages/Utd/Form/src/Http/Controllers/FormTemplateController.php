@@ -3,7 +3,8 @@
 namespace Utd\Form\Http\Controllers;
 
 use App\Helpers\Common;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
+use App\Support\PackageHelper;
 use App\Models\Agency;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
@@ -416,6 +417,9 @@ class FormTemplateController extends Controller
         $lang = $request->get('lang') ?? app()->getLocale();
 
         app()->setLocale($lang);
+        if (!PackageHelper::isInstalled('bd')) {
+            return response()->json(['data' => []]);
+        }
         $bds = Bd::where('name', 'like', "%{$query}%")
             ->orWhere('id', 'like', "%{$query}%")
             ->limit(6)

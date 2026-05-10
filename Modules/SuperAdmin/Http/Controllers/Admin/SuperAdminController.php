@@ -3,7 +3,7 @@
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -568,35 +568,37 @@ class SuperAdminController extends MainController
             }
             $isEditing = $form->isEditing();
             if (!$isEditing) {
-                $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
+                if (PackageHelper::isInstalled('bd')) {
+                    $countryName = Country::whereId($superAdmin->country_id)->first()->e_name;
 
-                $newBdId = DB::table('admin_users')->insertGetId([
-                    'parent_id' => $superAdmin->id,
-                    'username' => 'bd' . $countryName . 'default',
-                    'name' => 'bd' . $countryName . 'default',
-                    'password' => Hash::make('bd' . $countryName . 'default'),
-                    'default' => 1,
-                    'country_id' => $superAdmin->country_id,
-                    'type' => 'bd',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-                $defaultBd =  Bd::where('country_id', $superAdmin->country_id)->where('default', 1)->first();
-                if ($defaultBd) {
-                    $defaultBd->password   = Hash::make(Str::random(10));
-                    $defaultBd->save();
+                    $newBdId = DB::table('admin_users')->insertGetId([
+                        'parent_id' => $superAdmin->id,
+                        'username' => 'bd' . $countryName . 'default',
+                        'name' => 'bd' . $countryName . 'default',
+                        'password' => Hash::make('bd' . $countryName . 'default'),
+                        'default' => 1,
+                        'country_id' => $superAdmin->country_id,
+                        'type' => 'bd',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $defaultBd =  Bd::where('country_id', $superAdmin->country_id)->where('default', 1)->first();
+                    if ($defaultBd) {
+                        $defaultBd->password   = Hash::make(Str::random(10));
+                        $defaultBd->save();
+                    }
+                    Bd::where('country_id', $superAdmin->country_id)->update(['parent_id' => $superAdmin->id]);
+
+                    Agency::where('country_id', $superAdmin->country_id)->where(function ($q) {
+                        $q->whereDoesntHave('bd')
+                            ->orWhereHas('bd', function ($q) {
+                                $q->where([
+                                    'default' => 1,
+                                    'country_id' => 0
+                                ]);
+                            });
+                    })->update(['bd_id' => $newBdId]);
                 }
-                Bd::where('country_id', $superAdmin->country_id)->update(['parent_id' => $superAdmin->id]);
-
-                Agency::where('country_id', $superAdmin->country_id)->where(function ($q) {
-                    $q->whereDoesntHave('bd')
-                        ->orWhereHas('bd', function ($q) {
-                            $q->where([
-                                'default' => 1,
-                                'country_id' => 0
-                            ]);
-                        });
-                })->update(['bd_id' => $newBdId]);
             }
         });
 
@@ -694,7 +696,9 @@ class SuperAdminController extends MainController
         $totalSpent   = $totals->total_spent;
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
-        $bds = Bd::where('parent_id', $id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+        $bds = PackageHelper::isInstalled('bd')
+            ? Bd::where('parent_id', $id)->with('appUser')->paginate(10, ['*'], 'bd_page')
+            : collect();
         $prefix = dashboardName();
         switch ($tab) {
             case 'agencies':
@@ -745,7 +749,9 @@ class SuperAdminController extends MainController
 
         $totalCharges = $totals->total_charges;
         $totalSpent   = $totals->total_spent;
-        $bds = Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page');
+        $bds = PackageHelper::isInstalled('bd')
+            ? Bd::where('parent_id', $superAdmin->id)->with('appUser')->paginate(10, ['*'], 'bd_page')
+            : collect();
 
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');

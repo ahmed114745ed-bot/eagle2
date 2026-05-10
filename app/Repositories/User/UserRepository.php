@@ -4,7 +4,8 @@ namespace App\Repositories\User;
 
 use App\Helpers\AgencyPackageHelper;
 use Exception;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
+use App\Support\PackageHelper;
 use App\Models\User;
 use App\Models\Follow;
 use App\helper\UserDataHelper;
@@ -195,6 +196,9 @@ class UserRepository extends Repository
 
     public function user_bd2($key, $page, $perPage)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return collect();
+        }
         return Bd::selectRaw('concat(COALESCE(username, ""), " - ", id) as name, id')
             ->where(function ($query) use ($key) {
 
@@ -205,6 +209,9 @@ class UserRepository extends Repository
 
     public function userBdByCountries($areaManagerId, $key, $page, $perPage)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return collect();
+        }
         $areaManager = AreaManager::find($areaManagerId);
         if (!$areaManager)  $areaManager = SubAreaManager::with('countries')->find($areaManagerId);
         if (!$areaManager) return collect();

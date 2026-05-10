@@ -87,7 +87,7 @@ trait AgencyRelationsTrait
      */
     public function bd(): BelongsTo
     {
-        return $this->belongsTo($this->getModelClass('bd', \App\Models\Bd::class), 'bd_id');
+        return $this->belongsTo($this->getModelClass('bd', \Utd\Bd\Entities\Bd::class), 'bd_id');
     }
 
     /**

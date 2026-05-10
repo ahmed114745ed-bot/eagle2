@@ -73,7 +73,8 @@
         "utd/switch-account": "*",
         "utd/task-stream": "*",
         "utd/users-wallet": "dev-achievmentPackage",
-        "utd/vip": "*"
+        "utd/vip": "*",
+        "utd/bd": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -284,6 +285,10 @@
         {
             "type": "path",
             "url": "packages/Utd/UsersWallet"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Bd"
         }
     ]
 }

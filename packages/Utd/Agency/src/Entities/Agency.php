@@ -491,7 +491,7 @@ class Agency extends Model
 
     public function bd()
     {
-        $bdClass = config('agency-package.models.bd', \App\Models\Bd::class);
+        $bdClass = config('agency-package.models.bd', \Utd\Bd\Entities\Bd::class);
 
         return $this->belongsTo($bdClass, 'bd_id');
     }

@@ -8,7 +8,7 @@ trait DefaultBdAssignmentTrait
     {
         static::creating(function ($model) {
             if (empty($model->bd_id)) {
-                $bdClass = config('agency-package.models.bd', \App\Models\Bd::class);
+                $bdClass = config('agency-package.models.bd', \Utd\Bd\Entities\Bd::class);
 
                 $defaultBd = $bdClass::where('type', 'bd')
                     ->where('default', true)
@@ -23,7 +23,7 @@ trait DefaultBdAssignmentTrait
 
         static::updating(function ($model) {
             if (empty($model->bd_id)) {
-                $bdClass = config('agency-package.models.bd', \App\Models\Bd::class);
+                $bdClass = config('agency-package.models.bd', \Utd\Bd\Entities\Bd::class);
 
                 $defaultBd = $bdClass::where('type', 'bd')
                     ->where('default', true)

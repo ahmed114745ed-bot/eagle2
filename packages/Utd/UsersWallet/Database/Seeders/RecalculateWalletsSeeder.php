@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
+use App\Support\PackageHelper;
 use Utd\UsersWallet\Helpers\WalletHelper;
 
 class RecalculateWalletsSeeder extends Seeder
@@ -152,11 +153,14 @@ class RecalculateWalletsSeeder extends Seeder
 
         // BD aggregation: bd_salaries + bd_agency_host_sallaries — apply with WalletLog entries
         // BD aggregation: map bd records to their app user and credit the correct user wallets
-        \App\Models\BdSalary::query()->orderBy('id')->chunk(200, function ($bdRows) {
+        if (!PackageHelper::isInstalled('bd')) {
+            Log::info('RecalculateWalletsSeeder: BD package not installed, skipping BD aggregation.');
+        } else {
+        \Utd\Bd\Entities\BdSalary::query()->orderBy('id')->chunk(200, function ($bdRows) {
             foreach ($bdRows as $b) {
                 try {
                     // bd_id refers to admin_users.id (Bd). We need the related app user id (app_id) to credit the correct wallet
-                    $bd = \App\Models\Bd::find($b->bd_id);
+                    $bd = \Utd\Bd\Entities\Bd::find($b->bd_id);
                     if (! $bd || ! $bd->app_id) {
                         Log::warning('RecalculateWalletsSeeder: bd record missing or not linked to an app user for bd_salary '.$b->id, ['bd_id' => $b->bd_id]);
                         continue;
@@ -252,6 +256,7 @@ class RecalculateWalletsSeeder extends Seeder
                 }
             }
         });
+        } // end BD package check
 
         // Verification: compare wallets to expected sums and fail if mismatch
         $errors = [];
@@ -286,13 +291,14 @@ class RecalculateWalletsSeeder extends Seeder
                 // NOTE: bd_agency_host_sallaries (host amounts) are already applied per-target when processing UserSallary (dB)
                 // and are recorded as WalletLog entries. To avoid double-counting we treat host amounts as separate logs
                 // and exclude them from the aggregated expectedBalance here.
-                $bdIds = DB::table('admin_users')->where('app_id', $uid)->pluck('id')->toArray();
-                if (!empty($bdIds)) {
-                    $bdSalarySum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('salary');
-                    $bdCutSum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('cut_amount');
-                } else {
-                    $bdSalarySum = 0.0;
-                    $bdCutSum = 0.0;
+                $bdSalarySum = 0.0;
+                $bdCutSum = 0.0;
+                if (PackageHelper::isInstalled('bd')) {
+                    $bdIds = DB::table('admin_users')->where('app_id', $uid)->pluck('id')->toArray();
+                    if (!empty($bdIds)) {
+                        $bdSalarySum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('salary');
+                        $bdCutSum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('cut_amount');
+                    }
                 }
 
                 // Host shares (dB) are applied per-target via UserSallary; do not double count here
@@ -319,10 +325,14 @@ class RecalculateWalletsSeeder extends Seeder
                             ->get();
 
                         // BD records that map to this user
-                        $bdIds = DB::table('admin_users')->where('app_id', $uid)->pluck('id')->toArray();
-
-                        $bdSallariesRows = !empty($bdIds) ? DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->get() : collect();
-                        $bdHostRows = !empty($bdIds) ? DB::table('bd_agency_host_sallaries')->whereIn('bd_id', $bdIds)->get() : collect();
+                        $bdIds = [];
+                        $bdSallariesRows = collect();
+                        $bdHostRows = collect();
+                        if (PackageHelper::isInstalled('bd')) {
+                            $bdIds = DB::table('admin_users')->where('app_id', $uid)->pluck('id')->toArray();
+                            $bdSallariesRows = !empty($bdIds) ? DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->get() : collect();
+                            $bdHostRows = !empty($bdIds) ? DB::table('bd_agency_host_sallaries')->whereIn('bd_id', $bdIds)->get() : collect();
+                        }
 
                         Log::error('RecalculateWalletsSeeder mismatch details', [
                             'user' => $uid,

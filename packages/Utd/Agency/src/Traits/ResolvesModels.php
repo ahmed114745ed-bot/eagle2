@@ -222,7 +222,7 @@ trait ResolvesModels
      */
     protected function getBdModel(): ?string
     {
-        return $this->resolveModel('bd', \App\Models\Bd::class);
+        return $this->resolveModel('bd', \Utd\Bd\Entities\Bd::class);
     }
 
     /**

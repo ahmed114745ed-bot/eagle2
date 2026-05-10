@@ -3,7 +3,7 @@
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
 use App\Helpers\Common;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\Charge;
 use App\Models\CoinLog;
 use App\Models\GameChargeHistory;
@@ -587,6 +587,15 @@ class HomeController extends  MainController
 
     public function getBdStats(): JsonResponse
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return response()->json([
+                'bdCount' => 0,
+                'totalBDSalary' => 0,
+                'totalBDCut' => 0,
+                'averageAgenciesPerBD' => 0,
+            ]);
+        }
+
         $countryID = $this->countryId();
 
         $bdCount = Bd::where('parent_id', auth()->id())->where('country_id', $countryID)->count();

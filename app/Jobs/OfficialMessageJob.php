@@ -2,9 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\User;
 use App\Models\Agency;
+use App\Support\PackageHelper;
 use App\Support\FamilyPackage;
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
@@ -228,14 +229,16 @@ class OfficialMessageJob implements ShouldQueue
 
             $usersId = $users->pluck('id')->toArray();
         } elseif ($feature && $feature === 'bds') {
-            $users = Bd::query()
-                ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
-                ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
-                ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
-                 ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
-                ->get();
+            if (PackageHelper::isInstalled('bd')) {
+                $users = Bd::query()
+                    ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))
+                    ->when($subFeature === 'area_country', fn($q) => $q->whereIn('country_id', $countriesIds))
+                    ->when($subFeature === 'your_country', fn($q) => $q->where('country_id', $this->admin->country_id))
+                     ->when($subFeature === 'ids', fn($q) => $q->whereIn('id', $featureIds))
+                    ->get();
 
-            $usersId = $users->pluck('app_id')->toArray();
+                $usersId = $users->pluck('app_id')->toArray();
+            }
         } elseif ($feature && $feature === 'shipping_agency') {
             $agencies = ShippingAgency::query()
                 ->when($subFeature === 'country', fn($q) => $q->whereIn('country_id', $featureIds))

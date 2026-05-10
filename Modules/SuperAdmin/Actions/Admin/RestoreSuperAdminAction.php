@@ -2,8 +2,9 @@
 
 namespace Modules\SuperAdmin\Actions\Admin;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\User;
+use App\Support\PackageHelper;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Illuminate\Http\Request;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
@@ -33,7 +34,9 @@ class RestoreSuperAdminAction extends Action
             if ($user->is_super_admin) return $this->response()->error(__('can not restore this super admin user taken'))->refresh();
             $superAdmin->restore();
             $default = SuperAdmin::where('default', 1)->first();
-            Bd::where('country_id', $superAdmin->country_id)->where('parent_id', $default->id)->update(['parent_id' => $superAdmin->id]);
+            if (PackageHelper::isInstalled('bd')) {
+                Bd::where('country_id', $superAdmin->country_id)->where('parent_id', $default->id)->update(['parent_id' => $superAdmin->id]);
+            }
             return $this->response()->success(__(' successfully'))->refresh();
         } catch (\Exception $exception) {
             return $this->response()->error(__('Something went wrong') . $exception->getMessage());

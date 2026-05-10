@@ -2,7 +2,7 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -596,8 +596,10 @@ class AgencyController extends MainController
     {
         return function ($value) use ($editing) {
             $ops = [];
-            foreach (Bd::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
+            if (PackageHelper::isInstalled('bd')) {
+                foreach (Bd::where('id', $value)->get() as $user) {
+                    $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
+                }
             }
             return $ops;
         };
@@ -675,13 +677,14 @@ class AgencyController extends MainController
     {
         $form->saving(function (Form $form) {
             if (!$form->bd_id && !$form->model()->bd_id) {
+                if (PackageHelper::isInstalled('bd')) {
+                    $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
 
-                $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
-
-                if ($defaultBd) {
-                    $form->bd_id = $defaultBd->id;
-                } else {
-                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                    if ($defaultBd) {
+                        $form->bd_id = $defaultBd->id;
+                    } else {
+                        throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                    }
                 }
             }
             $form->country_id = Auth::user()->country_id;

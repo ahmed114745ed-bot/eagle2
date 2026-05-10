@@ -26,7 +26,7 @@ use App\Support\PackageHelper;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
-use App\Tik\Repositories\BdRepository;
+use Utd\Bd\Repositories\BdRepository;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Config;
 use App\Contracts\RoomGameContract;

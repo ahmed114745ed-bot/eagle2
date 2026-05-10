@@ -162,7 +162,7 @@ return [
         'user_salary' => \App\Models\UserSallary::class,
         'user_target' => \App\Models\UserTarget::class,
         'target' => \App\Models\Target::class,
-        'bd' => \App\Models\Bd::class,
+        'bd' => \Utd\Bd\Entities\Bd::class,
         'payment_gateway' => \App\Models\PaymentGateway::class,
         'config' => \App\Models\Config::class,
         'language' => \App\Models\Language::class,

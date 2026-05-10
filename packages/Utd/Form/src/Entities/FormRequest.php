@@ -2,8 +2,9 @@
 
 namespace Utd\Form\Entities;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\User;
+use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -41,6 +42,7 @@ class FormRequest extends Model
 
     public function bd()
     {
-        return $this->belongsTo(Bd::class, 'bd_id');
+        return PackageHelper::checkRelation($this, 'bd', 'belongsTo')
+            ?? $this->belongsTo(Bd::class, 'bd_id');
     }
 }

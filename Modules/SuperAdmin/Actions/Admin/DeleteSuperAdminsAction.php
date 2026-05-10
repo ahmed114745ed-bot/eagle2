@@ -4,7 +4,7 @@ namespace Modules\SuperAdmin\Actions\Admin;
 
 use App\Support\PackageHelper;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\User;
 use Modules\SuperAdmin\Entities\SubAdmin;
 use Modules\SuperAdmin\Entities\SuperAdmin;
@@ -43,7 +43,7 @@ class DeleteSuperAdminsAction extends RowAction
             app(\App\Contracts\MilestoneHelperContract::class)->removeReward($user, 'super-admin');
         }
         $defaultSuperAdmin = SuperAdmin::where('default', 1)->first();
-        if ($defaultSuperAdmin) Bd::where('parent_id', $model->id)->update(['parent_id' => $defaultSuperAdmin->id]);
+        if ($defaultSuperAdmin && PackageHelper::isInstalled('bd')) Bd::where('parent_id', $model->id)->update(['parent_id' => $defaultSuperAdmin->id]);
 
         $subAdmins =  SubAdmin::where('parent_id', $model->id)->pluck('app_id')->toArray();
         if (!empty($subAdmins)) {

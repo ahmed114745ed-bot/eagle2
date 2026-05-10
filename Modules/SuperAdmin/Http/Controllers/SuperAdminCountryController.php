@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\AgencySallary;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use App\Models\Charge;
 use App\Models\CoinGameUser;
 use App\Models\CoinGameUserMergedMonthly;
@@ -105,17 +105,19 @@ class SuperAdminCountryController extends Controller
             ->take(3)
             ->get();
 
-        $topBds = Bd::whereHas('agencies', function ($a) use ($countryID) {
-            $a->where('country_id', $countryID)
-                ->whereHas('members');
-        })
-            ->withCount(['agencies as total_members' => function ($agency) use ($countryID) {
-                $agency->where('country_id', $countryID)
-                    ->withCount('members');
-            }])
-            ->orderByDesc('total_members')
-            ->take(3)
-            ->get(['id', 'name']);
+        $topBds = PackageHelper::isInstalled('bd')
+            ? Bd::whereHas('agencies', function ($a) use ($countryID) {
+                $a->where('country_id', $countryID)
+                    ->whereHas('members');
+            })
+                ->withCount(['agencies as total_members' => function ($agency) use ($countryID) {
+                    $agency->where('country_id', $countryID)
+                        ->withCount('members');
+                }])
+                ->orderByDesc('total_members')
+                ->take(3)
+                ->get(['id', 'name'])
+            : collect();
 
         $topGamers = CoinGameUser::query()
             ->whereBetween('created_at', [$from, $to])
@@ -304,6 +306,9 @@ class SuperAdminCountryController extends Controller
 
     private function getTopBds($countryID)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return collect();
+        }
         return Bd::whereHas('agencies', function ($a) use ($countryID) {
             $a->where('country_id', $countryID)
                 ->whereHas('members');

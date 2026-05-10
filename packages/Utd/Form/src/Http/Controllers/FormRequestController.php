@@ -2,7 +2,8 @@
 
 namespace Utd\Form\Http\Controllers;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
+use App\Support\PackageHelper;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
@@ -418,6 +419,13 @@ class FormRequestController extends MainController
 
     protected function approveBdForm($request)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'BD package is not installed.',
+            ], 400);
+        }
+
         $data = $request->data;
 
         if (is_string($data)) {

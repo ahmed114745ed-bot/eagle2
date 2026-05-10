@@ -2,7 +2,7 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -14,11 +14,12 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use App\Models\BdAgencyHostSallary;
+use Utd\Bd\Entities\BdAgencyHostSallary;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
-use App\Admin\Actions\DeleteBdAction;
+use Utd\Bd\Actions\DeleteBdAction;
 use App\Admin\Controllers\MainController;
+use App\Support\PackageHelper;
 
 
 class ProfessionalBdController extends MainController
@@ -29,6 +30,9 @@ class ProfessionalBdController extends MainController
 
     public function index(Content $content)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return $content->title(__($this->title))->row('BD package is not installed.');
+        }
         return parent::index($content
             ->title(__($this->title))
             ->row(function (Row $row) {
@@ -56,6 +60,9 @@ class ProfessionalBdController extends MainController
      */
     public function show($id, Content $content)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return $content->title(trans('BD'))->row('BD package is not installed.');
+        }
         return $content
             ->title(trans('BD'))
             ->body($this->profile($id));
@@ -70,6 +77,9 @@ class ProfessionalBdController extends MainController
      */
     public function edit($id, Content $content)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return $content->title(trans('BD'))->row('BD package is not installed.');
+        }
         return $content
             ->title(trans('BD'))
             ->body($this->form()->edit($id));
@@ -77,6 +87,9 @@ class ProfessionalBdController extends MainController
 
     public function create(Content $content)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return $content->title(trans('BD'))->row('BD package is not installed.');
+        }
         return $content
             ->title(trans('BD'))
             ->body($this->form());
@@ -425,6 +438,9 @@ class ProfessionalBdController extends MainController
 
     public function sync($days = 0)
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return response()->json(['status' => 'error', 'message' => 'BD package is not installed.']);
+        }
         $days = request()->query('days', 0);
         $bds = DB::table('admin_users')
             ->where('type', 'bd')

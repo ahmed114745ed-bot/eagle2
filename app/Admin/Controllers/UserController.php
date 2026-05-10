@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Helpers\AgencyPackageHelper;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
@@ -1182,8 +1182,9 @@ class UserController extends MainController
 
     public function removeBD($id)
     {
-
-        Bd::where('app_id', $id)->update(['app_id' => 0]);
+        if (PackageHelper::isInstalled('bd')) {
+            Bd::where('app_id', $id)->update(['app_id' => 0]);
+        }
         $user = User::findOrFail($id);
         $user->is_bd = 0;
         $user->save();

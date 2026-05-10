@@ -3,12 +3,12 @@
 namespace App\Observers;
 
 use App\Models\Agency;
-use App\Models\BdSalary;
+use Utd\Bd\Entities\BdSalary;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Classes\Enums\NotificationType;
 use App\Jobs\SendCustomOfficialMessageToUser;
-use App\Services\BdAgencyHostSallaryService;
+use Utd\Bd\Services\BdAgencyHostSallaryService;
 use App\Support\PackageHelper;
 use Utd\UsersWallet\Helpers\WalletHelper;
 use Utd\UsersWallet\Jobs\UpdateUserWalletBalances;
@@ -138,6 +138,9 @@ class UserSallaryObserver
 
     private function updateBdHostSallary(UserSallary $userSallary ,$originalDbValue = null): void
     {
+        if (!PackageHelper::isInstalled('bd')) {
+            return;
+        }
         $agency = Agency::find($userSallary->user_agency_id);
 
         if ($agency && $agency->bd_id && $agency->status == 1) {

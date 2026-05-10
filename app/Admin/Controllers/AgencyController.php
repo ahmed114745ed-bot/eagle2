@@ -5,7 +5,7 @@ namespace App\Admin\Controllers;
 use App\Support\PackageHelper;
 
 use App\Facades\UserHandling;
-use App\Models\Bd;
+use Utd\Bd\Entities\Bd;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -721,8 +721,10 @@ class AgencyController extends MainController
     {
         return function ($value) use ($editing) {
             $ops = [];
-            foreach (Bd::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
+            if (PackageHelper::isInstalled('bd')) {
+                foreach (Bd::where('id', $value)->get() as $user) {
+                    $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
+                }
             }
             return $ops;
         };
@@ -823,16 +825,20 @@ class AgencyController extends MainController
             }
 
             if (!$form->bd_id && !$form->model()->bd_id) {
-                $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
+                if (PackageHelper::isInstalled('bd')) {
+                    $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
 
-                if ($defaultBd) {
-                    $form->bd_id = $defaultBd->id;
-                } else {
-                    throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                    if ($defaultBd) {
+                        $form->bd_id = $defaultBd->id;
+                    } else {
+                        throw new \Exception('لا يوجد BD افتراضي لنقل الوكالات إليه.');
+                    }
                 }
             }
-            $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
-            if ($bd) $form->country_id = $bd->country_id;
+            if (PackageHelper::isInstalled('bd')) {
+                $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
+                if ($bd) $form->country_id = $bd->country_id;
+            }
 
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = request()->app_owner_id;
@@ -857,13 +863,15 @@ class AgencyController extends MainController
             ]);
 
 
-            if (!request('bd_id') && $isEditing) {
-                $admin =  Bd::where('default', 1)->first();
-                $form->bd_id = $admin->id;
-            }
-            $bd = Bd::find($form->bd_id);
-            if ($bd) {
-                $form->model()->country_id = $bd->country_id;
+            if (PackageHelper::isInstalled('bd')) {
+                if (!request('bd_id') && $isEditing) {
+                    $admin =  Bd::where('default', 1)->first();
+                    $form->bd_id = $admin->id;
+                }
+                $bd = Bd::find($form->bd_id);
+                if ($bd) {
+                    $form->model()->country_id = $bd->country_id;
+                }
             }
         });
     }

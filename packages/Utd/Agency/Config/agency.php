@@ -86,7 +86,7 @@ return [
         'gift_log' => Utd\Gifts\Entities\GiftLog::class,
         'user_salary' => App\Models\UserSallary::class,
         'user_target' => App\Models\UserTarget::class,
-        'bd' => App\Models\Bd::class,
+        'bd' => Utd\Bd\Entities\Bd::class,
         'payment_gateway' => App\Models\PaymentGateway::class,
         'config' => App\Models\Config::class,
         'language' => App\Models\Language::class,

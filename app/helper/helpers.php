@@ -1111,69 +1111,29 @@ if (! function_exists('validateUploadedFileType')) {
     }
 }
 
-if (!function_exists('bd_url')) {
-    /**
-     * Get BD admin url.
-     *
-     * @param string $path
-     * @param mixed  $parameters
-     * @param bool   $secure
-     *
-     * @return string
-     */
-    function bd_url($path = '', $parameters = [], $secure = null)
+if (!function_exists('getGiftPercentage')) {
+    function getGiftPercentage(string $key): float
     {
-        if (\Illuminate\Support\Facades\URL::isValidUrl($path)) {
-            return $path;
-        }
+        $cacheKey = "percentage_{$key}";
 
-        // حدد base path الخاص بوحدة BD
-        $base = trim(config('bd.route.prefix', 'bd'), '/');
+        $value = Cache::get($cacheKey);
 
-        $secure = $secure ?? (config('bd.https') || config('bd.secure'));
-
-        if (app()->environment(['production', 'Production'])) {
-            return secure_url($base . '/' . trim($path, '/'), $parameters);
-        }
-
-        return url($base . '/' . trim($path, '/'), $parameters, $secure);
-    }
-
-
-    if (!function_exists('getGiftPercentage')) {
-        /**
-         * Get gift percentage by key from cache or DB
-         * and return it as decimal out of 10.
-         *
-         * @param string $key
-         * @return float
-         */
-        function getGiftPercentage(string $key): float
-        {
-            $cacheKey = "percentage_{$key}";
-
-            $value = Cache::get($cacheKey);
-
-            if ($value === null) {
-                $value = \App\Models\Setting::where('key', $key)->value('value');
-                if ($value !== null) {
-                    Cache::put($cacheKey, $value);
-                }
+        if ($value === null) {
+            $value = \App\Models\Setting::where('key', $key)->value('value');
+            if ($value !== null) {
+                Cache::put($cacheKey, $value);
             }
-            if ($value === null) {
-                $value = match ($key) {
-                    'app_wallet_lucky_gift' => 80,
-                    'owner_lucky_gift'      => 10,
-                    'host_lucky_gift'       => 10,
-                    default                  => 0,
-                };
-            }
-
-            $percentage = round(((float) $value) / 10, 2);
-
-
-            return $percentage;
         }
+        if ($value === null) {
+            $value = match ($key) {
+                'app_wallet_lucky_gift' => 80,
+                'owner_lucky_gift'      => 10,
+                'host_lucky_gift'       => 10,
+                default                  => 0,
+            };
+        }
+
+        return round(((float) $value) / 10, 2);
     }
 }
 
