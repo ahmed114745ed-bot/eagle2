@@ -21,9 +21,9 @@ class AudioGiftsListResource extends JsonResource
             ->translatedFormat('d F Y - h:i A');
 
         return [
-            'name' => $this->sender->name ?? '',
-            'avatar' => $this->sender->profile->avatar ?? '',
-            'sender_id' => $this->sender->id ?? 0,
+            'name' => $this->sender?->name ?? '',
+            'avatar' => $this->sender?->profile?->avatar ?? '',
+            'sender_id' => $this->sender?->id ?? 0,
             'description' => __('source:') . $roomName . ' ' . __('gift:') . $giftName,
             'created_at' => $formattedDate,
             'diamond' => $this->total ?? 0,

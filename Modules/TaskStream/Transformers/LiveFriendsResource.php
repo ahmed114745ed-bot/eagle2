@@ -11,7 +11,7 @@ class LiveFriendsResource extends JsonResource
     {
         return [
             'user_id' => $this->id,
-            'avatar' => $this->profile->avatar,
+            'avatar' => $this->profile?->avatar,
             'level' => [
                 'sender_img' => $this->senderLevel?->img  ?? '',
                 'receiver_img' => $this->receiverLevel?->img ?? '',

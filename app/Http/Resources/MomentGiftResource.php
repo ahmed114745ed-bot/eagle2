@@ -20,8 +20,8 @@ class MomentGiftResource extends JsonResource
             ->translatedFormat('d F Y - h:i A');
 
         return [
-            'name' => $this->user->name ?? '',
-            'avatar' => $this->user->profile->avatar ?? '',
+            'name' => $this->user?->name ?? '',
+            'avatar' => $this->user?->profile?->avatar ?? '',
             'description' => __('source:') . $sourceName . ' ' . __('gift:') . $giftName,
             'id_moment' => $this->moment_id,
             'created_at' => $formattedDate,
