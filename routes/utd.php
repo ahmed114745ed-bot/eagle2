@@ -5,7 +5,7 @@
 //use Illuminate\Support\Facades\Route;
 //use App\Http\Controllers\utd\BanController;
 //use App\Http\Controllers\utd\BoxController;
-//use App\Admin\Controllers\SettingController;
+use App\Admin\Controllers\SettingController;
 //use App\Http\Controllers\utd\RoomController;
 //use App\Http\Controllers\Api\V1\PkController;
 //use App\Http\Controllers\utd\ColorController;
