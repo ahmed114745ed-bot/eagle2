@@ -4672,9 +4672,21 @@
     });
 
 
+    // Mark the initially loaded tab as already loaded (data is in the page)
+    (function() {
+        var initialTab = '{{ $activeTab }}';
+        var initialEl = document.getElementById(initialTab + '-tab');
+        if (initialEl) initialEl.dataset.loaded = 'true';
+        // Level tab is always fully rendered (no server data needed)
+        var levelEl = document.getElementById('level-tab');
+        if (levelEl) levelEl.dataset.loaded = 'true';
+    })();
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+
+            // Switch tabs visually
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => {
                 c.classList.remove('active');
@@ -4682,18 +4694,75 @@
                 c.style.display = 'none';
             });
             btn.classList.add('active');
-            const target = btn.getAttribute('data-target');
-            const targetEl = document.getElementById(target);
+
+            var target = btn.getAttribute('data-target');
+            var targetEl = document.getElementById(target);
+            var href = btn.getAttribute('href');
+
             if (targetEl) {
                 targetEl.classList.add('active');
                 targetEl.classList.remove('d-none');
                 targetEl.style.display = 'block';
             }
-            const href = btn.getAttribute('href');
+
+            // Update URL without reload
             if (href) {
                 history.pushState(null, '', window.location.pathname + href);
             }
+
+            // If tab content not loaded yet, fetch via AJAX
+            if (targetEl && !targetEl.dataset.loaded) {
+                targetEl.innerHTML = '<div style="text-align:center;padding:60px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--primary-color);"></i><p style="margin-top:12px;color:#94a3b8;font-size:14px;">{{ __("Loading") }}...</p></div>';
+
+                $.ajax({
+                    url: window.location.pathname + href,
+                    type: 'GET',
+                    success: function(html) {
+                        var $parsed = $('<div>').append($.parseHTML(html, document, true));
+                        var $newContent = $parsed.find('#' + target);
+                        if ($newContent.length) {
+                            $(targetEl).html($newContent.html());
+                            targetEl.dataset.loaded = 'true';
+                            // Re-initialize select2 inside loaded tab if needed
+                            $(targetEl).find('#agency_id').each(function() {
+                                if (!$(this).data('select2')) {
+                                    $(this).select2({
+                                        placeholder: 'Select agency',
+                                        allowClear: true,
+                                        ajax: {
+                                            url: '/api/search/host-agency',
+                                            dataType: 'json',
+                                            delay: 250,
+                                            data: function(params) { return { q: params.term, page: params.page || 1 }; },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.data.map(function(item) { return { id: item.id, text: item.name }; }),
+                                                    pagination: { more: data.next_page_url !== null }
+                                                };
+                                            },
+                                            cache: true
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}</p></div>';
+                        }
+                    },
+                    error: function() {
+                        targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}. {{ __("Please try again") }}.</p></div>';
+                    }
+                });
+            }
         });
+    });
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var selectedTab = urlParams.get('tab') || 'packs';
+        var tabBtn = document.querySelector('.tab-btn[data-target="' + selectedTab + '-tab"]');
+        if (tabBtn) tabBtn.click();
     });
 
 

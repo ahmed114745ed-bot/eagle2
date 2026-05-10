@@ -308,7 +308,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('shipping-agency-report', [CoinController::class, 'shippingAgencyCoinReport']);
             });
 
-            Route::prefix('charisma-levels')->group(function () {
+            Route::prefix('charisma-levels')->middleware('charisma.badge')->group(function () {
                 Route::get('/', [CharismaLevelController::class, 'index']);
             });
 
