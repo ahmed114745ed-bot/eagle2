@@ -101,6 +101,7 @@ class ChargeAgencyController extends MainController
             if (!$this->agency) {
                 return;
             }
+            $name = $this->agency->owner->name ?? '';
             $uid = @$this->agency->owner->uuid ?? '';
             $path = @$this->agency->owner->profile?->avatar ?? '';
             $defaultImage = asset('images/businessman-icon.jpg');
