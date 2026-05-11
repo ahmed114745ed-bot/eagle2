@@ -64,7 +64,10 @@ class UserAchievementLevelController extends MainController
                 $filter->equal('user.uuid', __('uuid'));
             });
         });
-        $grid->model()->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->with(['user',
+        'user.profile',
+        'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+         'achievementLevel'])->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
