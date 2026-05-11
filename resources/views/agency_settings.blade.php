@@ -2,656 +2,320 @@
 
 
 <style>
-    :root {
-        /* Modern color palette */
-        
-        --bg-tertiary: #334155;
-        --accent-primary: #7c3aed;
-        --accent-secondary: #f59e0b;
-        --text-primary: #f1f5f9;
-        --text-secondary: #94a3b8;
-        --text-muted: #64748b;
-        --border-color: #334155;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --radius-lg: 16px;
-        --radius-md: 12px;
-        --radius-sm: 8px;
-        --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
-        --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.2);
-        --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-          --bg-primary: {{ config('themes.primaryColor') ?: '#2563eb' }};
-        --bg-secondary: {{ config('themes.secondaryColor') ?: '#1f2937' }};
-        --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
-        --text-primary-color: {{ config('themes.textPrimaryColor') ?: '#ffffff' }};
-       --text-secondary: {{ config('themes.textSecondaryColor') ?: '#9ca3af' }};
-        --box-background-color: {{ config('themes.boxBackgroundColor') ?: '#ffffff' }};
-        --table-background-color: {{ config('themes.tableBackGroundColor') ?: '#f9fafb' }};
-        --background-image: {{ config('themes.backgroundImage') ?: 'none' }};
-        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) ?: '' }});
-        --second-alpha: rgba(31, 41, 55, 0.1);
-        --primary-hover-alpha: rgba(37, 99, 235, 0.1);
-        --scroll-second-color: rgba(255, 255, 255, 0.8);
-        --scroll-first-color: rgba(37, 99, 235, 0.2);
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        color: var(--text-primary);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f0f2f5;
+        color: #1a1a2e;
         line-height: 1.6;
         min-height: 100vh;
-        overflow-x: hidden;
     }
 
     .all-page {
         display: flex;
         min-height: 100vh;
-        gap: 2rem;
-        padding: 2rem;
-        max-width: 1400px;
+        gap: 24px;
+        padding: 24px;
+        max-width: 1200px;
         margin: 0 auto;
     }
 
-    /* Sidebar Styling */
+    /* ── Sidebar ── */
     .settings-sidebar {
-        width: 280px;
+        width: 260px;
         flex-shrink: 0;
-         /* background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06)); */
-        background: var(--bg-secondary);
-        border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        box-shadow: var(--shadow-lg);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: #fff;
+        border-radius: 14px;
+        padding: 24px 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        border: 1px solid #e5e7eb;
         position: sticky;
-        top: 2rem;
+        top: 24px;
         height: fit-content;
     }
 
     .settings-sidebar h2 {
-        font-size: 1.5rem;
+        font-size: 1.15rem;
         font-weight: 700;
-        margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid var(--accent-primary);
-        color: var(--text-primary);
+        color: #1a1a2e;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #6366f1;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 8px;
+        cursor: pointer;
     }
+    .settings-sidebar h2::before { content: '⚙️'; font-size: 1.1rem; }
 
-    .settings-sidebar h2::before {
-        content: '⚙️';
-        font-size: 1.25rem;
-    }
-
-    .settings-menu {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
+    .settings-menu { display: flex; flex-direction: column; gap: 6px; }
 
     .settings-menu button {
-        background: transparent;
-        border: 1px solid var(--border-color);
-        color: var(--text-secondary);
-        padding: 1rem 1.25rem;
-        border-radius: var(--radius-md);
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        color: #4b5563;
+        padding: 12px 16px;
+        border-radius: 10px;
         text-align: left;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-weight: 500;
         cursor: pointer;
-        transition: var(--transition);
+        transition: all .2s ease;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 8px;
     }
-
-    .settings-menu button::before {
-        content: '→';
-        opacity: 0.5;
-        transition: var(--transition);
-    }
-
-    .settings-menu button:hover {
-        background: rgba(124, 58, 237, 0.1);
-        border-color: var(--accent-primary);
-        color: var(--text-primary);
-        transform: translateX(4px);
-    }
-
-    .settings-menu button:hover::before {
-        opacity: 1;
-        transform: translateX(2px);
-    }
+    .settings-menu button::before { content: '›'; font-size: 1.2rem; color: #9ca3af; transition: all .2s; }
+    .settings-menu button:hover { background: #eef2ff; border-color: #6366f1; color: #1a1a2e; }
+    .settings-menu button:hover::before { color: #6366f1; transform: translateX(3px); }
 
     .settings-menu button.active {
-        background: linear-gradient(135deg, var(--accent-primary), #9d4edd);
-        border-color: transparent;
-        color: white;
-        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        background: #6366f1;
+        border-color: #6366f1;
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 4px 14px rgba(99,102,241,.35);
     }
+    .settings-menu button.active::before { content: '✓'; color: #fff; }
 
-    .settings-menu button.active::before {
-        content: '✓';
-        opacity: 1;
-    }
-
-    /* Main Content Area */
+    /* ── Content ── */
     .settings-content {
         flex: 1;
-        background: var(--bg-secondary);
-        border-radius: var(--radius-lg);
-        padding: 2rem;
-        box-shadow: var(--shadow-lg);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        min-height: 600px;
+        background: #fff;
+        border-radius: 14px;
+        padding: 32px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        border: 1px solid #e5e7eb;
+        min-height: 500px;
     }
 
-    .settings-section {
-        display: none;
-        animation: fadeIn 0.4s ease-out;
+    .settings-section { display: none; animation: fadeUp .35s ease; }
+    .settings-section.active { display: block; }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
-    .settings-section.active {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Section Headers */
+    /* ── Section title ── */
     .settings-section h3 {
-        font-size: 1.75rem;
+        font-size: 1.35rem;
         font-weight: 700;
-        margin-bottom: 2rem;
-        color: var(--text-primary);
+        color: #1a1a2e;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
         position: relative;
-        padding-bottom: 0.75rem;
     }
-
     .settings-section h3::after {
         content: '';
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 4px;
-        background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-        border-radius: 2px;
+        bottom: 0; left: 0;
+        width: 48px; height: 3px;
+        background: #6366f1;
+        border-radius: 3px;
     }
 
-    /* Form Styling */
+    /* ── Form card ── */
     form {
-        background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06));;
-        border-radius: var(--radius-lg);
-        padding: 2rem;
-        box-shadow: var(--shadow-md);
-        border: 1px solid var(--border-color);
+        background: #fafbfc;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 28px;
     }
 
-    .form {
-        max-width: 500px;
-        margin: 0;
-    }
+    .form { max-width: 480px; }
 
+    /* ── Labels ── */
     label {
         display: block;
-        margin-bottom: 0.5rem;
-        color: var(--text-secondary);
-        font-weight: 500;
-        font-size: 0.9rem;
+        margin-bottom: 6px;
+        color: #374151;
+        font-weight: 600;
+        font-size: 0.8rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: .6px;
     }
 
+    /* ── Inputs ── */
     input[type="text"],
     input[type="number"],
     input[type="email"],
     input[type="password"],
     select {
         width: 100%;
-        padding: 1rem;
-        background: var(--bg-tertiary);
-        border: 2px solid var(--border-color);
-        border-radius: var(--radius-md);
-        color: var(--text-primary);
-        font-size: 1rem;
-        transition: var(--transition);
-        margin-bottom: 1.5rem;
+        padding: 11px 14px;
+        background: #fff;
+        border: 1.5px solid #d1d5db;
+        border-radius: 10px;
+        color: #111827;
+        font-size: .95rem;
+        font-weight: 500;
+        transition: all .2s ease;
+        margin-bottom: 18px;
     }
-
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
         outline: none;
-        border-color: var(--accent-primary);
-        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
-        background: var(--bg-secondary);
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,.12);
     }
+    input::placeholder { color: #9ca3af; }
 
-    /* Buttons */
-    button[type="submit"],
-    button.save-btn {
-        background: linear-gradient(135deg, var(--accent-primary), #9d4edd);
-        color: white;
+    /* ── Submit button ── */
+    button[type="submit"], button.save-btn {
+        background: #6366f1;
+        color: #fff;
         border: none;
-        padding: 1rem 2rem;
-        border-radius: var(--radius-md);
-        font-size: 1rem;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-size: .95rem;
         font-weight: 600;
         cursor: pointer;
-        transition: var(--transition);
-        width: auto;
-        min-width: 150px;
+        transition: all .2s ease;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        gap: 8px;
+        box-shadow: 0 2px 10px rgba(99,102,241,.25);
+        margin-top: 4px;
     }
-
-    button[type="submit"]:hover,
-    button.save-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(124, 58, 237, 0.4);
+    button[type="submit"]:hover, button.save-btn:hover {
+        background: #4f46e5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(99,102,241,.35);
     }
+    button[type="submit"]::before, button.save-btn::before { content: '💾'; }
 
-    button[type="submit"]::before,
-    button.save-btn::before {
-        content: '💾';
-    }
-
-    /* Remaining Diamonds Section */
-    .remaining-diamonds-section {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
-        border: 1px solid rgba(16, 185, 129, 0.2);
-        border-radius: var(--radius-lg);
-        padding: 2rem;
-        margin-top: 2rem;
-    }
-
-    .remaining-diamonds-section h3 {
-        color: var(--success);
-    }
-
-    .remaining-diamonds-section h3::after {
-        background: linear-gradient(90deg, var(--success), #34d399);
-    }
-
-    .info-box {
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid rgba(16, 185, 129, 0.2);
-        border-radius: var(--radius-md);
-        padding: 1rem;
-        margin: 1.5rem 0;
+    /* ── Alerts ── */
+    .alert {
+        padding: 12px 18px;
+        border-radius: 10px;
+        margin: 12px 0;
         display: flex;
-        align-items: flex-start;
-        gap: 1rem;
+        align-items: center;
+        gap: 10px;
+        font-size: .9rem;
+        font-weight: 500;
     }
+    .alert-danger  { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .alert-danger::before  { content: '⚠️'; }
+    .alert-info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-info::before    { content: 'ℹ️'; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .alert-success::before { content: '✅'; }
 
-    .info-box::before {
-        content: 'ℹ️';
-        font-size: 1.25rem;
-    }
-
-    /* Modal Styling */
+    /* ── Modal ── */
     .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(5px);
-        animation: fadeIn 0.3s ease-out;
+        display: none; position: fixed; z-index: 1000;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
     }
-
     .modal-content {
-        margin: auto;
-        display: block;
-        max-width: 90%;
-        max-height: 90vh;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
-        animation: scaleIn 0.3s ease-out;
+        margin: auto; display: block;
+        max-width: 90%; max-height: 90vh;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0,0,0,.3);
     }
-
-    @keyframes scaleIn {
-        from {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
     .close {
-        position: absolute;
-        top: 2rem;
-        right: 2rem;
-        color: white;
-        font-size: 2.5rem;
-        font-weight: 300;
-        cursor: pointer;
-        transition: var(--transition);
-        width: 3rem;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.1);
+        position: absolute; top: 20px; right: 20px;
+        color: #fff; font-size: 2rem; font-weight: 300;
+        cursor: pointer; width: 40px; height: 40px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; background: rgba(255,255,255,.15);
+        transition: all .2s;
     }
+    .close:hover { background: rgba(255,255,255,.3); }
 
-    .close:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: rotate(90deg);
+    /* ── Misc ── */
+    .badge-upload-container { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 16px; margin: 20px 0; }
+    .badge-upload-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; transition: all .2s; }
+    .badge-upload-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); border-color: #6366f1; }
+    .badge-preview { width: 100%; height: 140px; background: #f9fafb; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 10px 0; border: 2px dashed #d1d5db; }
+    .badge-preview img { max-width: 80%; max-height: 80%; object-fit: contain; }
+
+    .switch-container { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 10px; margin: 16px 0; }
+    .switch-item { display: flex; align-items: center; justify-content: space-between; background: #f9fafb; padding: 14px 18px; border-radius: 10px; border: 1px solid #e5e7eb; transition: all .2s; }
+    .switch-item:hover { border-color: #6366f1; }
+
+    .grid-per-pager { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; }
+    .grid-per-pager table { width: 100%; border-collapse: collapse; }
+    .grid-per-pager th { background: #6366f1; color: #fff; padding: 12px 16px; text-align: left; font-weight: 600; font-size: .85rem; }
+    .grid-per-pager td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; color: #374151; font-size: .9rem; }
+    .grid-per-pager tr:hover { background: #f5f3ff; }
+
+    .swal-wide { font-family: 'Inter', sans-serif !important; }
+
+    /* ── Field Cards ── */
+    .field-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all .2s ease;
     }
-
-    /* Badge Upload Section */
-    .badge-upload-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin: 2rem 0;
+    .field-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 4px 12px rgba(99,102,241,.1);
     }
-
-    .badge-upload-item {
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        transition: var(--transition);
+    .field-card-icon {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
     }
-
-    .badge-upload-item:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-md);
-        border-color: var(--accent-primary);
+    .field-card label {
+        text-align: center;
+        margin-bottom: 12px;
+        color: #374151;
     }
-
-    .badge-preview {
-        width: 100%;
-        height: 150px;
-        background: var(--bg-tertiary);
-        border-radius: var(--radius-md);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 1rem 0;
-        overflow: hidden;
-        border: 2px dashed var(--border-color);
-    }
-
-    .badge-preview img {
-        max-width: 80%;
-        max-height: 80%;
-        object-fit: contain;
-        border-radius: var(--radius-sm);
-        transition: var(--transition);
-    }
-
-    .badge-preview img:hover {
-        transform: scale(1.1);
-    }
-
-    /* Grid for percentage targets */
-    .percentage-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin: 2rem 0;
-    }
-
-    .percentage-item {
-        background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
-        border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        border: 1px solid var(--border-color);
-    }
-
-    .percentage-item label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .percentage-item label::before {
-        content: '⭐';
-        font-size: 1.2rem;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-        .all-page {
-            flex-direction: column;
-            padding: 1rem;
-        }
-        
-        .settings-sidebar {
-            width: 100%;
-            position: static;
-            margin-bottom: 1rem;
-        }
-        
-        .settings-menu {
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-        
-        .settings-menu button {
-            flex: 1;
-            min-width: 200px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .settings-content {
-            padding: 1.5rem;
-        }
-        
-        .badge-upload-container {
-            grid-template-columns: 1fr;
-        }
-        
-        .percentage-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        button[type="submit"] {
-            width: 100%;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .settings-menu button {
-            min-width: 100%;
-        }
-        
-        .settings-section h3 {
-            font-size: 1.5rem;
-        }
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: var(--bg-primary);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: var(--accent-primary);
-        border-radius: 5px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #9d4edd;
-    }
-
-    /* Loading animation for form submission */
-    .loading {
-        position: relative;
-        pointer-events: none;
-        opacity: 0.7;
-    }
-
-    .loading::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 20px;
-        height: 20px;
-        border: 2px solid white;
-        border-top-color: transparent;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    /* Toast notifications styling */
-    .swal-wide {
-        font-family: 'Inter', sans-serif !important;
-        background: var(--bg-secondary) !important;
-        color: var(--text-primary) !important;
-        border: 1px solid var(--border-color) !important;
-        border-radius: var(--radius-lg) !important;
-    }
-
-    /* Switch toggle styling */
-    .switch-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        margin: 2rem 0;
-    }
-
-    .switch-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--bg-primary);
-        padding: 1rem 1.5rem;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--border-color);
-        transition: var(--transition);
-    }
-
-    .switch-item:hover {
-        border-color: var(--accent-primary);
-        transform: translateX(4px);
-    }
-
-    /* Grid tables styling */
-    .grid-per-pager {
-        background: var(--bg-primary);
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        box-shadow: var(--shadow-md);
-    }
-
-    .grid-per-pager table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .grid-per-pager th {
-        background: var(--accent-primary);
-        color: white;
-        padding: 1rem;
-        text-align: left;
+    .field-card input {
+        text-align: center;
+        margin-bottom: 0 !important;
+        font-size: 1.1rem;
         font-weight: 600;
     }
-
-    .grid-per-pager td {
-        padding: 1rem;
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-secondary);
+    .input-wrap {
+        position: relative;
+    }
+    .input-wrap input {
+        padding-right: 36px;
+    }
+    .input-suffix {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-weight: 600;
+        font-size: .9rem;
+        pointer-events: none;
     }
 
-    .grid-per-pager tr:hover {
-        background: rgba(124, 58, 237, 0.1);
-    }
+    /* ── Total bar states ── */
+    #total-bar.is-valid { background: #f0fdf4 !important; border: 1px solid #bbf7d0; }
+    #total-bar.is-valid #total-value { color: #16a34a !important; }
+    #total-bar.is-invalid { background: #fef2f2 !important; border: 1px solid #fecaca; }
+    #total-bar.is-invalid #total-value { color: #dc2626 !important; }
 
-    /* Alert styling */
-    .alert {
-        padding: 1rem 1.5rem;
-        border-radius: var(--radius-md);
-        margin: 1rem 0;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        animation: slideIn 0.3s ease-out;
-    }
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f3f4f6; }
+    ::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
 
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+        .all-page { flex-direction: column; padding: 16px; }
+        .settings-sidebar { width: 100%; position: static; }
+        .settings-menu { flex-direction: row; flex-wrap: wrap; }
+        .settings-menu button { flex: 1; min-width: 180px; }
     }
-
-    .alert-danger {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        color: #fca5a5;
+    @media (max-width: 768px) {
+        .settings-content { padding: 20px; }
+        button[type="submit"] { width: 100%; }
     }
-
-    .alert-danger::before {
-        content: '⚠️';
-    }
-
-    .alert-info {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        color: #93c5fd;
-    }
-
-    .alert-info::before {
-        content: 'ℹ️';
-    }
-
-    .alert-success {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        color: #6ee7b7;
-    }
-
-    .alert-success::before {
-        content: '✅';
+    @media (max-width: 480px) {
+        .settings-menu button { min-width: 100%; }
     }
 </style>
 
@@ -685,6 +349,7 @@
             <div id="PercentageTarget" class="settings-section active">
 
                 <h3> {{ __('Percentage target') }}</h3>
+                <p style="color:#6b7280; margin:-16px 0 24px; font-size:.9rem;">{{ __('Set the weight of each metric. Total must equal 100%.') }}</p>
 
                 <form id="target-percentage-form" action="{{ route('admin.target-percentage') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -693,44 +358,84 @@
                     @endphp
                     @if ($errorMessage)
                         <div class="alert alert-danger text-center" style="margin-bottom: 20px;"> {{ $errorMessage }}
-                        </div>;
+                        </div>
                     @endif
-                    <div class="form">
-                        <label>{{ __('Hours:') }} </label>
-                        <input type="text" name="hours" value="{{ $hours }}" class="form-control">
-                        <label>{{ __('Days:') }} </label>
-                        <input type="text" name="days" value="{{ $days }}" class="form-control">
-                        <label>{{ __('Moments:') }} </label>
-                        <input type="text" name="moments" value="{{ $moments }}" class="form-control">
-                        <label>{{ __('Reels:') }} </label>
-                        <input type="text" name="reels" value="{{ $reels }}" class="form-control">
-                        <label>{{ __('Diamonds') }} </label>
-                        <input type="text" name="diamonds" value="{{ $diamonds }}" class="form-control">
-                        <button type="submit">{{ __('Save') }}</button>
+
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+                        <div class="field-card">
+                            <div class="field-card-icon">🕐</div>
+                            <label>{{ __('Hours') }}</label>
+                            <div class="input-wrap">
+                                <input type="text" name="hours" value="{{ $hours }}" class="form-control">
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
+                        <div class="field-card">
+                            <div class="field-card-icon">📅</div>
+                            <label>{{ __('Days') }}</label>
+                            <div class="input-wrap">
+                                <input type="text" name="days" value="{{ $days }}" class="form-control">
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
+                        <div class="field-card">
+                            <div class="field-card-icon">📸</div>
+                            <label>{{ __('Moments') }}</label>
+                            <div class="input-wrap">
+                                <input type="text" name="moments" value="{{ $moments }}" class="form-control">
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
+                        <div class="field-card">
+                            <div class="field-card-icon">🎬</div>
+                            <label>{{ __('Reels') }}</label>
+                            <div class="input-wrap">
+                                <input type="text" name="reels" value="{{ $reels }}" class="form-control">
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
+                        <div class="field-card">
+                            <div class="field-card-icon">💎</div>
+                            <label>{{ __('Diamonds') }}</label>
+                            <div class="input-wrap">
+                                <input type="text" name="diamonds" value="{{ $diamonds }}" class="form-control">
+                                <span class="input-suffix">%</span>
+                            </div>
+                        </div>
                     </div>
 
+                    <div id="total-bar" style="background:#f3f4f6; border-radius:10px; padding:12px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-weight:600; color:#374151;">Total</span>
+                        <span id="total-value" style="font-weight:700; font-size:1.1rem; color:#6366f1;">0%</span>
+                    </div>
+
+                    <button type="submit">{{ __('Save') }}</button>
                 </form>
             </div>
 
-            <div id="user_days" class="settings-section ">
+            <div id="user_days" class="settings-section">
 
-            <!-- <h3> {{ __('Percentage target') }}</h3> -->
+                <h3>{{ __('User Days') }}</h3>
+                <p style="color:#6b7280; margin:-16px 0 24px; font-size:.9rem;">{{ __('Configure the minimum hours per day for user activity.') }}</p>
 
-            <form id="target-percentage-form" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                     <div class="alert alert-danger text-center" style="margin-bottom: 20px;"> {{ $errorMessage }}
-                    </div>;
-                @endif
-                <div class="form">
-                    <label>{{ __('Hours:') }} </label>
-                    <input type="number" name="hours_days" value="{{ $hoursDays }}" class="form-control">
-                    <button type="submit">{{ __('Save') }}</button>
-                </div>
-            </form>
+                <form id="user-days-form" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @php
+                        $errorMessage = $errors ? $errors->first('msg') : null;
+                    @endphp
+                    @if ($errorMessage)
+                        <div class="alert alert-danger text-center" style="margin-bottom: 20px;"> {{ $errorMessage }}
+                        </div>
+                    @endif
+                    <div style="max-width:360px;">
+                        <div class="field-card">
+                            <div class="field-card-icon">⏱️</div>
+                            <label>{{ __('Hours per Day') }}</label>
+                            <input type="number" name="hours_days" value="{{ $hoursDays }}" class="form-control" style="margin-bottom:0;">
+                        </div>
+                    </div>
+                    <button type="submit" style="margin-top:20px;">{{ __('Save') }}</button>
+                </form>
             </div>
                 @if ($remaining_diamonds_action)
                     <div id="remaining_diamonds" class="settings-section p-4 shadow-sm rounded bg-white">
@@ -942,8 +647,27 @@
                 document.getElementById("imageModal").style.display = "none";
             }
 
+            // ── Live total % counter ──
+            function updateTotal() {
+                const fields = ['hours','days','moments','reels','diamonds'];
+                let total = 0;
+                fields.forEach(f => { total += parseFloat(document.querySelector('input[name="'+f+'"]')?.value) || 0; });
+                const el = document.getElementById('total-value');
+                const bar = document.getElementById('total-bar');
+                if (el) el.textContent = total + '%';
+                if (bar) {
+                    bar.classList.remove('is-valid','is-invalid');
+                    if (total === 100) bar.classList.add('is-valid');
+                    else if (total > 0) bar.classList.add('is-invalid');
+                }
+            }
+            document.querySelectorAll('#target-percentage-form input[type="text"]').forEach(inp => {
+                inp.addEventListener('input', updateTotal);
+            });
+            updateTotal(); // initial calc
+
             document.getElementById('target-percentage-form').addEventListener('submit', function(e) {
-                    e.preventDefault(); // إيقاف الإرسال مؤقتًا
+                    e.preventDefault();
 
                     const hours = parseFloat(document.querySelector('input[name="hours"]').value) || 0;
                     const days = parseFloat(document.querySelector('input[name="days"]').value) || 0;
