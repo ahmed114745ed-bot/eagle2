@@ -36,7 +36,9 @@ jobs:
           threshold=60
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
-            sudo docker system prune -a -f 2>/dev/null
+            sudo docker builder prune --all -f 2>/dev/null
+            sudo docker system prune -f 2>/dev/null
+            sudo docker image prune -f 2>/dev/null
           fi
 
   migrate:
