@@ -142,6 +142,7 @@ class Kernel extends HttpKernel
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
         'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
         'verify.utd.signature' => \App\Http\Middleware\VerifyUtdSignature::class,
+        'verify.utdstream.webhook' => \App\Http\Middleware\VerifyUtdStreamWebhook::class,
         'auth.rate.limit' => \App\Http\Middleware\AuthRateLimiter::class,
     ];
 }

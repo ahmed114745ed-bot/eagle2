@@ -120,6 +120,23 @@
                                                value="{{ $utd_stream_server_secret }}" class="form-control" required>
                                     </div>
                                 </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="utd_stream_webhook_url">Webhook URL:</label>
+                                        <div class="input-group">
+                                            <input type="text" id="utd_stream_webhook_url"
+                                                   value="{{ url('/api/utd-stream-webhook') }}"
+                                                   class="form-control"
+                                                   readonly
+                                                   style="background-color: #f5f5f5; cursor: not-allowed;">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyWebhookUrl()" title="Copy">
+                                                <i class="fa fa-copy"></i>
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted">{{ __('This URL is used by UTD-STREAM to send webhook events') }}</small>
+                                    </div>
+                                </div>
                             </div>
                             <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
                         </div>
@@ -459,5 +476,30 @@
 
         $(document).ready(initIsPreviewSwitch);
         $(document).on('pjax:success', initIsPreviewSwitch);
+
+        // Copy Webhook URL Function
+        function copyWebhookUrl() {
+            const webhookInput = document.getElementById('utd_stream_webhook_url');
+            webhookInput.select();
+            webhookInput.setSelectionRange(0, 99999); // For mobile devices
+
+            navigator.clipboard.writeText(webhookInput.value).then(function() {
+                // Success notification
+                const btn = event.target.closest('button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fa fa-check"></i>';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-secondary');
+
+                setTimeout(function() {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-secondary');
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy URL');
+            });
+        }
     </script>
 </div>
