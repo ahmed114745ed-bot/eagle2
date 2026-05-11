@@ -65,8 +65,9 @@ class SettingsController extends Controller
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
 
         // UTD-STREAM Credentials
-        $utd_app_id = Common::getConfig('utd_app_id');
-        $utd_server_secret = Common::getConfig('utd_server_secret');
+        $utd_stream_app_id = Common::getConfig('utd_stream_app_id');
+        $utd_stream_server_secret = Common::getConfig('utd_stream_server_secret');
+        $utd_stream_callback_secret = Common::getConfig('utd_stream_callback_secret');
         $utd_webhook_url = url('/api/utd-stream-webhook');
 
         return view('admin.settings', compact(
@@ -93,8 +94,9 @@ class SettingsController extends Controller
             'soundLibrary',
             'videoLibrary',
             'gamesLibrary',
-            'utd_app_id',
-            'utd_server_secret',
+            'utd_stream_app_id',
+            'utd_stream_server_secret',
+            'utd_stream_callback_secret',
             'utd_webhook_url'
         ));
     }

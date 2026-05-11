@@ -121,6 +121,16 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="utd_stream_callback_secret">Callback Secret:</label>
+                                        <input type="text" id="utd_stream_callback_secret" name="utd_stream_callback_secret"
+                                               placeholder="Callback Secret"
+                                               value="{{ $utd_stream_callback_secret ?? '' }}" class="form-control" required>
+                                        <small class="form-text text-muted">{{ __('Used to verify webhook signatures') }}</small>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="utd_stream_webhook_url">Webhook URL:</label>
