@@ -12,8 +12,8 @@ Route::prefix('stream')->group(function () {
     // ─── Rooms Management ───────────────────────
     Route::get('rooms', [UtdStreamController::class, 'getRooms']);
     Route::get('rooms/{roomName}', [UtdStreamController::class, 'roomInfo']);
-    Route::delete('rooms/{roomName}', [UtdStreamController::class, 'closeRoom']);
-    Route::put('rooms/{roomName}/metadata', [UtdStreamController::class, 'updateRoomMetadata']);
+    Route::delete('rooms/{roomName}', [UtdStreamController::class, 'deleteRoom']);
+    Route::patch('rooms/{roomName}/metadata', [UtdStreamController::class, 'patchRoomMetadata']);
     Route::post('rooms/{roomName}/send-data', [UtdStreamController::class, 'sendData']);
 
     // ─── Participant Management ─────────────────
