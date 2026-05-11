@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\FairLuckV5Controller;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
-use App\Http\Controllers\Api\V1\UtdStreamController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\AuthController;
@@ -79,6 +78,8 @@ Route::get('/health', [HealthCheckController::class, 'status']);
 Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
+Route::post('utd-stream-webhook', [\App\Http\Controllers\Api\V1\UtdStreamWebhookController::class, 'handle'])
+    ->middleware(['verify.utdstream.webhook']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
     // Protected test route - only accessible in local environment
@@ -214,22 +215,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('update-zego-agora/v2', [EnteranceController::class, 'libraryAgoraZegoV2']);
 
             // ─── UTD-STREAM ─────────────────────────────────
-            Route::prefix('stream')->group(function () {
-                Route::post('token', [UtdStreamController::class, 'token']);
-                Route::get('credential', [UtdStreamController::class, 'credential']);
-                Route::get('rooms/{roomName}', [UtdStreamController::class, 'roomInfo']);
-                Route::post('rooms/{roomName}/send-data', [UtdStreamController::class, 'sendData']);
-                Route::delete('rooms/{roomName}/participants/{identity}', [UtdStreamController::class, 'kick']);
-                Route::put('rooms/{roomName}/participants/{identity}/mute', [UtdStreamController::class, 'mute']);
-                Route::post('calls', [UtdStreamController::class, 'makeCall']);
-                Route::post('calls/{callId}/ringing', [UtdStreamController::class, 'ringing']);
-                Route::post('calls/{callId}/accept', [UtdStreamController::class, 'accept']);
-                Route::post('calls/{callId}/reject', [UtdStreamController::class, 'reject']);
-                Route::post('calls/{callId}/busy', [UtdStreamController::class, 'busy']);
-                Route::post('calls/{callId}/end', [UtdStreamController::class, 'end']);
-                Route::get('calls/{callId}', [UtdStreamController::class, 'callInfo']);
-            });
-
+            require __DIR__ . '/utd-stream.php';
 
             Route::prefix('config')->group(function () {
                 Route::get('settings', [VersionController::class, 'settings']);
