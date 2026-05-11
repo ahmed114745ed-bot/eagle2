@@ -246,12 +246,14 @@ class HomeController extends  MainController
     {
         $countryID = $this->countryId();
 
-        $topUsers = User::select('id', 'name')
-            ->withCount(['liveTimes as total_hours' => function ($q) {
-                $q->select(DB::raw("SUM(hours)"))
-                    ->where('start_time', '>=', now()->subMonth());
-            }])
-            ->where('country_id', $countryID)
+        // Performance fix: replaced correlated subquery (withCount) with JOIN
+        // Old query caused full table scan on live_times (74K rows) per user → 1+ hour stuck queries
+        $topUsers = User::select('users.id', 'users.name', DB::raw('SUM(live_times.hours) as total_hours'))
+            ->join('live_times', 'users.id', '=', 'live_times.uid')
+            ->where('users.country_id', $countryID)
+            ->where('live_times.start_time', '>=', now()->subMonth()->timestamp)
+            ->whereNull('users.deleted_at')
+            ->groupBy('users.id', 'users.name')
             ->having('total_hours', '>', 0)
             ->orderByDesc('total_hours')
             ->take(10)

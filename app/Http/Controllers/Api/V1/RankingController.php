@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Services\RankingServiceV2;
 use App\Services\RankingService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Mockery\Exception;
 use Modules\Vip\Services\Api\VipService;
 use App\Http\Resources\Api\V1\AgencyRankingRecourse;
@@ -113,7 +114,11 @@ class RankingController extends Controller
 
     public function topUserRanking()
     {
-        $todayTopUsers = $this->rankingService->getTodayTopUsers();
+        // Performance fix: cache ranking results for 5 minutes to reduce DB pressure
+        // Rankings don't need to be real-time — prevents duplicate heavy queries
+        $todayTopUsers = Cache::remember('top_user_ranking', 300, function () {
+            return $this->rankingService->getTodayTopUsers();
+        });
         return Common::apiResponse(true, 'Success', $todayTopUsers);
     }
 
