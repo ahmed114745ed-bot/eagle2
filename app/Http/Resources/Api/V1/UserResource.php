@@ -91,6 +91,14 @@ class UserResource extends JsonResource
             'user_types'           => $this->user_types,
             'shipping_agency'      => $this->formatShippingAgency(),
             'has_anti_ban'         => $this->getPackWithType(15),
+
+            'avatar' => [
+                'original' => $this->profile->avatar ?? '',
+                'thumbnail' =>  $this->profile->avatar_thumb ?? Common::getImageUrl($this->avatar, 'thumbnail'),
+                'medium' => $this->profile->avatar_medium ?? Common::getImageUrl($this->avatar, 'medium'),
+                'large' => $this->profile->avatar_large ?? Common::getImageUrl($this->avatar, 'large'),
+            ],
+
         ];
         if (in_array($this->is_mic, ['0', '1'])) {
             $data['is_mic'] = $this->is_mic;
