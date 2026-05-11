@@ -66,6 +66,7 @@ class ChargeAgencyController extends MainController
 
         $grid->model()
             ->with([
+                'agency',
                 'agency.owner.profile',
                 'agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ])
@@ -100,12 +101,12 @@ class ChargeAgencyController extends MainController
             if (!$this->agency) {
                 return;
             }
-            $uid = @$this->agency->owner->uuid;
-            $path = @$this->agency->owner->profile?->avatar;
+            $uid = @$this->agency->owner->uuid ?? '';
+            $path = @$this->agency->owner->profile?->avatar ?? '';
             $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $path ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
 
-            $image = "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
+            $image = "<img src='" . e($url) . "' onerror=\"this.onerror=null;this.src='" . e($defaultImage) . "'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
 
             $showUrl = $this->agency->owner ? url("admin/users/{$this->agency->owner->id}") : '#';
             return "
