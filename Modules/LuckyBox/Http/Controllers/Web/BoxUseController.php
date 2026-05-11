@@ -136,7 +136,7 @@ class BoxUseController extends MainController
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-';
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$user->avatar;
+            $avatarPath = @$user->profile?->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
             $userUrl = admin_url('users/' . $user->id);
