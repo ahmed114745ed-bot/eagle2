@@ -92,9 +92,11 @@ class   BannerController extends MainController
             if (!$url) {
                 return '<span style="color:#999;font-style:italic;">—</span>';
             }
-            return "<div style='width:220px; height:70px; overflow:hidden; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.12);'>
-                        <img src='{$url}' style='width:100%; height:100%; object-fit:cover; display:block;' alt='Splash'>
-                    </div>";
+            return "<a href='javascript:void(0)' onclick=\"event.preventDefault();document.getElementById('splash-overlay').style.display='flex';document.getElementById('splash-overlay-img').src='{$url}';\">
+                        <div style='width:220px; height:70px; overflow:hidden; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.12); cursor:pointer; transition:transform 0.2s;' onmouseover='this.style.transform=\"scale(1.03)\"' onmouseout='this.style.transform=\"scale(1)\"'>
+                            <img src='{$url}' style='width:100%; height:100%; object-fit:cover; display:block;' alt='Splash'>
+                        </div>
+                    </a>";
         });
 
         $grid->column('publish_at', __('Publish at'))->display(function ($value) {
@@ -131,6 +133,14 @@ class   BannerController extends MainController
             .grid-table tr:hover { background: #f8f9ff !important; }
             .grid-table td:first-child, .grid-table th:first-child { border-left: 3px solid transparent; }
             .grid-table tr:hover td:first-child { border-left: 3px solid #3f51b5; }
+        ');
+
+        // ── Fullscreen Image Overlay ──
+        Admin::html('
+            <div id="splash-overlay" onclick="this.style.display=\'none\'" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;justify-content:center;align-items:center;cursor:pointer;">
+                <img id="splash-overlay-img" src="" style="max-width:90%;max-height:90%;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5);object-fit:contain;" onclick="event.stopPropagation();">
+                <span style="position:absolute;top:20px;right:30px;color:#fff;font-size:36px;cursor:pointer;font-weight:300;line-height:1;" onclick="document.getElementById(\'splash-overlay\').style.display=\'none\'">&times;</span>
+            </div>
         ');
 
         $this->extendGrid($grid);
