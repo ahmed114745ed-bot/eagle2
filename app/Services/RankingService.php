@@ -11,6 +11,7 @@ use App\helper\RankingHelper;
 use Illuminate\Log\LogManager;
 use App\Helpers\UserPackHelper;
 use App\Helpers\UserLevelHelper;
+use Illuminate\Support\Facades\Cache;
 
 use Illuminate\Pagination\Paginator;
 use App\Http\Resources\TopUserResource;

@@ -38,7 +38,13 @@ class RestoreSuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
-        $grid->model()->onlyTrashed()->orderBy('deleted_at', 'desc');
+        $grid->model()->onlyTrashed()->with([
+            'appUser',
+            'appUser.profile',
+            "appUser.country:id,name,e_name",
+            'country',
+            'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->orderBy('deleted_at', 'desc');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));

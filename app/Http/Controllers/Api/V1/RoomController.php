@@ -1371,9 +1371,9 @@ class RoomController extends Controller
         if (!$room) return Common::apiResponse(0, 'Room not exist', null, 422);
         $uid  = $room->uid;
         if ($room->uid == $admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        $roomVisitor = $room->room_visitor;
-        $vis_arr     = !$roomVisitor ? [] : explode(",", $roomVisitor);
-        if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
+        if (!$room->roomVisitors()->where('user_id', $admin_id)->exists()) {
+            return Common::apiResponse(0, 'This user is not in this room', null, 404);
+        }
 
         $roomAdmin = $room->room_admin;
         $roomMax   = $room->total_admins;

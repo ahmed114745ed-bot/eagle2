@@ -95,7 +95,11 @@ class WareTabController extends MainController
         $type = request()->get('type', 4);
         $grid = new Grid(new Ware());
         //  $types = [6, 4, 5];
-        $grid->model()->where('type',  $type)->whereNot('get_type', 1);
+        // ✅ Performance: Select only needed columns instead of SELECT *
+        $grid->model()
+            ->select(['id', 'name', 'price', 'enable', 'show_img', 'img2', 'get_type', 'title', 'level', 'color', 'expire', 'is_active_for_vip', 'sort', 'type'])
+            ->where('type', $type)
+            ->whereNot('get_type', 1);
 
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -119,20 +123,17 @@ class WareTabController extends MainController
             /** @var Ware $this */
             $defaultImage = asset("images/image.png");
 
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+            // ✅ Performance: Use simple null/empty check instead of HTTP request (isImageExists)
+            // isImageExists() was making a real HTTP call (get_headers) per row = very slow
+            $url = !empty($path) ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
             $defaultImage = asset("images/image.png");
 
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+            // ✅ Performance: Use simple null/empty check instead of HTTP request (isImageExists)
+            $url = !empty($path) ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('get_type', __('get_type'))->select(

@@ -687,16 +687,10 @@ class SuperAdminController extends MainController
         $prefix = dashboardName();
 
         $subSuperAdmins = $superAdmin->subSuperAdmins()->with('appUser')->paginate(10, ['*'], 'sub_super_admin_page');
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
-                break;
-            case 'rewards':
 
-
-                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
-                break;
-        }
+        // Load ALL tab data at once for client-side tab switching (no page reload)
+        $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+        $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
 
         return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds', 'subSuperAdmins'));
     }
@@ -741,15 +735,11 @@ class SuperAdminController extends MainController
 
         $types = ['vip', 'badge', 'ware'];
         $type = request()->get('type', 'vip');
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
-            case 'rewards':
 
+        // Load ALL tab data at once for client-side tab switching (no page reload)
+        $agencies = $superAdmin->agencies()->paginate(10, ['*'], 'agencies_page');
+        $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
 
-                $rewards = SuperAdminReward::where('super_admin_id', $superAdmin->id)->where('type', $type)->with('ware', 'vip', 'badge')->paginate(10, ['*'], 'reward_page');
-                break;
-        }
         $prefix = dashboardName();
 
         return view('SuperAdmin::super_admin_profile', compact('superAdmin', 'defaultImage', 'agencies', 'totalCharges', 'totalSpent', 'prefix', 'type', 'types', 'rewards', 'bds', 'subSuperAdmins'));

@@ -55,6 +55,13 @@ class Handler extends ExceptionHandler
                     $statusCode = 500;
                 }
 
+                // Handle rate limiting (429) with a clear message
+                if ($statusCode === 429) {
+                    $retryAfter = $e->getHeaders()['Retry-After'] ?? null;
+                    $data = $retryAfter ? ['retry_after' => $retryAfter] : null;
+                    return Common::apiResponse(false, __('api_responses.too_many_requests'), $data, 429);
+                }
+
                 return Common::apiResponse(false, $e->getMessage(), null, $statusCode);
             }
 
