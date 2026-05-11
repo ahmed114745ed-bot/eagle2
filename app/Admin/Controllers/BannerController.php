@@ -111,16 +111,7 @@ class   BannerController extends MainController
                     </span>";
         })->style('text-align:center;');
 
-        $grid->column('is_active', __('Status'))->display(function ($value) {
-            if ($value) {
-                return "<span style='display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:#e8f5e9;color:#2e7d32;font-size:12px;font-weight:600;'>
-                            <i class='fa fa-check-circle'></i> " . __('Active') . "
-                        </span>";
-            }
-            return "<span style='display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:#fbe9e7;color:#c62828;font-size:12px;font-weight:600;'>
-                        <i class='fa fa-times-circle'></i> " . __('Inactive') . "
-                    </span>";
-        })->style('text-align:center;');
+         $grid->column('is_active', __('Is active'))->switch();
 
         $grid->column('updated_at', __('Updated at'))->display(function ($value) {
             return $value ? \Carbon\Carbon::parse($value)->diffForHumans() : '—';
