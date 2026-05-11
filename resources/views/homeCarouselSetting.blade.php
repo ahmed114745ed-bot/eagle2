@@ -6,28 +6,28 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Sidebar */
+    /* Sidebar - reads colors from dashboard menu */
     .cs-sidebar {
         width: 260px;
         flex-shrink: 0;
-        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-        border-radius: 16px;
+        background: var(--gradient-vertical-primary, linear-gradient(180deg, #2563eb 0%, #1f2937 100%));
+        border-radius: 0 20px 20px 0;
         padding: 28px 20px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
     }
 
     .cs-sidebar-title {
         font-size: 20px;
         font-weight: 700;
-        color: #f8fafc;
+        color: #ffffff;
         text-align: center;
         margin-bottom: 24px;
         padding-bottom: 16px;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.15);
     }
 
     .cs-sidebar-title i {
-        color: #f59e0b;
+        color: #ffffff;
         margin-right: 8px;
     }
 
@@ -37,28 +37,31 @@
         gap: 12px;
         width: 100%;
         padding: 14px 18px;
-        background: rgba(255, 255, 255, 0.04);
-        color: #94a3b8;
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.8);
         border: 1px solid transparent;
-        border-radius: 12px;
+        border-radius: var(--border-radius, 12px);
         cursor: pointer;
         font-size: 15px;
         font-weight: 500;
-        transition: all 0.25s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         margin-bottom: 6px;
         text-align: left;
+        position: relative;
+        overflow: hidden;
     }
 
     .cs-nav-btn:hover {
-        background: rgba(245, 158, 11, 0.1);
-        color: #f59e0b;
-        border-color: rgba(245, 158, 11, 0.2);
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateX(4px);
     }
 
     .cs-nav-btn.active {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%);
-        color: #f59e0b;
-        border-color: rgba(245, 158, 11, 0.3);
+        background: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+        border-color: rgba(255, 255, 255, 0.3);
         font-weight: 600;
     }
 
@@ -66,6 +69,7 @@
         font-size: 18px;
         width: 22px;
         text-align: center;
+        color: rgba(255, 255, 255, 0.9);
     }
 
     /* Main Content */
