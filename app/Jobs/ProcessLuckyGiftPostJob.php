@@ -128,7 +128,7 @@ class ProcessLuckyGiftPostJob implements ShouldQueue
                         ->where('id', $userId)
                         ->update($updateData);
 
-                    Log::channel('lucky_gift_receiver_issue')->error('UPDATED total_diamond_send + sender_level ONLY (no balance change)', [
+                    Log::channel('lucky_gift_receiver_issue')->info('UPDATED total_diamond_send + sender_level ONLY (no balance change)', [
                         'user_id' => $userId,
                         'total_diamond' => $totalDiamond,
                         'sender_level' => $senderLevel,
