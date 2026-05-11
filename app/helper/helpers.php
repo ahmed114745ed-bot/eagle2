@@ -364,17 +364,26 @@ if (!function_exists('get_file_details')) {
 
     if (!function_exists('isImageExists')) {
 
+        // function isImageExists($url)
+        // {
+        //     if (empty($url)) {
+        //         return false; // Prevent empty path error
+        //     }
+
+        //     $context = stream_context_create([
+        //         'http' => ['timeout' => 2] // Set a 2-second timeout
+        //     ]);
+        //     $headers = @get_headers($url, 1, $context);
+        //     return $headers && strpos($headers[0], '200') !== false;
+        // }
+
         function isImageExists($url)
         {
             if (empty($url)) {
-                return false; // Prevent empty path error
+                return false;
             }
 
-            $context = stream_context_create([
-                'http' => ['timeout' => 2] // Set a 2-second timeout
-            ]);
-            $headers = @get_headers($url, 1, $context);
-            return $headers && strpos($headers[0], '200') !== false;
+            return !empty(trim($url));
         }
     }
 

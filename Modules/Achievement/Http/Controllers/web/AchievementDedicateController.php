@@ -118,15 +118,21 @@ class AchievementDedicateController extends MainController
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
+                $showUrl = $this->user ? url("admin/users/{$this->user->id}") : "#";
+
                 return "
-             <div style='display: flex; align-items: center; gap: 10px;'>
-                 $image
-                 <div>
-                     <strong>$name</strong><br>
-                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                 </div>
-             </div>
-         ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}'
+                        style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 5px;'>
+                            <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                            
+                        </a>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
             });
 
 
