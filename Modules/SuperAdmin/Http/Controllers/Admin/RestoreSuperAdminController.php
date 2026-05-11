@@ -41,6 +41,7 @@ class RestoreSuperAdminController extends MainController
         $grid->model()->onlyTrashed()->with([
             'appUser',
             'appUser.profile',
+            "appUser.country:id,name,e_name",
             'country',
             'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])->orderBy('deleted_at', 'desc');
