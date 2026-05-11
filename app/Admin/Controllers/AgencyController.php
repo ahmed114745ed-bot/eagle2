@@ -375,19 +375,10 @@ class AgencyController extends MainController
 
         // --- Agency name column ---
         $grid->column('name', __('Agency'))->display(function ($name) {
-            $cacheKey = "agency_image_{$this->id}";
-
-            $image = Cache::remember($cacheKey, 3600, function () {
-                $path = $this->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
-            });
+            $path = $this->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            $image = "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
             $flagHtml = '';
             if (!empty($this->country?->flag)) {
                 $flagPath = getImagePath($this->country->flag);
@@ -417,14 +408,11 @@ class AgencyController extends MainController
         // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
 
-            $uid = @$this->owner->uuid;
-            $path = @$this->owner->profile?->avatar;
+            $uid = @$this->owner->uuid ?? '';
+            $path = @$this->owner->profile?->avatar ?? '';
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $path ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
             $flagHtml = '';
             if (!empty($this->owner?->country?->flag)) {
                 $flagPath = getImagePath($this->owner->country->flag);
@@ -439,8 +427,8 @@ class AgencyController extends MainController
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
             }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? admin_url("users/{$this->owner->id}") : 0;
+            $image = "<img src='" . e($url) . "' onerror=\"this.onerror=null;this.src='" . e($defaultImage) . "'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
+            $showUrl = $this->owner ? admin_url("users/{$this->owner->id}") : '#';
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image

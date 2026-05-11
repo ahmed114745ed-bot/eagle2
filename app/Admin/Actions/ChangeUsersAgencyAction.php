@@ -14,6 +14,7 @@ use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 
@@ -130,21 +131,22 @@ class ChangeUsersAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('old_agency_id', __('id'))->value($this->id);
-        $this->select('new_agency_id', __('agency id'))->options(function ($value) {
-            $ops2 = [];
-            foreach (
-                Agency::where('id', '!=', $this->id)->where(function ($query) {
-                    $query->WhereDoesntHave('additionalInfo')->orWhereHas(
-                        'additionalInfo',
-                        function ($query) {
-                            $query->where('status', 1);
-                        }
-                    );
-                })->get() as $agency
-            ) {
-                $ops2[$agency->id] = $agency->id . '_' . $agency->name;
-            }
-            return $ops2;
+        $currentId = $this->id;
+        $this->select('new_agency_id', __('agency id'))->options(function ($value) use ($currentId) {
+            $agencies = Cache::remember('agencies_select_options', 300, function () {
+                return Agency::query()
+                    ->where(function ($query) {
+                        $query->whereDoesntHave('additionalInfo')
+                            ->orWhereHas('additionalInfo', fn($q) => $q->where('status', 1));
+                    })
+                    ->select('id', 'name')
+                    ->get()
+                    ->pluck('name', 'id')
+                    ->mapWithKeys(fn($name, $id) => [$id => $id . '_' . $name])
+                    ->toArray();
+            });
+            unset($agencies[$currentId]);
+            return $agencies;
         });
     }
 
