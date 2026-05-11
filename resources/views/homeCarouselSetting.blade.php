@@ -395,7 +395,7 @@
                                     class="cs-field-input"
                                     placeholder="{{ __('Enter value') }}"
                                     required />
-                                <span class="cs-field-unit">/day</span>
+                                <span class="cs-field-unit">//hour</span>
                             </div>
                             <div class="cs-field-hint">
                                 <i class="fa fa-info-circle"></i> {{ __('Price for 1 day') }}
@@ -416,7 +416,7 @@
                                     class="cs-field-input"
                                     placeholder="{{ __('Enter value') }}"
                                     required />
-                                <span class="cs-field-unit">/day</span>
+                                <span class="cs-field-unit">/hour</span>
                             </div>
                             <div class="cs-field-hint">
                                 <i class="fa fa-info-circle"></i> {{ __('Price for 1 day') }}
@@ -437,7 +437,7 @@
                                     class="cs-field-input"
                                     placeholder="{{ __('Enter value') }}"
                                     required />
-                                <span class="cs-field-unit">/day</span>
+                                <span class="cs-field-unit">//hour</span>
                             </div>
                             <div class="cs-field-hint">
                                 <i class="fa fa-info-circle"></i> {{ __('Price for 1 day') }}
@@ -458,7 +458,7 @@
                                     class="cs-field-input"
                                     placeholder="{{ __('Enter value') }}"
                                     required />
-                                <span class="cs-field-unit">/day</span>
+                                <span class="cs-field-unit">/hour</span>
                             </div>
                             <div class="cs-field-hint">
                                 <i class="fa fa-info-circle"></i> {{ __('Price for 1 day') }}
