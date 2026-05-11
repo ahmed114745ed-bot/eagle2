@@ -366,7 +366,7 @@
                             <div class="field-card-icon">🕐</div>
                             <label>{{ __('Hours') }}</label>
                             <div class="input-wrap">
-                                <input type="text" name="hours" value="{{ $hours }}" class="form-control">
+                                <input type="number" name="hours" value="{{ $hours }}" class="form-control">
                                 <span class="input-suffix">%</span>
                             </div>
                         </div>
@@ -374,7 +374,7 @@
                             <div class="field-card-icon">📅</div>
                             <label>{{ __('Days') }}</label>
                             <div class="input-wrap">
-                                <input type="text" name="days" value="{{ $days }}" class="form-control">
+                                <input type="number" name="days" value="{{ $days }}" class="form-control">
                                 <span class="input-suffix">%</span>
                             </div>
                         </div>
@@ -382,7 +382,7 @@
                             <div class="field-card-icon">📸</div>
                             <label>{{ __('Moments') }}</label>
                             <div class="input-wrap">
-                                <input type="text" name="moments" value="{{ $moments }}" class="form-control">
+                                <input type="number" name="moments" value="{{ $moments }}" class="form-control">
                                 <span class="input-suffix">%</span>
                             </div>
                         </div>
@@ -390,7 +390,7 @@
                             <div class="field-card-icon">🎬</div>
                             <label>{{ __('Reels') }}</label>
                             <div class="input-wrap">
-                                <input type="text" name="reels" value="{{ $reels }}" class="form-control">
+                                <input type="number" name="reels" value="{{ $reels }}" class="form-control">
                                 <span class="input-suffix">%</span>
                             </div>
                         </div>
@@ -398,7 +398,7 @@
                             <div class="field-card-icon">💎</div>
                             <label>{{ __('Diamonds') }}</label>
                             <div class="input-wrap">
-                                <input type="text" name="diamonds" value="{{ $diamonds }}" class="form-control">
+                                <input type="number" name="diamonds" value="{{ $diamonds }}" class="form-control">
                                 <span class="input-suffix">%</span>
                             </div>
                         </div>
