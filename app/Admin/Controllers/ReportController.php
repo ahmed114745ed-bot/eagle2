@@ -726,6 +726,7 @@ class ReportController extends MainController
 
         $grid->model()->with([
             'bdSalaries',
+    
             'appUser',
             'appUser.profile',
             'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
