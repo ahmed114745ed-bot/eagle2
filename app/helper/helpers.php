@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Redis;
 use App\Services\AgoraRtmTokenBuilder;
 use Modules\UsersWallet\Entities\UserWallet;
 use Yasser\AgoraToken\RtmTokenBuilder;
-use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
+use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
+;
 
 use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
@@ -382,14 +383,7 @@ if (!function_exists('get_file_details')) {
                 return false;
             }
 
-            // Local storage/public images
-            $path = public_path(parse_url($url, PHP_URL_PATH));
-
-            if (file_exists($path)) {
-                return true;
-            }
-
-            return false;
+            return !empty(trim($url));
         }
     }
 
@@ -484,6 +478,7 @@ if (!function_exists('get_file_details')) {
                 Storage::disk(\config('filesystems.default'))->put($folder, $body);
 
                 return $folder;
+
             } catch (\Exception $e) {
                 \Log::error('httpImage() failed', [
                     'url' => $image,
@@ -513,7 +508,7 @@ if (!function_exists('get_file_details')) {
             $key = 'CharismaGift_' . $type . '_' . $userId . '_' . $roomId . '_' . implode($data) . '_' . $uniqueId;
             $data = serialize($data);
 
-
+       
 
             try {
 
@@ -529,7 +524,7 @@ if (!function_exists('get_file_details')) {
                 ];
                 \Illuminate\Support\Facades\Redis::set($key, serialize($values));
 
-
+             
 
                 //            \Illuminate\Support\Facades\DB::table('room_jobs')->insert($values);
             } catch (Exception $exception) {
@@ -1336,12 +1331,12 @@ if (!function_exists('getCountryIdFromLatLong')) {
         $responseEn = Http::withHeaders([
             'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
         ])->get('https://nominatim.openstreetmap.org/reverse', [
-            'lat' => $lat,
-            'lon' => $lon,
-            'format' => 'json',
-            'addressdetails' => 1,
-            'accept-language' => 'en',
-        ]);
+                    'lat' => $lat,
+                    'lon' => $lon,
+                    'format' => 'json',
+                    'addressdetails' => 1,
+                    'accept-language' => 'en',
+                ]);
 
         if (!$responseEn->ok()) {
             return null;
@@ -1363,12 +1358,12 @@ if (!function_exists('getCountryIdFromLatLong')) {
         $responseAr = Http::withHeaders([
             'User-Agent' => 'MyLaravelApp/1.0 (my@email.com)',
         ])->get('https://nominatim.openstreetmap.org/reverse', [
-            'lat' => $lat,
-            'lon' => $lon,
-            'format' => 'json',
-            'addressdetails' => 1,
-            'accept-language' => 'ar',
-        ]);
+                    'lat' => $lat,
+                    'lon' => $lon,
+                    'format' => 'json',
+                    'addressdetails' => 1,
+                    'accept-language' => 'ar',
+                ]);
 
         $countryNameAr = null;
         if ($responseAr->ok()) {
