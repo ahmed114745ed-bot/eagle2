@@ -33,7 +33,7 @@ jobs:
             fi
           fi
           find storage/jobs-logs -name '*.log' -size +50M -exec truncate -s 0 {} \; 2>/dev/null
-          threshold=80
+          threshold=60
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
             sudo docker system prune -a -f 2>/dev/null
@@ -127,7 +127,7 @@ jobs:
     needs: [deploy-app, deploy-job]
     if: always()
     steps:
-    - name: Cleanup old images
+    - name: Cleanup old images and build cache
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.156.128"
@@ -138,7 +138,6 @@ jobs:
         script: |
           CURRENT="${{ github.sha }}"
 
-          # Get previous image SHA from Swarm (keep N-1 for rollback safety)
           OCTA_PREV=$(sudo docker service inspect jo-octa --format '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null | grep -oE '[a-f0-9]{40}' || echo "")
           JOB_PREV=$(sudo docker service inspect jo-job --format '{{.PreviousSpec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null | grep -oE '[a-f0-9]{40}' || echo "")
           echo "Keeping: current=$CURRENT octa_prev=$OCTA_PREV job_prev=$JOB_PREV"
@@ -156,5 +155,6 @@ jobs:
           done
 
           sudo docker image prune -f 2>/dev/null || true
-          sudo docker builder prune -f --filter "until=24h" 2>/dev/null || true
+          sudo docker builder prune --all -f 2>/dev/null || true
+          sudo docker system prune -f 2>/dev/null || true
           echo "Disk: $(df -h / | awk 'NR==2{print $5}')"
