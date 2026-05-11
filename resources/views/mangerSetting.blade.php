@@ -366,44 +366,35 @@
                     @endif 
 
                     </div>
-                    <table class="table  table-hover grid-table" >
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Photo') }}</th>
-                                <th>{{ __('Title') }}</th>
-                                <th>{{ __('Actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($payment_gateways as $gateway)
-                            <tr>
-                                <td>{{ $gateway->id }}</td>
-                                <td>
-                                    <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}" style="width: 100px; height: 50px;">
-                                </td>
-                                <td>{{ $gateway->title }}</td>
-                                <td>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 15px;">
+                        @foreach($payment_gateways as $gateway)
+                        <div style="border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.18); transition: transform 0.2s, box-shadow 0.2s; background: var(--box-background-color, #2a2a2a);" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.18)'">
+                            {{-- Image --}}
+                            <div style="width: 100%; height: 140px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;" onclick="openFullScreen(this.querySelector('img'))">
+                                <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}" style="max-width: 90%; max-height: 120px; object-fit: contain; display: block; margin: 0; width: auto; height: auto;">
+                            </div>
+                            {{-- Info --}}
+                            <div style="padding: 14px 18px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                    <span style="font-size: 11px; opacity: 0.5;">#{{ $gateway->id }}</span>
+                                    <span style="font-size: 16px; font-weight: 600;">{{ $gateway->title }}</span>
+                                </div>
+                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
                                     @if (Admin::user()->can('*') || Admin::user()->can('edit-Payment-methods-for-shipping-agencies'))
-                                        <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}"
-                                        class="btn btn-sm btn-primary">
-                                            {{ __('Edit') }}
+                                        <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}" style="padding: 6px 18px; border-radius: 8px; background: rgba(33,150,243,0.15); color: #42a5f5; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; width: auto; border: none;" onmouseover="this.style.background='rgba(33,150,243,0.3)'" onmouseout="this.style.background='rgba(33,150,243,0.15)'">
+                                            <i class="fa fa-pencil"></i> {{ __('Edit') }}
                                         </a>
                                     @endif
-
                                     @if (Admin::user()->can('*') || Admin::user()->can('delete-Payment-methods-for-shipping-agencies'))
-                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}"
-                                        class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Are you sure?')">
-                                            {{ __('Delete') }}
+                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}" onclick="return confirm('Are you sure?')" style="padding: 6px 18px; border-radius: 8px; background: rgba(244,67,54,0.12); color: #ef5350; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; width: auto; border: none;" onmouseover="this.style.background='rgba(244,67,54,0.25)'" onmouseout="this.style.background='rgba(244,67,54,0.12)'">
+                                            <i class="fa fa-trash"></i> {{ __('Delete') }}
                                         </a>
                                     @endif
-
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
 
 
