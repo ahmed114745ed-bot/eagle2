@@ -62,7 +62,7 @@ class UtdStreamController extends Controller
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function closeRoom(Request $request, $roomName)
+    public function deleteRoom(Request $request, $roomName)
     {
         $result = self::closeRoom($roomName);
 
@@ -73,7 +73,7 @@ class UtdStreamController extends Controller
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function updateRoomMetadata(Request $request, $roomName)
+    public function patchRoomMetadata(Request $request, $roomName)
     {
         $request->validate([
             'metadata' => 'required',

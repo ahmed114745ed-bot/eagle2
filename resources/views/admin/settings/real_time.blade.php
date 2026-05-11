@@ -131,17 +131,21 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-12">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="utd_stream_webhook_url">Webhook URL:</label>
-                                        <div class="input-group">
+                                        <div style="display: flex; gap: 5px; align-items: center;">
                                             <input type="text" id="utd_stream_webhook_url"
                                                    value="{{ url('/api/utd-stream-webhook') }}"
                                                    class="form-control"
                                                    readonly
-                                                   style="background-color: #f5f5f5; cursor: not-allowed;">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyWebhookUrl()" title="Copy">
-                                                <i class="fa fa-copy"></i>
+                                                   style="background-color: #f5f5f5; cursor: not-allowed; flex: 1;">
+                                            <button class="btn btn-outline-secondary"
+                                                    type="button"
+                                                    onclick="copyWebhookUrl(event)"
+                                                    title="Copy"
+                                                    style="padding: 8px 12px;">
+                                                <i class="fa fa-copy" style="font-size: 16px;"></i>
                                             </button>
                                         </div>
                                         <small class="form-text text-muted">{{ __('This URL is used by UTD-STREAM to send webhook events') }}</small>
@@ -488,14 +492,22 @@
         $(document).on('pjax:success', initIsPreviewSwitch);
 
         // Copy Webhook URL Function
-        function copyWebhookUrl() {
+        function copyWebhookUrl(event) {
             const webhookInput = document.getElementById('utd_stream_webhook_url');
-            webhookInput.select();
-            webhookInput.setSelectionRange(0, 99999); // For mobile devices
+            const btn = event.currentTarget;
 
-            navigator.clipboard.writeText(webhookInput.value).then(function() {
+            // Create a temporary input to select and copy
+            const tempInput = document.createElement('input');
+            tempInput.value = webhookInput.value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+
                 // Success notification
-                const btn = event.target.closest('button');
                 const originalHTML = btn.innerHTML;
                 btn.innerHTML = '<i class="fa fa-check"></i>';
                 btn.classList.add('btn-success');
@@ -506,10 +518,11 @@
                     btn.classList.remove('btn-success');
                     btn.classList.add('btn-outline-secondary');
                 }, 2000);
-            }).catch(function(err) {
+            } catch (err) {
                 console.error('Failed to copy: ', err);
+                document.body.removeChild(tempInput);
                 alert('Failed to copy URL');
-            });
+            }
         }
     </script>
 </div>
