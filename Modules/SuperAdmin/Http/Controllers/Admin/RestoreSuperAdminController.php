@@ -118,9 +118,13 @@ class RestoreSuperAdminController extends MainController
             return $locale === 'en' ? (@$this->country->e_name ?? @$this->country->name) : (@$this->country->name ?? @$this->country->e_name);
         });
         if (Admin::user()->can('restore-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('return', __('restore'))->display(function () {
-                $superAdmin = SuperAdmin::where('country_id', $this->country_id)->first();
-                return  $superAdmin ? '<span style="color: red;">' . __('can not restore this super admin') . '</span>' : (new RestoreSuperAdminAction($this->id))->render();
+            // Pre-fetch all country_ids that already have an active (non-trashed) super admin to avoid N+1 queries
+            $occupiedCountryIds = SuperAdmin::pluck('country_id')->toArray();
+
+            $grid->column('return', __('restore'))->display(function () use ($occupiedCountryIds) {
+                return in_array($this->country_id, $occupiedCountryIds)
+                    ? '<span style="color: red;">' . __('can not restore this super admin') . '</span>'
+                    : (new RestoreSuperAdminAction($this->id))->render();
             });
         }
 
