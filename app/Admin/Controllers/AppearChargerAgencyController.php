@@ -222,7 +222,8 @@ class AppearChargerAgencyController extends MainController
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
-        $grid->model()->with(['owner.profile','owner.country', 'creator', 'country'])
+        $grid->model()->with(['owner.profile', 'owner.country', 'creator', 'country'])
+            ->withCount('chargeAgency as charge_agency_exists')
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 
@@ -236,18 +237,11 @@ class AppearChargerAgencyController extends MainController
 
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
-                $cacheKey = "agency_image_{$this->id}";
-                $image = Cache::remember($cacheKey, 3600, function () {
-                    $path = @$this->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
+                $path = @$this->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-
-                    return handleShowImageWithTypes($this->id, $url, 40, 40);
-                });
+                $image = "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
 
                 $flagHtml = '';
                 if (!empty($this->country?->flag)) {
@@ -279,7 +273,6 @@ class AppearChargerAgencyController extends MainController
             })->sortable();
 
         $grid->column('owner_id', __('Owner'))->display(function () {
-            // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
             $name = $this->owner ? $this->owner->name ?? 'Unknown Owner' : 'Unknown Owner';
             $uid = $this->owner ? $this->owner->uuid ?? 'N/A' : 'N/A';
             $phone = $this->owner ? $this->owner->phone ?? '-' : '-';
@@ -287,14 +280,11 @@ class AppearChargerAgencyController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+            $image = $this->owner
+                ? "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />"
+                : '';
 
-            // التأكد من أن الـ owner موجود قبل استدعاء دالة `handleShowImageWithTypes`
-            $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
-
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
             $flagHtml = '';
             if (!empty($this->owner?->country?->flag)) {
                 $flagPath = getImagePath($this->owner->country->flag);
@@ -314,8 +304,8 @@ class AppearChargerAgencyController extends MainController
                     $image
                     <div>
                         <strong>$name</strong> {$flagHtml}<br>
-                        <span style=' font-size: smaller;'>UID: $uid</span><br>
-                        <span style=' font-size: smaller;'>Phone: $phone</span>
+                        <span style='font-size: smaller;'>UID: $uid</span><br>
+                        <span style='font-size: smaller;'>Phone: $phone</span>
                     </div>
                 </div>
             ";
@@ -323,9 +313,9 @@ class AppearChargerAgencyController extends MainController
 
         $grid->column('charge_agency', __("Charge-agency"))
             ->display(function () {
-                return $this->chargeAgency ? 1 : 0;
+                return $this->charge_agency_exists > 0 ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates())->sortable();;
+            ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('appear_charger_agency', __("Appear charger agency"))
             ->display(function () {
@@ -340,7 +330,9 @@ class AppearChargerAgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
         $permission = $this->permission_name;
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            $id = $creatorId;
+            if ($this->creator) {
+                return app(\App\Admin\Services\CreatorService::class)->show($this->creator);
+            }
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->actions(function ($actions) use ($permission) {
