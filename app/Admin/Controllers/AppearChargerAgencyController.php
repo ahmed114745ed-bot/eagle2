@@ -222,7 +222,7 @@ class AppearChargerAgencyController extends MainController
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
-        $grid->model()->with(['owner.profile', 'creator', 'country'])
+        $grid->model()->with(['owner.profile','owner.country', 'creator', 'country'])
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 

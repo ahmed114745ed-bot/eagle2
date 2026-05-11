@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Helpers\WebPHelper;
 use App\Http\Services\BannerServices;
 use App\Models\Banner;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -54,18 +55,7 @@ class   BannerController extends MainController
             ->body($this->form()->edit($id)));
     }
 
-    //     public function store()
-    //     {
-    //          $data = request()->all();
-    //         (new BannerServices())->store($data);
-    //     }
 
-    //     public function update($id)
-    //     {
-    //         $data = request()->all();
-    // //        dd($data);
-    //         (new BannerServices())->update($id, $data);
-    //     }
 
     public function create(Content $content)
     {
@@ -95,14 +85,54 @@ class   BannerController extends MainController
 
         $grid->model()->orderByDesc('id');
 
-        $grid->column('id', __('Id'));
-        // $grid->column('title', __('Title'));
-        // $grid->column('button_text', __('Button text'));
-        $grid->column('image_url', __('img'))->image('', 100);
-        // $grid->column('redirect_url', __('Redirect url'));
-        $grid->column('publish_at', __('Publish at'));
-        $grid->column('is_active', __('Is active'))->switch();
-        $grid->column('updated_at', __('Updated at'));
+        $grid->column('id', __('Id'))->sortable()->style('font-weight:600;');
+
+        $grid->column('image_url', __('Image'))->display(function ($img) {
+            $url = $img ? getImagePath($img) : null;
+            if (!$url) {
+                return '<span style="color:#999;font-style:italic;">—</span>';
+            }
+            return "<div style='width:220px; height:70px; overflow:hidden; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.12);'>
+                        <img src='{$url}' style='width:100%; height:100%; object-fit:cover; display:block;' alt='Splash'>
+                    </div>";
+        });
+
+        $grid->column('publish_at', __('Publish at'))->display(function ($value) {
+            if ($value) {
+                $timeAgo = \Carbon\Carbon::parse($value)->diffForHumans();
+                return "<span style='display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:16px;background:#e3f2fd;color:#1565c0;font-size:11px;font-weight:600;'>
+                            <i class='fa fa-clock-o'></i> {$timeAgo}
+                        </span>";
+            }
+            return "<span style='display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:16px;background:#f5f5f5;color:#9e9e9e;font-size:11px;font-weight:500;'>
+                        <i class='fa fa-minus-circle'></i> " . __('Not Published') . "
+                    </span>";
+        })->style('text-align:center;');
+
+        $grid->column('is_active', __('Status'))->display(function ($value) {
+            if ($value) {
+                return "<span style='display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:#e8f5e9;color:#2e7d32;font-size:12px;font-weight:600;'>
+                            <i class='fa fa-check-circle'></i> " . __('Active') . "
+                        </span>";
+            }
+            return "<span style='display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:#fbe9e7;color:#c62828;font-size:12px;font-weight:600;'>
+                        <i class='fa fa-times-circle'></i> " . __('Inactive') . "
+                    </span>";
+        })->style('text-align:center;');
+
+        $grid->column('updated_at', __('Updated at'))->display(function ($value) {
+            return $value ? \Carbon\Carbon::parse($value)->diffForHumans() : '—';
+        })->style('color:#757575;font-size:12px;');
+
+        // ── Table Styles ──
+        Admin::style('
+            .grid-table td { vertical-align: middle !important; }
+            .grid-table th { background: #fafbfc !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #546e7a !important; }
+            .grid-table tr:hover { background: #f8f9ff !important; }
+            .grid-table td:first-child, .grid-table th:first-child { border-left: 3px solid transparent; }
+            .grid-table tr:hover td:first-child { border-left: 3px solid #3f51b5; }
+        ');
+
         $this->extendGrid($grid);
 
         return $grid;
@@ -119,13 +149,24 @@ class   BannerController extends MainController
         $show = new Show(Banner::findOrFail($id));
 
         $show->field('id', __('Id'));
-        // $show->field('title', __('Title'));
-        // $show->field('button_text', __('Button text'));
-        $show->field('image_url', __('Image url'));
-        // $show->field('redirect_url', __('Redirect url'));
-        $show->field('publish_at', __('Publish at'));
-        $show->field('is_active', __('Is active'));
-        $show->field('expire', __('duration(days)'));
+
+        $show->field('image_url', __('Image'))->as(function ($img) {
+            return $img ? getImagePath($img) : null;
+        })->image('', 300);
+
+        $show->field('publish_at', __('Publish at'))->as(function ($value) {
+            if (!$value) return __('Not Published');
+            return \Carbon\Carbon::parse($value)->format('Y-m-d H:i') . ' (' . \Carbon\Carbon::parse($value)->diffForHumans() . ')';
+        });
+
+        $show->field('is_active', __('Status'))->as(function ($value) {
+            return $value ? '✅ ' . __('Active') : '❌ ' . __('Inactive');
+        });
+
+        $show->field('expire', __('Duration (days)'))->as(function ($value) {
+            return (!$value || $value == 0) ? '∞ ' . __('Forever') : $value . ' ' . __('days');
+        });
+
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 
