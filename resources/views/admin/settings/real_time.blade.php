@@ -99,6 +99,39 @@
                     <div class="col-md-6 mb-3 ms-0 me-auto">
                         <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="m-0 color-white">{{ __('UTD-STREAM') }}</h4>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="utd_stream_app_id">{{ __('admin.app_id') }}:</label>
+                                        <input type="text" id="utd_stream_app_id" name="utd_stream_app_id"
+                                               placeholder="App ID"
+                                               value="{{ $utd_stream_app_id }}" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="utd_stream_server_secret">{{ __('admin.server_secret') }}:</label>
+                                        <input type="text" id="utd_stream_server_secret" name="utd_stream_server_secret"
+                                               placeholder="Server Secret"
+                                               value="{{ $utd_stream_server_secret }}" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+                    <div class="col-md-6 mb-3 ms-0 me-auto">
+                        <div class="card p-9-px shadow real-time-card-height">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0 color-white">{{ __('admin.Zego') }}</h4>
                             </div>
 
@@ -246,6 +279,18 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD-STREAM') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdStreamSoundRadio" class="custom-radio libraryRealTime"
+                                   name="sound_library"
+                                   value="4" {{ $soundLibrary == '4' ? 'checked' : '' }}>
+                            <label for="utdStreamSoundRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
@@ -300,6 +345,18 @@
                                    name="video_library"
                                    value="3" {{ $videoLibrary == '3' ? 'checked' : '' }}>
                             <label for="utdZegoVideoRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD-STREAM') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdStreamVideoRadio" class="custom-radio libraryRealTime"
+                                   name="video_library"
+                                   value="4" {{ $videoLibrary == '4' ? 'checked' : '' }}>
+                            <label for="utdStreamVideoRadio" class="switch"></label>
                         </div>
                     </div>
                 </div>
