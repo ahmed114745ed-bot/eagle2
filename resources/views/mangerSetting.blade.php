@@ -20,10 +20,10 @@
     .settings-content {
         flex-grow: 1;
         padding: 20px;
-        background: var(--secondary-color) !important;
-        filter: brightness(0.85);
-        color: var(--text-secondary-color) !important;
-        border-top: 3px solid var(--second-alpha) !important;
+        background: #ffffff !important;
+        filter: none;
+        color: #333333 !important;
+        border-top: 3px solid #e0e0e0 !important;
         border-radius: 20px !important;
         padding: 15px;
     }
@@ -355,9 +355,9 @@
 
                 <div class="table-responsive">
                     <div class="box-header with-border" style="display: flex;">
-                    <div class="settings-menu">
+                    {{-- <div class="settings-menu">
                         <button class="" onclick="showSection('PaymentGateways')">{{ __('Payment Gateways') }}</button>
-                    </div>
+                    </div> --}}
                   @if (Admin::user()->can('*') || Admin::user()->can('create-Payment-methods-for-shipping-agencies'))
 
                         <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
@@ -368,25 +368,25 @@
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 15px;">
                         @foreach($payment_gateways as $gateway)
-                        <div style="border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.18); transition: transform 0.2s, box-shadow 0.2s; background: var(--box-background-color, #2a2a2a);" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,0.3)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.18)'">
+                        <div style="border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; background: #fafafa;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,0.08)'">
                             {{-- Image --}}
-                            <div style="width: 100%; height: 140px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;" onclick="openFullScreen(this.querySelector('img'))">
+                            <div style="width: 100%; height: 140px; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; border-bottom: 1px solid #eee;" onclick="openFullScreen(this.querySelector('img'))">
                                 <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}" style="max-width: 90%; max-height: 120px; object-fit: contain; display: block; margin: 0; width: auto; height: auto;">
                             </div>
                             {{-- Info --}}
-                            <div style="padding: 14px 18px;">
+                            <div style="padding: 14px 18px; background: #fafafa;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                    <span style="font-size: 11px; opacity: 0.5;">#{{ $gateway->id }}</span>
-                                    <span style="font-size: 16px; font-weight: 600;">{{ $gateway->title }}</span>
+                                    <span style="font-size: 11px; color: #999;">#{{ $gateway->id }}</span>
+                                    <span style="font-size: 16px; font-weight: 700; color: #333;">{{ $gateway->title }}</span>
                                 </div>
-                                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                <div style="display: flex; gap: 10px; justify-content: center;">
                                     @if (Admin::user()->can('*') || Admin::user()->can('edit-Payment-methods-for-shipping-agencies'))
-                                        <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}" style="padding: 6px 18px; border-radius: 8px; background: rgba(33,150,243,0.15); color: #42a5f5; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; width: auto; border: none;" onmouseover="this.style.background='rgba(33,150,243,0.3)'" onmouseout="this.style.background='rgba(33,150,243,0.15)'">
+                                        <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}" style="padding: 7px 20px; border-radius: 6px; background: #3b82f6; color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; width: auto; border: none;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">
                                             <i class="fa fa-pencil"></i> {{ __('Edit') }}
                                         </a>
                                     @endif
                                     @if (Admin::user()->can('*') || Admin::user()->can('delete-Payment-methods-for-shipping-agencies'))
-                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}" onclick="return confirm('Are you sure?')" style="padding: 6px 18px; border-radius: 8px; background: rgba(244,67,54,0.12); color: #ef5350; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; width: auto; border: none;" onmouseover="this.style.background='rgba(244,67,54,0.25)'" onmouseout="this.style.background='rgba(244,67,54,0.12)'">
+                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}" onclick="return confirm('Are you sure?')" style="padding: 7px 20px; border-radius: 6px; background: #ef4444; color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; transition: background 0.2s; width: auto; border: none;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
                                             <i class="fa fa-trash"></i> {{ __('Delete') }}
                                         </a>
                                     @endif
