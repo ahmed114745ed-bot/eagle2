@@ -104,6 +104,9 @@ class CountryController extends MainController
                 $tabs[$category->id] = $title;
             }
 
+            // Pre-warm the row action cache so MoveCountryCategoryAction doesn't re-query
+            MoveCountryCategoryAction::warmCategoryCache($categories, $locale);
+
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
                 $active = $filterType == $key ? 'active' : '';
