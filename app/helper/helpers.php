@@ -284,6 +284,12 @@ if (!function_exists('get_file_details')) {
     if (!function_exists('numToStringNew')) {
         function numToStringNew($number)
         {
+            // If already formatted (e.g. "2K", "1.5M"), return as-is
+            if (!is_numeric($number)) {
+                return (string) $number;
+            }
+
+            $number = (float) $number;
             $units = ['', 'K', 'M', 'B', 'T', 'D', 'E', 'F'];
             for ($i = 0; $number >= 1000 && $i < count($units) - 1; $i++) {
                 $number /= 1000;
