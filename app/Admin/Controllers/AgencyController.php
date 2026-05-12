@@ -375,19 +375,10 @@ class AgencyController extends MainController
 
         // --- Agency name column ---
         $grid->column('name', __('Agency'))->display(function ($name) {
-            $cacheKey = "agency_image_{$this->id}";
-
-            $image = Cache::remember($cacheKey, 3600, function () {
-                $path = $this->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                return handleShowImageWithTypes($this->id, $url, 40, 40, 0);
-            });
+            $path = $this->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            $image = "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
             $flagHtml = '';
             if (!empty($this->country?->flag)) {
                 $flagPath = getImagePath($this->country->flag);

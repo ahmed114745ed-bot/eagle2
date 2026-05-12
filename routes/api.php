@@ -78,6 +78,8 @@ Route::get('/health', [HealthCheckController::class, 'status']);
 Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
+Route::post('utd-stream-webhook', [\App\Http\Controllers\Api\V1\UtdStreamWebhookController::class, 'handle'])
+    ->middleware(['verify.utdstream.webhook']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
     // Protected test route - only accessible in local environment
@@ -212,6 +214,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('zego-credential', [UserController::class, 'zegoCredential']);
             Route::get('update-zego-agora/v2', [EnteranceController::class, 'libraryAgoraZegoV2']);
 
+            // ─── UTD-STREAM ─────────────────────────────────
+            require __DIR__ . '/utd-stream.php';
 
             Route::prefix('config')->group(function () {
                 Route::get('settings', [VersionController::class, 'settings']);

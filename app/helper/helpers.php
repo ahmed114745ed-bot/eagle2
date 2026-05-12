@@ -284,6 +284,23 @@ if (!function_exists('get_file_details')) {
     if (!function_exists('numToStringNew')) {
         function numToStringNew($number)
         {
+            // Handle null/empty
+            if ($number === null || $number === '') {
+                return '0';
+            }
+
+            // If it's already a formatted string like "2K", "1.5M", return as-is
+            if (is_string($number) && !is_numeric($number)) {
+                // Check if it matches a formatted pattern (number + unit suffix)
+                if (preg_match('/^[\d.]+[KMBТDEF]$/i', $number)) {
+                    return $number;
+                }
+                return (string) $number;
+            }
+
+            // Convert string numbers like '1233' to float
+            $number = (float) $number;
+
             $units = ['', 'K', 'M', 'B', 'T', 'D', 'E', 'F'];
             for ($i = 0; $number >= 1000 && $i < count($units) - 1; $i++) {
                 $number /= 1000;

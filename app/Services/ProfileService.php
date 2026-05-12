@@ -4,16 +4,16 @@ namespace App\Services;
 
 use App\Helpers\Common;
 use App\Helpers\WebPHelper;
-use App\Models\Profile;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
-use App\Services\UserCounterServices;
-use App\Repositories\ProfileRepository;
-use Illuminate\Support\Facades\Storage;
-use App\Repositories\User\UserRepository;
-use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\UserResource as V1UserResource;
+use App\Http\Resources\Api\V1\UserVisitorResource;
+use App\Models\Profile;
+use App\Repositories\ProfileRepository;
+use App\Repositories\User\UserRepository;
+use App\Services\UserCounterServices;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
 
 class ProfileService
@@ -52,24 +52,56 @@ class ProfileService
 
         if ($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData, $user->id);
         $profile = Profile::where('user_id', $request->user()->id)->first();
+        // if ($request->hasFile('image')) {
+
+        //     $img = $request->file('image');
+        //     $imageType = $img->getClientOriginalExtension();
+        //     if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
+        //         throw new \Exception(__('api_responses.gifImage'));
+        //     }
+
+        //     $user->profile_count += 1;
+        //     $user->save();
+
+        //     //  $newImagePath = WebPHelper::uploadWebp(
+        //     //         $img,
+        //     //         'profile',
+        //     //         'profile_image'
+        //     //     );
+        //    // $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
+        //      $imagePath = Common::upload('profile', $img);
+        //     $this->profileRepo->updateAvatar($profile, $imagePath);
+        // }
+
+
         if ($request->hasFile('image')) {
 
             $img = $request->file('image');
-            $imageType = $img->getClientOriginalExtension();
-            if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
+            $extension = strtolower($img->getClientOriginalExtension());
+
+            // GIF permission check
+            if ($extension === 'gif' && !Common::hasInPack($user->id, 22, false)) {
                 throw new \Exception(__('api_responses.gifImage'));
             }
 
-            $user->profile_count += 1;
-            $user->save();
+            // Validate image before upload
+            $validation = Common::validateMedia($img, 'profile');
+            if (!$validation['valid']) {
+                throw new \Exception($validation['error']);
+            }
 
-            //  $newImagePath = WebPHelper::uploadWebp(
-            //         $img,
-            //         'profile',
-            //         'profile_image'
-            //     );
-           // $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
-             $imagePath = Common::upload('profile', $img);
+            $user->increment('profile_count');
+
+            // Upload original + dispatch optimization job (async)
+            $imagePath = Common::uploadOptimized(
+                'profile',
+                $img,
+                'profile',
+                Profile::class,
+                $profile->id,
+                'avatar'
+            );
+
             $this->profileRepo->updateAvatar($profile, $imagePath);
         }
 
@@ -87,7 +119,7 @@ class ProfileService
         }
         if ($request->hasFile('new_multi_image')) {
             foreach ($request->file('new_multi_image') as $file) {
-               $newImagePath = WebPHelper::uploadWebp(
+                $newImagePath = WebPHelper::uploadWebp(
                     $file,
                     'profile',
                     'profile_image',

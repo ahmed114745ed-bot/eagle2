@@ -64,7 +64,14 @@ class UserAchievementLevelController extends MainController
                 $filter->equal('user.uuid', __('uuid'));
             });
         });
-        $grid->model()->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->with([
+            'user',
+            'user.profile',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'achievementLevel',
+            'giftAchievement.gift:id,img',
+            'customAchievement.images',
+        ])->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
@@ -111,12 +118,14 @@ class UserAchievementLevelController extends MainController
             if ($value != null) {
                 $image = $value;
             } else {
-                $image = $this->achievementLevel?->valid_image ?? $this->giftAchievement()->whereHas('gift', function ($q) {
-                    $q->select('img');
-                })->first()->gift->img?? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? null;
+                // Use eager-loaded relations instead of per-row queries
+                $image = $this->achievementLevel?->valid_image
+                    ?? $this->giftAchievement?->gift?->img
+                    ?? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image
+                    ?? null;
             }
-            $value = getDriverUrl() . '/' . $image;
-            return "<img src='$value' width='80' height='80'>";
+            $url = getDriverUrl() . '/' . $image;
+            return "<img src='{$url}' width='80' height='80' onerror=\"this.style.display='none'\">";
         });
 
         $states = [

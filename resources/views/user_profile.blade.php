@@ -4517,6 +4517,20 @@
             $('#item_modal_update').modal('show');
         });
 
+        // Loading spinner on user edit form submit
+        $('#country_update_form').on('submit', function () {
+            var btn = $(this).find('button[type="submit"]');
+            btn.prop('disabled', true);
+            btn.html('<i class="fas fa-spinner fa-spin" style="font-size: 12px;"></i> {{ __("Saving...") }}');
+        });
+
+        // Loading spinner on level update form submit
+        $('#user_level_update_form').on('submit', function () {
+            var btn = $(this).find('button[type="submit"]');
+            btn.prop('disabled', true);
+            btn.html('<i class="fas fa-spinner fa-spin" style="font-size: 12px;"></i> {{ __("Saving...") }}');
+        });
+
         $(document).on('click', '.cancel_user_item_model_btn', function () {
             $('#item_modal_update').modal('hide');
         });

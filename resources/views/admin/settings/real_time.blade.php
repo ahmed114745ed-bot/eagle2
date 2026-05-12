@@ -99,6 +99,70 @@
                     <div class="col-md-6 mb-3 ms-0 me-auto">
                         <div class="card p-9-px shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="m-0 color-white">{{ __('UTD-STREAM') }}</h4>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="utd_stream_app_id">{{ __('admin.app_id') }}:</label>
+                                        <input type="text" id="utd_stream_app_id" name="utd_stream_app_id"
+                                               placeholder="App ID"
+                                               value="{{ $utd_stream_app_id }}" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="utd_stream_server_secret">{{ __('admin.server_secret') }}:</label>
+                                        <input type="text" id="utd_stream_server_secret" name="utd_stream_server_secret"
+                                               placeholder="Server Secret"
+                                               value="{{ $utd_stream_server_secret }}" class="form-control" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="utd_stream_callback_secret">Callback Secret:</label>
+                                        <input type="text" id="utd_stream_callback_secret" name="utd_stream_callback_secret"
+                                               placeholder="Callback Secret"
+                                               value="{{ $utd_stream_callback_secret ?? '' }}" class="form-control" required>
+                                        <small class="form-text text-muted">{{ __('Used to verify webhook signatures') }}</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="utd_stream_webhook_url">Webhook URL:</label>
+                                        <div style="display: flex; gap: 5px; align-items: center;">
+                                            <input type="text" id="utd_stream_webhook_url"
+                                                   value="{{ url('/api/utd-stream-webhook') }}"
+                                                   class="form-control"
+                                                   readonly
+                                                   style="background-color: #f5f5f5; cursor: not-allowed; flex: 1;">
+                                            <button class="btn btn-outline-secondary"
+                                                    type="button"
+                                                    onclick="copyWebhookUrl(event)"
+                                                    title="Copy"
+                                                    style="padding: 8px 12px;">
+                                                <i class="fa fa-copy" style="font-size: 16px;"></i>
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted">{{ __('This URL is used by UTD-STREAM to send webhook events') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3 btn-save btn0bottom">{{ __('save') }}</button>
+                        </div>
+                    </div>
+                </form>
+
+                <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+                    <div class="col-md-6 mb-3 ms-0 me-auto">
+                        <div class="card p-9-px shadow real-time-card-height">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0 color-white">{{ __('admin.Zego') }}</h4>
                             </div>
 
@@ -246,6 +310,18 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD-STREAM') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdStreamSoundRadio" class="custom-radio libraryRealTime"
+                                   name="sound_library"
+                                   value="4" {{ $soundLibrary == '4' ? 'checked' : '' }}>
+                            <label for="utdStreamSoundRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
@@ -300,6 +376,18 @@
                                    name="video_library"
                                    value="3" {{ $videoLibrary == '3' ? 'checked' : '' }}>
                             <label for="utdZegoVideoRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD-STREAM') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdStreamVideoRadio" class="custom-radio libraryRealTime"
+                                   name="video_library"
+                                   value="4" {{ $videoLibrary == '4' ? 'checked' : '' }}>
+                            <label for="utdStreamVideoRadio" class="switch"></label>
                         </div>
                     </div>
                 </div>
@@ -402,5 +490,39 @@
 
         $(document).ready(initIsPreviewSwitch);
         $(document).on('pjax:success', initIsPreviewSwitch);
+
+        // Copy Webhook URL Function
+        function copyWebhookUrl(event) {
+            const webhookInput = document.getElementById('utd_stream_webhook_url');
+            const btn = event.currentTarget;
+
+            // Create a temporary input to select and copy
+            const tempInput = document.createElement('input');
+            tempInput.value = webhookInput.value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+
+                // Success notification
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fa fa-check"></i>';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-secondary');
+
+                setTimeout(function() {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-secondary');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                document.body.removeChild(tempInput);
+                alert('Failed to copy URL');
+            }
+        }
     </script>
 </div>

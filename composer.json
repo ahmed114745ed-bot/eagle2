@@ -24,7 +24,7 @@
         "google/apiclient": "2.15.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "imdhemy/google-play-billing": "^1.5.1",
-        "intervention/image": "^3.8",
+        "intervention/image": "^2.1",
         "jxlwqq/material-ui": "^1.0",
         "jxlwqq/watermark": "^1.0",
         "kreait/firebase-php": "^7.19",

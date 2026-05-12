@@ -259,27 +259,7 @@ function getQueryParam(name) {
     return urlParams.get(name);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const activeTab = getQueryParam("tab") || "brandSettings";
-    showSection(activeTab);
-
-    document.querySelectorAll(".settings-menu button").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const sectionId = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-            showSection(sectionId);
-        });
-    });
-
-    document.querySelectorAll(".inner-settings-menu button").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const type = btn.getAttribute("onclick").match(/'(.+?)'/)[1];
-            changeInnerTab(type);
-        });
-    });
-});
-
-// Define functions in global scope for inline onclick handlers
+// Define functions in global scope FIRST (before initialization)
 window.showSection = function(sectionId) {
     // Show/hide sections
     document.querySelectorAll('.settings-section').forEach(section => {
@@ -479,6 +459,20 @@ window.updateBackgroundValue = async function() {
             reader.onerror = error => reject(error);
         });
     }
+
+// Initialize settings tabs - supports both regular page load and pjax navigation
+(function initSettingsTabs() {
+    function doInit() {
+        const activeTab = getQueryParam("tab") || "brandSettings";
+        showSection(activeTab);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", doInit);
+    } else {
+        doInit();
+    }
+})();
 </script>
 
 <script>

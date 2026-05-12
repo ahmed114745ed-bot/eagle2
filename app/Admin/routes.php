@@ -359,6 +359,7 @@ Route::group(
             return $categories;
         });
         Route::resource('all-games', AllGameController::class);
+        Route::post('all-games/import-json', [AllGameController::class, 'importJson'])->name('all-games.import-json');
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
         Route::resource('blacks', 'BlackListController');

@@ -1,271 +1,332 @@
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #121212;
-        color: white;
-        display: flex;
-    }
-
-    /* القائمة الجانبية */
-    .settings-sidebar {
-        width: 250px;
-        background: var(--secondary-color);
-        min-height: 400px;
-        padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .settings-sidebar h2 {
-        text-align: center;
-        color: var(--primary-color);
-    }
-
-    .settings-menu button {
-        display: block;
-        width: 100%;
-        text-align: right;
-        padding: 15px;
-        background: #333;
-        color: white;
-        border: none;
-        margin-bottom: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .settings-menu button:hover {
-        background: var(--primary-color);
-    }
-
-    /* محتوى الصفحة */
-    .settings-content {
-        flex-grow: 1;
-        padding: 20px;
-    }
-
-    .settings-section {
-        display: none;
-    }
-
-    .active {
-        display: block;
-    }
-
-    /* تنسيق النماذج */
-    form {
-        background: #222;
-        padding: 20px;
-        border-radius: 5px;
-    }
-
-    label {
-        display: block;
-        margin: 10px 0 5px;
-    }
-
-    input,
-    select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        background: #333;
-        border: 1px solid #444;
-        color: white;
-    }
-
-    button {
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f0f2f5;
+        color: #1a1a2e;
+        line-height: 1.6;
+        min-height: 100vh;
     }
 
     .all-page {
-        display: inline-flex;
+        display: flex;
+        min-height: 100vh;
+        gap: 24px;
+        padding: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
-    .wrapper {
-        width: 100%;
+    /* ── Sidebar ── */
+    .settings-sidebar {
+        width: 260px;
+        flex-shrink: 0;
+        background: #fff;
+        border-radius: 14px;
+        padding: 24px 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        border: 1px solid #e5e7eb;
+        position: sticky;
+        top: 24px;
+        height: fit-content;
     }
 
-    .settings-content {
-        width: 869px;
-    }
-
-    .form {
-        width: 400px;
-        margin: auto;
-    }
-
-    /* تصميم النافذة */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        padding-top: 50px;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-    }
-
-    /* الصورة داخل النافذة */
-    .modal-content {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-    }
-
-    /* زر الإغلاق */
-    .close {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: white;
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    img {
-        width: 201px;
-        display: block;
-        height: 99px;
+    .settings-sidebar h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a2e;
         margin-bottom: 20px;
-    }
-
-    button {
-        width: 200px;
-    }
-
-    /* Toggle Switch Styling */
-    .feature-toggle-container {
+        padding-bottom: 14px;
+        border-bottom: 2px solid #6366f1;
         display: flex;
         align-items: center;
-        margin-bottom: 20px;
+        gap: 8px;
     }
+    .settings-sidebar h2::before { content: '⚙️'; font-size: 1.1rem; }
 
-    .toggle-label {
-        margin-left: 10px;
-    }
+    .settings-menu { display: flex; flex-direction: column; gap: 6px; }
 
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-    }
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .slider {
-        position: absolute;
+    .settings-menu button {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        color: #4b5563;
+        padding: 12px 16px;
+        border-radius: 10px;
+        text-align: left;
+        font-size: 0.9rem;
+        font-weight: 500;
         cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
+        transition: all .2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+    .settings-menu button::before { content: '›'; font-size: 1.2rem; color: #9ca3af; transition: all .2s; }
+    .settings-menu button:hover { background: #eef2ff; border-color: #6366f1; color: #1a1a2e; }
+    .settings-menu button:hover::before { color: #6366f1; transform: translateX(3px); }
+
+    .settings-menu button.active {
+        background: #6366f1 !important;
+        border-color: #6366f1 !important;
+        color: #fff !important;
+        font-weight: 600;
+        box-shadow: 0 4px 14px rgba(99,102,241,.35);
+    }
+    .settings-menu button.active::before { content: '✓'; color: #fff; }
+
+    /* ── Content ── */
+    .settings-content {
+        flex: 1;
+        background: #fff;
+        border-radius: 14px;
+        padding: 32px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        border: 1px solid #e5e7eb;
+        min-height: 500px;
     }
 
-    .slider:before {
+    .settings-section { display: none; animation: fadeUp .35s ease; }
+    .settings-section.active { display: block; }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Section title ── */
+    .settings-section h2 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+        padding-bottom: 12px;
+        position: relative;
+        text-align: center;
+    }
+    .settings-section h2::after {
+        content: '';
         position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
+        bottom: 0; left: 50%; transform: translateX(-50%);
+        width: 48px; height: 3px;
+        background: #6366f1;
+        border-radius: 3px;
     }
 
-    input:checked + .slider {
-        background-color: #2196F3;
+    .section-desc {
+        color: #6b7280;
+        font-size: .9rem;
+        margin-bottom: 24px;
+        text-align: center;
     }
 
-    input:focus + .slider {
-        box-shadow: 0 0 1px #2196F3;
+    /* ── Form card ── */
+    form {
+        background: #fafbfc;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 28px;
     }
 
-    input:checked + .slider:before {
-        transform: translateX(26px);
+    .form { max-width: 520px; margin: 0 auto; }
+
+    /* ── Labels ── */
+    label {
+        display: block;
+        margin-bottom: 6px;
+        color: #374151;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: .5px;
     }
 
-    .slider.round {
-        border-radius: 34px;
+    /* ── Inputs ── */
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        width: 100%;
+        padding: 11px 14px;
+        background: #fff;
+        border: 1.5px solid #d1d5db;
+        border-radius: 10px;
+        color: #111827;
+        font-size: .95rem;
+        font-weight: 500;
+        transition: all .2s ease;
+        margin-bottom: 18px;
+    }
+    input:focus, select:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,.12);
     }
 
-    .slider.round:before {
-        border-radius: 50%;
+    /* ── Submit button ── */
+    button[type="submit"], button.save-btn, .btn-form {
+        background: #6366f1 !important;
+        color: #fff !important;
+        border: none;
+        padding: 12px 32px;
+        border-radius: 10px;
+        font-size: .95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 2px 10px rgba(99,102,241,.25);
+        width: auto !important;
+        min-width: 160px;
+    }
+    button[type="submit"]:hover, button.save-btn:hover, .btn-form:hover {
+        background: #4f46e5 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(99,102,241,.35);
     }
 
+    /* ── Feature Description ── */
     .feature-description-container {
-        border: 1px solid #ddd;
-        padding: 15px;
-        border-radius: 5px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 24px;
+    }
+    .feature-description-container h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .feature-description-container h4::before { content: '📋'; }
+    .feature-description-container .external-content {
+        min-height: 80px;
+        color: #6b7280;
+        font-size: .9rem;
+        line-height: 1.7;
+    }
+
+    /* ── Field Card ── */
+    .field-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        transition: all .2s ease;
         margin-bottom: 20px;
     }
-
-    .external-content {
-        min-height: 200px;
+    .field-card:hover {
+        border-color: #6366f1;
+        box-shadow: 0 4px 12px rgba(99,102,241,.08);
+    }
+    .field-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .field-card-icon {
+        width: 44px; height: 44px;
+        background: #eef2ff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+    .field-card-header label {
+        margin-bottom: 0;
+        font-size: .9rem;
     }
 
-    .loading {
-        color: #888;
-        font-style: italic;
+    /* ── Alerts ── */
+    .alert {
+        padding: 12px 18px;
+        border-radius: 10px;
+        margin: 12px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: .9rem;
+        font-weight: 500;
+    }
+    .alert-danger  { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .alert-info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+
+    /* ── Modal ── */
+    .modal {
+        display: none; position: fixed; z-index: 1000;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+    }
+    .modal-content {
+        margin: auto; display: block;
+        max-width: 90%; max-height: 90vh;
+        border-radius: 12px;
+    }
+    .close {
+        position: absolute; top: 20px; right: 20px;
+        color: #fff; font-size: 2rem; cursor: pointer;
+        width: 40px; height: 40px; display: flex;
+        align-items: center; justify-content: center;
+        border-radius: 50%; background: rgba(255,255,255,.15);
     }
 
-    @media (max-width: 576px) {
+    /* ── Toggle Switch ── */
+    .switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #d1d5db; transition: .3s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background: white; transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+    input:checked + .slider { background: #6366f1; }
+    input:checked + .slider:before { transform: translateX(24px); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f3f4f6; }
+    ::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+        .all-page { flex-direction: column; padding: 16px; }
+        .settings-sidebar { width: 100%; position: static; }
+        .settings-menu { flex-direction: row; flex-wrap: wrap; }
+        .settings-menu button { flex: 1; min-width: 180px; }
     }
     @media (max-width: 768px) {
-        .all-page {
-            display: block;
-        }
-        .settings-content {
-            width: 100%;
-        }
-        .form {
-            width: auto;
-        }
-    }
-    @media (max-width: 992px) {
-    }
-    @media (max-width: 1200px) {
-    }
-    @media (max-width: 1400px) {
+        .settings-content { padding: 20px; }
+        .form { max-width: 100%; }
     }
 </style>
 
-
-
 <body>
 <div class="all-page">
-    <div class="settings-sidebar">
+    {{-- <div class="settings-sidebar">
         <h2>{{ __('Settings') }}</h2>
         <div class="settings-menu">
-            <button onclick="showSection('AppFeature')"
-                    style="background: var(--primary-color); color: var(--text-secondary-color);">
+            <button onclick="showSection('AppFeature')" class="active">
                 {{ __('CP Settings') }}
             </button>
-
-
-
-
         </div>
-    </div>
+    </div> --}}
 
     <div class="settings-content">
         <div id="AppFeature" class="settings-section active">
             <h2>{{ __('CP Settings') }}</h2>
+            <p class="section-desc">{{ __('Configure CP module gift type preferences.') }}</p>
+
             <form id="agencyFeatureForm" action="{{ url("admin/cp-settings/update") }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @php
@@ -276,11 +337,12 @@
                 @endif
 
                 <div class="form">
-                   <div class="mb-4 inp-div">
-                        <label for="cp_enable_all_gifts" class="form-label fw-bold d-block text-end">
-                            {{ __('gifts type') }}
-                        </label>
-                        <select name="cp_enable_all_gifts" id="cp_enable_all_gifts" class="form-control text-end">
+                    <div class="field-card">
+                        <div class="field-card-header">
+                            <div class="field-card-icon">🎁</div>
+                            <label for="cp_enable_all_gifts">{{ __('Gifts Type') }}</label>
+                        </div>
+                        <select name="cp_enable_all_gifts" id="cp_enable_all_gifts">
                             <option value="true" {{ $enableGifts === true ? 'selected' : '' }}>
                                 {{ __('all gifts') }}
                             </option>
@@ -290,23 +352,19 @@
                         </select>
                     </div>
 
-                    <div class="d-flex justify-content-end div-btn-form">
-                        <button type="submit" class="btn btn-success btn-lg fw-bold shadow-sm btn-form">{{ __('Save') }}</button>
+                    <div style="text-align:center; margin: 20px 0;">
+                        <button type="submit" class="btn-form">💾 {{ __('Save') }}</button>
                     </div>
-<br>
+
                     <div class="feature-description-container">
                         <h4>{{ __('Feature Description') }}</h4>
                         <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('admin.feature_description') }}</div>
+                          <h5>  {{ __('admin.feature_description') }}</h5>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-
-
-
-
     </div>
 </div>
 
@@ -321,28 +379,17 @@
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
         }
-
         const activeTab = getQueryParam("firsttab") || "AppFeature";
         showSection(activeTab);
     });
 
     function showSection(sectionId) {
-        document.querySelectorAll('.settings-section').forEach(section => {
-            section.classList.remove('active');
-        });
+        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(sectionId)?.classList.add('active');
 
-        document.getElementById(sectionId).classList.add('active');
-
-        document.querySelectorAll('.settings-menu button').forEach(button => {
-            button.style.backgroundColor = '';
-            button.style.color = '';
-        });
-
-        const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-        if (activeButton) {
-            activeButton.style.backgroundColor = 'var(--primary-color)';
-            activeButton.style.color = 'var(--text-secondary-color)';
-        }
+        document.querySelectorAll('.settings-menu button').forEach(b => b.classList.remove('active'));
+        const btn = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+        if (btn) btn.classList.add('active');
 
         const url = new URL(window.location);
         url.searchParams.set("firsttab", sectionId);
@@ -350,91 +397,12 @@
     }
 
     function openFullScreen(imgElement) {
-        var modal = document.getElementById("imageModal");
-        var modalImg = document.getElementById("fullImage");
-        modal.style.display = "block";
-        modalImg.src = imgElement.src;
+        document.getElementById("imageModal").style.display = "block";
+        document.getElementById("fullImage").src = imgElement.src;
     }
 
     function closeFullScreen() {
         document.getElementById("imageModal").style.display = "none";
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var agencyHiddenValue = document.getElementById('host_agency_value').value;
-        document.getElementById('agency_toggle').checked = (agencyHiddenValue === '1');
-
-        var reelHiddenValue = document.getElementById('host_reel_value').value;
-        document.getElementById('reel_toggle').checked = (reelHiddenValue === '1');
-        var youtubeHiddenValue = document.getElementById('host_youtube_value').value;
-        document.getElementById('youtube_toggle').checked = (youtubeHiddenValue === '1')
-        var liveHiddenValue = document.getElementById('host_live_value').value;
-        document.getElementById('live_toggle').checked = (liveHiddenValue === '1')
-    });
 </script>
 </body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{{-- <div class="box">
-    <div class="box-header">
-        <h3 class="box-title">{{ __('CP Settings') }}</h3>
-    </div>
-
-    <div class="box-body no-padding">
-        <div class="switch-container">
-
-            <div class="switch-item" style=" width: 50%;">
-                <label for="enableAllGiftsCP" class="switch-label">
-                    {{ __('Enable all CP gifts') }}
-                </label>
-
-                <label class="switch">
-                    <input type="checkbox" id="enableAllGiftsCP"
-                           {{ $enableGifts == 1 ? 'checked' : '' }}>
-                    <span class="slider round"></span>
-                </label>
-            </div>
-
-        </div>
-    </div>
-</div>
-<script>
-$(document).ready(function () {
-
-    $('#enableAllGiftsCP').on('change', function() {
-        var status = $(this).is(':checked') ? 1 : 0;
-
-        $.ajax({
-            url: '{{ admin_url("cp-settings/update") }}',
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                cp_enable_all_gifts: status
-            },
-            success: function(response) {
-                toastr.success("{{ __('Updated successfully!') }}");
-            },
-            error: function() {
-                toastr.error("{{ __('Something went wrong!') }}");
-            }
-        });
-    });
-
-});
-</script> --}}

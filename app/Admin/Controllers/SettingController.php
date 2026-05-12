@@ -57,6 +57,8 @@ class SettingController extends MainController
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
         $zego_key = Common::getConf('zego_key');
+        $utd_stream_app_id = Common::getConfig('utd_stream_app_id');
+        $utd_stream_server_secret = Common::getConfig('utd_stream_server_secret');
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
@@ -106,7 +108,9 @@ class SettingController extends MainController
                 'agora_app_certificate',
                 'zego_filter_enabled',
                 'is_auto_preview',
-                'countries'
+                'countries',
+                'utd_stream_app_id',
+                'utd_stream_server_secret'
             ]))));
     }
 
