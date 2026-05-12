@@ -729,16 +729,17 @@ class UserRepository extends Repository
 
     public function nearUsers($userId, $latitude, $longitude)
     {
+        $lat = (float) $latitude;
+        $lng = (float) $longitude;
+
         return  User::query()
             ->with('profile')
-            ->select(
-                'users.*',
-                DB::raw("(6371 * acos(cos(radians(?))
+            ->selectRaw("users.*, (6371 * acos(cos(radians(?))
                 * cos(radians(users.lat))
                 * cos(radians(users.long) - radians(?))
                 + sin(radians(?))
-                * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
-            )->whereNotNull('lat')->whereNotNull('long')
+                * sin(radians(users.lat)))) AS distance", [$lat, $lng, $lat])
+            ->whereNotNull('lat')->whereNotNull('long')
             ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
             ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $userId)])
             ->where('id', '!=', $userId)->orderBy('distance', 'asc')->paginate(10);
@@ -754,14 +755,14 @@ class UserRepository extends Repository
             ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $userId)])
             ->where('id', '!=', $userId);
         if (($latitude != null) && ($longitude != null)) {
-            $builder = $builder->select(
-                'users.*',
-                DB::raw("(6371 * acos(cos(radians(?))
+            $lat = (float) $latitude;
+            $lng = (float) $longitude;
+            $builder = $builder->selectRaw("users.*, (6371 * acos(cos(radians(?))
                     * cos(radians(users.lat))
                     * cos(radians(users.long) - radians(?))
                     + sin(radians(?))
-                    * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
-            )->whereNotNull('lat')->whereNotNull('long');
+                    * sin(radians(users.lat)))) AS distance", [$lat, $lng, $lat])
+                ->whereNotNull('lat')->whereNotNull('long');
         }
 
         $builder->with([
