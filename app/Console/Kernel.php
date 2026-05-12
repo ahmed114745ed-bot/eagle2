@@ -201,19 +201,19 @@ class Kernel extends ConsoleKernel
             ->runInBackground();
 
         // Performance: Cleanup old fair_luck data (30 days retention)
-        $schedule->command('cleanup:fair-luck-transactions --days=30 --chunk=5000')
-            ->dailyAt('03:00')
-            ->timezone(getTimezone())
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/cleanup-fair-luck-transactions.log'))
-            ->runInBackground();
+        // $schedule->command('cleanup:fair-luck-transactions --days=30 --chunk=5000')
+        //     ->dailyAt('03:00')
+        //     ->timezone(getTimezone())
+        //     ->withoutOverlapping()
+        //     ->appendOutputTo(storage_path('logs/cleanup-fair-luck-transactions.log'))
+        //     ->runInBackground();
 
-        $schedule->command('cleanup:fair-luck-wallet-histories --days=30 --chunk=5000')
-            ->dailyAt('04:00')
-            ->timezone(getTimezone())
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/cleanup-fair-luck-wallet-histories.log'))
-            ->runInBackground();
+        // $schedule->command('cleanup:fair-luck-wallet-histories --days=30 --chunk=5000')
+        //     ->dailyAt('04:00')
+        //     ->timezone(getTimezone())
+        //     ->withoutOverlapping()
+        //     ->appendOutputTo(storage_path('logs/cleanup-fair-luck-wallet-histories.log'))
+        //     ->runInBackground();
     }
 
     protected function commands(): void
