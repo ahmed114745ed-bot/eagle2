@@ -36,20 +36,23 @@ class MoveGroupCountry extends BatchAction
     {
         $locale = app()->getLocale();
 
-        // Category select
+        // Category select — cache to avoid duplicate queries
         $this->select('category_id', __('Select Category'))
             ->options(function () use ($locale) {
+                static $cachedCategories = null;
 
-                $categories = [];
-                foreach (CountryCategory::get() as $category) {
-                    $title = $category->title[$locale]
-                        ?? $category->title['en']
-                        ?? reset($category->title);
+                if ($cachedCategories === null) {
+                    $cachedCategories = [];
+                    foreach (CountryCategory::get() as $category) {
+                        $title = $category->title[$locale]
+                            ?? $category->title['en']
+                            ?? reset($category->title);
 
-                    $categories[$category->id] = $title;
+                        $cachedCategories[$category->id] = $title;
+                    }
                 }
 
-                return $categories;
+                return $cachedCategories;
             })
             ->required();
     }
