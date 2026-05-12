@@ -2919,7 +2919,7 @@ class Common
      * @param string      $size    Size: 'original', 'thumb', 'medium', 'large'
      * @return string              Full URL or empty string
      */
-    public static function getImageUrl(string $path, string $size = 'medium'): string
+    public static function getImageUrl(?string $path, string $size = 'medium'): string
     {
         if (!$path) {
             return '';
