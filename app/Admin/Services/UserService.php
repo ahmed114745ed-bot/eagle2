@@ -132,7 +132,7 @@ class UserService
         return <<<HTML
         <a href="{$showUrl}" class="auc-card">
             <div class="auc-avatar">
-                <img src="{$url}" class="auc-avatar-img" alt="{$name}">
+                <img src="{$url}" class="auc-avatar-img" alt="{$name}" onerror="this.onerror=null;this.src='{$defaultImage}';">
             </div>
             <div class="auc-info">
                 <div class="auc-name-row">

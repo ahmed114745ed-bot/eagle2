@@ -88,6 +88,12 @@ class AgencyJoinRequestController extends MainController
 
 
         $grid->model()
+            ->with([
+                'user:id,name,uuid,phone,country_id',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'user.profile:user_id,avatar',
+                'agency:id,name,img,country_id'
+            ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
                 $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID))
@@ -114,16 +120,11 @@ class AgencyJoinRequestController extends MainController
         $grid->id(__('ID'));
         $grid->column('user.name', __('User'))
             ->display(function ($name) {
-                $uid = @$this->user->uuid;
-                $path = @$this->user?->profile?->avatar;
+                $uid = @$this->user->uuid ?? '';
+                $path = @$this->user?->profile?->avatar ?? '';
                 $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $url = $path ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
+                $image = "<img src='" . e($url) . "' onerror=\"this.onerror=null;this.src='" . e($defaultImage) . "'\" style='height:40px; width:40px; border-radius:50%; object-fit:cover;' />";
                 $showUrl = $this->user ? url("admin/users/{$this->user->id}") : "#";
 
                 return "
@@ -139,15 +140,10 @@ class AgencyJoinRequestController extends MainController
             });
         $grid->column('agency.name', __('Agency'))
             ->display(function ($name) {
-                $path = @$this->agency->img;
+                $path = @$this->agency->img ?? '';
                 $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $url = $path ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
+                $image = "<img src='" . e($url) . "' onerror=\"this.onerror=null;this.src='" . e($defaultImage) . "'\" style='height:40px; width:40px; border-radius:50%; object-fit:cover;' />";
                 $showUrl = $this->agency ? url("admin/agencies/profile/{$this->agency->id}") : '#';
 
                 return "
@@ -187,24 +183,18 @@ class AgencyJoinRequestController extends MainController
         });
         $grid->column('change_status_admin_id', __('Change Status Admin'))
             ->display(function () {
-                $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
+                $adminId = $this->change_status_admin_id;
+                if (!$adminId) return '-';
 
-                if (!$admin) {
-                    return '-';
-                }
+                $admin = Admin::find($adminId) ?? User::find($adminId);
+                if (!$admin) return '-';
 
                 $name = $admin->name ?? 'Unknown';
                 $uid = $admin->uuid ?? 'N/A';
-                $path = @$admin->profile?->avatar ?? @$admin->avatar;
+                $path = @$admin->profile?->avatar ?? @$admin->avatar ?? '';
                 $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $url = $path ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
+                $image = "<img src='" . e($url) . "' onerror=\"this.onerror=null;this.src='" . e($defaultImage) . "'\" style='height:40px; width:40px; border-radius:50%; object-fit:cover;' />";
                 $type = userType(@$admin?->type_user ?? '') ?? 'Unknown Type';
 
                 return "
@@ -322,7 +312,6 @@ class AgencyJoinRequestController extends MainController
                 }
 
                 uploadMonthlyDiamondReceive($user_id, 0);
-
             }
         });
 

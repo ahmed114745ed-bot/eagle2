@@ -16,6 +16,7 @@ use Encore\Admin\Layout\Content;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class SettingController extends MainController
 {
@@ -54,9 +55,8 @@ class SettingController extends MainController
         $chargeTabType = request()->get('type', 'Experience');
         $zego_token = Common::getConf('zego_token');
         $zego_key = Common::getConf('zego_key');
-        $utd_api_key = Common::getConf('utd_api_key');
-        $utd_app_id = Common::getConf('utd_app_id');
-        $appCoinRate = data_get($settings, 'app_coin_rate');
+        $utd_stream_app_id = Common::getConfig('utd_stream_app_id');
+        $utd_stream_server_secret = Common::getConfig('utd_stream_server_secret');
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
@@ -104,12 +104,9 @@ class SettingController extends MainController
                 'gamesLibrary',
                 'zego_filter_enabled',
                 'is_auto_preview',
-                'utd_api_key',
-                'utd_app_id',
                 'countries',
-                'appCoinRate',
-                'userTransferRateEnabled',
-                'userTransferCoinRate'
+                'utd_stream_app_id',
+                'utd_stream_server_secret'
             ]))));
     }
 
@@ -300,6 +297,8 @@ class SettingController extends MainController
             Cache::forget('charisma_format');
             Cache::put('charisma_format', $request->value, now()->addYear());
 
+            Config::set('charisma.format', (bool) $request->value);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -317,6 +316,8 @@ class SettingController extends MainController
 
             Cache::forget('charisma_badge');
             Cache::put('charisma_badge', $request->value, now()->addYear());
+
+            Config::set('charisma.badge', (bool) $request->value);
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {

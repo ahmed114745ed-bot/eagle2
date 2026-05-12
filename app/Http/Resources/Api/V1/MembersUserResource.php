@@ -40,9 +40,9 @@ class MembersUserResource extends JsonResource
             'family_id' => (int)$this->familyId ? (string)$this->familyId: (string)$request->family_id, // Include family_id in the response
             'name' => @$this->name ?: '',
             'profile' => [
-                'image' => @$this->profile->avatar,
-                'age' => Carbon::parse(@$this->profile->birthday)->age,
-                'gender' => (int)(@$this->profile->gender ?? 1),
+                'image' => $this->profile?->avatar,
+                'age' => Carbon::parse($this->profile?->birthday)->age,
+                'gender' => (int)($this->profile?->gender ?? 1),
             ],
             'type_user'            => intval(@$this->type_user) ?: 0, // both
             'vip_level' => $this->userVip->level ?? 0,

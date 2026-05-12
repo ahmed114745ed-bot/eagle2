@@ -158,6 +158,11 @@ $isVisible =
         $canSeeSelf($item)
         || count($visibleChildren) > 0
     );
+
+// إخفاء charisma-levels إذا كانت الميزة مغلقة
+if ($uri === 'charisma-levels' && !config('charisma.badge', false)) {
+    $isVisible = false;
+}
 @endphp
 
 {{-- ===================== RENDER ===================== --}}

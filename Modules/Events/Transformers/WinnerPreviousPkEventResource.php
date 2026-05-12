@@ -18,10 +18,10 @@ class WinnerPreviousPkEventResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'user_id'   => $this->user->id,
-            'uuid'      => @$this->user->uuid ?? 0,
-            'name'      => @$this->user->name ?? '',
-            'avatar'    => @$this->user->profile->avatar ?? '',
+            'user_id'   => $this->user?->id,
+            'uuid'      => $this->user?->uuid ?? 0,
+            'name'      => $this->user?->name ?? '',
+            'avatar'    => $this->user?->profile?->avatar ?? '',
             'level'     => $this->level,
             'pk_type'   => $this->pk_type,
             'room_id'   => @$this->room_id ?? 0,

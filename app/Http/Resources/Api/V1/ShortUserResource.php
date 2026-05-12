@@ -25,8 +25,8 @@ class ShortUserResource extends JsonResource
             'uuid' => @$this->uuid_v2,
             'name' => @$this->name ?: '',
             'profile' => [
-                'image' => @$this->profile->avatar ?: '',
-                'image_id' => @$this->profile->image_id ?: '',
+                'image' => $this->profile?->avatar ?: '',
+                'image_id' => $this->profile?->image_id ?: '',
             ],
             'frame' => UserPackHelper::getFrameImage($this->resource),
             'frame_id' => UserPackHelper::getFrameId($this->resource),

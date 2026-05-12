@@ -18,10 +18,10 @@ class TopPreviousResource extends JsonResource
     $name_ar = 'تيك شات';
     return [
 
-        'user_id'   => @$this->user->id ?? 0,
-        'uuid'      => @$this->user->uuid ?? 0,
-        'name'      => @$this->user->name ?? (app()->getLocale() == 'ar' ?$name_ar:$name_en),
-        'avatar'    => @$this->user->profile->avatar ?? 'tik-logo.png',
+        'user_id'   => $this->user?->id ?? 0,
+        'uuid'      => $this->user?->uuid ?? 0,
+        'name'      => $this->user?->name ?? (app()->getLocale() == 'ar' ?$name_ar:$name_en),
+        'avatar'    => $this->user?->profile?->avatar ?? 'tik-logo.png',
         'level'     => @$this->level ?? 0,
     ];
 }

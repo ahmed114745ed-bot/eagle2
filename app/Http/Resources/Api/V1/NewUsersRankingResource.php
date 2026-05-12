@@ -29,7 +29,7 @@ class NewUsersRankingResource extends JsonResource
                 ];
             }
         }
-        $hasColor = Common::hasInPackV2($this->ranker->packs, 18, true);
+        $hasColor = Common::hasInPackV2($user->packs, 18, true);
 
         $color_name = (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVipV2($this->user_id, 18, 'color') : null);
 
@@ -44,19 +44,19 @@ class NewUsersRankingResource extends JsonResource
             'remaining'        => numToString($this->exp_diff ?? 0),
             'remaining_int'    => ceil($this->exp_diff ?? 0),
             'name'             => $this->class == 3 ? ($user->ownerRoom?->room_name ?? '') : $user->name,
-            'avatar'           => $this->class == 3 ? ($user->ownerRoom?->room_cover ?? '') : $user->profile->avatar,
+            'avatar'           => $this->class == 3 ? ($user->ownerRoom?->room_cover ?? '') : ($user->profile?->avatar ?? ''),
             'frame'            => UserPackHelper::getFrameImage($user),
             'frame_id'         => UserPackHelper::getFrameId($user),
             'type_user'        => intval($user->type_user) ?: 0,
             'manger_type'      => !$user->mangerType ? null : new MangerTypeResource($user->mangerType),
-            'vip_level'        => $user->UserVip->level ?? 0,
+            'vip_level'        => $user->UserVip?->level ?? 0,
             'sender_level'     => $user->total_sender_level ?? 0,
             'reciver_level'    => $user->total_received_level ?? 0,
             'vip_level_img'    => $user->UserVip?->OVip?->img ?? '',
             'sender_level_img' => UserLevelHelper::getSenderImage($user),
             'reciver_level_img'=> UserLevelHelper::getReceiverImage($user),
             'country'          => $user->country,
-            'age'              => $user->profile->age ?? '',
+            'age'              => $user->profile?->age ?? '',
             'achievement_images' => $achievement_images,
             'color_name'       => $color_name,
             'room'             => $this->class == 3 ? $this->roomData($user->ownerRoom) : null,

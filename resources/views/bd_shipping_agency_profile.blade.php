@@ -1548,29 +1548,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (target === selectedTab) {
             tab.classList.add('active');
-            content.style.display = 'block';
-            targetElement = content;
+            if (content) { content.style.display = 'block'; content.classList.add('active'); }
         } else {
             tab.classList.remove('active');
-            content.style.display = 'none';
+            if (content) { content.style.display = 'none'; content.classList.remove('active'); }
         }
 
         tab.addEventListener('click', function (e) {
             e.preventDefault();
-            document.getElementById('tab-loading').style.display = 'block';
-            allTabs.forEach(t => t.style.pointerEvents = 'none');
-            const href = tab.getAttribute('href');
-            setTimeout(() => {
-                window.location.href = href;
-            }, 300);
+            allTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            allTabs.forEach(t => {
+                const panelId = t.getAttribute('data-target');
+                const panel = document.getElementById(panelId);
+                if (!panel) return;
+                if (panelId === target) { panel.style.display = 'block'; panel.classList.add('active'); }
+                else { panel.style.display = 'none'; panel.classList.remove('active'); }
+            });
+            const url = new URL(window.location.href);
+            const tabParam = new URLSearchParams(this.getAttribute('href').replace('?', ''));
+            url.searchParams.set('tab', tabParam.get('tab'));
+            window.history.replaceState({}, '', url.toString());
         });
     });
-
-    if (targetElement) {
-        setTimeout(() => {
-            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 400);
-    }
 });
 </script>
 

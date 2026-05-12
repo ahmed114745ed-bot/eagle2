@@ -42,7 +42,7 @@ class MomentfollwedResource extends JsonResource
             'created_at'  => $moment->created_at ?? 0, 'updated_at' => $moment->updated_at ?? 0,
             'img'         => $moment->img ?? 0, 'is_like' => @$this->moment->likes_exists ?? false, 'user' => [
                 'id'             => $moment->user->id ?? 0, 'uuid' => $moment->user->uuid ?? '',
-                'name'           => $moment->user->name ?? '', 'image' => $moment->user->profile->avatar ?? '',
+                'name'           => $moment->user->name ?? '', 'image' => $moment->user?->profile?->avatar ?? '',
                 'receiver_level' => $receiver_level ?? 0, // both
                 'sender_level'   => $sender_level, // both
                 'receiver_img'   => $receiver_img, // both

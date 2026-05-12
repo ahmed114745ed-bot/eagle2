@@ -787,7 +787,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'received_level', 'phone', 'bio', 'total_diamond_send', 'agency_id', 'family_id', 'can_play', 'charge_level', 'transfer_salary', 'online']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di', 'email', 'sender_level', 'exchange_diamonds','received_level', 'phone', 'bio', 'total_diamond_send', 'agency_id', 'family_id', 'can_play', 'charge_level', 'transfer_salary', 'online']);
         $with = [
             'images',
             'profile:id,user_id,avatar,gender',
@@ -989,6 +989,11 @@ class UserController extends MainController
             'totalGiftCoins',
             'permission'
         );
+
+        // For AJAX tab requests, return only the rendered view (no admin layout)
+        if (request()->ajax() && request()->has('tab')) {
+            return view('user_profile', $data)->render();
+        }
 
         return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }

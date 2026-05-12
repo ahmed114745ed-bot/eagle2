@@ -90,6 +90,17 @@
     $anyChildExists = $anyChild ?? false;
     $allPermission = Admin::user()->can('*');
     $isVisible = ($hasRoles || $hasPermission|| $allPermission || $anyChildExists );
+
+    // إخفاء charisma-levels إذا كانت الميزة مغلقة
+    if (Arr::get($item, 'uri') == 'charisma-levels' && !config('charisma.badge', false)) {
+        $isVisible = false;
+    }
+
+    // if (Arr::get($item, 'id') == '13'){
+    //     dump(Admin::user()->can(Arr::get($item, 'permission')));
+
+    //         dump($isVisible, $hasRoles , $hasPermission, $allPermission , $anyChildExists);
+    //     }
 @endphp
 
 @if($isVisible)

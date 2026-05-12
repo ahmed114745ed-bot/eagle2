@@ -86,5 +86,9 @@ class RouteServiceProvider extends ServiceProvider
         RateLimiter::for('auth-otp', function (Request $request) {
             return Limit::perMinute(3)->by($request->ip());
         });
+
+        RateLimiter::for('lucky-gift', function (Request $request) {
+            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
+        });
     }
 }

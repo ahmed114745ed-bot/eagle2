@@ -85,6 +85,7 @@ class AppServiceProvider extends ServiceProvider
             //            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
+            $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
         }
 
         $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
@@ -248,6 +249,7 @@ class AppServiceProvider extends ServiceProvider
 
         Config::set([
             'charisma.format' => (bool) ($settings['charisma_format'] ?? false),
+            'charisma.badge' => (bool) ($settings['charisma_badge'] ?? false),
             'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
             'themes.secondaryColor' => $settings['secondary_color'] ?? '#1A1A1A',
             'themes.textPrimaryColor' => $settings['text_primary_color'] ?? '#fdf8f8',

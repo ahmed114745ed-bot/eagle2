@@ -115,7 +115,7 @@ class BoxUseController extends MainController
             });
         });
 
-        $grid->model()->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->with(['user', 'user.profile', 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'), 'room', 'room.roomVisitors'])->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
@@ -136,17 +136,13 @@ class BoxUseController extends MainController
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-';
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$user->avatar;
+            $avatarPath = @$user->profile?->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
 
             $userUrl = admin_url('users/' . $user->id);
 
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;' onerror=\"this.src='$defaultImage'\">
                         <div>
                             <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
                             <span style='color: var(--uuid-color); font-size: smaller;'>UUID: $uuid</span><br>

@@ -359,6 +359,7 @@ Route::group(
             return $categories;
         });
         Route::resource('all-games', AllGameController::class);
+        Route::post('all-games/import-json', [AllGameController::class, 'importJson'])->name('all-games.import-json');
         Route::post('game-provider-setting', [AllGameController::class, 'gameSettings']);
         Route::resource('game-settings', GameSettingsController::class);
         Route::resource('blacks', 'BlackListController');
@@ -732,7 +733,7 @@ Route::group(
             ->except(['update'])
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
-        Route::resource('charisma-levels', CharismaLevelController::class);
+        Route::resource('charisma-levels', CharismaLevelController::class)->middleware('charisma.badge');
         Route::resource('room-settings', RoomSettingsController::class);
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');

@@ -117,6 +117,7 @@ class FormRequestController extends MainController
             ->select(['id', 'name', 'bd_id', 'whatsapp_number', 'submitted_by', 'form_template_type', 'status'])
             ->with([
                 'user',
+                'user.profile',
                 'user.country',
                 'user.senderLevel',
                 'user.receiverLevel',
@@ -522,7 +523,9 @@ class FormRequestController extends MainController
             'app_owner_id' => $owner->id,
             'bd_id' => $bd?->id,
             'country_id' => $countryId,
+            'type'=> 2,
         ]);
+        
 
         MilestoneHelper::grantMilestoneToUser($owner, 'charge-agency-owner');
         $request->update(['status' => 'approved']);

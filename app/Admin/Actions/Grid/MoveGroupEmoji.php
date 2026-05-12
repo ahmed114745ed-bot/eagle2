@@ -3,9 +3,9 @@
 namespace App\Admin\Actions\Grid;;
 
 use Illuminate\Http\Request;
-use App\Models\EmojiCategory;
 use Encore\Admin\Actions\BatchAction;
 use Illuminate\Database\Eloquent\Collection;
+use App\Admin\Actions\MoveEmojiCategoryAction;
 
 class MoveGroupEmoji extends BatchAction
 {
@@ -33,23 +33,9 @@ class MoveGroupEmoji extends BatchAction
 
     public function form()
     {
-        $locale = app()->getLocale();
-
-        // Category select
+        // Reuse cached categories from MoveEmojiCategoryAction (no extra query)
         $this->select('category_id', __('Select Category'))
-            ->options(function () use ($locale) {
-
-                $categories = [];
-                foreach (EmojiCategory::get() as $category) {
-                    $title = $category->title[$locale]
-                        ?? $category->title['en']
-                        ?? reset($category->title);
-
-                    $categories[$category->id] = $title;
-                }
-
-                return $categories;
-            })
+            ->options(MoveEmojiCategoryAction::getCategoryOptions())
             ->required();
     }
 }

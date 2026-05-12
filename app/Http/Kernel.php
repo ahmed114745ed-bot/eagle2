@@ -129,6 +129,7 @@ class Kernel extends HttpKernel
         'local' => \App\Http\Middleware\LocalOnly::class,
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
+        'charisma.badge' => \App\Http\Middleware\CharismaBadgeMiddleware::class,
         'room.cup' => \App\Http\Middleware\RoomCupMiddleware::class,
         'room.boom' => \App\Http\Middleware\RoomBoomMiddleware::class,
         'pk.live' => \App\Http\Middleware\PkLiveMiddleware::class,
@@ -142,6 +143,7 @@ class Kernel extends HttpKernel
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
         'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
         'verify.utd.signature' => \App\Http\Middleware\VerifyUtdSignature::class,
+        'verify.utdstream.webhook' => \App\Http\Middleware\VerifyUtdStreamWebhook::class,
         'auth.rate.limit' => \App\Http\Middleware\AuthRateLimiter::class,
     ];
 }

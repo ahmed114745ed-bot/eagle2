@@ -1548,8 +1548,7 @@
             </div>
         </div>
 
-        @if($activeTab == 'gift-log')
-    <div class="tab-content active" id="gift-log-tab">
+    <div class="tab-content" id="gift-log-tab">
         <div class="card" style="border:none;">
             <!-- Card Header -->
             <div style="display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:2px solid #f0f2f5; background:linear-gradient(135deg,#fff5f5 0%,#ffffff 100%);">
@@ -1627,7 +1626,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($giftSLogs as $index => $giftSLog)
+                        @foreach($giftSLogs ?? [] as $index => $giftSLog)
                             @php
                                 $userImageDefault = asset('images/businessman-icon.jpg');
                                 $defaultImage = asset("images/background_room.jpg");
@@ -1732,7 +1731,6 @@
             </div>
         </div>
     </div>
-@endif
 
         <div class="tab-content" id="targets-tab">
             <div class="card" style="border:none;">
@@ -2035,51 +2033,48 @@
 
                     let targetElement = null;
 
+                    // Set initial visibility based on URL param
                     allTabs.forEach(tab => {
                         const target = tab.getAttribute('data-target');
                         const content = document.getElementById(target);
 
                         if (target.startsWith(selectedTab)) {
                             tab.classList.add('active');
-                            content.style.display = 'block';
-                            targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
+                            if (content) { content.style.display = 'block'; content.classList.add('active'); }
+                            targetElement = content;
                         } else {
                             tab.classList.remove('active');
-                            content.style.display = 'none';
+                            if (content) { content.style.display = 'none'; content.classList.remove('active'); }
                         }
 
+                        // Client-side tab switching — no page reload
                         tab.addEventListener('click', function (e) {
                             e.preventDefault();
-                            document.getElementById('tab-loading').style.display = 'block';
-                            allTabs.forEach(t => t.style.pointerEvents = 'none');
-                            const href = tab.getAttribute('href');
-                            setTimeout(() => {
-                                window.location.href = href;
-                            }, 300);
+
+                            // Update active tab button
+                            allTabs.forEach(t => t.classList.remove('active'));
+                            this.classList.add('active');
+
+                            // Show/hide panels
+                            allTabs.forEach(t => {
+                                const panelId = t.getAttribute('data-target');
+                                const panel = document.getElementById(panelId);
+                                if (!panel) return;
+                                if (panelId === target) {
+                                    panel.style.display = 'block';
+                                    panel.classList.add('active');
+                                } else {
+                                    panel.style.display = 'none';
+                                    panel.classList.remove('active');
+                                }
+                            });
+
+                            // Update URL without reload
+                            const url = new URL(window.location.href);
+                            const tabParam = new URLSearchParams(this.getAttribute('href').replace('?', ''));
+                            url.searchParams.set('tab', tabParam.get('tab'));
+                            window.history.replaceState({}, '', url.toString());
                         });
-                    });
-
-                    if (targetElement) {
-                        setTimeout(() => {
-                            targetElement.scrollIntoView({ behavior: 'smooth' });
-                        }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
-                    }
-                });
-
-
-
-
-
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        // Remove active class from all buttons and content
-                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-                        // Add active class to clicked button and corresponding content
-                        btn.classList.add('active');
-                        const target = btn.getAttribute('data-target');
-                        document.getElementById(target).classList.add('active');
                     });
                 });
 

@@ -28,7 +28,7 @@ class UserResource extends JsonResource
         return [
             'id'=>@$this->id, // both
             'name'=>@$this->name?:'', // both
-            'image'=>@$this->profile->avatar?:'', // both
+            'image'=>$this->profile?->avatar?:'', // both
 //            'is_follow'=> $this->followeds_exists ?? false,
             'uuid'                 => @$this->uuid, // both
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',

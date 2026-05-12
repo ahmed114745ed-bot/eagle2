@@ -39,6 +39,7 @@ class CpsUserResource extends JsonResource
         })
         ->first();
 
+        $otherUser = null;
         if ($cp && ($cp->user_one_id == $this->id)) {
             $otherUser = User::Find($cp->user_two_id);
         } elseif ($cp && ($cp->user_two_id == $this->id)) {
@@ -50,16 +51,16 @@ class CpsUserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name ?? '',
             'uuid' => $this->uuid,
-            'image' => @$this->profile?->avatar ?? '',
+            'image' => $this->profile?->avatar ?? '',
             'exp'           => $cp?->di ?? 0,
-            'reciver_level_img'  => $total_received_level_img->img ?? '',
-            'sender_level_img'  => $total_sender_level_img->img ?? '',
+            'reciver_level_img'  => $total_received_level_img?->img ?? '',
+            'sender_level_img'  => $total_sender_level_img?->img ?? '',
             'other' => [
-                'id' => $otherUser->id ?? 0,
-                'name' => $otherUser->name ?? '',
-                'uuid' => $otherUser->uuid ?? 0,
-                'image' => $otherUser->profile->avatar ?? '',
-            ], 
+                'id' => $otherUser?->id ?? 0,
+                'name' => $otherUser?->name ?? '',
+                'uuid' => $otherUser?->uuid ?? 0,
+                'image' => $otherUser?->profile?->avatar ?? '',
+            ],
         ];
     
    

@@ -19,17 +19,17 @@ class AdminsAgencyResource extends JsonResource
 
     public function toArray($request)
     {
-        $hasColor = Common::hasInPackV2(@$this->user->packs, 18, true);
+        $hasColor = Common::hasInPackV2($this->user?->packs, 18, true);
 
         return [
-            'id' => $this->user->id ?? 0,
-            'name' => @$this->user->name ?? '', // both
-            'uuid' => $this->user->uuid ?? '',
-            'image' => @$this->user->profile->avatar ?? '',
+            'id' => $this->user?->id ?? 0,
+            'name' => $this->user?->name ?? '',
+            'uuid' => $this->user?->uuid ?? '',
+            'image' => $this->user?->profile?->avatar ?? '',
             'exp'   => '0',
-            'image_color'          => @$this->user->color_image,
-            'id_image'             => @$this->user->specialId?->ware?->show_img ?? '',
-            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$this->user->id, 18, 'color') : null),
+            'image_color'          => $this->user?->color_image,
+            'id_image'             => $this->user?->specialId?->ware?->show_img ?? '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip($this->user?->id, 18, 'color') : null),
 
         ];
     }

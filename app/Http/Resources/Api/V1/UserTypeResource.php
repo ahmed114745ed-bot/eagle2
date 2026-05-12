@@ -52,10 +52,10 @@ class UserTypeResource extends JsonResource
             'uuid'       => @$this->uuid,
             'name'       => @$this->name ?: '',
             'profile'    => [
-                'image'  => @$this->profile->avatar,
-                'age'    => Carbon::parse(@$this->profile->birthday)->age,
-                'gender' => @$this->profile->gender ?? 1,
-                'country'=> @$this->profile->country?:''
+                'image'  => $this->profile?->avatar,
+                'age'    => Carbon::parse($this->profile?->birthday)->age,
+                'gender' => $this->profile?->gender ?? 1,
+                'country'=> $this->profile?->country?:''
             ],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'   => @$this->dress_1,
