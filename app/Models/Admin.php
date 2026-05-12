@@ -27,6 +27,11 @@ class Admin extends Administrator
 
     public function getAgencyIdAttribute()
     {
+        // If agency is already eager-loaded, use it directly (no extra query)
+        if ($this->relationLoaded('agency')) {
+            return $this->agency?->id;
+        }
+
         return \Illuminate\Support\Facades\Cache::remember(
             "admin_agency_id_{$this->id}",
             300,
