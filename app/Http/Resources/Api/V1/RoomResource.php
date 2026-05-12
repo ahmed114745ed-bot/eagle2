@@ -70,9 +70,9 @@ class RoomResource extends JsonResource
 
             'avatar' => [
                 'original' => $this->room_cover ?? '',
-                'thumbnail' =>  $this->avatar_thumb ?? Common::getImageUrl($this->room_cover, 'thumbnail'),
-                'medium' => $this->avatar_medium ?? Common::getImageUrl($this->room_cover, 'medium'),
-                'large' => $this->avatar_large ?? Common::getImageUrl($this->room_cover, 'large'),
+                'thumbnail' =>  $this->avatar_thumb ?? Common::getImageUrl($this->room_cover ?? '', 'thumbnail'),
+                'medium' => $this->avatar_medium ?? Common::getImageUrl($this->room_cover ?? '', 'medium'),
+                'large' => $this->avatar_large ?? Common::getImageUrl($this->room_cover ?? '', 'large'),
             ],
 
             //            'class' => $this->myClass ?: new \stdClass(),
