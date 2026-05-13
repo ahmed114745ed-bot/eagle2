@@ -38,11 +38,11 @@ class Handler extends ExceptionHandler
         // Handle missing table exceptions
         if (MissingTableHandler::isMissingTableException($e)) {
             MissingTableHandler::handle($e);
-            
+
             if ($request->is('api/*')) {
                 return Common::apiResponse(0, 'Service temporarily unavailable. Please try again later.', null, 503);
             }
-            
+
             // For web requests, show a friendly error page or return empty response
             return response()->view('errors.503', [], 503);
         }

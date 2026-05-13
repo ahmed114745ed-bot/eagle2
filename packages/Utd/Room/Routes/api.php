@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\V1\ChargeController;
 use Illuminate\Support\Facades\Route;
-use Utd\Room\Entities\BackgroundController;
+use Utd\Room\Http\Controllers\Api\BackgroundController;
 use Utd\Room\Http\Controllers\Api\EnteranceController;
 use Utd\Room\Http\Controllers\Api\MicrophoneController;
 use Utd\Room\Http\Controllers\Api\RequestBackgroundImageController;

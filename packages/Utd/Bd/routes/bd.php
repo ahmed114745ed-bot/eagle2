@@ -13,6 +13,12 @@ use Utd\Bd\Http\Controllers\WalletController;
 use Utd\Bd\Http\Controllers\UserController;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\Helpers\AgencyPackageHelper;
+use App\Support\PackageHelper;
+
+// Check if BD package is installed, otherwise return 404
+if (!PackageHelper::isInstalled('bd')) {
+    abort(404);
+}
 
 
 

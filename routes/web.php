@@ -1,7 +1,6 @@
 <?php
 
 use App\Admin\Controllers\AuthController;
-use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\HomeCarouselController;
@@ -18,6 +17,7 @@ use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V2\MallController;
 use Utd\Bd\Http\Controllers\BdSalaryMigrationController;
+use Utd\Bd\Http\Controllers\Admin\BdController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\PayPalController;
 use App\Http\Controllers\SettingsController;
@@ -465,7 +465,10 @@ Route::get('/clear-admin-error', function () {
 
 Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
 Route::get('/admin/super-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.super.logout');
-Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
+
+if (PackageHelper::isInstalled('bd')) {
+    Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
+}
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
@@ -549,7 +552,10 @@ Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondControll
 Route::get('/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
-Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
+
+if (PackageHelper::isInstalled('bd')) {
+    Route::get('/sync-bd-agencies', [BdController::class, 'sync']);
+}
 
 
 Route::get('/charge-agency-export-report', [
@@ -577,12 +583,17 @@ Route::get('get-setting/{key}', function ($key) {
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
 Route::get('/deeplink/{target?}', [\App\Http\Controllers\General\DeepLinkController::class, 'index']);
 
-Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
+if (PackageHelper::isInstalled('bd')) {
+    Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate']);
+}
 
 
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
-Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
+
+if (PackageHelper::isInstalled('bd')) {
+    Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
+}
 Route::get('/emoji-image-type', [EmojiController::class, 'gitImage']);
 
 

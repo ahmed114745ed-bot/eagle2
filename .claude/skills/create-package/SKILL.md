@@ -13,6 +13,52 @@ Guide for creating a new Laravel package in this project under `packages/Utd/`.
 
 You are creating a new UTD package. Follow the patterns established by existing packages (Reals, Moments, Room, Gifts).
 
+## Common Issues & Prevention
+
+### Issue: "Class ServiceProvider not found" when running php artisan
+
+**Cause:** Package is registered in `composer.json` but not installed in `vendor/` or not in autoload files.
+
+**Prevention:**
+1. Always run `composer install` (not `composer update`) after adding a new local package
+2. Ensure repository is added with `"symlink": true` option
+3. Verify `vendor/utd/{package-name}` symlink exists
+4. Check `vendor/composer/installed.json` contains your package
+
+**Fix:**
+```bash
+# Quick fix - reinstall all packages
+composer install --no-interaction
+
+# Manual fix - create symlink then install
+ln -sf ../../packages/Utd/{PackageName} vendor/utd/{package-name}
+composer install --no-interaction
+```
+
+### Issue: Package migrations not running
+
+**Cause:** Missing `loadMigrationsFrom()` in ServiceProvider or migrations path is wrong.
+
+**Prevention:**
+- Always add `$this->loadMigrationsFrom(__DIR__.'/../database/migrations');` in ServiceProvider `boot()` method
+- Use `Schema::hasTable()` guards in migrations to prevent duplicate table errors
+
+### Issue: Routes not loading
+
+**Cause:** Missing route registration in ServiceProvider or middleware not applied.
+
+**Prevention:**
+- Register routes in `registerRoutes()` method with correct middleware
+- Check route file exists in `routes/api.php` or `routes/web.php`
+
+### Issue: PackageHelper not recognizing the package
+
+**Cause:** Package not added to `app/Support/PackageHelper.php` registry.
+
+**Prevention:**
+- Always add package to `PackageHelper::$packages` array after creation
+- Use the primary entity class as the package identifier
+
 ### Step 1: Create Directory Structure
 
 ```
@@ -423,7 +469,10 @@ If a class is **general-purpose** but happens to use a package model in a few li
 ```json
 {
     "type": "path",
-    "url": "packages/Utd/{PackageName}"
+    "url": "packages/Utd/{PackageName}",
+    "options": {
+        "symlink": true
+    }
 }
 ```
 
@@ -432,9 +481,32 @@ If a class is **general-purpose** but happens to use a package model in a few li
 "utd/{package-name}": "*"
 ```
 
-3. Run:
+3. **Install the package** (CRITICAL - prevents "ServiceProvider not found" errors):
 ```bash
-composer update utd/{package-name}
+composer install --no-interaction
+```
+
+**IMPORTANT:** Always use `composer install` (not `composer update`) when adding a new local package to ensure proper registration in `vendor/composer/installed.json` and autoload files.
+
+4. **Verify installation** - Check that the package is properly installed:
+```bash
+# Verify symlink exists
+ls -la vendor/utd/{package-name}
+
+# Verify autoload is registered
+php artisan --version
+
+# Should output Laravel version without errors
+```
+
+5. **If you get "Class ServiceProvider not found" error:**
+```bash
+# Solution 1: Run full composer install
+composer install --no-interaction
+
+# Solution 2: If still failing, manually create symlink then install
+ln -sf ../../packages/Utd/{PackageName} vendor/utd/{package-name}
+composer install --no-interaction
 ```
 
 ### Step 14: Add Test Suite
@@ -524,3 +596,19 @@ class {Entity}Test extends TestCase
 | Service class | PascalCase + Service | `GiftService` |
 | Controller | PascalCase + Controller | `GiftController` |
 | Resource | PascalCase + Resource | `GiftResource` |
+
+## Post-Creation Checklist
+
+After creating a new package, verify everything works:
+
+- [ ] **Package installed:** `ls -la vendor/utd/{package-name}` shows symlink
+- [ ] **Laravel boots:** `php artisan --version` runs without errors
+- [ ] **Autoload works:** `php artisan list` shows package commands (if any)
+- [ ] **Migrations load:** `php artisan migrate:status` lists package migrations
+- [ ] **Routes registered:** `php artisan route:list | grep {route-prefix}` shows package routes
+- [ ] **Config published:** `php artisan vendor:publish --tag={package-name}-config` works
+- [ ] **PackageHelper updated:** `PackageHelper::isInstalled('{packageKey}')` returns true
+- [ ] **Tests pass:** `./vendor/bin/phpunit --testsuite={PackageName}` runs successfully
+- [ ] **No errors:** Check `storage/logs/laravel.log` for package-related errors
+
+If any check fails, review the corresponding step in this guide.

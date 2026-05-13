@@ -3,11 +3,17 @@
 use Utd\Bd\Http\Controllers\Admin\BdController;
 use Utd\Bd\Http\Controllers\Admin\BdSelectController;
 use Illuminate\Support\Facades\Route;
+use App\Support\PackageHelper;
+
+// Check if BD package is installed, otherwise return 404
+if (!PackageHelper::isInstalled('bd')) {
+    abort(404);
+}
 
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
-        'namespace' => config('admin.route.namespace'),
+        'namespace' => '',
         'middleware' => [
             'web',
             'admin',

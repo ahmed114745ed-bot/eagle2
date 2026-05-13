@@ -120,6 +120,7 @@ class Kernel extends HttpKernel
         'web-agency-feature' => WebAgencyFeatureEnable::class,
         'ban.user.actions' => \App\Http\Middleware\CheckUserBan::class,
         'local' => \App\Http\Middleware\LocalOnly::class,
+        'package' => \App\Http\Middleware\CheckPackageInstalled::class,
         'preview.superadmin' => PreviewSuperAdmin::class,
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
         'room.cup' => \App\Http\Middleware\RoomCupMiddleware::class,

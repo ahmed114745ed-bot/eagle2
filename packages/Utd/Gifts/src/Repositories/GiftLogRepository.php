@@ -107,4 +107,36 @@ class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryC
                 $q->whereBetween('created_at', [$formattedStartDate, $formattedEndDate]);
             })->groupBy('giftId', 'sender_id', 'receiver_id')->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function sumGiftPriceByReceiver($receiverId, $startDate, $endDate, $date)
+    {
+        return $this->model
+            ->where('receiver_id', $receiverId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('giftPrice');
+    }
+
+    public function totalUsersGiftPrice($receiverIds)
+    {
+        return $this->model
+            ->whereIn('receiver_id', $receiverIds)
+            ->sum('giftPrice');
+    }
+
+    public function getByDaily($userId, $agencyId, $start, $end)
+    {
+        return $this->model
+            ->where('sender_id', $userId)
+            ->where('agency_id', $agencyId)
+            ->whereBetween('created_at', [$start, $end])
+            ->get();
+    }
+
+    public function getByDate($userId, $date)
+    {
+        return $this->model
+            ->where('sender_id', $userId)
+            ->where('created_at', '>=', $date)
+            ->get();
+    }
 }

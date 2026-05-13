@@ -3,9 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\AgencyPackageHelper;
-use App\Helpers\Common;
-use App\Models\AppFeature;
-use App\Services\AppFeatureService;
+use App\Support\PackageHelper;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,11 +17,17 @@ class WebAgencyFeatureEnable
      */
     public function handle(Request $request, Closure $next, ...$slug): Response
     {
-        // Check if Agency package is installed first
-        if (!AgencyPackageHelper::isAgencyInstalled()) {
-            abort(403, __('Agency feature is not available'));
+        // التحقق من تثبيت الحزمة - إذا مش مثبتة، نسمح بالمرور
+        if (!PackageHelper::isInstalled('agency')) {
+            return $next($request);
         }
 
+        // التحقق من الجداول - إذا مش موجودة، نسمح بالمرور
+        if (!AgencyPackageHelper::isAgencyInstalled()) {
+            return $next($request);
+        }
+
+        // التحقق من تفعيل الميزة
         $app_feature = \Cache::get('host_agency');
 
         if (!($app_feature == '1' || $app_feature == 1)) {

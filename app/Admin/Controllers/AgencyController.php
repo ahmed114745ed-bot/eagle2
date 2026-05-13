@@ -3,9 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Support\PackageHelper;
+use App\Helpers\BdPackageHelper;
 
 use App\Facades\UserHandling;
-use Utd\Bd\Entities\Bd;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -93,8 +93,15 @@ class AgencyController extends MainController
         $uuid = $request->uuid;
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return Agency::query()
-                ->with(['admins', 'bd', 'owner:id,name,uuid', 'owner.profile'])
+            $query = Agency::query();
+
+            // إضافة علاقة BD فقط إذا الحزمة مثبتة
+            $with = ['admins', 'owner:id,name,uuid', 'owner.profile'];
+            if (PackageHelper::isInstalled('bd')) {
+                $with[] = 'bd';
+            }
+
+            return $query->with($with)
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
@@ -701,7 +708,10 @@ class AgencyController extends MainController
 
         if (!$form->isEditing()) {
             $form->row(function ($row) {
-                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name')->rules('required');
+                // إظهار حقل BD فقط إذا الحزمة مثبتة
+                if (PackageHelper::isInstalled('bd')) {
+                    $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name')->rules('required');
+                }
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
@@ -709,7 +719,10 @@ class AgencyController extends MainController
             });
         } else {
             $form->row(function ($row) {
-                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions(true))->ajax('/api/search/users-bd2', 'id', 'name');
+                // إظهار حقل BD فقط إذا الحزمة مثبتة
+                if (PackageHelper::isInstalled('bd')) {
+                    $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions(true))->ajax('/api/search/users-bd2', 'id', 'name');
+                }
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions(true))->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
@@ -722,7 +735,7 @@ class AgencyController extends MainController
         return function ($value) use ($editing) {
             $ops = [];
             if (PackageHelper::isInstalled('bd')) {
-                foreach (Bd::where('id', $value)->get() as $user) {
+                foreach (BdPackageHelper::where('id', $value) as $user) {
                     $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
                 }
             }
@@ -826,7 +839,7 @@ class AgencyController extends MainController
 
             if (!$form->bd_id && !$form->model()->bd_id) {
                 if (PackageHelper::isInstalled('bd')) {
-                    $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
+                    $defaultBd = BdPackageHelper::findByCountry(Auth::user()->country_id);
 
                     if ($defaultBd) {
                         $form->bd_id = $defaultBd->id;
@@ -835,8 +848,8 @@ class AgencyController extends MainController
                     }
                 }
             }
-            if (PackageHelper::isInstalled('bd')) {
-                $bd = Bd::select(['id', 'country_id'])->find($form->bd_id);
+            if (PackageHelper::isInstalled('bd') && $form->bd_id) {
+                $bd = BdPackageHelper::find($form->bd_id);
                 if ($bd) $form->country_id = $bd->country_id;
             }
 
@@ -865,12 +878,16 @@ class AgencyController extends MainController
 
             if (PackageHelper::isInstalled('bd')) {
                 if (!request('bd_id') && $isEditing) {
-                    $admin =  Bd::where('default', 1)->first();
-                    $form->bd_id = $admin->id;
+                    $admin = BdPackageHelper::findDefault();
+                    if ($admin) {
+                        $form->bd_id = $admin->id;
+                    }
                 }
-                $bd = Bd::find($form->bd_id);
-                if ($bd) {
-                    $form->model()->country_id = $bd->country_id;
+                if ($form->bd_id) {
+                    $bd = BdPackageHelper::find($form->bd_id);
+                    if ($bd) {
+                        $form->model()->country_id = $bd->country_id;
+                    }
                 }
             }
         });

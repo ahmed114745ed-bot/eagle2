@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BD Package - دليل التثبيت والإزالة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-right: 5px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+            padding-right: 15px;
+            border-right: 3px solid #764ba2;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            direction: ltr;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .code-block code {
+            white-space: pre;
+        }
+
+        .step {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-right: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .success h4 {
+            color: #155724;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        ul {
+            margin-right: 25px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+            padding-right: 10px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        .footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 حزمة BD (Business Developer)</h1>
+            <p>دليل شامل للتثبيت والإزالة والاستخدام</p>
+        </div>
+
+        <div class="content">
+            <!-- معلومات الحزمة -->
+            <div class="section">
+                <h2><span class="icon">ℹ️</span> معلومات الحزمة</h2>
+                <table>
+                    <tr>
+                        <th>المعلومة</th>
+                        <th>القيمة</th>
+                    </tr>
+                    <tr>
+                        <td>اسم الحزمة</td>
+                        <td><code>utd/bd</code></td>
+                    </tr>
+                    <tr>
+                        <td>النوع</td>
+                        <td>حزمة اختيارية (Optional Package)</td>
+                    </tr>
+                    <tr>
+                        <td>المسار</td>
+                        <td><code>packages/Utd/Bd</code></td>
+                    </tr>
+                    <tr>
+                        <td>Service Provider</td>
+                        <td><code>Utd\Bd\BdServiceProvider::class</code></td>
+                    </tr>
+                    <tr>
+                        <td>الوصف</td>
+                        <td>نظام إدارة مطوري الأعمال (Business Developers)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- خطوات التثبيت -->
+            <div class="section">
+                <h2><span class="icon">⚙️</span> خطوات التثبيت</h2>
+
+                <h3>الطريقة 1: باستخدام Composer (الموصى بها)</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>تثبيت الحزمة عبر Composer:</strong>
+                    <div class="code-block"><code>composer require utd/bd</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>مسح الـ Cache:</strong>
+                    <div class="code-block"><code>php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>إعادة بناء Autoload:</strong>
+                    <div class="code-block"><code>composer dump-autoload</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>تشغيل Migrations (إذا لزم الأمر):</strong>
+                    <div class="code-block"><code>php artisan migrate</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>نشر الـ Assets (إذا كانت موجودة):</strong>
+                    <div class="code-block"><code>php artisan vendor:publish --provider="Utd\Bd\BdServiceProvider"</code></div>
+                </div>
+
+                <h3>الطريقة 2: التثبيت اليدوي</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>إضافة في <code>composer.json</code> في قسم <code>require</code>:</strong>
+                    <div class="code-block"><code>"utd/bd": "*"</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>إضافة في <code>composer.json</code> في قسم <code>repositories</code>:</strong>
+                    <div class="code-block"><code>{
+    "type": "path",
+    "url": "packages/Utd/Bd"
+}</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>إضافة Service Provider في <code>config/app.php</code>:</strong>
+                    <div class="code-block"><code>Utd\Bd\BdServiceProvider::class,</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>تحديث Dependencies:</strong>
+                    <div class="code-block"><code>composer update utd/bd</code></div>
+                </div>
+
+                <div class="success">
+                    <h4>✅ التحقق من التثبيت:</h4>
+                    <div class="code-block"><code>php artisan tinker
+PackageHelper::isInstalled('bd')</code></div>
+                    <p style="margin-top: 10px;">إذا كانت النتيجة <strong>true</strong> فالحزمة مثبتة بنجاح</p>
+                </div>
+            </div>
+
+            <!-- خطوات الإزالة -->
+            <div class="section">
+                <h2><span class="icon">🗑️</span> خطوات الإزالة (بدون حذف البيانات)</h2>
+
+                <div class="warning">
+                    <h4>⚠️ تحذير مهم:</h4>
+                    <p>الخطوات التالية تزيل الحزمة من التطبيق ولكن <strong>تحتفظ بالبيانات والملفات</strong></p>
+                    <ul>
+                        <li>✅ البيانات في قاعدة البيانات تبقى محفوظة</li>
+                        <li>✅ ملفات الحزمة في <code>packages/Utd/Bd/</code> تبقى محفوظة</li>
+                        <li>✅ يمكن إعادة التثبيت في أي وقت</li>
+                    </ul>
+                </div>
+
+                <h3>الطريقة 1: باستخدام Composer (الموصى بها)</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>إزالة الحزمة عبر Composer:</strong>
+                    <div class="code-block"><code>composer remove utd/bd</code></div>
+                    <p style="margin-top: 10px; color: #666;">هذا الأمر يزيل الحزمة من vendor/ ولكن يبقي الملفات في packages/</p>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>حذف/تعطيل Service Provider من <code>config/app.php</code>:</strong>
+                    <div class="code-block"><code>// Utd\Bd\BdServiceProvider::class, // Package uninstalled</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>حذف ملفات الـ Cache:</strong>
+                    <div class="code-block"><code>rm -f bootstrap/cache/services.php
+rm -f bootstrap/cache/packages.php
+rm -f bootstrap/cache/config.php</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>مسح الـ Cache وإعادة البناء:</strong>
+                    <div class="code-block"><code>composer dump-autoload
+php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear</code></div>
+                </div>
+
+                <h3>الطريقة 2: الإزالة اليدوية</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>حذف من <code>composer.json</code> من قسم <code>require</code>:</strong>
+                    <div class="code-block"><code>// احذف هذا السطر:
+"utd/bd": "*"</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>حذف من <code>composer.json</code> من قسم <code>repositories</code>:</strong>
+                    <div class="code-block"><code>// احذف هذا القسم:
+{
+    "type": "path",
+    "url": "packages/Utd/Bd"
+}</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>تعطيل Service Provider في <code>config/app.php</code>:</strong>
+                    <div class="code-block"><code>// Utd\Bd\BdServiceProvider::class,</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>تحديث Composer:</strong>
+                    <div class="code-block"><code>composer update
+composer dump-autoload</code></div>
+                </div>
+
+                <div class="success">
+                    <h4>✅ التحقق من الإزالة:</h4>
+                    <div class="code-block"><code>composer show utd/bd
+# النتيجة: Package "utd/bd" not found
+
+php artisan tinker
+PackageHelper::isInstalled('bd')
+# النتيجة: false</code></div>
+                </div>
+
+                <div class="info">
+                    <h4>📁 الملفات المحفوظة بعد الإزالة:</h4>
+                    <ul>
+                        <li><strong>مجلد الحزمة:</strong> <code>packages/Utd/Bd/</code> (كامل)</li>
+                        <li><strong>الجداول:</strong> <code>bd_*</code>, <code>admin_users</code> (WHERE type='bd')</li>
+                        <li><strong>الـ Routes:</strong> محمية في <code>routes/web.php</code> بـ <code>PackageHelper::isInstalled('bd')</code></li>
+                        <li><strong>Config:</strong> أي ملفات configuration تم نشرها</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Routes المحمية -->
+            <div class="section">
+                <h2><span class="icon">🛡️</span> Routes المحمية</h2>
+                <p>جميع routes الخاصة بالحزمة محمية بفحص التثبيت، لن تظهر أخطاء إذا كانت الحزمة غير مثبتة:</p>
+
+                <div class="code-block"><code>// في routes/web.php
+
+// ✅ Route محمي
+if (PackageHelper::isInstalled('bd')) {
+    Route::get('/sync-bd-agencies', [\Utd\Bd\Http\Controllers\Admin\BdController::class, 'sync']);
+}
+
+// ✅ Route محمي
+if (PackageHelper::isInstalled('bd')) {
+    Route::get('/migrate-bd-salaries', [\Utd\Bd\Http\Controllers\BdSalaryMigrationController::class, 'migrate']);
+}
+
+// ✅ Route محمي
+Route::get('assign-super-admin-bd', function () {
+    if (!PackageHelper::isInstalled('bd')) {
+        return "BD package is not installed.";
+    }
+    // ... الكود
+});</code></div>
+            </div>
+
+            <!-- استعادة التثبيت -->
+            <div class="section">
+                <h2><span class="icon">🔄</span> إعادة التثبيت</h2>
+                <p>لإعادة تثبيت الحزمة بعد إزالتها (البيانات والملفات محفوظة):</p>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>تثبيت الحزمة:</strong>
+                    <div class="code-block"><code>composer require utd/bd</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>تفعيل Service Provider في <code>config/app.php</code>:</strong>
+                    <div class="code-block"><code>Utd\Bd\BdServiceProvider::class,</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>مسح الـ Cache:</strong>
+                    <div class="code-block"><code>php artisan config:clear
+php artisan cache:clear
+composer dump-autoload</code></div>
+                </div>
+
+                <div class="success">
+                    <h4>✅ جاهز!</h4>
+                    <p>الحزمة الآن مثبتة مع جميع البيانات السابقة محفوظة</p>
+                </div>
+            </div>
+
+            <!-- استكشاف الأخطاء -->
+            <div class="section">
+                <h2><span class="icon">🔧</span> استكشاف الأخطاء الشائعة</h2>
+
+                <h3>خطأ: Class "Utd\Bd\BdServiceProvider" not found</h3>
+                <div class="warning">
+                    <h4>الحل:</h4>
+                    <div class="code-block"><code># 1. حذف ملفات الـ cache
+rm -f bootstrap/cache/*.php
+
+# 2. مسح الـ cache
+php artisan config:clear
+php artisan cache:clear
+
+# 3. إعادة بناء autoload
+composer dump-autoload</code></div>
+                </div>
+
+                <h3>خطأ: Target class [BdController] does not exist</h3>
+                <div class="warning">
+                    <h4>الحل:</h4>
+                    <p>استخدم Full namespace في الـ routes:</p>
+                    <div class="code-block"><code>// ❌ خطأ
+use App\Admin\Controllers\BdController;
+
+// ✅ صحيح
+if (PackageHelper::isInstalled('bd')) {
+    Route::get('/route', [\Utd\Bd\Http\Controllers\Admin\BdController::class, 'method']);
+}</code></div>
+                </div>
+
+                <h3>خطأ: Table 'bd_*' doesn't exist</h3>
+                <div class="warning">
+                    <h4>الحل:</h4>
+                    <div class="code-block"><code># تشغيل migrations
+php artisan migrate
+
+# أو تشغيل migrations محددة
+php artisan migrate --path=/packages/Utd/Bd/database/migrations</code></div>
+                </div>
+            </div>
+
+            <!-- الملفات الهامة -->
+            <div class="section">
+                <h2><span class="icon">📄</span> الملفات والمجلدات الهامة</h2>
+                <table>
+                    <tr>
+                        <th>المسار</th>
+                        <th>الوصف</th>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/Bd/src/</code></td>
+                        <td>كود المصدر للحزمة</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/Bd/config/</code></td>
+                        <td>ملفات الإعدادات</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/Bd/database/migrations/</code></td>
+                        <td>ملفات الـ migrations</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/Bd/routes/</code></td>
+                        <td>ملفات الـ routes</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/Bd/composer.json</code></td>
+                        <td>ملف composer للحزمة</td>
+                    </tr>
+                    <tr>
+                        <td><code>routes/web.php</code></td>
+                        <td>Routes المحمية في المشروع الرئيسي</td>
+                    </tr>
+                    <tr>
+                        <td><code>config/app.php</code></td>
+                        <td>تسجيل Service Provider</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- جداول قاعدة البيانات -->
+            <div class="section">
+                <h2><span class="icon">🗄️</span> جداول قاعدة البيانات</h2>
+                <p>الجداول المستخدمة من قبل الحزمة:</p>
+                <ul>
+                    <li><code>admin_users</code> (حقل <code>type = 'bd'</code>)</li>
+                    <li><code>bd_sallaries</code> (bd_salaries)</li>
+                    <li><code>bd_agency_host_sallary</code></li>
+                    <li>جداول أخرى تبدأ بـ <code>bd_*</code></li>
+                </ul>
+
+                <div class="info">
+                    <h4>📌 ملاحظة:</h4>
+                    <p>عند الإزالة، هذه الجداول <strong>لا يتم حذفها</strong> تلقائياً للحفاظ على البيانات</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📦 حزمة BD - نظام إدارة مطوري الأعمال</p>
+            <p style="margin-top: 10px; opacity: 0.8;">UTD Software Solutions © 2025</p>
+        </div>
+    </div>
+</body>
+</html>
