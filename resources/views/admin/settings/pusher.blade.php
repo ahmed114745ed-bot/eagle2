@@ -1,5 +1,11 @@
 <div id="pusherSettings" class="settings-section">
-    <h3>{{ __('Real Time Setting') }}</h3>
+    <div class="section-header-bar">
+        <div class="section-header-icon"><i class="fas fa-satellite-dish"></i></div>
+        <div class="section-header-text">
+            <h3>{{ __('Real Time Setting') }}</h3>
+            <p>{{ __('Configure Pusher, Firebase and real-time communication') }}</p>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-6 mb-3 ms-0 me-auto">

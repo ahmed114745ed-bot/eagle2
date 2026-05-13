@@ -1,6 +1,11 @@
 <div id="mobileLinks" class="settings-section">
-    <h3>{{ __('Mobile App Links') }}</h3>
-    <p class="section-subtitle">{{ __('Configure download links for different platforms') }}</p>
+    <div class="section-header-bar">
+        <div class="section-header-icon"><i class="fas fa-mobile-alt"></i></div>
+        <div class="section-header-text">
+            <h3>{{ __('Mobile App Links') }}</h3>
+            <p>{{ __('Configure download links for different platforms') }}</p>
+        </div>
+    </div>
 
     <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" class="settings-form">
         @csrf

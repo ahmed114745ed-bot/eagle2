@@ -1,4 +1,11 @@
 <div id="workSettings" class="settings-section">
+    <div class="section-header-bar">
+        <div class="section-header-icon"><i class="fas fa-briefcase"></i></div>
+        <div class="section-header-text">
+            <h3>{{ __('Work Settings') }}</h3>
+            <p>{{ __('Configure experience, charge and work-related settings') }}</p>
+        </div>
+    </div>
     <div class="box-body">
         <!-- Improved Tab Navigation -->
         <div class="inner-settings-menu mb-4">

@@ -1,4 +1,11 @@
 <div id="paymentCredentialSettings" class="settings-section">
+    <div class="section-header-bar">
+        <div class="section-header-icon"><i class="fas fa-credit-card"></i></div>
+        <div class="section-header-text">
+            <h3>{{ __('Payment') }}</h3>
+            <p>{{ __('Configure payment gateways and credential settings') }}</p>
+        </div>
+    </div>
 
     <div class="form">
         <label class="d-block">{{ __('Payment Credential Settings:') }}</label>

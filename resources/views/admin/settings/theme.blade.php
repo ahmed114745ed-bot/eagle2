@@ -1,5 +1,11 @@
 <div id="themeSettings" class="theme-settings settings-section">
-    <h3>{{ __('Theme settings') }}</h3>
+    <div class="section-header-bar">
+        <div class="section-header-icon"><i class="fas fa-paint-brush"></i></div>
+        <div class="section-header-text">
+            <h3>{{ __('Theme Settings') }}</h3>
+            <p>{{ __('Customize colors, appearance and visual style') }}</p>
+        </div>
+    </div>
     <form id="themeSettingsForm" action="{{ route('admin.app.settings.update') }}" method="POST"
           enctype="multipart/form-data" class="settings-form">
         @csrf

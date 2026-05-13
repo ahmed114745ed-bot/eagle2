@@ -1,4 +1,11 @@
 <div id="gamesSettings" class="settings-section">
+    <div class="section-header-bar">
+        <div class="section-header-icon"><i class="fas fa-gamepad"></i></div>
+        <div class="section-header-text">
+            <h3>{{ __('Games') }}</h3>
+            <p>{{ __('Configure game providers and gaming settings') }}</p>
+        </div>
+    </div>
 
     <div class="form">
         <label class="d-block">{{ __('Games Settings:') }}</label>
