@@ -38,7 +38,7 @@ class SuperAdminCountryController extends Controller
             'online' => 1,
         ])->count();
 
-        $superAdmin = SuperAdmin::where(['country_id' => $countryID])->first();
+        $superAdmin = SuperAdmin::with('appUser')->where(['country_id' => $countryID])->first();
 
         $topRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
             ->with(['owner:id,name,country_id'])
