@@ -61,7 +61,7 @@ trait UtdStreamTrait
 
     // ─── Token ───────────────────────────────────────────────
 
-    public static function generateStreamToken($identity, $roomName, $name = null, $role = null)
+    public static function generateStreamToken($identity, $roomName, $name = null, $role = null, $service = null)
     {
         $body = [
             'identity' => $identity,
@@ -70,6 +70,7 @@ trait UtdStreamTrait
 
         if ($name) $body['name'] = $name;
         if ($role) $body['role'] = $role;
+        if ($service) $body['service'] = $service;
 
         return self::streamRequest('POST', '/token', $body);
     }

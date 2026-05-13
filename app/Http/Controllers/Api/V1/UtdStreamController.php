@@ -18,6 +18,7 @@ class UtdStreamController extends Controller
         $request->validate([
             'room_name' => 'required|string',
             'role'      => 'nullable|string|in:host,guest,audience,visitor',
+            'service'   => 'required|string|in:rooms,streaming',
         ]);
 
         $user = $request->user();
@@ -28,7 +29,8 @@ class UtdStreamController extends Controller
             $identity,
             $request->room_name,
             $name,
-            $request->role
+            $request->role,
+            $request->service
         );
 
         if (!$result) {
