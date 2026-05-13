@@ -916,7 +916,7 @@
             </h1>
         </div>
 
-        <div class="super-admin-card" onclick="sendMessage({{@$superAdmin->appUser?->id ?? 303}})">
+        <div class="super-admin-card" onclick="sendMessage({{@$superAdmin->appUser?->id}})">
             <div class="admin-crown">👑</div>
             <div class="admin-header">
                 @php
