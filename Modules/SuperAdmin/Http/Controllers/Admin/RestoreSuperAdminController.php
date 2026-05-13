@@ -38,7 +38,13 @@ class RestoreSuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
-        $grid->model()->onlyTrashed()->orderBy('deleted_at', 'desc');
+        $grid->model()->onlyTrashed()->with([
+            'appUser',
+            'appUser.profile',
+            "appUser.country:id,name,e_name",
+            'country',
+            'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->orderBy('deleted_at', 'desc');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -112,9 +118,13 @@ class RestoreSuperAdminController extends MainController
             return $locale === 'en' ? (@$this->country->e_name ?? @$this->country->name) : (@$this->country->name ?? @$this->country->e_name);
         });
         if (Admin::user()->can('restore-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('return', __('restore'))->display(function () {
-                $superAdmin = SuperAdmin::where('country_id', $this->country_id)->first();
-                return  $superAdmin ? '<span style="color: red;">' . __('can not restore this super admin') . '</span>' : (new RestoreSuperAdminAction($this->id))->render();
+            // Pre-fetch all country_ids that already have an active (non-trashed) super admin to avoid N+1 queries
+            $occupiedCountryIds = SuperAdmin::pluck('country_id')->toArray();
+
+            $grid->column('return', __('restore'))->display(function () use ($occupiedCountryIds) {
+                return in_array($this->country_id, $occupiedCountryIds)
+                    ? '<span style="color: red;">' . __('can not restore this super admin') . '</span>'
+                    : (new RestoreSuperAdminAction($this->id))->render();
             });
         }
 

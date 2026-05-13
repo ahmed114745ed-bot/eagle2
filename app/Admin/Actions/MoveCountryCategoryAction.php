@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MoveCountryCategoryAction extends RowAction
 {
+    protected static ?array $cachedCategories = null;
+
     public function name()
     {
         // الاسم ديناميكي بحسب الحالة الحالية
@@ -31,26 +33,42 @@ class MoveCountryCategoryAction extends RowAction
         return $this->response()->success(__('moved successfully'))->refresh();
     }
 
+    /**
+     * Pre-warm the category cache from an already-loaded collection.
+     */
+    public static function warmCategoryCache($categories, string $locale): void
+    {
+        if (self::$cachedCategories === null) {
+            self::$cachedCategories = [];
+            foreach ($categories as $category) {
+                $title = $category->title[$locale]
+                    ?? $category->title['en']
+                    ?? reset($category->title);
+
+                self::$cachedCategories[$category->id] = $title;
+            }
+        }
+    }
+
     // Popup form
     public function form()
     {
         $locale = app()->getLocale();
 
-        // Category select
+        // Pre-load categories once for all row action instances
+        if (self::$cachedCategories === null) {
+            self::$cachedCategories = [];
+            foreach (CountryCategory::get() as $category) {
+                $title = $category->title[$locale]
+                    ?? $category->title['en']
+                    ?? reset($category->title);
+
+                self::$cachedCategories[$category->id] = $title;
+            }
+        }
+
         $this->select('category_id', __('Select Category'))
-            ->options(function () use ($locale) {
-
-                $categories = [];
-                foreach (CountryCategory::get() as $category) {
-                    $title = $category->title[$locale]
-                        ?? $category->title['en']
-                        ?? reset($category->title);
-
-                    $categories[$category->id] = $title;
-                }
-
-                return $categories;
-            })
+            ->options(self::$cachedCategories)
             ->required();
     }
 }

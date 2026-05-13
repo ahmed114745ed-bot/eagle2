@@ -169,6 +169,12 @@ return [
             'path' => storage_path('logs/datetime.log'),
             'level' => 'debug',
         ],
+        'lucky_gift_receiver_issue' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/lucky_gift_receiver_issue.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];

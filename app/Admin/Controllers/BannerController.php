@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Helpers\WebPHelper;
 use App\Http\Services\BannerServices;
 use App\Models\Banner;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -54,18 +55,7 @@ class   BannerController extends MainController
             ->body($this->form()->edit($id)));
     }
 
-    //     public function store()
-    //     {
-    //          $data = request()->all();
-    //         (new BannerServices())->store($data);
-    //     }
 
-    //     public function update($id)
-    //     {
-    //         $data = request()->all();
-    // //        dd($data);
-    //         (new BannerServices())->update($id, $data);
-    //     }
 
     public function create(Content $content)
     {
@@ -95,14 +85,55 @@ class   BannerController extends MainController
 
         $grid->model()->orderByDesc('id');
 
-        $grid->column('id', __('Id'));
-        // $grid->column('title', __('Title'));
-        // $grid->column('button_text', __('Button text'));
-        $grid->column('image_url', __('img'))->image('', 100);
-        // $grid->column('redirect_url', __('Redirect url'));
-        $grid->column('publish_at', __('Publish at'));
-        $grid->column('is_active', __('Is active'))->switch();
-        $grid->column('updated_at', __('Updated at'));
+        $grid->column('id', __('Id'))->sortable()->style('font-weight:600;');
+
+        $grid->column('image_url', __('Image'))->display(function ($img) {
+            $url = $img ? getImagePath($img) : null;
+            if (!$url) {
+                return '<span style="color:#999;font-style:italic;">—</span>';
+            }
+            return "<a href='javascript:void(0)' onclick=\"event.preventDefault();document.getElementById('splash-overlay').style.display='flex';document.getElementById('splash-overlay-img').src='{$url}';\">
+                        <div style='width:220px; height:70px; overflow:hidden; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.12); cursor:pointer; transition:transform 0.2s;' onmouseover='this.style.transform=\"scale(1.03)\"' onmouseout='this.style.transform=\"scale(1)\"'>
+                            <img src='{$url}' style='width:100%; height:100%; object-fit:cover; display:block;' alt='Splash'>
+                        </div>
+                    </a>";
+        });
+
+        $grid->column('publish_at', __('Publish at'))->display(function ($value) {
+            if ($value) {
+                $timeAgo = \Carbon\Carbon::parse($value)->diffForHumans();
+                return "<span style='display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:16px;background:#e3f2fd;color:#1565c0;font-size:11px;font-weight:600;'>
+                            <i class='fa fa-clock-o'></i> {$timeAgo}
+                        </span>";
+            }
+            return "<span style='display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:16px;background:#f5f5f5;color:#9e9e9e;font-size:11px;font-weight:500;'>
+                        <i class='fa fa-minus-circle'></i> " . __('Not Published') . "
+                    </span>";
+        })->style('text-align:center;');
+
+         $grid->column('is_active', __('Is active'))->switch();
+
+        $grid->column('updated_at', __('Updated at'))->display(function ($value) {
+            return $value ? \Carbon\Carbon::parse($value)->diffForHumans() : '—';
+        })->style('color:#757575;font-size:12px;');
+
+        // ── Table Styles ──
+        Admin::style('
+            .grid-table td { vertical-align: middle !important; }
+            .grid-table th { background: #fafbfc !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #546e7a !important; }
+            .grid-table tr:hover { background: #f8f9ff !important; }
+            .grid-table td:first-child, .grid-table th:first-child { border-left: 3px solid transparent; }
+            .grid-table tr:hover td:first-child { border-left: 3px solid #3f51b5; }
+        ');
+
+        // ── Fullscreen Image Overlay ──
+        Admin::html('
+            <div id="splash-overlay" onclick="this.style.display=\'none\'" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;justify-content:center;align-items:center;cursor:pointer;">
+                <img id="splash-overlay-img" src="" style="max-width:90%;max-height:90%;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5);object-fit:contain;" onclick="event.stopPropagation();">
+                <span style="position:absolute;top:20px;right:30px;color:#fff;font-size:36px;cursor:pointer;font-weight:300;line-height:1;" onclick="document.getElementById(\'splash-overlay\').style.display=\'none\'">&times;</span>
+            </div>
+        ');
+
         $this->extendGrid($grid);
 
         return $grid;
@@ -119,13 +150,24 @@ class   BannerController extends MainController
         $show = new Show(Banner::findOrFail($id));
 
         $show->field('id', __('Id'));
-        // $show->field('title', __('Title'));
-        // $show->field('button_text', __('Button text'));
-        $show->field('image_url', __('Image url'));
-        // $show->field('redirect_url', __('Redirect url'));
-        $show->field('publish_at', __('Publish at'));
-        $show->field('is_active', __('Is active'));
-        $show->field('expire', __('duration(days)'));
+
+        $show->field('image_url', __('Image'))->as(function ($img) {
+            return $img ? getImagePath($img) : null;
+        })->image('', 300);
+
+        $show->field('publish_at', __('Publish at'))->as(function ($value) {
+            if (!$value) return __('Not Published');
+            return \Carbon\Carbon::parse($value)->format('Y-m-d H:i') . ' (' . \Carbon\Carbon::parse($value)->diffForHumans() . ')';
+        });
+
+        $show->field('is_active', __('Status'))->as(function ($value) {
+            return $value ? '✅ ' . __('Active') : '❌ ' . __('Inactive');
+        });
+
+        $show->field('expire', __('Duration (days)'))->as(function ($value) {
+            return (!$value || $value == 0) ? '∞ ' . __('Forever') : $value . ' ' . __('days');
+        });
+
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 

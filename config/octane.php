@@ -82,7 +82,12 @@ return [
     |
     */
 
-    'listeners' => [],
+    'listeners' => [
+        \Laravel\Octane\Events\RequestTerminated::class => [
+            // Fix: Disconnect idle DB connections after each request to prevent connection leak
+            \App\Listeners\DisconnectIdleDbConnections::class,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------

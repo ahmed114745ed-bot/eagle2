@@ -62,19 +62,26 @@ class Bd extends Model
 
     public function getTotalSalaryAttribute()
     {
+        if ($this->relationLoaded('bdSalaries')) {
+            return $this->bdSalaries->sum('salary');
+        }
         return $this->bdSalaries()->sum('salary');
     }
     public function getTotalCutAttribute()
     {
+        if ($this->relationLoaded('bdSalaries')) {
+            return $this->bdSalaries->sum('cut_amount');
+        }
         return $this->bdSalaries()->sum('cut_amount');
     }
 
     public function getNetSallaryAttribute()
     {
-        $userSallary = $this->bdSalaries()
-        ->sum(DB::raw('salary - cut_amount'));
+        if ($this->relationLoaded('bdSalaries')) {
+            return floor($this->bdSalaries->sum(fn($s) => $s->salary - $s->cut_amount));
+        }
 
-       return floor($userSallary);
+        return floor($this->bdSalaries()->sum(DB::raw('salary - cut_amount')));
     }
 
     protected static function booted(): void
@@ -203,10 +210,10 @@ class Bd extends Model
     }
     public function getBdSalaryAttribute()
     {
-        $userSallary = $this->bdSalaries()
-            ->sum(DB::raw('salary - cut_amount'));
-
-        return floor($userSallary);
+        if ($this->relationLoaded('bdSalaries')) {
+            return floor($this->bdSalaries->sum(fn($s) => $s->salary - $s->cut_amount));
+        }
+        return floor($this->bdSalaries()->sum(DB::raw('salary - cut_amount')));
     }
 
     public function salaries()
