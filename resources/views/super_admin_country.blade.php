@@ -916,11 +916,11 @@
             </h1>
         </div>
 
-        <div class="super-admin-card" onclick="sendMessage({{@$superAdmin->user?->id ?? 303}})">
+        <div class="super-admin-card" onclick="sendMessage({{@$superAdmin->appUser?->id ?? 303}})">
             <div class="admin-crown">👑</div>
             <div class="admin-header">
                 @php
-                    $avatarUrl = getImagePath(@$superAdmin->user?->profile?->avatar)
+                    $avatarUrl = getImagePath(@$superAdmin->appUser?->profile?->avatar)
                         ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='%23FFD700'/%3E%3Cstop offset='1' stop-color='%23FF6B6B'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='90' height='90' fill='url(%23g)'/%3E%3C/svg%3E";
                 @endphp
 
