@@ -59,6 +59,7 @@ use App\Exports\AgencyCharge;
 use App\Exports\AgencyChargeTransactions;
 use App\Facades\CustomNotification;
 use App\helper\TimeHelper;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Helpers\AdminNotificationHelper;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
@@ -2227,11 +2228,15 @@ Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
     return response('<pre>' . e($output) . '</pre>');
 });
 
-Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
-    Debugbar::info('Viewport:', $request->all());
-    return response()->json(['ok' => true]);
-});
-
+// Debugbar viewport logging (development only)
+/*
+if (config('app.debug')) {
+    Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
+        Debugbar::info('Viewport:', $request->all());
+        return response()->json(['ok' => true]);
+    });
+}
+*/
 Route::get('/octane', function () {
     Cache::store('octane')->clear();
 
