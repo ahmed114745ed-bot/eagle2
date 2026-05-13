@@ -2257,16 +2257,17 @@ class Common
                     'colored_name' => '',
                 ];
                 case UserTypeEnum::SUPER_ADMIN:
-                $subAreaManager = $resource->superAdmin;
+                $superAdmin = $resource->superAdmin;
+                $linkedUser = $superAdmin?->appUser;
                 return [
-                    'name' => $subAreaManager->name ?? '',
-                    'image' => $subAreaManager->avatar ?? '',
-                    'uuid' => $subAreaManager->id ?? '',
-                    'id' => $subAreaManager->id ?? '',
+                    'name' => $linkedUser ? ($linkedUser->name . ' (مدير دولة)') : ($superAdmin->name ?? ''),
+                    'image' => $linkedUser?->profile?->avatar ?? ($superAdmin->avatar ?? ''),
+                    'uuid' => $linkedUser->uuid ?? ($superAdmin->id ?? ''),
+                    'id' => $superAdmin->id ?? '',
                     'type' => 'dash',
-                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
-                    'image_color' => null,
-                    'id_image' => '',
+                    'url' => $superAdmin ? url($prefix . "/auth/users/{$superAdmin->id}") : '#',
+                    'image_color' => $linkedUser->color_image ?? null,
+                    'id_image' => $linkedUser?->specialId?->ware?->show_img ?? '',
                     'colored_name' => '',
                 ];
 
@@ -2608,6 +2609,7 @@ class Common
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
+            'superAdmin.appUser.profile',
             'receiverUser',
             'receiverUser.profile',
             'receiverUser.packs' => function ($q) {
