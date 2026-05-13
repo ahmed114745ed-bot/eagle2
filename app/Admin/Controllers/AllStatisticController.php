@@ -738,11 +738,11 @@ class AllStatisticController extends MainController
             $userBaseQuery = User::when($countryID, fn($q) => $q->whereIn('country_id', $countryID));
 
             $stats = [
-                'usersCount' => $userBaseQuery->count(),
-                'newSignUpsToday' => $userBaseQuery->whereDate('created_at', today())->count(),
-                'newSignUpsThisWeek' => $userBaseQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-                'newSignUpsThisMonth' => $userBaseQuery->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
-                'onlineUser' => $userBaseQuery->where('online', 1)->count(),
+                'usersCount' => (clone $userBaseQuery)->count(),
+                'newSignUpsToday' => (clone $userBaseQuery)->whereDate('created_at', today())->count(),
+                'newSignUpsThisWeek' => (clone $userBaseQuery)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                'newSignUpsThisMonth' => (clone $userBaseQuery)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+                'onlineUser' => (clone $userBaseQuery)->where('online', 1)->count(),
             ];
 
             // Peak Hours
@@ -768,14 +768,14 @@ class AllStatisticController extends MainController
                 $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
             });
 
-            $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
-            $stats['messagesThisMonth'] = $chatMessageQuery->whereMonth('created_at', now()->month)
+            $stats['messagesToday'] = (clone $chatMessageQuery)->whereDate('created_at', today())->count();
+            $stats['messagesThisMonth'] = (clone $chatMessageQuery)->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)->count();
 
-            $stats['usersWhoSend'] = $chatMessageQuery->distinct('user_id')->count('user_id');
+            $stats['usersWhoSend'] = (clone $chatMessageQuery)->distinct('user_id')->count('user_id');
             $stats['usersWhoNeverSend'] = $stats['usersCount'] - $stats['usersWhoSend'];
 
-            $stats['openConversationsToday'] = $chatMessageQuery->whereDate('created_at', today())
+            $stats['openConversationsToday'] = (clone $chatMessageQuery)->whereDate('created_at', today())
                 ->distinct('chat_room_id')->count('chat_room_id');
 
             $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
