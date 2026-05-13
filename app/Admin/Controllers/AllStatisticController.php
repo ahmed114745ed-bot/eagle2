@@ -801,7 +801,7 @@ class AllStatisticController extends MainController
     public function financeCards(Request $request)
     {
         $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : now()->startOfDay();
-        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->startOfDay();
+        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->endOfDay();
 
         $result = UserSallary::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
@@ -828,10 +828,10 @@ class AllStatisticController extends MainController
 
         $totalGiftsValue = GiftLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
-            ->sum(\DB::raw('giftPrice * giftNum'));
+            ->sum(\DB::raw('giftPrice'));
 
         $rate = Common::getCoinsValue('user_coins');
-        $totalGiftsUsd = $totalGiftsValue / $rate;
+        $totalGiftsUsd = $rate > 0 ? $totalGiftsValue / $rate : 0;
 
         return response()->json([
             'total_balance' => $totalTargets,
