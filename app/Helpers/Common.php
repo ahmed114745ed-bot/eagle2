@@ -2256,6 +2256,33 @@ class Common
                     'id_image' => '',
                     'colored_name' => '',
                 ];
+                case UserTypeEnum::SUPER_ADMIN:
+                $subAreaManager = $resource->superAdmin;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
+
+                case UserTypeEnum::SUB_ADMIN:
+                $subAreaManager = $resource->subSuperAdmin;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
 
             case 'user':
                 $user = $resource->senderUser;
