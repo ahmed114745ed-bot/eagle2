@@ -30,9 +30,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
     return (int) $user->id === (int) $id;
 });
-// Broadcast::channel('room-{roomId}', function ($user, $roomId) {
-//     return  $roomId;
-// });
 
 Broadcast::channel('room-{roomId}-{userId}', function ($user, $roomId, $userId) {
     return  $userId == $user->id;
@@ -57,7 +54,6 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
 Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
     return [
         'id'   => $user->id,
-       // 'name' => $user->name,
     ];
 });
 
@@ -90,7 +86,6 @@ Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
 Broadcast::channel('pk.battle.{creatorId}', function ($user, $creatorId) {
     return [
         'id'   => $user->id,
-        // 'name' => $user->name,
         'creator_id' => $creatorId,
     ];
 });

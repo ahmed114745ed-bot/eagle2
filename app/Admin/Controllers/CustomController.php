@@ -48,14 +48,5 @@ class CustomController extends MainController
         ->view('custom_settings', compact('settings'));
     }
 
-    public function cleanDuplicates()
-    {
-        $defaultAreaManagers = \Modules\AreaManager\Entities\AreaManager::where('id',406)->delete();
-
-        $defaultBds = \App\Models\Bd::where('id', 424)->delete();
-
-
-        return response()->json(['message' => 'تم تنظيف النسخ المكررة بنجاح']);
-    }
 
 }

@@ -394,13 +394,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
              Route::get('/bad-words', [SensitiveWordController::class, 'index']);
+
+
             Route::prefix('gifts')->withoutMiddleware(['throttle', 'throttle:api'])->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
                 Route::get('/v2', [GiftController::class, 'getByCategory']);
                 Route::get('/images', [GiftController::class, 'get_images']);
-                // Route::post('/send3', [GiftLogController::class, 'gift_queue_six2']);
-
-                //todo
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift'])->middleware(['checkCpu', 'appFeatureEnable:lucky', 'throttle:lucky-gift']);
             });
@@ -445,8 +444,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('use_pack_item', [PackController::class, 'usePackItem']);
                 Route::post('takeOff', [PackController::class, 'takeOff']);
                 Route::post('takeOffV2', [PackController::class, 'takeOffV2']);
-                //                Route::get('my_store', [UserController::class, 'my_store']);
-                //                Route::get('my_income', [UserController::class, 'my_income']);
                 Route::post('getTimes', [HomeController::class, 'getTimes']);
             });
             Route::post('send_pack', [UserController::class, 'sendPack']);
@@ -611,8 +608,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('banners')->group(function () {
                 Route::get('/', [\App\Http\Controllers\BannerController::class, 'index2']);
-                // Route::get('/', [\App\Http\Controllers\BannerController::class, 'index']);
-                // Route::get('/banner', [\App\Http\Controllers\BannerController::class, 'index2']);
             });
 
             Route::prefix('black_list')->group(function () {
@@ -622,19 +617,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/check/{userId}', [\App\Http\Controllers\Api\V1\BlackListController::class, 'checkBlockStatus']);
             });
 
-            // Route::get('/data-data', function(){
-            //     $id = \App\Models\User::first()?->id;
-            //     $data = Common::level_center(@$id);
-            //     return $data;
-            // });
+       
 
             Route::post('test-google-id', [AuthController::class, 'verifyGoogleToken']);
 
-            // Music Store
-            // Route::prefix('music')->group(function () {
-            //     Route::get('/', [MusicStoreController::class, 'index']);
-            //     Route::post('/', [MusicStoreController::class, 'store']);
-            // });
+      
             Route::get('achievement-valid-images', [AchievementController::class, 'achievement_valid_images']);
 
             Route::prefix('music')->group(function () {
@@ -649,7 +636,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::group(['prefix' => 'paytabs', 'as' => 'paytabs.'], function () {
                 Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
-                // Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
                 Route::any('response', [PaytabsController::class, 'response'])->name('response');
             });
 
@@ -660,9 +646,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     ->unique()
                     ->values()
                     ->toArray();
-                // $result = Common::unsubscribeFromTopic($tokens, $topic);
 
-                // return response()->json($result);
             });
         }
     );
@@ -700,25 +684,3 @@ Route::get('gifts-by-id', function (Request $request) {
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
 
-// Protected dashboard routes with authentication and rate limiting
-Route::middleware(['auth:sanctum', 'throttle:30,1'])->group(function () {
-    Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
-    Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
-    Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
-});
-
-// Queue restart route - protected with authentication, admin check, IP whitelist, and rate limiting
-Route::middleware(['auth:sanctum', 'admin', 'adminIp', 'throttle:3,1'])->get('queue/restart', function () {
-    \Log::warning('Queue restart triggered', [
-        'ip' => request()->ip(),
-        'user_id' => auth()->id(),
-        'time' => now(),
-    ]);
-
-    \Artisan::call('queue:restart');
-    return response()->json([
-        'success' => true,
-        'message' => 'Queue workers restarted successfully',
-        'output' => \Artisan::output()
-    ]);
-});

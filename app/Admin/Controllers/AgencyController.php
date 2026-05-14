@@ -1204,18 +1204,7 @@ class AgencyController extends MainController
     }
 
 
-    public function usersAgency()
-    {
-        $users = User::where('agency_id', '!=', 0)->whereNotNull('agency_id')
-            ->where('type_user', 0)
-            ->get();
-
-        return response()->json([
-            'count_users'    => $users->count(),        // how many users
-            'user_ids' => $users->pluck('id'),    // list of user IDs
-        ]);
-    }
-
+  
     public function UpdateTypeUserAgency()
     {
         $query = User::whereIn('id', Agency::select('app_owner_id'))

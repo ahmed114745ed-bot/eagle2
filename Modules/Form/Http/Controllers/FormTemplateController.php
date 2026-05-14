@@ -644,42 +644,4 @@ class FormTemplateController extends Controller
 
 
 
-    public function removeRepetition()
-    {
-        DB::transaction(function () {
-
-            // get duplicated form_types
-            $duplicates = FormTemplate::select('form_type')
-                ->groupBy('form_type')
-                ->havingRaw('COUNT(*) > 1')
-                ->pluck('form_type');
-
-            foreach ($duplicates as $formType) {
-
-                // get all templates for this form_type ordered by oldest
-                $templates = FormTemplate::where('form_type', $formType)
-                    ->orderBy('id')
-                    ->get();
-
-                // keep first one
-                $keep = $templates->shift();
-
-                // delete duplicates
-                foreach ($templates as $template) {
-
-                    // delete related fields & sections safely
-                    foreach ($template->sections as $section) {
-                        $section->fields()->delete();
-                    }
-
-                    $template->sections()->delete();
-                    $template->delete();
-                }
-            }
-        });
-        return response()->json([
-            'message'    => 'remove repetition',
-
-        ]);
-    }
 }

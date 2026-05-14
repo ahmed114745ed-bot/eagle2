@@ -21,9 +21,6 @@ class PaymentController extends Controller
         if ($request->p_method == 'strip') {
 
             $coinLog = CoinLog::query()->where('trx', $request->trx)->where('status', 0)->where('method', 'strip')->first();
-            //            if (!$coinLog){
-            //                return Common::apiResponse (0,'fail',null,400);
-            //            }
             $user = User::query()->find($coinLog->user_id);
 
             if (!$coinLog) return Common::apiResponse(0, 'cannot find transaction', null, 404);
@@ -36,11 +33,7 @@ class PaymentController extends Controller
                 $user->increment('di', $coinLog->obtained_coins);
                 $coinLog->status = 1;
                 $coinLog->save();
-                // Common::sendOfficialMessage (@$user->id,__('congratulations'),__('your recharge success'));
-                // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-                // $title='Tik Chat';
-                // $body=__('your recharge success') .$request->user ()->name ;
-                // Common::send_firebase_notification($tokens_notfacion,$title,$body);
+
 
                 return Common::apiResponse(1, 'successfully paid', null, 200);
             }

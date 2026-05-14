@@ -164,7 +164,7 @@ Route::group([
     ],
 ], function () {
 
-    Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
+    Route::get('change-password-view', [App\Admin\Controllers\AuthController::class, 'changePasswordView'])
         ->name('admin.change-password-view');
 });
 
@@ -255,7 +255,6 @@ Route::group(
         Route::resource('user-online-history', UserOnlineHistoryController::class);
         Route::post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
-        Route::resource('rooms-preview', TestController::class); //
 
         Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
@@ -389,7 +388,6 @@ Route::group(
         Route::resource('percentage-games', PercentageGameController::class);
         Route::resource('test-pusher', TestPusherController::class);
         Route::resource('report_user', ReportUserController::class)->middleware('web-agency-feature');
-        // Route::resource('coupons', 'CouponController');
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
@@ -459,7 +457,6 @@ Route::group(
                 'index' => 'user_targets'
             ]
         ])->middleware('web-agency-feature');
-        // Route::get('/', 'HomeController@infoBox')->name('home');
         Route::get('/', 'AllStatisticController@index')->name('home');
         Route::resource('sensitive-words', SensitiveWordController::class);
 
@@ -507,7 +504,6 @@ Route::group(
             'agencyMangerExport'
         ])->name('agency-manger-export');
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
-        //        Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
         Route::resource('wares-vips', WareVipController::class);
         // servers
         Route::resource('server-country', ServerCountryController::class);
@@ -570,7 +566,6 @@ Route::group(
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
         Route::resource('usersBd', BdController::class);
-        Route::resource('user-Bds', BdController::class);
         Route::resource('usersBd-settings', BdSelectController::class);
 
         Route::post('toggle-salary-transfer', [BdSelectController::class, 'toggleSalaryTransfer'])->name('bd.toggle-salary-transfer');
@@ -601,7 +596,6 @@ Route::group(
         Route::resource('coin-reports', 'CoinReportController');
         Route::resource('ban-types', BanTypeController::class);
         Route::resource('sallaries_history', 'SallariesHistoryController');
-        // Route::resource ('export-excel','ImportExcelReportController');
         Route::resource('agencies-tareget-manger', AgencyMangerTaregetController::class);
         Route::resource('report_users', ReportFromUsersController::class)->middleware('web-agency-feature');
         Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
@@ -633,8 +627,6 @@ Route::group(
             Route::get('professional/users', [UserController::class, 'indexProfessionals']);
 
             Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
-            // Route::get('/users/{id}/edit', 'UserController@edit');
-            // Route::get('/users/{id}', 'UserController@show');
             Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');
             Route::get('/target', 'AgencyTargetController@index')->name('targets');
             Route::get('/charges', 'ChargeController@index')->name('charges');
@@ -669,7 +661,6 @@ Route::group(
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
-        // Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         Route::resource('agency-manger-users', AgencyMangerUsers::class);
