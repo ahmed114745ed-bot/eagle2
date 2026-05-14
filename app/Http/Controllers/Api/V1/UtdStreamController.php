@@ -424,10 +424,20 @@ class UtdStreamController extends Controller
             'room_sid' => $room['sid'] ?? null,
         ]);
 
-        // حفظ الجلسة في Database
-        $ownerUserId = $room['name'] ?? null;
-        if ($ownerUserId && is_numeric($ownerUserId)) {
-            $ownerUserId = (int) $ownerUserId;
+        // البحث عن صاحب الغرفة من جدول rooms
+        $roomName = $room['name'] ?? null;
+        $ownerUserId = null;
+
+        if ($roomName) {
+            // البحث في room_name أو numid
+            $existingRoom = \DB::table('rooms')
+                ->where('room_name', $roomName)
+                ->orWhere('numid', $roomName)
+                ->first();
+
+            if ($existingRoom) {
+                $ownerUserId = $existingRoom->uid;
+            }
         }
 
         \App\Models\StreamingRoomSession::create([
