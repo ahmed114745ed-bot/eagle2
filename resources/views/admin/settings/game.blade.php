@@ -7,385 +7,462 @@
         </div>
     </div>
 
-    <div class="form">
-        <label class="d-block">{{ __('Games Settings:') }}</label>
+    <div class="gm-providers-grid">
 
-        <div class="row mt-4">
-            {{-- <div class="col-md-6 mb-3 ms-0 me-auto">
-                <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
-                    @csrf
-                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                    <input type="hidden" name="provider_code" value="bytesun">
-                    <input type="hidden" name="provider_name" value="Bytesun">
+        {{-- ══════════════════════════════════════════════════════════
+             QUANTUM NEXUS
+        ══════════════════════════════════════════════════════════ --}}
+        <form class="gm-form-reset" action="{{ url('admin/game-provider-setting') }}" method="POST">
+            @csrf
+            <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+            <input type="hidden" name="provider_code" value="quantum_nexus">
+            <input type="hidden" name="provider_name" value="Quantum Nexus">
+            <div class="gm-provider-card">
+                <div class="gm-provider-header" style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+                    <div class="gm-provider-logo"><i class="fas fa-atom"></i></div>
+                    <div class="gm-provider-title">
+                        <h5>{{ __('Quantum Nexus') }}</h5>
+                        <span>{{ __('Game provider') }}</span>
+                    </div>
+                    <div class="gm-provider-toggle">
+                        <input type="hidden" name="active" value="0">
+                        <input type="checkbox" id="quantumNexusRadio" class="custom-payment-radio libraryRealTime"
+                               name="active" value="1" {{ @$quantumNexusSettings?->is_active == 1 ? 'checked' : '' }}>
+                        <label for="quantumNexusRadio" class="switch"></label>
+                    </div>
+                </div>
+                <div class="gm-provider-body">
+                    <div class="gm-input-group">
+                        <label><i class="fas fa-key"></i> {{ __('app key') }}</label>
+                        <input type="text" name="app_key" placeholder="app_key"
+                               value="{{ $quantumNexusSettings->app_key ?? '' }}" class="form-control gm-input" required>
+                    </div>
 
-                    <div class="card p-4 shadow-sm border-0" style="min-height: 600px; border-radius: 12px;">
+                    @php
+                        $routes = $quantumNexusSettings->webhook_routes ?? [];
+                        if (is_string($routes)) $routes = json_decode($routes, true);
+                        $routes = is_array($routes) ? $routes : [];
+                    @endphp
 
-                        <!-- Header -->
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0"style="color: white;">{{ __('Bytesun') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                                <input type="hidden" name="active" value="0">
-                                                <input type="checkbox" id="bytesunRadio"
-                                                    class="custom-payment-radio libraryRealTime"
-                                                    name="active" value="1"
-                                                    {{ @$bytesunSettings?->is_active == 1  ? 'checked' : '' }}>
-                                                <label for="bytesunRadio" class="switch"></label>
-                                            </div>
-                                    </div>
-
-                        <!-- Settings Fields -->
-                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('app key') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="app_key"
-                                                        placeholder="app_key"
-                                                        value="{{ $bytesunSettings->app_key ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('app id') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="app_id"
-                                                        placeholder="app_id"
-                                                        value="{{ $bytesunSettings->app_id ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('channel') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="channel"
-                                                        placeholder="channel"
-                                                        value="{{ $bytesunSettings->channel ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="tencent_app_id">{{ __('gsp') }}:</label>
-                                                    <input type="text" id="tencent_app_id" name="gsp"
-                                                        placeholder="gsp"
-                                                        value="{{ $bytesunSettings->gsp ?? '' }}" class="form-control" required>
-                                                </div>
-                                            </div>
-                                    </div>
-
-                        <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-
-                        <!-- Divider -->
-                     <hr class="my-4">
-
-                        <h5 class="mb-3">Webhook Endpoints</h5>
-
-                        @php
-                            $routes = $bytesunSettings->webhook_routes ?? [];
-
-                            if (is_string($routes)) {
-                                $routes = json_decode($routes, true);
-                            }
-
-                            $routes = is_array($routes) ? $routes : [];
-                        @endphp
-
-                        @if(count($routes))
+                    @if(count($routes))
+                        <div class="gm-webhooks-section">
+                            <div class="gm-webhooks-title"><i class="fas fa-link"></i> Webhook Endpoints</div>
                             @foreach($routes as $key => $url)
-                                <div class="mb-3">
-                                    <label class="form-label text-capitalize fw-semibold">
-                                        {{ str_replace('_', ' ', $key) }}
-                                    </label>
-
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-success text-white fw-bold">POST</span>
-                                        <input type="text" class="form-control webhook-url font-monospace bg-light" value="{{ $url }}" readonly>
-                                        <button type="button" class="btn btn-success" onclick="copyWebhook(this)">
-                                            <i class="bi bi-clipboard me-1"></i>Copy
+                                <div class="gm-webhook-item">
+                                    <div class="gm-webhook-info">
+                                        <span class="gm-webhook-name">{{ str_replace('_', ' ', $key) }}</span>
+                                        <span class="gm-webhook-method">POST</span>
+                                    </div>
+                                    <div class="gm-webhook-url-wrap">
+                                        <input type="text" class="form-control gm-input gm-input-readonly" value="{{ $url }}" readonly>
+                                        <button type="button" class="gm-copy-btn" onclick="gmCopyWebhook(this)">
+                                            <i class="fas fa-copy"></i>
                                         </button>
                                     </div>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="alert alert-warning">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                No webhook endpoints configured.
-                            </div>
-                        @endif
-
-
-                    </div>
-                </form>
-            </div> --}}
-
-            <div class="col-md-6 mb-3 ms-0 me-auto">
-                <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
-                    @csrf
-                     <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                    <input type="hidden" name="provider_code" value="quantum_nexus">
-                    <input type="hidden" name="provider_name" value="Quantum Nexus">
-                    <div class="card p-4 shadow-sm border-0" style="min-height: 600px; border-radius: 12px;">
-
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="m-0"style="color: white;">{{ __('Quantum Nexus') }}</h4>
-                             <div class="d-flex align-items-center">
-                                    <input type="hidden" name="active" value="0">
-                                    <input type="checkbox" id="quantumNexusRadio"
-                                           class="custom-payment-radio libraryRealTime"
-                                           name="active" value="1"
-                                        {{ @$quantumNexusSettings?->is_active == 1  ? 'checked' : '' }}>
-                                    <label for="quantumNexusRadio" class="switch"></label>
-                                </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="quantum_nexus_app_id">{{ __('app key') }}:</label>
-                                        <input type="text" id="quantum_nexus_app_id" name="app_key"
-                                               placeholder="app_key"
-                                               value="{{ $quantumNexusSettings->app_key ?? '' }}" class="form-control" required>
-                                    </div>
-                                </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-
-                        <hr class="my-4">
-
-                            <h5 class="mb-3">Webhook Endpoints</h5>
-
-                            @php
-                                $routes = $quantumNexusSettings->webhook_routes ?? [];
-
-                                if (is_string($routes)) {
-                                    $routes = json_decode($routes, true);
-                                }
-
-                                $routes = is_array($routes) ? $routes : [];
-                            @endphp
-
-                            @if(count($routes))
-                                @foreach($routes as $key => $url)
-                                    <div class="mb-3">
-                                        <label class="form-label text-capitalize fw-semibold">
-                                            {{ str_replace('_', ' ', $key) }}
-                                        </label>
-
-                                        {{-- <div class="input-group">
-                                            <span class="input-group-text bg-success text-white fw-bold"> Type :=> POST</span>
-                                            <input type="text" class="form-control webhook-url font-monospace bg-light" value="{{ $url }}" readonly>
-                                            <button type="button" class="btn btn-success" onclick="copyWebhook(this)">
-                                                <i class="bi bi-clipboard me-1"></i>Copy
-                                            </button>
-                                        </div> --}}
-
-                                        <div class="webhook-container">
-                                            <div class="webhook-label">Type =&gt; POST</div>
-                                            <input type="text" class="form-control webhook-url" value="{{ $url }}" readonly>
-                                            <button type="button" class="btn btn-copy" onclick="copyWebhook(this)">
-                                                <i class="bi bi-clipboard"></i>Copy
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @else
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                    No webhook endpoints configured.
-                                </div>
-                            @endif
-
-                    </div>
-                </form>
+                    @endif
+                </div>
+                <div class="gm-provider-footer">
+                    <button type="submit" class="btn gm-btn-save"><i class="fas fa-save"></i> {{ __('save') }}</button>
+                </div>
             </div>
+        </form>
 
+        {{-- ══════════════════════════════════════════════════════════
+             UTD GAMES
+        ══════════════════════════════════════════════════════════ --}}
+        <form class="gm-form-reset" action="{{ url('admin/game-provider-setting') }}" method="POST">
+            @csrf
+            <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+            <input type="hidden" name="provider_code" value="utd_games">
+            <input type="hidden" name="provider_name" value="UTD Games">
+            <div class="gm-provider-card">
+                <div class="gm-provider-header" style="background: linear-gradient(135deg, #f97316, #fb923c);">
+                    <div class="gm-provider-logo"><i class="fas fa-dice"></i></div>
+                    <div class="gm-provider-title">
+                        <h5>{{ __('UTD Games') }}</h5>
+                        <span>{{ __('Game provider') }}</span>
+                    </div>
+                    <div class="gm-provider-toggle">
+                        <input type="hidden" name="active" value="0">
+                        <input type="checkbox" id="utdGamesRadio" class="custom-payment-radio libraryRealTime"
+                               name="active" value="1" {{ @$utdGamesSettings?->is_active == 1 ? 'checked' : '' }}>
+                        <label for="utdGamesRadio" class="switch"></label>
+                    </div>
+                </div>
+                <div class="gm-provider-body">
+                    <div class="gm-input-group">
+                        <label><i class="fas fa-key"></i> {{ __('app key') }}</label>
+                        <input type="text" name="app_key" placeholder="app_key"
+                               value="{{ $utdGamesSettings->app_key ?? '' }}" class="form-control gm-input" required>
+                    </div>
 
-              <div class="col-md-6 mb-3 ms-0 me-auto">
-                <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
-                    @csrf
-                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                    <input type="hidden" name="provider_code" value="utd_games">
-                    <input type="hidden" name="provider_name" value="UTD Games">
+                    @php
+                        $utdRoutes = $utdGamesSettings->webhook_routes ?? [];
+                        if (is_string($utdRoutes)) $utdRoutes = json_decode($utdRoutes, true);
+                        $utdRoutes = is_array($utdRoutes) ? $utdRoutes : [];
+                    @endphp
 
-                    <div class="card p-4 shadow-sm border-0" style="min-height: 600px; border-radius: 12px;">
-
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="m-0" style="color: white;">{{ __('UTD Games') }}</h4>
-                            <div class="d-flex align-items-center">
-                                <input type="hidden" name="active" value="0">
-                                <input type="checkbox" id="utdGamesRadio"
-                                       class="custom-payment-radio libraryRealTime"
-                                       name="active" value="1"
-                                    {{ @$utdGamesSettings?->is_active == 1  ? 'checked' : '' }}>
-                                <label for="utdGamesRadio" class="switch"></label>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="utd_games_app_key">{{ __('app key') }}:</label>
-                                    <input type="text" id="utd_games_app_key" name="app_key"
-                                           placeholder="app_key"
-                                           value="{{ $utdGamesSettings->app_key ?? '' }}" class="form-control" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-
-                        <hr class="my-4">
-
-                        <h5 class="mb-3">Webhook Endpoints</h5>
-
-                        @php
-                            $utdRoutes = $utdGamesSettings->webhook_routes ?? [];
-
-                            if (is_string($utdRoutes)) {
-                                $utdRoutes = json_decode($utdRoutes, true);
-                            }
-
-                            $utdRoutes = is_array($utdRoutes) ? $utdRoutes : [];
-                        @endphp
-
-                        @if(count($utdRoutes))
+                    @if(count($utdRoutes))
+                        <div class="gm-webhooks-section">
+                            <div class="gm-webhooks-title"><i class="fas fa-link"></i> Webhook Endpoints</div>
                             @foreach($utdRoutes as $key => $url)
-                                <div class="mb-3">
-                                    <label class="form-label text-capitalize fw-semibold">
-                                        {{ str_replace('_', ' ', $key) }}
-                                    </label>
-
-                                    <div class="webhook-container">
-                                        <div class="webhook-label">Type =&gt; POST</div>
-                                        <input type="text" class="form-control webhook-url" value="{{ $url }}" readonly>
-                                        <button type="button" class="btn btn-copy" onclick="copyWebhook(this)">
-                                            <i class="bi bi-clipboard"></i>Copy
+                                <div class="gm-webhook-item">
+                                    <div class="gm-webhook-info">
+                                        <span class="gm-webhook-name">{{ str_replace('_', ' ', $key) }}</span>
+                                        <span class="gm-webhook-method">POST</span>
+                                    </div>
+                                    <div class="gm-webhook-url-wrap">
+                                        <input type="text" class="form-control gm-input gm-input-readonly" value="{{ $url }}" readonly>
+                                        <button type="button" class="gm-copy-btn" onclick="gmCopyWebhook(this)">
+                                            <i class="fas fa-copy"></i>
                                         </button>
                                     </div>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="alert alert-warning">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                No webhook endpoints configured.
-                            </div>
-                        @endif
-
-                    </div>
-                </form>
-            </div>
-
-              <div class="col-md-6 mb-3 ms-0 me-auto">
-                <form action="{{ url('admin/game-provider-setting') }}" method="POST" class="settings-form">
-                    @csrf
-                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
-                    <input type="hidden" name="provider_code" value="zero_games">
-                    <input type="hidden" name="provider_name" value="Zero Games">
-
-                    <div class="card p-4 shadow-sm border-0" style="min-height: 600px; border-radius: 12px;">
-
-                        <!-- Header -->
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0"style="color: white;">{{ __('Zero Games') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                                <input type="hidden" name="active" value="0">
-                                                <input type="checkbox" id="zeroGamesRadio"
-                                                    class="custom-payment-radio libraryRealTime"
-                                                    name="active" value="1"
-                                                    {{ @$zeroGamesSettings?->is_active == 1  ? 'checked' : '' }}>
-                                                <label for="zeroGamesRadio" class="switch"></label>
-                                            </div>
-                                    </div>
-
-                        <!-- Settings Fields -->
-                        <div class="row">                    
                         </div>
-
-                        <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-
-
-                    </div>
-                </form>
+                    @endif
+                </div>
+                <div class="gm-provider-footer">
+                    <button type="submit" class="btn gm-btn-save"><i class="fas fa-save"></i> {{ __('save') }}</button>
+                </div>
             </div>
-        </div>
+        </form>
+
+        {{-- ══════════════════════════════════════════════════════════
+             ZERO GAMES
+        ══════════════════════════════════════════════════════════ --}}
+        <form class="gm-form-reset" action="{{ url('admin/game-provider-setting') }}" method="POST">
+            @csrf
+            <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+            <input type="hidden" name="provider_code" value="zero_games">
+            <input type="hidden" name="provider_name" value="Zero Games">
+            <div class="gm-provider-card">
+                <div class="gm-provider-header" style="background: linear-gradient(135deg, #10b981, #34d399);">
+                    <div class="gm-provider-logo"><i class="fas fa-chess-knight"></i></div>
+                    <div class="gm-provider-title">
+                        <h5>{{ __('Zero Games') }}</h5>
+                        <span>{{ __('Game provider') }}</span>
+                    </div>
+                    <div class="gm-provider-toggle">
+                        <input type="hidden" name="active" value="0">
+                        <input type="checkbox" id="zeroGamesRadio" class="custom-payment-radio libraryRealTime"
+                               name="active" value="1" {{ @$zeroGamesSettings?->is_active == 1 ? 'checked' : '' }}>
+                        <label for="zeroGamesRadio" class="switch"></label>
+                    </div>
+                </div>
+                <div class="gm-provider-body">
+                    <div class="gm-empty-state">
+                        <i class="fas fa-cog"></i>
+                        <span>{{ __('No additional settings required') }}</span>
+                    </div>
+                </div>
+                <div class="gm-provider-footer">
+                    <button type="submit" class="btn gm-btn-save"><i class="fas fa-save"></i> {{ __('save') }}</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
-
+{{-- ═══════════════════════════════════════════════════════════════
+     SCOPED STYLES
+═══════════════════════════════════════════════════════════════ --}}
 <style>
+    .gm-form-reset {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: auto !important;
+    }
+    .gm-providers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 20px;
+        align-items: start;
+    }
 
-    .webhook-container {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* space between input and button */
-    max-width: 500px; /* optional */
-}
+    /* ── Card ──────────────────────────────────────────────────── */
+    .gm-provider-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+    .dark-mode .gm-provider-card {
+        background: #1e293b;
+        border-color: rgba(255,255,255,0.06);
+    }
+    .gm-provider-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+    .dark-mode .gm-provider-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
 
-.webhook-container .webhook-url {
-    flex: 1; /* input takes remaining space */
-    font-size: 0.9rem;
-}
-
-.webhook-container .btn-copy {
-    background: green !important;
-    color: white;
-    width: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-}
-    .btn-save {
-        display: block;
-        margin: 20px auto 0 auto; /* top margin 20px, auto left/right */
+    /* ── Header ────────────────────────────────────────────────── */
+    .gm-provider-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 20px;
+        color: #fff;
     }
-    .btn-success {
-        background: green !important;
-    width: 100px;
-    }
-        .input-group {
-        flex-wrap: nowrap !important;
-    }
-    
-    .input-group .btn {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-    
-    .webhook-url {
-        font-size: 0.9rem;
-    }
-    
-    .input-group-text.bg-success {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        min-width: 65px;
+    .gm-provider-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
         justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+        backdrop-filter: blur(10px);
+    }
+    .gm-provider-title { flex: 1; }
+    .gm-provider-title h5 {
+        margin: 0 0 2px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+    }
+    .gm-provider-title span {
+        font-size: 12px;
+        opacity: 0.85;
+    }
+    .gm-provider-toggle { flex-shrink: 0; }
+
+    /* ── Body ──────────────────────────────────────────────────── */
+    .gm-provider-body {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .gm-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .gm-input-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+    }
+    .dark-mode .gm-input-group label { color: #94a3b8; }
+    .gm-input-group label i { font-size: 11px; opacity: 0.7; }
+    .gm-input {
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+        font-size: 13px !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background: #f8fafc !important;
+    }
+    .dark-mode .gm-input {
+        background: #0f172a !important;
+        border-color: rgba(255,255,255,0.08) !important;
+        color: #e2e8f0 !important;
+    }
+    .gm-input:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
+        outline: none;
+    }
+    .gm-input-readonly {
+        background: #f1f5f9 !important;
+        cursor: not-allowed;
+        color: #64748b !important;
+        font-size: 12px !important;
+    }
+    .dark-mode .gm-input-readonly {
+        background: rgba(255,255,255,0.04) !important;
+        color: #94a3b8 !important;
     }
 
+    /* ── Empty State ───────────────────────────────────────────── */
+    .gm-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 30px 20px;
+        color: #94a3b8;
+    }
+    .gm-empty-state i {
+        font-size: 28px;
+        opacity: 0.5;
+    }
+    .gm-empty-state span {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    /* ── Webhooks ───────────────────────────────────────────────── */
+    .gm-webhooks-section {
+        margin-top: 6px;
+        padding-top: 18px;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .dark-mode .gm-webhooks-section { border-top-color: rgba(255,255,255,0.06); }
+    .gm-webhooks-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .dark-mode .gm-webhooks-title { color: #f1f5f9; }
+    .gm-webhooks-title i { color: #6366f1; font-size: 13px; }
+    .gm-webhook-item {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+    .dark-mode .gm-webhook-item {
+        background: #0f172a;
+        border-color: rgba(255,255,255,0.06);
+    }
+    .gm-webhook-item:hover { border-color: #cbd5e1; }
+    .dark-mode .gm-webhook-item:hover { border-color: rgba(255,255,255,0.12); }
+    .gm-webhook-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .gm-webhook-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        text-transform: capitalize;
+    }
+    .dark-mode .gm-webhook-name { color: #e2e8f0; }
+    .gm-webhook-method {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: rgba(16,185,129,0.1);
+        color: #059669;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .dark-mode .gm-webhook-method {
+        background: rgba(16,185,129,0.15);
+        color: #34d399;
+    }
+    .gm-webhook-url-wrap {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .gm-webhook-url-wrap .gm-input { flex: 1; }
+    .gm-copy-btn {
+        width: 38px !important;
+        height: 38px;
+        border-radius: 10px !important;
+        border: 1px solid #e2e8f0 !important;
+        background: #fff !important;
+        color: #64748b !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        padding: 0 !important;
+    }
+    .dark-mode .gm-copy-btn {
+        background: #1e293b !important;
+        border-color: rgba(255,255,255,0.08) !important;
+        color: #94a3b8 !important;
+    }
+    .gm-copy-btn:hover {
+        background: #6366f1 !important;
+        border-color: #6366f1 !important;
+        color: #fff !important;
+    }
+
+    /* ── Footer ────────────────────────────────────────────────── */
+    .gm-provider-footer {
+        padding: 14px 20px;
+        border-top: 1px solid #f1f5f9;
+    }
+    .dark-mode .gm-provider-footer { border-top-color: rgba(255,255,255,0.06); }
+    .gm-btn-save {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px !important;
+        background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+        color: #fff !important;
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 3px 10px rgba(99,102,241,0.25);
+        width: auto !important;
+    }
+    .gm-btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(99,102,241,0.3);
+        background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+    }
+
+    /* ── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 992px) {
+        .gm-providers-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+        .gm-provider-body { padding: 16px; }
+        .gm-provider-header { padding: 14px 16px; }
+    }
 </style>
 
-
 <script>
-    function copyWebhook(button) {
-    // Find input inside the same webhook-container
-    const container = button.closest('.webhook-container');
-    const input = container.querySelector('.webhook-url');
-
-    if (!input) return;
-
-    // Copy to clipboard
-    navigator.clipboard.writeText(input.value).then(() => {
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="bi bi-check-lg me-1"></i>Copied!';
-        button.classList.add('btn-outline-success');
-        button.classList.remove('btn-success');
-
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.classList.remove('btn-outline-success');
-            button.classList.add('btn-success');
-        }, 2000);
-    });
-}
-
+    function gmCopyWebhook(btn) {
+        const input = btn.closest('.gm-webhook-url-wrap').querySelector('input');
+        navigator.clipboard.writeText(input.value).then(() => {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+        }).catch(() => {
+            const temp = document.createElement('input');
+            temp.value = input.value;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+        });
+    }
 </script>
