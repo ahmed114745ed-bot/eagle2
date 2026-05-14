@@ -20,7 +20,7 @@ return [
     'not_in_same_country' => 'ليس في نفس البلد',
     'delete'                => 'مسح',
     "searchAchievements" => "البحث عن الإنجازات",
-
+    "utdPaymob" => "UTD Paymob",
     "password_incorrect" => 'كلمة المرور غير صحيحة',
     "username_not_found" => 'اسم المستخدم غير موجود',
     'is_preview' => 'عرض مباشر',
