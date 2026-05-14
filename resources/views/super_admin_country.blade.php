@@ -1,1139 +1,1027 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     @php
         $countryName = app()->getLocale() == 'ar' ? $country->name : $country->e_name;
     @endphp
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>
-        {{ config('app.name') }} – {{ $countryName }}
-    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>{{ config('app.name') }} – {{ $countryName }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-left: env(safe-area-inset-left, 0px);
+            --safe-right: env(safe-area-inset-right, 0px);
+            --c-bg: #0a0a1a;
+            --c-surface: rgba(255,255,255,0.04);
+            --c-surface-hover: rgba(255,255,255,0.07);
+            --c-border: rgba(255,255,255,0.06);
+            --c-border-hover: rgba(139,92,246,0.3);
+            --c-text: #ffffff;
+            --c-text-secondary: rgba(255,255,255,0.55);
+            --c-text-tertiary: rgba(255,255,255,0.35);
+            --c-violet: #8b5cf6;
+            --c-pink: #ec4899;
+            --c-cyan: #22d3ee;
+            --c-gold: #fbbf24;
+            --c-emerald: #34d399;
+            --radius-sm: 14px;
+            --radius-md: 20px;
+            --radius-lg: 24px;
+            --radius-xl: 28px;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
             overflow-x: hidden;
-            position: relative;
-            background: #0a0e27;
-        }
-
-        /* خلفية متحركة خرافية */
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: linear-gradient(270deg, #0a0e27, #1a1f4e, #2d1b69, #6b2d91, #ff006e, #ff4500, #ffd700);
-            background-size: 1400% 1400%;
-            animation: gradientWave 20s ease infinite;
-        }
-
-        @keyframes gradientWave {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        /* جزيئات متحركة */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: radial-gradient(circle, #ffd700 0%, transparent 70%);
-            border-radius: 50%;
-            animation: floatUp 15s linear infinite;
-        }
-
-        @keyframes floatUp {
-            from {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-10vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* نجوم متلألئة */
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s ease-in-out infinite;
-        }
-
-        @keyframes twinkle {
-            0%, 100% {
-                opacity: 0.3;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.5);
-            }
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* زر تبديل اللغة */
-        .language-switcher {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            padding: 5px;
-            border-radius: 50px;
-            border: 2px solid rgba(255, 215, 0, 0.5);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-        }
-
-        .lang-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 50px;
-            background: transparent;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
-
-        .lang-btn.active {
-            background: linear-gradient(45deg, #ffd700, #ff6b6b);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-        }
-
-        /* رأس الصفحة */
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .country-flag-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 30px;
-        }
-
-        .country-flag {
-            width: 150px;
-            height: 100px;
-            font-size: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
-            animation: flagWave 3s ease-in-out infinite;
-        }
-
-        @keyframes flagWave {
-            0%, 100% {
-                transform: rotate(-5deg) scale(1);
-            }
-            50% {
-                transform: rotate(5deg) scale(1.1);
-            }
-        }
-
-        /* تأثير الهالة المتحركة */
-        .glow-rings {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            pointer-events: none;
-        }
-
-        .glow-ring {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 3px solid;
-            border-radius: 50%;
-            animation: pulseRing 3s ease-out infinite;
-        }
-
-        .glow-ring:nth-child(1) {
-            border-color: #ffd700;
-            animation-delay: 0s;
-        }
-
-        .glow-ring:nth-child(2) {
-            border-color: #ff6b6b;
-            animation-delay: 1s;
-        }
-
-        .glow-ring:nth-child(3) {
-            border-color: #4ecdc4;
-            animation-delay: 2s;
-        }
-
-        @keyframes pulseRing {
-            0% {
-                transform: scale(0.5);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1.5);
-                opacity: 0;
-            }
-        }
-
-        .country-name {
-            font-size: 36px;
-            font-weight: 900;
-            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
-            background-size: 300% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientText 3s ease infinite;
-            text-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
-        }
-
-        @keyframes gradientText {
-            0%, 100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-        }
-
-        /* بطاقة السوبر أدمن الفخمة */
-        .super-admin-card {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 107, 107, 0.2));
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 3px solid transparent;
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transform: perspective(1000px) rotateX(0deg);
-            transition: all 0.5s;
-            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.1);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) rotateX(0deg);
-            }
-            50% {
-                transform: translateY(-10px) rotateX(2deg);
-            }
-        }
-
-        .super-admin-card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
-            border-radius: 30px;
-            z-index: -1;
-            animation: borderRotate 4s linear infinite;
-        }
-
-        @keyframes borderRotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .super-admin-card:hover {
-            transform: perspective(1000px) rotateX(5deg) translateY(-5px);
-            box-shadow: 0 30px 60px rgba(255, 215, 0, 0.5);
-        }
-
-        .admin-crown {
-            position: absolute;
-            top: -15px;
-            right: 20px;
-            font-size: 40px;
-            animation: crownBounce 2s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px gold);
-        }
-
-        @keyframes crownBounce {
-            0%, 100% {
-                transform: rotate(-10deg) translateY(0);
-            }
-            50% {
-                transform: rotate(10deg) translateY(-5px);
-            }
-        }
-
-        .admin-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .admin-avatar {
-            width: 90px;
-            height: 90px;
-            border-radius: 20px;
-            border: 4px solid #ffd700;
-            margin-left: 20px;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-            animation: avatarPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes avatarPulse {
-            0%, 100% {
-                box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-            }
-            50% {
-                box-shadow: 0 0 50px rgba(255, 215, 0, 1);
-            }
-        }
-
-        .admin-info h3 {
-            font-size: 24px;
-            margin-bottom: 5px;
-            background: linear-gradient(45deg, #ffd700, #ff6b6b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-        }
-
-        .admin-levels {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .level-item {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            padding: 15px;
-            border-radius: 20px;
-            text-align: center;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-            animation: levelFloat 4s ease-in-out infinite;
-        }
-
-        .level-item:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .level-item:nth-child(2) {
-            animation-delay: 0.5s;
-        }
-
-        .level-item:nth-child(3) {
-            animation-delay: 1s;
-        }
-
-        @keyframes levelFloat {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-5px);
-            }
-        }
-
-        .level-item::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transform: rotate(45deg);
-            animation: levelShine 3s linear infinite;
-        }
-
-        @keyframes levelShine {
-            0% {
-                transform: translateX(-100%) translateY(-100%) rotate(45deg);
-            }
-            100% {
-                transform: translateX(100%) translateY(100%) rotate(45deg);
-            }
-        }
-
-        .level-value {
-            font-size: 28px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ffd700, #ffaa00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: numberGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes numberGlow {
-            0%, 100% {
-                filter: brightness(1);
-            }
-            50% {
-                filter: brightness(1.5);
-            }
-        }
-
-        /* إحصائيات مبهرة */
-        .stats-section {
-            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(255, 107, 107, 0.1));
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 2px solid rgba(78, 205, 196, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stats-title {
-            font-size: 22px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(78, 205, 196, 0.8);
-            animation: titlePulse 2s ease-in-out infinite;
-        }
-
-        @keyframes titlePulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            animation: statFloat 5s ease-in-out infinite;
-        }
-
-        .stat-card:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .stat-card:nth-child(2) {
-            animation-delay: 1s;
-        }
-
-        .stat-card:nth-child(3) {
-            animation-delay: 2s;
-        }
-
-        @keyframes statFloat {
-            0%, 100% {
-                transform: translateY(0) rotateZ(0deg);
-            }
-            25% {
-                transform: translateY(-5px) rotateZ(1deg);
-            }
-            75% {
-                transform: translateY(5px) rotateZ(-1deg);
-            }
-        }
-
-        .stat-card:hover {
-            transform: scale(1.1) rotateZ(5deg);
-            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5);
-            border-color: #ffd700;
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: 900;
-            background: linear-gradient(45deg, #4ecdc4, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: block;
-            animation: countUp 2s ease-out;
-        }
-
-        @keyframes countUp {
-            from {
-                transform: scale(0);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* قوائم التوب بتصميم جديد */
-        .top-section {
-            margin-bottom: 35px;
-            animation: sectionSlide 0.8s ease-out;
-        }
-
-        @keyframes sectionSlide {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .section-title {
-            font-size: 20px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 107, 107, 0.2));
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            text-align: center;
-            color: #fff;
-            font-weight: bold;
-            border: 2px solid rgba(255, 215, 0, 0.4);
-            position: relative;
-            overflow: hidden;
-            animation: titleGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes titleGlow {
-            0%, 100% {
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
-            }
-        }
-
-        .top-list {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .top-item {
-            flex: 1;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 20px 15px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            transition: all 0.4s;
-            animation: topItemFloat 4s ease-in-out infinite;
-        }
-
-        .top-item:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .top-item:nth-child(2) {
-            animation-delay: 0.5s;
-        }
-
-        .top-item:nth-child(3) {
-            animation-delay: 1s;
-        }
-
-        @keyframes topItemFloat {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-8px);
-            }
-        }
-
-        .top-item:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
-            border-color: #ffd700;
-        }
-
-        .top-rank {
-            position: absolute;
-            top: -15px;
-            left: 50%;
+            background: var(--c-bg);
+            color: var(--c-text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+        }
+
+        /* ── Accessibility ── */
+        .skip-link {
+            position: absolute; top: -100%; left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #ffd700, #ff6b6b);
-            color: #000;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 18px;
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6);
-            animation: rankPulse 2s ease-in-out infinite;
+            background: linear-gradient(135deg, var(--c-violet), var(--c-pink));
+            color: #fff; padding: 12px 24px;
+            border-radius: 0 0 12px 12px;
+            font-weight: 700; font-size: 14px;
+            z-index: 200; text-decoration: none;
+            transition: top 0.3s ease;
+        }
+        .skip-link:focus { top: 0; }
+        .sr-only {
+            position: absolute; width: 1px; height: 1px;
+            padding: 0; margin: -1px; overflow: hidden;
+            clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+        :focus-visible {
+            outline: 2px solid var(--c-violet);
+            outline-offset: 3px;
+        }
+        :focus:not(:focus-visible) { outline: none; }
+
+        /* ── Ambient Background ── */
+        .ambient-bg {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(139,92,246,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 80% 80%, rgba(236,72,153,0.12) 0%, transparent 55%),
+                radial-gradient(ellipse 60% 70% at 50% 50%, rgba(6,182,212,0.06) 0%, transparent 50%),
+                var(--c-bg);
+            will-change: filter;
+            animation: ambientShift 25s ease-in-out infinite;
+        }
+        @keyframes ambientShift {
+            0%,100% { filter: hue-rotate(0deg) brightness(1); }
+            50% { filter: hue-rotate(15deg) brightness(1.05); }
+        }
+        .ambient-orb {
+            position: fixed; border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none; z-index: 0;
+            will-change: transform;
+        }
+        .ambient-orb-1 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%);
+            top: -10%; left: -15%;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+        .ambient-orb-2 {
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(236,72,153,0.15), transparent 70%);
+            bottom: -10%; right: -15%;
+            animation: orbFloat 18s ease-in-out infinite reverse;
+        }
+        @keyframes orbFloat {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(30px,20px) scale(1.15); }
         }
 
-        @keyframes rankPulse {
-            0%, 100% {
-                transform: translateX(-50%) scale(1);
-                box-shadow: 0 5px 20px rgba(255, 215, 0, 0.6);
-            }
-            50% {
-                transform: translateX(-50%) scale(1.2);
-                box-shadow: 0 8px 30px rgba(255, 215, 0, 1);
-            }
+        /* Stars */
+        .stars-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .star {
+            position: absolute; border-radius: 50%; background: #fff;
+            animation: starPulse 3s ease-in-out infinite;
+        }
+        @keyframes starPulse {
+            0%,100% { opacity: 0.15; }
+            50% { opacity: 0.8; box-shadow: 0 0 4px #fff; }
         }
 
-        .top-avatar {
-            width: 70px;
-            height: 70px;
-            margin: 15px auto;
-            border-radius: 15px;
-            border: 3px solid #ffd700;
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
-            animation: avatarRotate 8s linear infinite;
+        /* ── Main Container ── */
+        .app-container {
+            position: relative; z-index: 2;
+            max-width: 430px;
+            margin: 0 auto;
+            padding: 0 16px;
+            padding-bottom: calc(40px + var(--safe-bottom));
         }
 
-        @keyframes avatarRotate {
-            0% {
-                transform: rotateY(0deg);
-            }
-            100% {
-                transform: rotateY(360deg);
-            }
+        /* ── Language Switcher ── */
+        .lang-bar {
+            display: flex; justify-content: center;
+            gap: 4px; padding: 12px 0 4px;
+            position: sticky; top: 0; z-index: 50;
         }
-
-        /* للغرف والوكالات - صور مربعة */
-        .room-avatar, .agency-avatar {
-            border-radius: 15px !important;
+        .lang-bar-inner {
+            display: flex; gap: 3px; padding: 4px;
+            background: rgba(10,10,26,0.85);
+            backdrop-filter: blur(24px) saturate(1.4);
+            -webkit-backdrop-filter: blur(24px) saturate(1.4);
+            border-radius: 50px;
+            border: 1px solid var(--c-border);
         }
-
-        .top-name {
-            font-size: 14px;
-            margin-top: 10px;
-            font-weight: bold;
+        .lang-btn {
+            padding: 8px 20px; border: none; border-radius: 50px;
+            background: transparent; color: var(--c-text-secondary);
+            font-family: inherit; font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 36px;
+        }
+        .lang-btn:active:not(.active) { transform: scale(0.95); }
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--c-violet), var(--c-pink));
             color: #fff;
+            box-shadow: 0 4px 16px rgba(139,92,246,0.4);
         }
 
-        .top-value {
-            font-size: 12px;
-            color: #ffd700;
-            margin-top: 5px;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        /* ── Hero Section ── */
+        .hero {
+            text-align: center;
+            padding: 32px 0 28px;
+            animation: fadeInUp 0.8s cubic-bezier(0.22,1,0.36,1) both;
         }
-
-        /* رسالة تحفيزية ملحمية */
-        .motivational-message {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 107, 107, 0.3));
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 30px;
-            margin-top: 40px;
-            border: 3px solid #ffd700;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .flag-container {
             position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5), inset 0 0 30px rgba(255, 255, 255, 0.1);
-            animation: messageGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes messageGlow {
-            0%, 100% {
-                box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 80px rgba(255, 215, 0, 0.8);
-            }
-        }
-
-        .motivational-message::before {
-            content: '🔥';
-            position: absolute;
-            font-size: 150px;
-            opacity: 0.1;
-            top: -30px;
-            right: -30px;
-            animation: fireFloat 4s ease-in-out infinite;
-        }
-
-        @keyframes fireFloat {
-            0%, 100% {
-                transform: rotate(-15deg) scale(1);
-            }
-            50% {
-                transform: rotate(15deg) scale(1.2);
-            }
-        }
-
-        .message-title {
-            font-size: 28px;
-            font-weight: 900;
+            display: inline-flex;
+            align-items: center; justify-content: center;
             margin-bottom: 20px;
-            text-align: center;
-            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
-            background-size: 300% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientText 3s ease infinite;
+        }
+        .flag-ring {
+            position: absolute;
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            border: 2px solid rgba(139,92,246,0.15);
+            animation: ringPulse 3s ease-in-out infinite;
+        }
+        .flag-ring:nth-child(2) {
+            width: 140px; height: 140px;
+            border-color: rgba(236,72,153,0.1);
+            animation-delay: 1s;
+        }
+        @keyframes ringPulse {
+            0%,100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
+        .flag-emoji {
+            font-size: 72px;
+            filter: drop-shadow(0 0 30px rgba(139,92,246,0.3));
+            animation: flagFloat 4s ease-in-out infinite;
+            position: relative; z-index: 2;
+        }
+        @keyframes flagFloat {
+            0%,100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.05); }
+        }
+        .hero-title {
+            font-size: 32px; font-weight: 900;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #f0abfc 100%);
+            background-size: 300% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmer 5s ease infinite;
+            margin-bottom: 6px;
+        }
+        @keyframes shimmer {
+            0%,100% { background-position: 0% center; }
+            50% { background-position: 300% center; }
+        }
+        .hero-subtitle {
+            font-size: 12px; font-weight: 700;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--c-text-tertiary);
         }
 
-        .message-text {
-            font-size: 18px;
-            line-height: 2;
-            text-align: center;
-            color: #fff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-            animation: textGlow 2s ease-in-out infinite;
+        /* ── Glass Card Base ── */
+        .glass-card {
+            position: relative;
+            background: var(--c-surface);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease;
         }
-
-        @keyframes textGlow {
-            0%, 100% {
-                text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-            }
-            50% {
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-            }
-        }
-
-        .fire-emoji {
-            display: inline-block;
-            animation: fireJump 1s ease-in-out infinite;
-        }
-
-        @keyframes fireJump {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        /* عناصر اللغة الإنجليزية */
-        [lang="en"] {
-            direction: ltr;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* تأثيرات إضافية */
-        .lightning {
-            position: fixed;
-            top: -100px;
-            width: 2px;
-            height: 100vh;
-            background: linear-gradient(to bottom, transparent, #ffd700, transparent);
-            animation: lightning 4s linear infinite;
-            opacity: 0;
-        }
-
-        @keyframes lightning {
-            0%, 90%, 100% {
-                opacity: 0;
-            }
-            95% {
-                opacity: 1;
-            }
-        }
-
-        /* شعاع دوار */
-        .rotating-beam {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 200%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ffd700, transparent);
-            transform-origin: center;
-            animation: beamRotate 10s linear infinite;
-            opacity: 0.3;
+        .glass-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
             pointer-events: none;
         }
 
-        @keyframes beamRotate {
-            0% {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-            100% {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
+        /* ── Super Admin Card ── */
+        .sa-section {
+            margin-bottom: 16px;
+            animation: fadeInUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.15s both;
         }
-
-        /* تأثيرات الموبايل */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            .country-name {
-                font-size: 28px;
-            }
-
-            .stats-grid, .admin-levels {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .top-list {
-                flex-direction: column;
-            }
+        .sa-card {
+            padding: 24px 20px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .page-title {
+        .sa-card:active {
+            transform: scale(0.98);
+        }
+        .sa-card-glow {
+            position: absolute; top: -1px; left: -1px; right: -1px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--c-violet), var(--c-pink), var(--c-gold), var(--c-violet));
+            background-size: 300% auto;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            animation: gradientSlide 3s linear infinite;
+        }
+        @keyframes gradientSlide {
+            0% { background-position: 0% center; }
+            100% { background-position: 300% center; }
+        }
+        .sa-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px;
+            background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(236,72,153,0.08));
+            border: 1px solid rgba(251,191,36,0.18);
+            border-radius: 50px;
+            font-size: 12px; font-weight: 800; color: var(--c-gold);
+            margin-bottom: 18px;
+        }
+        .sa-crown {
+            position: absolute; top: -6px;
+            font-size: 28px; z-index: 5;
+            animation: crownBounce 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 12px rgba(251,191,36,0.5));
+        }
+        [dir="rtl"] .sa-crown { right: 20px; }
+        [dir="ltr"] .sa-crown { left: 20px; }
+        @keyframes crownBounce {
+            0%,100% { transform: rotate(-8deg) translateY(0); }
+            50% { transform: rotate(5deg) translateY(-6px); }
+        }
+        .sa-profile {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 20px;
+        }
+        .sa-avatar-wrap {
+            position: relative; flex-shrink: 0;
+        }
+        .sa-avatar {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            object-fit: cover; display: block;
+            border: 2.5px solid rgba(139,92,246,0.35);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .sa-avatar-glow {
+            position: absolute; inset: -6px;
+            border-radius: 24px;
+            border: 1.5px solid rgba(139,92,246,0.1);
+            animation: auraGlow 3s ease-in-out infinite;
+        }
+        .sa-avatar-glow:nth-child(3) { animation-delay: 1.5s; }
+        @keyframes auraGlow {
+            0%,100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.06); opacity: 0.9; }
+        }
+        .sa-info { min-width: 0; flex: 1; }
+        .sa-name {
+            font-size: 22px; font-weight: 900;
+            background: linear-gradient(135deg, #fff, #c4b5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+        .sa-id {
+            font-size: 12px; color: var(--c-text-secondary);
+            font-weight: 600; margin-top: 2px;
+        }
+        .sa-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        }
+        .sa-stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: var(--radius-sm);
+            padding: 14px 6px;
             text-align: center;
-            font-size: 32px;
-            font-weight: 900;
-            color: #ffd700;
-            margin-top: 40px;
-            margin-bottom: 70px;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .sa-stat-card:active {
+            transform: scale(0.96);
+            background: rgba(139,92,246,0.08);
+        }
+        .sa-stat-label {
+            font-size: 10px; font-weight: 700;
+            color: var(--c-text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .sa-stat-value {
+            font-size: 26px; font-weight: 900;
+            background: linear-gradient(135deg, var(--c-gold), var(--c-pink), var(--c-violet));
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmer 4s ease infinite;
+            line-height: 1;
+        }
+        .sa-stat-card:nth-child(2) .sa-stat-value { animation-delay: 0.4s; }
+        .sa-stat-card:nth-child(3) .sa-stat-value { animation-delay: 0.8s; }
+
+        /* ── Live Users Card ── */
+        .live-section {
+            margin-bottom: 16px;
+            animation: fadeInUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.25s both;
+        }
+        .live-card {
+            padding: 24px 20px;
+            text-align: center;
+        }
+        .live-indicator {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 700; color: var(--c-emerald);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .live-dot {
+            width: 8px; height: 8px;
+            background: var(--c-emerald); border-radius: 50%;
+            box-shadow: 0 0 8px var(--c-emerald);
+            animation: livePing 1.5s ease-in-out infinite;
+        }
+        @keyframes livePing {
+            0%,100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+        .live-count {
+            font-size: 56px; font-weight: 900; line-height: 1;
+            background: linear-gradient(135deg, var(--c-emerald), var(--c-cyan), var(--c-violet));
+            background-size: 300% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmer 4s ease infinite;
+        }
+        .live-label {
+            font-size: 13px; color: var(--c-text-secondary);
+            font-weight: 600; margin-top: 6px;
+        }
+
+        /* ── Ranking Sections ── */
+        .rankings-wrap {
+            display: flex; flex-direction: column; gap: 16px;
+        }
+        .ranking-section {
+            animation: fadeInUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .ranking-section:nth-child(1) { animation-delay: 0.3s; }
+        .ranking-section:nth-child(2) { animation-delay: 0.38s; }
+        .ranking-section:nth-child(3) { animation-delay: 0.46s; }
+        .ranking-section:nth-child(4) { animation-delay: 0.54s; }
+        .ranking-section:nth-child(5) { animation-delay: 0.62s; }
+        .ranking-section:nth-child(6) { animation-delay: 0.70s; }
+        .ranking-section:nth-child(7) { animation-delay: 0.78s; }
+
+        .ranking-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            background: var(--c-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-md);
+            font-size: 14px; font-weight: 800;
+            margin-bottom: 10px;
+            position: relative; overflow: hidden;
+        }
+        .ranking-header::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+            animation: sweepShine 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes sweepShine {
+            0%,100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+        .rh-icon {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0;
+        }
+        .rh-icon.v1 { background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(99,102,241,0.25)); }
+        .rh-icon.v2 { background: linear-gradient(135deg, rgba(236,72,153,0.25), rgba(244,114,182,0.25)); }
+        .rh-icon.v3 { background: linear-gradient(135deg, rgba(6,182,212,0.25), rgba(34,211,238,0.25)); }
+        .rh-icon.v4 { background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(52,211,153,0.25)); }
+        .rh-icon.v5 { background: linear-gradient(135deg, rgba(245,158,11,0.25), rgba(251,191,36,0.25)); }
+        .rh-icon.v6 { background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.25)); }
+        .rh-icon.v7 { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(248,113,113,0.25)); }
+
+        .ranking-cards {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        }
+
+        .rank-card {
+            background: var(--c-surface);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-md);
+            padding: 28px 8px 16px;
+            text-align: center;
+            position: relative; overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .rank-card:active {
+            transform: scale(0.96);
+            border-color: var(--c-border-hover);
+        }
+
+        /* Medal badges */
+        .rank-badge {
+            position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 26px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 900; color: #fff; z-index: 3;
+        }
+        .badge-gold {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 3px 12px rgba(245,158,11,0.5);
+        }
+        .badge-silver {
+            background: linear-gradient(135deg, #9ca3af, #6b7280);
+            box-shadow: 0 3px 10px rgba(156,163,175,0.3);
+        }
+        .badge-bronze {
+            background: linear-gradient(135deg, #cd7f32, #a0522d);
+            box-shadow: 0 3px 10px rgba(205,127,50,0.3);
+        }
+
+        .rank-avatar {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            margin: 8px auto 10px;
+            background-size: cover; background-position: center;
+            border: 2px solid rgba(255,255,255,0.06);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .rank-name {
+            font-size: 12px; font-weight: 700;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            padding: 0 4px; margin-bottom: 4px;
+            color: var(--c-text);
+        }
+        .rank-val {
+            font-size: 11px; font-weight: 700;
+            background: linear-gradient(135deg, var(--c-gold), var(--c-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* ── Empty / Error States ── */
+        .ranking-empty, .ranking-error {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 28px 16px;
+        }
+        .ranking-empty-icon, .ranking-error-icon {
+            font-size: 28px; margin-bottom: 6px;
+        }
+        .ranking-empty-text, .ranking-error-text {
+            color: var(--c-text-secondary);
+            font-size: 12px; font-weight: 600;
+        }
+        .ranking-retry-btn {
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 50px;
+            color: var(--c-violet);
+            font-family: inherit;
+            font-size: 12px; font-weight: 700;
+            cursor: pointer;
+            min-height: 36px;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ranking-retry-btn:active {
+            transform: scale(0.95);
+            background: rgba(139,92,246,0.25);
+        }
+
+        /* ── Skeleton Loading ── */
+        .skeleton-pulse {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 400% 100%;
+            animation: skeletonMove 1.5s ease-in-out infinite;
+        }
+        @keyframes skeletonMove {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-card .rank-avatar {
+            background-image: none !important;
+            background-color: rgba(255,255,255,0.04);
+        }
+        .skeleton-line { display: block; }
+        .rank-card.loaded {
+            animation: cardReveal 0.4s ease both;
+        }
+        @keyframes cardReveal {
+            from { opacity: 0; transform: translateY(12px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ── Epic Message ── */
+        .epic-section {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            animation: fadeInUp 0.8s cubic-bezier(0.22,1,0.36,1) 1s both;
+        }
+        .epic-card {
+            padding: 28px 20px;
+        }
+        .epic-glow-bar {
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            background: linear-gradient(90deg, var(--c-violet), var(--c-pink), var(--c-gold), var(--c-emerald), var(--c-cyan), var(--c-violet));
+            background-size: 300% auto;
+            animation: gradientSlide 3s linear infinite;
+        }
+        .epic-title {
+            font-size: 22px; font-weight: 900;
+            text-align: center;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, var(--c-gold), var(--c-pink), var(--c-violet), var(--c-cyan));
+            background-size: 300% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shimmer 5s ease infinite;
+            line-height: 1.4;
+        }
+        .epic-text {
+            font-size: 15px; line-height: 2;
+            text-align: center;
+            color: var(--c-text-secondary);
+        }
+        .epic-text strong {
+            color: var(--c-gold);
+            -webkit-text-fill-color: unset;
+        }
+        .epic-highlight {
+            display: block;
+            font-size: 18px; font-weight: 900;
+            color: var(--c-gold);
+            margin: 14px 0;
+            text-shadow: 0 0 16px rgba(251,191,36,0.25);
+        }
+        .bounce-emoji {
+            display: inline-block;
+            animation: emojiBounce 2s ease-in-out infinite;
+        }
+        .bounce-emoji:nth-child(even) { animation-delay: 0.3s; }
+        @keyframes emojiBounce {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* ── Ripple Effect ── */
+        @keyframes rippleFx {
+            to { transform: scale(3); opacity: 0; }
+        }
+
+        /* ── Responsive Fine-tuning ── */
+        @media (min-width: 430px) {
+            .app-container { padding: 0 20px; padding-bottom: calc(40px + var(--safe-bottom)); }
+        }
+
+        @media (max-width: 360px) {
+            .hero-title { font-size: 26px; }
+            .flag-emoji { font-size: 60px; }
+            .sa-name { font-size: 18px; }
+            .sa-avatar { width: 60px; height: 60px; border-radius: 16px; }
+            .sa-avatar-glow { border-radius: 20px; }
+            .sa-stat-value { font-size: 22px; }
+            .sa-stat-label { font-size: 9px; }
+            .live-count { font-size: 46px; }
+            .rank-avatar { width: 46px; height: 46px; border-radius: 14px; }
+            .rank-name { font-size: 11px; }
+            .rank-val { font-size: 10px; }
+            .rank-badge { width: 22px; height: 22px; font-size: 10px; border-radius: 7px; }
+            .ranking-header { font-size: 13px; padding: 12px 14px; }
+            .rh-icon { width: 36px; height: 36px; font-size: 18px; }
+            .epic-title { font-size: 18px; }
+            .epic-text { font-size: 14px; line-height: 1.9; }
+            .epic-highlight { font-size: 16px; }
+        }
+
+        @media (max-width: 320px) {
+            .app-container { padding: 0 12px; }
+            .hero-title { font-size: 24px; }
+            .flag-emoji { font-size: 54px; }
+            .sa-card { padding: 20px 16px; }
+            .sa-stat-card { padding: 10px 4px; }
+            .sa-stat-value { font-size: 20px; }
+            .live-count { font-size: 40px; }
+            .live-card { padding: 20px 16px; }
+            .rank-card { padding: 24px 4px 12px; border-radius: 14px; }
+            .rank-avatar { width: 40px; height: 40px; border-radius: 12px; }
+            .epic-card { padding: 22px 14px; }
+        }
+
+        /* Large phones */
+        @media (min-width: 390px) {
+            .sa-stat-value { font-size: 28px; }
+            .live-count { font-size: 60px; }
+            .rank-avatar { width: 60px; height: 60px; }
+        }
+
+        /* ── Reduced Motion ── */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .ambient-bg, .ambient-orb, .stars-field { display: none !important; }
         }
     </style>
 </head>
 <body>
-<!-- الخلفية المتحركة -->
-<div class="animated-bg"></div>
-<!-- الجزيئات المتحركة -->
-<div class="particles" id="particles"></div>
-<!-- الشعاع الدوار -->
-<div class="rotating-beam"></div>
-<!-- البرق -->
-<div class="lightning" style="left: 20%;"></div>
-<div class="lightning" style="left: 50%; animation-delay: 2s;"></div>
-<div class="lightning" style="left: 80%; animation-delay: 3s;"></div>
-<h1 class="page-title">
-    {{ config('app.name') }} – {{ $countryName }}
-</h1>
-<!-- زر تبديل اللغة -->
-<meta name="csrf-token" content="{{ csrf_token() }}">
 
+<a href="#main-content" class="skip-link">{{ __('Skip to main content') }}</a>
 
-<div class="language-switcher">
-    @php
-        $languages = \App\Models\Language::where('is_enabled', 1)->pluck('name', 'code');
-    @endphp
+<!-- ── Ambient Background ── -->
+<div class="ambient-bg" aria-hidden="true"></div>
+<div class="ambient-orb ambient-orb-1" aria-hidden="true"></div>
+<div class="ambient-orb ambient-orb-2" aria-hidden="true"></div>
+<div class="stars-field" id="starsField" aria-hidden="true"></div>
 
-    @foreach($languages as $key => $language)
-        <button
-            type="button"
-            class="language lang-btn {{ app()->getLocale() === $key ? 'active' : '' }}"
-            data-id="{{ $key }}">
-            {{ $language }}
-            @if(app()->getLocale() === $key)
-                <i class="fa fa-check"></i>
-            @endif
-        </button>
-    @endforeach
-</div>
+<!-- ── Language Switcher ── -->
+<nav class="lang-bar" aria-label="{{ __('Language switcher') }}">
+    <div class="lang-bar-inner">
+        @php $languages = \App\Models\Language::where('is_enabled', 1)->pluck('name', 'code'); @endphp
+        @foreach($languages as $key => $language)
+            <button type="button"
+                    class="language lang-btn {{ app()->getLocale() === $key ? 'active' : '' }}"
+                    data-id="{{ $key }}"
+                    aria-label="{{ __('Switch language to :lang', ['lang' => $language]) }}"
+                    {{ app()->getLocale() === $key ? 'aria-current=true' : '' }}>
+                {{ $language }}
+            </button>
+        @endforeach
+    </div>
+</nav>
 
-<div class="container">
-    <!-- النسخة العربية -->
-    <div id="ar-content">
-        <div class="header">
-            <div class="country-flag-container">
-                <div class="glow-rings">
-                    <div class="glow-ring"></div>
-                    <div class="glow-ring"></div>
-                    <div class="glow-ring"></div>
-                </div>
-                <div class="country-flag">{{ $country->iso }}</div>
-            </div>
-            <h1 class="country-name">
-                {{ $countryName }}
-            </h1>
+<main id="main-content">
+<div class="app-container">
+
+    <!-- ── Hero ── -->
+    <header class="hero">
+        <div class="flag-container">
+            <div class="flag-ring" aria-hidden="true"></div>
+            <div class="flag-ring" aria-hidden="true"></div>
+            <span class="flag-emoji" role="img" aria-label="{{ $countryName }} {{ __('flag') }}">{{ $country->iso }}</span>
         </div>
+        <h1 class="hero-title">{{ $countryName }}</h1>
+        <p class="hero-subtitle">{{ config('app.name') }}</p>
+    </header>
 
-        <div class="super-admin-card" onclick="sendMessage({{@$superAdmin->appUser?->id}})">
-            <div class="admin-crown">👑</div>
-            <div class="admin-header">
-                @php
-                    $avatarUrl = getImagePath(@$superAdmin->appUser?->profile?->avatar)
-                        ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cdefs%3E%3ClinearGradient id='g'%3E%3Cstop offset='0' stop-color='%23FFD700'/%3E%3Cstop offset='1' stop-color='%23FF6B6B'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='90' height='90' fill='url(%23g)'/%3E%3C/svg%3E";
-                @endphp
-
-                <img
-                    src="{{ $avatarUrl }}"
-                    alt="{{ @$superAdmin->name ?? 'country manager' }}"
-                    class="admin-avatar"
-                />
-                <div class="admin-info">
-                    <h3>🌟 {{ __('Super Admin') }} 🌟</h3>
-                    <p style="color: #fff; font-size: 18px; font-weight: bold;">
-                        {{ @$superAdmin->name }}
-                    </p>
-                    <p style="color: #ffd700;">ID: {{ @$superAdmin->id }}</p>
-                </div>
-            </div>
-
-            <div class="admin-levels">
-                <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">{{ __('Sending Level') }}</div>
-                    <div class="level-value">75</div>
-                </div>
-                <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">{{ __('Receiving Level') }}</div>
-                    <div class="level-value">82</div>
-                </div>
-                <div class="level-item">
-                    <div style="color: #fff; margin-bottom: 10px;">{{ __('Recharge Level') }}</div>
-                    <div class="level-value">90</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="stats-section">
-            <h2 class="stats-title">🎮 {{ __('Active Users') }} 🎮</h2>
-            <div class="stats-grid" style="display:flex;justify-content:center;align-items:center;">
-                <div class="stat-card">
-                    <span class="stat-number">{{ $onlineUsers }}</span>
-                    <span style="color: #fff;"></span>
-                </div>
-            </div>
-        </div>
-
-        {{-- Top Rooms --}}
-        <div class="top-section">
-            <h3 class="section-title">🏆 {{ __('Top 3 Entertainment Rooms') }} 🎉</h3>
-            <div class="top-list">
-                @foreach($topRooms as $index => $room)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar room-avatar"
-                             style="background-image:url('{{ getImagePath($room->room_cover) ?? asset("images/background_room.jpg") }}');
-                                background-size:cover;background-position:center;">
-                        </div>
-                        <div class="top-name">{{ $room->room_name }}</div>
-                        <div class="top-value">{{ number_format($room->room_visitors_count) }} {{ __('members') }}</div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Top Supporters --}}
-        <div class="top-section">
-            <h3 class="section-title">💎 {{ __('Top 3 Generous Supporters') }} 💰</h3>
-            <div class="top-list">
-                @foreach($topSenders as $index => $topSender)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar"
-                             style="background-image:url('{{ getImagePath($topSender->sender?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
-                                background-size:cover;background-position:center;">
-                        </div>
-                        <div class="top-name">{{ $topSender->sender->name }}</div>
-                        <div class="top-value">{{ number_format($topSender->total_sent / 1000, 1) }}K 💎</div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Star Hosts --}}
-        <div class="top-section">
-            <h3 class="section-title">🎤 {{ __('Top 3 Star Hosts') }} ⭐</h3>
-            <div class="top-list">
-                @foreach($topReceivers as $index => $topReceiver)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar"
-                             style="background-image:url('{{ getImagePath($topReceiver->receiver?->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}');
-                                background-size:cover;background-position:center;">
-                        </div>
-                        <div class="top-name">{{ $topReceiver->receiver->name }}</div>
-                        <div class="top-value">{{ number_format($topReceiver->total_sent / 1000, 1) }}K 💎</div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Top Agencies --}}
-        <div class="top-section">
-            <h3 class="section-title">🏢 {{ __('Top 3 Host Agencies') }} 🚀</h3>
-            <div class="top-list">
-                @foreach($topAgencies as $index => $agency)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar agency-avatar"
-                             style="background-image:url('{{ getImagePath($agency->img) ?? asset("images/icon-agency.jpg") }}');
-                                background-size:cover;background-position:center;">
-                        </div>
-                        <div class="top-name">{{ $agency->name }}</div>
-                        <div class="top-value">
-                            {{ number_format($agency->members_count) }} {{ __('hosts') }}
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Top Charge Agencies --}}
-        <div class="top-section">
-            <h3 class="section-title">💰 {{ __('Top 3 Recharge Agencies') }} 💵</h3>
-            <div class="top-list">
-                @foreach($topChargeAgencies as $index => $charge)
+    <!-- ── Super Admin ── -->
+    @if($superAdmin)
+    <section class="sa-section" aria-label="{{ __('Super Admin') }}">
+        <div class="glass-card sa-card"
+             role="button"
+             tabindex="0"
+             aria-label="{{ __('View Super Admin profile') }}: {{ $superAdmin->name ?? __('Unknown') }}"
+             data-user-id="{{ $superAdmin->appUser?->id ?? '' }}">
+            <div class="sa-card-glow" aria-hidden="true"></div>
+            <div class="sa-crown" aria-hidden="true">👑</div>
+            <div class="sa-badge" aria-hidden="true">🌟 {{ __('Super Admin') }}</div>
+            <div class="sa-profile">
+                <div class="sa-avatar-wrap">
                     @php
-                        $agency = $charge->senderShippingAgency;
+                        $avatarUrl = getImagePath($superAdmin->appUser?->profile?->avatar)
+                            ?? "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='72' height='72' rx='20' fill='url(%23g)'/%3E%3C/svg%3E";
                     @endphp
-                    @if($agency)
-                        <div class="top-item">
-                            <span class="top-rank">{{ $index + 1 }}</span>
-                            <div class="top-avatar agency-avatar"
-                                 style="background-image:url('{{ getImagePath($agency->img ?? null) ?? asset("images/icon-agency.jpg") }}');
-                            background-size:cover;background-position:center;">
-                            </div>
-                            <div class="top-name">{{ $agency->name }}</div>
-                            <div class="top-value">
-                                {{ number_format($charge->amount ?? 0, 2) }} 💵
-                            </div>
-                        </div>
-                    @endif
-                @endforeach
+                    <img src="{{ $avatarUrl }}" alt="{{ $superAdmin->name ?? __('Admin') }}" class="sa-avatar" loading="eager"/>
+                    <div class="sa-avatar-glow" aria-hidden="true"></div>
+                    <div class="sa-avatar-glow" aria-hidden="true"></div>
+                </div>
+                <div class="sa-info">
+                    <div class="sa-name">{{ $superAdmin->name ?? '' }}</div>
+                    <div class="sa-id">ID: {{ $superAdmin->id ?? '' }}</div>
+                </div>
+            </div>
+            <div class="sa-stats">
+                <div class="sa-stat-card">
+                    <div class="sa-stat-label">{{ __('Sending Level') }}</div>
+                    <div class="sa-stat-value">75</div>
+                </div>
+                <div class="sa-stat-card">
+                    <div class="sa-stat-label">{{ __('Receiving Level') }}</div>
+                    <div class="sa-stat-value">82</div>
+                </div>
+                <div class="sa-stat-card">
+                    <div class="sa-stat-label">{{ __('Recharge Level') }}</div>
+                    <div class="sa-stat-value">90</div>
+                </div>
             </div>
         </div>
+    </section>
+    @endif
 
-        {{-- Top BD --}}
-        <div class="top-section">
-            <h3 class="section-title">👥 {{ __('Top 3 Most Active BD') }} 🎯</h3>
-            <div class="top-list">
-                @foreach($topBds as $index => $bd)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-name">{{ $bd->name }}</div>
-                        <div class="top-value">{{ number_format($bd->total_members) }} {{ __('agency') }}</div>
-                    </div>
-                @endforeach
+    <!-- ── Live Users ── -->
+    <section class="live-section" aria-label="{{ __('Active Users') }}">
+        <div class="glass-card live-card" role="status" aria-live="polite" aria-atomic="true">
+            <div class="live-indicator">
+                <span class="live-dot" aria-hidden="true"></span>
+                {{ __('LIVE NOW') }}
             </div>
+            <div class="live-count" id="liveNum" aria-hidden="true">{{ $onlineUsers }}</div>
+            <span class="sr-only" id="liveNumA11y">{{ number_format($onlineUsers) }} {{ __('Active Users') }}</span>
+            <div class="live-label">{{ __('Active Users') }}</div>
         </div>
+    </section>
 
-        {{-- Top Gamers --}}
-        <div class="top-section">
-            <h3 class="section-title">🎮 {{ __('Top 3 Gamers') }} 🏅</h3>
-            <div class="top-list">
-                @foreach($topGamers as $index => $gamer)
-                    <div class="top-item">
-                        <span class="top-rank">{{ $index + 1 }}</span>
-                        <div class="top-avatar"
-                             style="background-image:url('{{ getImagePath($gamer->user?->profile?->avatar) ?? asset('images/default-avatar.jpg') }}');
-                            background-size:cover;background-position:center;">
-                        </div>
-                        <div class="top-name">{{ $gamer->user?->name }}</div>
-                        <div class="top-value">{{ number_format($gamer->coins / 1000, 1) }}K ⚡</div>
-                    </div>
-                @endforeach
+    <!-- ── Rankings ── -->
+    <div id="rankings-container" class="rankings-wrap">
+        @php
+            $sections = [
+                ['key' => 'topRooms',          'icon' => '🏠', 'class' => 'v1', 'title' => __('Top 3 Entertainment Rooms') . ' 🎉',    'unit' => __('members'),  'emoji' => ''],
+                ['key' => 'topSenders',        'icon' => '💎', 'class' => 'v2', 'title' => __('Top 3 Generous Supporters') . ' 💰',     'unit' => '',             'emoji' => '💎'],
+                ['key' => 'topReceivers',      'icon' => '🎤', 'class' => 'v3', 'title' => __('Top 3 Star Hosts') . ' ⭐',               'unit' => '',             'emoji' => '💎'],
+                ['key' => 'topAgencies',       'icon' => '🏢', 'class' => 'v4', 'title' => __('Top 3 Host Agencies') . ' 🚀',           'unit' => __('hosts'),    'emoji' => ''],
+                ['key' => 'topChargeAgencies', 'icon' => '💰', 'class' => 'v5', 'title' => __('Top 3 Recharge Agencies') . ' 💵',       'unit' => '',             'emoji' => '💵'],
+                ['key' => 'topBds',            'icon' => '👥', 'class' => 'v6', 'title' => __('Top 3 Most Active BD') . ' 🎯',          'unit' => __('agency'),   'emoji' => ''],
+                ['key' => 'topGamers',         'icon' => '🎮', 'class' => 'v7', 'title' => __('Top 3 Gamers') . ' 🏅',                  'unit' => '',             'emoji' => '⚡'],
+            ];
+        @endphp
+
+        @foreach($sections as $sec)
+        <section class="ranking-section" data-section="{{ $sec['key'] }}" aria-labelledby="heading-{{ $sec['key'] }}">
+            <h3 class="ranking-header" id="heading-{{ $sec['key'] }}">
+                <span class="rh-icon {{ $sec['class'] }}" aria-hidden="true">{{ $sec['icon'] }}</span>
+                {{ $sec['title'] }}
+            </h3>
+            <div class="ranking-cards" id="cards-{{ $sec['key'] }}" data-unit="{{ $sec['unit'] }}" data-emoji="{{ $sec['emoji'] }}" data-rank-label="{{ __('Rank') }}" aria-busy="true" aria-label="{{ __('Loading rankings') }}">
+                @for($i = 0; $i < 3; $i++)
+                <div class="rank-card skeleton-card" aria-hidden="true">
+                    <div class="rank-badge {{ $i===0?'badge-gold':($i===1?'badge-silver':'badge-bronze') }}">{{ $i+1 }}</div>
+                    <div class="rank-avatar skeleton-pulse"></div>
+                    <div class="skeleton-line skeleton-pulse" style="width:65%;height:12px;margin:5px auto;border-radius:6px;"></div>
+                    <div class="skeleton-line skeleton-pulse" style="width:45%;height:10px;margin:3px auto;border-radius:6px;"></div>
+                </div>
+                @endfor
             </div>
-        </div>
+        </section>
+        @endforeach
+    </div>
 
-        {{-- Motivational Message --}}
-        <div class="motivational-message">
-            <h2 class="message-title">
-                <small>{{ $country->iso }}</small> {{ __('Epic Message to Heroes of :country', ['country' => $countryName]) }} <small>{{ $country->iso }}</small>            </h2>
-            <p class="message-text"><span class="fire-emoji">🔥</span>{{ __(':app LIFE Legends', ['app' => config('app.name')]) }}<span class="fire-emoji">🔥</span><br/><br/>
-                {{ __('You are not just players... You are the Entertainment Army!') }} 🎮<br/>
-                {{ __('Every room you open becomes an arena of joy and laughter!') }} 🎉<br/>
-                {{ __('Every gift you send plants smiles on faces!') }} 💝<br/>
-                {{ __('Every game you play writes :country\'s name in golden letters!', ['country' => $countryName]) }} ⚡<br/><br/>
-                <strong style="font-size:24px;color:#ffd700;">🏆 {{ __('Make the World Dance to :country\'s rhythm', ['country' => $countryName]) }} 🏆</strong><br/><br/>
-                {{ __('Play... Dance... Sing... Laugh... Spread Happiness!') }} 🎊<br/>
-                {{ __('Make every minute in :app LIFE an authentic celebration!', ['app' => config('app.name')]) }} 🎪<br/><br/>
-                <strong style="font-size:20px;">{{ __(':country is strong with you... First place awaits!', ['country' => $countryName]) }} 🦅</strong>
+    <!-- ── Epic Message ── -->
+    <section class="epic-section" aria-labelledby="epic-heading">
+        <div class="glass-card epic-card">
+            <div class="epic-glow-bar" aria-hidden="true"></div>
+            <h2 class="epic-title" id="epic-heading">
+                {{ $country->iso }} {{ __('Epic Message to Heroes of :country', ['country' => $countryName]) }} {{ $country->iso }}
+            </h2>
+            <p class="epic-text">
+                <span class="bounce-emoji" aria-hidden="true">🔥</span> {{ __(':app LIFE Legends', ['app' => config('app.name')]) }} <span class="bounce-emoji" aria-hidden="true">🔥</span><br/><br/>
+                {{ __('You are not just players... You are the Entertainment Army!') }} <span class="bounce-emoji" aria-hidden="true">🎮</span><br/>
+                {{ __('Every room you open becomes an arena of joy and laughter!') }} <span class="bounce-emoji" aria-hidden="true">🎉</span><br/>
+                {{ __('Every gift you send plants smiles on faces!') }} <span class="bounce-emoji" aria-hidden="true">💝</span><br/>
+                {{ __('Every game you play writes :country\'s name in golden letters!', ['country' => $countryName]) }} <span class="bounce-emoji" aria-hidden="true">⚡</span><br/><br/>
+                <strong class="epic-highlight"><span class="bounce-emoji" aria-hidden="true">🏆</span> {{ __('Make the World Dance to :country\'s rhythm', ['country' => $countryName]) }} <span class="bounce-emoji" aria-hidden="true">🏆</span></strong>
+                {{ __('Play... Dance... Sing... Laugh... Spread Happiness!') }} <span class="bounce-emoji" aria-hidden="true">🎊</span><br/>
+                {{ __('Make every minute in :app LIFE an authentic celebration!', ['app' => config('app.name')]) }} <span class="bounce-emoji" aria-hidden="true">🎪</span><br/><br/>
+                <strong>{{ __(':country is strong with you... First place awaits!', ['country' => $countryName]) }} <span class="bounce-emoji" aria-hidden="true">🦅</span></strong>
             </p>
         </div>
-    </div>
+    </section>
+
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $.ajaxSetup({
-        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}
-    });
-
-    $(".language").click(function() {
-        let id = $(this).data('id');
-        let url = "{{ url('/locale') }}"; // or {{ admin_url('/locale') }} etc.
-        $.post(url, { locale: id }, () => location.reload());
-    });
-</script>
-<script>
-    // إنشاء الجزيئات المتحركة function createParticles() { const particlesContainer = document.getElementById('particles'); for (let i = 0; i < 50; i++) { const particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = Math.random() * 100 + '%'; particle.style.animationDelay = Math.random() * 15 + 's'; particle.style.animationDuration = (15 + Math.random() * 10) + 's'; particlesContainer.appendChild(particle); } } // إنشاء النجوم function createStars() { const body = document.body; for (let i = 0; i < 100; i++) { const star = document.createElement('div'); star.className = 'star'; star.style.left = Math.random() * 100 + '%'; star.style.top = Math.random() * 100 + '%'; star.style.animationDelay = Math.random() * 3 + 's'; body.appendChild(star); } } // تبديل اللغة function switchLanguage(lang) { const arContent = document.getElementById('ar-content'); const enContent = document.getElementById('en-content'); const langBtns = document.querySelectorAll('.lang-btn'); langBtns.forEach(btn => btn.classList.remove('active')); if (lang === 'ar') { arContent.classList.remove('hidden'); enContent.classList.add('hidden'); langBtns[0].classList.add('active'); document.dir = 'rtl'; } else { arContent.classList.add('hidden'); enContent.classList.remove('hidden'); langBtns[1].classList.add('active'); document.dir = 'ltr'; } } // تأثيرات صوتية عند الضغط document.querySelectorAll('.top-item, .stat-card, .level-item').forEach(item => { item.addEventListener('click', function() { this.style.animation = 'none'; setTimeout(() => { this.style.animation = ''; }, 10); // تأثير موجة عند الضغط const ripple = document.createElement('div'); ripple.style.position = 'absolute'; ripple.style.width = '100px'; ripple.style.height = '100px'; ripple.style.borderRadius = '50%'; ripple.style.background = 'rgba(255, 255, 255, 0.5)'; ripple.style.transform = 'translate(-50%, -50%)'; ripple.style.pointerEvents = 'none'; ripple.style.animation = 'ripple 0.6s ease-out'; const rect = this.getBoundingClientRect(); ripple.style.left = event.clientX - rect.left + 'px'; ripple.style.top = event.clientY - rect.top + 'px'; this.style.position = 'relative'; this.style.overflow = 'hidden'; this.appendChild(ripple); setTimeout(() => ripple.remove(), 600); }); }); // تأثير الكتابة المتحركة للأرقام function animateNumbers() { document.querySelectorAll('.stat-number').forEach(element => { const target = parseInt(element.textContent.replace(',', '')); let current = 0; const increment = target / 50; const timer = setInterval(() => { current += increment; if (current >= target) { current = target; clearInterval(timer); } element.textContent = Math.floor(current).toLocaleString(); }, 30); }); } // تحديث الإحصائيات بشكل دوري setInterval(() => { const statNumbers = document.querySelectorAll('.stat-number'); statNumbers.forEach(num => { const current = parseInt(num.textContent.replace(',', '')); const variation = Math.floor(Math.random() * 100) - 50; num.textContent = (current + variation).toLocaleString(); }); }, 10000); // تهيئة الصفحة createParticles(); createStars(); setTimeout(animateNumbers, 500); // إضافة تأثير ripple CSS const style = document.createElement('style'); style.textContent = ` @keyframes ripple { 0% { width: 0; height: 0; opacity: 1; } 100% { width: 200px; height: 200px; opacity: 0; } } `; document.head.appendChild(style);
-</script>
+</main>
 
 <script>
+(function(){
+    'use strict';
+
+    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ── Language Switcher ──
+    document.querySelectorAll('.language').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            fetch("{{ url('/locale') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: new URLSearchParams({ locale: this.dataset.id })
+            }).then(function() {
+                location.reload();
+            });
+        });
+    });
+
     function sendMessage(userId) {
-        const message = `open_profile:${userId}`;
-        window.postMessage(message, '*');
-        console.log("✅ Sent message to Flutter:", message);
+        window.postMessage('open_profile:' + userId, '*');
     }
+
+    // ── Stars ──
+    if (!prefersReducedMotion) {
+        var field = document.getElementById('starsField');
+        if (field) {
+            var count = 50;
+            for (var i = 0; i < count; i++) {
+                var s = document.createElement('div');
+                s.className = 'star';
+                var sz = 1 + Math.random() * 2;
+                s.style.cssText = 'width:' + sz + 'px;height:' + sz + 'px;left:' + Math.random() * 100 + '%;top:' + Math.random() * 100 + '%;animation-delay:' + Math.random() * 5 + 's;animation-duration:' + (2 + Math.random() * 4) + 's';
+                field.appendChild(s);
+            }
+        }
+    }
+
+    // ── Counter Animation ──
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('liveNum');
+        if (el) {
+            var target = parseInt(el.textContent.replace(/,/g, ''));
+            if (!isNaN(target)) {
+                if (prefersReducedMotion) {
+                    el.textContent = target.toLocaleString();
+                } else {
+                    var current = 0;
+                    var step = Math.ceil(target / 50);
+                    var timer = setInterval(function() {
+                        current += step;
+                        if (current >= target) { current = target; clearInterval(timer); }
+                        el.textContent = current.toLocaleString();
+                    }, 25);
+                }
+            }
+        }
+
+        // ── SA Card Interaction ──
+        var saCard = document.querySelector('.sa-card');
+        if (saCard) {
+            var userId = saCard.dataset.userId;
+            function handleActivate() {
+                if (userId) sendMessage(userId);
+            }
+            saCard.addEventListener('click', handleActivate);
+            saCard.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleActivate();
+                }
+            });
+        }
+
+        // ── Ripple on Tap ──
+        document.querySelectorAll('.rank-card, .sa-stat-card').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                var r = document.createElement('div');
+                var rect = this.getBoundingClientRect();
+                var sz = Math.max(rect.width, rect.height) * 2.5;
+                Object.assign(r.style, {
+                    position: 'absolute', width: sz + 'px', height: sz + 'px', borderRadius: '50%',
+                    background: 'radial-gradient(circle,rgba(139,92,246,0.2),transparent)',
+                    left: (e.clientX - rect.left - sz / 2) + 'px',
+                    top: (e.clientY - rect.top - sz / 2) + 'px',
+                    transform: 'scale(0)', animation: 'rippleFx 0.6s ease-out',
+                    pointerEvents: 'none', zIndex: '10'
+                });
+                this.appendChild(r);
+                setTimeout(function() { r.remove(); }, 600);
+            });
+        });
+
+        // ── Scroll Reveal ──
+        if ('IntersectionObserver' in window) {
+            var obs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.style.animationPlayState = 'running';
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.ranking-section').forEach(function(s) { obs.observe(s); });
+        }
+
+        // ── AJAX Lazy Load Rankings ──
+        var statsUrl = "{{ url('country/' . $country->id . '/stats') }}";
+        var badges = ['badge-gold', 'badge-silver', 'badge-bronze'];
+        var defaultAvatar = "{{ asset('images/businessman-icon.jpg') }}";
+        var defaultBdBg = 'linear-gradient(135deg,rgba(99,102,241,0.3),rgba(168,85,247,0.3))';
+        var noDataText = "{{ __('No data available yet') }}";
+        var errorText = "{{ __('Could not load data. Please refresh the page.') }}";
+        var retryText = "{{ __('Retry') }}";
+
+        fetch(statsUrl, {
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var sectionKeys = ['topRooms', 'topSenders', 'topReceivers', 'topAgencies', 'topChargeAgencies', 'topBds', 'topGamers'];
+            sectionKeys.forEach(function(key, si) {
+                var container = document.getElementById('cards-' + key);
+                if (!container) return;
+                var items = data[key] || [];
+                var unit = container.dataset.unit || '';
+                var emoji = container.dataset.emoji || '';
+                var rankLabel = container.dataset.rankLabel || 'Rank';
+
+                container.setAttribute('aria-busy', 'false');
+                container.removeAttribute('aria-label');
+                container.innerHTML = '';
+
+                if (items.length === 0) {
+                    container.innerHTML = '<div class="ranking-empty" role="status">' +
+                        '<div class="ranking-empty-icon">📭</div>' +
+                        '<div class="ranking-empty-text">' + noDataText + '</div>' +
+                        '</div>';
+                    return;
+                }
+
+                items.forEach(function(item, i) {
+                    var card = document.createElement('div');
+                    card.className = 'rank-card loaded';
+                    card.style.animationDelay = (si * 0.08 + i * 0.1) + 's';
+                    card.setAttribute('aria-label', (item.name || '-') + ', ' + rankLabel + ' ' + (i + 1));
+
+                    var avatarStyle = (key === 'topBds' && !item.image)
+                        ? 'background:' + defaultBdBg
+                        : "background-image:url('" + (item.image || defaultAvatar) + "');background-size:cover;background-position:center";
+
+                    var valText = unit ? item.value + ' ' + unit : item.value + (emoji ? ' ' + emoji : '');
+
+                    card.innerHTML =
+                        '<div class="rank-badge ' + badges[i] + '" aria-hidden="true">' + (i + 1) + '</div>' +
+                        '<div class="rank-avatar" style="' + avatarStyle + '" role="img" aria-label="' + (item.name || '') + '"></div>' +
+                        '<div class="rank-name">' + (item.name || '-') + '</div>' +
+                        '<div class="rank-val">' + valText + '</div>';
+
+                    container.appendChild(card);
+                });
+            });
+        })
+        .catch(function(err) {
+            console.error('Stats load error:', err);
+            document.querySelectorAll('.ranking-cards').forEach(function(container) {
+                container.setAttribute('aria-busy', 'false');
+                container.removeAttribute('aria-label');
+                container.innerHTML = '<div class="ranking-error" role="alert">' +
+                    '<div class="ranking-error-icon">⚠️</div>' +
+                    '<div class="ranking-error-text">' + errorText + '</div>' +
+                    '<button type="button" class="ranking-retry-btn" onclick="location.reload()">' + retryText + '</button>' +
+                    '</div>';
+            });
+        });
+    });
+})();
 </script>
 </body>
 </html>
