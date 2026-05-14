@@ -6,6 +6,8 @@ use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Traits\HelperTraits\UtdStreamTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class UtdStreamController extends Controller
 {
@@ -389,5 +391,524 @@ class UtdStreamController extends Controller
         return Common::apiResponse(true, 'Success', [
             'app_id' => $streamData['app_id'],
         ]);
+    }
+
+    // ─── WEBHOOKS - Event Handlers (16 Events) ───────────────
+
+    /**
+     * Verify webhook signature
+     */
+    private function verifyWebhookSignature(Request $request, string $secret): bool
+    {
+        $signature = $request->header('X-UTD-Stream-Signature');
+        $rawBody = $request->getContent();
+
+        if (!$signature || !$rawBody) {
+            return false;
+        }
+
+        $expected = 'sha256=' . hash_hmac('sha256', $rawBody, $secret);
+
+        return hash_equals($expected, $signature);
+    }
+
+    // ─── Room Events (6) ─────────────────────────────────────
+
+    public function onRoomStarted(Request $request)
+    {
+        $data = $request->all();
+        $room = $data['room'] ?? [];
+
+        Log::info('Webhook: room_started', [
+            'room_name' => $room['name'] ?? null,
+            'room_sid' => $room['sid'] ?? null,
+        ]);
+
+        // البحث عن صاحب الغرفة من جدول rooms
+        $roomName = $room['name'] ?? null;
+        $ownerUserId = null;
+
+        if ($roomName) {
+            // البحث في room_name أو numid
+            $existingRoom = \DB::table('rooms')
+                ->where('room_name', $roomName)
+                ->orWhere('numid', $roomName)
+                ->first();
+
+            if ($existingRoom) {
+                $ownerUserId = $existingRoom->uid;
+            }
+        }
+
+        \App\Models\StreamingRoomSession::create([
+            'room_name' => $room['name'] ?? null,
+            'room_sid' => $room['sid'],
+            'owner_user_id' => $ownerUserId,
+            'started_at' => now(),
+            'metadata' => $data,
+        ]);
+
+        // تحديث Analytics
+        $analytics = \App\Models\StreamingAnalytics::today();
+        $analytics->increment('total_sessions');
+
+        // تحديث Cache للغرف النشطة
+        $activeRooms = Cache::increment('streaming:active_rooms');
+        if ($activeRooms > $analytics->peak_concurrent_rooms) {
+            $analytics->update(['peak_concurrent_rooms' => $activeRooms]);
+        }
+
+        // إرسال إشعارات للمتابعين
+        if ($ownerUserId) {
+            dispatch(new \App\Jobs\SendNotificationToAllFollowers($ownerUserId))
+                ->onQueue('notification_heavy');
+        }
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onRoomFinished(Request $request)
+    {
+        $data = $request->all();
+        $room = $data['room'] ?? [];
+
+        Log::info('Webhook: room_finished', [
+            'room_name' => $room['name'] ?? null,
+            'room_sid' => $room['sid'] ?? null,
+        ]);
+
+        // تحديث نهاية الجلسة وحساب المدة
+        $session = \App\Models\StreamingRoomSession::where('room_sid', $room['sid'])->first();
+        if ($session) {
+            $session->finished_at = now();
+            $session->calculateDuration();
+
+            // تحديث Analytics بمدة الجلسة
+            if ($session->duration_minutes) {
+                $analytics = \App\Models\StreamingAnalytics::today();
+                $analytics->increment('total_session_minutes', $session->duration_minutes);
+            }
+        }
+
+        // تقليل عدد الغرف النشطة
+        Cache::decrement('streaming:active_rooms');
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onParticipantJoined(Request $request)
+    {
+        $data = $request->all();
+        $room = $data['room'] ?? [];
+        $participant = $data['participant'] ?? [];
+
+        Log::info('Webhook: participant_joined', [
+            'room_name' => $room['name'] ?? null,
+            'participant' => $participant['identity'] ?? null,
+        ]);
+
+        // البحث عن الجلسة
+        $roomSession = \App\Models\StreamingRoomSession::where('room_sid', $room['sid'])->first();
+
+        if (!$roomSession) {
+            Log::warning('Room session not found for participant_joined', ['room_sid' => $room['sid']]);
+            return response()->json(['status' => 'ok'], 200);
+        }
+
+        // حفظ جلسة المشارك
+        \App\Models\StreamingParticipantSession::create([
+            'room_session_id' => $roomSession->id,
+            'participant_identity' => $participant['identity'],
+            'participant_name' => $participant['name'] ?? null,
+            'joined_at' => now(),
+        ]);
+
+        // تحديث عدادات الغرفة
+        $roomSession->increment('total_participants');
+
+        $currentCount = $roomSession->participantSessions()->whereNull('left_at')->count();
+        if ($currentCount > $roomSession->peak_participants) {
+            $roomSession->update(['peak_participants' => $currentCount]);
+        }
+
+        // تحديث Analytics
+        $analytics = \App\Models\StreamingAnalytics::today();
+        $analytics->increment('total_participants');
+
+        // تتبع المشاركين الفريدين
+        $cacheKey = 'streaming:unique_participants:' . now()->toDateString();
+        $uniqueParticipants = Cache::remember($cacheKey, now()->endOfDay(), function () {
+            return collect();
+        });
+
+        if (!$uniqueParticipants->contains($participant['identity'])) {
+            $uniqueParticipants->push($participant['identity']);
+            Cache::put($cacheKey, $uniqueParticipants, now()->endOfDay());
+            $analytics->increment('unique_participants');
+        }
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onParticipantLeft(Request $request)
+    {
+        $data = $request->all();
+        $room = $data['room'] ?? [];
+        $participant = $data['participant'] ?? [];
+
+        Log::info('Webhook: participant_left', [
+            'room_name' => $room['name'] ?? null,
+            'participant' => $participant['identity'] ?? null,
+        ]);
+
+        // البحث عن الجلسة
+        $roomSession = \App\Models\StreamingRoomSession::where('room_sid', $room['sid'])->first();
+
+        if (!$roomSession) {
+            return response()->json(['status' => 'ok'], 200);
+        }
+
+        // تحديث وقت المغادرة وحساب المدة
+        $participantSession = \App\Models\StreamingParticipantSession::where('room_session_id', $roomSession->id)
+            ->where('participant_identity', $participant['identity'])
+            ->whereNull('left_at')
+            ->latest('joined_at')
+            ->first();
+
+        if ($participantSession) {
+            $participantSession->left_at = now();
+            $participantSession->calculateDuration();
+
+            // تحديث Analytics بمدة المشارك
+            if ($participantSession->duration_minutes) {
+                $analytics = \App\Models\StreamingAnalytics::today();
+                $analytics->increment('total_participant_minutes', $participantSession->duration_minutes);
+            }
+        }
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onTrackPublished(Request $request)
+    {
+        $data = $request->all();
+        $room = $data['room'] ?? [];
+        $participant = $data['participant'] ?? [];
+        $track = $data['track'] ?? [];
+
+        Log::info('Webhook: track_published', [
+            'room_name' => $room['name'] ?? null,
+            'participant' => $participant['identity'] ?? null,
+            'track_type' => $track['type'] ?? null,
+        ]);
+
+        // البحث عن الجلسة
+        $roomSession = \App\Models\StreamingRoomSession::where('room_sid', $room['sid'])->first();
+
+        if (!$roomSession) {
+            return response()->json(['status' => 'ok'], 200);
+        }
+
+        // تحديد نوع وجودة الـ Track
+        $trackType = strtolower($track['type'] ?? 'unknown');
+        $videoQuality = null;
+
+        if ($trackType === 'video') {
+            $height = $track['height'] ?? 0;
+            $videoQuality = \App\Models\StreamingTrack::determineVideoQuality($height);
+        }
+
+        // حفظ الـ Track
+        \App\Models\StreamingTrack::create([
+            'room_session_id' => $roomSession->id,
+            'participant_identity' => $participant['identity'],
+            'track_type' => $trackType,
+            'video_quality' => $videoQuality,
+            'video_width' => $track['width'] ?? null,
+            'video_height' => $track['height'] ?? null,
+            'published_at' => now(),
+        ]);
+
+        // تحديث Analytics حسب الجودة
+        $analytics = \App\Models\StreamingAnalytics::today();
+
+        if ($trackType === 'video') {
+            match ($videoQuality) {
+                'sd' => $analytics->increment('tracks_sd'),
+                'hd' => $analytics->increment('tracks_hd'),
+                'fhd' => $analytics->increment('tracks_fhd'),
+                '2k' => $analytics->increment('tracks_2k'),
+                '2k_plus', '4k' => $analytics->increment('tracks_2k_plus'),
+                default => null,
+            };
+        } elseif ($trackType === 'audio') {
+            $analytics->increment('tracks_audio');
+        }
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onTrackUnpublished(Request $request)
+    {
+        $data = $request->all();
+        $room = $data['room'] ?? [];
+        $participant = $data['participant'] ?? [];
+        $track = $data['track'] ?? [];
+
+        Log::info('Webhook: track_unpublished', [
+            'room_name' => $room['name'] ?? null,
+            'participant' => $participant['identity'] ?? null,
+            'track_type' => $track['type'] ?? null,
+        ]);
+
+        // البحث عن الجلسة
+        $roomSession = \App\Models\StreamingRoomSession::where('room_sid', $room['sid'])->first();
+
+        if (!$roomSession) {
+            return response()->json(['status' => 'ok'], 200);
+        }
+
+        // تحديث وقت إيقاف الـ Track وحساب المدة
+        $trackType = strtolower($track['type'] ?? 'unknown');
+
+        $trackRecord = \App\Models\StreamingTrack::where('room_session_id', $roomSession->id)
+            ->where('participant_identity', $participant['identity'])
+            ->where('track_type', $trackType)
+            ->whereNull('unpublished_at')
+            ->latest('published_at')
+            ->first();
+
+        if ($trackRecord) {
+            $trackRecord->unpublished_at = now();
+            $trackRecord->calculateDuration();
+        }
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    // ─── Call Events (7) ─────────────────────────────────────
+
+    public function onCallInitiated(Request $request)
+    {
+        $data = $request->all();
+        $call = $data['call'] ?? [];
+
+        Log::info('Webhook: call_initiated', [
+            'call_id' => $call['call_id'] ?? null,
+            'caller' => $call['caller_identity'] ?? null,
+            'callee' => $call['callee_identity'] ?? null,
+            'type' => $call['type'] ?? 'voice',
+        ]);
+
+        // Cache call metadata
+        Cache::put("stream:call:{$call['call_id']}", $call, now()->addDay());
+        Cache::put("stream:call:{$call['call_id']}:initiated_at", now(), now()->addDay());
+
+        // Update analytics
+        Cache::increment('analytics:calls:total');
+        Cache::increment('analytics:calls:active');
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onCallRinging(Request $request)
+    {
+        $data = $request->all();
+        $call = $data['call'] ?? [];
+
+        Log::info('Webhook: call_ringing', [
+            'call_id' => $call['call_id'] ?? null,
+        ]);
+
+        Cache::put("stream:call:{$call['call_id']}:ringing_at", now(), now()->addDay());
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onCallAccepted(Request $request)
+    {
+        $data = $request->all();
+        $call = $data['call'] ?? [];
+
+        Log::info('Webhook: call_accepted', [
+            'call_id' => $call['call_id'] ?? null,
+        ]);
+
+        Cache::put("stream:call:{$call['call_id']}:answered_at", now(), now()->addDay());
+        Cache::increment('analytics:calls:accepted');
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onCallRejected(Request $request)
+    {
+        $data = $request->all();
+        $call = $data['call'] ?? [];
+
+        Log::info('Webhook: call_rejected', [
+            'call_id' => $call['call_id'] ?? null,
+        ]);
+
+        Cache::decrement('analytics:calls:active');
+        Cache::increment('analytics:calls:rejected');
+        Cache::forget("stream:call:{$call['call_id']}");
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onCallBusy(Request $request)
+    {
+        $data = $request->all();
+        $call = $data['call'] ?? [];
+
+        Log::info('Webhook: call_busy', [
+            'call_id' => $call['call_id'] ?? null,
+        ]);
+
+        Cache::decrement('analytics:calls:active');
+        Cache::forget("stream:call:{$call['call_id']}");
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onCallEnded(Request $request)
+    {
+        $data = $request->all();
+        $call = $data['call'] ?? [];
+
+        $durationSeconds = $call['duration_seconds'] ?? 0;
+        $durationMinutes = ceil($durationSeconds / 60);
+
+        Log::info('Webhook: call_ended', [
+            'call_id' => $call['call_id'] ?? null,
+            'duration_seconds' => $durationSeconds,
+            'duration_minutes' => $durationMinutes,
+        ]);
+
+        // Update usage statistics
+        Cache::decrement('analytics:calls:active');
+
+        $callType = $call['type'] ?? 'voice';
+        if ($callType === 'video') {
+            Cache::increment('analytics:calls:video_minutes', $durationMinutes);
+        } else {
+            Cache::increment('analytics:calls:audio_minutes', $durationMinutes);
+        }
+
+        Cache::forget("stream:call:{$call['call_id']}");
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onCallMissed(Request $request)
+    {
+        $data = $request->all();
+        $call = $data['call'] ?? [];
+
+        Log::info('Webhook: call_missed', [
+            'call_id' => $call['call_id'] ?? null,
+        ]);
+
+        Cache::decrement('analytics:calls:active');
+        Cache::increment('analytics:calls:missed');
+        Cache::forget("stream:call:{$call['call_id']}");
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    // ─── Presence Events (2) ─────────────────────────────────
+
+    public function onUserOnline(Request $request)
+    {
+        $data = $request->all();
+        $identity = $data['identity'] ?? null;
+        $name = $data['name'] ?? null;
+
+        Log::info('Webhook: user_online', [
+            'identity' => $identity,
+            'name' => $name,
+        ]);
+
+        if (!$identity || !is_numeric($identity)) {
+            return response()->json(['status' => 'ok'], 200);
+        }
+
+        $userId = (int) $identity;
+
+        // حفظ جلسة جديدة
+        \App\Models\UserPresenceSession::create([
+            'user_id' => $userId,
+            'connected_at' => now(),
+        ]);
+
+        // Update cache للعدادات Live
+        Cache::put("presence:user:{$userId}:status", 'online', now()->addHours(24));
+        Cache::increment('analytics:presence:online_users');
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function onUserOffline(Request $request)
+    {
+        $data = $request->all();
+        $identity = $data['identity'] ?? null;
+        $name = $data['name'] ?? null;
+
+        Log::info('Webhook: user_offline', [
+            'identity' => $identity,
+            'name' => $name,
+        ]);
+
+        if (!$identity || !is_numeric($identity)) {
+            return response()->json(['status' => 'ok'], 200);
+        }
+
+        $userId = (int) $identity;
+
+        // إنهاء آخر جلسة مفتوحة وحساب المدة
+        $session = \App\Models\UserPresenceSession::where('user_id', $userId)
+            ->whereNull('disconnected_at')
+            ->latest('connected_at')
+            ->first();
+
+        if ($session) {
+            $session->disconnected_at = now();
+            $session->calculateDuration();
+
+            Log::info('User session ended', [
+                'identity' => $identity,
+                'duration_minutes' => $session->duration_minutes,
+            ]);
+        }
+
+        // Update cache
+        Cache::put("presence:user:{$userId}:status", 'offline', now()->addHours(24));
+        Cache::decrement('analytics:presence:online_users');
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    // ─── Messaging Events (1) ────────────────────────────────
+
+    public function onMessageSent(Request $request)
+    {
+        $data = $request->all();
+        $message = $data['message'] ?? [];
+
+        Log::info('Webhook: message_sent', [
+            'message_id' => $message['message_id'] ?? null,
+            'conversation_id' => $message['conversation_id'] ?? null,
+            'sender' => $message['sender_identity'] ?? null,
+            'type' => $message['type'] ?? 'text',
+        ]);
+
+        // تحديث Analytics
+        $analytics = \App\Models\StreamingAnalytics::today();
+        $analytics->increment('total_messages');
+
+        // TODO: إرسال push notification للمستقبل
+        // يمكن إضافة هذا لاحقاً بناءً على conversation_id
+
+        return response()->json(['status' => 'ok'], 200);
     }
 }

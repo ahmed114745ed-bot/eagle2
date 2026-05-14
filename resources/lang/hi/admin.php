@@ -447,4 +447,71 @@ return [
 केवल CP उपहार:
 चुनने पर, उपयोगकर्ता केवल CP-विशेष उपहार देख सकेगा, जिन्हें वे केवल CP फीचर के भीतर उपयोग कर सकते हैं।",
 
+    // UTD Stream Webhooks
+    'UTD Stream Webhooks' => 'UTD स्ट्रीम वेबहुक',
+    'Base Webhook URL' => 'आधार वेबहुक URL',
+    'Total Events' => 'कुल घटनाएँ',
+    'events' => 'घटनाएँ',
+    'Copy' => 'कॉपी करें',
+    'Copied!' => 'कॉपी हो गया!',
+    'Failed' => 'असफल',
+
+    // Webhook Categories
+    'webhook_category_rooms_streaming' => 'कमरे और स्ट्रीमिंग',
+    'webhook_category_calls' => 'कॉल्स',
+    'webhook_category_presence' => 'उपस्थिति',
+    'webhook_category_messaging' => 'संदेश',
+
+    // Rooms & Streaming Events
+    'webhook_room_started_name' => 'कमरा शुरू हुआ',
+    'webhook_room_started_desc' => 'जब एक नया कमरा खुलता है और लाइव स्ट्रीमिंग शुरू होती है तो ट्रिगर होता है',
+
+    'webhook_room_finished_name' => 'कमरा समाप्त हुआ',
+    'webhook_room_finished_desc' => 'जब कमरा बंद हो जाता है और लाइव स्ट्रीमिंग पूरी तरह से समाप्त हो जाती है तो ट्रिगर होता है',
+
+    'webhook_participant_joined_name' => 'प्रतिभागी शामिल हुआ',
+    'webhook_participant_joined_desc' => 'जब कोई नया उपयोगकर्ता कमरे में शामिल होता है तो ट्रिगर होता है',
+
+    'webhook_participant_left_name' => 'प्रतिभागी चला गया',
+    'webhook_participant_left_desc' => 'जब कोई उपयोगकर्ता कमरा छोड़ता है या डिस्कनेक्ट हो जाता है तो ट्रिगर होता है',
+
+    'webhook_track_published_name' => 'ऑडियो/वीडियो सक्षम',
+    'webhook_track_published_desc' => 'जब कोई प्रतिभागी ऑडियो या कैमरा चालू करता है और स्ट्रीमिंग शुरू करता है तो ट्रिगर होता है',
+
+    'webhook_track_unpublished_name' => 'ऑडियो/वीडियो अक्षम',
+    'webhook_track_unpublished_desc' => 'जब कोई प्रतिभागी ऑडियो या कैमरा बंद करता है और स्ट्रीमिंग रोकता है तो ट्रिगर होता है',
+
+    // Calls Events
+    'webhook_call_initiated_name' => 'कॉल आरंभ की गई',
+    'webhook_call_initiated_desc' => 'जब एक नई कॉल शुरू होती है और कनेक्शन अनुरोध भेजा जाता है तो ट्रिगर होता है',
+
+    'webhook_call_ringing_name' => 'कॉल बज रही है',
+    'webhook_call_ringing_desc' => 'जब रिसीवर को कॉल अधिसूचना प्राप्त होती है और वह बजना शुरू होती है तो ट्रिगर होता है',
+
+    'webhook_call_accepted_name' => 'कॉल स्वीकार की गई',
+    'webhook_call_accepted_desc' => 'जब रिसीवर कॉल का उत्तर देता है और कनेक्शन शुरू होता है तो ट्रिगर होता है',
+
+    'webhook_call_rejected_name' => 'कॉल अस्वीकृत',
+    'webhook_call_rejected_desc' => 'जब रिसीवर स्पष्ट रूप से कॉल को अस्वीकार करता है तो ट्रिगर होता है',
+
+    'webhook_call_busy_name' => 'व्यस्त',
+    'webhook_call_busy_desc' => 'जब रिसीवर किसी अन्य कॉल पर व्यस्त होता है तो ट्रिगर होता है',
+
+    'webhook_call_ended_name' => 'कॉल समाप्त हुई',
+    'webhook_call_ended_desc' => 'जब किसी भी पक्ष से कॉल समाप्त होती है या कनेक्शन खो जाता है तो ट्रिगर होता है',
+
+    'webhook_call_missed_name' => 'मिस्ड कॉल',
+    'webhook_call_missed_desc' => 'जब रिसीवर उत्तर नहीं देता और कॉल टाइमआउट समाप्त हो जाता है तो ट्रिगर होता है',
+
+    // Presence Events
+    'webhook_user_online_name' => 'उपयोगकर्ता ऑनलाइन',
+    'webhook_user_online_desc' => 'जब कोई उपयोगकर्ता सिस्टम से कनेक्ट होता है और सक्रिय हो जाता है तो ट्रिगर होता है',
+
+    'webhook_user_offline_name' => 'उपयोगकर्ता ऑफलाइन',
+    'webhook_user_offline_desc' => 'जब कोई उपयोगकर्ता डिस्कनेक्ट होता है या निष्क्रिय हो जाता है तो ट्रिगर होता है',
+
+    // Messaging Events
+    'webhook_message_sent_name' => 'संदेश भेजा गया',
+    'webhook_message_sent_desc' => 'जब किसी वार्तालाप में नया संदेश भेजा जाता है तो ट्रिगर होता है',
+
 ];

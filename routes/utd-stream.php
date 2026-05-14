@@ -42,4 +42,31 @@ Route::prefix('stream')->group(function () {
 
     // ─── Project Info ───────────────────────────
     Route::get('project', [UtdStreamController::class, 'projectInfo']);
+
+    // ─── Webhooks - Events (16 events) ─────────
+    Route::prefix('webhooks')->group(function () {
+        // Rooms & Streaming (6 events)
+        Route::post('room_started', [UtdStreamController::class, 'onRoomStarted']);
+        Route::post('room_finished', [UtdStreamController::class, 'onRoomFinished']);
+        Route::post('participant_joined', [UtdStreamController::class, 'onParticipantJoined']);
+        Route::post('participant_left', [UtdStreamController::class, 'onParticipantLeft']);
+        Route::post('track_published', [UtdStreamController::class, 'onTrackPublished']);
+        Route::post('track_unpublished', [UtdStreamController::class, 'onTrackUnpublished']);
+
+        // Calls (7 events)
+        Route::post('call_initiated', [UtdStreamController::class, 'onCallInitiated']);
+        Route::post('call_ringing', [UtdStreamController::class, 'onCallRinging']);
+        Route::post('call_accepted', [UtdStreamController::class, 'onCallAccepted']);
+        Route::post('call_rejected', [UtdStreamController::class, 'onCallRejected']);
+        Route::post('call_busy', [UtdStreamController::class, 'onCallBusy']);
+        Route::post('call_ended', [UtdStreamController::class, 'onCallEnded']);
+        Route::post('call_missed', [UtdStreamController::class, 'onCallMissed']);
+
+        // Presence (2 events)
+        Route::post('user_online', [UtdStreamController::class, 'onUserOnline']);
+        Route::post('user_offline', [UtdStreamController::class, 'onUserOffline']);
+
+        // Messaging (1 event)
+        Route::post('message_sent', [UtdStreamController::class, 'onMessageSent']);
+    });
 });

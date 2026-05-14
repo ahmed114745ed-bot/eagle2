@@ -50,6 +50,7 @@
         <button onclick="showSection('appSettings')"><i class="fas fa-cogs"></i> {{ __('App settings') }}</button>
         <button onclick="showSection('realTimeSetting')"><i class="fas fa-broadcast-tower"></i> {{ __('Sound & Video') }}</button>
         <button onclick="showSection('pusherSettings')"><i class="fas fa-satellite-dish"></i> {{ __('Real Time Setting') }}</button>
+        <button onclick="showSection('utdStreamWebhooks')">{{ __('UTD Stream Webhooks') }}</button>
         <button onclick="showSection('paymentCredentialSettings')"><i class="fas fa-credit-card"></i> {{ __('Payment') }}</button>
         <button onclick="showSection('gamesSettings')"><i class="fas fa-gamepad"></i> {{ __('Games') }}</button>
         <button onclick="showSection('notificationSettings')" class="position-relative"><i class="fas fa-bell"></i> {{ __('Notifications') }}<span class="sb-soon">{{ __('soon') }}</span></button>
@@ -70,6 +71,7 @@
         @include('admin.settings.mobile_links')
         @include('admin.settings.app')
         @include('admin.settings.pusher')
+        @include('admin.settings.utd_stream_webhooks')
 
         <div id="notificationSettings" class="settings-section"></div>
 
