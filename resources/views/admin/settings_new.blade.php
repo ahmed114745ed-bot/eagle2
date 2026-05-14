@@ -51,6 +51,7 @@
         </button>
         <button onclick="showSection('realTimeSetting')">{{ __('Sound & Video') }}</button>
         <button onclick="showSection('pusherSettings')">{{ __('Real Time Setting') }}</button>
+        <button onclick="showSection('utdStreamWebhooks')">{{ __('UTD Stream Webhooks') }}</button>
         <button onclick="showSection('paymentCredentialSettings')">{{ __('Payment') }}</button>
         <button onclick="showSection('gamesSettings')" class="position-relative">
             {{ __('Games') }}
@@ -79,6 +80,7 @@
         @include('admin.settings.mobile_links')
         @include('admin.settings.app')
         @include('admin.settings.pusher')
+        @include('admin.settings.utd_stream_webhooks')
 
         <div id="notificationSettings" class="settings-section"></div>
 
