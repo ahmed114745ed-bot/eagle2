@@ -74,7 +74,10 @@ use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use Modules\Vip\Http\Controllers\Api\VipController;
 
 
-Route::get('/health', [HealthCheckController::class, 'status']);
+// HAProxy health check endpoint — must be outside throttle middleware
+Route::get('/health', function () {
+    return response('ok', 200);
+})->withoutMiddleware(['throttle:api', 'throttle']);
 Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);

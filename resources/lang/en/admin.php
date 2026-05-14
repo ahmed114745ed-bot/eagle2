@@ -472,4 +472,71 @@ When selected, the user will be able to view and use all available gifts in the 
 CP Gifts Only:
 When selected, the user will only see CP-specific gifts, which they can use exclusively within the CP feature.",
 
+    // UTD Stream Webhooks
+    'UTD Stream Webhooks' => 'UTD Stream Webhooks',
+    'Base Webhook URL' => 'Base Webhook URL',
+    'Total Events' => 'Total Events',
+    'events' => 'events',
+    'Copy' => 'Copy',
+    'Copied!' => 'Copied!',
+    'Failed' => 'Failed',
+
+    // Webhook Categories
+    'webhook_category_rooms_streaming' => 'Rooms & Streaming',
+    'webhook_category_calls' => 'Calls',
+    'webhook_category_presence' => 'Presence',
+    'webhook_category_messaging' => 'Messaging',
+
+    // Rooms & Streaming Events
+    'webhook_room_started_name' => 'Room Started',
+    'webhook_room_started_desc' => 'Triggered when a new room is opened and live streaming begins',
+
+    'webhook_room_finished_name' => 'Room Finished',
+    'webhook_room_finished_desc' => 'Triggered when the room is closed and live streaming ends completely',
+
+    'webhook_participant_joined_name' => 'Participant Joined',
+    'webhook_participant_joined_desc' => 'Triggered when a new user joins the room',
+
+    'webhook_participant_left_name' => 'Participant Left',
+    'webhook_participant_left_desc' => 'Triggered when a user leaves the room or disconnects',
+
+    'webhook_track_published_name' => 'Audio/Video Enabled',
+    'webhook_track_published_desc' => 'Triggered when a participant turns on audio or camera and starts streaming',
+
+    'webhook_track_unpublished_name' => 'Audio/Video Disabled',
+    'webhook_track_unpublished_desc' => 'Triggered when a participant turns off audio or camera and stops streaming',
+
+    // Calls Events
+    'webhook_call_initiated_name' => 'Call Initiated',
+    'webhook_call_initiated_desc' => 'Triggered when a new call starts and the connection request is sent',
+
+    'webhook_call_ringing_name' => 'Call Ringing',
+    'webhook_call_ringing_desc' => 'Triggered when the receiver receives the call notification and it starts ringing',
+
+    'webhook_call_accepted_name' => 'Call Accepted',
+    'webhook_call_accepted_desc' => 'Triggered when the receiver answers the call and connection begins',
+
+    'webhook_call_rejected_name' => 'Call Rejected',
+    'webhook_call_rejected_desc' => 'Triggered when the receiver explicitly rejects the call',
+
+    'webhook_call_busy_name' => 'Busy',
+    'webhook_call_busy_desc' => 'Triggered when the receiver is busy on another call',
+
+    'webhook_call_ended_name' => 'Call Ended',
+    'webhook_call_ended_desc' => 'Triggered when the call ends from either party or connection is lost',
+
+    'webhook_call_missed_name' => 'Missed Call',
+    'webhook_call_missed_desc' => 'Triggered when the receiver doesn\'t answer and the call timeout expires',
+
+    // Presence Events
+    'webhook_user_online_name' => 'User Online',
+    'webhook_user_online_desc' => 'Triggered when a user connects to the system and becomes active',
+
+    'webhook_user_offline_name' => 'User Offline',
+    'webhook_user_offline_desc' => 'Triggered when a user disconnects or becomes inactive',
+
+    // Messaging Events
+    'webhook_message_sent_name' => 'Message Sent',
+    'webhook_message_sent_desc' => 'Triggered when a new message is sent in a conversation',
+
 ];

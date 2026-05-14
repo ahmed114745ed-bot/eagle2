@@ -170,6 +170,16 @@ class Charge extends Model
         return $this->belongsTo(SubAreaManager::class, 'charger_id');
     }
 
+    public function superAdmin(): BelongsTo
+    {
+        return $this->belongsTo(SuperAdmin::class, 'charger_id');
+    }
+
+    public function subSuperAdmin(): BelongsTo
+    {
+        return $this->belongsTo(SubAdmin::class, 'charger_id');
+    }
+
     public function bd()
     {
         return $this->belongsTo(Bd::class, 'charger_id');

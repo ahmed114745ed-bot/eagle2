@@ -25,48 +25,55 @@ class SettingController extends MainController
 
     public function index(Content $content)
     {
+        // Batch load all settings + configs in 2 queries instead of 20+ individual calls
         $settings = Setting::pluck('value', 'key')->toArray();
+        $configs = \App\Models\Config::pluck('value', 'name')->toArray();
+
+        // Helper to read from pre-loaded configs
+        $cfg = fn(string $key) => $configs[$key] ?? null;
+
         $timezones = Timezone::all();
-
-        $zego_server_secret = Common::getConfig('zego_server_secret');
-        $zego_app_id = Common::getConfig('zego_app_id');
-
-        $app_sign = Common::getConfig('app_sign');
-        $library = Common::getConfig('library');
-        $soundLibrary = Common::getConfig('sound_library');
-        $videoLibrary = Common::getConfig('video_library');
-        $liveLibrary = Common::getConfig('live_library');
-        $gamesLibrary = Common::getConfig('games_library');
+        $agora_app_id = $cfg('app_id');
+        $agora_app_certificate = $cfg('agora_app_certificate');
+        $zego_server_secret = $cfg('zego_server_secret');
+        $zego_app_id = $cfg('zego_app_id');
+        $tencent_server_secret = $cfg('tencent_server_secret');
+        $tencent_app_id = $cfg('tencent_app_id');
+        $app_sign = $cfg('app_sign');
+        $library = $cfg('library');
+        $soundLibrary = $cfg('sound_library');
+        $videoLibrary = $cfg('video_library');
+        $liveLibrary = $cfg('live_library');
+        $gamesLibrary = $cfg('games_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::with('settings')->uniqueTypes()->orderByDesc('status')->get();
-        $pusher_app_id = Common::getConf('pusher_app_id');
-        $pusher_app_key = Common::getConf('pusher_app_key');
-        $pusher_app_secret = Common::getConf('pusher_app_secret');
-        $pusher_app_cluster = Common::getConf('pusher_app_cluster');
-        $firebase_api_key = Common::getConf('firebase_api_key');
-        $firebase_auth_domain = Common::getConf('firebase_auth_domain');
-        $firebase_database_url = Common::getConf('firebase_database_url');
-        $supabase_url = Common::getConf('supabase_url');
-        $supabase_key = Common::getConf('supabase_key');
-        $zego_filter_enabled = Common::getConf('zego_filter_enabled');
-        $is_auto_preview = Common::getConf('is_auto_preview');
+        $pusher_app_id = $cfg('pusher_app_id');
+        $pusher_app_key = $cfg('pusher_app_key');
+        $pusher_app_secret = $cfg('pusher_app_secret');
+        $pusher_app_cluster = $cfg('pusher_app_cluster');
+        $firebase_api_key = $cfg('firebase_api_key');
+        $firebase_auth_domain = $cfg('firebase_auth_domain');
+        $firebase_database_url = $cfg('firebase_database_url');
+        $supabase_url = $cfg('supabase_url');
+        $supabase_key = $cfg('supabase_key');
+        $zego_filter_enabled = $cfg('zego_filter_enabled');
+        $is_auto_preview = $cfg('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
         $languages = Language::select(['id', 'name', 'code'])->get();
         $chargeTabType = request()->get('type', 'Experience');
-        $zego_token = Common::getConf('zego_token');
-        $zego_key = Common::getConf('zego_key');
-        $utd_stream_app_id = Common::getConfig('utd_stream_app_id');
-        $utd_stream_server_secret = Common::getConfig('utd_stream_server_secret');
+        $zego_token = $cfg('zego_token');
+        $zego_key = $cfg('zego_key');
+        $utd_stream_app_id = $cfg('utd_stream_app_id');
+        $utd_stream_server_secret = $cfg('utd_stream_server_secret');
+        $utd_stream_callback_secret = $cfg('utd_stream_callback_secret');
         $gameSettings = GameProviderSetting::all()->keyBy('provider_code');
         $bytesunSettings = $gameSettings->get('bytesun');
         $quantumNexusSettings = $gameSettings->get('quantum_nexus');
         $zeroGamesSettings = $gameSettings->get('zero_games');
         $utdGamesSettings = $gameSettings->get('utd_games');
-        $isThemeEnabled = Common::getSettingValue('isThemeEnabled') ?? 0;
+        $isThemeEnabled = $settings['isThemeEnabled'] ?? 0;
 
-        $supabase_service_role_key = Common::getConf('supabase_service_role_key');
-        $userTransferRateEnabled = data_get($settings, 'user_transfer_rate_enabled');
-        $userTransferCoinRate = data_get($settings, 'user_transfer_coin_rate');
+        $supabase_service_role_key = $cfg('supabase_service_role_key');
         return parent::index($content
             ->header(__('Settings'))
             ->description('   ')
@@ -106,7 +113,8 @@ class SettingController extends MainController
                 'is_auto_preview',
                 'countries',
                 'utd_stream_app_id',
-                'utd_stream_server_secret'
+                'utd_stream_server_secret',
+                'utd_stream_callback_secret'
             ]))));
     }
 
