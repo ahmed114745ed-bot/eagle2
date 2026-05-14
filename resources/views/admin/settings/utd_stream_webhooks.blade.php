@@ -144,8 +144,7 @@
                            class="form-control"
                            readonly
                            style="background-color: var(--table-background-color, #fff); border: 1px solid #e2e8f0; color: #475569; font-family: 'Courier New', monospace; font-size: 14px; font-weight: 500; flex: 1; padding: 12px; border-radius: 12px;">
-                    <button class="btn"
-                            onclick="copyToClipboard('{{ $baseUrl }}', event, 'base')"
+                    <button type="button" class="btn webhook-copy-btn-base" data-copy="{{ $baseUrl }}"
                             style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 12px 25px; border: none; border-radius: 12px; min-width: 120px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 14px rgba(99,102,241,0.3);">
                         <i class="fa fa-copy"></i> <span class="copy-text">{{ __('admin.Copy') }}</span>
                     </button>
@@ -188,8 +187,7 @@
                                class="form-control"
                                readonly
                                style="background-color: #fff; border: 1px solid #e2e8f0; color: #475569; font-family: 'Courier New', monospace; font-size: 11px; flex: 1; padding: 10px; border-radius: 8px;">
-                        <button class="btn btn-sm webhook-copy-btn"
-                                onclick="copyToClipboard('{{ $baseUrl }}/{{ $webhook['event'] }}', event, '{{ $webhook['event'] }}')"
+                        <button type="button" class="btn btn-sm webhook-copy-btn-item" data-copy="{{ $baseUrl }}/{{ $webhook['event'] }}"
                                 style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 10px 15px; border: none; border-radius: 8px; transition: all 0.3s; white-space: nowrap; box-shadow: 0 2px 6px rgba(99,102,241,0.3);">
                             <i class="fa fa-copy"></i>
                         </button>
@@ -352,103 +350,70 @@
 </style>
 
 <script>
-console.log('=== Webhook Script Loaded ===');
-console.log('Script loaded at:', new Date().toISOString());
-
-// Make function globally accessible
-window.copyToClipboard = async function(text, event, identifier) {
-    console.log('=== Copy Function Called ===');
-    console.log('Text to copy:', text);
-    console.log('Identifier:', identifier);
-    console.log('Event:', event);
-
-    const btn = event.currentTarget;
-    console.log('Button element:', btn);
-
-    const originalHTML = btn.innerHTML;
-    const originalBg = btn.style.background;
-
-    console.log('Original HTML:', originalHTML);
-    console.log('Original Background:', originalBg);
-
-    try {
-        console.log('Checking clipboard support...');
-        console.log('navigator.clipboard:', navigator.clipboard);
-        console.log('window.isSecureContext:', window.isSecureContext);
-
-        // Try modern Clipboard API first
-        if (navigator.clipboard && window.isSecureContext) {
-            console.log('Using modern Clipboard API');
-            await navigator.clipboard.writeText(text);
-            console.log('Modern API copy successful');
-        } else {
-            console.log('Using fallback method');
-            // Fallback for older browsers
-            const tempInput = document.createElement('textarea');
-            tempInput.value = text;
-            tempInput.style.position = 'fixed';
-            tempInput.style.opacity = '0';
-            tempInput.style.top = '0';
-            tempInput.style.left = '0';
-            document.body.appendChild(tempInput);
-            console.log('Temp textarea created:', tempInput);
-
-            tempInput.focus();
-            tempInput.select();
-            tempInput.setSelectionRange(0, 99999);
-            console.log('Text selected in textarea');
-
-            const successful = document.execCommand('copy');
-            console.log('execCommand result:', successful);
-
-            document.body.removeChild(tempInput);
-            console.log('Temp textarea removed');
-
-            if (!successful) {
-                throw new Error('execCommand copy failed');
-            }
-        }
-
-        console.log('Copy operation completed successfully');
-
-        // Success feedback
-        btn.innerHTML = '<i class="fa fa-check"></i> {{ __("admin.Copied!") }}';
-        btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-
-        setTimeout(function() {
-            btn.innerHTML = originalHTML;
-            btn.style.background = originalBg;
-            console.log('Button restored to original state');
-        }, 2000);
-    } catch (err) {
-        console.error('=== Copy Failed ===');
-        console.error('Error type:', err.name);
-        console.error('Error message:', err.message);
-        console.error('Error stack:', err.stack);
-        console.error('Full error:', err);
-
-        // Error feedback
-        btn.innerHTML = '<i class="fa fa-times"></i> {{ __("admin.Failed") }}';
-        btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-
-        setTimeout(function() {
-            btn.innerHTML = originalHTML;
-            btn.style.background = originalBg;
-        }, 2000);
-    }
-};
-
-console.log('=== copyToClipboard function defined ===');
-console.log('window.copyToClipboard:', typeof window.copyToClipboard);
-
-// Test if function is callable
-setTimeout(function() {
-    console.log('=== DOM Ready Check ===');
-    const copyButtons = document.querySelectorAll('button[onclick*="copyToClipboard"]');
-    console.log('Found copy buttons:', copyButtons.length);
-    copyButtons.forEach((btn, index) => {
-        console.log(`Button ${index}:`, btn);
-        console.log(`Button ${index} onclick:`, btn.getAttribute('onclick'));
+document.addEventListener('DOMContentLoaded', () => {
+    // Handle base URL copy button
+    document.querySelectorAll('.webhook-copy-btn-base').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const textToCopy = this.getAttribute('data-copy');
+            copyText(this, textToCopy);
+        });
     });
-}, 1000);
+
+    // Handle webhook item copy buttons
+    document.querySelectorAll('.webhook-copy-btn-item').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const textToCopy = this.getAttribute('data-copy');
+            copyText(this, textToCopy);
+        });
+    });
+
+    function copyText(button, text) {
+        const originalHTML = button.innerHTML;
+        const originalBg = button.style.background;
+
+        // Create temporary textarea
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '0';
+        document.body.appendChild(textarea);
+
+        try {
+            // Select and copy
+            textarea.focus();
+            textarea.select();
+            const successful = document.execCommand('copy');
+
+            document.body.removeChild(textarea);
+
+            if (successful) {
+                // Success feedback
+                button.innerHTML = '<i class="fa fa-check"></i> تم النسخ';
+                button.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.style.background = originalBg;
+                }, 2000);
+            } else {
+                throw new Error('Copy failed');
+            }
+        } catch (err) {
+            console.error('Copy error:', err);
+            document.body.removeChild(textarea);
+
+            // Error feedback
+            button.innerHTML = '<i class="fa fa-times"></i> فشل';
+            button.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.style.background = originalBg;
+            }, 2000);
+        }
+    }
+});
 </script>
