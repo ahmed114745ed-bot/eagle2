@@ -26,11 +26,56 @@
     display: inline-flex;   /* important: keep inline alignment */
     align-items: center;
     justify-content: center;
+    gap: 8px;
     padding: 8px 12px;
     border: none;
     background-color: #f0f0f0;
     cursor: pointer;
     white-space: nowrap;    /* prevent text from wrapping */
+}
+
+.settings-menu button i {
+    flex-shrink: 0;
+}
+
+.sb-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sb-brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+}
+.sb-brand-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e2e8f0;
+}
+
+.sb-soon {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: #ef4444;
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+.rtl .sb-soon {
+    margin-left: 0;
+    margin-right: 8px;
 }
 
 .settings-menu button.active {
