@@ -6,7 +6,7 @@
         [
             'name' => __('admin.webhook_category_rooms_streaming'),
             'icon' => 'fa-video',
-            'color' => '#FF6B6B',
+            'gradient' => 'linear-gradient(135deg, #6366f1, #818cf8)',
             'webhooks' => [
                 [
                     'event' => 'room_started',
@@ -43,7 +43,7 @@
         [
             'name' => __('admin.webhook_category_calls'),
             'icon' => 'fa-phone',
-            'color' => '#4ECDC4',
+            'gradient' => 'linear-gradient(135deg, #10b981, #34d399)',
             'webhooks' => [
                 [
                     'event' => 'call_initiated',
@@ -85,7 +85,7 @@
         [
             'name' => __('admin.webhook_category_presence'),
             'icon' => 'fa-user-circle',
-            'color' => '#95E1D3',
+            'gradient' => 'linear-gradient(135deg, #3b82f6, #60a5fa)',
             'webhooks' => [
                 [
                     'event' => 'user_online',
@@ -102,7 +102,7 @@
         [
             'name' => __('admin.webhook_category_messaging'),
             'icon' => 'fa-comments',
-            'color' => '#F38181',
+            'gradient' => 'linear-gradient(135deg, #f59e0b, #fbbf24)',
             'webhooks' => [
                 [
                     'event' => 'message_sent',
@@ -117,202 +117,281 @@
 @endphp
 
 <div id="utdStreamWebhooks" class="settings-section">
+    <div class="section-header-bar">
+        <div class="section-header-icon"><i class="fas fa-webhook"></i></div>
+        <div class="section-header-text">
+            <h3>{{ __('admin.UTD Stream Webhooks') }}</h3>
+            <p>{{ __('Configure these webhook URLs in your UTD-STREAM dashboard to receive real-time events') }}</p>
+        </div>
+    </div>
+
     <div class="form">
-        <div class="card shadow-sm" style="background-color: var(--box-background-color, #f8f9fa); border: none; border-radius: 12px; overflow: hidden;">
-            <!-- Header -->
-            <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color, #FF9428) 0%, #c88213 100%); padding: 25px;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fa fa-webhook" style="font-size: 30px; color: white;"></i>
-                    </div>
-                    <div style="flex: 1;">
-                        <h3 class="mb-0" style="color: white; font-weight: bold; font-size: 24px;">
-                            {{ __('admin.UTD Stream Webhooks') }}
-                        </h3>
-                        <p class="mb-0 mt-2" style="color: rgba(255,255,255,0.9); font-size: 14px;">
-                            Configure these webhook URLs in your UTD-STREAM dashboard to receive real-time events
-                        </p>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.15); padding: 15px 20px; border-radius: 10px; text-align: center;">
-                        <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 5px;">{{ __('admin.Total Events') }}</div>
-                        <div style="color: white; font-size: 28px; font-weight: bold;">{{ $totalEvents }}</div>
-                    </div>
+        <div class="as-section">
+            <div class="as-section-header">
+                <div class="as-section-icon" style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+                    <i class="fa fa-link"></i>
+                </div>
+                <div>
+                    <h5>{{ __('admin.Base Webhook URL') }}</h5>
+                    <span>{{ __('Configure this URL in your UTD-STREAM dashboard') }}</span>
                 </div>
             </div>
 
-            <div class="card-body" style="padding: 30px;">
-                <!-- Base URL Section -->
-                <div class="alert" style="background: linear-gradient(135deg, rgba(var(--primary-color-rgb, 255,148,40), 0.1) 0%, rgba(var(--primary-color-rgb, 255,148,40), 0.05) 100%); border: 2px solid var(--primary-color, #FF9428); border-radius: 10px; padding: 20px; margin-bottom: 30px;">
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-                        <div style="background: var(--primary-color, #FF9428); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fa fa-link" style="color: white; font-size: 18px;"></i>
+            <div class="as-field-card">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text"
+                           value="{{ $baseUrl }}"
+                           class="form-control"
+                           readonly
+                           style="background-color: var(--table-background-color, #fff); border: 1px solid #e2e8f0; color: #475569; font-family: 'Courier New', monospace; font-size: 14px; font-weight: 500; flex: 1; padding: 12px; border-radius: 12px;">
+                    <button class="btn"
+                            onclick="copyToClipboard('{{ $baseUrl }}', event, 'base')"
+                            style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 12px 25px; border: none; border-radius: 12px; min-width: 120px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 14px rgba(99,102,241,0.3);">
+                        <i class="fa fa-copy"></i> <span class="copy-text">{{ __('admin.Copy') }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Webhook Categories -->
+        @foreach($webhookCategories as $index => $category)
+        <div class="as-section" style="animation: fadeIn 0.5s ease-in {{$index * 0.1}}s backwards;">
+            <div class="as-section-header">
+                <div class="as-section-icon" style="background: {{ $category['gradient'] }};">
+                    <i class="fa {{ $category['icon'] }}"></i>
+                </div>
+                <div>
+                    <h5>{{ $category['name'] }}</h5>
+                    <span>{{ count($category['webhooks']) }} {{ __('admin.events') }}</span>
+                </div>
+            </div>
+
+            <div class="as-fields-grid">
+                @foreach($category['webhooks'] as $webhook)
+                <div class="as-field-card webhook-item">
+                    <div class="as-field-top">
+                        <div class="as-field-icon" style="background: {{ $category['gradient'] }};">
+                            <i class="fa fa-bolt"></i>
                         </div>
-                        <strong style="color: var(--text-primary-color, #333); font-size: 18px;">{{ __('admin.Base Webhook URL') }}</strong>
+                        <label class="as-field-label">{{ $webhook['name'] }}</label>
                     </div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
+                    <div style="color: #94a3b8; font-size: 13px; line-height: 1.6; margin-bottom: 14px;">
+                        {{ $webhook['description'] }}
+                    </div>
+                    <div style="background: var(--box-background-color, #f8f9fa); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="font-size: 11px; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; font-weight: 600;">Event Type:</div>
+                        <code style="color: #475569; font-size: 12px; background: transparent; font-weight: 500;">{{ $webhook['event'] }}</code>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
                         <input type="text"
-                               value="{{ $baseUrl }}"
+                               value="{{ $baseUrl }}/{{ $webhook['event'] }}"
                                class="form-control"
                                readonly
-                               style="background-color: var(--table-background-color, #fff); border: 2px solid var(--primary-color, #FF9428); color: var(--primary-color, #FF9428); font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold; flex: 1; padding: 12px;">
-                        <button class="btn"
-                                onclick="copyToClipboard('{{ $baseUrl }}', event, 'base')"
-                                style="background: var(--primary-color, #FF9428); color: white; padding: 12px 25px; border: none; border-radius: 8px; min-width: 120px; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 12px rgba(255,148,40,0.3);">
-                            <i class="fa fa-copy"></i> <span class="copy-text">{{ __('admin.Copy') }}</span>
+                               style="background-color: #fff; border: 1px solid #e2e8f0; color: #475569; font-family: 'Courier New', monospace; font-size: 11px; flex: 1; padding: 10px; border-radius: 8px;">
+                        <button class="btn btn-sm webhook-copy-btn"
+                                onclick="copyToClipboard('{{ $baseUrl }}/{{ $webhook['event'] }}', event, '{{ $webhook['event'] }}')"
+                                style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 10px 15px; border: none; border-radius: 8px; transition: all 0.3s; white-space: nowrap; box-shadow: 0 2px 6px rgba(99,102,241,0.3);">
+                            <i class="fa fa-copy"></i>
                         </button>
-                    </div>
-                </div>
-
-                <!-- Webhook Categories -->
-                @foreach($webhookCategories as $index => $category)
-                <div class="webhook-category mb-4" style="background-color: var(--box-background-color, #f8f9fa); border-radius: 12px; padding: 25px; border-left: 5px solid {{ $category['color'] }}; box-shadow: 0 2px 8px rgba(0,0,0,0.08); animation: fadeIn 0.5s ease-in {{$index * 0.1}}s backwards;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                        <h4 style="color: {{ $category['color'] }}; margin: 0; font-weight: bold; font-size: 20px; display: flex; align-items: center; gap: 10px;">
-                            <div style="background: {{ $category['color'] }}; width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fa {{ $category['icon'] }}" style="color: white; font-size: 22px;"></i>
-                            </div>
-                            {{ $category['name'] }}
-                        </h4>
-                        <span style="background: {{ $category['color'] }}; color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold;">
-                            {{ count($category['webhooks']) }} {{ __('admin.events') }}
-                        </span>
-                    </div>
-
-                    <div class="webhooks-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
-                        @foreach($category['webhooks'] as $webhook)
-                        <div class="webhook-item" style="background-color: var(--table-background-color, #fff); border-radius: 10px; padding: 20px; transition: all 0.3s; border: 2px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                            <div style="margin-bottom: 15px;">
-                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                    <div style="width: 8px; height: 8px; background: {{ $category['color'] }}; border-radius: 50%;"></div>
-                                    <div style="color: {{ $category['color'] }}; font-weight: bold; font-size: 16px; font-family: 'Courier New', monospace;">
-                                        {{ $webhook['name'] }}
-                                    </div>
-                                </div>
-                                <div style="color: var(--text-secondary-color, #666); font-size: 13px; line-height: 1.6; padding-left: 16px;">
-                                    {{ $webhook['description'] }}
-                                </div>
-                            </div>
-
-                            <div style="background: var(--box-background-color, #f8f9fa); padding: 10px; border-radius: 6px; margin-bottom: 12px;">
-                                <div style="font-size: 11px; color: var(--text-secondary-color, #666); margin-bottom: 5px; text-transform: uppercase; font-weight: bold;">Event Type:</div>
-                                <code style="color: {{ $category['color'] }}; font-size: 12px; background: transparent;">{{ $webhook['event'] }}</code>
-                            </div>
-
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="text"
-                                       value="{{ $baseUrl }}/{{ $webhook['event'] }}"
-                                       class="form-control"
-                                       readonly
-                                       style="background-color: var(--box-background-color, #f8f9fa); border: 1px solid #ddd; color: var(--text-primary-color, #333); font-family: 'Courier New', monospace; font-size: 11px; flex: 1; padding: 10px;">
-                                <button class="btn btn-sm"
-                                        onclick="copyToClipboard('{{ $baseUrl }}/{{ $webhook['event'] }}', event, '{{ $webhook['event'] }}')"
-                                        style="background-color: {{ $category['color'] }}; color: white; padding: 10px 15px; border: none; border-radius: 6px; transition: all 0.3s; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                                    <i class="fa fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        @endforeach
                     </div>
                 </div>
                 @endforeach
             </div>
         </div>
+        @endforeach
     </div>
 </div>
 
 <style>
-.webhook-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
-    border-color: var(--primary-color, #FF9428) !important;
-}
-
-.webhook-category {
-    transition: all 0.3s ease;
-}
-
-.webhook-category:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+    /* ── Section Container ─────────────────────────────────────── */
+    .as-section {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        transition: all 0.3s ease;
     }
-    to {
-        opacity: 1;
+    .dark-mode .as-section {
+        background: #1e293b;
+        border-color: rgba(255,255,255,0.06);
+    }
+
+    /* ── Section Header ────────────────────────────────────────── */
+    .as-section-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .dark-mode .as-section-header {
+        border-bottom-color: rgba(255,255,255,0.06);
+    }
+    .as-section-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 16px;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .as-section-header h5 {
+        margin: 0 0 2px 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .dark-mode .as-section-header h5 {
+        color: #f1f5f9;
+    }
+    .as-section-header span {
+        font-size: 13px;
+        color: #94a3b8;
+    }
+
+    /* ── Fields Grid ───────────────────────────────────────────── */
+    .as-fields-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    /* ── Field Card ────────────────────────────────────────────── */
+    .as-field-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 18px;
+        transition: all 0.3s ease;
+    }
+    .dark-mode .as-field-card {
+        background: #0f172a;
+        border-color: rgba(255,255,255,0.06);
+    }
+    .as-field-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .dark-mode .as-field-card:hover {
+        border-color: rgba(255,255,255,0.12);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .as-field-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+    .as-field-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 14px;
+        flex-shrink: 0;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+    .as-field-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin: 0 !important;
+        letter-spacing: 0.02em;
+    }
+    .dark-mode .as-field-label {
+        color: #cbd5e1;
+    }
+
+    /* ── Webhook specific styles ─────────────────────────────── */
+    .webhook-item:hover {
+        transform: translateY(-2px);
+    }
+
+    .webhook-copy-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(99,102,241,0.4) !important;
+    }
+
+    .webhook-copy-btn:active {
         transform: translateY(0);
     }
-}
 
-.btn:hover {
-    opacity: 0.85;
-    transform: scale(1.05);
-}
-
-.btn:active {
-    transform: scale(0.98);
-}
-
-/* Dark mode support */
-.dark-mode .webhook-item {
-    background-color: var(--table-background-color, #2a2a2a) !important;
-}
-
-.dark-mode .webhook-category {
-    background-color: var(--box-background-color, #1a1a1a) !important;
-}
-
-@media (max-width: 768px) {
-    .webhooks-grid {
-        grid-template-columns: 1fr !important;
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .card-header > div {
-        flex-direction: column !important;
-        text-align: center !important;
+    /* Dark mode input styles */
+    .dark-mode .as-field-card input.form-control {
+        background-color: #1e293b !important;
+        border-color: rgba(255,255,255,0.08) !important;
+        color: #e2e8f0 !important;
     }
-}
+
+    @media (max-width: 768px) {
+        .as-fields-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
 </style>
 
 <script>
-function copyToClipboard(text, event, identifier) {
+async function copyToClipboard(text, event, identifier) {
     const btn = event.currentTarget;
     const originalHTML = btn.innerHTML;
-
-    // Create temporary input
-    const tempInput = document.createElement('input');
-    tempInput.value = text;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    tempInput.setSelectionRange(0, 99999);
+    const originalBg = btn.style.background;
 
     try {
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
+        // Try modern Clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            // Fallback for older browsers
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+        }
 
         // Success feedback
         btn.innerHTML = '<i class="fa fa-check"></i> {{ __("admin.Copied!") }}';
-        const originalBg = btn.style.backgroundColor;
-        btn.style.backgroundColor = '#4CAF50';
+        btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
 
         setTimeout(function() {
             btn.innerHTML = originalHTML;
-            btn.style.backgroundColor = originalBg;
+            btn.style.background = originalBg;
         }, 2000);
     } catch (err) {
         console.error('Failed to copy:', err);
-        document.body.removeChild(tempInput);
 
         // Error feedback
         btn.innerHTML = '<i class="fa fa-times"></i> {{ __("admin.Failed") }}';
-        const originalBg = btn.style.backgroundColor;
-        btn.style.backgroundColor = '#f44336';
+        btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
 
         setTimeout(function() {
             btn.innerHTML = originalHTML;
-            btn.style.backgroundColor = originalBg;
+            btn.style.background = originalBg;
         }, 2000);
     }
 }
