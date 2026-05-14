@@ -353,26 +353,59 @@
 
 <script>
 async function copyToClipboard(text, event, identifier) {
+    console.log('=== Copy Function Called ===');
+    console.log('Text to copy:', text);
+    console.log('Identifier:', identifier);
+    console.log('Event:', event);
+
     const btn = event.currentTarget;
+    console.log('Button element:', btn);
+
     const originalHTML = btn.innerHTML;
     const originalBg = btn.style.background;
 
+    console.log('Original HTML:', originalHTML);
+    console.log('Original Background:', originalBg);
+
     try {
+        console.log('Checking clipboard support...');
+        console.log('navigator.clipboard:', navigator.clipboard);
+        console.log('window.isSecureContext:', window.isSecureContext);
+
         // Try modern Clipboard API first
         if (navigator.clipboard && window.isSecureContext) {
+            console.log('Using modern Clipboard API');
             await navigator.clipboard.writeText(text);
+            console.log('Modern API copy successful');
         } else {
+            console.log('Using fallback method');
             // Fallback for older browsers
             const tempInput = document.createElement('textarea');
             tempInput.value = text;
             tempInput.style.position = 'fixed';
             tempInput.style.opacity = '0';
+            tempInput.style.top = '0';
+            tempInput.style.left = '0';
             document.body.appendChild(tempInput);
+            console.log('Temp textarea created:', tempInput);
+
+            tempInput.focus();
             tempInput.select();
             tempInput.setSelectionRange(0, 99999);
-            document.execCommand('copy');
+            console.log('Text selected in textarea');
+
+            const successful = document.execCommand('copy');
+            console.log('execCommand result:', successful);
+
             document.body.removeChild(tempInput);
+            console.log('Temp textarea removed');
+
+            if (!successful) {
+                throw new Error('execCommand copy failed');
+            }
         }
+
+        console.log('Copy operation completed successfully');
 
         // Success feedback
         btn.innerHTML = '<i class="fa fa-check"></i> {{ __("admin.Copied!") }}';
@@ -381,9 +414,14 @@ async function copyToClipboard(text, event, identifier) {
         setTimeout(function() {
             btn.innerHTML = originalHTML;
             btn.style.background = originalBg;
+            console.log('Button restored to original state');
         }, 2000);
     } catch (err) {
-        console.error('Failed to copy:', err);
+        console.error('=== Copy Failed ===');
+        console.error('Error type:', err.name);
+        console.error('Error message:', err.message);
+        console.error('Error stack:', err.stack);
+        console.error('Full error:', err);
 
         // Error feedback
         btn.innerHTML = '<i class="fa fa-times"></i> {{ __("admin.Failed") }}';
