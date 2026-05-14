@@ -352,7 +352,11 @@
 </style>
 
 <script>
-async function copyToClipboard(text, event, identifier) {
+console.log('=== Webhook Script Loaded ===');
+console.log('Script loaded at:', new Date().toISOString());
+
+// Make function globally accessible
+window.copyToClipboard = async function(text, event, identifier) {
     console.log('=== Copy Function Called ===');
     console.log('Text to copy:', text);
     console.log('Identifier:', identifier);
@@ -432,5 +436,19 @@ async function copyToClipboard(text, event, identifier) {
             btn.style.background = originalBg;
         }, 2000);
     }
-}
+};
+
+console.log('=== copyToClipboard function defined ===');
+console.log('window.copyToClipboard:', typeof window.copyToClipboard);
+
+// Test if function is callable
+setTimeout(function() {
+    console.log('=== DOM Ready Check ===');
+    const copyButtons = document.querySelectorAll('button[onclick*="copyToClipboard"]');
+    console.log('Found copy buttons:', copyButtons.length);
+    copyButtons.forEach((btn, index) => {
+        console.log(`Button ${index}:`, btn);
+        console.log(`Button ${index} onclick:`, btn.getAttribute('onclick'));
+    });
+}, 1000);
 </script>
