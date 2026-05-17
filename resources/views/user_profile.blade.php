@@ -3066,7 +3066,7 @@
         </div>
     </div>
 
-    <div class="tab-content {{ $activeTab == 'wallet_logs' ? '' : 'd-none' }}" id="wallet-logs-tab">
+    <div class="tab-content {{ $activeTab == 'wallet_logs' ? 'active show' : 'd-none' }}" id="wallet-logs-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 50%, #0f766e 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -3230,7 +3230,7 @@
         </div>
     </div>
 
-    <div class="tab-content {{ $activeTab == 'badges' ? '' : 'd-none' }}" id="badges-tab">
+    <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
             <div class="card-header" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 50%, #be185d 100%); padding: 18px 24px; border: none;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
