@@ -14,11 +14,11 @@ use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
-use Modules\AreaManager\Entities\Region;
+use Utd\AreaManager\Entities\Region;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\AreaManager;
 
 class OfficialMessageJob implements ShouldQueue
 {

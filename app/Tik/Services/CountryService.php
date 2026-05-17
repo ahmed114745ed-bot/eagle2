@@ -5,7 +5,7 @@ namespace App\Tik\Services;
 use App\Helpers\Common;
 use App\Models\CountryCategory;
 use App\Models\ChangeCountryRequest;
-use Modules\AreaManager\Entities\Region;
+use Utd\AreaManager\Entities\Region;
 use App\Tik\Repositories\CountryRepository;
 use Illuminate\Database\Eloquent\Collection;
 

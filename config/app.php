@@ -211,7 +211,7 @@ return [
         Barryvdh\DomPDF\ServiceProvider::class,
         // Utd\Bd\BdServiceProvider::class, // Removed - Package uninstalled
         App\Providers\TimeServiceProvider::class,
-        Modules\AreaManager\Providers\AreaManagerServiceProvider::class,
+        // Modules\AreaManager\Providers\AreaManagerServiceProvider::class, // Moved to package utd/area-manager
         Modules\SuperAdmin\Providers\SuperAdminServiceProvider::class,
         Illuminate\Foundation\Providers\ArtisanServiceProvider::class,
 

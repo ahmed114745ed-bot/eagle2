@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Utd\Agency\Selectables\ShippingAgencies;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Models\OfficialMessageAdmin as OfficialMessage;
-use Modules\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\AreaManager;
 
 class OfficialMessageController extends MainController
 {

@@ -9,7 +9,7 @@ use Encore\Admin\Grid\Filter;
 use Utd\Vip\Entities\OVip;
 use Encore\Admin\Grid\Selectable;
 use Illuminate\Support\Facades\Auth;
-use Modules\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\AreaManager;
 
 class Bds extends Selectable
 {

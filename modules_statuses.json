@@ -23,7 +23,7 @@
     "Vip": false,
     "RoleRewards": false,
     "Milestones": false,
-    "AreaManager": true,
+    "AreaManager": false,
     "SuperAdmin": true,
     "TaskStream": false,
     "RankingReward": false

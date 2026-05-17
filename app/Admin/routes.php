@@ -1,7 +1,7 @@
 <?php
 
 use App\Admin\Controllers\AdminAgencyMangerController;
-use App\Admin\Controllers\AdminAreaManagerChargeController;
+use Utd\AreaManager\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AdminAuthController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AgencyController;

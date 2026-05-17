@@ -31,6 +31,7 @@ use Utd\UsersWallet\Entities\UserWallet;
 use Utd\Milestones\Entities\Milestone;
 use Utd\SpecialId\Entities\SpecialHistory;
 use Utd\SwitchAccount\Entities\UserAccount;
+use Utd\AreaManager\Entities\AreaManager;
 
 class PackageHelper
 {
@@ -63,6 +64,7 @@ class PackageHelper
         'form' => FormTemplate::class,
         'usersWallet' => UserWallet::class,
         'bd' => Bd::class,
+        //'areaManager' => AreaManager::class,
     ];
 
     /**

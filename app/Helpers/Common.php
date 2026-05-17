@@ -59,9 +59,9 @@ use App\Jobs\SendFirebaseNotificationJob;
 use Illuminate\Pagination\CursorPaginator;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\AreaManager;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Modules\AreaManager\Entities\SubAreaManager;
+use Utd\AreaManager\Entities\SubAreaManager;
 
 class Common
 {

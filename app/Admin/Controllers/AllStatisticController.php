@@ -26,7 +26,7 @@ use App\Models\UserTarget;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 
-use Modules\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\AreaManager;
 use App\Support\PackageHelper;
 use App\Models\CoinGameUserDailyAggregated;
 use Carbon\CarbonPeriod;

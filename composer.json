@@ -289,6 +289,13 @@
         {
             "type": "path",
             "url": "packages/Utd/Bd"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/AreaManager",
+            "options": {
+                "symlink": true
+            }
         }
     ]
 }

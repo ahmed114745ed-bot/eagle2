@@ -6,7 +6,7 @@ use App\Helpers\AgencyPackageHelper;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-use Modules\AreaManager\Entities\Region;
+use Utd\AreaManager\Entities\Region;
 
 class Admin extends Administrator
 {

@@ -65,3 +65,17 @@ Encore\Admin\Admin::script(<<<'JS'
         });
     });
 JS);
+
+// Filter menu to hide AreaManager items when package is not installed
+view()->composer('admin::partials.menu', function ($view) {
+    $menu = $view->getData()['menu'] ?? null;
+
+    if ($menu && !\App\Support\PackageHelper::isInstalled('areaManager')) {
+        // Hide AreaManager menu items (IDs: 277, 278, 279)
+        $filteredMenu = $menu->filter(function ($item) {
+            return !in_array($item->id, [277, 278, 279]);
+        });
+
+        $view->with('menu', $filteredMenu);
+    }
+});

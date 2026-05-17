@@ -14,7 +14,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use App\Helpers\UserCoinLogHelper;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use App\Support\PackageHelper;

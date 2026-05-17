@@ -1,0 +1,92 @@
+# AreaManager Package
+
+حزمة إدارة المناطق الجغرافية لنظام UTD
+
+## المحتويات
+
+### Entities (Models)
+- **AreaManager**: نموذج مدير المنطقة
+- **SubAreaManager**: نموذج مدير المنطقة الفرعي
+- **Region**: نموذج المنطقة/الإقليم
+- **RegionCountry**: نموذج ربط المنطقة بالدولة
+- **AreaPolygon**: نموذج الإحداثيات الجغرافية للمنطقة
+
+### Controllers
+تم نقل 32 متحكم من Module إلى الحزمة تشمل:
+- AreaManagerController
+- AuthController
+- HomeController
+- UserController
+- AgencyController
+- ChargeController
+- وغيرها...
+
+### Migrations
+- `create_regions_table`: إنشاء جدول المناطق
+- `create_region_countries_table`: إنشاء جدول ربط المناطق بالدول
+- `create_area_polygons_table`: إنشاء جدول الإحداثيات الجغرافية
+- `add_area_manager_id_to_countries_table`: إضافة عمود مدير المنطقة للدول
+- `add_is_area_manager_to_users_table`: إضافة حقل مدير منطقة للمستخدمين
+- `add_is-sub_area_manger_to_users`: إضافة حقل مدير منطقة فرعي
+
+### Routes
+- Web Routes: مسارات لوحة التحكم والمصادقة
+- API Routes: مسارات API للتطبيق
+
+## التثبيت
+
+الحزمة مثبتة تلقائياً عبر composer autoloading.
+
+## الاستخدام
+
+### فحص تثبيت الحزمة
+```php
+use App\Support\PackageHelper;
+
+if (PackageHelper::isInstalled('areaManager')) {
+    // الحزمة مثبتة
+}
+```
+
+### استخدام Models
+```php
+use Utd\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\Region;
+
+$areaManager = AreaManager::find(1);
+$regions = Region::where('manager_id', $managerId)->get();
+```
+
+### العلاقات الآمنة (من خارج الحزمة)
+```php
+use App\Support\PackageHelper;
+use Utd\AreaManager\Entities\AreaManager;
+
+// في Model خارجي
+public function areaManager()
+{
+    return PackageHelper::checkRelation($this, 'areaManager', 'belongsTo')
+        ?? $this->belongsTo(AreaManager::class, 'area_manager_id');
+}
+```
+
+## الملفات المنقولة
+
+تم نقل الملفات التالية من `Modules/AreaManager` إلى هذه الحزمة:
+- جميع Entities
+- جميع Controllers  
+- جميع Migrations
+- جميع Routes
+- جميع Actions
+- جميع Seeders
+
+## الحماية من الأخطاء
+
+جميع migrations تحتوي على guards لمنع الأخطاء في حالة:
+- عدم تثبيت الحزمة
+- الجداول موجودة بالفعل
+- الجداول الخارجية غير موجودة
+
+## الترخيص
+
+Proprietary - UTD Team

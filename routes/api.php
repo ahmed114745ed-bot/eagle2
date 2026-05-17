@@ -53,7 +53,7 @@ use App\Services\CodapayService;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Modules\AreaManager\Http\Controllers\AreaManagerController;
+use Utd\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Utd\Achievements\Http\Controllers\AchievementController;
 use Utd\Family\Http\Controllers\Api\FamilyController;

@@ -14,8 +14,8 @@ use App\Models\SuperPackageReward;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\AreaManager\Entities\AreaManager;
-use Modules\AreaManager\Entities\SubAreaManager;
+use Utd\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\SubAreaManager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SuperAdminReward extends Model

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AreaManager Package - دليل التثبيت والإزالة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-right: 5px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+            padding-right: 15px;
+            border-right: 3px solid #764ba2;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            direction: ltr;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .code-block code {
+            white-space: pre;
+        }
+
+        .step {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-right: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .success h4 {
+            color: #155724;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        ul {
+            margin-right: 25px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+            padding-right: 10px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        .footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 حزمة AreaManager (مدير المناطق)</h1>
+            <p>دليل شامل للتثبيت والإزالة والاستخدام</p>
+        </div>
+
+        <div class="content">
+            <!-- معلومات الحزمة -->
+            <div class="section">
+                <h2><span class="icon">ℹ️</span> معلومات الحزمة</h2>
+                <table>
+                    <tr>
+                        <th>المعلومة</th>
+                        <th>القيمة</th>
+                    </tr>
+                    <tr>
+                        <td>اسم الحزمة</td>
+                        <td><code>utd/area-manager</code></td>
+                    </tr>
+                    <tr>
+                        <td>النوع</td>
+                        <td>حزمة اختيارية (Optional Package)</td>
+                    </tr>
+                    <tr>
+                        <td>المسار</td>
+                        <td><code>packages/Utd/AreaManager</code></td>
+                    </tr>
+                    <tr>
+                        <td>Service Provider</td>
+                        <td><code>Utd\AreaManager\AreaManagerServiceProvider::class</code></td>
+                    </tr>
+                    <tr>
+                        <td>الوصف</td>
+                        <td>نظام إدارة المناطق الجغرافية ومديري المناطق</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- خطوات التثبيت -->
+            <div class="section">
+                <h2><span class="icon">⚙️</span> خطوات التثبيت</h2>
+
+                <h3>الطريقة 1: باستخدام Composer (الموصى بها)</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>تثبيت الحزمة عبر Composer:</strong>
+                    <div class="code-block"><code>composer require utd/area-manager</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>تسجيل في PackageHelper (إضافة في <code>app/Support/PackageHelper.php</code>):</strong>
+                    <div class="code-block"><code>use Utd\AreaManager\Entities\AreaManager;
+
+private static array $packages = [
+    // ... other packages
+    'areaManager' => AreaManager::class,
+];</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>تشغيل Migrations:</strong>
+                    <div class="code-block"><code>php artisan migrate</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>مسح الـ Cache:</strong>
+                    <div class="code-block"><code>php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>إعادة بناء Autoload:</strong>
+                    <div class="code-block"><code>composer dump-autoload</code></div>
+                </div>
+
+                <h3>الطريقة 2: التثبيت اليدوي</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>إضافة في <code>composer.json</code> في قسم <code>require</code>:</strong>
+                    <div class="code-block"><code>"utd/area-manager": "*"</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>إضافة في <code>composer.json</code> في قسم <code>repositories</code>:</strong>
+                    <div class="code-block"><code>{
+    "type": "path",
+    "url": "packages/Utd/AreaManager",
+    "options": {
+        "symlink": true
+    }
+}</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>تثبيت Dependencies:</strong>
+                    <div class="code-block"><code>composer install --no-interaction</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>تسجيل في PackageHelper:</strong>
+                    <p>أضف في <code>app/Support/PackageHelper.php</code></p>
+                    <div class="code-block"><code>use Utd\AreaManager\Entities\AreaManager;
+
+private static array $packages = [
+    'areaManager' => AreaManager::class,
+];</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>تشغيل Migrations ومسح الـ Cache:</strong>
+                    <div class="code-block"><code>php artisan migrate
+php artisan optimize:clear</code></div>
+                </div>
+
+                <div class="success">
+                    <h4>✅ التحقق من التثبيت:</h4>
+                    <div class="code-block"><code># التحقق من تثبيت الحزمة
+composer show utd/area-manager
+
+# التحقق من Routes
+php artisan route:list | grep -i "area"
+
+# التحقق من PackageHelper
+php artisan tinker
+PackageHelper::isInstalled('areaManager')</code></div>
+                    <p style="margin-top: 10px;">إذا كانت النتيجة <strong>true</strong> فالحزمة مثبتة بنجاح</p>
+                </div>
+            </div>
+
+            <!-- خطوات الإزالة -->
+            <div class="section">
+                <h2><span class="icon">🗑️</span> خطوات الإزالة (بدون حذف البيانات)</h2>
+
+                <div class="warning">
+                    <h4>⚠️ تحذير مهم:</h4>
+                    <p>الخطوات التالية تزيل الحزمة من التطبيق ولكن <strong>تحتفظ بالبيانات والملفات</strong></p>
+                    <ul>
+                        <li>✅ البيانات في قاعدة البيانات تبقى محفوظة</li>
+                        <li>✅ ملفات الحزمة في <code>packages/Utd/AreaManager/</code> تبقى محفوظة</li>
+                        <li>✅ يمكن إعادة التثبيت في أي وقت</li>
+                    </ul>
+                </div>
+
+                <h3>الطريقة 1: باستخدام Composer (الموصى بها)</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>حذف من PackageHelper (في <code>app/Support/PackageHelper.php</code>):</strong>
+                    <div class="code-block"><code>// احذف هذا السطر:
+'areaManager' => AreaManager::class,</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>إزالة الحزمة عبر Composer:</strong>
+                    <div class="code-block"><code>composer remove utd/area-manager</code></div>
+                    <p style="margin-top: 10px; color: #666;">هذا الأمر يزيل الحزمة من vendor/ ولكن يبقي الملفات في packages/</p>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>حذف ملفات الـ Cache:</strong>
+                    <div class="code-block"><code>rm -f bootstrap/cache/services.php
+rm -f bootstrap/cache/packages.php
+rm -f bootstrap/cache/config.php</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>مسح الـ Cache وإعادة البناء:</strong>
+                    <div class="code-block"><code>composer dump-autoload
+php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear</code></div>
+                </div>
+
+                <h3>الطريقة 2: الإزالة اليدوية</h3>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>حذف من PackageHelper:</strong>
+                    <p>احذف من <code>app/Support/PackageHelper.php</code></p>
+                    <div class="code-block"><code>'areaManager' => AreaManager::class,</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>حذف من <code>composer.json</code> من قسم <code>require</code>:</strong>
+                    <div class="code-block"><code>// احذف هذا السطر:
+"utd/area-manager": "*"</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>حذف من <code>composer.json</code> من قسم <code>repositories</code>:</strong>
+                    <div class="code-block"><code>// احذف هذا القسم:
+{
+    "type": "path",
+    "url": "packages/Utd/AreaManager",
+    "options": {
+        "symlink": true
+    }
+}</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>تحديث Composer:</strong>
+                    <div class="code-block"><code>composer install --no-interaction
+composer dump-autoload</code></div>
+                </div>
+
+                <div class="success">
+                    <h4>✅ التحقق من الإزالة:</h4>
+                    <div class="code-block"><code>composer show utd/area-manager
+# النتيجة: Package "utd/area-manager" not found
+
+php artisan tinker
+PackageHelper::isInstalled('areaManager')
+# النتيجة: false</code></div>
+                </div>
+
+                <div class="info">
+                    <h4>📁 الملفات المحفوظة بعد الإزالة:</h4>
+                    <ul>
+                        <li><strong>مجلد الحزمة:</strong> <code>packages/Utd/AreaManager/</code> (كامل)</li>
+                        <li><strong>الجداول:</strong> <code>regions</code>, <code>region_countries</code>, <code>sub_area_managers</code>, <code>admin_users</code> (WHERE type='area-manager')</li>
+                        <li><strong>الـ Relations:</strong> محمية في <code>app/Models/Charge.php</code> بـ <code>PackageHelper::checkRelation()</code></li>
+                        <li><strong>Config:</strong> أي ملفات configuration تم نشرها</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PackageHelper Guards -->
+            <div class="section">
+                <h2><span class="icon">🛡️</span> العلاقات المحمية (PackageHelper Guards)</h2>
+                <p>جميع علاقات النماذج التي تشير للحزمة محمية بـ PackageHelper، لن تظهر أخطاء إذا كانت الحزمة غير مثبتة:</p>
+
+                <div class="code-block"><code>// في app/Models/Charge.php
+
+// ✅ علاقة محمية
+public function areaManager(): BelongsTo
+{
+    return PackageHelper::checkRelation($this, 'areaManager', 'belongsTo')
+        ?? $this->belongsTo(AreaManager::class, 'charger_id');
+}
+
+// ✅ علاقة محمية
+public function subAreaManager(): BelongsTo
+{
+    return PackageHelper::checkRelation($this, 'areaManager', 'belongsTo')
+        ?? $this->belongsTo(SubAreaManager::class, 'charger_id');
+}
+
+// ✅ علاقة محمية
+public function receiverSubAreaManager(): BelongsTo
+{
+    return PackageHelper::checkRelation($this, 'areaManager', 'belongsTo')
+        ?? $this->belongsTo(SubAreaManager::class, 'user_id');
+}</code></div>
+            </div>
+
+            <!-- استعادة التثبيت -->
+            <div class="section">
+                <h2><span class="icon">🔄</span> إعادة التثبيت</h2>
+                <p>لإعادة تثبيت الحزمة بعد إزالتها (البيانات والملفات محفوظة):</p>
+
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>تثبيت الحزمة:</strong>
+                    <div class="code-block"><code>composer require utd/area-manager</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>تفعيل في PackageHelper (إضافة في <code>app/Support/PackageHelper.php</code>):</strong>
+                    <div class="code-block"><code>use Utd\AreaManager\Entities\AreaManager;
+
+'areaManager' => AreaManager::class,</code></div>
+                </div>
+
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>مسح الـ Cache:</strong>
+                    <div class="code-block"><code>php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear
+composer dump-autoload</code></div>
+                </div>
+
+                <div class="success">
+                    <h4>✅ جاهز!</h4>
+                    <p>الحزمة الآن مثبتة مع جميع البيانات السابقة محفوظة</p>
+                </div>
+            </div>
+
+            <!-- نقاط الوصول -->
+            <div class="section">
+                <h2><span class="icon">📍</span> نقاط الوصول (Access Points)</h2>
+                <table>
+                    <tr>
+                        <th>النوع</th>
+                        <th>المسار</th>
+                        <th>الوصف</th>
+                    </tr>
+                    <tr>
+                        <td>Admin Panel</td>
+                        <td><code>/admin/area-manager-users</code></td>
+                        <td>إدارة مديري المناطق</td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard</td>
+                        <td><code>/areaManager/login</code></td>
+                        <td>لوحة تحكم مدير المناطق</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile API</td>
+                        <td><code>POST /api/areaManager/login</code></td>
+                        <td>تسجيل دخول التطبيق</td>
+                    </tr>
+                    <tr>
+                        <td>Charges</td>
+                        <td><code>/admin/area-manager-charges-reports</code></td>
+                        <td>تقارير الشحن</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- استكشاف الأخطاء -->
+            <div class="section">
+                <h2><span class="icon">🔧</span> استكشاف الأخطاء الشائعة</h2>
+
+                <h3>خطأ: Class "Utd\AreaManager\AreaManagerServiceProvider" not found</h3>
+                <div class="warning">
+                    <h4>الحل:</h4>
+                    <div class="code-block"><code># 1. حذف ملفات الـ cache
+rm -f bootstrap/cache/*.php
+
+# 2. مسح الـ cache
+php artisan config:clear
+php artisan cache:clear
+php artisan optimize:clear
+
+# 3. إعادة بناء autoload
+composer dump-autoload
+
+# 4. التحقق من symlink
+ls -la vendor/utd/area-manager</code></div>
+                </div>
+
+                <h3>خطأ: Routes Not Found (404)</h3>
+                <div class="warning">
+                    <h4>الحل:</h4>
+                    <div class="code-block"><code># مسح الـ cache وإعادة تحميل الـ routes
+php artisan optimize:clear
+php artisan route:list | grep area
+
+# التحقق من تثبيت الحزمة
+composer show utd/area-manager</code></div>
+                </div>
+
+                <h3>خطأ: PackageHelper Not Recognizing Package</h3>
+                <div class="warning">
+                    <h4>الحل:</h4>
+                    <p>تأكد من تسجيل الحزمة في PackageHelper:</p>
+                    <div class="code-block"><code>// في app/Support/PackageHelper.php
+use Utd\AreaManager\Entities\AreaManager;
+
+private static array $packages = [
+    'areaManager' => AreaManager::class,
+];</code></div>
+                </div>
+
+                <h3>خطأ: Table 'regions' doesn't exist</h3>
+                <div class="warning">
+                    <h4>الحل:</h4>
+                    <div class="code-block"><code># تشغيل migrations
+php artisan migrate
+
+# التحقق من حالة الـ migrations
+php artisan migrate:status</code></div>
+                </div>
+            </div>
+
+            <!-- الملفات الهامة -->
+            <div class="section">
+                <h2><span class="icon">📄</span> الملفات والمجلدات الهامة</h2>
+                <table>
+                    <tr>
+                        <th>المسار</th>
+                        <th>الوصف</th>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/AreaManager/src/</code></td>
+                        <td>كود المصدر للحزمة</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/AreaManager/config/</code></td>
+                        <td>ملفات الإعدادات</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/AreaManager/database/migrations/</code></td>
+                        <td>ملفات الـ migrations</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/AreaManager/routes/</code></td>
+                        <td>ملفات الـ routes</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/AreaManager/src/Admin/</code></td>
+                        <td>Admin Actions و Controllers</td>
+                    </tr>
+                    <tr>
+                        <td><code>packages/Utd/AreaManager/composer.json</code></td>
+                        <td>ملف composer للحزمة</td>
+                    </tr>
+                    <tr>
+                        <td><code>app/Support/PackageHelper.php</code></td>
+                        <td>تسجيل الحزمة للحماية</td>
+                    </tr>
+                    <tr>
+                        <td><code>app/Models/Charge.php</code></td>
+                        <td>العلاقات المحمية بـ PackageHelper</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- جداول قاعدة البيانات -->
+            <div class="section">
+                <h2><span class="icon">🗄️</span> جداول قاعدة البيانات</h2>
+                <p>الجداول المستخدمة من قبل الحزمة:</p>
+                <ul>
+                    <li><code>admin_users</code> (حقل <code>type = 'area-manager'</code> و <code>type = 'sub-area-manager'</code>)</li>
+                    <li><code>regions</code> - المناطق الجغرافية</li>
+                    <li><code>region_countries</code> - ربط المناطق بالدول (pivot table)</li>
+                    <li><code>sub_area_managers</code> - مديري المناطق الفرعيين</li>
+                </ul>
+
+                <div class="info">
+                    <h4>📌 ملاحظة:</h4>
+                    <p>عند الإزالة، هذه الجداول <strong>لا يتم حذفها</strong> تلقائياً للحفاظ على البيانات</p>
+                </div>
+            </div>
+
+            <!-- الميزات -->
+            <div class="section">
+                <h2><span class="icon">✨</span> الميزات الرئيسية</h2>
+                <ul>
+                    <li>✅ <strong>إدارة المناطق الجغرافية:</strong> إنشاء وإدارة المناطق</li>
+                    <li>✅ <strong>ربط الدول:</strong> ربط الدول بالمناطق باستخدام الخرائط</li>
+                    <li>✅ <strong>التسلسل الهرمي:</strong> مديري المناطق والمديرين الفرعيين</li>
+                    <li>✅ <strong>نظام الشحن:</strong> محفظة مدمجة (diamonds) وعمليات مالية</li>
+                    <li>✅ <strong>لوحة تحكم Web:</strong> واجهة إدارية كاملة</li>
+                    <li>✅ <strong>Mobile API:</strong> نقاط RESTful API للتطبيقات</li>
+                    <li>✅ <strong>متعدد اللغات:</strong> دعم العربية والإنجليزية</li>
+                    <li>✅ <strong>PackageHelper:</strong> وصول آمن للنماذج عبر الحزم</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🌍 حزمة AreaManager - نظام إدارة المناطق الجغرافية</p>
+            <p style="margin-top: 10px; opacity: 0.8;">UTD Software Solutions © 2026</p>
+        </div>
+    </div>
+</body>
+</html>

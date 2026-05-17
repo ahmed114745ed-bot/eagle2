@@ -7,10 +7,10 @@ use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Bd\Entities\Bd;
-use Modules\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\AreaManager;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\AreaManager\Entities\SubAreaManager;
+use Utd\AreaManager\Entities\SubAreaManager;
 use Modules\SuperAdmin\Entities\SubAdmin;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 
@@ -138,7 +138,8 @@ class Charge extends Model
 
     public function receiverSubAreaManager(): BelongsTo
     {
-        return $this->belongsTo(SubAreaManager::class, 'user_id');
+        return PackageHelper::checkRelation($this, 'areaManager', 'belongsTo')
+            ?? $this->belongsTo(SubAreaManager::class, 'user_id');
     }
 
     public function receiverSuperAdmin(): BelongsTo
@@ -180,12 +181,14 @@ class Charge extends Model
 
     public function areaManager(): BelongsTo
     {
-        return $this->belongsTo(AreaManager::class, 'charger_id');
+        return PackageHelper::checkRelation($this, 'areaManager', 'belongsTo')
+            ?? $this->belongsTo(AreaManager::class, 'charger_id');
     }
 
     public function subAreaManager(): BelongsTo
     {
-        return $this->belongsTo(SubAreaManager::class, 'charger_id');
+        return PackageHelper::checkRelation($this, 'areaManager', 'belongsTo')
+            ?? $this->belongsTo(SubAreaManager::class, 'charger_id');
     }
 
     public function bd()

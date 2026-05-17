@@ -15,8 +15,8 @@ use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\AreaManager\Entities\AreaManager;
-use Modules\AreaManager\Entities\SubAreaManager;
+use Utd\AreaManager\Entities\AreaManager;
+use Utd\AreaManager\Entities\SubAreaManager;
 use App\Http\Resources\Api\V1\UserDataRoomResource;
 use Utd\Agency\Repositories\UserRepository as Repository;
 
