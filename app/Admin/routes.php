@@ -30,7 +30,6 @@ use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ChargeVipController;
-use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\CharismaLevelController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\CoinGameUserAllController;
@@ -39,8 +38,6 @@ use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\CoreWalletTransactionController;
 use App\Admin\Controllers\CountryCategoryController;
-use App\Admin\Controllers\CountryController;
-use App\Admin\Controllers\CountryRequestActionController;
 use App\Admin\Controllers\CountryRequestHistoryController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\CustomZegoMessageController;
@@ -49,7 +46,6 @@ use App\Admin\Controllers\EmojiCategoryController;
 use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\FairLuckSettingsController;
-use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\FamilyController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\Filter\FilterController;
@@ -316,7 +312,6 @@ Route::group(
         Route::post('/delete-user-vip/{id}', [UsersAppController::class, 'deleteUserVip']);
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
-        //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
@@ -601,7 +596,6 @@ Route::group(
         Route::resource('coin-reports', 'CoinReportController');
         Route::resource('ban-types', BanTypeController::class);
         Route::resource('sallaries_history', 'SallariesHistoryController');
-        // Route::resource ('export-excel','ImportExcelReportController');
         Route::resource('agencies-tareget-manger', AgencyMangerTaregetController::class);
         Route::resource('report_users', ReportFromUsersController::class)->middleware('web-agency-feature');
         Route::post('cashing', 'ReportController@cashing')->name('cashing')->middleware('web-agency-feature');
@@ -754,7 +748,6 @@ Route::group(
         Route::resource('ware-management', WareTabController::class);
 
         Route::resource('user-charges', UsersChargeController::class);
-        //         Route::resource('user-charges-report/{id}', UserChargeReportController::class)->except(['show', 'edit', 'delete']);
         Route::group(['prefix' => 'user-charges-report'], function () {
             Route::get('/{id}', [UserChargeReportController::class, 'index']);
         });

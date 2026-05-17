@@ -2,15 +2,17 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
-use App\Models\Agency;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Services\AppFeatureService;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
-use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
+use App\Models\Agency;
+use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
 
 class RequestAgencyController extends AdminController
@@ -75,7 +77,14 @@ class RequestAgencyController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Agency());
-        $grid->model()
+        $grid->model()->with([
+            'additionalInfo',
+            'owner.profile:user_id,avatar',
+                'owner.country',
+                'owner.senderLevel',
+                'owner.receiverLevel',
+                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])
             ->where('bd_id', Auth::user()->id)
             ->where('status', 0)->orderByDesc("id")
             ->whereHas('additionalInfo', function ($query) {
@@ -88,31 +97,12 @@ class RequestAgencyController extends AdminController
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('owner.name', trans('name'))->display(function ($name) {
-            $uid = @$this->owner->uuid;
-            $path = @$this?->owner->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->owner) ? url("admin/users/{$this->owner->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('owner.name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('name', __('agency'))->display(function () {
             $name = @$this->name ?? '';

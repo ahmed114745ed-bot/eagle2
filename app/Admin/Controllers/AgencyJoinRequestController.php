@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UserService;
 use App\Helpers\Common;
 use App\Models\Admin;
 use App\Models\AgencyJoinRequest;
@@ -89,9 +90,12 @@ class AgencyJoinRequestController extends MainController
 
         $grid->model()
             ->with([
-                'user:id,name,uuid,phone,country_id',
+                'user:id,name,uuid,phone,country_id,special_id,sender_level,received_level',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'user.profile:user_id,avatar',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
                 'agency:id,name,img,country_id'
             ])
             ->when($countryID, fn($q) =>
@@ -118,26 +122,14 @@ class AgencyJoinRequestController extends MainController
         });
 
         $grid->id(__('ID'));
-        $grid->column('user.name', __('User'))
-            ->display(function ($name) {
-                $uid = @$this->user->uuid ?? '';
-                $path = @$this->user?->profile?->avatar ?? '';
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = $path ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
-                $image = "<img src='" . e($url) . "' onerror=\"this.onerror=null;this.src='" . e($defaultImage) . "'\" style='height:40px; width:40px; border-radius:50%; object-fit:cover;' />";
-                $showUrl = $this->user ? url("admin/users/{$this->user->id}") : "#";
 
-                return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <strong>$name</strong><br>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                    </div>
-                </div>
-            ";
-            });
+
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
+
         $grid->column('agency.name', __('Agency'))
             ->display(function ($name) {
                 $path = @$this->agency->img ?? '';

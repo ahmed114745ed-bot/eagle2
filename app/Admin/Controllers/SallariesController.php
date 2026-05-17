@@ -2,16 +2,19 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\User;
-use function request;
+use App\Admin\Services\UserService;
 use App\Models\Agency;
-use Encore\Admin\Grid;
-use Encore\Admin\Layout\Row;
 use App\Models\AgencySallary;
-use Encore\Admin\Widgets\Box;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
+use function request;
 
 class SallariesController extends MainController
 {
@@ -53,6 +56,9 @@ class SallariesController extends MainController
         $grid->model()
             ->with([
                 'profile',
+                'country',
+                'senderLevel',
+                'receiverLevel',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
@@ -75,6 +81,9 @@ class SallariesController extends MainController
         users.country_id,
         users.agency_id,
         users.online,
+        users.sender_level, 
+        users.received_level,
+        users.special_id
         users.created_at,
         users.updated_at,
         COALESCE(SUM(us.sallary),0) AS sallary,
@@ -89,7 +98,10 @@ class SallariesController extends MainController
                 'users.agency_id',
                 'users.online',
                 'users.created_at',
-                'users.updated_at'
+                'users.updated_at',
+                ' users.sender_level',
+                ' users.received_level',
+                'users.special_id'
             );
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -106,47 +118,17 @@ class SallariesController extends MainController
                 }, __('Year'), 'year')->integer();
             });
 
-            $filter->where(function ($query) {
-                $month = request('month');
-            }, __('Month'), 'month')->integer();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $month = request('month');
+                }, __('Month'), 'month')->integer();
+            });
         });
 
-        $grid->column('name', __('name'))->display(function ($name) {
-            $uid = @$this->uuid;
-            $path = @$this->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  url("admin/users/{$this->id}");
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
-        });;
-        // $grid->column('total', __('net salary'))
-        //     ->display(function () {
-        //         $usd =   @$this->sumNetSalary(request('month'), request('year')) ?? 0;
-        //         $image = asset('images/dollar.jpg'); // Adjust path as needed
-        //         $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
-        //         return "<div style='display: flex; align-items: center; '>
-
-        //                 <span>{$usd}</span>
-        //                   <img src='{$image}' alt='USD' width='20' height='20'>
-        //             </div>";
-        //     })->default(0);
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('total', __('net salary'))->display(function ($v) {
             $v = truncateAndTrim($v) ?? 0;
@@ -156,15 +138,7 @@ class SallariesController extends MainController
               <img src='{$img}' width='20'>
             </div>";
         });
-        // $grid->column('salary', __('salary'))->display(function () {
-        //     $usd =   @$this->sumSalary(request('month'), request('year')) ?? 0;
-        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
-        //     return "<div style='display: flex; align-items: center; '>
 
-        //                 <span>{$usd}</span>
-        //                   <img src='{$image}' alt='USD' width='20' height='20'>
-        //             </div>";
-        // })->default(0);
         $grid->column('sallary', __('salary'))->display(function ($v) {
             $v = truncateAndTrim($v) ?? 0;
             $img = asset('images/dollar.jpg');
@@ -173,16 +147,7 @@ class SallariesController extends MainController
               <img src='{$img}' width='20'>
             </div>";
         });
-        // $grid->column('withdrawal', __('withdrawal'))->display(function () {
-        //     $usd =   @$this->sumCutAmount(request('month'), request('year')) ?? 0;
 
-        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
-        //     return "<div style='display: flex; align-items: center; '>
-
-        //                 <span>{$usd}</span>
-        //                   <img src='{$image}' alt='USD' width='20' height='20'>
-        //             </div>";
-        // })->default(0);
 
         $grid->column('withdrawal', __('withdrawal'))->display(function ($v) {
             $v = truncateAndTrim($v) ?? 0;

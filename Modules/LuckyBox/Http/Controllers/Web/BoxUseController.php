@@ -2,14 +2,16 @@
 
 namespace Modules\LuckyBox\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
+use Encore\Admin\Show;
 use Modules\LuckyBox\Entities\BoxUse;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class BoxUseController extends MainController
 {
@@ -103,7 +105,7 @@ class BoxUseController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BoxUse);
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -115,7 +117,16 @@ class BoxUseController extends MainController
             });
         });
 
-        $grid->model()->with(['user', 'user.profile', 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'), 'room', 'room.roomVisitors'])->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->with([
+            'user',
+            'user.profile',
+            'user.country',
+            'user.senderLevel',
+            'user.receiverLevel',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'room',
+            'room.roomVisitors'
+        ])->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
@@ -128,28 +139,11 @@ class BoxUseController extends MainController
 
         $grid->id(__('ID'));
 
-        $grid->column('user_id', __('User'))->display(function () {
-            $user = $this->user;
-            if (!$user) return '-';
-
-            $name = $user->name;
-            $uuid = $user->uuid;
-            $phone = $user->phone ?: '-';
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$user->profile?->avatar;
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-
-            $userUrl = admin_url('users/' . $user->id);
-
-            return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;' onerror=\"this.src='$defaultImage'\">
-                        <div>
-                            <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
-                            <span style='color: var(--uuid-color); font-size: smaller;'>UUID: $uuid</span><br>
-                            <span style='color: var(--phone-color); font-size: smaller;'>📞 $phone</span>
-                        </div>
-                    </div>";
+        $grid->column('nameName', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('box_id', __('Box'))->display(function () {
 

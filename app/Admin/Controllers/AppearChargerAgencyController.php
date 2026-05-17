@@ -2,26 +2,27 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\DeleteShippingAgencyAction;
+use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencySallary;
 use App\Models\Charge;
 use App\Models\CoinLog;
-use Carbon\Carbon;
+use App\Models\GiftLog;
+use App\Models\ShippingAgency;
 use App\Models\User;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Models\AgencySallary;
-use App\Models\ShippingAgency;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Actions\DeleteShippingAgencyAction;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -222,7 +223,15 @@ class AppearChargerAgencyController extends MainController
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
-        $grid->model()->with(['owner.profile', 'owner.country', 'creator', 'country'])
+        $grid->model()->with([
+            'owner.profile',
+            'owner.country',
+            'owner.senderLevel',
+            'owner.receiverLevel',
+            'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'creator',
+            'country'
+        ])
             ->withCount('chargeAgency as charge_agency_exists')
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
@@ -272,44 +281,11 @@ class AppearChargerAgencyController extends MainController
                 ";
             })->sortable();
 
-        $grid->column('owner_id', __('Owner'))->display(function () {
-            $name = $this->owner ? $this->owner->name ?? 'Unknown Owner' : 'Unknown Owner';
-            $uid = $this->owner ? $this->owner->uuid ?? 'N/A' : 'N/A';
-            $phone = $this->owner ? $this->owner->phone ?? '-' : '-';
-            $path = $this->owner && $this->owner->profile ? $this->owner->profile->avatar : '';
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            $image = $this->owner
-                ? "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />"
-                : '';
-
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
-            $flagHtml = '';
-            if (!empty($this->owner?->country?->flag)) {
-                $flagPath = getImagePath($this->owner->country->flag);
-                $flagTitle = app()->getLocale() === 'ar'
-                    ? e($this->owner->country->name)
-                    : e($this->owner->country->e_name);
-
-                $flagHtml = "<img src='{$flagPath}'
-                         class='flag-image'
-                         alt='flag Image'
-                         title='{$flagTitle}'
-                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
-            }
-            return "
-                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <strong>$name</strong> {$flagHtml}<br>
-                        <span style='font-size: smaller;'>UID: $uid</span><br>
-                        <span style='font-size: smaller;'>Phone: $phone</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('ownerName', __('Owner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('charge_agency', __("Charge-agency"))
             ->display(function () {
@@ -503,7 +479,6 @@ class AppearChargerAgencyController extends MainController
         $form->saved(function (Form $form) {
 
             $appOwnerId = intval($form->model()->app_owner_id);
-
         });
 
         return $form;

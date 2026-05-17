@@ -210,7 +210,7 @@ class RoomController extends MainController
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
                 'roomModes'     => $roomModes,
-                'errors' => new ViewErrorBag(), 
+                'errors' => new ViewErrorBag(),
             ])));
     }
     /**
@@ -368,8 +368,10 @@ class RoomController extends MainController
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
                     'country:id,flag,name,e_name',
+                    'senderLevel',
+                    'receiverLevel',
 
-                ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
+                ])->select(['id', 'uuid', 'special_id', 'name', 'country_id', 'sender_level', 'received_level',]),
                 'microphones' => function ($q) {
                     $q->orderBy('position');
                 },
@@ -655,14 +657,12 @@ class RoomController extends MainController
                ";
         });
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
-            $user = $this->owner;
-            if (! $user) {
-                return __('No User');
-            }
 
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+        $grid->column('owner_id', __('room owner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
             $adminsCount = is_array($this->admins) ? count($this->admins) : 0;

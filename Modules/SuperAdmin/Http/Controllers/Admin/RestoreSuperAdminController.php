@@ -2,15 +2,15 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
-
-use Modules\SuperAdmin\Entities\SuperAdmin;
+use Encore\Admin\Show;
 use Modules\SuperAdmin\Actions\Admin\RestoreSuperAdminAction;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class RestoreSuperAdminController extends MainController
 {
@@ -43,6 +43,8 @@ class RestoreSuperAdminController extends MainController
             'appUser.profile',
             "appUser.country:id,name,e_name",
             'country',
+            'appUser.senderLevel',
+            'appUser.receiverLevel',
             'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])->orderBy('deleted_at', 'desc');
 
@@ -81,37 +83,13 @@ class RestoreSuperAdminController extends MainController
                 </div>
             ";
         });
-        $grid->column('appUser.name', __('user'))->display(function ($name) {
-            $user = $this->appUser;
-            if (request()->filled('_export_')) {
-                return $name;
-            }
-            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
+       
 
-            $uid = $user->uuid ?? 'غير معروف';
-            $path = $user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->appUser);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('country_name', __('Country'))->display(function () {
             $locale = app()->getLocale(); // get current locale

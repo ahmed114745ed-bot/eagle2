@@ -2,15 +2,17 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Models\ChangeLevelHistory;
 use App\Models\User;
-use Modules\Vip\Entities\Vip;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Models\ChangeLevelHistory;
+use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
-use App\Admin\Controllers\MainController;
+use Modules\Vip\Entities\Vip;
 
 class UserLevelController extends MainController
 {
@@ -62,8 +64,9 @@ class UserLevelController extends MainController
         $grid->model()
             ->with([
                 'profile',
-                'totalSenderLevels:id,level,img,type',
-                'totalReceiverLevels:id,level,img,type',
+                'country',
+                'senderLevel',
+                'receiverLevel',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID));
@@ -76,32 +79,11 @@ class UserLevelController extends MainController
         });
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'))->display(function ($name) {
-            $path = $this->profile?->avatar ?? '';
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$this->id}");
-            $uuid = $this->uuid;
-
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
 

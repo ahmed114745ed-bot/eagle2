@@ -2,11 +2,10 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\RemainingDiamond;
-
-
-use Encore\Admin\Grid;
 use App\Admin\Services\UserService;
+use App\Models\RemainingDiamond;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 
 class RemainingDiamondHistoryController extends MainController
@@ -86,15 +85,11 @@ class RemainingDiamondHistoryController extends MainController
         ]);
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
 
-                $user = $this->user;
-                if (! $user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('remaining', __('remaining diamonds'))->display(function ($usd) {
 
