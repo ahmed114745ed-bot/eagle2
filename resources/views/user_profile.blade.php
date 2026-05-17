@@ -4634,8 +4634,17 @@
         }
     }
 
-    // Initialize PJAX
-    $(document).pjax('a[data-pjax]', '#pjax-container');
+    // Initialize PJAX — exclude filter buttons from pjax interception
+    $(document).pjax('a[data-pjax]:not(.btn)', '#pjax-container');
+
+    // Force all .btn links inside forms to bypass pjax (full page reload)
+    $(document).on('click', '.btn-default, .btn-info', function(e) {
+        if ($(this).is('a') && $(this).attr('href') && $(this).attr('href') !== '#') {
+            e.stopImmediatePropagation();
+            window.location.href = $(this).attr('href');
+            return false;
+        }
+    });
 
     // PJAX event listeners for loading indicator
     $(document).on('pjax:start', function() {
