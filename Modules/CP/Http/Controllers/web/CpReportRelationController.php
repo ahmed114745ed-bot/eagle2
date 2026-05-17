@@ -2,13 +2,14 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
-use App\Models\User;
-
-use Encore\Admin\Grid;
-use Modules\CP\Entities\Cp;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
 use App\Admin\Actions\CancelCpRelationAction;
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Modules\CP\Entities\Cp;
 
 class CpReportRelationController extends MainController
 {
@@ -46,9 +47,15 @@ class CpReportRelationController extends MainController
                 'fromUser',
                 'fromUser.profile',
                 'fromUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'fromUser.country',
+                'fromUser.senderLevel',
+                'fromUser.receiverLevel',
                 'toUser',
                 'toUser.profile',
                 'toUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'toUser.country',
+                'toUser.senderLevel',
+                'toUser.receiverLevel',
             ]
         )->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
@@ -88,32 +95,16 @@ class CpReportRelationController extends MainController
             });
         });
 
-        $grid->column('fromUser.name', __('name'))
-            ->display(function ($name) {
-                $uid = @$this->fromUser->uuid;
-                $path = @$this->fromUser->profile->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
-                return "$image<br>$name <br>
-            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
-            });
-        $grid->column('toUser.name', __('name'))
-            ->display(function ($name) {
-                $uid = @$this->toUser->uuid;
-                $path = @$this->toUser->profile->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
-                return "$image<br>$name <br>
-            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
-            });
+
+        $grid->column('fromUsername', __('from user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->fromUser);
+        });
+
+        $grid->column('toUsername', __('to user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->toUser);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
         $grid->column("di", __("coins"));
         $grid->column("level.level", __("level"));
         $grid->column("price", __("price"));

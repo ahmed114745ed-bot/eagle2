@@ -13,7 +13,6 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Box;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Public\Http\Services\UpgradeLevelServices;
@@ -33,9 +32,6 @@ class GroupChatController extends MainController
     {
         return parent::index($content
             ->title(__("group Chat"))
-            /* ->row(function (Row $row) {
-                $row->column(12, $this->grid2());
-            }) */
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             }));
@@ -50,18 +46,6 @@ class GroupChatController extends MainController
             ->view('chat_settings');
     }
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
-    protected function grid2()
-    {
-        $form = new Box();
-        $form->view('admin.grid.common.group-chat');
-
-        return $form;
-    }
 
 
     /**
@@ -120,16 +104,15 @@ class GroupChatController extends MainController
                     $subQuery->where('country_id', $countryID);
                 });
             });
-        }) ->with([
-                'user.profile',
-                
-                'user.userSetting',
-                'user.country',
-                'user.senderLevel',
-                'user.receiverLevel',
-                'user.monthlyDiamondReceive',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-            ])->orderByDesc('id');
+        })->with([
+            'user.profile',
+            'user.userSetting',
+            'user.country',
+            'user.senderLevel',
+            'user.receiverLevel',
+            'user.monthlyDiamondReceive',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->orderByDesc('id');
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -168,80 +151,19 @@ class GroupChatController extends MainController
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('text', __('Message'))->limit(50);
-        $grid->column('name', __('user'))
-            ->display(function ($name) {
 
-                $user = $this->user;
-                if (!$user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
         $grid->column('image', __('Image'))->image('', 50, 50);
         $grid->column('parent_id', __('Parent ID'));
         $grid->column('created_at', __('Created at'))->sortable();
         $grid->column('updated_at', __('Updated at'))->sortable();
         $grid->disableCreateButton();
-        //        $grid->filter(function($filter){
-        //            $filter->like('text', 'Message');
-        //            $filter->equal('user_id', 'User ID');
-        //            $filter->between('created_at', 'Created Date')->datetime();
-        //        });
 
         return $grid;
-        //        $grid = new Grid(new GroupChat);
-        //        $countryID =session('filter_country_id');
-        //        $grid->model()->when($countryID, function ($query) use ($countryID) {
-        //            $query->where(function ($q) use ($countryID) {
-        //                $q->whereHas('user', function ($subQuery) use ($countryID) {
-        //                    $subQuery->where('country_id', $countryID);
-        //                });
-        //            });
-        //        })->orderByDesc('id');
-        //        $grid->quickSearch();
-        //        $grid->filter(function (Grid\Filter $filter) {
-        //            $filter->expand();
-        //            $filter->disableIdFilter();
-        //            $filter->column('1/2', function ($filter) {
-        //                $filter->where(function ($query) {
-        //                    $input = $this->input;
-        //                    $query->whereHas('user', function ($query) use ($input) {
-        //                        $query->where('name', 'like', "%$input%")
-        //                            ->orWhere('uuid', 'like', "%$input%");
-        //                    });
-        //                }, __('User'))->placeholder(__('Search by name or UUID '));
-        //            });
-        //        });
-        //        $grid->id(__('ID'));
-        //        $grid->column('user.name', __('name'))->display(function ($recever) {
-        //            $name =  $this->user?->name ?? '';
-        //            $uid = @$this->user?->uuid ?? 0;
-        //            $path = @$this->user?->profile?->avatar;
-        //            $defaultImage = asset("images/businessman-icon.jpg");
-        //            $url = getImagePath($path) ?? $defaultImage;
-        //
-        //            // Check if the image exists
-        //            if (!isImageExists($url)) {
-        //                $url = $defaultImage;
-        //            }
-        //            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-        //
-        //            return "
-        //             <div style='display: flex; align-items: center; gap: 10px;'>
-        //                 $image
-        //                 <div>
-        //                     <strong>$name</strong><br>
-        //                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-        //                 </div>
-        //             </div>
-        //         ";
-        //        });
-        //        $grid->text(__('text'));
-        //
-        //        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
-        //        $grid->disableExport();
-        //        $this->extendGrid($grid);
-        //        return $grid;
     }
 
     /**

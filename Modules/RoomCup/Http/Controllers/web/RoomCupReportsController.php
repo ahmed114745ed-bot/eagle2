@@ -2,16 +2,17 @@
 
 namespace Modules\RoomCup\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
 use App\Models\Room;
 use App\Models\User;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Admin\Services\UserService;
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Show;
 use Modules\RoomCup\Entities\RoomCupReward;
 use Modules\RoomCup\Entities\TotalRoomGift;
-use Encore\Admin\Controllers\AdminController;
 
 class RoomCupReportsController extends MainController
 {
@@ -32,10 +33,13 @@ class RoomCupReportsController extends MainController
             ->with([
                 'gift:id,current_total,room_id',
                 'gift.room:id,id,room_name,room_cover,uid',
-                'user:id,id,name,uuid,special_id',
+                'user:id,id,name,uuid,special_id,country_id,sender_level,receiver_level',
                 'user.packs:id,user_id,type,is_used,target_id,expire',
                 'user.packs.ware:id',
                 'user.profile:id,user_id,avatar',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'gift.room.owner:id,id,name,uuid,special_id',
                 'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
@@ -45,15 +49,10 @@ class RoomCupReportsController extends MainController
             ])
             ->orderBy('created_at', 'desc');
 
-
-        $grid->column('user_id', __('user'))->display(function ($name) {
-            $user = $this->user;
-            if (! $user) {
-                return __('No User');
-            }
-
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+         $grid->column('user_id', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('room_id', __('room'))->display(function ($name) {
             $path = @$this->gift->room->room_cover;

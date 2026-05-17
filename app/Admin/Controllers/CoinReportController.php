@@ -2,13 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Charge;
-use Encore\Admin\Grid;
-
-use App\Helpers\Common;
-use App\Models\CoinGameUser;
-use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Models\Charge;
+use App\Models\CoinGameUser;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Modules\LuckyBox\Entities\UserLuckyGift;
 
 class CoinReportController extends MainController
@@ -101,19 +101,6 @@ class CoinReportController extends MainController
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
-            // ->selectRaw(
-            //     'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
-            //         'SUM(user_lucky_gifts.number) as total_number, ' .
-            //         'user_lucky_gifts.gift_id, ' .
-            //         'user_lucky_gifts.user_id, ' .
-            //         'MAX(users.name) as user_name, ' . // Aggregated using MAX
-            //         'MAX(gifts.img) as gift_img, ' . // Aggregated using MAX
-            //         'MAX(gifts.name) as gift_name, ' . // Aggregated using MAX
-            //         'user_lucky_gifts.gift_price, ' .
-            //         'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win',
-            //     'SUM(CASE WHEN user_lucky_gifts.value > 0 THEN user_lucky_gifts.value ELSE 0 END) as total_win_value ' .
-            //         'SUM(CASE WHEN user_lucky_gifts.value < 0 THEN ABS(user_lucky_gifts.value) ELSE 0 END) as total_lose_value'
-            // )
             ->selectRaw(
                 'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
                     'SUM(user_lucky_gifts.number) as total_number, ' .
@@ -143,7 +130,7 @@ class CoinReportController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-           
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
@@ -163,15 +150,11 @@ class CoinReportController extends MainController
             });
         });
 
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
-                $user = $this->user;
-                if (!$user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
         $grid->column('gift_id', __('gifts'))->display(function ($name) {
             if (!$this->gift) {
                 return __('No Gift');
@@ -249,7 +232,7 @@ class CoinReportController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-           
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
@@ -267,18 +250,14 @@ class CoinReportController extends MainController
 
                 $filter->equal('user_id', __('user'))->select()->ajax('/api/search/users2', 'id', 'name');
             });
-
         });
 
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
 
-                $user = $this->user;
-                if (!$user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
         $grid->column('game_name', __('game name'));
         $grid->column('total_coins_lose', __('loser'));
         $grid->column('total_coins_win', __('win'));

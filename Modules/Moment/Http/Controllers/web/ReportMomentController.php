@@ -2,14 +2,15 @@
 
 namespace Modules\Moment\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\Moment\Entities\Moment;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
 use Modules\Moment\Entities\ReportMoment;
-use Encore\Admin\Facades\Admin;
 
 class ReportMomentController extends MainController
 {
@@ -75,51 +76,31 @@ class ReportMomentController extends MainController
     {
         $grid = new Grid(new ReportMoment());
         $grid->model()->whereHas('moment')->orderByDesc('id');
-        $grid->model()->with(['moment' => fn($query) => $query->withExists(['likes', 'comments'])]);
+        $grid->model()->with([
+            'moment' => fn($query) => $query->withExists(['likes', 'comments']),
+            'reporter.profile:user_id,avatar',
+            'reporter.country',
+            'reporter.senderLevel',
+            'reporter.receiverLevel',
+            'reporter.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'reportedUser.profile:user_id,avatar',
+            'reportedUser.country',
+            'reportedUser.senderLevel',
+            'reportedUser.receiverLevel',
+            'reportedUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ]);
 
         $grid->column('id', __('Id'));
 
-        $grid->column('Reporter_id', __('Reporter'))->display(function () {
-            if (!$this->reporter) return '-';
-
-            $url = admin_url('users/' . $this->reporter->id);
-            $name = $this->reporter->name;
-            $uuid = $this->reporter->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->reporter->avatar;
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-            return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='$url'\">
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                        <div>
-                            <span style='color: #3498db; font-weight: bold;'>$name</span><br>
-                            <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
-                        </div>
-                    </div>";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->reporter);
         });
 
-        $grid->column('Reported_id', __('Reported User'))->display(function () {
-            if (!$this->reportedUser) return '-';
-
-            $url = admin_url('users/' . $this->reportedUser->id);
-            $name = $this->reportedUser->name;
-            $uuid = $this->reportedUser->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->reportedUser->avatar;
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-            return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='$url'\">
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                        <div>
-                            <span style='color: #e74c3c; font-weight: bold;'>$name</span><br>
-                            <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
-                        </div>
-                    </div>";
+        $grid->column('name', __('Reported User'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->reportedUser);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
 
 

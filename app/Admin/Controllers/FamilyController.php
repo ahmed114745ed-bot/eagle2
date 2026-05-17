@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UserService;
 use App\Facades\UserHandling;
 use App\Models\Config;
 use App\Models\Family;
@@ -100,6 +101,10 @@ class FamilyController extends MainController
             ->with([
                 'owner:id,name,uuid',
                 'owner.profile:id,user_id,avatar',
+                'owner.country',
+                'owner.senderLevel',
+                'owner.receiverLevel',
+                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
             ->orderByDesc('id');
 
@@ -142,26 +147,10 @@ class FamilyController extends MainController
             ";
         });
 
-        $grid->column('owner.name', trans('owner'))->display(function ($name) {
-            $owner = $this->owner;
-            if (!$owner) return '-';
-
-            $uid = $owner->uuid;
-            $avatar = $owner->profile?->avatar;
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = $avatar ? getImagePath($avatar) : $defaultImage;
-            $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$owner->id}");
-            $escapedName = e($name);
-
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                {$imgTag}
-                <div>
-                    <a href='{$showUrl}' style='text-decoration: underline;'>{$escapedName}</a>
-                    <br><span style='font-size: smaller;'>UUID: {$uid}</span>
-                </div>
-            </div>";
+         $grid->column('nameUser', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('num', __('number of people'))->display(function ($value) {
             // Original accessor returns count - 1 to exclude owner
