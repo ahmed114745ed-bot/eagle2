@@ -2620,7 +2620,7 @@ Route::get('/fix-gift-prices/preview', function () {
             'gl.total',
             'gl.created_at',
             DB::raw('(gl.giftNum * gl.total) as expected_price'),
-            DB::raw('ABS(CAST(gl.giftPrice AS SIGNED) - (gl.giftNum * gl.total)) as price_difference')
+            DB::raw('(GREATEST(gl.giftPrice, gl.giftNum * gl.total) - LEAST(gl.giftPrice, gl.giftNum * gl.total)) as price_difference')
         ])
         ->get();
 
