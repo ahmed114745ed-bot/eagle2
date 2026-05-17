@@ -46,10 +46,8 @@ WORKDIR /app
 # Copy application files
 COPY . /app
 
-# Ensure Laravel framework directories exist (.dockerignore excludes them)
-RUN mkdir -p /app/storage/framework/{cache,sessions,views} /app/bootstrap/cache
-
-
+# Recreate storage dirs excluded by .dockerignore
+RUN mkdir -p storage/framework/{cache,data,sessions,testing,views} storage/logs bootstrap/cache
 
 # Setup supervisord configuration
 COPY docker/octana-supervisor.conf /etc/supervisor/conf.d/supervisord.conf

@@ -37,8 +37,8 @@ WORKDIR /app
 # Copy application files
 COPY . /app
 
-# Ensure Laravel framework directories exist (.dockerignore excludes them)
-RUN mkdir -p /app/storage/framework/{cache,sessions,views} /app/bootstrap/cache
+# Recreate storage dirs excluded by .dockerignore
+RUN mkdir -p storage/framework/{cache,data,sessions,testing,views} storage/logs bootstrap/cache
 
 # Copy the crontab file
 COPY docker/cron /etc/cron.d/app-cron
@@ -64,7 +64,7 @@ COPY docker/jobs-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
 # Install application dependencies
 
 RUN env REDIS_HOST=172.17.0.1 \
-	 composer install --no-dev --optimize-autoloader    
+	 composer install --no-dev --no-interaction --ignore-platform-reqs --optimize-autoloader --no-scripts
 
 
 RUN chmod -R 777 /app/storage
