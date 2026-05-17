@@ -2256,6 +2256,34 @@ class Common
                     'id_image' => '',
                     'colored_name' => '',
                 ];
+                case UserTypeEnum::SUPER_ADMIN:
+                $superAdmin = $resource->superAdmin;
+                $linkedUser = $superAdmin?->appUser;
+                return [
+                    'name' => $linkedUser ? ($linkedUser->name . ' (مدير دولة)') : ($superAdmin->name ?? ''),
+                    'image' => $linkedUser?->profile?->avatar ?? ($superAdmin->avatar ?? ''),
+                    'uuid' => $linkedUser->uuid ?? ($superAdmin->id ?? ''),
+                    'id' => $superAdmin->id ?? '',
+                    'type' => 'dash',
+                    'url' => $superAdmin ? url($prefix . "/auth/users/{$superAdmin->id}") : '#',
+                    'image_color' => $linkedUser->color_image ?? null,
+                    'id_image' => $linkedUser?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => '',
+                ];
+
+                case UserTypeEnum::SUB_ADMIN:
+                $subAreaManager = $resource->subSuperAdmin;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
 
             case 'user':
                 $user = $resource->senderUser;
@@ -2581,6 +2609,7 @@ class Common
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
+            'superAdmin.appUser.profile',
             'receiverUser',
             'receiverUser.profile',
             'receiverUser.packs' => function ($q) {

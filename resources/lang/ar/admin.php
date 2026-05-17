@@ -20,7 +20,7 @@ return [
     'not_in_same_country' => 'ليس في نفس البلد',
     'delete'                => 'مسح',
     "searchAchievements" => "البحث عن الإنجازات",
-
+    "utdPaymob" => "UTD Paymob",
     "password_incorrect" => 'كلمة المرور غير صحيحة',
     "username_not_found" => 'اسم المستخدم غير موجود',
     'is_preview' => 'عرض مباشر',
@@ -467,6 +467,71 @@ return [
 هدايا CP فقط:
 عند التحديد، لن يرى المستخدم إلا هدايا CP المحددة، والتي يمكنه استخدامها حصريًا ضمن ميزة CP.",
 
+    // UTD Stream Webhooks
+    'UTD Stream Webhooks' => 'روابط ويب هوك UTD Stream',
+    'Base Webhook URL' => 'رابط الويب هوك الأساسي',
+    'Total Events' => 'إجمالي الأحداث',
+    'events' => 'أحداث',
+    'Copy' => 'نسخ',
+    'Copied!' => 'تم النسخ!',
+    'Failed' => 'فشل',
 
+    // Webhook Categories
+    'webhook_category_rooms_streaming' => 'الغرف والبث المباشر',
+    'webhook_category_calls' => 'المكالمات',
+    'webhook_category_presence' => 'حالة الحضور',
+    'webhook_category_messaging' => 'الرسائل',
+
+    // Rooms & Streaming Events
+    'webhook_room_started_name' => 'بدء الغرفة',
+    'webhook_room_started_desc' => 'يتم إرساله عندما تُفتح غرفة جديدة ويبدأ البث المباشر فيها',
+
+    'webhook_room_finished_name' => 'إنهاء الغرفة',
+    'webhook_room_finished_desc' => 'يتم إرساله عندما تُغلق الغرفة وينتهي البث المباشر بشكل نهائي',
+
+    'webhook_participant_joined_name' => 'انضمام مشارك',
+    'webhook_participant_joined_desc' => 'يتم إرساله لحظة دخول مستخدم جديد إلى الغرفة',
+
+    'webhook_participant_left_name' => 'مغادرة مشارك',
+    'webhook_participant_left_desc' => 'يتم إرساله عندما يغادر المستخدم الغرفة أو يقطع الاتصال',
+
+    'webhook_track_published_name' => 'تفعيل الصوت/الفيديو',
+    'webhook_track_published_desc' => 'يتم إرساله عندما يفتح المشارك الصوت أو الكاميرا ويبدأ البث',
+
+    'webhook_track_unpublished_name' => 'إيقاف الصوت/الفيديو',
+    'webhook_track_unpublished_desc' => 'يتم إرساله عندما يغلق المشارك الصوت أو الكاميرا ويوقف البث',
+
+    // Calls Events
+    'webhook_call_initiated_name' => 'بدء المكالمة',
+    'webhook_call_initiated_desc' => 'يتم إرساله عند بدء مكالمة جديدة وإرسال طلب الاتصال',
+
+    'webhook_call_ringing_name' => 'رنين المكالمة',
+    'webhook_call_ringing_desc' => 'يتم إرساله عندما يستلم المستقبل إشعار المكالمة وتبدأ بالرنين',
+
+    'webhook_call_accepted_name' => 'قبول المكالمة',
+    'webhook_call_accepted_desc' => 'يتم إرساله عندما يرد المستقبل على المكالمة ويبدأ الاتصال',
+
+    'webhook_call_rejected_name' => 'رفض المكالمة',
+    'webhook_call_rejected_desc' => 'يتم إرساله عندما يرفض المستقبل المكالمة بشكل صريح',
+
+    'webhook_call_busy_name' => 'مشغول',
+    'webhook_call_busy_desc' => 'يتم إرساله عندما يكون المستقبل مشغولاً في مكالمة أخرى',
+
+    'webhook_call_ended_name' => 'إنهاء المكالمة',
+    'webhook_call_ended_desc' => 'يتم إرساله عند انتهاء المكالمة من أي طرف أو قطع الاتصال',
+
+    'webhook_call_missed_name' => 'مكالمة فائتة',
+    'webhook_call_missed_desc' => 'يتم إرساله عندما لا يرد المستقبل على المكالمة وتنتهي مهلة الانتظار',
+
+    // Presence Events
+    'webhook_user_online_name' => 'المستخدم متصل',
+    'webhook_user_online_desc' => 'يتم إرساله عندما يتصل المستخدم بالنظام ويصبح نشطاً',
+
+    'webhook_user_offline_name' => 'المستخدم غير متصل',
+    'webhook_user_offline_desc' => 'يتم إرساله عندما يقطع المستخدم الاتصال أو يصبح غير نشط',
+
+    // Messaging Events
+    'webhook_message_sent_name' => 'إرسال رسالة',
+    'webhook_message_sent_desc' => 'يتم إرساله عند إرسال رسالة جديدة في المحادثة',
 
 ];
