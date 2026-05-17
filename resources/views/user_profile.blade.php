@@ -2773,7 +2773,7 @@
                     <div class="card mb-4" style="border: 1px solid #d1fae5; border-radius: 10px; box-shadow: none;">
                         <div class="card-body">
                             <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
-                                  class="form-horizontal" pjax-container="">
+                              class="form-horizontal">
                                 <input type="hidden" name="tab" value="salary">
                                 <div class="filter-container" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
                                     <div class="filter-content">
@@ -3088,7 +3088,7 @@
                 <div class="card mb-4" style="border: 1px solid #ccfbf1; border-radius: 10px; box-shadow: none;">
                     <div class="card-body">
                         <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
-                              class="form-horizontal gift-log-form" pjax-container="">
+                              class="form-horizontal gift-log-form">
                             <input type="hidden" name="tab" value="wallet_logs">
                             <div class="filter-container" style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 10px;">
                                 <div class="filter-content">
@@ -3385,7 +3385,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form"
-                              method="GET" pjax-container>
+                              method="GET">
                             <input type="hidden" name="tab" value="user-agency">
 
                             <input type="hidden" name="user_agency_page"
@@ -3581,7 +3581,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form"
-                              method="GET" pjax-container>
+                              method="GET">
                             <input type="hidden" name="tab" value="user-coins">
                             <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
 
@@ -3953,7 +3953,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form"
-                              method="GET" pjax-container>
+                              method="GET">
                             <input type="hidden" name="tab" value="gift-log">
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">

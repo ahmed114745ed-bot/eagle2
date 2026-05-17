@@ -564,19 +564,25 @@ class UserController extends MainController
                 $giftType = request('gift_type', 'receiver');
                 $start = request('start_at');
                 $end = request('end_at');
-                $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
-                $agencyId = request('agency_id', $agency_id);
+                // Only default agency_id on initial load (no date filter)
+                // When user submits filter form, only filter by agency if explicitly selected
+                if ($start || $end) {
+                    $agencyId = request()->filled('agency_id') ? request('agency_id') : null;
+                } else {
+                    $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
+                    $agencyId = request('agency_id', $agency_id);
+                }
 
-                // Convert empty string or "0" to null to ensure filter doesn't apply with falsy values
+                // Convert empty string or "0" to null
                 if ($agencyId === '' || $agencyId === '0' || $agencyId === 0) {
                     $agencyId = null;
                 }
 
                 $timezone = Common::timeZone();
 
-                // Convert dates to UTC for database query
-                $startUtc = $start && $end ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
-                $endUtc = $start && $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
+                // Convert dates to UTC for database query (support single date too)
+                $startUtc = $start ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
+                $endUtc = $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
 
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
