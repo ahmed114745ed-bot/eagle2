@@ -46,6 +46,9 @@ WORKDIR /app
 # Copy application files
 COPY . /app
 
+# Ensure Laravel framework directories exist (.dockerignore excludes them)
+RUN mkdir -p /app/storage/framework/{cache,sessions,views} /app/bootstrap/cache
+
 
 
 # Setup supervisord configuration

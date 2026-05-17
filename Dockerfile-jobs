@@ -37,6 +37,9 @@ WORKDIR /app
 # Copy application files
 COPY . /app
 
+# Ensure Laravel framework directories exist (.dockerignore excludes them)
+RUN mkdir -p /app/storage/framework/{cache,sessions,views} /app/bootstrap/cache
+
 # Copy the crontab file
 COPY docker/cron /etc/cron.d/app-cron
 
