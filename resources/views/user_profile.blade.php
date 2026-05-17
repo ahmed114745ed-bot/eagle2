@@ -4637,13 +4637,90 @@
     // Initialize PJAX — exclude filter buttons from pjax interception
     $(document).pjax('a[data-pjax]:not(.btn)', '#pjax-container');
 
-    // Force all .btn links inside forms to bypass pjax (full page reload)
-    $(document).on('click', '.btn-default, .btn-info', function(e) {
-        if ($(this).is('a') && $(this).attr('href') && $(this).attr('href') !== '#') {
+    // Force all .btn links inside forms/tabs to bypass pjax (full page reload)
+    // BUT exclude .nav-link inside gift-log and charge tabs (handled by AJAX sub-tab switcher below)
+    $(document).on('click', '.btn-default, .btn-info, .charge_action', function(e) {
+        if ($(this).is('a') && $(this).attr('href') && $(this).attr('href') !== '#' && !$(this).closest('.tab-btn').length) {
             e.stopImmediatePropagation();
             window.location.href = $(this).attr('href');
             return false;
         }
+    });
+
+    // ── AJAX Sub-Tab Switcher (sender/receiver in gift-log, receiver/charger in charge) ──
+    // When clicking sub-tabs (.nav-link) inside gift-log-tab or charge-tab, reload just the tab content via AJAX
+    $(document).on('click', '#gift-log-tab .nav-link, #charge-tab .nav-link', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        var $link = $(this);
+        var href = $link.attr('href');
+        if (!href || href === '#') return;
+
+        // Determine which parent tab container to reload
+        var $tabContent = $link.closest('.tab-content');
+        var tabId = $tabContent.attr('id');
+
+        // Update active state on sub-tab pills
+        $link.closest('ul.nav-pills').find('li').removeClass('active');
+        $link.closest('ul.nav-pills').find('.nav-link').removeClass('active');
+        $link.closest('li').addClass('active');
+        $link.addClass('active');
+
+        // Show loading spinner inside the tab
+        var $cardBody = $tabContent.find('.box-body.p-3, .box-body').first().parent();
+        var originalContent = $tabContent.html();
+        $tabContent.prepend('<div id="subtab-loading" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.8);z-index:100;display:flex;align-items:center;justify-content:center;border-radius:14px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--primary-color);"></i></div>');
+        $tabContent.css('position', 'relative');
+
+        // Update URL without reload
+        history.pushState(null, '', window.location.pathname + href);
+
+        // Fetch new content via AJAX
+        $.ajax({
+            url: window.location.pathname + href,
+            type: 'GET',
+            success: function(html) {
+                var $parsed = $('<div>').append($.parseHTML(html, document, true));
+                var $newContent = $parsed.find('#' + tabId);
+                if ($newContent.length) {
+                    $tabContent.html($newContent.html());
+                    $tabContent.css('position', '');
+                    // Re-initialize select2 inside loaded tab if needed
+                    $tabContent.find('#agency_id').each(function() {
+                        if (!$(this).data('select2')) {
+                            $(this).select2({
+                                placeholder: 'Select agency',
+                                allowClear: true,
+                                ajax: {
+                                    url: '/api/search/host-agency',
+                                    dataType: 'json',
+                                    delay: 250,
+                                    data: function(params) { return { q: params.term, page: params.page || 1 }; },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.data.map(function(item) { return { id: item.id, text: item.name }; }),
+                                            pagination: { more: data.next_page_url !== null }
+                                        };
+                                    },
+                                    cache: true
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    // Fallback: remove loading overlay
+                    $tabContent.find('#subtab-loading').remove();
+                    $tabContent.css('position', '');
+                }
+            },
+            error: function() {
+                // Remove loading and show error
+                $tabContent.find('#subtab-loading').remove();
+                $tabContent.css('position', '');
+                Swal.fire({ icon: 'error', title: '{{ __("Failed to load content") }}' });
+            }
+        });
     });
 
     // PJAX event listeners for loading indicator
