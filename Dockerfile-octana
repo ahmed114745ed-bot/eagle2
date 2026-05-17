@@ -47,7 +47,7 @@ WORKDIR /app
 COPY . /app
 
 # Recreate storage dirs excluded by .dockerignore
-RUN mkdir -p storage/framework/{cache,data,sessions,testing,views} storage/logs bootstrap/cache
+RUN mkdir -p storage/framework/cache storage/framework/data storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
 
 # Setup supervisord configuration
 COPY docker/octana-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
