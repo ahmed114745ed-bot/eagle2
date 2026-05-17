@@ -85,8 +85,6 @@ RUN sed -i "/^OCTANE_/d" .env && sed -i "/^SESSION_DRIVER/d" .env && sed -i "/^L
 COPY docker/octane.php /app/config/octane.php
 #COPY docker/auth.php   /app/config/auth.php
 
-RUN cat .env
-
 RUN chmod -R 777 /app/storage
 RUN chmod -R 777 /app/bootstrap
 RUN chmod 777 /app/public/settings.json

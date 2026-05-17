@@ -1,8 +1,39 @@
 # Git
 .git
 .github
-# Composers
+
+# Dependencies (reinstalled during build)
 vendor
+node_modules
+
+# Docker files (not needed inside the image)
 Dockerfile*
-Dockerfile-jobs
-composer.lock
+docker-compose*.yml
+*-deployment.yml
+
+# Secrets and env (bind-mounted at runtime)
+.env
+.env.*
+gcp.json
+service-account.json
+AuthKey_*.p8
+
+# Tests (not needed in production)
+tests
+
+# Logs and temp files
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+*.log
+
+# IDE and OS
+.idea
+.vscode
+*.swp
+*.swo
+
+# Documentation
+*.md
+LICENSE
