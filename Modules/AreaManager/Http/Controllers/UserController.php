@@ -317,7 +317,7 @@ class UserController extends MainController
                 if (! $user) {
                     return __('No User');
                 }
-                return app(UserService::class)->adminUserAvatar($user, false, areaManager_url("users/profile/{$user->id}"));
+                return app(UserService::class)->adminUserCard($user, false, areaManager_url("users/profile/{$user->id}"));
             });
 
         $grid->column('agency_id', __('Agency'))
@@ -329,7 +329,7 @@ class UserController extends MainController
 
                 return app(AgencyService::class)->adminAgencyData($agency);
             });
-
+   Admin::style(UserService::adminUserCardStyles() . gridStyles());
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
             .modal-dialog {

@@ -589,7 +589,7 @@ class RoomController extends MainController
                 return __('No User');
             }
             $showUrl = url("areaManager/users/profile/{$this->id}");
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
+            return app(UserService::class)->adminUserCard($user, withoutLevels: true, showUrl: $showUrl);
         });
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {

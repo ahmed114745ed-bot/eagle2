@@ -589,8 +589,9 @@ class RoomController extends MainController
                 return __('No User');
             }
 
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+            return app(UserService::class)->adminUserCard($user, withoutLevels: true);
         })->sortable();
+           Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
             $adminsCount = is_array($this->admins) ? count($this->admins) : 0;

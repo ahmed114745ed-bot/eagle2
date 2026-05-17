@@ -46,12 +46,27 @@ class SalariesController extends MainController
     protected function users_grid()
     {
         $grid = new Grid(new User());
+        $grid->model()->with([
+                'profile',
+                'agency',
+                'userSetting',
+                'country',
+                'senderLevel',
+                'receiverLevel',
+                'monthlyDiamondReceive',
+                'shippingAgency',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ]);
+
         $grid->column('id', __('id'));
         $grid->column('agency', __('agency'))->display(function () {
             return @$this->agency->name;
         });
         // $grid->column ('uuid',__ ('uuid'));
-        $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this));
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('old_usd', __('old usd'));
         $grid->column('target_usd', __('target usd'));
         $grid->column('target_token_usd', __('target token usd'));
@@ -148,7 +163,10 @@ class SalariesController extends MainController
             });
         });
         $grid->column('id', __('id'));
-        $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this, withoutLevels: true));
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this, withoutLevels: true);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('total', __('salary'))->default(0);
         if (Admin::user()->isRole('developer') || Admin::user()->isRole('admin')) {
             $grid->column('pay', __('pay'))->display(function () {
