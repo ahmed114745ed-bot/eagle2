@@ -58,28 +58,10 @@ RUN env REDIS_HOST=172.17.0.1 \
     composer install --no-dev --no-interaction --ignore-platform-reqs   --optimize-autoloader --no-scripts
  
 
-RUN env REDIS_HOST=172.17.0.1 \
-    composer require laravel/octane   --no-interaction --ignore-platform-reqs --no-scripts
-
-RUN env REDIS_HOST=172.17.0.1 \ 
-    php artisan octane:install  --server=swoole
- 
-
 ENV OCTANE_WORKERS=4
 ENV OCTANE_MAX_REQUESTS=500
 ENV OCTANE_TASK_WORKERS=4
-
 ENV OCTANE_SERVER="swoole"
-
-
-RUN sed -i "/^OCTANE_/d" .env && sed -i "/^SESSION_DRIVER/d" .env && sed -i "/^LOG_LEVEL/d" .env && printf "%s\n" \
-"OCTANE_WORKERS=${OCTANE_WORKERS}" \
-"OCTANE_MAX_REQUESTS=${OCTANE_MAX_REQUESTS}" \
-"OCTANE_SERVER=${OCTANE_SERVER}" \
-"OCTANE_TASK_WORKERS=${OCTANE_TASK_WORKERS}" \
-"SESSION_DRIVER=redis" \
-"LOG_LEVEL=error" \
->> .env
 
 
 
