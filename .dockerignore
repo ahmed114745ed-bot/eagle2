@@ -5,6 +5,9 @@
 # Dependencies (reinstalled during build)
 vendor
 node_modules
+# TODO: remove this exclusion after backend team fixes composer.json/lock mismatch
+# (intervention/image ^2.1 in json vs 3.11.8 in lock)
+composer.lock
 
 # Docker files (not needed inside the image)
 Dockerfile*
