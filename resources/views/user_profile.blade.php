@@ -4123,12 +4123,33 @@
                                     ? (@$giftSLog->gift->name ?? '')
                                     : (@$giftSLog->gift->e_name ?? '');
 
-                                $giftCategory = @$giftSLog->gift->category;
+                                // Get category name
                                 $giftCategoryName = '';
-                                if ($giftCategory && isset($giftCategory->title)) {
-                                    $giftCategoryName = is_array($giftCategory->title)
-                                        ? ($giftCategory->title[app()->getLocale()] ?? $giftCategory->title['en'] ?? '')
-                                        : $giftCategory->title;
+                                $gift = @$giftSLog->gift;
+                                if ($gift) {
+                                    if (!$gift->relationLoaded('category')) {
+                                        $gift->load('category');
+                                    }
+
+                                    $giftCategory = $gift->category;
+
+                                    \Log::info('Gift Category Debug', [
+                                        'gift_id' => $gift->id,
+                                        'gift_category_id' => $gift->gift_category_id ?? null,
+                                        'category_exists' => $giftCategory ? true : false,
+                                        'category_title' => $giftCategory->title ?? null,
+                                        'locale' => app()->getLocale(),
+                                    ]);
+
+                                    if ($giftCategory && $giftCategory->title) {
+                                        $categoryTitle = $giftCategory->title;
+                                        if (is_array($categoryTitle)) {
+                                            $locale = app()->getLocale();
+                                            $giftCategoryName = trim($categoryTitle[$locale] ?? $categoryTitle['en'] ?? '');
+                                        } else {
+                                            $giftCategoryName = trim($categoryTitle);
+                                        }
+                                    }
                                 }
 
                                     $agency =$giftSLog->agency;
