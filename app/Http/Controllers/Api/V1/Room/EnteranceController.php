@@ -687,7 +687,7 @@ class EnteranceController extends Controller
             //    $this->repo->save ($room);
 
             $room->save();
-            $room = Room::find($room->id);
+            $room = Room::with(['myType', 'backgroundImage', 'background'])->find($room->id);
 
             $request['owner_id'] = $room->uid;
             $is_locked = false;

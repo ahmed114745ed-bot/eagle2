@@ -1297,12 +1297,17 @@ class RoomController extends Controller
         $star_level            = Common::getLevel($user_id, 1);
         $gold_level            = Common::getLevel($user_id, 2);
         $vip_level             = Common::getLevel($user_id, 3);
-        $star_img              = DB::table('vips')->where('level', $star_level)->where('type', 1)->value('img');
-        $gold_img              = DB::table('vips')->where('level', $gold_level)->where('type', 2)->value('img');
-        $vip_img               = DB::table('vips')->where('level', $vip_level)->where('type', 3)->value('img');
-        $result[0]['star_img'] = $star_img;
-        $result[0]['gold_img'] = $gold_img;
-        $result[0]['vip_img']  = $vip_img;
+        $vipImages = DB::table('vips')
+            ->where(function ($q) use ($star_level, $gold_level, $vip_level) {
+                $q->where(fn($q) => $q->where('level', $star_level)->where('type', 1))
+                  ->orWhere(fn($q) => $q->where('level', $gold_level)->where('type', 2))
+                  ->orWhere(fn($q) => $q->where('level', $vip_level)->where('type', 3));
+            })
+            ->get(['level', 'type', 'img'])
+            ->keyBy('type');
+        $result[0]['star_img'] = $vipImages->get(1)?->img;
+        $result[0]['gold_img'] = $vipImages->get(2)?->img;
+        $result[0]['vip_img']  = $vipImages->get(3)?->img;
 
         $result[0]['is_time'] = 0;
         $info                 = Db::table('time_logs')->selectRaw('created_at,time')->where([

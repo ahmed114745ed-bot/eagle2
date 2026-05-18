@@ -201,8 +201,12 @@ class SearchRepository implements SearchRepositoryInterface
             })
             ->whereNotIn('id', $blockedUserIds)
             ->where('status', 1)
-            ->having('total_score', '>', 0) // ✅ Exclude non-matching users
-            ->with(['followedByAuthUser', 'country'])
+            ->having('total_score', '>', 0)
+            ->with([
+                'followedByAuthUser', 'country', 'profile', 'mangerType',
+                'specialId.ware', 'color_image', 'receiverLevel', 'senderLevel',
+                'agency.owner', 'packs.ware',
+            ])
             ->orderByDesc('total_score')
             ->paginate(10, ['*'], 'page', $page);
 
@@ -288,8 +292,9 @@ class SearchRepository implements SearchRepositoryInterface
                             ->where('status', '<>', 'seen');
                     }]);
             },
-            'profile',
-            'UserVip'
+            'profile', 'UserVip', 'mangerType', 'specialId.ware',
+            'country', 'color_image', 'receiverLevel', 'senderLevel',
+            'agency.owner',
         ])
             ->paginate($perPage, ['*'], 'page', $currentPage);
     }

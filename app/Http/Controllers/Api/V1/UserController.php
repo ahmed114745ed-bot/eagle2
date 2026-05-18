@@ -1472,9 +1472,9 @@ class UserController extends Controller
     {
         $ops = [0 => 'no agency'];
         $app_owner_id = Agency::query()->where('status', 1)->pluck('app_owner_id');
-        $users = User::whereIn('id', $app_owner_id)->get();
-        foreach ($users as $user) {
-            $ops[$user->id] = $user->name;
+        $users = User::whereIn('id', $app_owner_id)->pluck('name', 'id');
+        foreach ($users as $id => $name) {
+            $ops[$id] = $name;
         }
         return $ops;
     }

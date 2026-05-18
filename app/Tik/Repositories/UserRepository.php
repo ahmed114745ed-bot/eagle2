@@ -243,7 +243,14 @@ class UserRepository extends AbstractRepository
 
     public function getUsersWithPaginate($ids, $paginate)
     {
-        return $this->model->query()->whereIn('id', $ids)->paginate($paginate);
+        return $this->model->query()
+            ->with([
+                'profile:id,user_id,avatar,birthday,gender',
+                'UserVip',
+                'mangerType',
+                'specialId.ware',
+            ])
+            ->whereIn('id', $ids)->paginate($paginate);
     }
 
 
