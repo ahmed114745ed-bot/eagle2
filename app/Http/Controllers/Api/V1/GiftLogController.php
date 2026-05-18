@@ -532,7 +532,10 @@ class GiftLogController extends Controller
                             continue;
                         }
 
-                        $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
+                        // Wrap in DB::transaction to ensure data consistency
+                        DB::transaction(function () use ($user, $diamonds) {
+                            $this->processDiamonds($user, $diamonds, Carbon::now(), 11, 2025);
+                        });
                     } catch (\Throwable $e) {
 
                         \Log::error("Monthly diamond add ERROR for user_id = {$userSalary->user_id}", [
@@ -605,13 +608,18 @@ class GiftLogController extends Controller
             ->chunk(50, function ($giftLogs) {
 
                 $roomIds = $giftLogs->pluck('room_id')->toArray();
+                // Batch fetch for existence check (optimized)
                 $existingTotals = TotalRoomGift::whereIn('room_id', $roomIds)
                     ->whereDate('created_at', now())
                     ->get()
                     ->keyBy('room_id');
 
                 foreach ($giftLogs as $log) {
-                    $totalRoomGift = $existingTotals->get($log->room_id);
+                    // Use lockForUpdate() to prevent race condition on concurrent requests
+                    $totalRoomGift = TotalRoomGift::where('room_id', $log->room_id)
+                        ->whereDate('created_at', now())
+                        ->lockForUpdate()
+                        ->first();
 
                     if (!$totalRoomGift) {
                         $totalRoomGift = TotalRoomGift::create([
