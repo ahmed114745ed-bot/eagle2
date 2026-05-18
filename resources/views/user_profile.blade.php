@@ -4123,12 +4123,20 @@
                                     ? (@$giftSLog->gift->name ?? '')
                                     : (@$giftSLog->gift->e_name ?? '');
 
-                                $giftCategory = @$giftSLog->gift->category;
+                                // Get category name
                                 $giftCategoryName = '';
-                                if ($giftCategory && isset($giftCategory->title)) {
-                                    $giftCategoryName = is_array($giftCategory->title)
-                                        ? ($giftCategory->title[app()->getLocale()] ?? $giftCategory->title['en'] ?? '')
-                                        : $giftCategory->title;
+                                if (isset($giftSLog->gift) && $giftSLog->gift) {
+                                    // Load category if not already loaded
+                                    if (!isset($giftSLog->gift->category)) {
+                                        $giftSLog->gift->load('category');
+                                    }
+
+                                    $giftCategory = $giftSLog->gift->category;
+                                    if ($giftCategory && isset($giftCategory->title)) {
+                                        $giftCategoryName = is_array($giftCategory->title)
+                                            ? ($giftCategory->title[app()->getLocale()] ?? $giftCategory->title['en'] ?? '')
+                                            : $giftCategory->title;
+                                    }
                                 }
 
                                     $agency =$giftSLog->agency;
