@@ -893,7 +893,8 @@ class UserController extends MainController
                     ->with([
                         'receiver:id,name,uuid,special_id',
                         'sender:id,name,uuid,special_id',
-                        'gift:id,name,price,e_name,img,type',
+                        'gift:id,name,price,e_name,img,type,gift_category_id',
+                        'gift.category:id,title',
                         'room:id,room_name,room_cover',
                         'agency:id,name',
                     ])
