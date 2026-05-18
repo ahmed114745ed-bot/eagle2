@@ -204,8 +204,9 @@ class SearchRepository implements SearchRepositoryInterface
             ->having('total_score', '>', 0)
             ->with([
                 'followedByAuthUser', 'country', 'profile', 'mangerType',
-                'specialId.ware', 'color_image', 'receiverLevel', 'senderLevel',
-                'agency.owner', 'packs.ware',
+                'specialId.ware', 'color_image',
+                'receiverLevel:id,img,level', 'senderLevel:id,img,level',
+                'agency' => fn($q) => $q->select('id', 'name', 'app_owner_id')->with('owner:id,name'),
             ])
             ->orderByDesc('total_score')
             ->paginate(10, ['*'], 'page', $page);

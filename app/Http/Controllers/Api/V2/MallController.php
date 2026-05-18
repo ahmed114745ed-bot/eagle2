@@ -158,8 +158,8 @@ class MallController extends Controller
         $expireUpdates = $expireUserVips->groupBy('expire');
         foreach ($expireUpdates as $expireValue => $vips) {
             $vipIds = $vips->pluck('id')->toArray();
-            Pack::where('vip_user_id', '!=', null)
-                ->whereIn('vip_user_id', $vipIds)
+            // whereIn() already ignores NULL values, no need for redundant != null check
+            Pack::whereIn('vip_user_id', $vipIds)
                 ->update(['expire' => $expireValue]);
         }
 

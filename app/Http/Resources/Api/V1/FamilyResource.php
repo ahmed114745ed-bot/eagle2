@@ -42,7 +42,9 @@ class FamilyResource extends JsonResource
             $owner = new \stdClass();
         }
 
-        $mems = $this->relationLoaded('allMembers') ? $this->allMembers : FamilyUser::query()->with("user")->where('family_id', @$this->id)->where('status', 1)->where("user_type",'!=',2)->get();
+        // Always use loadMissing to ensure relation is loaded with proper eager loading (fixes N+1)
+        $this->resource->loadMissing('allMembers.user');
+        $mems = $this->allMembers;
 
         $authUserId = $request->user()->id;
         $requested = FamilyUser::where('user_id', $authUserId)
@@ -50,9 +52,7 @@ class FamilyResource extends JsonResource
         ->where('status', 0)
         ->exists();
 
-        $amIMember = $this->relationLoaded('allMembers')
-            ? $this->allMembers->where('user_id', $authUserId)->isNotEmpty()
-            : FamilyUser::query()->where('user_id', $authUserId)->where('family_id', $this->id)->where('status', 1)->exists();
+        $amIMember = $this->allMembers->where('user_id', $authUserId)->isNotEmpty();
 
         return [
 
