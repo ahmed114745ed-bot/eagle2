@@ -75,7 +75,7 @@ services:
           memory: 256M
 
   redis:
-    image: redis:latest
+    image: redis:8.6
     command: ["redis-server", "--timeout", "0", "--tcp-keepalive", "60", "--maxmemory", "1gb", "--maxmemory-policy", "allkeys-lru"]
     ports:
       - "6379:6379"
