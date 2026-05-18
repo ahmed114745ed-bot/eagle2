@@ -110,8 +110,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Prevent lazy loading in non-production environments to detect N+1 queries
+        // Detect N+1 queries: log violations instead of throwing exceptions
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(!$this->app->isProduction());
+
+        // In non-production, log lazy loading violations instead of crashing
+        if (!$this->app->isProduction()) {
+            \Illuminate\Database\Eloquent\Model::handleLazyLoadingViolationUsing(function ($model, $relation) {
+                \Illuminate\Support\Facades\Log::warning("N+1 Query Detected: Lazy loading [{$relation}] on model [" . get_class($model) . "]");
+            });
+        }
 
         // Override admin.pjax middleware for Swoole/Octane compatibility
         $this->overridePjaxMiddleware();

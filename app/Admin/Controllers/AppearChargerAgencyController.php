@@ -365,11 +365,9 @@ class AppearChargerAgencyController extends MainController
 
         $form->select('app_owner_id', __('app owner id'))
             ->options(function ($value) {
-                $ops2 = [];
-                foreach (User::where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
+                if (!$value) return [];
+                $user = User::find($value);
+                return $user ? [$user->id => $user->uuid . '_' . $user->name] : [];
             })
             ->ajax('/api/search/users5', 'id', 'name')->rules('required');
 

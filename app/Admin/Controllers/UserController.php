@@ -705,7 +705,7 @@ class UserController extends MainController
     public function countries()
     {
         $ops = [null => __('no country')];
-        $countries = Country::all();
+        $countries = Country::select('id', 'name', 'e_name')->get();
         foreach ($countries as $country) {
             $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
         }

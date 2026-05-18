@@ -95,7 +95,7 @@ class SalariesController extends MainController
     protected function agencies_grid()
     {
         $grid = new Grid(new Agency());
-        $grid->model()->where('target_usd', '>', 0);
+        $grid->model()->where('target_usd', '>', 0)->withCount('users');
         $grid->column('id', __('id'));
         $grid->column('name', __('name'));
         $grid->column('phone', __('phone'));
@@ -106,7 +106,7 @@ class SalariesController extends MainController
             return $this->old_usd + $this->target_usd - $this->target_token_usd;
         });
         $grid->column('users', __('users'))->display(function () {
-            return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users()->count() . '</a>';
+            return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
         });
         $grid->column('cashing', __('cashing'))->display(function () {
             return (new SalariesAction($this->id, 'agency'))->render();
@@ -229,16 +229,25 @@ class SalariesController extends MainController
     public function updateUserCutAmount()
     {
         UserWallet::with('user')->chunk(100, function ($usersWallets) {
-            foreach ($usersWallets as $wallet) {
-                $totalCutAmount = UserSallary::where('user_id', $wallet->user_id)
-                    ->sum('cut_amount');
+            $walletUserIds = $usersWallets->pluck('user_id')->toArray();
 
+            $totalCutAmounts = UserSallary::whereIn('user_id', $walletUserIds)
+                ->groupBy('user_id')
+                ->selectRaw('user_id, SUM(cut_amount) as total_cut')
+                ->pluck('total_cut', 'user_id');
+
+            $currentSalaries = UserSallary::whereIn('user_id', $walletUserIds)
+                ->where('month', now()->format('m'))
+                ->where('year', now()->format('Y'))
+                ->where('is_finished', 0)
+                ->get()
+                ->keyBy('user_id');
+
+            foreach ($usersWallets as $wallet) {
+                $totalCutAmount = $totalCutAmounts->get($wallet->user_id, 0);
                 $cutAmount = $wallet->cut_amount - $totalCutAmount;
-                $UserSalary = UserSallary::where('user_id', $wallet->user_id)->where([
-                    'month' => now()->format('m'),
-                    'year' => now()->format('Y'),
-                    'is_finished' => 0
-                ])->first();
+                $UserSalary = $currentSalaries->get($wallet->user_id);
+
                 if ($UserSalary) {
                     $UserSalary->cut_amount += $cutAmount;
                     $UserSalary->save();
@@ -268,10 +277,15 @@ class SalariesController extends MainController
         $usersId = [];
 
         UserWallet::with('user')->chunk(100, function ($usersWallets) use (&$counter, &$usersId) {
-            foreach ($usersWallets as $wallet) {
+            $walletUserIds = $usersWallets->pluck('user_id')->toArray();
 
-                $totalCutAmount = UserSallary::where('user_id', $wallet->user_id)
-                    ->sum('cut_amount');
+            $totalCutAmounts = UserSallary::whereIn('user_id', $walletUserIds)
+                ->groupBy('user_id')
+                ->selectRaw('user_id, SUM(cut_amount) as total_cut')
+                ->pluck('total_cut', 'user_id');
+
+            foreach ($usersWallets as $wallet) {
+                $totalCutAmount = $totalCutAmounts->get($wallet->user_id, 0);
 
                 if ($wallet->cut_amount != $totalCutAmount) {
                     $counter++;

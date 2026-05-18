@@ -46,7 +46,7 @@ class AgencyMangerUsers extends MainController
         $grid = new Grid(new User());
 
         $grid = new Grid(new User());
-        $grid->model ()->ofAgency();
+        $grid->model ()->ofAgency()->with('profile');
         $grid->quickSearch ();
         $grid->filter (function (Grid\Filter $filter){
             $filter->expand ();
@@ -326,17 +326,13 @@ class AgencyMangerUsers extends MainController
         // $form->textarea('credential', __('Credential'));
         // $form->number('type_user', __('Type user'));
         // $form->text('apple_id', __('Apple id'));
-        $opsAgencyManger = [];
-        foreach (DB::table('admin_users')->get() as $user){
-            $opsAgencyManger[$user->id] = $user->name;
-        }
-        $form->select('agency_manger_id', __('Agency Manger Id'))->options($opsAgencyManger);
+        $form->select('agency_manger_id', __('Agency Manger Id'))->options(
+            DB::table('admin_users')->pluck('name', 'id')
+        );
 
-        $opsAgencyMangerUser = [];
-        foreach (User::where('is_manger',0)->get() as $user){
-            $opsAgencyMangerUser[$user->id] = $user->uuid.'_'.$user->name;
-        }
-        $form->select('agency_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerUser);
+        $form->select('agency_manger_id', __('Agency Manger Id'))->options(
+            User::where('is_manger', 0)->selectRaw("id, CONCAT(uuid, '_', name) as label")->pluck('label', 'id')
+        );
         // $form->text('apple_id', __('Apple id'));
         $form->hidden('is_manger', __('Is manger'))->default(true);
 
