@@ -64,7 +64,7 @@ return [
 
         RequestTerminated::class => [
             FlushTemporaryContainerInstances::class,
-            // DisconnectFromDatabases::class,
+            DisconnectFromDatabases::class,
             CollectGarbage::class,
             ReportException::class,
             StopWorkerIfNecessary::class,
