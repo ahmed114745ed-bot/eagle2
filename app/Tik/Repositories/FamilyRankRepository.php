@@ -22,7 +22,7 @@ class FamilyRankRepository extends AbstractRepository
     {
         $builder = $this->model->query()->selectRaw('sum(coins) as coins,family_id')
             ->groupBy('family_id')->whereHas('family')
-            ->with('family')
+            ->with(['family' => fn($q) => $q->with(['owner' => fn($q) => $q->with('country')])])
             ->where($condition);
 
         foreach ($whereBetween as $key => $value) {

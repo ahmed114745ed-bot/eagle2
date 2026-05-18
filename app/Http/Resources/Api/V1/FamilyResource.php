@@ -16,7 +16,7 @@ class FamilyResource extends JsonResource
      */
     public function toArray($request)
     {
-        $user = User::find($this->user_id);
+        $user = $this->owner;
         if ($user) {
             $owner = [
                 'id'        => $user->id,
@@ -24,7 +24,7 @@ class FamilyResource extends JsonResource
                 'family_id' => strval($user->family_id),
                 'name'  => $user->name,
                 'profile' => [
-                    'image' => $user->profile->avatar,
+                    'image' => @$user->profile->avatar,
                 ],
                 'country' => [
                     'id' => @$user->country->id,
@@ -32,9 +32,9 @@ class FamilyResource extends JsonResource
                     'flag' => @$user->country->flag,
                 ],
                 'family_status' => 2,
-                'type_user'            => intval(@$user->type_user) ?: 0, // both
+                'type_user'            => intval(@$user->type_user) ?: 0,
                 "manger_type"          => new MangerTypeResource(@$user->mangerType),
-                'uuid'                 => @$user->uuid, // both
+                'uuid'                 => @$user->uuid,
                 'id_image'             => @$user->specialId?->ware?->show_img ?? '',
                 'special_id'          =>  @$user->specialId?->ware?->id ?? 0,
             ];
@@ -42,11 +42,17 @@ class FamilyResource extends JsonResource
             $owner = new \stdClass();
         }
 
-        $mems = FamilyUser::query()->with("user")->where('family_id', @$this->id)->where('status', 1)->where("user_type",'!=',2)->get();
-        $requested = FamilyUser::where('user_id', $request->user()->id)
+        $mems = $this->relationLoaded('allMembers') ? $this->allMembers : FamilyUser::query()->with("user")->where('family_id', @$this->id)->where('status', 1)->where("user_type",'!=',2)->get();
+
+        $authUserId = $request->user()->id;
+        $requested = FamilyUser::where('user_id', $authUserId)
         ->where('family_id', $this->id)
         ->where('status', 0)
         ->exists();
+
+        $amIMember = $this->relationLoaded('allMembers')
+            ? $this->allMembers->where('user_id', $authUserId)->isNotEmpty()
+            : FamilyUser::query()->where('user_id', $authUserId)->where('family_id', $this->id)->where('status', 1)->exists();
 
         return [
 
@@ -57,11 +63,11 @@ class FamilyResource extends JsonResource
             'max_num_of_members' => @$this->num ?: 0,
             'max_num_of_admins' => @$this->num_admins ?: 0,
             'owner' => $owner,
-            'am_i_member' => FamilyUser::query()->where('user_id', $request->user()->id)->where('family_id', $this->id)->where('status', 1)->exists(),
-            'am_i_owner' => (@$this->user_id == $request->user()->id) ? true : false,
+            'am_i_member' => $amIMember,
+            'am_i_owner' => (@$this->user_id == $authUserId) ? true : false,
             'am_i_admin' => $request->user()->is_family_admin ? true : false,
             'members' => ShortFamilyUserResource::collection($mems),
-            'num_of_requests' => FamilyUser::query()->where('family_id', $this->id)->where('status', 0)->count(),
+            'num_of_requests' => $this->pending_requests_count ?? FamilyUser::query()->where('family_id', $this->id)->where('status', 0)->count(),
             'num_of_members' => ($this->members_count + 1),
             'level' => @$this->level ?: '',
             'requested' => @$requested,

@@ -128,7 +128,7 @@ class ProfileController extends Controller
     public function getFollowingUsers()
     {
         $followedIds = Follow::query()->whereHas('followed')->where('user_id', Auth::id())->pluck('followed_user_id');
-        $users = User::query()->whereIn("id", $followedIds)->get();
+        $users = User::query()->with(['profile', 'UserVip', 'mangerType', 'specialId.ware', 'country'])->whereIn("id", $followedIds)->get();
         return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
     }
 }

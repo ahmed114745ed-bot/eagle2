@@ -110,6 +110,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Prevent lazy loading in non-production environments to detect N+1 queries
+        \Illuminate\Database\Eloquent\Model::preventLazyLoading(!$this->app->isProduction());
+
         // Override admin.pjax middleware for Swoole/Octane compatibility
         $this->overridePjaxMiddleware();
 
