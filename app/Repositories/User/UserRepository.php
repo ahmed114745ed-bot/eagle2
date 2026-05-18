@@ -535,11 +535,7 @@ class UserRepository extends Repository
     {
         //        $authUserId = auth()->id();
         return User::with([
-            'packs',
-            //            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
-            //                ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-            //                ->where('is_used', 1)
-            //                ->with(['ware']),
+            'packs.ware',
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
             'receiverLevel:id,img,level,exp',
             'senderLevel:id,img,level',
@@ -570,7 +566,7 @@ class UserRepository extends Repository
     {
 
         return User::with([
-            'packs',
+            'packs.ware',
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
             'receiverLevel:id,img,level',
             'senderLevel:id,img,level',
