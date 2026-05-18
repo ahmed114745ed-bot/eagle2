@@ -2608,7 +2608,6 @@ Route::get('/set-lucky-version-7', function () {
 Route::get('/fix-gift-prices/preview', function () {
     $affectedRecords = DB::table('gift_logs as gl')
         ->join('gifts as g', 'g.id', '=', 'gl.giftId')
-        ->where('gl.giftNum', '<>', 1)
         ->where('g.gift_category_id', 1)
         ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
         ->whereRaw('gl.giftPrice != (gl.giftNum * gl.total)')
@@ -2640,7 +2639,6 @@ Route::get('/fix-gift-prices/execute', function () {
         // Get IDs of affected records
         $affectedIds = DB::table('gift_logs as gl')
             ->join('gifts as g', 'g.id', '=', 'gl.giftId')
-            ->where('gl.giftNum', '<>', 1)
             ->where('g.gift_category_id', 1)
             ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
             ->whereRaw('gl.giftPrice != (gl.giftNum * gl.total)')
