@@ -3,8 +3,6 @@ version: '3.8'
 services:
   rixo-chat-octa:
     image: ${OCTA_IMAGE}
-    ports:
-      - "8080:8000"
     volumes:
       - /var/www/rixo-chat/.env:/app/.env
       - /var/www/rixo-chat/gcp.json:/app/docker/gcp.json
@@ -77,8 +75,6 @@ services:
   redis:
     image: redis:8.6
     command: ["redis-server", "--timeout", "0", "--tcp-keepalive", "60", "--maxmemory", "1gb", "--maxmemory-policy", "allkeys-lru"]
-    ports:
-      - "6379:6379"
     networks:
       - app-network
     deploy:
