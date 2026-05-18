@@ -4125,17 +4125,22 @@
 
                                 // Get category name
                                 $giftCategoryName = '';
-                                if (isset($giftSLog->gift) && $giftSLog->gift) {
-                                    // Load category if not already loaded
-                                    if (!isset($giftSLog->gift->category)) {
-                                        $giftSLog->gift->load('category');
+                                $gift = @$giftSLog->gift;
+                                if ($gift) {
+                                    // Load category relation if not loaded
+                                    if (!$gift->relationLoaded('category')) {
+                                        $gift->load('category');
                                     }
 
-                                    $giftCategory = $giftSLog->gift->category;
-                                    if ($giftCategory && isset($giftCategory->title)) {
-                                        $giftCategoryName = is_array($giftCategory->title)
-                                            ? ($giftCategory->title[app()->getLocale()] ?? $giftCategory->title['en'] ?? '')
-                                            : $giftCategory->title;
+                                    $giftCategory = $gift->category;
+                                    if ($giftCategory && $giftCategory->title) {
+                                        $categoryTitle = $giftCategory->title;
+                                        if (is_array($categoryTitle)) {
+                                            $locale = app()->getLocale();
+                                            $giftCategoryName = trim($categoryTitle[$locale] ?? $categoryTitle['en'] ?? '');
+                                        } else {
+                                            $giftCategoryName = trim($categoryTitle);
+                                        }
                                     }
                                 }
 
