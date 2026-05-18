@@ -763,7 +763,7 @@ class UserRepository extends Repository
             ->toArray();
 
         $builder = User::query()
-            ->with('profile')
+            ->with(['profile', 'images', 'chatRoomsAsUser', 'chatRoomsAsUser2'])
             ->where('id', '!=', $userId);
 
         // Use whereNotIn instead of whereDoesntHave - way faster with index

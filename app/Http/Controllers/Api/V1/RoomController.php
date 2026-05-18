@@ -494,7 +494,7 @@ class RoomController extends Controller
         $roomAdmin = Room::query()->where(['uid' => $uid])->value('room_admin');
 
         $roomAdmin = explode(',', $roomAdmin);
-        $admins    = User::whereIn('id', $roomAdmin)->get();
+        $admins    = User::with('profile')->whereIn('id', $roomAdmin)->get();
         $admins    = $admins->filter(function ($q) {
             return !Common::hasInPack($q->id, 17, true);
         });
@@ -511,7 +511,7 @@ class RoomController extends Controller
         $roomVisitor = explode(',', $roomVisitor);
 
         $roomVisitor = array_values(array_diff($roomVisitor, $roomAdmin));
-        $visitors    = User::query()->whereIn('id', $roomVisitor)->get();
+        $visitors    = User::query()->with('profile')->whereIn('id', $roomVisitor)->get();
         $visitors    = $visitors->filter(function ($q) {
             return !Common::hasInPack($q->id, 17, true);
         });
@@ -524,7 +524,7 @@ class RoomController extends Controller
             $visitor[$k]['is_admin'] = 0;
         }
         $res['room_id']  = $uid;
-        $res['owner']    = new UserResource(User::find($uid));
+        $res['owner']    = new UserResource(User::with('profile')->find($uid));
         $res['admin']    = UserResource::collection($admins);  //$admin;
         $res['visitors'] = UserResource::collection($visitors); //$visitor;
         return Common::apiResponse(1, '', $res);
@@ -545,9 +545,25 @@ class RoomController extends Controller
         $roomSound_arr     = explode(",", $room['room_sound']);
         $mic               = [];
 
+        // Pre-load all mic users with their profiles in ONE query (fixes N+1)
+        $micUserIds = array_filter($microphone, fn($v) => $v > 0);
+        $micUsers = [];
+        if (!empty($micUserIds)) {
+            $micUsers = User::with('profile')
+                ->whereIn('id', $micUserIds)
+                ->get()
+                ->keyBy('id');
+        }
+
+        // Pre-load wares for dress_1 and dress_4 values
+        $dressIds = $micUsers->pluck('dress_4')->merge($micUsers->pluck('dress_1'))->filter()->unique()->toArray();
+        $waresData = [];
+        if (!empty($dressIds)) {
+            $waresData = DB::table('wares')->whereIn('id', $dressIds)->get(['id', 'color', 'img1'])->keyBy('id');
+        }
+
         foreach ($microphone as $k => &$v) {
             $ar = [];
-            //            $ar['remainTime'] = 0;
             foreach ($is_prohibit_sound as $ke => &$va) {
                 if ($k == $ke) {
                     $ar['can_lock'] = $va ? 2 : 1;
@@ -560,20 +576,18 @@ class RoomController extends Controller
                 $ar['status'] = 3;
             } else {
                 $ar['status']   = 2;
-                $user           = (array)DB::table('users')->selectRaw("id,nickname,dress_1,dress_4")->find($v);
+                $userModel = $micUsers->get($v);
                 $ar['user_id']  = $v;
-                $ar['avatar']   = @User::query()->find($v)->profile->avatar;
-                $ar['nickname'] = $user['nickname'];
-                $ar['gender']   = @User::query()->find($v)->profile->gender;
-                if ($user['dress_1']) {
-                    $txk       = DB::table('wares')->where(['id' => $user['dress_4']])->value('img1');
-                    $ar['txk'] = $txk;
+                $ar['avatar']   = $userModel?->profile?->avatar ?? '';
+                $ar['nickname'] = $userModel?->nickname ?? '';
+                $ar['gender']   = $userModel?->profile?->gender ?? '';
+                if ($userModel && $userModel->dress_1) {
+                    $ar['txk'] = isset($waresData[$userModel->dress_4]) ? $waresData[$userModel->dress_4]->img1 : '';
                 } else {
                     $ar['txk'] = '';
                 }
-                if ($user['dress_4']) {
-                    $ar['mic_color'] =
-                        DB::table('wares')->where(['id' => $user['dress_4']])->value('color') ?: '#ffffff';
+                if ($userModel && $userModel->dress_4) {
+                    $ar['mic_color'] = isset($waresData[$userModel->dress_4]) ? ($waresData[$userModel->dress_4]->color ?: '#ffffff') : '#ffffff';
                 } else {
                     $ar['mic_color'] = '#ffffff';
                 }
@@ -600,12 +614,6 @@ class RoomController extends Controller
                     if ($ar['remainTime'] <= 0) {
                         Db::table('time_log')->where(['uid' => $uid, 'muid' => $v])->delete();
                     }
-                    //if ($v == '1100001'){
-                    //}
-                    //删除计时时间
-                    // if ($ar['remainTime'] == 0){
-                    //    //Db::name('time_log')->where(array('uid'=>$uid,'muid'=>$uid))->delete();
-                    // }
                 }
             }
             $ar['is_muted'] = in_array($v, $roomSound_arr) ? 2 : 1;
@@ -704,7 +712,7 @@ class RoomController extends Controller
         }
 
         $user               = (array)DB::table('users')->selectRaw('id,nickname')->find($user_id);
-        $u                  = User::query()->find($user_id);
+        $u                  = User::query()->with('profile')->find($user_id);
         $user['avatar']     = @$u->profile->avatar;
         $user_level         = Common::getLevel($user_id, 3);
         $user['nick_color'] = Common::getNickColorByVip($user_level);
@@ -1132,10 +1140,11 @@ class RoomController extends Controller
         if ($result) {
             //exit the room
             Common::quit_hand_2($uid, $black_id);
-            $user = User::find($black_id);
-            if ($user) {
-                $user->now_room_uid = 0;
-                $user->save();
+            // Load user once instead of twice (fixes duplicate User::find N+1)
+            $b = User::find($black_id);
+            if ($b) {
+                $b->now_room_uid = 0;
+                $b->save();
             }
             $mc   = [
                 'messageContent' => [
@@ -1144,11 +1153,7 @@ class RoomController extends Controller
                 ]
             ];
             $json = json_encode($mc);
-            $b    = User::find($black_id);
-            $n    = 'nan';
-            if ($b) {
-                $n = $b->name ?: 'nan';
-            }
+            $n    = $b ? ($b->name ?: 'nan') : 'nan';
 
             // record kicked user
             $user_request = $request->user();
@@ -1160,7 +1165,7 @@ class RoomController extends Controller
 
             Common::sendToZego_4('SendCustomCommand', $room_id, $uid, $black_id, $json);
             $this->calcTime($black_id);
-            $message             = __('api.blockRoom', ['name' => $b->name, 'actionName' => $request->user()->name, 'duration' => $duration], 'ar');
+            $message             = __('api.blockRoom', ['name' => $b->name ?? 'nan', 'actionName' => $request->user()->name, 'duration' => $duration], 'ar');
 
             Common::sendToZego_2('SendBroadcastMessage', $room_id, $uid, 'room', $message);
             return Common::apiResponse(1, 'success');
@@ -1279,7 +1284,7 @@ class RoomController extends Controller
 
         $result[0]['is_follows'] = $is_follows ? 1 : 2;
 
-        $user = User::find($result[0]['id']);
+        $user = User::with('profile')->find($result[0]['id']);
 
         $result[0]['image'] = @$user->profile->avatar;
         $result[0]['age']   = Common::getBrithdayMsg(@$user->profile->birthday, 0) ?: 0;
@@ -1292,12 +1297,17 @@ class RoomController extends Controller
         $star_level            = Common::getLevel($user_id, 1);
         $gold_level            = Common::getLevel($user_id, 2);
         $vip_level             = Common::getLevel($user_id, 3);
-        $star_img              = DB::table('vips')->where('level', $star_level)->where('type', 1)->value('img');
-        $gold_img              = DB::table('vips')->where('level', $gold_level)->where('type', 2)->value('img');
-        $vip_img               = DB::table('vips')->where('level', $vip_level)->where('type', 3)->value('img');
-        $result[0]['star_img'] = $star_img;
-        $result[0]['gold_img'] = $gold_img;
-        $result[0]['vip_img']  = $vip_img;
+        $vipImages = DB::table('vips')
+            ->where(function ($q) use ($star_level, $gold_level, $vip_level) {
+                $q->where(fn($q) => $q->where('level', $star_level)->where('type', 1))
+                  ->orWhere(fn($q) => $q->where('level', $gold_level)->where('type', 2))
+                  ->orWhere(fn($q) => $q->where('level', $vip_level)->where('type', 3));
+            })
+            ->get(['level', 'type', 'img'])
+            ->keyBy('type');
+        $result[0]['star_img'] = $vipImages->get(1)?->img;
+        $result[0]['gold_img'] = $vipImages->get(2)?->img;
+        $result[0]['vip_img']  = $vipImages->get(3)?->img;
 
         $result[0]['is_time'] = 0;
         $info                 = Db::table('time_logs')->selectRaw('created_at,time')->where([
@@ -1899,7 +1909,7 @@ class RoomController extends Controller
 
         try {
             $userId = $request->user()->id;
-            $room = Room::findOrFail($request->room_id);
+            $room = Room::with('roomVisitors')->findOrFail($request->room_id);
             $userToBlock = $request->user_id;
             $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
             if (!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0, 'This user is not in this room', null, 404);
