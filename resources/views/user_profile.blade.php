@@ -4123,6 +4123,14 @@
                                     ? (@$giftSLog->gift->name ?? '')
                                     : (@$giftSLog->gift->e_name ?? '');
 
+                                $giftCategory = @$giftSLog->gift->category;
+                                $giftCategoryName = '';
+                                if ($giftCategory && isset($giftCategory->title)) {
+                                    $giftCategoryName = is_array($giftCategory->title)
+                                        ? ($giftCategory->title[app()->getLocale()] ?? $giftCategory->title['en'] ?? '')
+                                        : $giftCategory->title;
+                                }
+
                                     $agency =$giftSLog->agency;
                                     $agencyName = $agency->name ?? '';
                                     $agencyId = $agency->id ?? 0;
@@ -4207,10 +4215,9 @@
                                         {!! handleShowImageWithTypes($giftSLog->gift->id ?? 0, getImagePath($giftSLog->gift->img ?? ''), 30, 30) !!}
                                         <div>
                                             <span>{{ $giftName }}</span><br>
-                                            <span>id: {{ $giftSLog->gift->id ?? 0 }}</span><br>
+                                            <span>{{ __('Gift ID') }}: {{ $giftSLog->gift->id ?? 0 }}</span><br>
                                             <small class="text-muted">
-                                                {{ __('Type') }}
-                                                : {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}<br>
+                                                {{ __('Type') }}: {{ $giftCategoryName ?: '-' }}<br>
                                                 @if(@$giftSLog->gift->pk)
                                                     <br>{{ __('PK') }}
                                                 @endif
