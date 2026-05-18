@@ -2970,58 +2970,65 @@ Route::get('/set-lucky-version-7', function () {
 });
 
 Route::get('/fix-gift-prices/preview', function () {
+
+    $formula = '(CAST(gl.giftNum AS SIGNED) * CAST(gl.total AS SIGNED))';
+
     $affectedRecords = DB::table('gift_logs as gl')
         ->join('gifts as g', 'g.id', '=', 'gl.giftId')
         ->where('g.gift_category_id', 1)
         ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
-        ->whereRaw('gl.giftPrice != (gl.giftNum * gl.total)')
+        ->whereRaw("gl.giftPrice != {$formula}")
         ->select([
             'gl.id',
             'gl.giftId',
+            'gl.receiver_id',
             'gl.giftNum',
             'gl.giftPrice',
             'gl.total',
             'gl.created_at',
-            DB::raw('(gl.giftNum * gl.total) as expected_price'),
+            DB::raw("{$formula} as expected_price"),
+            DB::raw("({$formula} - gl.giftPrice) as compensation"),
         ])
         ->get();
 
-    $totalCount = $affectedRecords->count();
-    $sampleRecords = $affectedRecords->take(10);
-
     return response()->json([
         'status' => true,
-        'total_affected_records' => $totalCount,
-        'message' => "سيتم تصحيح {$totalCount} سجل من gift_logs",
-        'sample_records' => $sampleRecords,
-        'execute_url' => url('/fix-gift-prices/execute')
+        'total_affected_records' => $affectedRecords->count(),
+        'message' => "سيتم تصحيح {$affectedRecords->count()} سجل",
+        'sample_records' => $affectedRecords->take(10),
+        'execute_url' => url('/fix-gift-prices/execute'),
     ]);
 });
 
+
 Route::get('/fix-gift-prices/execute', function () {
+
     try {
-        // Get IDs of affected records
+
+        $formula = '(CAST(giftNum AS SIGNED) * CAST(total AS SIGNED))';
+
         $affectedIds = DB::table('gift_logs as gl')
             ->join('gifts as g', 'g.id', '=', 'gl.giftId')
             ->where('g.gift_category_id', 1)
             ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
-            ->whereRaw('gl.giftPrice != (gl.giftNum * gl.total)')
+            ->whereRaw("gl.giftPrice != {$formula}")
             ->pluck('gl.id');
 
-        // Update giftPrice for affected records
         $updated = DB::table('gift_logs')
             ->whereIn('id', $affectedIds)
             ->update([
-                'giftPrice' => DB::raw('giftNum * total')
+                'giftPrice' => DB::raw($formula)
             ]);
 
         return response()->json([
             'status' => true,
-            'message' => "تم تصحيح {$updated} سجل بنجاح ✅",
             'updated_count' => $updated,
-            'affected_ids_count' => $affectedIds->count()
+            'affected_ids_count' => $affectedIds->count(),
+            'message' => "تم تصحيح {$updated} سجل بنجاح ✅"
         ]);
+
     } catch (\Exception $e) {
+
         return response()->json([
             'status' => false,
             'message' => 'حدث خطأ أثناء التحديث',
