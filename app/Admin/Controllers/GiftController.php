@@ -119,7 +119,7 @@ class GiftController extends MainController
         }
 
         $grid->model()
-            ->with('vip')
+            ->with(['vip', 'category'])
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
             ->orderByRaw('ISNULL(`sort`), `sort` ASC')
@@ -139,7 +139,7 @@ class GiftController extends MainController
             $tabs = ['all' => __('All')];
 
             // هات كل الكاتيجوري وطلع الترجمة حسب اللغة الحالية
-            $categories = GiftCategory::orderBy('sort', 'asc')->get();
+            $categories = GiftCategory::select('id', 'title', 'sort')->orderBy('sort', 'asc')->get();
             foreach ($categories as $category) {
                 $title = $category->title[$locale] ?? $category->title['en'] ?? '';
                 $tabs[$category->id] = $title;

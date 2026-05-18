@@ -251,6 +251,16 @@ class SuperPackageController extends MainController
             $existingRewards = PackageReward::where('super_package_id', $rankingRangeId)->get();
 
             if ($existingRewards->count() > 0) {
+                $wareIds = $existingRewards->where('type', 'ware')->pluck('target')->unique();
+                $badgeIds = $existingRewards->where('type', 'badge')->pluck('target')->unique();
+                $vipIds = $existingRewards->where('type', 'vip')->pluck('target')->unique();
+                $achievementIds = $existingRewards->where('type', 'achievement')->pluck('target')->unique();
+
+                $waresMap = Ware::whereIn('id', $wareIds)->get()->keyBy('id');
+                $badgesMap = Badge::whereIn('id', $badgeIds)->get()->keyBy('id');
+                $vipsMap = OVip::whereIn('id', $vipIds)->get()->keyBy('id');
+                $achievementsMap = CustomAchievement::with('images')->whereIn('id', $achievementIds)->get()->keyBy('id');
+
                 $html = '
                 <div class="box box-success">
                     <div class="box-header with-border">
@@ -264,22 +274,22 @@ class SuperPackageController extends MainController
                     $url = '';
 
                     if ($reward->type == 'ware') {
-                        $ware = Ware::find($reward->target);
+                        $ware = $waresMap->get($reward->target);
                         $name = $ware->name ?? $reward->target;
                         $url = getImagePath($ware->img2 ?? $ware->show_img ?? '');
                     } elseif ($reward->type == 'badge') {
-                        $badge = Badge::find($reward->target);
+                        $badge = $badgesMap->get($reward->target);
                         $name = $badge->name ?? $reward->target;
                         $url = getImagePath($badge->img ?? '');
                     } elseif ($reward->type == 'vip') {
-                        $vip = OVip::find($reward->target);
+                        $vip = $vipsMap->get($reward->target);
                         $name = $vip->name ?? $reward->target;
                         $url = getImagePath($vip->img ?? '');
                     } elseif ($reward->type == 'coin') {
                         $name = $reward->target . 'coin';
                         $url = getImagePath('coin.png');
                     } elseif ($reward->type == 'achievement') {
-                        $achievement = CustomAchievement::find($reward->target);
+                        $achievement = $achievementsMap->get($reward->target);
                         $name = $achievement->name ?? 'Achievement';
                         $url = getImagePath($achievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '');
                     }

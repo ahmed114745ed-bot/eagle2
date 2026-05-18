@@ -82,11 +82,9 @@ class AdminUserController extends EncorUsersController
 
         $form =  parent ::form ();
         $form->select('app_id', __('validation.select_user'))->options(function ($value) {
-            $ops2 = [];
-            foreach (User::Where('id', $value)->get() as $user) {
-                $ops2[$user->id] = $user->uuid . '_' . $user->name;
-            }
-            return $ops2;
+            if (!$value) return [];
+            $user = User::find($value);
+            return $user ? [$user->id => $user->uuid . '_' . $user->name] : [];
         })->ajax('/api/search/users3', 'id', 'name')->rules('required');
 
 

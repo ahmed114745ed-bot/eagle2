@@ -76,7 +76,7 @@ class WalletController extends MainController
         $grid = new Grid(new \App\Models\WalletTransaction());
 
         $currentUserId = \Auth::user()->id;
-        $grid->model()->where('user_id', $currentUserId);
+        $grid->model()->with(['user.profile'])->where('user_id', $currentUserId);
 
         $grid->column('id', __('Id'));
 

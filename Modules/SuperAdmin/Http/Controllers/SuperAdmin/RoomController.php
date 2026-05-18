@@ -342,6 +342,7 @@ class RoomController extends MainController
                     'profile:id,user_id,avatar'
                 ])->select(['id', 'uuid', 'special_id', 'name']),
 
+                'microphones.user.profile',
             ])->whereHas('owner.country', function ($q) use ($authCountryId) {
                 $q->where('id',  $authCountryId);
             })

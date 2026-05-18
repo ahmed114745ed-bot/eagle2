@@ -88,7 +88,7 @@ class AdminUsersController extends MainController
         $grid = new Grid(new AdminUser());
         $grid->model()
             ->whereHas('roles', fn($q) => $q->where('slug', 'like', '%_genc%_anager%'))
-            ->where('app_id', '!=', 0)->with(['user' => fn($q) => $q->withCount('agencies')]);
+            ->where('app_id', '!=', 0)->with(['user' => fn($q) => $q->with('profile')->withCount('agencies')]);
 
         $grid->model()->with(['managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')]);
 
@@ -118,13 +118,8 @@ class AdminUsersController extends MainController
             ';
         });
 
-        $grid->column('user.agencies.agencies_count', __('Agency Count'))->display(function ($agencies) {
-            $user = $this->user;
-            if ($user !== null) {
-                $wordlist = \App\Models\Agency::where('agency_manger_id', $user->id)->get();
-                return $wordlist->count();
-            }
-            return 0;
+        $grid->column('user.agencies_count', __('Agency Count'))->display(function () {
+            return $this->user?->agencies_count ?? 0;
         });
 
         $grid->column('managerAgencies.total_salaries', __('salary'))->display(function ($_) {
@@ -236,7 +231,7 @@ class AdminUsersController extends MainController
 
         $grid = new Grid(new Agency());
         $grid->id(__('ID'));
-        $grid->model()->where('agency_manger_id', $AdmenUser->app_id);
+        $grid->model()->where('agency_manger_id', $AdmenUser->app_id)->with('owner')->withCount('users');
         $grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
             return Common::getusersShow($model->app_owner_id);
         });
@@ -245,13 +240,7 @@ class AdminUsersController extends MainController
         $grid->column('owner.name', trans('owner'));
         $grid->column('phone', trans('phone'));
         $grid->column('img', trans('img'))->image('', 30);
-        $grid->column('', trans('Users Count'))->display(function () {
-            if ($this->id !== 0) {
-                $wordlist = \App\Models\User::where('agency_id', $this->id)->count();
-                return $wordlist;
-            }
-            return 0;
-        });
+        $grid->column('users_count', trans('Users Count'));
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             // Disable the "View" action

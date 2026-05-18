@@ -648,23 +648,19 @@ class AgencyController extends MainController
 
     protected function bdOptions($editing = false)
     {
-        return function ($value) use ($editing) {
-            $ops = [];
-            foreach (Bd::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->username;
-            }
-            return $ops;
+        return function ($value) {
+            if (!$value) return [];
+            $user = Bd::find($value);
+            return $user ? [$user->id => $user->uuid ?? $user->id . '_' . $user->username] : [];
         };
     }
 
     protected function ownerOptions($editing = false)
     {
-        return function ($value) use ($editing) {
-            $ops = [];
-            foreach (User::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
-            }
-            return $ops;
+        return function ($value) {
+            if (!$value) return [];
+            $user = User::find($value);
+            return $user ? [$user->id => $user->uuid ?? $user->id . '_' . $user->name] : [];
         };
     }
 
@@ -1105,7 +1101,9 @@ class AgencyController extends MainController
     {
         $grid = new Grid(new User());
 
-        $grid->model()->where('agency_id', $agencyId)->where('type_user', 1)->whereDoesntHave('agencyUserJob');
+        $grid->model()->where('agency_id', $agencyId)->where('type_user', 1)->whereDoesntHave('agencyUserJob')
+            ->with(['profile', 'country']);
+        $joinRequests = AgencyJoinRequest::where('agency_id', $agencyId)->get()->keyBy('user_id');
         $grid->column('name', __('User'))
             ->display(function ($name) {
                 $uid = @$this->uuid;
@@ -1130,8 +1128,8 @@ class AgencyController extends MainController
         ";
             });
 
-        $grid->column('whatsapp', __('whatsapp'))->display(function ($number) use ($agencyId) {
-            $joinRequest = AgencyJoinRequest::where(['agency_id' => $agencyId, 'user_id' => $this->id])->first();
+        $grid->column('whatsapp', __('whatsapp'))->display(function ($number) use ($joinRequests) {
+            $joinRequest = $joinRequests->get($this->id);
             if (!$joinRequest) return '-';
             $number = $joinRequest->whatsapp;
             if (!$number) return '-';
