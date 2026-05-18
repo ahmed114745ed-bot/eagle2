@@ -4127,12 +4127,20 @@
                                 $giftCategoryName = '';
                                 $gift = @$giftSLog->gift;
                                 if ($gift) {
-                                    // Load category relation if not loaded
                                     if (!$gift->relationLoaded('category')) {
                                         $gift->load('category');
                                     }
 
                                     $giftCategory = $gift->category;
+
+                                    \Log::info('Gift Category Debug', [
+                                        'gift_id' => $gift->id,
+                                        'gift_category_id' => $gift->gift_category_id ?? null,
+                                        'category_exists' => $giftCategory ? true : false,
+                                        'category_title' => $giftCategory->title ?? null,
+                                        'locale' => app()->getLocale(),
+                                    ]);
+
                                     if ($giftCategory && $giftCategory->title) {
                                         $categoryTitle = $giftCategory->title;
                                         if (is_array($categoryTitle)) {
