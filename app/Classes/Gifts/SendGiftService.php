@@ -75,10 +75,43 @@ class SendGiftService
         }
 
         $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
-
+//getGiftLogDatForLuckyGift
         foreach ($receivedUsers as $receivedUser) {
             $cpId = @$cpIds[$receivedUser->id] ?? null;
             $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId, sourceType: $sourceType, appFeatureStatus: $appFeatureStatus);
+            $info['room_boom_uuid'] = $roomBoomUuid;
+            $data[] = $info;
+        }
+
+        DB::transaction(function () use ($data) {
+            DB::table('gift_logs')->insert($data);
+        }, attempts: 3);
+
+        return $roomBoomUuid;
+    }
+
+        public function sendGift3ForLuckyGift($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null, $sourceType = null, $type = null)
+    {
+        if ($totalPrice == null)
+            $totalPrice = $gift->price * $number;
+        $roomBoomUuid = (string) Str::uuid();
+        $data = [];
+        $diamondLogs = [];
+        $now = now();
+
+        if ($type !== 'bag') {
+            $featureType = $room->type === 'audio'
+                ? UserDiamondLogType::GIFT_ROOM_AUDIO
+                : UserDiamondLogType::GIFT_ROOM_LIVE;
+
+            UserDiamondLogHelper::bulkLogByType($receivedUsers, $featureType, $totalPrice, $senderUser->id);
+        }
+
+        $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
+//
+        foreach ($receivedUsers as $receivedUser) {
+            $cpId = @$cpIds[$receivedUser->id] ?? null;
+            $info = $this->getGiftLogDataForLuckyGift($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId, sourceType: $sourceType, appFeatureStatus: $appFeatureStatus);
             $info['room_boom_uuid'] = $roomBoomUuid;
             $data[] = $info;
         }
@@ -373,6 +406,39 @@ class SendGiftService
      * @return array
      */
     public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null, $sourceType = null, $appFeatureStatus = null): array
+    {
+     
+
+        $info['giftId'] = $gift->id;
+        $info['roomowner_id'] = $room->uid;
+        $info['giftNum'] = $number;
+        $info['giftName'] = $gift->name ?: '_';
+        $info['giftPrice'] = $totalPrice;
+        $info['app_profit_coins'] = $totalPrice;
+        $info['sender_id'] = $senderUser->id;
+        $info['receiver_id'] = $receivedUser->id;
+        $info['is_play'] = $isPlay ? 2 : 1;
+        $info['type'] = 2;
+        $info['created_at'] = $info['updated_at'] = date('Y-m-d H:i:s', time());
+
+        $info['platform_obtain'] = 0.0;                          //platform
+        $info['receiver_obtain'] = $totalPrice;                  //recipient
+        $info['roomowner_obtain'] = floor($totalPrice * 0.03);    //homeowner
+
+        $info['agency_id'] = $receivedUser->agency_id;//homeowner
+        $info['receiver_family_id'] = @$receivedUser->family_id;         //homeowner
+        $info['sender_family_id'] = @$senderUser->family_id;
+        $info['pk'] = @$isPk ?? false;
+        $info['cp_id'] = $cpId;
+        $info['room_id'] = $room->id;
+        $info['room_gift_status'] = $appFeatureStatus ?? false;
+        $info['source_type'] = $sourceType ?? 'coins';  
+        $info['total'] = $gift->price;
+
+        return $info;
+    }
+
+     public function getGiftLogDataForLuckyGift(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null, $sourceType = null, $appFeatureStatus = null): array
     {
      
 

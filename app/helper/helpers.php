@@ -229,26 +229,28 @@ if (!function_exists('uploadMonthlyDiamondReceive')) {
 }
 
 if (!function_exists('incrementMonthlyDiamond')) {
+    /**
+     * Increment monthly diamond received for a user (Race Condition Safe)
+     *
+     * Uses atomic UPSERT to prevent race conditions when multiple Lucky Gifts
+     * are sent to the same user concurrently.
+     *
+     * @param int $user_id
+     * @param float|int $value
+     * @return void
+     */
     function incrementMonthlyDiamond($user_id, $value)
     {
         $date = \Carbon\Carbon::now(getTimezone());
 
-        $monthlyRecord = MonthlyDiamondReceive::where('user_id', $user_id)
-            ->where('month', $date->month)
-            ->where('year', $date->year)
-            ->lockForUpdate()
-            ->first();
-
-        if ($monthlyRecord) {
-            $monthlyRecord->increment('monthly_diamond_received', $value);
-        } else {
-            MonthlyDiamondReceive::create([
-                'user_id' => $user_id,
-                'month' => $date->month,
-                'year' => $date->year,
-                'monthly_diamond_received' => $value,
-            ]);
-        }
+        \DB::statement("
+            INSERT INTO monthly_diamond_receives
+                (user_id, month, year, monthly_diamond_received, created_at, updated_at)
+            VALUES (?, ?, ?, ?, NOW(), NOW())
+            ON DUPLICATE KEY UPDATE
+                monthly_diamond_received = monthly_diamond_received + VALUES(monthly_diamond_received),
+                updated_at = NOW()
+        ", [$user_id, $date->month, $date->year, $value]);
     }
 }
 
