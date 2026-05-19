@@ -220,7 +220,8 @@
         box-shadow: var(--shadow-2);
     }
 
-    .moment-post:has(.dropdown-menu.show) {
+    .moment-post:has(.dropdown-menu.show),
+    .moment-post:has(.post-dropdown:not([style*="display: none"])) {
         z-index: 100;
     }
 
@@ -306,7 +307,8 @@
     }
 
     /* Dropdown Menu */
-    .dropdown-menu {
+    .dropdown-menu,
+    .post-dropdown {
         display: none;
         position: absolute;
         top: 38px;
@@ -327,7 +329,10 @@
     /* RTL Support for Dropdown */
     html.rtl .dropdown-menu.different,
     html[dir="rtl"] .dropdown-menu.different,
-    [dir="rtl"] .dropdown-menu.different {
+    [dir="rtl"] .dropdown-menu.different,
+    html.rtl .post-dropdown,
+    html[dir="rtl"] .post-dropdown,
+    [dir="rtl"] .post-dropdown {
         text-align: right;
         right: 0% !important;
         left: auto;
@@ -341,13 +346,15 @@
 
     /* إذا لم يكن هناك مساحة على اليمين، اعرضها على اليسار */
     @media (max-width: 768px) {
-        .dropdown-menu {
+        .dropdown-menu,
+        .post-dropdown {
             right: 0;
             left: auto;
         }
     }
 
-    .dropdown-item {
+    .dropdown-item,
+    .post-dropdown-item {
         padding: 8px 12px;
         cursor: pointer;
         display: flex;
@@ -362,25 +369,32 @@
         border: none;
         width: 100%;
         text-align: left;
+        text-decoration: none;
     }
 
     /* RTL Support for Dropdown Item */
     html.rtl .dropdown-item,
     html[dir="rtl"] .dropdown-item,
-    [dir="rtl"] .dropdown-item {
+    [dir="rtl"] .dropdown-item,
+    html.rtl .post-dropdown-item,
+    html[dir="rtl"] .post-dropdown-item,
+    [dir="rtl"] .post-dropdown-item {
         text-align: right;
         flex-direction: row-reverse;
     }
 
-    .dropdown-item:hover {
+    .dropdown-item:hover,
+    .post-dropdown-item:hover {
         background: var(--primary-color);
     }
 
-    .dropdown-item.delete-item {
+    .dropdown-item.delete-item,
+    .post-dropdown-item.delete-item {
         color: #e4405f;
     }
 
-    .dropdown-item i {
+    .dropdown-item i,
+    .post-dropdown-item i {
         width: 20px;
         text-align: center;
         font-size: 16px;
@@ -1164,7 +1178,8 @@
             height: 48px;
         }
 
-        .dropdown-menu {
+        .dropdown-menu,
+        .post-dropdown {
             min-width: 180px;
             font-size: 14px;
         }
@@ -1256,12 +1271,14 @@
             font-size: 18px;
         }
 
-        .dropdown-menu {
+        .dropdown-menu,
+        .post-dropdown {
             min-width: 160px;
             font-size: 13px;
         }
 
-        .dropdown-item {
+        .dropdown-item,
+        .post-dropdown-item {
             padding: 6px 10px;
             font-size: 13px;
         }
@@ -1810,6 +1827,7 @@
     .nav-btn,
     .menu-btn,
     .dropdown-menu,
+    .post-dropdown,
     .side-modal-content {
         transform: translateZ(0);
         backface-visibility: hidden;
@@ -1822,6 +1840,7 @@
     /* تحسين الانتقالات */
     .moment-post,
     .dropdown-menu,
+    .post-dropdown,
     .side-modal,
     .side-modal-content,
     .side-modal-overlay {

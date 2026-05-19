@@ -146,9 +146,36 @@
         // زر العودة للأعلى
         $('#scrollTopBtn').on('click', scrollToTop);
 
+        // Event delegation for post actions (works with dynamically created elements)
+        $(document).on('click', '[data-action="toggle-menu"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = $(this).data('id');
+            var menu = $('#menu-' + id);
+            $('.post-dropdown').not(menu).hide();
+            menu.toggle();
+        });
+
+        $(document).on('click', '[data-action="delete-moment"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = $(this).data('id');
+            $('.post-dropdown').hide();
+            deleteMoment(id, e);
+        });
+
+        $(document).on('click', '[data-action="edit-moment"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = $(this).data('id');
+            $('.post-dropdown').hide();
+            editMoment(id, e);
+        });
+
         // إغلاق القوائم المنسدلة عند النقر خارجها
         $(document).on('click', function(e) {
             if (!$(e.target).closest('.post-menu').length) {
+                $('.post-dropdown').hide();
                 $('.dropdown-menu').removeClass('show');
             }
         });
@@ -439,18 +466,18 @@
                         </div>
                     </div>
                     <div class="post-menu">
-                        <button class="menu-btn" onclick="toggleMenu(${moment.id}, event)">
+                        <a href="javascript:void(0)" class="menu-btn" data-action="toggle-menu" data-id="${moment.id}">
                             <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                        <div class="dropdown-menu different" id="menu-${moment.id}">
-                            <button class="dropdown-item" onclick="editMoment(${moment.id}, event)">
+                        </a>
+                        <div class="post-dropdown" id="menu-${moment.id}" style="display:none;">
+                            <a href="javascript:void(0)" class="post-dropdown-item" data-action="edit-moment" data-id="${moment.id}">
                                 <i class="fas fa-edit"></i>
                                 <span>${texts.editDesc || 'Edit Description'}</span>
-                            </button>
-                            <button class="dropdown-item delete-item" onclick="deleteMoment(${moment.id}, event)">
+                            </a>
+                            <a href="javascript:void(0)" class="post-dropdown-item delete-item" data-action="delete-moment" data-id="${moment.id}">
                                 <i class="fas fa-trash"></i>
                                 <span>${texts.deleteMoment || 'Delete Moment'}</span>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
