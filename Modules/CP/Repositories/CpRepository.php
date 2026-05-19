@@ -351,7 +351,7 @@ class CpRepository
             cps.user_two_id,
             cps.cp_relation_id,
             cp_relations.type as relation_type,
-            SUM(gift_logs.giftNum * gift_logs.giftPrice) as total_gifts
+            SUM(gift_logs.giftPrice) as total_gifts
         ')
             ->join('cps', 'cps.id', '=', 'gift_logs.cp_id')
             ->join('cp_relations', 'cp_relations.id', '=', 'cps.cp_relation_id')
