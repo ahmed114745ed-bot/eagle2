@@ -550,6 +550,7 @@ Route::get('/send-notification/{id}', function ($id) {
 });
 
  Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+ Route::get('/fix-monthly-diamond-discrepancies', [\App\Http\Controllers\DiamondController::class, 'fixMonthlyDiamondDiscrepancies']);
 // Route::get('/calculate-salary' , [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 // Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 // Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
