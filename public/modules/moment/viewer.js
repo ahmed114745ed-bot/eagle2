@@ -31,6 +31,13 @@
     };
 
     $(document).ready(function() {
+        // Setup CSRF token for all AJAX requests
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': csrf
+            }
+        });
+
         // اكتشاف اللغة وتطبيق الاتجاه
         detectAndApplyDirection();
 
@@ -1195,39 +1202,58 @@
     }
 
     window.editMoment = function(momentId, event) {
-        if (event) event.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
         $('.dropdown-menu').removeClass('show');
 
         const descElement = $(`#desc-${momentId}`);
-        const currentDesc = descElement.text().trim();
+        const currentDesc = descElement.length ? descElement.text().trim() : '';
 
-        Swal.fire({
-            title: texts.editDesc || 'Edit Description',
-            input: 'textarea',
-            inputValue: currentDesc,
-            inputAttributes: { rows: 5 },
-            showCancelButton: true,
-            confirmButtonColor: '#1877f2',
-            cancelButtonColor: '#65676b',
-            confirmButtonText: texts.save || 'Save',
-            cancelButtonText: texts.cancel || 'Cancel',
-            inputValidator: (value) => {
-                if (value && value.length > 1000) {
-                    return texts.descTooLong || 'Description is too long (max 1000 characters)';
+        try {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: texts.editDesc || 'Edit Description',
+                    input: 'textarea',
+                    inputValue: currentDesc,
+                    inputAttributes: { rows: 5 },
+                    showCancelButton: true,
+                    confirmButtonColor: '#1877f2',
+                    cancelButtonColor: '#65676b',
+                    confirmButtonText: texts.save || 'Save',
+                    cancelButtonText: texts.cancel || 'Cancel',
+                    inputValidator: (value) => {
+                        if (value && value.length > 1000) {
+                            return texts.descTooLong || 'Description is too long (max 1000 characters)';
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        updateMomentDescription(momentId, result.value);
+                    }
+                });
+            } else {
+                var newDesc = prompt(texts.editDesc || 'Edit Description:', currentDesc);
+                if (newDesc !== null) {
+                    updateMomentDescription(momentId, newDesc);
                 }
             }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                updateMomentDescription(momentId, result.value);
+        } catch(e) {
+            console.error('editMoment error:', e);
+            var newDesc = prompt('Edit Description:', currentDesc);
+            if (newDesc !== null) {
+                updateMomentDescription(momentId, newDesc);
             }
-        });
+        }
     };
 
     function updateMomentDescription(momentId, description) {
         $.ajax({
             url: routes.updateDescription.replace(':id', momentId),
-            method: 'PUT',
-            data: { description: description, _token: csrf },
+            method: 'POST',
+            data: { description: description, _token: csrf, _method: 'PUT' },
+            headers: { 'X-CSRF-TOKEN': csrf },
             success: function(response) {
                 if (response.success) {
                     $(`#desc-${momentId}`).html(escapeHtml(response.description));
@@ -1253,48 +1279,67 @@
     }
 
     window.deleteMoment = function(momentId, event) {
-        if (event) event.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
         $('.dropdown-menu').removeClass('show');
 
-        Swal.fire({
-            title: texts.sure || 'Are you sure?',
-            text: texts.noRevert || 'You will not be able to revert this!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#e4405f',
-            cancelButtonColor: '#65676b',
-            confirmButtonText: texts.yesDelete || 'Yes, delete it!',
-            cancelButtonText: texts.cancel || 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: routes.deleteMoment.replace(':id', momentId),
-                    type: 'DELETE',
-                    data: { _token: csrf },
-                    success: function(response) {
-                        if (response.success) {
-                            $(`.moment-post[data-moment-id="${momentId}"]`).fadeOut(300, function() {
-                                $(this).remove();
-                            });
-                            Swal.fire({
-                                icon: 'success',
-                                title: texts.deleted || 'Deleted!',
-                                text: texts.momentDeleted || 'Moment deleted successfully',
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: texts.error || 'Error',
-                            text: xhr.responseJSON?.message || texts.failDeleteMoment || 'Failed to delete moment'
+        var doDelete = function() {
+            $.ajax({
+                url: routes.deleteMoment.replace(':id', momentId),
+                type: 'POST',
+                data: { _token: csrf, _method: 'DELETE' },
+                headers: { 'X-CSRF-TOKEN': csrf },
+                success: function(response) {
+                    if (response.success) {
+                        $(`.moment-post[data-moment-id="${momentId}"]`).fadeOut(300, function() {
+                            $(this).remove();
                         });
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'success', title: texts.deleted || 'Deleted!', text: texts.momentDeleted || 'Moment deleted successfully', timer: 1500, showConfirmButton: false });
+                        } else {
+                            alert(texts.momentDeleted || 'Moment deleted successfully');
+                        }
                     }
+                },
+                error: function(xhr) {
+                    var msg = xhr.responseJSON?.message || texts.failDeleteMoment || 'Failed to delete moment';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                    } else {
+                        alert('Error: ' + msg);
+                    }
+                    console.error('Delete moment error:', xhr.status, xhr.responseText);
+                }
+            });
+        };
+
+        try {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: texts.sure || 'Are you sure?',
+                    text: texts.noRevert || 'You will not be able to revert this!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e4405f',
+                    cancelButtonColor: '#65676b',
+                    confirmButtonText: texts.yesDelete || 'Yes, delete it!',
+                    cancelButtonText: texts.cancel || 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) doDelete();
                 });
+            } else {
+                if (confirm(texts.sure || 'Are you sure you want to delete this moment?')) {
+                    doDelete();
+                }
             }
-        });
+        } catch(e) {
+            console.error('deleteMoment error:', e);
+            if (confirm('Are you sure you want to delete this moment?')) {
+                doDelete();
+            }
+        }
     };
 
     window.deleteComment = function(commentId, momentId) {
@@ -1302,44 +1347,59 @@
     };
 
     window.deleteCommentFromModal = function(commentId, momentId, event) {
-        if (event) event.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
 
-        Swal.fire({
-            title: texts.sure || 'Are you sure?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#e4405f',
-            cancelButtonColor: '#65676b',
-            confirmButtonText: texts.yesDelete || 'Yes, delete it!',
-            cancelButtonText: texts.cancel || 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: routes.deleteComment.replace(':id', commentId),
-                    type: 'DELETE',
-                    data: { _token: csrf },
-                    success: function(response) {
-                        if (response.success) {
-                            loadCommentsInModal(momentId);
-                            Swal.fire({
-                                icon: 'success',
-                                title: texts.deleted || 'Deleted!',
-                                text: texts.commentDeleted || 'Comment deleted successfully',
-                                timer: 1200,
-                                showConfirmButton: false
-                            });
+        var doDelete = function() {
+            $.ajax({
+                url: routes.deleteComment.replace(':id', commentId),
+                type: 'POST',
+                data: { _token: csrf, _method: 'DELETE' },
+                headers: { 'X-CSRF-TOKEN': csrf },
+                success: function(response) {
+                    if (response.success) {
+                        loadCommentsInModal(momentId);
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'success', title: texts.deleted || 'Deleted!', text: texts.commentDeleted || 'Comment deleted successfully', timer: 1200, showConfirmButton: false });
                         }
-                    },
-                    error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: texts.error || 'Error',
-                            text: xhr.responseJSON?.message || texts.failDeleteComment || 'Failed to delete comment'
-                        });
                     }
+                },
+                error: function(xhr) {
+                    var msg = xhr.responseJSON?.message || texts.failDeleteComment || 'Failed to delete comment';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                    } else {
+                        alert('Error: ' + msg);
+                    }
+                    console.error('Delete comment error:', xhr.status, xhr.responseText);
+                }
+            });
+        };
+
+        try {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: texts.sure || 'Are you sure?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e4405f',
+                    cancelButtonColor: '#65676b',
+                    confirmButtonText: texts.yesDelete || 'Yes, delete it!',
+                    cancelButtonText: texts.cancel || 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) doDelete();
                 });
+            } else {
+                if (confirm('Are you sure you want to delete this comment?')) {
+                    doDelete();
+                }
             }
-        });
+        } catch(e) {
+            console.error('deleteComment error:', e);
+            if (confirm('Are you sure?')) doDelete();
+        }
     };
 
     window.clearFilters = function() {
