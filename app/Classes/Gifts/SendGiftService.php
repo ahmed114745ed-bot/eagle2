@@ -374,21 +374,7 @@ class SendGiftService
      */
     public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null, $sourceType = null, $appFeatureStatus = null): array
     {
-        // Validation: التحقق من أن السعر صحيح (الخطوة 6 من التقرير)
-        $expectedTotal = $gift->price * $number;
-
-        if (abs($totalPrice - $expectedTotal) > 0.01) {
-            Log::warning('Gift price mismatch', [
-                'gift_id' => $gift->id,
-                'expected' => $expectedTotal,
-                'received' => $totalPrice,
-                'gift_price' => $gift->price,
-                'number' => $number,
-                'source_type' => $sourceType,
-            ]);
-            // استخدم الحساب الصحيح
-            $totalPrice = $expectedTotal;
-        }
+     
 
         $info['giftId'] = $gift->id;
         $info['roomowner_id'] = $room->uid;
