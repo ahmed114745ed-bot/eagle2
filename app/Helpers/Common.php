@@ -2957,6 +2957,9 @@ class Common
             return Storage::url($path);
         }
         $pathInfo = pathinfo($path);
+        if (!isset($pathInfo['extension'])) {
+            return Storage::url($path);
+        }
         $versionPath = $pathInfo['dirname'] . '/versions/'
             . $pathInfo['filename'] . '_' . $size . '.'
             . $pathInfo['extension'];
