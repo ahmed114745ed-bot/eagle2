@@ -22,12 +22,15 @@
     const TRIGGER_THRESHOLD = 3; // التحميل عند الوصول لآخر 3 عناصر
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    // ترجمات See More لأربع لغات
+    // ترجمات See More لجميع اللغات المدعومة
     const seeMoreTexts = {
         ar: { more: 'عرض المزيد', less: 'عرض أقل' },
         en: { more: 'See More', less: 'See Less' },
         fr: { more: 'Voir Plus', less: 'Voir Moins' },
-        es: { more: 'Ver Más', less: 'Ver Menos' }
+        es: { more: 'Ver Más', less: 'Ver Menos' },
+        hi: { more: 'और देखें', less: 'कम देखें' },
+        tr: { more: 'Devamını Gör', less: 'Daha Az Gör' },
+        id: { more: 'Lihat Selengkapnya', less: 'Lihat Lebih Sedikit' }
     };
 
     $(document).ready(function() {
@@ -1240,15 +1243,15 @@
         const currentDesc = descElement.length ? descElement.text().trim() : '';
 
         Swal.fire({
-            title: 'Edit Description',
+            title: texts.editDesc || 'Edit Description',
             input: 'textarea',
             inputValue: currentDesc,
             inputAttributes: { rows: 5 },
             showCancelButton: true,
             confirmButtonColor: '#1877f2',
             cancelButtonColor: '#65676b',
-            confirmButtonText: 'Save',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: texts.save || 'Save',
+            cancelButtonText: texts.cancel || 'Cancel',
             preConfirm: function(inputValue) {
                 updateMomentDescription(momentId, inputValue || '');
             }
@@ -1339,15 +1342,15 @@
         };
 
         Swal.fire({
-            title: 'Are you sure?',
-            text: 'You will not be able to revert this!',
+            title: texts.sure || 'Are you sure?',
+            text: texts.noRevert || 'You will not be able to revert this!',
             type: 'warning',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#e4405f',
             cancelButtonColor: '#65676b',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: texts.yesDelete || 'Yes, delete it!',
+            cancelButtonText: texts.cancel || 'Cancel',
             preConfirm: function() {
                 doDelete();
             }
