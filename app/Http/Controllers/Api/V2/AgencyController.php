@@ -264,6 +264,13 @@ class AgencyController extends Controller
 
         try {
             $agency = $this->agencyService->update($userId, $id, $request);
+
+            // Clear agency cache after update
+            $year = \Carbon\Carbon::now()->year;
+            $month = \Carbon\Carbon::now()->month;
+            Cache::forget("agency_details_{$id}_{$year}_{$month}");
+            Cache::forget("agency_history_{$id}_{$year}_{$month}");
+            Cache::forget("agency_target_{$id}_{$year}_{$month}");
         } catch (\Exception $e) {
 
             return Common::apiResponse(0, $e->getMessage(), null, 500);
