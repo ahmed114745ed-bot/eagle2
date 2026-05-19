@@ -1233,74 +1233,62 @@
             event.stopPropagation();
             event.preventDefault();
         }
+        $('.post-dropdown').hide();
         $('.dropdown-menu').removeClass('show');
 
         const descElement = $(`#desc-${momentId}`);
         const currentDesc = descElement.length ? descElement.text().trim() : '';
 
-        try {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: texts.editDesc || 'Edit Description',
-                    input: 'textarea',
-                    inputValue: currentDesc,
-                    inputAttributes: { rows: 5 },
-                    showCancelButton: true,
-                    confirmButtonColor: '#1877f2',
-                    cancelButtonColor: '#65676b',
-                    confirmButtonText: texts.save || 'Save',
-                    cancelButtonText: texts.cancel || 'Cancel',
-                    inputValidator: (value) => {
-                        if (value && value.length > 1000) {
-                            return texts.descTooLong || 'Description is too long (max 1000 characters)';
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        updateMomentDescription(momentId, result.value);
-                    }
-                });
-            } else {
-                var newDesc = prompt(texts.editDesc || 'Edit Description:', currentDesc);
-                if (newDesc !== null) {
-                    updateMomentDescription(momentId, newDesc);
-                }
+        Swal.fire({
+            title: 'Edit Description',
+            input: 'textarea',
+            inputValue: currentDesc,
+            inputAttributes: { rows: 5 },
+            showCancelButton: true,
+            confirmButtonColor: '#1877f2',
+            cancelButtonColor: '#65676b',
+            confirmButtonText: 'Save',
+            cancelButtonText: 'Cancel',
+            preConfirm: function(inputValue) {
+                updateMomentDescription(momentId, inputValue || '');
             }
-        } catch(e) {
-            console.error('editMoment error:', e);
-            var newDesc = prompt('Edit Description:', currentDesc);
-            if (newDesc !== null) {
-                updateMomentDescription(momentId, newDesc);
-            }
-        }
+        });
     };
 
     function updateMomentDescription(momentId, description) {
+        var currentCsrf = $('meta[name="csrf-token"]').attr('content') || csrf;
         $.ajax({
             url: routes.updateDescription.replace(':id', momentId),
-            method: 'POST',
-            data: { description: description, _token: csrf, _method: 'PUT' },
-            headers: { 'X-CSRF-TOKEN': csrf },
+            method: 'PUT',
+            data: { description: description, _token: currentCsrf },
+            headers: { 'X-CSRF-TOKEN': currentCsrf },
             success: function(response) {
-                if (response.success) {
-                    $(`#desc-${momentId}`).html(escapeHtml(response.description));
-                    const direction = detectTextDirection(response.description);
-                    $(`#desc-${momentId}`).attr('dir', direction).css('text-align', direction === 'rtl' ? 'right' : 'left');
-                    Swal.fire({
-                        icon: 'success',
-                        title: texts.updated || 'Updated',
-                        text: texts.descUpdated || 'Description updated successfully',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                if (response && response.success) {
+                    var descEl = $(`#desc-${momentId}`);
+                    if (descEl.length) {
+                        descEl.find('.description-text').html(escapeHtml(response.description));
+                        var direction = detectTextDirection(response.description);
+                        descEl.attr('dir', direction).css('text-align', direction === 'rtl' ? 'right' : 'left');
+                    }
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'success', title: texts.updated || 'Updated', text: texts.descUpdated || 'Description updated successfully', timer: 1500, showConfirmButton: false });
+                    }
+                } else {
+                    var msg = (response && response.message) ? response.message : 'Update failed';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                    } else {
+                        alert(msg);
+                    }
                 }
             },
             error: function(xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: texts.error || 'Error',
-                    text: xhr.responseJSON?.message || texts.failUpdate || 'Failed to update description'
-                });
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : ('Error ' + xhr.status + ': ' + xhr.statusText);
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                } else {
+                    alert(msg);
+                }
             }
         });
     }
@@ -1310,38 +1298,42 @@
             event.stopPropagation();
             event.preventDefault();
         }
+        $('.post-dropdown').hide();
         $('.dropdown-menu').removeClass('show');
+
+        var currentCsrf = $('meta[name="csrf-token"]').attr('content') || csrf;
 
         var doDelete = function() {
             var deleteUrl = routes.deleteMoment.replace(':id', momentId);
-            console.log('Deleting moment:', momentId, 'URL:', deleteUrl);
             $.ajax({
                 url: deleteUrl,
-                type: 'POST',
-                data: { _token: csrf, _method: 'DELETE' },
-                headers: { 'X-CSRF-TOKEN': csrf },
+                type: 'DELETE',
+                data: { _token: currentCsrf },
+                headers: { 'X-CSRF-TOKEN': currentCsrf },
                 success: function(response) {
-                    console.log('Delete response:', response);
                     if (response && response.success) {
                         $(`.moment-post[data-moment-id="${momentId}"]`).fadeOut(300, function() {
                             $(this).remove();
                         });
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({ icon: 'success', title: texts.deleted || 'Deleted!', text: texts.momentDeleted || 'Moment deleted successfully', timer: 1500, showConfirmButton: false });
-                        } else {
-                            alert('Moment deleted successfully');
                         }
                     } else {
-                        var msg = (response && response.message) ? response.message : 'Delete returned false';
-                        console.error('Delete failed:', msg);
-                        alert('Delete failed: ' + msg);
+                        var msg = (response && response.message) ? response.message : 'Delete failed';
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                        } else {
+                            alert(msg);
+                        }
                     }
                 },
                 error: function(xhr) {
-                    console.error('Delete AJAX error:', xhr.status, xhr.statusText, xhr.responseText);
-                    var msg = 'Error ' + xhr.status + ': ';
-                    try { msg += xhr.responseJSON?.message || xhr.statusText; } catch(e) { msg += xhr.statusText; }
-                    alert(msg);
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : ('Error ' + xhr.status + ': ' + xhr.statusText);
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                    } else {
+                        alert(msg);
+                    }
                 }
             });
         };
@@ -1355,9 +1347,8 @@
             confirmButtonColor: '#e4405f',
             cancelButtonColor: '#65676b',
             confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
-        }).then(function(result) {
-            if (result.value || result.isConfirmed) {
+            cancelButtonText: 'Cancel',
+            preConfirm: function() {
                 doDelete();
             }
         });
@@ -1374,11 +1365,12 @@
         }
 
         var doDelete = function() {
+            var currentCsrf = $('meta[name="csrf-token"]').attr('content') || csrf;
             $.ajax({
                 url: routes.deleteComment.replace(':id', commentId),
-                type: 'POST',
-                data: { _token: csrf, _method: 'DELETE' },
-                headers: { 'X-CSRF-TOKEN': csrf },
+                type: 'DELETE',
+                data: { _token: currentCsrf },
+                headers: { 'X-CSRF-TOKEN': currentCsrf },
                 success: function(response) {
                     if (response.success) {
                         loadCommentsInModal(momentId);
