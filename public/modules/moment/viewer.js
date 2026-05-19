@@ -7,7 +7,7 @@
     const adminUserUrl = cfg.adminUserUrl || '';
     const defaultAvatar = cfg.defaultAvatar || '';
     const storageUrl = cfg.storageUrl || '';
-    const csrf = cfg.csrf || '';
+    const csrf = $('meta[name="csrf-token"]').attr('content') || cfg.csrf || '';
 
     let currentPage = 1;
     let currentSort = 'random'; // الترتيب الافتراضي عشوائي
@@ -1313,60 +1313,54 @@
         $('.dropdown-menu').removeClass('show');
 
         var doDelete = function() {
+            var deleteUrl = routes.deleteMoment.replace(':id', momentId);
+            console.log('Deleting moment:', momentId, 'URL:', deleteUrl);
             $.ajax({
-                url: routes.deleteMoment.replace(':id', momentId),
+                url: deleteUrl,
                 type: 'POST',
                 data: { _token: csrf, _method: 'DELETE' },
                 headers: { 'X-CSRF-TOKEN': csrf },
                 success: function(response) {
-                    if (response.success) {
+                    console.log('Delete response:', response);
+                    if (response && response.success) {
                         $(`.moment-post[data-moment-id="${momentId}"]`).fadeOut(300, function() {
                             $(this).remove();
                         });
                         if (typeof Swal !== 'undefined') {
                             Swal.fire({ icon: 'success', title: texts.deleted || 'Deleted!', text: texts.momentDeleted || 'Moment deleted successfully', timer: 1500, showConfirmButton: false });
                         } else {
-                            alert(texts.momentDeleted || 'Moment deleted successfully');
+                            alert('Moment deleted successfully');
                         }
+                    } else {
+                        var msg = (response && response.message) ? response.message : 'Delete returned false';
+                        console.error('Delete failed:', msg);
+                        alert('Delete failed: ' + msg);
                     }
                 },
                 error: function(xhr) {
-                    var msg = xhr.responseJSON?.message || texts.failDeleteMoment || 'Failed to delete moment';
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
-                    } else {
-                        alert('Error: ' + msg);
-                    }
-                    console.error('Delete moment error:', xhr.status, xhr.responseText);
+                    console.error('Delete AJAX error:', xhr.status, xhr.statusText, xhr.responseText);
+                    var msg = 'Error ' + xhr.status + ': ';
+                    try { msg += xhr.responseJSON?.message || xhr.statusText; } catch(e) { msg += xhr.statusText; }
+                    alert(msg);
                 }
             });
         };
 
-        try {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: texts.sure || 'Are you sure?',
-                    text: texts.noRevert || 'You will not be able to revert this!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e4405f',
-                    cancelButtonColor: '#65676b',
-                    confirmButtonText: texts.yesDelete || 'Yes, delete it!',
-                    cancelButtonText: texts.cancel || 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) doDelete();
-                });
-            } else {
-                if (confirm(texts.sure || 'Are you sure you want to delete this moment?')) {
-                    doDelete();
-                }
-            }
-        } catch(e) {
-            console.error('deleteMoment error:', e);
-            if (confirm('Are you sure you want to delete this moment?')) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to revert this!',
+            type: 'warning',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e4405f',
+            cancelButtonColor: '#65676b',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then(function(result) {
+            if (result.value || result.isConfirmed) {
                 doDelete();
             }
-        }
+        });
     };
 
     window.deleteComment = function(commentId, momentId) {
