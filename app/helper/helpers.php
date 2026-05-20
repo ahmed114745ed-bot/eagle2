@@ -1596,13 +1596,8 @@ if (!function_exists('bd_url')) {
         // حدد base path الخاص بوحدة BD
         $base = trim(config('bd.route.prefix', 'bd'), '/');
 
-        $secure = $secure ?? (config('bd.https') || config('bd.secure'));
-
-        if (app()->environment(['production', 'Production'])) {
-            return secure_url($base . '/' . trim($path, '/'), $parameters);
-        }
-
-        return url($base . '/' . trim($path, '/'), $parameters, $secure);
+        // Always use HTTPS when APP_URL starts with https://
+        return secure_url($base . '/' . trim($path, '/'), $parameters);
     }
 
 
