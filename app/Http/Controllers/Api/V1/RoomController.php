@@ -1394,39 +1394,40 @@ class RoomController extends Controller
             return Common::apiResponse(0, 'This user is not in this room', null, 404);
         }
 
-        $roomAdmin = $room->room_admin;
+        $adminRepo = app(\App\Repositories\RoomAdministratorRepository::class);
         $roomMax   = $room->total_admins;
-        $adm_arr   = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
-        if (count($adm_arr) > 0 && $adm_arr[0] == '') unset($adm_arr[0]);
-        $adm_arr   = array_unique($adm_arr);
-
-        if (in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is already an administrator, please do not repeat the settings', null, 444);
         $configMaxRoom = Common::getConfig('max_room_admin') ?? 4;
+        $maxAdmins = max($roomMax, $configMaxRoom);
 
-        if (count($adm_arr) == ($roomMax >= $configMaxRoom ? $roomMax : $configMaxRoom)) return Common::apiResponse(0, 'room manager is full', null, 404);
-
-
-        $adm_arr = array_merge($adm_arr, [$admin_id]);
-        $str     = implode(",", $adm_arr);
-
-        $res  =  $room->update(['room_admin' => $str]);
-        $adm_arr = explode(",", $room->room_admin) ?? [];
-        $a    = User::find($admin_id);
-        $n    = 'nan';
-        if ($a) {
-            $n = $a->name ?: 'nan';
+        // Check if user is already an admin
+        if ($adminRepo->isAdmin($room->id, $admin_id)) {
+            return Common::apiResponse(0, 'This user is already an administrator, please do not repeat the settings', null, 444);
         }
-        //  Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
-        $ms   = [
-            'messageContent' => [
-                'message' => 'updateAdmins',
-                'admins' => array_values($adm_arr)
-            ]
-        ];
+
+        // Check if room is full
+        if (!$adminRepo->canAddAdmin($room->id, $maxAdmins)) {
+            return Common::apiResponse(0, 'room manager is full', null, 404);
+        }
+
+        // Add admin using repository (dual-write to both new table and legacy column)
+        $res = $adminRepo->addAdmin($room->id, $admin_id, $request->user()->id ?? null);
 
         if ($res) {
+            // Get current admins for Zego notification
+            $adm_arr = $adminRepo->getAdmins($room->id)->toArray();
 
-            $resu = Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
+            $a = User::find($admin_id);
+            $n = $a ? ($a->name ?: 'nan') : 'nan';
+
+            // Send Zego notification
+            $ms = [
+                'messageContent' => [
+                    'message' => 'updateAdmins',
+                    'admins' => array_values($adm_arr)
+                ]
+            ];
+
+            Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
             return Common::apiResponse(1, 'Set administrator successfully', $adm_arr, 200);
         } else {
             return Common::apiResponse(0, 'Failed to set administrator', null, 400);
@@ -1448,30 +1449,32 @@ class RoomController extends Controller
         $uid      = $room->uid;
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
 
-        $roomAdmin = $room->room_admin;
-        $adm_arr   = !$roomAdmin ? [] : explode(",", $roomAdmin);
-        if (!in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is not an administrator of this room', null, 404);
-        $key = array_search($admin_id, $adm_arr);
-        unset($adm_arr[$key]);
-        $str  = implode(",", $adm_arr);
-        $res  = $room->update(['room_admin' => $str]);
-        $adm_arr = explode(",", $room->room_admin) ?? [];
+        $adminRepo = app(\App\Repositories\RoomAdministratorRepository::class);
 
-
-        $a    = User::find($admin_id);
-        $n    = 'nan';
-        if ($a) {
-            $n = $a->name ?: 'nan';
+        // Check if user is an admin
+        if (!$adminRepo->isAdmin($room->id, $admin_id)) {
+            return Common::apiResponse(0, 'This user is not an administrator of this room', null, 404);
         }
-        // Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', "  لم يعد هذا المستخدم ادمن فى هذة الغرفه  $n");
-        $ms   = [
-            'messageContent' => [
-                'message' => 'updateAdmins',
-                'admins' => array_values($adm_arr)
-            ]
-        ];
-        $resu = Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
+
+        // Remove admin using repository (dual-write to both new table and legacy column)
+        $res = $adminRepo->removeAdmin($room->id, $admin_id);
+
         if ($res) {
+            // Get current admins for response
+            $adm_arr = $adminRepo->getAdmins($room->id)->toArray();
+
+            $a = User::find($admin_id);
+            $n = $a ? ($a->name ?: 'nan') : 'nan';
+
+            // Send Zego notification
+            $ms = [
+                'messageContent' => [
+                    'message' => 'updateAdmins',
+                    'admins' => array_values($adm_arr)
+                ]
+            ];
+
+            Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
             return Common::apiResponse(1, 'Cancel administrator successfully', $adm_arr, 200);
         } else {
             return Common::apiResponse(0, 'Failed to cancel administrator', null, 400);
@@ -1901,6 +1904,8 @@ class RoomController extends Controller
         $validator = Validator::make($request->all(), [
             'room_id' => 'required|integer|exists:rooms,id',
             'user_id' => 'required|integer|exists:users,id',
+            'duration' => 'nullable|integer|min:60', // Duration in seconds, minimum 60 seconds
+            'reason' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -1912,32 +1917,28 @@ class RoomController extends Controller
             $room = Room::with('roomVisitors')->findOrFail($request->room_id);
             $userToBlock = $request->user_id;
             $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
-            if (!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
+            if (!in_array($userToBlock, $roomVisitors)) {
+                return Common::apiResponse(0, 'This user is not in this room', null, 404);
+            }
 
             // Check if the current user is the owner of the room
             if ($room->uid != $userId) {
                 return Common::apiResponse(0, 'You do not have permission to perform this action', 400);
             }
 
+            $blacklistRepo = app(\App\Repositories\RoomBlacklistRepository::class);
 
-            // Get the current blacklist
-            $blacklist = $room->room_black ? explode(',', $room->room_black) : [];
-
-            // Check if the user is already in the blacklist
-            foreach ($blacklist as $entry) {
-                $parts = explode('#', $entry);
-                $id = $parts[0] ?? null;
-
-                if ($id == $userToBlock) {
-                    return Common::apiResponse(0, 'This user is already in the blacklist', 400);
-                }
+            // Check if the user is already blacklisted
+            if ($blacklistRepo->isBlacklisted($room->id, $userToBlock)) {
+                return Common::apiResponse(0, 'This user is already in the blacklist', 400);
             }
 
-            // Add the user to the blacklist
-            $blacklist[] = $userToBlock . '#' . time(); // Add a timestamp or additional info if needed
-            $room->room_black = implode(',', $blacklist);
-            $room->save();
+            // Add the user to the blacklist (dual-write to both new table and legacy column)
+            $duration = $request->duration; // null for permanent ban
+            $reason = $request->reason;
+
+            $blacklistRepo->addBan($room->id, $userToBlock, $userId, $duration, $reason);
 
             return Common::apiResponse(true, 'User added to the blacklist', 200);
         } catch (Exception $e) {
@@ -1956,7 +1957,6 @@ class RoomController extends Controller
         }
 
         try {
-
             $userId = $request->user()->id;
             $room = Room::findOrFail($request->room_id);
 
@@ -1964,30 +1964,16 @@ class RoomController extends Controller
                 return Common::apiResponse(0, 'you do not have permission', 400);
             }
 
-            $ids = array_filter(explode(',', $room->room_black));
+            $blacklistRepo = app(\App\Repositories\RoomBlacklistRepository::class);
             $userToRemove = $request->user_id;
 
-            $found = false;
-
-            $ids = array_values(array_filter($ids, function ($entry) use ($userToRemove, &$found) {
-
-                $parts = explode('#', $entry);
-                $id = $parts[0] ?? null;
-
-                if ($id == $userToRemove) {
-                    $found = true;
-                    return false;
-                }
-
-                return true;
-            }));
-
-            if (!$found) {
+            // Check if user is in blacklist
+            if (!$blacklistRepo->isBlacklisted($room->id, $userToRemove)) {
                 return Common::apiResponse(0, 'this user not in black list', 400);
             }
 
-            $room->room_black = implode(',', $ids);
-            $room->save();
+            // Remove from blacklist (dual-write to both new table and legacy column)
+            $blacklistRepo->removeBan($room->id, $userToRemove);
 
             return Common::apiResponse(true, 'block removed', 200);
         } catch (Exception $e) {
