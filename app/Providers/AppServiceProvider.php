@@ -74,9 +74,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
+        URL::forceScheme('https');
 
         Form::extend('image', Image::class);
         Form::extend('imagePath', ImagePath::class);
