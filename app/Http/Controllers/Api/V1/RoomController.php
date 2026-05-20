@@ -1115,27 +1115,26 @@ class RoomController extends Controller
             : Room::where('uid', $uid)->where('type', 'audio')->first();
         if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
         $uid = $room->uid;
-        $black_list = @$room->room_black;
-        $room_id    = @$room->id;
-        if ($black_list == null) {
-            $black_list = $black_id . '#' . time() . '#' . ($duration * 60);
-        } else {
-            $list   = explode(',', $black_list);
-            $exists = false;
-            foreach ($list as &$item) {
-                $black = explode('#', $item);
-                if ($black[0] == $black_id) {
-                    $item   = $black_id . '#' . time() . '#' . ($duration * 60);
-                    $exists = true;
-                }
-            }
-            if (!$exists) {
-                array_push($list, $black_id . '#' . time() . '#' . ($duration * 60));
-            }
+        $room_id = @$room->id;
 
-            $black_list = implode(',', $list);
+        // Use new RoomBlacklistRepository with dual-write
+        $blacklistRepo = app(\App\Repositories\RoomBlacklistRepository::class);
+        $durationSeconds = $duration * 60; // Convert minutes to seconds
+
+        // Check if already banned and update, or add new ban
+        if ($blacklistRepo->isBlacklisted($room->id, $black_id)) {
+            // Remove old ban
+            $blacklistRepo->removeBan($room->id, $black_id);
         }
-        $result = DB::table('rooms')->where('uid', $uid)->update(['room_black' => $black_list]);
+
+        // Add new ban with updated duration
+        $result = $blacklistRepo->addBan(
+            $room->id,
+            $black_id,
+            Auth::id(), // banned_by
+            $durationSeconds,
+            'Kicked out for ' . $duration . ' minutes'
+        );
 
         if ($result) {
             //exit the room

@@ -213,6 +213,15 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/cleanup-fair-luck-wallet-histories.log'))
             ->runInBackground();
+
+        // Mark expired room bans as inactive every hour
+        $schedule->job(new \App\Jobs\ExpireRoomBans)
+            ->hourly()
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->name('expire-room-bans')
+            ->appendOutputTo(storage_path('logs/expire-room-bans.log'))
+            ->runInBackground();
     }
 
     protected function commands(): void
