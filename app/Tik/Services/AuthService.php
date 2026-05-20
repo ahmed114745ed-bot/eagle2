@@ -766,6 +766,11 @@ class AuthService
             throw new \Exception($message);
         }
 
+        // Check device account limit before allowing login
+        if (!empty($deviceToken)) {
+            $this->checkDeviceAccountLimit($user->id, $deviceToken);
+        }
+
         $this->userRepository->updateDeviceToken($user, $deviceToken);
         (new SwitchAccountServices())->saveDeviceUser($user->id, $deviceToken);
         $this->logoutAsConfiguration($user);
@@ -795,22 +800,58 @@ class AuthService
     {
         $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
-        
+        // Check actual users count in users table (includes both Registration and Login)
+        $actualUsersCount = User::where('device_token', $deviceToken)
+            ->where('device_token', '!=', '')
+            ->whereNotNull('device_token')
+            ->count();
+
+        if ($actualUsersCount >= $register_account) {
+            \Log::warning('Device account limit exceeded - actual users check', [
+                'device_token' => $deviceToken,
+                'actual_users_count' => $actualUsersCount,
+                'limit' => $register_account
+            ]);
+            throw new CValidationException(__('max_accounts_reached'));
+        }
+
+        // Update devices_token_histories for tracking purposes
         $record = DevicesTokenHistory::where('device_token', $deviceToken)->first();
-        
+
         if ($record) {
-            
-            if ($record->count >= $register_account) {
-                \Log::warning('Device account limit exceeded in devicesTokenHistory', [
-                    'device_token' => $deviceToken,
-                    'current_count' => $record->count,
-                    'limit' => $register_account
-                ]);
-                throw new CValidationException(__('max_accounts_reached'));
-            }
             $record->increment('count');
         } else {
             DevicesTokenHistory::create(['device_token' => $deviceToken, 'count' => 1]);
+        }
+    }
+
+    /**
+     * Check if device has reached the maximum allowed accounts limit
+     * Used during login to prevent users from logging in with too many accounts on same device
+     *
+     * @param int $userId - The user trying to login
+     * @param string $deviceToken - The device token
+     * @throws CValidationException if limit exceeded
+     */
+    private function checkDeviceAccountLimit($userId, $deviceToken)
+    {
+        $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+        // Count how many different users are using this device token (excluding current user)
+        $otherUsersCount = User::where('device_token', $deviceToken)
+            ->where('device_token', '!=', '')
+            ->whereNotNull('device_token')
+            ->where('id', '!=', $userId)
+            ->count();
+
+        if ($otherUsersCount >= $register_account) {
+            \Log::warning('Device account limit exceeded on login', [
+                'device_token' => $deviceToken,
+                'user_id' => $userId,
+                'other_users_count' => $otherUsersCount,
+                'limit' => $register_account
+            ]);
+            throw new CValidationException(__('max_accounts_reached'));
         }
     }
 }
