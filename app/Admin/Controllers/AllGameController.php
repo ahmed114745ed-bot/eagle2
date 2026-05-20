@@ -18,16 +18,15 @@ use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AllGameController extends MainController
 {
     protected $title = 'games';
     public $permission_name = 'games';
 
-    public function __construct()
-    {
-        (new AppFeatureService)->validateStatusEnable("game");
-    }
+    
     public function show($id, Content $content)
     {
         return parent::show($id, $content
@@ -94,12 +93,7 @@ class AllGameController extends MainController
         return $form;
     }
 
-    //  public function show($id, Content $content)
-    // {
-    //     return parent::show($id, $content
-    //         ->title(trans('Games'))
-    //         ->body($this->detail($id)));
-    // }
+   
 
     /**
      * Edit interface.
@@ -108,20 +102,7 @@ class AllGameController extends MainController
      * @param Content $content
      * @return Content
      */
-    // public function edit($id, Content $content)
-    // {
-    //     return parent::edit($id, $content
-    //         ->title(trans('Games'))
-    //         ->body($this->form()->edit($id)));
-    // }
-
-    // public function create(Content $content)
-    // {
-    //     return parent::create($content
-    //         ->title(trans('Games'))
-    //         ->body($this->form()));
-    // }
-
+    
     protected function grid()
     {
         $grid = new Grid(new AllGame());
@@ -141,6 +122,20 @@ class AllGameController extends MainController
         $grid->column('url', __('Full Url'));
         $grid->column('mini_url', __('Mini Url'));
         $grid->column('image', __('Image'))->image('', 50);
+
+        // Import JSON button + modal (rendered from Blade view)
+        $importUrl = url(config('admin.route.prefix') . '/all-games/import-json');
+        $grid->tools(function ($tools) use ($importUrl) {
+            $modalHtml = view('admin.grid.Form.importGamesModal', compact('importUrl'))->render();
+            $tools->append(
+                '<div class="btn-group pull-right" style="margin-right: 10px;">'
+                . '<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#importJsonModal" style="border-radius:8px;font-weight:600;padding:7px 16px;box-shadow:0 2px 8px rgba(16,185,129,0.25);">'
+                . '<i class="fa fa-cloud-download"></i>&nbsp; Import JSON'
+                . '</button></div>'
+                . $modalHtml
+            );
+        });
+
         $this->extendGrid($grid);
         return $grid;
     }
@@ -204,6 +199,85 @@ class AllGameController extends MainController
         return $form;
     }
 
+
+    /**
+     * Import games from JSON URL or pasted JSON data.
+     */
+    public function importJson(Request $request)
+    {
+        $gameType = (int) $request->input('game_type', 2);
+        $jsonUrl = $request->input('json_url');
+        $jsonData = $request->input('json_data');
+        $games = null;
+
+        // Priority: pasted JSON > URL
+        if (!empty(trim($jsonData ?? ''))) {
+            $games = json_decode($jsonData, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                admin_toastr('Invalid JSON format: ' . json_last_error_msg(), 'error');
+                return back();
+            }
+        } elseif (!empty(trim($jsonUrl ?? ''))) {
+            try {
+                $response = Http::withoutVerifying()->timeout(15)->get($jsonUrl);
+                if (!$response->successful()) {
+                    admin_toastr('Failed to fetch JSON from URL. HTTP Status: ' . $response->status(), 'error');
+                    return back();
+                }
+                $games = $response->json();
+            } catch (\Exception $e) {
+                Log::error('[AllGameController] importJson fetch error: ' . $e->getMessage());
+                admin_toastr('Error fetching URL: ' . $e->getMessage(), 'error');
+                return back();
+            }
+        } else {
+            admin_toastr('Please provide a JSON URL or paste JSON data', 'error');
+            return back();
+        }
+
+        if (!is_array($games) || empty($games)) {
+            admin_toastr('JSON must be a non-empty array of game objects', 'error');
+            return back();
+        }
+
+        // Validate required fields
+        foreach ($games as $index => $game) {
+            if (!isset($game['gameId']) || !isset($game['name']) || !isset($game['full_url'])) {
+                admin_toastr("Game at index {$index} is missing required fields (gameId, name, full_url)", 'error');
+                return back();
+            }
+        }
+
+        // Import games using updateOrCreate
+        $imported = 0;
+        $updated = 0;
+
+        foreach ($games as $game) {
+            $data = [
+                'custom_id' => $game['gameId'],
+                'name'      => $game['title'] ?? $game['name'],
+                'name_en'   => $game['name'],
+                'url'       => $game['full_url'] ?? null,
+                'hd_url'    => $game['hd_url'] ?? null,
+                'mini_url'  => $game['half_url'] ?? null,
+                'type'      => $gameType ?? 2,
+            ];
+
+            $existing = AllGame::where('custom_id', $game['gameId'])->first();
+
+            if ($existing) {
+                $existing->update($data);
+                $updated++;
+            } else {
+                $data['is_enable'] = 1;
+                AllGame::create($data);
+                $imported++;
+            }
+        }
+
+        admin_toastr("Import completed! {$imported} new games added, {$updated} games updated.", 'success');
+        return redirect(url(config('admin.route.prefix') . '/all-games'));
+    }
 
     public function gameSettings(Request $request)
     {

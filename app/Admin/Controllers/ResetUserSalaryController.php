@@ -12,7 +12,9 @@ use App\Admin\Actions\ResetUserSalary;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Widgets\Table;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
 
 class ResetUserSalaryController extends MainController
 {
@@ -48,10 +50,17 @@ class ResetUserSalaryController extends MainController
                 'users.name',
                 'users.uuid',
                 'users.online',
+                'users.sender_level',
+                 'users.received_level',
+                 'users.special_id',
+                 "users.country_id",
                 DB::raw('SUM(COALESCE(us.sallary, 0) - COALESCE(us.cut_amount, 0) ) as salary')
             )
             ->leftJoin('user_sallaries as us', 'us.user_id', '=', 'users.id')
-            ->groupBy('users.id', 'users.name', 'users.uuid', 'users.online')
+            ->groupBy('users.id', 'users.name', 'users.uuid', 'users.online','users.sender_level',
+                 'users.received_level',
+                 'users.special_id',
+                 "users.country_id",)
             ->havingRaw('salary < 0');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -67,34 +76,10 @@ class ResetUserSalaryController extends MainController
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('name', trans('user'))->display(function ($name) {
-            if (! $this->id) {
-                return;
-            }
-            $uid = @$this->uuid;
-            $path = @$this->profile?->avatar;
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->id ? url("admin/users/{$this->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('salary', trans('salary'));
 
         $grid->column('target', __('charge history'))->display(function ($model) {

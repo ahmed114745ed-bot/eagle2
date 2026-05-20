@@ -52,6 +52,7 @@ class CommunityController extends Controller
 
         $this->searchRepository->saveSearchHistory($user_id, $keywords);
 
+        $user->loadMissing(['blockedUsers', 'blockedMe']);
         $blockedByMe = $user->blockedUsers->pluck('from_uid')->toArray();
         $blockedMe = $user->blockedMe->pluck('user_id')->toArray();
         $blockedUserIds = array_unique(array_merge($blockedByMe, $blockedMe));

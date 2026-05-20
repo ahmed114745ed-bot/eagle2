@@ -117,6 +117,7 @@ class FormRequestController extends MainController
             ->select(['id', 'name', 'bd_id', 'whatsapp_number', 'submitted_by', 'form_template_type', 'status'])
             ->with([
                 'user',
+                'user.profile',
                 'user.country',
                 'user.senderLevel',
                 'user.receiverLevel',
@@ -126,16 +127,10 @@ class FormRequestController extends MainController
             ])
             ->where('form_template_type', $type)->orderByDesc('id');
 
-        $grid->column('user', __('user'))
-            ->display(function ($name) {
-
-                $user = $this->user;
-                if (!$user) {
-                    return '';
-                }
-
-                return app(UserService::class)->adminUserAvatar($user);
-            });
+        $grid->column('nameUser', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('name', __('name'));
 

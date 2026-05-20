@@ -2,32 +2,33 @@
 
 namespace Modules\AreaManager\Http\Controllers\Admin;
 
-use App\Models\User;
+use App\Admin\Actions\DeleteAreaManagerAction;
+use App\Admin\Actions\FrozenWalletSuperAdminAction;
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Enums\Charges\UserTypeEnum;
+use App\Helpers\Common;
 use App\Models\Charge;
+use App\Models\Country;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Country;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
-use Encore\Admin\Facades\Admin;
-use Illuminate\Validation\Rule;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\Region;
-use App\Admin\Controllers\MainController;
+use Modules\AreaManager\Entities\RegionCountry;
 use Modules\Milestones\Entities\Milestone;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\AreaManager\Entities\AreaManager;
-use App\Admin\Actions\DeleteAreaManagerAction;
-use Modules\AreaManager\Entities\RegionCountry;
-use App\Admin\Actions\FrozenWalletSuperAdminAction;
 
 class AreaManagerController extends MainController
 {
@@ -97,7 +98,16 @@ class AreaManagerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AreaManager());
-        $grid->model()->with(['appUser.packs', 'regionArea:id,name,manager_id', 'appUser', 'creator', 'appUser.profile'])->orderByDesc('id');
+        $grid->model()->with([
+            'regionArea:id,name,manager_id',
+            'appUser',
+            'creator',
+            'appUser.profile',
+            'appUser.country',
+            'appUser.senderLevel',
+            'appUser.receiverLevel',
+            'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])->orderByDesc('id');
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
@@ -134,30 +144,10 @@ class AreaManagerController extends MainController
             return '<span style="color:#999;">●</span>';
         });
 
-        $grid->column('appUser.name', __('User'))->display(function ($name) {
-            $user = $this->appUser;
-            if (!$user) return "<span style='color:red;'>" . __('Not Linked') . "</span>";
-            $uid = $user->uuid ?? __('Unknown');
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($user->profile?->avatar) ?? $defaultImage;
-            if (! isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
-
-            return "
-                <div style='display:flex; align-items:center; gap:10px;'>
-                    $image
-                    <div>
-                        <a href='{$showUrl}' style='text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;'>
-                            <span style='text-decoration:underline; cursor:pointer;'>$name</span>
-                        </a>
-                        <span style='font-size:smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->appUser);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('regionArea.name', __('Regions'));
 
@@ -176,7 +166,7 @@ class AreaManagerController extends MainController
                     return Milestone::where('slug', 'area-manager')->first();
                 });
                 $url = url('admin/milestone-rewards/' . $milestone?->id); // Generates absolute URL for /admin/milestones
-                 $url = $milestone?->id ? url('admin/milestone-rewards/' . $milestone?->id) : '';
+                $url = $milestone?->id ? url('admin/milestone-rewards/' . $milestone?->id) : '';
                 $milestone = __('Acquisitions');   // Translates 'milestone' via your language files
 
                 $customButtonHTML = <<<HTML
@@ -606,14 +596,7 @@ class AreaManagerController extends MainController
         $superAdmins = SuperAdmin::where('parent_id', $id)->with(['appUser', 'country', 'appUser.country'])->paginate(10, ['*'], 'super_admins_page');
         $prefix = dashboardName();
         $subAreaManagers = $areaManager->subAreaManager()->with('appUser')->paginate(10, ['*'], 'sub_super_admin_page');
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
-                break;
-            case 'charge':
-
-                break;
-        }
+        $agencies = $areaManager->agencies()->with('owner.profile')->paginate(10, ['*'], 'agencies_page');
 
         return view('areaManager.area_manager_profile', compact('areaManager', 'defaultImage', 'prefix', 'superAdmins', 'agencies', 'totalCharges', 'totalSpent', 'chargeTabType', 'subAreaManagers', 'charges'));
     }

@@ -187,7 +187,8 @@ class EncorUsersController extends AdminController
         $grid = new Grid(new \App\Models\Admin());
      //   $countryID = empty((array)session('filter_country_id'));
 
-        $grid->model()->when(empty($roleAuthId), fn($q) => $q->where('type', null))
+        $grid->model()->with(['agency', 'roles', 'createdBy'])
+            ->when(empty($roleAuthId), fn($q) => $q->where('type', null))
             ->where('is_preview', 0)
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('slug', 'agency-owner');

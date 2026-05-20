@@ -94,6 +94,16 @@ class ProfileRepository
     public function getRandomUsers($limit = 10)
     {
         $user = User::find(auth()->user()->id);
-        return User::has("images")->whereNotIn("id", $user?->followeds?->pluck("followed_user_id")->toArray())->inRandomOrder()->where("online", 1)->limit($limit)->get();
+        $user?->loadMissing('followeds');
+        return User::has("images")
+            ->with([
+                'profile', 'UserVip', 'followPacks', 'ware', 'color_image', 'images',
+                'followedByAuthUser', 'followerByAuthUser',
+            ])
+            ->whereNotIn("id", $user?->followeds?->pluck("followed_user_id")->toArray() ?? [])
+            ->inRandomOrder()
+            ->where("online", 1)
+            ->limit($limit)
+            ->get();
     }
 }

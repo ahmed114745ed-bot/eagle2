@@ -94,7 +94,7 @@ class ProfessionalBdController extends MainController
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
         $grid->model()->where('parent_id', $authId)
             ->where('country_id', '!=', $authSuperAdmin->country_id)
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'country'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')

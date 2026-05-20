@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
+use App\Admin\Services\UserService;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
@@ -172,27 +173,11 @@ class FreeUserController extends MainController
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
 
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
-                $path = @$this->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-                return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                    <strong>$name</strong><br>
-                </div>
-            </div>
-        ";
+        $grid->column('name', __('user'))
+            ->display(function () {
+                return app(UserService::class)->adminUserCard($this);
             });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 //        $grid->column('return', __('status user'))->display(function () {
 //            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
 //            return (new \App\Admin\Actions\UserAction(

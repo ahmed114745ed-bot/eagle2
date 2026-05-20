@@ -2,15 +2,16 @@
 
 namespace Modules\Reals\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Modules\Reals\Entities\Real;
 use Modules\Reals\Entities\ReportReals;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class ReportRealsController extends MainController
 {
@@ -41,57 +42,30 @@ class ReportRealsController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ReportReals());
-        $grid->model()->whereHas('reel')->orderByDesc('id');
+        $grid->model()->with([
+            'reporter.profile:user_id,avatar',
+                'reporter.country',
+                'reporter.senderLevel',
+                'reporter.receiverLevel',
+                'reporter.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'reportedUser.profile:user_id,avatar',
+                'reportedUser.country',
+                'reportedUser.senderLevel',
+                'reportedUser.receiverLevel',
+                'reportedUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])->whereHas('reel')->orderByDesc('id');
 
         $grid->column('id', __('ID'));
 
-        $grid->column('reporter.name', __('Reporter'))->display(function () {
-            $reporter = $this->reporter;
-            if (!$reporter) return '-';
-
-            $name = $reporter->name;
-            $uuid = $reporter->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$reporter->avatar;
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-            $userUrl = admin_url('users/' . $reporter->id);
-
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                <div>
-                    <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
-                    <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
-                </div>
-            </div>";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->reporter);
         });
 
-        $grid->column('reportedUser.name', __('Reported User'))->display(function () {
-            $reportedUser = $this->reportedUser;
-            if (!$reportedUser) return '-';
-
-            $name = $reportedUser->name;
-            $uuid = $reportedUser->uuid;
-
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$reportedUser->avatar;
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-
-            $userUrl = admin_url('users/' . $reportedUser->id);
-
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                <div>
-                    <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
-                    <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
-                </div>
-            </div>";
+        $grid->column('name', __('Reported User'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->reportedUser);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('description', __('Description'))->display(function ($description) {
             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');

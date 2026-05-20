@@ -2,14 +2,15 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Services\AppFeatureService;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
-use App\Admin\Controllers\MainController;
+use Modules\Events\Entities\RewardWinnerPk;
 use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\WinnerReward;
-use Modules\Events\Entities\RewardWinnerPk;
-use Encore\Admin\Facades\Admin;
 
 class EventReportController extends MainController
 {
@@ -50,32 +51,23 @@ class EventReportController extends MainController
     protected function weekly_star()
     {
         $grid = new Grid(new WinnerReward());
-        $grid->model()->where('type', 'weekly_star')->orWhere('type', null);
+        $grid->model()->with([
+            'winner',
+            'winner.profile',
+            'winner.country',
+            'winner.senderLevel',
+            'winner.receiverLevel',
+            'reward',
+            'reward.vip:id,name,img',
+            'reward.ware:id,name,img2,show_img',
+            'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])->where('type', 'weekly_star')->orWhere('type', null);
         $grid->column('id', __('ID'));
 
-        $grid->column('winner.name', __('name'))->display(function ($name) {
-            $name =  $this->winner?->name ?? '';
-            $uid = @$this->winner?->uuid ?? 0;
-            $path = @$this->winner?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "
-                 <div style='display: flex; align-items: center; gap: 10px;'>
-                     $image
-                     <div>
-                         <strong>$name</strong><br>
-                         <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                     </div>
-                 </div>
-             ";
+        $grid->column('nameWinner', __('winner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->winner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
 
         $grid->column('reward.level', __('level'));
@@ -122,31 +114,22 @@ class EventReportController extends MainController
     protected function pk_event()
     {
         $grid = new Grid(new RewardWinnerPk());
-
+        $grid->model()->with([
+            'winner',
+            'winner.profile',
+            'winner.country',
+            'winner.senderLevel',
+            'winner.receiverLevel',
+            'reward',
+            'reward.vip:id,name,img',
+            'reward.ware:id,name,img2,show_img',
+            'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ]);
         $grid->column('id', __('ID'));
-        $grid->column('winner.name', __('name'))->display(function ($name) {
-            $name =  $this->winner?->name ?? '';
-            $uid = @$this->winner?->uuid ?? 0;
-            $path = @$this->winner?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "
-             <div style='display: flex; align-items: center; gap: 10px;'>
-                 $image
-                 <div>
-                     <strong>$name</strong><br>
-                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                 </div>
-             </div>
-         ";
+        $grid->column('nameWinner', __('winner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->winner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
         $grid->column(__('gifts'))->display(function () {
@@ -193,31 +176,22 @@ class EventReportController extends MainController
     protected function event_period()
     {
         $grid = new Grid(new WinnerReward());
-        $grid->model()->where('type', 'event_period');
+        $grid->model()->with([
+            'winner',
+            'winner.profile',
+            'winner.country',
+            'winner.senderLevel',
+            'winner.receiverLevel',
+            'reward',
+            'reward.vip:id,name,img',
+            'reward.ware:id,name,img2,show_img',
+            'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])->where('type', 'event_period');
         $grid->column('id', __('ID'));
-        $grid->column('winner.name', __('name'))->display(function ($name) {
-            $name =  $this->winner?->name ?? '';
-            $uid = @$this->winner?->uuid ?? 0;
-            $path = @$this->winner?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "
-             <div style='display: flex; align-items: center; gap: 10px;'>
-                 $image
-                 <div>
-                     <strong>$name</strong><br>
-                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                 </div>
-             </div>
-         ";
+        $grid->column('nameWinner', __('winner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->winner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
         $grid->column(__('gifts'))->display(function () {

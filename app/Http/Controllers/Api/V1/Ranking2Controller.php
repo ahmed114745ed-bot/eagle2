@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Services\RankingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class Ranking2Controller extends Controller
 {
@@ -45,7 +46,11 @@ class Ranking2Controller extends Controller
 
     public function topUserRanking()
     {
-        return $this->rankingService->topUser2();
+        // Performance fix: cache ranking results for 5 minutes to reduce DB pressure
+        $data = Cache::remember('top_user_ranking_v2', 300, function () {
+            return $this->rankingService->topUser2();
+        });
+        return $data;
     }
 
 

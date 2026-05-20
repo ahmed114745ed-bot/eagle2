@@ -117,7 +117,8 @@ class BdController extends MainController
                 'appUser.profile',
                 'parent.appUser.packs',
                 'createdBy.agencies',
-                'createdBy'
+                'createdBy',
+                'country'
             ])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
@@ -471,33 +472,27 @@ class BdController extends MainController
 
         if ($form->isEditing()) {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
+                if (!$value) return [];
+                $user = User::find($value);
+                return $user ? [$user->id => $user->uuid . '_' . $user->name] : [];
             })->ajax('/api/search/users-bd', 'id', 'name')->required()->help('لا يمكن التعديل إلا إذا لم يكن هناك مستخدم مرتبط، أو كان المستخدم مرتبطًا لكن تم حذفه.');
         } else {
             $form->select('app_id', __('validation.select_user'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
+                if (!$value) return [];
+                $user = User::find($value);
+                return $user ? [$user->id => $user->uuid . '_' . $user->name] : [];
             })->ajax('/api/search/users-bd', 'id', 'name')->required();
 
             //            $form->switch('default', __('set_as_default'))
             //                ->help(__('make_bd_default'));
         }
 
-        $form->select('country_id', trans('country'))->options(function () {
-            $ops       = [null => __('no country')];
-            $countries = Country::all();
-            foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ? ($country->e_name ?? $country->name) : $country->name;
-            }
-            return $ops;
-        })->required();
+        $countryOps = [null => __('no country')];
+        $countries = Country::select('id', 'name', 'e_name')->get();
+        foreach ($countries as $country) {
+            $countryOps[$country->id] = App::isLocale('en') ? ($country->e_name ?? $country->name) : $country->name;
+        }
+        $form->select('country_id', trans('country'))->options($countryOps)->required();
 
         $form->hidden('type', __('Type'))->value('bd');
         $form->hidden('transfer_salary', __('transfer_salary'));
@@ -586,41 +581,29 @@ class BdController extends MainController
         }
         $bd->display_image = $imageUrl;
 
-        $agencies = $transactions = $target_history = null;
+        $agencies = $bd->agencies()->paginate(10, ['*'], 'agencies_page');
 
-        switch ($tab) {
-            case 'agencies':
-                $agencies = $bd->agencies()->paginate(10, ['*'], 'agencies_page');
-                break;
+        $transactions = $bd->transactions()
+            ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
+            ->with('receiveragency')
+            ->latest()
+            ->paginate(10, ['*'], 'transactions_page');
 
-            case 'transactions':
-                $transactions = $bd->transactions()
-                    ->select('id', 'agency_id', 'user_id', 'usd', 'amount', 'created_at', 'user_charger_type', 'user_type')
-                    ->with('receiveragency')
-                    ->latest()
-                    ->paginate(10, ['*'], 'transactions_page');
-                break;
-
-            case 'target_history':
-                $target_history = BdAgencyHostSallary::select(
-                    'id',
-                    'bd_id',
-                    'agency_id',
-                    // 'salary',
-                    'amount',
-                    'month',
-                    'year',
-                    'bd_user_id',
-                    'created_at'
-                )
-                    ->where('bd_id', $bd->id)
-                    ->where('bd_id', $bd->id)
-                    ->where('amount', '!=', 0)
-                    ->where('year', $year)
-                    ->latest()
-                    ->paginate(10, ['*'], 'target_history_page');
-                break;
-        }
+        $target_history = BdAgencyHostSallary::select(
+            'id',
+            'bd_id',
+            'agency_id',
+            'amount',
+            'month',
+            'year',
+            'bd_user_id',
+            'created_at'
+        )
+            ->where('bd_id', $bd->id)
+            ->where('amount', '!=', 0)
+            ->where('year', $year)
+            ->latest()
+            ->paginate(10, ['*'], 'target_history_page');
 
         return view('admin.bd.bd_profile', compact('bd', 'agencies', 'transactions', 'target_history'));
     }
@@ -682,7 +665,7 @@ class BdController extends MainController
             ->whereHas('appUser', function ($query) use ($countriesIds) {
                 $query->whereIn('country_id', $countriesIds);
             })
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'country'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')

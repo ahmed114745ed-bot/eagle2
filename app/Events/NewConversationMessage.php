@@ -55,7 +55,7 @@ class NewConversationMessage implements ShouldBroadcast
             'text'       => $this->text,
             'sender'     => check()->user(),
             'files'      => $this->files,
-            'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            'created_at' => Carbon::now('UTC')->toIso8601String(), // Send UTC timestamp for client-side conversion
         ];
     }
 }

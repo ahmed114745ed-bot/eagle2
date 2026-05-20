@@ -72,7 +72,12 @@ class FamilyUserRepository extends AbstractRepository
     public function requestUsersList($userId, $familyId)
     {
         return $this->model->query()
-            ->with('user')
+            ->with(['user' => fn($q) => $q->with([
+                'profile:id,user_id,avatar,birthday,gender',
+                'country:id,name,flag',
+                'specialId.ware',
+                'mangerType',
+            ])])
             ->where('family_id', $familyId)
             ->where('user_id', '!=', $userId)->where('status', 0)->get();
     }

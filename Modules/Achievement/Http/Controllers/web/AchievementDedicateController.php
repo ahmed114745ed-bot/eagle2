@@ -2,14 +2,15 @@
 
 namespace Modules\Achievement\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Selectables\AllUsers;
+use App\Selectables\CustomAchievements;
 use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Selectables\AllUsers;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Selectables\CustomAchievements;
-use App\Admin\Controllers\MainController;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
 class AchievementDedicateController extends MainController
@@ -33,7 +34,6 @@ class AchievementDedicateController extends MainController
 
         return parent::create($content
             ->title(trans('user-achievement-levels'))
-            //   ->body(view('admin.grid.users.UserAchievementLevelDedicate'))
             ->body($this->form()));
     }
 
@@ -71,6 +71,9 @@ class AchievementDedicateController extends MainController
             'user.profile',
             'user',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'user.country',
+            'user.senderLevel',
+            'user.receiverLevel',
             'admin',
             'customAchievement',
             'customAchievement.images',
@@ -99,35 +102,10 @@ class AchievementDedicateController extends MainController
             ->orderByDesc('id');
 
         $grid->column('id', __('Id'));
-        $grid->column('user.name', __('user'))
-            ->display(function ($recever) {
-
-                $name =  $this->user?->name ?? '';
-
-                $uid = @$this->user?->uuid ?? 0;
-                if (request()->filled('_export_')) {
-                    return "{$name} (UUID: {$uid})";
-                }
-                $path = @$this->user?->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-                return "
-             <div style='display: flex; align-items: center; gap: 10px;'>
-                 $image
-                 <div>
-                     <strong>$name</strong><br>
-                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                 </div>
-             </div>
-         ";
-            });
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
 
         $grid->column('admin.name', __('creator'))->display(function () {

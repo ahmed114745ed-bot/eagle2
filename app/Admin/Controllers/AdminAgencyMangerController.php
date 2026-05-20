@@ -187,11 +187,9 @@ class  AdminAgencyMangerController extends MainController
         $form->display('updated_at', trans('admin.updated_at'));
 
         $form->select('app_id', __('Agency Manger app Id'))->options(function ($value) {
-            $opsAgencyManger = [];
-            foreach (User::Where('id', $value)->get() as $user) {
-                $opsAgencyManger[$user->id] = $user->uuid . '_' . $user->name;
-            }
-            return $opsAgencyManger;
+            if (!$value) return [];
+            $user = User::find($value);
+            return $user ? [$user->id => $user->uuid . '_' . $user->name] : [];
         })->ajax('/api/search/app-manger', 'id', 'name')->required();
 
 

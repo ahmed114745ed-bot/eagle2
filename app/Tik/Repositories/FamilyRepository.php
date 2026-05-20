@@ -23,14 +23,28 @@ class FamilyRepository extends AbstractRepository
         if (!is_null($search))   $conditions[] =  ['name', 'like', "%$search%"];
         return $this->getPaginate(
             conditions: $conditions,
-            with: ['members' => fn ($q) => $q->limit(10)],
+            with: [
+                'members' => fn ($q) => $q->limit(10),
+                'owner' => fn($q) => $q->with(['profile:id,user_id,avatar', 'country:id,name,flag']),
+            ],
             withCount: ['members', 'usersRequests']
         );
     }
 
     public function findById($id)
     {
-        return $this->model->query()->find($id);
+        return $this->model->query()
+            ->with([
+                'owner' => fn($q) => $q->with([
+                    'profile:id,user_id,avatar',
+                    'country:id,name,flag',
+                    'mangerType',
+                    'specialId.ware',
+                ]),
+                'allMembers.user',
+            ])
+            ->withCount(['members', 'allMembers'])
+            ->find($id);
     }
 
     // public function create($data)

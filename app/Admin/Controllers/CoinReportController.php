@@ -2,13 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Charge;
-use Encore\Admin\Grid;
-
-use App\Helpers\Common;
-use App\Models\CoinGameUser;
-use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Models\Charge;
+use App\Models\CoinGameUser;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Modules\LuckyBox\Entities\UserLuckyGift;
 
 class CoinReportController extends MainController
@@ -94,25 +94,13 @@ class CoinReportController extends MainController
         $grid->model()->with([
             'gift',
             'user',
+            'user.profile',
             'user.country',
             'user.senderLevel',
             'user.receiverLevel',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
-            // ->selectRaw(
-            //     'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
-            //         'SUM(user_lucky_gifts.number) as total_number, ' .
-            //         'user_lucky_gifts.gift_id, ' .
-            //         'user_lucky_gifts.user_id, ' .
-            //         'MAX(users.name) as user_name, ' . // Aggregated using MAX
-            //         'MAX(gifts.img) as gift_img, ' . // Aggregated using MAX
-            //         'MAX(gifts.name) as gift_name, ' . // Aggregated using MAX
-            //         'user_lucky_gifts.gift_price, ' .
-            //         'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win',
-            //     'SUM(CASE WHEN user_lucky_gifts.value > 0 THEN user_lucky_gifts.value ELSE 0 END) as total_win_value ' .
-            //         'SUM(CASE WHEN user_lucky_gifts.value < 0 THEN ABS(user_lucky_gifts.value) ELSE 0 END) as total_lose_value'
-            // )
             ->selectRaw(
                 'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
                     'SUM(user_lucky_gifts.number) as total_number, ' .
@@ -142,11 +130,7 @@ class CoinReportController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            // $filter->column(1 / 2, function ($filter) {
-            //     $filter->where(function ($query) {
-            //         $query->where('users.uuid', $this->input);
-            //     }, __('Uid'), 'Uid');
-            // });
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
@@ -166,15 +150,11 @@ class CoinReportController extends MainController
             });
         });
 
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
-                $user = $this->user;
-                if (!$user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
         $grid->column('gift_id', __('gifts'))->display(function ($name) {
             if (!$this->gift) {
                 return __('No Gift');
@@ -200,12 +180,6 @@ class CoinReportController extends MainController
         });
 
         $grid->column('total_number', __('number'));
-        // $grid->column(__('cost'))->display(function () {
-        //     return $this->total_number * $this->gift_price;
-        // });
-        // $grid->column(__('win'))->display(function () {
-        //     return $this->total_number_win * $this->gift_price;
-        // });
 
         $grid->column(__('win'))->display(function () {
             return $this->total_win_value;  // sum of positive 'value'
@@ -226,30 +200,6 @@ class CoinReportController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
-
-        // $grid->model()
-        //     ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
-        //     ->with([
-        //         'game',
-        //         'user',
-        //         'user.country',
-        //         'user.senderLevel',
-        //         'user.receiverLevel',
-        //         'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        //     ])
-        //     ->selectRaw('
-        //     MIN(coin_game_users.created_at) as earliest_created_at,
-        //     coin_game_users.user_id,
-        //     MAX(users.name) as user_name,
-        //     games.name as game_name,
-        //     SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win,
-        //     SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
-        // ')
-        //     ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
-        //     ->leftJoin('games', 'coin_game_users.game_id', '=', 'games.id')
-        //     ->groupBy('coin_game_users.user_id', 'games.name')
-        //     ->orderByDesc('earliest_created_at');
-
         $grid->model()
             ->when(
                 $countryID,
@@ -259,6 +209,7 @@ class CoinReportController extends MainController
             ->with([
                 'game',
                 'user',
+                'user.profile',
                 'user.country',
                 'user.senderLevel',
                 'user.receiverLevel',
@@ -281,11 +232,7 @@ class CoinReportController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            // $filter->column(1 / 2, function ($filter) {
-            //     $filter->where(function ($query) {
-            //         $query->where('users.uuid', $this->input);
-            //     }, __('Uid'), 'Uid');
-            // });
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
@@ -303,27 +250,14 @@ class CoinReportController extends MainController
 
                 $filter->equal('user_id', __('user'))->select()->ajax('/api/search/users2', 'id', 'name');
             });
-
-
-            //            $filter->column(1/2, function ($filter) {
-            //                $filter->equal('game_id', __('Game Type'))
-            //                    ->select([
-            //                        1 => 'Game Type 1',
-            //                        2 => 'Game Type 2',
-            //                        3 => 'Game Type 3',
-            //                    ]);
-            //            });
         });
 
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
 
-                $user = $this->user;
-                if (!$user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
         $grid->column('game_name', __('game name'));
         $grid->column('total_coins_lose', __('loser'));
         $grid->column('total_coins_win', __('win'));

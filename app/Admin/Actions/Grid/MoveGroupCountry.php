@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class MoveGroupCountry extends BatchAction
 {
+    protected static ?array $cachedCategories = null;
+
     public $name;
 
     public function __construct()
@@ -36,21 +38,20 @@ class MoveGroupCountry extends BatchAction
     {
         $locale = app()->getLocale();
 
-        // Category select
+        // Pre-load categories once
+        if (self::$cachedCategories === null) {
+            self::$cachedCategories = [];
+            foreach (CountryCategory::get() as $category) {
+                $title = $category->title[$locale]
+                    ?? $category->title['en']
+                    ?? reset($category->title);
+
+                self::$cachedCategories[$category->id] = $title;
+            }
+        }
+
         $this->select('category_id', __('Select Category'))
-            ->options(function () use ($locale) {
-
-                $categories = [];
-                foreach (CountryCategory::get() as $category) {
-                    $title = $category->title[$locale]
-                        ?? $category->title['en']
-                        ?? reset($category->title);
-
-                    $categories[$category->id] = $title;
-                }
-
-                return $categories;
-            })
+            ->options(self::$cachedCategories)
             ->required();
     }
 }

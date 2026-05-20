@@ -2,16 +2,15 @@
 
 namespace Modules\Achievement\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Helpers\Common;
 use App\Models\AchievementValidImage;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-
-
 use Encore\Admin\Layout\Content;
-
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
@@ -64,7 +63,17 @@ class UserAchievementLevelController extends MainController
                 $filter->equal('user.uuid', __('uuid'));
             });
         });
-        $grid->model()->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->with([
+            'user',
+            'user.profile',
+            'user.country',
+            'user.senderLevel',
+            'user.receiverLevel',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'achievementLevel',
+            'giftAchievement.gift:id,img',
+            'customAchievement.images',
+        ])->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
@@ -73,31 +82,12 @@ class UserAchievementLevelController extends MainController
         });
         $grid->disableCreateButton();
         $grid->column('id', __('Id'));
-        // $grid->column('achievement_level_id', __('Achievement level id'));
-        // $grid->column('user_id', __('User id'));
-        $grid->column('user.name', __('Users'))
-            ->display(function ($name) {
-                $uid = @$this->user?->uuid;
-                $path = @$this->user?->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
 
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-                return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                    <strong>$name</strong><br>
-                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                </div>
-            </div>
-        ";
-            });
+        $grid->column('nameUser', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+        
         $grid->column('achievementLevel.target', __('achievement_level_target'))->display(function ($column) {
             if ($this->achievement_level_id != null) {
                 return $this->achievementLevel->target ?? 0;
@@ -111,12 +101,14 @@ class UserAchievementLevelController extends MainController
             if ($value != null) {
                 $image = $value;
             } else {
-                $image = $this->achievementLevel?->valid_image ?? $this->giftAchievement()->whereHas('gift', function ($q) {
-                    $q->select('img');
-                })->first()->gift->img?? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? null;
+                // Use eager-loaded relations instead of per-row queries
+                $image = $this->achievementLevel?->valid_image
+                    ?? $this->giftAchievement?->gift?->img
+                    ?? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image
+                    ?? null;
             }
-            $value = getDriverUrl() . '/' . $image;
-            return "<img src='$value' width='80' height='80'>";
+            $url = getDriverUrl() . '/' . $image;
+            return "<img src='{$url}' width='80' height='80' onerror=\"this.style.display='none'\">";
         });
 
         $states = [

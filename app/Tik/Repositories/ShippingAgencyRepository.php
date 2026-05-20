@@ -45,7 +45,11 @@ class ShippingAgencyRepository extends AbstractRepository
     public function findById($id)
     {
 
-        return $this->model  ->with(['additionalInfo', 'mempers','admins'])
+        return $this->model->with([
+            'additionalInfo', 'mempers',
+            'owner.profile',
+            'admins.user.profile', 'admins.user.packs', 'admins.user.specialId.ware',
+        ])
         ->withCount('mempers')
         ->where('id', $id)->first();
 

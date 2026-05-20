@@ -29,114 +29,11 @@ class SuperAdminCountryController extends Controller
         $country = Country::findOrFail($id);
         $countryID = $country->id;
 
-        $timezone = Common::timeZone();
-        $from = Carbon::now($timezone)->subDays(30)->startOfDay();
-        $to   = Carbon::now($timezone)->endOfDay();
+        // Only load essential data for instant page render
+        $superAdmin = SuperAdmin::with('appUser.profile')->where('country_id', $countryID)->first();
+        $onlineUsers = $this->getOnlineUsers($countryID);
 
-        $onlineUsers = User::select(['id', 'country_id', 'online'])->where([
-            'country_id' => $countryID,
-            'online' => 1,
-        ])->count();
-
-        $superAdmin = SuperAdmin::where(['country_id' => $countryID])->first();
-
-        $topRooms = Room::whereHas('owner', fn($q) => $q->where('country_id', $countryID))
-            ->with(['owner:id,name,country_id'])
-            ->withCount(['roomVisitors' => function ($q) use ($from, $to) {
-                $q->whereBetween('created_at', [$from, $to]);
-            }])
-            ->orderByDesc('room_visitors_count')
-            ->take(3)
-            ->get(['id', 'name', 'uid']);
-
-        $topSenders = GiftLog::whereHas(
-            'sender',
-            fn($q) =>
-            $q->where('country_id', $countryID)
-        )
-            ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
-            ->groupBy('sender_id')
-            ->orderByDesc('total_sent')
-            ->take(3)
-            ->with([
-                'sender:id,name,country_id',
-                'sender.profile:id,user_id,avatar'
-            ])
-            ->get()
-            ->filter(fn($s) => $s->total_sent > 0);
-
-        $topReceivers = GiftLog::whereHas(
-            'receiver',
-            fn($q) =>
-            $q->where('country_id', $countryID)
-        )
-            ->whereBetween('created_at', [$from, $to])
-            ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_sent')
-            ->groupBy('receiver_id')
-            ->orderByDesc('total_sent')
-            ->take(3)
-            ->with([
-                'receiver:id,name,country_id',
-                'receiver.profile:id,user_id,avatar'
-            ])
-            ->get()
-            ->filter(fn($s) => $s->total_sent > 0);
-
-        $topAgencies = Agency::where('country_id', $countryID)
-            ->withCount('members')
-            ->orderByDesc('members_count')
-            ->take(3)
-            ->get(['id', 'name']);
-
-        $topChargeAgencies = Charge::where('charger_type', 'agency')
-            ->whereHas('senderShippingAgency', function ($q) use ($countryID) {
-                $q->where('country_id', $countryID);
-            })
-            ->whereBetween('created_at', [$from, $to])
-            ->with([
-                'senderShippingAgency:id,name,country_id,img'
-            ])
-            ->orderByDesc('amount')
-            ->take(3)
-            ->get();
-
-        $topBds = Bd::whereHas('agencies', function ($a) use ($countryID) {
-            $a->where('country_id', $countryID)
-                ->whereHas('members');
-        })
-            ->withCount(['agencies as total_members' => function ($agency) use ($countryID) {
-                $agency->where('country_id', $countryID)
-                    ->withCount('members');
-            }])
-            ->orderByDesc('total_members')
-            ->take(3)
-            ->get(['id', 'name']);
-
-        $topGamers = CoinGameUser::query()
-            ->whereBetween('created_at', [$from, $to])
-            ->where('type', 1)
-            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
-            ->with([
-                'user:id,name,country_id',
-                'user.profile:id,user_id,avatar'
-            ])
-            ->orderByDesc('coins')
-            ->limit(3)
-            ->get();
-
-        return view('super_admin_country', compact([
-            'country',
-            'superAdmin',
-            'onlineUsers',
-            'topSenders',
-            'topRooms',
-            'topAgencies',
-            'topReceivers',
-            'topBds',
-            'topChargeAgencies',
-            'topGamers'
-        ]));
+        return view('super_admin_country', compact('country', 'superAdmin', 'onlineUsers'));
     }
 
     public function locale()
@@ -160,7 +57,7 @@ class SuperAdminCountryController extends Controller
         return view('superAdmin.super_admin_country', compact('country'));
     }
 
-    public function getStats(Request $request, $id)
+    public function getStats(\Illuminate\Http\Request $request, $id)
     {
         $country = Country::findOrFail($id);
         $cacheKey = "country_stats_{$id}";
@@ -176,21 +73,58 @@ class SuperAdminCountryController extends Controller
     private function fetchCountryStats(Country $country)
     {
         $countryID = $country->id;
-        $timezone = config('app.timezone', 'UTC');
+        $timezone = Common::timeZone();
         $from = Carbon::now($timezone)->subDays(30)->startOfDay();
         $to = Carbon::now($timezone)->endOfDay();
 
-        // Run queries in parallel using lazy collections where possible
+        $defaultAvatar = asset('images/businessman-icon.jpg');
+        $defaultRoom = asset('images/background_room.jpg');
+        $defaultAgency = asset('images/icon-agency.jpg');
+
         return [
-            'onlineUsers' => $this->getOnlineUsers($countryID),
-            'superAdmin' => $this->getSuperAdmin($countryID),
-            'topRooms' => $this->getTopRooms($countryID, $from, $to),
-            'topSenders' => $this->getTopSenders($countryID, $from, $to),
-            'topReceivers' => $this->getTopReceivers($countryID, $from, $to),
-            'topAgencies' => $this->getTopAgencies($countryID),
-            'topChargeAgencies' => $this->getTopChargeAgencies($countryID, $from, $to),
-            'topBds' => $this->getTopBds($countryID),
-            'topGamers' => $this->getTopGamers($countryID, $from, $to),
+            'topRooms' => $this->getTopRooms($countryID, $from, $to)->map(fn($r) => [
+                'name'  => $r->room_name ?? '-',
+                'image' => getImagePath($r->room_cover) ?? $defaultRoom,
+                'value' => number_format($r->room_visitors_count ?? 0),
+            ])->values(),
+
+            'topSenders' => $this->getTopSenders($countryID, $from, $to)->map(fn($s) => [
+                'name'  => $s->sender?->name ?? '-',
+                'image' => getImagePath($s->sender?->profile?->avatar) ?? $defaultAvatar,
+                'value' => number_format(($s->total_sent ?? 0) / 1000, 1) . 'K',
+            ])->values(),
+
+            'topReceivers' => $this->getTopReceivers($countryID, $from, $to)->map(fn($r) => [
+                'name'  => $r->receiver?->name ?? '-',
+                'image' => getImagePath($r->receiver?->profile?->avatar) ?? $defaultAvatar,
+                'value' => number_format(($r->total_sent ?? 0) / 1000, 1) . 'K',
+            ])->values(),
+
+            'topAgencies' => $this->getTopAgencies($countryID)->map(fn($a) => [
+                'name'  => $a->name ?? '-',
+                'image' => getImagePath($a->img) ?? $defaultAgency,
+                'value' => number_format($a->members_count ?? 0),
+            ])->values(),
+
+            'topChargeAgencies' => $this->getTopChargeAgencies($countryID, $from, $to)
+                ->filter(fn($c) => $c->senderShippingAgency)
+                ->map(fn($c) => [
+                    'name'  => $c->senderShippingAgency->name ?? '-',
+                    'image' => getImagePath($c->senderShippingAgency->img ?? null) ?? $defaultAgency,
+                    'value' => number_format($c->amount ?? 0, 2),
+                ])->values(),
+
+            'topBds' => $this->getTopBds($countryID)->map(fn($b) => [
+                'name'  => $b->name ?? '-',
+                'image' => null,
+                'value' => number_format($b->total_members ?? 0),
+            ])->values(),
+
+            'topGamers' => $this->getTopGamers($countryID, $from, $to)->map(fn($g) => [
+                'name'  => $g->user?->name ?? '-',
+                'image' => getImagePath($g->user?->profile?->avatar) ?? $defaultAvatar,
+                'value' => number_format(($g->coins ?? 0) / 1000, 1) . 'K',
+            ])->values(),
         ];
     }
 
@@ -221,22 +155,13 @@ class SuperAdminCountryController extends Controller
             }])
             ->orderByDesc('room_visitors_count')
             ->limit(3)
-            ->get()
-            ->map(function ($room) {
-                return [
-                    'id' => $room->id,
-                    'room_name' => $room->room_name,
-                    'room_cover' => $room->room_cover,
-                    'room_visitors_count' => $room->room_visitors_count,
-                    'owner' => $room->owner,
-                ];
-            });
+            ->get();
     }
 
     private function getTopSenders($countryID, $from, $to)
     {
         return GiftLog::select('sender_id')
-            ->selectRaw('SUM(giftPrice * giftNum) as total_sent')
+            ->selectRaw('SUM(giftPrice) as total_sent')
             ->join('users', 'gift_logs.sender_id', '=', 'users.id')
             ->where('users.country_id', $countryID)
             ->whereBetween('gift_logs.created_at', [$from, $to])
@@ -253,20 +178,20 @@ class SuperAdminCountryController extends Controller
 
     private function getTopReceivers($countryID, $from, $to)
     {
-        return GiftLog::select('receiver_id')
-            ->selectRaw('SUM(giftPrice * giftNum) as total_sent')
+        return GiftLog::select('gift_logs.receiver_id')
+            ->selectRaw('SUM(gift_logs.giftPrice) as total_sent')
             ->join('users', 'gift_logs.receiver_id', '=', 'users.id')
             ->where('users.country_id', $countryID)
             ->whereBetween('gift_logs.created_at', [$from, $to])
-            ->groupBy('receiver_id')
+            ->groupBy('gift_logs.receiver_id')
             ->having('total_sent', '>', 0)
             ->orderByDesc('total_sent')
             ->limit(3)
-            ->with([
+            ->get()
+            ->load([
                 'receiver:id,name,country_id',
                 'receiver.profile:id,user_id,avatar'
-            ])
-            ->get();
+            ]);
     }
 
     private function getTopAgencies($countryID)

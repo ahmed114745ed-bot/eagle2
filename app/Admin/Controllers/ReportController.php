@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
 use App\Helpers\Common;
 use App\Models\AdminUser;
 use App\Models\Agency;
@@ -182,6 +183,10 @@ class ReportController extends MainController
                 'users.name',
                 'users.uuid',
                 'users.agency_id',
+                'users.sender_level',
+                'users.received_level',
+                'users.special_id',
+                'users.country_id',
                 DB::raw('COALESCE(diamond_table.diamonds,0) as diamonds'),
                 DB::raw('COALESCE(salary_table.cut_sum,0) as expenses'),
                 DB::raw('COALESCE(salary_table.total_salary,0) as total'),
@@ -233,31 +238,10 @@ class ReportController extends MainController
         });
         $grid->column('id', __('Id'));
 
-        $grid->column('name', __('user'))->display(function ($name) {
-            $name = @$this->name ?? '';
-            $uid = @$this->uuid;
-            $path = @$this?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this ? url("admin/users/{$this->id}") : 0;
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
         });
-
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('diamonds', __('diamond'))->display(function ($v) {
             $diamond = floor($v ?? 0);
             $image = asset('images/diamond.jpg'); // Adjust path as needed
@@ -376,7 +360,7 @@ class ReportController extends MainController
         });
 
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . route('custom-export-users', ['month' => request('month'), 'year' => request('year'), 'agency_id' => request('agency_id'), 'id' => request('id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="' . route('admin.custom-export-users', ['month' => request('month'), 'year' => request('year'), 'agency_id' => request('agency_id'), 'id' => request('id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
         });
 
         $grid->disableExport();
@@ -571,7 +555,7 @@ class ReportController extends MainController
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = $this->user ? url("admin/users/{$this->user->id}") : 0;
-            
+
             return "<div class='user-card'>
                     $image
                     <div class='user-info'>
@@ -580,15 +564,6 @@ class ReportController extends MainController
                     </div>
                 </div>";
         });
-
-        // $grid->column('due1', __('due'))->display(function ($_) {
-        //     $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
-        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
-        //     return "<div style='display: flex; align-items: center; '>
-        //             <span>{$salary}</span>
-        //             <img src='{$image}' alt='USD' width='20' height='20'>
-        //         </div>";
-        // });
         // Add custom styling for agencies manager table
         Admin::style('
             .agencies-manager-table .due-badge {
@@ -726,6 +701,9 @@ class ReportController extends MainController
 
         $grid->model()->with([
             'bdSalaries',
+            'appUser.country',
+            'appUser.senderLevel',
+            'appUser.receiverLevel',
             'appUser',
             'appUser.profile',
             'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
@@ -806,7 +784,7 @@ class ReportController extends MainController
         ');
 
         $grid->column('id', __('Id'));
-        
+
         $grid->column('username', __('account dashboard'))->display(function ($name) {
             $uid = @$this->id;
             $path = @$this?->avatar;
@@ -819,7 +797,7 @@ class ReportController extends MainController
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = url("admin/usersBd/{$this->id}");
-            
+
             return "<div class='bd-card'>
                     $image
                     <div class='bd-info'>
@@ -829,27 +807,11 @@ class ReportController extends MainController
                 </div>";
         });
 
-        $grid->column('appUser.name', __('account user'))->display(function ($name) {
-            $uid = @$this->appUser->uuid;
-            $path = @$this?->appUser->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->appUser ? url("admin/users/{$this->appUser->id}") : 0;
-            
-            return "<div class='bd-card'>
-                    $image
-                    <div class='bd-info'>
-                       <a href='{$showUrl}' class='bd-name'>$name</a>
-                       <span class='bd-meta'>UUID: $uid</span>
-                    </div>
-                </div>";
+        $grid->column('appUser', __('account user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->appUser);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('due', __('Due'))->display(function () {
             $salary = round($this->net_sallary ?? 0, 2);
@@ -863,12 +825,12 @@ class ReportController extends MainController
         $grid->disableExport();
         $grid->disableActions();
         $grid->disableCreateButton();
-        
+
         // Add bd-report-table class
         Admin::script("
             document.querySelector('.grid-table')?.classList.add('bd-report-table');
         ");
-        
+
         return $grid;
     }
 

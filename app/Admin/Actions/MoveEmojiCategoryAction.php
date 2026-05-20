@@ -9,9 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class MoveEmojiCategoryAction extends RowAction
 {
+    /**
+     * Cache categories across all row instances to avoid N+1 queries.
+     */
+    protected static ?array $cachedCategories = null;
+
     public function name()
     {
-        // الاسم ديناميكي بحسب الحالة الحالية
         return  __('move');
     }
 
@@ -33,23 +37,35 @@ class MoveEmojiCategoryAction extends RowAction
     // Popup form
     public function form()
     {
-        $locale = app()->getLocale();
+        $options = static::getCategoryOptions();
 
-        // Category select
         $this->select('category_id', __('Select Category'))
-            ->options(function () use ($locale) {
-
-                $categories = [];
-                foreach (EmojiCategory::get() as $category) {
-                    $title = $category->title[$locale]
-                        ?? $category->title['en']
-                        ?? reset($category->title);
-
-                    $categories[$category->id] = $title;
-                }
-
-                return $categories;
-            })
+            ->options($options)
             ->required();
+    }
+
+    /**
+     * Get category options (cached per request to avoid N+1).
+     */
+    public static function getCategoryOptions(): array
+    {
+        if (static::$cachedCategories !== null) {
+            return static::$cachedCategories;
+        }
+
+        $locale = app()->getLocale();
+        $categories = [];
+
+        foreach (EmojiCategory::get() as $category) {
+            $title = $category->title[$locale]
+                ?? $category->title['en']
+                ?? reset($category->title);
+
+            $categories[$category->id] = $title;
+        }
+
+        static::$cachedCategories = $categories;
+
+        return $categories;
     }
 }

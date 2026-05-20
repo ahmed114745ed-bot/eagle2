@@ -200,9 +200,27 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/fairluck-sync-wallets.log'))
             ->runInBackground();
 
-        $schedule->command('app:print-datetime-every-minute')
-            ->everyMinute()
-            ->appendOutputTo(storage_path('logs/print-datetime-every-minute.log'))
+       $schedule->command('cleanup:fair-luck-transactions --days=30 --chunk=5000')
+            ->dailyAt('03:00')
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/cleanup-fair-luck-transactions.log'))
+            ->runInBackground();
+
+        $schedule->command('cleanup:fair-luck-wallet-histories --days=30 --chunk=5000')
+            ->dailyAt('04:00')
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/cleanup-fair-luck-wallet-histories.log'))
+            ->runInBackground();
+
+        // Mark expired room bans as inactive every hour
+        $schedule->job(new \App\Jobs\ExpireRoomBans)
+            ->hourly()
+            ->timezone(getTimezone())
+            ->withoutOverlapping()
+            ->name('expire-room-bans')
+            ->appendOutputTo(storage_path('logs/expire-room-bans.log'))
             ->runInBackground();
     }
 

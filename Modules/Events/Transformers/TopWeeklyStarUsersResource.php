@@ -17,9 +17,9 @@ class TopWeeklyStarUsersResource extends JsonResource
         return [
             'totalGiftNum' => strval(intval(@$this->totalGiftNum)) ?? "0",
             'user_id'      => $this->sender_id,
-            'uuid'         => $this->sender->uuid ?? 0,
-            'name'         => @$this->sender->name ?? '',
-            'avatar'       => @$this->sender->profile->avatar ?? '',
+            'uuid'         => $this->sender?->uuid ?? 0,
+            'name'         => $this->sender?->name ?? '',
+            'avatar'       => $this->sender?->profile?->avatar ?? '',
         ];
     }
 }

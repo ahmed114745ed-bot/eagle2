@@ -3,12 +3,14 @@
 namespace Modules\SalaryTransaction\Http\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
 use App\Models\ShippingAgency;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Illuminate\Support\Facades\Cache;
 use Modules\SalaryTransaction\Entities\ChargeAgency as EntitiesChargeAgency;
 
@@ -33,7 +35,7 @@ class ChargeAgencyController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('agency-country'))
             ->body($this->detail($id)));
     }
@@ -47,7 +49,7 @@ class ChargeAgencyController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('agency-country'))
             ->body($this->form()->edit($id)));
     }
@@ -62,29 +64,30 @@ class ChargeAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new EntitiesChargeAgency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()
+            ->with([
+                'agency',
+                'agency.owner.profile',
+                'agency.owner.country',
+                'agency.owner.senderLevel',
+                'agency.owner.receiverLevel',
+                'agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
             ->when($countryID, fn($q) => $q->whereHas('agency', fn($q) => $q->where('country_id', $countryID)))
             ->whereHas('agency');
 
         $grid->id(__('ID'));
         $grid->column('agency.name', __('Agency'))->display(function ($name) {
-            if (! $this->agency){
-                return ;
+            if (!$this->agency) {
+                return;
             }
-            $cacheKey = "agency_image_{$this->agency->id}";
-            $image = Cache::remember($cacheKey, 3600, function () {
-                $path = @$this->agency->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+            $path = @$this->agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                return handleShowImageWithTypes($this->agency->id, $url, 40, 40, 0);
-            });
+            $image = "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:0%; object-fit:cover;' alt='' />";
 
             $profileUrl = route('admin.agency.profile', ['id' => $this->agency->id]);
 
@@ -99,37 +102,14 @@ class ChargeAgencyController extends MainController
                     </a>";
         });
 
-        $grid->column('agency.owner.name', trans('owner'))->display(function ($name) {
-            if (! $this->agency){
-                return ;
-            }
-            $uid = @$this->agency->owner->uuid;
-            $path = @$this->agency->owner->profile?->avatar;
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->agency->id, $url, 40, 40);
-            $showUrl = $this->agency->owner ? url("admin/users/{$this->agency->owner->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('name', __('owner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->agency->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
-        $grid->column('agency.phone',trans('phone'));
-        $this->extendGrid ($grid);
+        $grid->column('agency.phone', trans('phone'));
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -140,7 +120,7 @@ class ChargeAgencyController extends MainController
 
         $show->id(__('admin.ID'));
         $show->name('name');
-        $this->extendShow ($show);
+        $this->extendShow($show);
         return $show;
     }
 
@@ -155,11 +135,11 @@ class ChargeAgencyController extends MainController
         $this->disableFormTools($form);
 
         $form->display(__('admin.ID'));
-        $form->select('agency_id', __('agency'))->options (function (){
-            $ops = [0=>'root'];
+        $form->select('agency_id', __('agency'))->options(function () {
+            $ops = [0 => 'root'];
             // $ps = Agency::query ()->WhereDoesntHave('chargeAgency')->where("Shipping_agency",1)->get ();
-            $ps = ShippingAgency::query ()->get ();
-            foreach ($ps as $p){
+            $ps = ShippingAgency::query()->get();
+            foreach ($ps as $p) {
                 $ops[$p->id] = $p->name;
             }
             return $ops;
@@ -167,7 +147,6 @@ class ChargeAgencyController extends MainController
             if (!$id = $form->model()->id) {
                 return 'unique:charge_agencies,agency_id';
             }
-
         });
         return $form;
     }

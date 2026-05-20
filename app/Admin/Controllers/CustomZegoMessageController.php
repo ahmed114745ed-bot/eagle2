@@ -29,6 +29,7 @@ class CustomZegoMessageController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new CustomZegoMessage());
+        $grid->model()->with(['user', 'gift']);
 
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('name'));
@@ -70,13 +71,9 @@ class CustomZegoMessageController extends AdminController
         $form = new Form(new CustomZegoMessage());
 
         $form->select('user_id', __('user'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
-        $form->select('gift_id', __('gifts'))->options(function ($value){
-            $ops = [];
-            foreach (Gift::where('type',6)->get() as $gift){
-                $ops[$gift->id] = $gift->name .' - '. $gift->id .' - '. $gift->price;
-            }
-            return $ops;
-        })->required();
+        $form->select('gift_id', __('gifts'))->options(
+            Gift::where('type', 6)->get()->pluck(null, 'id')->map(fn($gift) => $gift->name . ' - ' . $gift->id . ' - ' . $gift->price)->toArray()
+        )->required();
         $form->number('percentage', __('Percentage'));
         $form->saving(function (Form $form) {
             $user=User::query()->find($form->user_id);

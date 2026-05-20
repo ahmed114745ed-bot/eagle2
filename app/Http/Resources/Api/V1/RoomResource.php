@@ -67,6 +67,14 @@ class RoomResource extends JsonResource
             'visitors_count' => $this->count_room_socket_v2,
             'cover' => $this->room_cover ?: '',
             'room_level_image'   => $this->type == 'audio' ? @$this->roomLevel->img ?? '' : '',
+
+            'avatar' => [
+                'original' => $this->room_cover ?? '',
+                'thumbnail' =>  $this->avatar_thumb ?? Common::getImageUrl($this->room_cover ?? '', 'thumbnail'),
+                'medium' => $this->avatar_medium ?? Common::getImageUrl($this->room_cover ?? '', 'medium'),
+                'large' => $this->avatar_large ?? Common::getImageUrl($this->room_cover ?? '', 'large'),
+            ],
+
             //            'class' => $this->myClass ?: new \stdClass(),
             //            'type' => $this->myType ?: new \stdClass(),
             'is_hot' => $this->hot ?: 0,

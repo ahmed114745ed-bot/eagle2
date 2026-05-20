@@ -57,21 +57,25 @@ class ChatMessageResource extends JsonResource
 
     function create_at($timeZone = null)
     {
-        $createdAt = Carbon::parse($this->created_at);//->setTimezone($timeZone);
+        $createdAt = Carbon::parse($this->created_at);
 
-        if ($createdAt->isCurrentHour() || $createdAt->isCurrentDay()) {
+        if ($timeZone) {
+            $createdAt->setTimezone($timeZone);
+        }
+
+        // Get current time in the same timezone for accurate comparison
+        $now = Carbon::now($timeZone ?: 'UTC');
+
+        if ($createdAt->isSameHour($now) || $createdAt->isSameDay($now)) {
             if (app()->getLocale() == 'ar') {
                 return UserCommon::englishToArabicNumbers($createdAt);
             }
             return $createdAt->isoFormat('h:mm:ss A');
         } else if ($createdAt->isYesterday()) {
             return __('messages.yesterday');
-        } else if ($createdAt->isCurrentWeek()) {
+        } else if ($createdAt->isSameWeek($now)) {
             $dayName = $createdAt->locale(app()->getLocale())->dayName; // ترجم اسم اليوم
             return $dayName;
-        } else if ($createdAt->isCurrentDay()) {
-            $daysSinceCreation = $createdAt->diffInHours(Carbon::now());
-            return __('messages.days_ago', ['days' => $daysSinceCreation]);
         } else {
             if (app()->getLocale() == 'ar') {
                 return UserCommon::englishToArabicNumbersDate($createdAt);
@@ -83,8 +87,15 @@ class ChatMessageResource extends JsonResource
 
     public function toArray(Request $request)
     {
-
-        $timeZone = $request->hasHeader('tz') ? $request->header()['tz'][0] : 'UTC';
+        // Get timezone from request header with validation
+        $timeZone = getTimezone(); // Use system timezone as default instead of UTC
+        if ($request->hasHeader('tz')) {
+            $requestedTimezone = $request->header()['tz'][0];
+            // Validate timezone
+            if (in_array($requestedTimezone, timezone_identifiers_list())) {
+                $timeZone = $requestedTimezone;
+            }
+        }
         $reacts = React::where('chat_message_id', $this->id)->get();
         $albums = MessageAlbum::where('chat_message_id', $this->id)->get();
         $album_array = [];

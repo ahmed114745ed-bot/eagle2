@@ -106,9 +106,10 @@ class WinnerRankingController extends  MainController
 
         $grid->column('winner_id', __('Winner'))->display(function () {
             return $this->user
-                ? app(UserService::class)->adminUserAvatar($this->user)
+                ? app(UserService::class)->adminUserCard($this->user)
                 : __('No User');
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('type', __('type'))->display(fn($type) => [
             'sender'   => 'wealth',

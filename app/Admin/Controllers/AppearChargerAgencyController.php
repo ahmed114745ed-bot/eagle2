@@ -2,26 +2,27 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\DeleteShippingAgencyAction;
+use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencySallary;
 use App\Models\Charge;
 use App\Models\CoinLog;
-use Carbon\Carbon;
+use App\Models\GiftLog;
+use App\Models\ShippingAgency;
 use App\Models\User;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Models\AgencySallary;
-use App\Models\ShippingAgency;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Actions\DeleteShippingAgencyAction;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -222,7 +223,16 @@ class AppearChargerAgencyController extends MainController
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
-        $grid->model()->with(['owner.profile', 'creator', 'country'])
+        $grid->model()->with([
+            'owner.profile',
+            'owner.country',
+            'owner.senderLevel',
+            'owner.receiverLevel',
+            'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'creator',
+            'country'
+        ])
+            ->withCount('chargeAgency as charge_agency_exists')
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 
@@ -236,18 +246,11 @@ class AppearChargerAgencyController extends MainController
 
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
-                $cacheKey = "agency_image_{$this->id}";
-                $image = Cache::remember($cacheKey, 3600, function () {
-                    $path = @$this->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
+                $path = @$this->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-
-                    return handleShowImageWithTypes($this->id, $url, 40, 40);
-                });
+                $image = "<img src='{$url}' onerror=\"this.onerror=null;this.src='{$defaultImage}'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
 
                 $flagHtml = '';
                 if (!empty($this->country?->flag)) {
@@ -278,54 +281,17 @@ class AppearChargerAgencyController extends MainController
                 ";
             })->sortable();
 
-        $grid->column('owner_id', __('Owner'))->display(function () {
-            // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
-            $name = $this->owner ? $this->owner->name ?? 'Unknown Owner' : 'Unknown Owner';
-            $uid = $this->owner ? $this->owner->uuid ?? 'N/A' : 'N/A';
-            $phone = $this->owner ? $this->owner->phone ?? '-' : '-';
-            $path = $this->owner && $this->owner->profile ? $this->owner->profile->avatar : '';
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            // التأكد من أن الـ owner موجود قبل استدعاء دالة `handleShowImageWithTypes`
-            $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
-
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
-            $flagHtml = '';
-            if (!empty($this->owner?->country?->flag)) {
-                $flagPath = getImagePath($this->owner->country->flag);
-                $flagTitle = app()->getLocale() === 'ar'
-                    ? e($this->owner->country->name)
-                    : e($this->owner->country->e_name);
-
-                $flagHtml = "<img src='{$flagPath}'
-                         class='flag-image'
-                         alt='flag Image'
-                         title='{$flagTitle}'
-                         style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
-            }
-            return "
-                <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <strong>$name</strong> {$flagHtml}<br>
-                        <span style=' font-size: smaller;'>UID: $uid</span><br>
-                        <span style=' font-size: smaller;'>Phone: $phone</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('ownerName', __('Owner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('charge_agency', __("Charge-agency"))
             ->display(function () {
-                return $this->chargeAgency ? 1 : 0;
+                return $this->charge_agency_exists > 0 ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates())->sortable();;
+            ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('appear_charger_agency', __("Appear charger agency"))
             ->display(function () {
@@ -340,7 +306,9 @@ class AppearChargerAgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
         $permission = $this->permission_name;
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            $id = $creatorId;
+            if ($this->creator) {
+                return app(\App\Admin\Services\CreatorService::class)->show($this->creator);
+            }
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->actions(function ($actions) use ($permission) {
@@ -397,11 +365,9 @@ class AppearChargerAgencyController extends MainController
 
         $form->select('app_owner_id', __('app owner id'))
             ->options(function ($value) {
-                $ops2 = [];
-                foreach (User::where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
+                if (!$value) return [];
+                $user = User::find($value);
+                return $user ? [$user->id => $user->uuid . '_' . $user->name] : [];
             })
             ->ajax('/api/search/users5', 'id', 'name')->rules('required');
 
@@ -511,7 +477,6 @@ class AppearChargerAgencyController extends MainController
         $form->saved(function (Form $form) {
 
             $appOwnerId = intval($form->model()->app_owner_id);
-
         });
 
         return $form;
@@ -528,56 +493,40 @@ class AppearChargerAgencyController extends MainController
         });
 
         $agencyId = $agency->id;
-        $charges = null;
-        $resiveds = null;
-        $coinLogs = null;
 
-        switch ($tab) {
-            case 'charges':
-                $charges = Charge::where('charger_type', 'agency')
-                    ->where('charger_id', $agencyId);
+        // Load charges (sent transactions)
+        $chargesQuery = Charge::where('charger_type', 'agency')
+            ->where('charger_id', $agencyId);
 
-                $relations = [];
-
-                if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
-                    $charges->where('user_type', $request->filter_by);
-                    $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
-                }
-                if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
-                    $charges->where('user_id', $request->filter_id);
-                }
-
-                if (!empty($relations)) {
-                    $charges->with($relations);
-                }
-
-                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
-                break;
-
-            case 'resived':
-                $resiveds = Charge::where('user_id', $agencyId)
-                    ->where('user_type', 'agency');
-
-                if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
-                    $resiveds->where('charger_type', $request->sender_type);
-                }
-                if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
-                    $resiveds->where('charger_id', $request->sender_id);
-                }
-
-                $resiveds = $resiveds->with(['sender'])
-                    ->latest()
-                    ->paginate(10, ['*'], 'resived_page');
-                break;
-
-
-            case 'coinsLog':
-                $coinLogs = CoinLog::where('user_id', $agencyId)
-                    ->where('user_type', 'shipping_agency')
-                    ->latest()
-                    ->paginate(10, ['*'], 'resived_page');
-                break;
+        $relations = [];
+        if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
+            $chargesQuery->where('user_type', $request->filter_by);
+            $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
         }
+        if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
+            $chargesQuery->where('user_id', $request->filter_id);
+        }
+        if (!empty($relations)) {
+            $chargesQuery->with($relations);
+        }
+        $charges = $chargesQuery->latest()->paginate(10, ['*'], 'charges_page');
+
+        // Load received transactions
+        $resivedsQuery = Charge::where('user_id', $agencyId)
+            ->where('user_type', 'agency');
+        if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
+            $resivedsQuery->where('charger_type', $request->sender_type);
+        }
+        if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
+            $resivedsQuery->where('charger_id', $request->sender_id);
+        }
+        $resiveds = $resivedsQuery->with(['sender'])->latest()->paginate(10, ['*'], 'resived_page');
+
+        // Load coin logs
+        $coinLogs = CoinLog::where('user_id', $agencyId)
+            ->where('user_type', 'shipping_agency')
+            ->latest()
+            ->paginate(10, ['*'], 'coins_page');
 
         $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
         $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');

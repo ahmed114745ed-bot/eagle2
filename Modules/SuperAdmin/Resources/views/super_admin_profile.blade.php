@@ -1,1333 +1,532 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
     :root {
-        --primary-color: {{ config('themes.primaryColor') }};
-        --secondary-color: {{ config('themes.secondaryColor') }};
-        --text-primary-color: {{ config('themes.textPrimaryColor') }};
-        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
-        --box-background-color: {{ config('themes.boxBackgroundColor') }};
-        --table-background-color: {{ config('themes.tableBackGroundColor')}}
-         --background-image:{{ config('themes.backgroundImage') }};
-        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
-        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
-        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
-        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
-        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
-
-
-        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
-        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
-        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+        --shadow-md: 0 4px 20px rgba(0,0,0,0.1);
+        --radius: 16px;
     }
 
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 57px;
-        color: white;
-        font-size: 20px;
-        margin-bottom: 6px;
-    }
+    .sa-container { max-width: 1280px; margin: 0 auto; padding: 24px; font-family: 'Inter', 'Segoe UI', sans-serif; color: #1a1a2e; }
 
-    .stat-icon.bg-blue {
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    }
+    /* Header Card */
+    .sa-header { background: white; border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 24px; }
+    .sa-header-banner { background: var(--gradient-1); height: 120px; position: relative; }
+    .sa-header-body { padding: 0 32px 28px; display: flex; align-items: flex-end; gap: 24px; margin-top: -50px; position: relative; flex-wrap: wrap; }
 
-    .stat-icon.bg-green {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-    }
+    .sa-avatar { width: 110px; height: 110px; border-radius: 20px; overflow: hidden; border: 4px solid white; box-shadow: var(--shadow-md); flex-shrink: 0; background: white; }
+    .sa-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .stat-info {
-        flex: 1;
-    }
+    .sa-info { flex: 1; min-width: 200px; padding-top: 10px; }
+    .sa-name { margin: 0 0 8px; font-size: 26px; font-weight: 800; color: #1a1a2e; letter-spacing: -0.5px; }
 
-    .stat-value {
-        font-size: 20px;
-        font-weight: 700;
-        color: #2c3e50;
-        line-height: 1;
-    }
+    .sa-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+    .sa-meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; background: #f8f9fa; padding: 5px 12px; border-radius: 8px; }
+    .sa-meta-label { font-weight: 600; color: #6c757d; }
+    .sa-meta-value { color: #1a1a2e; font-weight: 500; }
 
-    .stat-label {
-        font-size: 13px;
-        color: #7f8c8d;
-        margin-top: 5px;
-    }
+    /* Stats Cards */
+    .sa-stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .sa-stat-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 20px 24px; display: flex; align-items: center; gap: 16px; border: 1px solid #f0f0f0; transition: all 0.3s; }
+    .sa-stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .sa-stat-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; flex-shrink: 0; }
+    .sa-stat-icon.charges { background: var(--gradient-5); }
+    .sa-stat-icon.spent { background: var(--gradient-2); }
+    .sa-stat-icon.salary { background: var(--gradient-3); }
+    .sa-stat-value { font-size: 24px; font-weight: 800; background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .sa-stat-label { font-size: 12px; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-top: 2px; }
 
-    .section-box {
-        background: var(--secondary-color);
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
+    /* Tabs */
+    .sa-tabs { display: flex; background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 6px; margin-bottom: 24px; overflow-x: auto; gap: 4px; }
+    .sa-tab-btn { padding: 10px 20px; background: none; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 7px; font-size: 13px; color: #6c757d; text-decoration: none; }
+    .sa-tab-btn i { font-size: 14px; }
+    .sa-tab-btn.active { background: var(--gradient-1); color: white !important; box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+    .sa-tab-btn:hover:not(.active) { background: #f8f9fa; color: #1a1a2e; }
 
+    .sa-tab-content { display: none; }
+    .sa-tab-content.active { display: block; }
 
-    .section-header h4 {
-        margin: 0;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+    /* Cards */
+    .sa-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 24px; border: 1px solid #f0f0f0; overflow: hidden; }
+    .sa-card-header { padding: 20px 24px; border-bottom: 2px solid #f0f2f5; display: flex; align-items: center; justify-content: space-between; }
+    .sa-card-header-left { display: flex; align-items: center; gap: 12px; }
+    .sa-card-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; }
+    .sa-card-title { margin: 0; font-size: 18px; font-weight: 800; color: #1a1a2e; }
+    .sa-card-subtitle { font-size: 12px; color: #6c757d; }
+    .sa-count-badge { background: var(--gradient-1); color: white; padding: 6px 16px; border-radius: 50px; font-size: 13px; font-weight: 700; }
 
-    .section-header .text-yellow {
-        color: #f39c12;
-    }
+    /* Tables */
+    .sa-table { width: 100%; border-collapse: collapse; }
+    .sa-table thead th { background: #f8f9fa; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e9ecef; }
+    .sa-table td { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; font-size: 13px; }
+    .sa-table tbody tr { transition: background 0.2s; }
+    .sa-table tbody tr:hover { background: #fafbfc; }
+    .sa-table tr:last-child td { border-bottom: none; }
 
-    .section-header .text-red {
-        color: #e74c3c;
-    }
+    .sa-user-cell { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+    .sa-user-avatar { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; border: 2px solid #f0f2f5; flex-shrink: 0; }
+    .sa-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .sa-user-name { font-weight: 700; font-size: 13px; color: #1a1a2e; }
+    .sa-user-meta { font-size: 11px; color: #adb5bd; }
 
+    .sa-status-active { color: #10b981; font-weight: 700; }
+    .sa-status-inactive { color: #ef4444; font-weight: 700; }
 
-    .number-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        background: #ecf0f1;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 13px;
-    }
+    /* Empty State */
+    .sa-empty { padding: 60px 24px; text-align: center; }
+    .sa-empty-icon { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f0f2f5, #e9ecef); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    .sa-empty-icon i { font-size: 32px; color: #adb5bd; }
+    .sa-empty p { font-size: 16px; font-weight: 600; color: #6c757d; margin: 0 0 4px; }
+    .sa-empty small { font-size: 13px; color: #adb5bd; }
 
-    .number-badge.warning {
-        background: #fef9e7;
-        color: #f39c12;
-    }
+    /* Reward Sub-tabs */
+    .sa-reward-pills { display: flex; gap: 6px; margin-bottom: 16px; padding: 16px 24px 0; }
+    .sa-reward-pill { padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; text-decoration: none; color: #6c757d; background: #f0f2f5; transition: all 0.3s; }
+    .sa-reward-pill.active { background: var(--gradient-1); color: white; box-shadow: 0 3px 10px rgba(102,126,234,0.3); }
+    .sa-reward-pill:hover:not(.active) { background: #e9ecef; }
 
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 30px 0;
-        color: #95a5a6;
-    }
+    /* Action buttons */
+    .sa-btn { padding: 6px 14px; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+    .sa-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .sa-btn-primary { background: var(--gradient-1); color: white; }
+    .sa-btn-danger { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
 
-    .empty-state i {
-        font-size: 40px;
-        margin-bottom: 10px;
-    }
-
-    .empty-state p {
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .empty-table {
-        padding: 30px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: #95a5a6;
-        background: white;
-        border-radius: 8px;
-        margin: 15px 0;
-    }
-
-    .empty-table i {
-        font-size: 40px;
-        margin-bottom: 10px;
-    }
-
-    .empty-table p {
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .agency-profile-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-        /* background: var(--secondary-color); */
-        /* filter: brightness(0.85); */
-
-    }
-
-    .agency-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 4px solid #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .agency-avatar .logo-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .agency-info {
-        flex: 1;
-    }
-
-    .agency-name {
-        margin: 0 0 10px 0;
-        color: #2c3e50;
-        font-size: 28px;
-        font-weight: 700;
-    }
-
-    .agency-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-
-    .meta-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 14px;
-    }
-
-    .meta-label {
-        font-weight: 600;
-        color: #7f8c8d;
-    }
-
-    .meta-value {
-        color: #34495e;
-    }
-
-    .meta-uuid {
-        color: #95a5a6;
-        font-size: 0.9em;
-    }
-
-    .agency-stats {
-        display: flex;
-        gap: 15px;
-    }
-
-    .stat-card {
-        background: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        text-align: center;
-        min-width: 200px;
-
-    }
-
-    .stat-value {
-        font-size: 20px;
-        font-weight: 700;
-        color: #3498db;
-    }
-
-    .stat-label {
-        font-size: 12px;
-        color: #7f8c8d;
-        text-transform: none;
-        letter-spacing: 0.5px;
-    }
-
-    .ltr .btn-back {
-        position: absolute;
-        top: 5px;
-        right: 20px;
-        background: #ecf0f1;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 6px;
-        color: #7f8c8d;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .btn-back:hover {
-        background: #d6e0e3;
-        color: #34495e;
-    }
-
-    .notice-section {
-        background: #fff8e1;
-        border-left: 4px solid #ffc107;
-        padding: 15px;
-        border-radius: 0 6px 6px 0;
-        margin-bottom: 25px;
-    }
-
-    .notice-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-        color: #ff9800;
-        font-weight: 600;
-    }
-
-    .notice-content {
-        color: #5d4037;
-        line-height: 1.5;
-    }
-
-    .top-performers-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
+    /* Responsive */
     @media (max-width: 768px) {
-        .top-performers-section {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-    }
-
-    .stats-row {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-
-    .section-title {
-        margin: 0;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #2c3e50;
-    }
-
-    .section-badge {
-        background: #3498db;
-        color: white;
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .avatar-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-        gap: 15px;
-    }
-
-    .avatar-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: inherit;
-        transition: transform 0.2s;
-    }
-
-    .avatar-item:hover {
-        transform: translateY(-3px);
-    }
-
-    .avatar-img-container {
-        position: relative;
-        width: 60px;
-        height: 60px;
-        margin-bottom: 8px;
-    }
-
-    .avatar-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .avatar-badge {
-        position: absolute;
-        bottom: -5px;
-        right: -5px;
-        background: #e74c3c;
-        color: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        font-weight: bold;
-        border: 2px solid white;
-    }
-
-    .avatar-badge.admin {
-        background: #27ae60;
-    }
-
-    .avatar-name {
-        font-size: 12px;
-        text-align: center;
-        max-width: 80px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 30px 0;
-        color: #95a5a6;
-    }
-
-    .empty-state i {
-        font-size: 40px;
-        margin-bottom: 10px;
-    }
-
-    .empty-state p {
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .agency-tabs {
-        display: flex;
-        border-bottom: 1px solid #ddd;
-        margin-bottom: 20px;
-        overflow-x: auto;
-    }
-
-    .tab-btn {
-        padding: 12px 20px;
-        background: none;
-        border: none;
-        border-bottom: 3px solid transparent;
-        font-weight: 600;
-
-        cursor: pointer;
-        transition: all 0.3s;
-        white-space: nowrap;
-    }
-
-    .tab-btn.active {
-        color: var(--primary-color);
-        border-bottom-color: var(--primary-color);
-    }
-
-    .tab-btn:hover:not(.active) {
-        color: #34495e;
-    }
-
-    .tab-content {
-        display: none;
-    }
-
-    .tab-content.active {
-        display: block;
-    }
-
-    .card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        margin-bottom: 30px;
-    }
-
-    .card-header h3 {
-        margin: 0;
-        font-size: 18px;
-        color: #2c3e50;
-    }
-
-    .table-section {
-        width: 100%;
-        border-collapse: collapse;
-        background: var(--secondary-color);
-    }
-
-    .data-table td {
-        width: 262px;
-        padding: 12px 15px;
-        border-bottom: 1px solid #eee;
-        vertical-align: middle;
-    }
-
-    .data-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .user-cell {
-        /* display: flex; */
-        align-items: center;
-        gap: 10px;
-    }
-
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        overflow: hidden;
-    }
-
-    .user-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .user-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .user-info strong {
-        font-size: 14px;
-    }
-
-    .user-info small {
-        font-size: 11px;
-        color: #95a5a6;
-    }
-
-    .role-badge {
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-        color: white;
-    }
-
-    .role-badge.owner {
-        background: #9b59b6;
-    }
-
-    .role-badge.admin {
-        background: #27ae60;
-    }
-
-    .btn-action {
-        padding: 5px 10px;
-        background: #3498db;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 12px;
-        cursor: pointer;
-        transition: background 0.3s;
-    }
-
-    .btn-action:hover {
-        background: #2980b9;
-    }
-
-    .empty-table {
-        padding: 30px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: #95a5a6;
-    }
-
-    .empty-table i {
-        font-size: 40px;
-        margin-bottom: 10px;
-    }
-
-    .empty-table p {
-        margin: 0;
-        font-size: 14px;
-    }
-
-    .user-avatar,
-    .supporter-avatar {
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .supporters-avatars {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-    }
-
-    .user-info-cell {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .target-card-section-1 {
-        /* display: inline-flex; */
-        width: 100%;
-        padding-top: 26px;
-        margin-bottom: 35px;
-
-    }
-
-    .card-target-filter {
-        display: inline;
-        width: 34%;
-        left: 33px;
-        position: absolute;
-    }
-
-    .card-target-filter .form-group {
-        margin-bottom: 16px;
-        right: 20px;
-        position: relative;
-        top: 10px;
-    }
-
-    .card-target-filter button {
-        position: relative;
-        left: -49px;
-        bottom: -29px;
-    }
-
-    .card-target-filter-phone {
-        width: 51%;
-        margin-bottom: 27px;
-        position: relative;
-    }
-
-    .card-target-filter-phone .form-group {
-        margin-bottom: 16px;
-        right: 20px;
-        position: relative;
-        top: 10px;
-    }
-
-    .card-target-filter-phone button {
-        position: relative;
-        left: -49px;
-        bottom: -29px;
-    }
-
-    .target-card-stat {
-        width: 50%;
-    }
-
-    .filter-form {
-        border-radius: 13px;
-        height: 165px;
-
-    }
-
-    .card-target-filter-phone {
-        /* display: none; */
-    }
-
-    .card-target-filter {
-        display: none;
-    }
-
-    @media (max-width: 768px) {
-        .stats-row {
-            flex-direction: column;
-            width: 108%;
-
-        }
-
-        .avatar-grid {
-            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-        }
-
-        .target-card-section-1 {
-            display: grid;
-            width: 100%;
-            padding-top: 26px;
-            margin-bottom: 35px;
-        }
-
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 118px;
-            color: white;
-            font-size: 20px;
-            margin-bottom: 6px;
-
-        }
-
-
-        .target-card-stat {
-            width: 92%;
-
-        }
-
-        .card-target-filter {
-            display: none;
-        }
-
-        .card-target-filter-phone {
-            display: block;
-            width: 100%;
-            left: 0px;
-            position: relative;
-            margin-bottom: 31px;
-
-        }
-
-        .card-target-filter-phone .col-md-7 {
-            float: none;
-        }
-
-        .card-target-filter-phone .form-control {
-            display: block;
-            width: 89%;
-            padding: 6px 12px;
-            font-size: 14px;
-            line-height: 1.42857143;
-            color: var(--text-secondary-color) !important;
-            background-color: #fff;
-            background-image: none;
-            border: 1px solid var(--primary-hover-alpha) !important;
-            border-radius: 4px;
-        }
-
-        nav-scroll-container {
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* For Arabic (Right aligned) */
-        .nav-right .nav {
-            justify-content: flex-end; /* Move to right side */
-            direction: rtl;
-        }
-
-        /* For English (Left aligned) */
-        .nav-left .nav {
-            justify-content: flex-start; /* Move to left side */
-            direction: ltr;
-        }
-
-        .card-target-filter-phone .filter-form {
-            border-radius: 13px;
-            height: 238px;
-        }
-
-        .card-target-filter-phone .align-items-end {
-            display: grid;
-        }
-
-        .card-target-filter-phone button {
-            left: -224px;
-
-        }
+        .sa-header-body { padding: 0 16px 20px; gap: 16px; }
+        .sa-name { font-size: 20px; }
+        .sa-stats-row { grid-template-columns: 1fr; }
     }
 </style>
 
+<div class="sa-container">
 
-<body>
-
-<div class="agency-profile-container">
-
-    <!-- Header Section -->
-    <div class="agency-header">
-        <div class="agency-avatar">
-            <img src="{{$superAdmin->display_image }}" alt="Agency Logo" class="logo-img">
-        </div>
-        <div class="agency-info">
-            <h1 class="agency-name">{{ $superAdmin->name ??'' }}</h1>
-            <div class="agency-meta">
-                <div class="meta-item">
-                    <span class="meta-label">{{ __("ID") }}:</span>
-                    <span class="meta-value">{{ $superAdmin->id }}</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">{{ __("username") }}:</span>
-                    <span class="meta-value">{{ $superAdmin->username ?? '' }}</span>
-                </div>
-            </div>
-            <div class="agency-meta">
-                <div class="meta-item">
-                    <span class="meta-label">{{ __("salary") }}:</span>
-                    <span class="meta-value">{{ $superAdmin->di }}</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">{{ __("country") }}:</span>
-                    <img src="{{ getImagePath(@$superAdmin->country->flag) }}"
-                         class="flag-image"
-                         alt="flag Image"
-                         title="{{ app()->getLocale() === 'ar' ? @$superAdmin->country->name : @$superAdmin->country->e_name }}">
-                </div>
-            </div>
-        </div>
-
-
-        <a href="{{ url('admin/usersBd') }}" class="btn-back">
+    <!-- Go Back -->
+    <div style="margin-bottom:16px; display:flex; justify-content:flex-end;">
+        <a href="{{ url('admin/usersBd') }}" style="display:inline-flex; align-items:center; gap:8px; padding:10px 22px; background:white; color:#667eea; border-radius:50px; font-weight:700; font-size:14px; text-decoration:none; box-shadow:0 4px 15px rgba(0,0,0,0.1); border:2px solid #e9ecef;">
             <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
         </a>
     </div>
 
-    <div class="top-performers-section">
-        {{--            <div class="performers-card">--}}
-        {{--                <div class="section-header">--}}
-        {{--                    <h2 class="section-title">--}}
-        {{--                        <i class="fas fa-star"></i>--}}
-        {{--                        {{ __('total proft') }}--}}
-        {{--                    </h2>--}}
-        {{--                </div>--}}
-        {{--                    <div class="avatar-grid">--}}
-
-
-        {{--                            <a href="#" >--}}
-        {{--                               {{  truncateAndTrim( $superAdmin->total_salary)  }}--}}
-        {{--                            </a>--}}
-        {{--                    </div>--}}
-
-        {{--            </div>--}}
-
-        <div class="performers-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    {{ __('total charges') }}
-                </h2>
+    <!-- Header Card -->
+    <div class="sa-header">
+        <div class="sa-header-banner"></div>
+        <div class="sa-header-body">
+            <div class="sa-avatar">
+                <img src="{{ $superAdmin->display_image }}" alt="Avatar">
             </div>
-            <div class="avatar-grid">
-                <a href="#">
-                    {{ truncateAndTrim($totalCharges ,2) . ' 💰'  }}
-                </a>
-            </div>
-        </div>
-        <div class="performers-card">
-            <div class="section-header">
-                <h2 class="section-title">
-                    {{ __('total spent') }}
-                </h2>
-            </div>
-            <div class="avatar-grid">
-                <a href="#">
-                    {{ truncateAndTrim($totalSpent,2) }}
-                </a>
+            <div class="sa-info">
+                <h1 class="sa-name">{{ $superAdmin->name ?? '' }}</h1>
+                <div class="sa-meta">
+                    <div class="sa-meta-item">
+                        <i class="fas fa-id-badge" style="color:#667eea;"></i>
+                        <span class="sa-meta-label">{{ __("ID") }}:</span>
+                        <span class="sa-meta-value">{{ $superAdmin->id }}</span>
+                    </div>
+                    <div class="sa-meta-item">
+                        <i class="fas fa-user" style="color:#43e97b;"></i>
+                        <span class="sa-meta-label">{{ __("username") }}:</span>
+                        <span class="sa-meta-value">{{ $superAdmin->username ?? '' }}</span>
+                    </div>
+                    @if(@$superAdmin->country)
+                        <div class="sa-meta-item">
+                            <img src="{{ getImagePath(@$superAdmin->country->flag) }}" style="width:20px; height:14px; border-radius:3px; object-fit:cover;">
+                            <span class="sa-meta-value">{{ app()->getLocale() === 'ar' ? @$superAdmin->country->name : @$superAdmin->country->e_name }}</span>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Tabs Navigation -->
-    @php $activeTab = request('tab', 'agencies'); @endphp
-
-    <div class="agency-tabs">
-        <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
-        <a href="?tab=rewards" class="tab-btn {{ $activeTab === 'rewards' ? 'active' : '' }}">{{ __('rewards') }}</a>
-        <a href="?tab=bds" class="tab-btn {{ $activeTab === 'bds' ? 'active' : '' }}">{{ __('bds') }}</a>
-        <a href="?tab=sub_super_admin" class="tab-btn {{ $activeTab === 'sub_super_admin' ? 'active' : '' }}">{{ __('super admins') }}</a>
-
-
+    <!-- Stats Row -->
+    <div class="sa-stats-row">
+        <div class="sa-stat-card">
+            <div class="sa-stat-icon charges"><i class="fas fa-coins"></i></div>
+            <div>
+                <div class="sa-stat-value">{{ number_format(truncateAndTrim($totalCharges, 2)) }}</div>
+                <div class="sa-stat-label"><i class="fas fa-arrow-up"></i> {{ __('total charges') }}</div>
+            </div>
+        </div>
+        <div class="sa-stat-card">
+            <div class="sa-stat-icon spent"><i class="fas fa-shopping-cart"></i></div>
+            <div>
+                <div class="sa-stat-value" style="background:var(--gradient-2); -webkit-background-clip:text;">{{ number_format(truncateAndTrim($totalSpent, 2)) }}</div>
+                <div class="sa-stat-label"><i class="fas fa-arrow-down"></i> {{ __('total spent') }}</div>
+            </div>
+        </div>
+        <div class="sa-stat-card">
+            <div class="sa-stat-icon salary"><i class="fas fa-money-bill-wave"></i></div>
+            <div>
+                <div class="sa-stat-value" style="background:var(--gradient-3); -webkit-background-clip:text;">{{ number_format(@$superAdmin->di ?? 0) }}</div>
+                <div class="sa-stat-label"><i class="fas fa-wallet"></i> {{ __('salary') }}</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="tab-loading"
-         style="display: none; position: fixed; top: 50%; left: 50%; background: var(--primary-color); color: var(--text-primary-color); z-index: 9999; padding: 30px 40px; border-radius: 10px; font-size: 20px; font-weight: bold; box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);">
-        {{ __('Loading...') }}
+    <!-- Tabs -->
+    <div class="sa-tabs">
+        <a href="?tab=agencies" class="sa-tab-btn" data-target="agencies-tab"><i class="fas fa-building"></i> {{ __('agencies') }}</a>
+        <a href="?tab=rewards" class="sa-tab-btn" data-target="rewards-tab"><i class="fas fa-gift"></i> {{ __('rewards') }}</a>
+        <a href="?tab=bds" class="sa-tab-btn" data-target="bds-tab"><i class="fas fa-headset"></i> {{ __('bds') }}</a>
+        <a href="?tab=sub_super_admin" class="sa-tab-btn" data-target="sub_super_admin-tab"><i class="fas fa-user-shield"></i> {{ __('super admins') }}</a>
     </div>
 
-    <!-- Members Tab -->
-    @if($activeTab === 'agencies')
-        <div class="tab-content active" id="members-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h3>{{ __('Agencies') }}</h3>
-                    <span class="badge count-badge">{{ optional($agencies)->total() ?? 0 }}</span>
+    <!-- Loading -->
+    <div id="tab-loading" style="display:none;"></div>
+
+    <!-- ===== TAB: AGENCIES ===== -->
+    <div class="sa-tab-content" id="agencies-tab">
+        <div class="sa-card">
+            <div class="sa-card-header" style="background:linear-gradient(135deg,#f8f9ff 0%,#ffffff 100%);">
+                <div class="sa-card-header-left">
+                    <div class="sa-card-icon" style="background:var(--gradient-3);"><i class="fas fa-building"></i></div>
+                    <div>
+                        <h3 class="sa-card-title">{{ __('Agencies') }}</h3>
+                        <span class="sa-card-subtitle">{{ __('Managed agencies') }}</span>
+                    </div>
                 </div>
-                @if($agencies && $agencies->count())
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('owner') }}</th>
-                                <th>{{ __('Status') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($agencies as $index => $agency)
-                                <tr>
-                                    <td>{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
-                                    <td class="user-cell">
-                                        <div class="user-avatar">
-                                            <a href=" {{ url($prefix.'/agencies/profile/' .$agency->id) }}">
-                                                <img src="{{ getImagePath($agency->img) }}"
-                                                     alt="{{ $agency->name ??'' }}">
-                                            </a>
-                                        </div>
-                                        <div class="user-info">
-                                            <strong>
-                                                <a href="{{url($prefix.'/agencies/profile/' .$agency->id) }}">
-                                                    {{ $agency->name ??'' }}
-                                                </a>
-                                            </strong>
-                                        </div>
-                                    </td>
-
-                                    <td class="user-cell">
-                                        <div class="user-avatar">
-                                            <a href="{{ url($prefix.'/users/'. $agency->owner?->id ) }}">
-                                                <img src="{{ getImagePath($agency->owner?->profile?->avatar) }}"
-                                                     alt="{{ $agency->owner?->name ??'' }}">
-                                            </a>
-                                        </div>
-                                        <div class="user-info">
-                                            <strong>
-                                                <a href="{{ url($prefix.'/users/'.$agency->owner?->id) }}">
-                                                    {{ $agency->owner?->name ??'' }}
-                                                </a>
-                                            </strong>
-                                        </div>
-                                    </td>
-                                    <td class="">
-                                        @if($agency->status == 1)
-                                            <span style="color:green;" title="Active">&#10004;</span> {{-- ✔ --}}
-                                        @else
-                                            <span style="color:red;" title="Inactive">&#10008;</span> {{-- ✖ --}}
-                                        @endif
-                                    </td>
-
-
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $agencies->appends(['tab' => 'agencies'])->links('vendor.pagination.default') }}
-                    </div>
-                @else
-                    <div class="empty-table">
-                        <i class="fas fa-users-slash"></i>
-                        <p>{{ __('No agencies found') }}</p>
-                    </div>
-                @endif
+                <span class="sa-count-badge">{{ optional($agencies)->total() ?? 0 }}</span>
             </div>
-        </div>
-    @endif
-
-    @if($activeTab === 'sub_super_admin')
-        <div class="tab-content active" id="sub-super-admin-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h3>{{ __('Super Admins') }}</h3>
-                    <span class="badge count-badge">{{ optional($subSuperAdmins)->total() ?? 0 }}</span>
-                </div>
-                @if($subSuperAdmins && $subSuperAdmins->count())
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
+            @if($agencies && $agencies->count())
+                <div class="table-responsive">
+                    <table class="sa-table">
+                        <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th><i class="fas fa-building" style="color:#4facfe;margin-right:6px;"></i>{{ __('Name') }}</th>
+                            <th><i class="fas fa-crown" style="color:#f59e0b;margin-right:6px;"></i>{{ __('owner') }}</th>
+                            <th><i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i>{{ __('Status') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($agencies as $index => $agency)
                             <tr>
-                                <th>#</th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('user') }}</th>
-                                <th>{{ __('Role') }}</th>
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($subSuperAdmins as $index => $subSuperAdmin)
-                                <tr>
-                                    <td>{{ $index + 1 + (($subSuperAdmins->currentPage() - 1) * $subSuperAdmins->perPage()) }}</td>
-
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-
-                                            <!-- Avatar -->
-                                            <div class="user-avatar">
-                                                <a href="{{ url($prefix.'/auth-users/' .$subSuperAdmin->id) }}">
-                                                    <img
-                                                        src="{{ $subSuperAdmin->avatar ? getImagePath($subSuperAdmin->avatar) : $defaultImage }}"
-                                                        alt="{{ $subSuperAdmin->username ?? '' }}"
-                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
-                                                </a>
-                                            </div>
-
-                                            <!-- Name + ID -->
-                                            <div class="user-info" style="line-height: 1.2;">
-                                                <strong>
-                                                    <a href="{{ url($prefix.'/auth-users/' .$subSuperAdmin->id) }}"
-                                                       style="display: block;">
-                                                        {{ $subSuperAdmin->username ?? '' }}
-                                                    </a>
-                                                </strong>
-
-                                                <small style="color: #555;">
-                                                    ID: {{ $subSuperAdmin->id }}
-                                                </small>
-                                            </div>
-
+                                <td style="font-weight:600; color:#adb5bd;">{{ $index + 1 + (($agencies->currentPage() - 1) * $agencies->perPage()) }}</td>
+                                <td>
+                                    <a href="{{ url($prefix.'/agencies/profile/' .$agency->id) }}" class="sa-user-cell">
+                                        <div class="sa-user-avatar"><img src="{{ getImagePath($agency->img) }}" alt=""></div>
+                                        <div>
+                                            <div class="sa-user-name">{{ $agency->name ?? '' }}</div>
+                                            <div class="sa-user-meta">ID: {{ $agency->id }}</div>
                                         </div>
-                                    </td>
-
-
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-
-                                            <!-- Avatar -->
-                                            <div class="user-avatar">
-                                                <a href="{{ url($prefix.'/users/' . ($subSuperAdmin->appUser?->id ?? 0)) }}">
-                                                    <img
-                                                        src="{{ $subSuperAdmin->appUser?->profile?->avatar ? getImagePath($subSuperAdmin->appUser->profile->avatar) : $defaultImage }}"
-                                                        alt="{{ $subSuperAdmin->appUser?->name ?? '' }}"
-                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
-                                                </a>
-                                            </div>
-
-                                            <!-- Name + ID -->
-                                            <div class="user-info" style="line-height: 1.2;">
-                                                <strong style="display: flex; align-items: center; gap: 6px;">
-                                                    <a href="{{ url($prefix.'/users/' . ($subSuperAdmin->appUser?->id ?? 0)) }}"
-                                                       style="display: flex; align-items: center; gap: 6px;">
-
-                                                        {{-- Country Flag --}}
-                                                        @if(@$subSuperAdmin->appUser->country->flag)
-                                                            <img src="{{ getImagePath($subSuperAdmin->appUser->country->flag) }}"
-                                                                 alt="flag"
-                                                                 style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
-                                                        @endif
-
-                                                        {{-- User Name --}}
-                                                        {{ $subSuperAdmin->appUser?->name ?? '' }}
-                                                    </a>
-                                                </strong>
-
-                                                <small style="color: #555;">
-                                                    ID: {{ $subSuperAdmin->appUser?->uuid ?? 'N/A' }}
-                                                </small>
-                                            </div>
-
-                                        </div>
-                                    </td>
-
-                                      <td>
-                                                
-                                                    @if (\Encore\Admin\Facades\Admin::user()->can('delete-' . 'auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                                                        <button class="btn btn-info kick-member-btn" data-id="{{ $subSuperAdmin->id }}">
-                                                            {{ __('delete') }}
-                                                        </button>
-                                                    @endif
-
-                                                     @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-                                                                <button type="submit" class="btn btn-info edit_user_item_model_btn" data-id="{{ $subSuperAdmin->id }}">
-                                                                    {{ __('edit') }}
-                                                                </button>
-                                                            @endif
-                                               
-                                            </td>
-
-
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $subSuperAdmins->appends(['tab' => 'sub-super-admin',
-                        'sub_super_admin_page' => $subSuperAdmins?->currentPage(),])->links('vendor.pagination.default') }}
-                    </div>
-                @else
-                    <div class="empty-table">
-                        <i class="fas fa-users-slash"></i>
-                        <p>{{ __('No super admins found') }}</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-    @endif
-
-
-     @if($activeTab === 'bds')
-        <div class="tab-content active" id="bds-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h3>{{ __('Bds') }}</h3>
-                    <span class="badge count-badge">{{ optional($bds)->total() ?? 0 }}</span>
-                </div>
-                @if($bds && $bds->count())
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('user') }}</th>
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($bds as $index => $bd)
-                                <tr>
-                                    <td>{{ $index + 1 + (($bds->currentPage() - 1) * $bds->perPage()) }}</td>
-                                    {{-- <td class="user-cell">
-                                            <div class="user-avatar">
-                                                <a >
-                                                    <img src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}"  alt="{{ $bd->username ?? '' }}">
-                                                </a>
-                                            </div>
-                                            <div class="user-info">
-                                                <strong>
-                                                    <a href="{{url($prefix.'/usersBd/' .$bd->id) }}">
-                                                        {{ $bd->username ??'' }}
-                                                    </a>
-                                                </strong>
-                                            </div>
-                                        </td> --}}
-
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-
-                                            <!-- Avatar -->
-                                            <div class="user-avatar">
-                                                <a href="{{ url($prefix.'/usersBd/' .$bd->id) }}">
-                                                    <img
-                                                        src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}"
-                                                        alt="{{ $bd->username ?? '' }}"
-                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
-                                                </a>
-                                            </div>
-
-                                            <!-- Name + ID -->
-                                            <div class="user-info" style="line-height: 1.2;">
-                                                <strong>
-                                                    <a href="{{ url($prefix.'/usersBd/' .$bd->id) }}"
-                                                       style="display: block;">
-                                                        {{ $bd->username ?? '' }}
-                                                    </a>
-                                                </strong>
-
-                                                <small style="color: #555;">
-                                                    ID: {{ $bd->id }}
-                                                </small>
-                                            </div>
-
-                                        </div>
-                                    </td>
-
-
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-
-                                            <!-- Avatar -->
-                                            <div class="user-avatar">
-                                                <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}">
-                                                    <img
-                                                        src="{{ $bd->appUser?->profile?->avatar ? getImagePath($bd->appUser->profile->avatar) : $defaultImage }}"
-                                                        alt="{{ $bd->appUser?->name ?? '' }}"
-                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
-                                                </a>
-                                            </div>
-
-                                            <!-- Name + ID -->
-                                            <div class="user-info" style="line-height: 1.2;">
-                                                <strong style="display: flex; align-items: center; gap: 6px;">
-                                                    <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}"
-                                                       style="display: flex; align-items: center; gap: 6px;">
-
-                                                        {{-- Country Flag --}}
-                                                        @if(@$bd->appUser->country->flag)
-                                                            <img src="{{ getImagePath($bd->appUser->country->flag) }}"
-                                                                 alt="flag"
-                                                                 style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
-                                                        @endif
-
-                                                        {{-- User Name --}}
-                                                        {{ $bd->appUser?->name ?? '' }}
-                                                    </a>
-                                                </strong>
-
-                                                <small style="color: #555;">
-                                                    ID: {{ $bd->appUser?->uuid ?? 'N/A' }}
-                                                </small>
-                                            </div>
-
-                                        </div>
-                                    </td>
-
-
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $bds->appends(['tab' => 'bds'])->links('vendor.pagination.default') }}
-                    </div>
-                @else
-                    <div class="empty-table">
-                        <i class="fas fa-users-slash"></i>
-                        <p>{{ __('No bds found') }}</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-    @endif
-
-    @if($activeTab === 'rewards')
-        <div class="tab-content active" id="rewards-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h3>{{ __('rewards') }}</h3>
-                    <span class="badge count-badge">{{ optional($rewards)->total() ?? 0 }}</span>
-                </div>
-
-                <div class="box-body">
-                    <div class="nav-scroll-container {{ app()->getLocale() == 'ar' ? 'nav-right' : 'nav-left' }}">
-                        <ul class="nav nav-pills">
-                            @foreach($types as $name)
-                                <li class="{{ $type == $name ? 'active' : '' }}">
-                                    <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'reward_page' => 1]) }}"
-                                       class="charge_action">
-                                        {{ __($name) }}
                                     </a>
-                                </li>
-                            @endforeach
-                        </ul>
+                                </td>
+                                <td>
+                                    <a href="{{ url($prefix.'/users/'.$agency->owner?->id) }}" class="sa-user-cell">
+                                        <div class="sa-user-avatar"><img src="{{ getImagePath($agency->owner?->profile?->avatar) ?? $defaultImage }}" alt=""></div>
+                                        <div>
+                                            <div class="sa-user-name">{{ $agency->owner?->name ?? '' }}</div>
+                                            <div class="sa-user-meta">UUID: {{ $agency->owner?->uuid ?? 'N/A' }}</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    @if($agency->status == 1)
+                                        <span class="sa-status-active"><i class="fas fa-circle" style="font-size:8px;margin-right:4px;"></i> {{ __('Active') }}</span>
+                                    @else
+                                        <span class="sa-status-inactive"><i class="fas fa-circle" style="font-size:8px;margin-right:4px;"></i> {{ __('Inactive') }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding:16px 24px; display:flex; justify-content:center; background:#fafbfc; border-top:1px solid #f0f2f5;">
+                    {{ $agencies->appends(['tab' => 'agencies'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="sa-empty">
+                    <div class="sa-empty-icon"><i class="fas fa-building"></i></div>
+                    <p>{{ __('No agencies found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- ===== TAB: REWARDS ===== -->
+    <div class="sa-tab-content" id="rewards-tab">
+        <div class="sa-card">
+            <div class="sa-card-header" style="background:linear-gradient(135deg,#fff5f5 0%,#ffffff 100%);">
+                <div class="sa-card-header-left">
+                    <div class="sa-card-icon" style="background:var(--gradient-2);"><i class="fas fa-gift"></i></div>
+                    <div>
+                        <h3 class="sa-card-title">{{ __('rewards') }}</h3>
+                        <span class="sa-card-subtitle">{{ __('Reward items') }}</span>
                     </div>
                 </div>
-                @if($rewards && $rewards->count())
-                    <div class="table-responsive">
-
-                        <table class="data-table">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('image') }}</th>
-                                <th>{{ __('count') }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($rewards as $index => $reward)
-                                @php
-                                    $name = '';
-                                    $image = '';
-
-                                    if (request('type') == 'ware') {
-                                        $name = @$reward->ware->name ?? '';
-                                        $image = @$reward->ware->image ?? '';
-                                    } elseif (request('type') == 'vip') {
-                                        $name = @$reward->vip->name ?? '';
-                                        $image = @$reward->vip->image ?? '';
-                                    } elseif (request('type') == 'badge') {
-                                        $name = @$reward->badge->name ?? '';
-                                        $image = @$reward->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
-                                    }
-                                @endphp
-
-                                <tr>
-                                    <td>{{ $index + 1 + (($rewards->currentPage() - 1) * $rewards->perPage()) }}</td>
-                                    <td>{{ $name }}</td>
-                                    <td>
-                                        @if($image)
-                                            <img src="{{ getImagePath($image) }}" alt="Image" width="40" height="40">
-                                        @endif
-                                    </td>
-                                    <td>{{ $reward->no_reward }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-wrapper">
-                        {{ $rewards->appends(['tab' => 'rewards'])->links('vendor.pagination.default') }}
-                    </div>
-                @else
-                    <div class="empty-table">
-                        <i class="fas fa-users-slash"></i>
-                        <p>{{ __('No reward found') }}</p>
-                    </div>
-                @endif
+                <span class="sa-count-badge" style="background:var(--gradient-2);">{{ optional($rewards)->total() ?? 0 }}</span>
             </div>
-        </div>
-    @endif
 
-    
+            <!-- Reward type pills -->
+            <div class="sa-reward-pills">
+                @foreach($types as $name)
+                    <a href="{{ request()->fullUrlWithQuery(['type' => $name, 'reward_page' => 1]) }}"
+                       class="sa-reward-pill {{ $type == $name ? 'active' : '' }}">
+                        @if($name == 'vip') <i class="fas fa-crown" style="margin-right:4px;"></i>
+                        @elseif($name == 'badge') <i class="fas fa-certificate" style="margin-right:4px;"></i>
+                        @elseif($name == 'ware') <i class="fas fa-box" style="margin-right:4px;"></i>
+                        @endif
+                        {{ __($name) }}
+                    </a>
+                @endforeach
+            </div>
+
+            @if($rewards && $rewards->count())
+                <div class="table-responsive">
+                    <table class="sa-table">
+                        <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th><i class="fas fa-tag" style="color:#f5576c;margin-right:6px;"></i>{{ __('Name') }}</th>
+                            <th><i class="fas fa-image" style="color:#764ba2;margin-right:6px;"></i>{{ __('image') }}</th>
+                            <th><i class="fas fa-sort-numeric-up" style="color:#4facfe;margin-right:6px;"></i>{{ __('count') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($rewards as $index => $reward)
+                            @php
+                                $rName = '';
+                                $rImage = '';
+                                if (request('type') == 'ware') { $rName = @$reward->ware->name ?? ''; $rImage = @$reward->ware->image ?? ''; }
+                                elseif (request('type') == 'vip') { $rName = @$reward->vip->name ?? ''; $rImage = @$reward->vip->image ?? ''; }
+                                elseif (request('type') == 'badge') { $rName = @$reward->badge->name ?? ''; $rImage = @$reward->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? ''; }
+                            @endphp
+                            <tr>
+                                <td style="font-weight:600; color:#adb5bd;">{{ $index + 1 + (($rewards->currentPage() - 1) * $rewards->perPage()) }}</td>
+                                <td><span style="font-weight:700; color:#1a1a2e;">{{ $rName }}</span></td>
+                                <td>
+                                    @if($rImage)
+                                        <div style="width:40px; height:40px; border-radius:10px; overflow:hidden; border:2px solid #f0f2f5;">
+                                            <img src="{{ getImagePath($rImage) }}" style="width:100%; height:100%; object-fit:cover;">
+                                        </div>
+                                    @else
+                                        <span style="color:#adb5bd;">—</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9); color:#2e7d32; padding:4px 12px; border-radius:8px; font-weight:700; font-size:12px;">
+                                        {{ $reward->no_reward }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding:16px 24px; display:flex; justify-content:center; background:#fafbfc; border-top:1px solid #f0f2f5;">
+                    {{ $rewards->appends(['tab' => 'rewards', 'type' => $type])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="sa-empty">
+                    <div class="sa-empty-icon"><i class="fas fa-gift"></i></div>
+                    <p>{{ __('No reward found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- ===== TAB: BDS ===== -->
+    <div class="sa-tab-content" id="bds-tab">
+        <div class="sa-card">
+            <div class="sa-card-header" style="background:linear-gradient(135deg,#f0fff4 0%,#ffffff 100%);">
+                <div class="sa-card-header-left">
+                    <div class="sa-card-icon" style="background:var(--gradient-4);"><i class="fas fa-headset"></i></div>
+                    <div>
+                        <h3 class="sa-card-title">{{ __('Bds') }}</h3>
+                        <span class="sa-card-subtitle">{{ __('Business developers') }}</span>
+                    </div>
+                </div>
+                <span class="sa-count-badge" style="background:var(--gradient-4); color:#1a1a2e;">{{ optional($bds)->total() ?? 0 }}</span>
+            </div>
+            @if($bds && $bds->count())
+                <div class="table-responsive">
+                    <table class="sa-table">
+                        <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th><i class="fas fa-user-tie" style="color:#43e97b;margin-right:6px;"></i>{{ __('Name') }}</th>
+                            <th><i class="fas fa-user" style="color:#4facfe;margin-right:6px;"></i>{{ __('user') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($bds as $index => $bd)
+                            <tr>
+                                <td style="font-weight:600; color:#adb5bd;">{{ $index + 1 + (($bds->currentPage() - 1) * $bds->perPage()) }}</td>
+                                <td>
+                                    <a href="{{ url($prefix.'/usersBd/' .$bd->id) }}" class="sa-user-cell">
+                                        <div class="sa-user-avatar"><img src="{{ $bd->avatar ? getImagePath($bd->avatar) : $defaultImage }}" alt=""></div>
+                                        <div>
+                                            <div class="sa-user-name">{{ $bd->username ?? '' }}</div>
+                                            <div class="sa-user-meta">ID: {{ $bd->id }}</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ url($prefix.'/users/' . ($bd->appUser?->id ?? 0)) }}" class="sa-user-cell">
+                                        <div class="sa-user-avatar"><img src="{{ $bd->appUser?->profile?->avatar ? getImagePath($bd->appUser->profile->avatar) : $defaultImage }}" alt=""></div>
+                                        <div>
+                                            <div class="sa-user-name" style="display:flex; align-items:center; gap:6px;">
+                                                @if(@$bd->appUser->country->flag)
+                                                    <img src="{{ getImagePath($bd->appUser->country->flag) }}" style="width:18px; height:13px; border-radius:2px; object-fit:cover;">
+                                                @endif
+                                                {{ $bd->appUser?->name ?? '' }}
+                                            </div>
+                                            <div class="sa-user-meta">UUID: {{ $bd->appUser?->uuid ?? 'N/A' }}</div>
+                                        </div>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding:16px 24px; display:flex; justify-content:center; background:#fafbfc; border-top:1px solid #f0f2f5;">
+                    {{ $bds->appends(['tab' => 'bds'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="sa-empty">
+                    <div class="sa-empty-icon"><i class="fas fa-headset"></i></div>
+                    <p>{{ __('No bds found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- ===== TAB: SUB SUPER ADMINS ===== -->
+    <div class="sa-tab-content" id="sub_super_admin-tab">
+        <div class="sa-card">
+            <div class="sa-card-header" style="background:linear-gradient(135deg,#fef5ff 0%,#ffffff 100%);">
+                <div class="sa-card-header-left">
+                    <div class="sa-card-icon" style="background:var(--gradient-1);"><i class="fas fa-user-shield"></i></div>
+                    <div>
+                        <h3 class="sa-card-title">{{ __('Super Admins') }}</h3>
+                        <span class="sa-card-subtitle">{{ __('Sub super admin accounts') }}</span>
+                    </div>
+                </div>
+                <span class="sa-count-badge">{{ optional($subSuperAdmins)->total() ?? 0 }}</span>
+            </div>
+            @if($subSuperAdmins && $subSuperAdmins->count())
+                <div class="table-responsive">
+                    <table class="sa-table">
+                        <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th><i class="fas fa-user-shield" style="color:#667eea;margin-right:6px;"></i>{{ __('Name') }}</th>
+                            <th><i class="fas fa-user" style="color:#4facfe;margin-right:6px;"></i>{{ __('user') }}</th>
+                            <th><i class="fas fa-bolt" style="color:#f59e0b;margin-right:6px;"></i>{{ __('Role') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($subSuperAdmins as $index => $subSuperAdmin)
+                            <tr>
+                                <td style="font-weight:600; color:#adb5bd;">{{ $index + 1 + (($subSuperAdmins->currentPage() - 1) * $subSuperAdmins->perPage()) }}</td>
+                                <td>
+                                    <a href="{{ url($prefix.'/auth-users/' .$subSuperAdmin->id) }}" class="sa-user-cell">
+                                        <div class="sa-user-avatar"><img src="{{ $subSuperAdmin->avatar ? getImagePath($subSuperAdmin->avatar) : $defaultImage }}" alt=""></div>
+                                        <div>
+                                            <div class="sa-user-name">{{ $subSuperAdmin->username ?? '' }}</div>
+                                            <div class="sa-user-meta">ID: {{ $subSuperAdmin->id }}</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ url($prefix.'/users/' . ($subSuperAdmin->appUser?->id ?? 0)) }}" class="sa-user-cell">
+                                        <div class="sa-user-avatar"><img src="{{ $subSuperAdmin->appUser?->profile?->avatar ? getImagePath($subSuperAdmin->appUser->profile->avatar) : $defaultImage }}" alt=""></div>
+                                        <div>
+                                            <div class="sa-user-name" style="display:flex; align-items:center; gap:6px;">
+                                                @if(@$subSuperAdmin->appUser->country->flag)
+                                                    <img src="{{ getImagePath($subSuperAdmin->appUser->country->flag) }}" style="width:18px; height:13px; border-radius:2px; object-fit:cover;">
+                                                @endif
+                                                {{ $subSuperAdmin->appUser?->name ?? '' }}
+                                            </div>
+                                            <div class="sa-user-meta">UUID: {{ $subSuperAdmin->appUser?->uuid ?? 'N/A' }}</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                        @if (\Encore\Admin\Facades\Admin::user()->can('delete-auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                            <button class="sa-btn sa-btn-danger kick-member-btn" data-id="{{ $subSuperAdmin->id }}">
+                                                <i class="fas fa-trash"></i> {{ __('delete') }}
+                                            </button>
+                                        @endif
+                                        @if (\Encore\Admin\Facades\Admin::user()->can('edit-auth-users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                                            <button class="sa-btn sa-btn-primary edit_user_item_model_btn" data-id="{{ $subSuperAdmin->id }}">
+                                                <i class="fas fa-pen"></i> {{ __('edit') }}
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div style="padding:16px 24px; display:flex; justify-content:center; background:#fafbfc; border-top:1px solid #f0f2f5;">
+                    {{ $subSuperAdmins->appends(['tab' => 'sub_super_admin'])->links('vendor.pagination.default') }}
+                </div>
+            @else
+                <div class="sa-empty">
+                    <div class="sa-empty-icon"><i class="fas fa-user-shield"></i></div>
+                    <p>{{ __('No super admins found') }}</p>
+                </div>
+            @endif
+        </div>
+    </div>
 
 </div>
 
-
+<!-- Edit Modal -->
 <div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
         <div class="modal-content border-0">
             <div class="modal-content position-relative">
                 <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
-                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <form action="{{  url(request()->segment(1) . '/update-sub-super-admin')}}" id="country_update_form" method="POST"
-                      enctype="multipart/form-data">
+                <form action="{{ url(request()->segment(1) . '/update-sub-super-admin') }}" id="country_update_form" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body p-0">
-
                         <div class="p-4">
                             <div class="row flex-evenly">
-                                <input type="hidden" name=id class="item_id">
-
+                                <input type="hidden" name="id" class="item_id">
                                 <div class="col-lg-6 mb-3 form-group">
                                     <label class="form-label">{{ __('admin.name') }}</label>
-                                    <input type="text" name="name" class="form-control"
-                                           id="name">
+                                    <input type="text" name="name" class="form-control" id="name">
                                 </div>
-
                                 <div class="col-lg-6 mb-3 form-group">
                                     <label class="form-label">{{ __('admin.username') }}</label>
                                     <input type="text" name="username" class="form-control" id="username">
                                 </div>
-
                                 <div class="col-lg-6 mb-3 form-group">
                                     <label for="user_id" class="form-label">{{ __('admin.users') }}</label>
                                     <select class="form-control" id="user_id" name="user_id">
                                         <option value="">{{ __('admin.selectUser') }}</option>
                                     </select>
-
                                 </div>
-
-                                 <div class="col-lg-6 mb-3 form-group">
+                                <div class="col-lg-6 mb-3 form-group">
                                     <label class="form-label">{{ __('admin.password') }}</label>
                                     <input type="password" name="password" class="form-control" id="password" placeholder="Leave blank if not changing">
                                 </div>
-
                                 <div class="col-lg-6 form-group mb-3">
                                     <label class="form-label">{{ __('image') }}</label>
                                     <input class="form-control" name="image" accept="image/*" type="file"/>
-                                    <div class="mt-2">
-                                       <img src="" class="w-40 " style="width: 100px" id="img_edit"
-                                                alt="">
-                                    </div>
+                                    <div class="mt-2"><img src="" class="w-40" style="width: 100px" id="img_edit" alt=""></div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
-
                     <div class="modal-footer">
-                        <button class="btn btn-secondary cancel_user_item_model_btn" type="button"
-                                data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button class="btn btn-secondary cancel_user_item_model_btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                         <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
                     </div>
                 </form>
@@ -1336,22 +535,15 @@
     </div>
 </div>
 
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-
 <script>
     const DASHBOARD_PREFIX = "{{ request()->segment(1) }}";
-</script>
-<script>
+
+    // ===== Client-side Tab Switching =====
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
-        const selectedTab = urlParams.get('tab') || 'members';
-
-        const allTabs = document.querySelectorAll('.tab-btn');
-        const allTabContents = document.querySelectorAll('[id$="-tab"]');
-
-        let targetElement = null;
+        const selectedTab = urlParams.get('tab') || 'agencies';
+        const allTabs = document.querySelectorAll('.sa-tab-btn');
 
         allTabs.forEach(tab => {
             const target = tab.getAttribute('data-target');
@@ -1359,318 +551,98 @@
 
             if (target.startsWith(selectedTab)) {
                 tab.classList.add('active');
-                content.style.display = 'block';
-                targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
+                if (content) { content.style.display = 'block'; content.classList.add('active'); }
             } else {
                 tab.classList.remove('active');
-                content.style.display = 'none';
+                if (content) { content.style.display = 'none'; content.classList.remove('active'); }
             }
 
             tab.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.getElementById('tab-loading').style.display = 'block';
-                allTabs.forEach(t => t.style.pointerEvents = 'none');
-                const href = tab.getAttribute('href');
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 300);
-            });
-        });
+                allTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
 
-        if (targetElement) {
-            setTimeout(() => {
-                targetElement.scrollIntoView({behavior: 'smooth'});
-            }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
-        }
-    });
-
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Remove active class from all buttons and content
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            // Add active class to clicked button and corresponding content
-            btn.classList.add('active');
-            const target = btn.getAttribute('data-target');
-            document.getElementById(target).classList.add('active');
-        });
-    });
-
-
-    $(document).ready(function () {
-
-       $('#user_id').select2({
-                    dropdownParent: $('#item_modal_update'),
-                    width: '100%',
-                    placeholder: 'Select user',
-                    allowClear: true,
-                    minimumInputLength: 1,
-                    ajax: {
-                        url: '/api/search/users-superadmin',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (params) {
-                            return {
-                                q: params.term || '',
-                                page: params.page || 1,
-                                selected_id: $('#user_id').val() || null
-                            };
-                        },
-                        processResults: function (data) {
-                            return {
-                                results: data.data.map(item => ({
-                                    id: item.id,
-                                    text: item.name
-                                })),
-                                pagination: {
-                                    more: data.current_page < data.last_page
-                                }
-                            };
-                        }
+                allTabs.forEach(t => {
+                    const panelId = t.getAttribute('data-target');
+                    const panel = document.getElementById(panelId);
+                    if (!panel) return;
+                    if (panelId === target) {
+                        panel.style.display = 'block';
+                        panel.classList.add('active');
+                    } else {
+                        panel.style.display = 'none';
+                        panel.classList.remove('active');
                     }
                 });
 
-                // Safe pre-select when the page provides data attributes
-                // Example: <select id="user_id" data-selected-id="..." data-selected-text="...">
-                (function () {
-                    var preId = $('#user_id').data('selected-id');
-                    var preText = $('#user_id').data('selected-text');
-                    if (preId) {
-                        $('#user_id').val(null).trigger('change');
-                        var selectedUser = new Option(preText || preId, preId, true, true);
-                        $('#user_id').append(selectedUser).trigger('change');
-                    }
-                })();
+                const url = new URL(window.location.href);
+                const tabParam = new URLSearchParams(this.getAttribute('href').replace('?', ''));
+                url.searchParams.set('tab', tabParam.get('tab'));
+                window.history.replaceState({}, '', url.toString());
+            });
+        });
+    });
+
+    // ===== jQuery Logic =====
+    $(document).ready(function () {
+        $('#user_id').select2({
+            dropdownParent: $('#item_modal_update'), width: '100%', placeholder: 'Select user', allowClear: true, minimumInputLength: 1,
+            ajax: {
+                url: '/api/search/users-superadmin', dataType: 'json', delay: 250,
+                data: function (params) { return { q: params.term || '', page: params.page || 1, selected_id: $('#user_id').val() || null }; },
+                processResults: function (data) { return { results: data.data.map(item => ({ id: item.id, text: item.name })), pagination: { more: data.current_page < data.last_page } }; }
+            }
+        });
+
+        (function () {
+            var preId = $('#user_id').data('selected-id');
+            var preText = $('#user_id').data('selected-text');
+            if (preId) { $('#user_id').val(null).trigger('change'); var sel = new Option(preText || preId, preId, true, true); $('#user_id').append(sel).trigger('change'); }
+        })();
+
         $(document).on('click', '.edit_user_item_model_btn', function () {
             $('#item_modal_update').modal('show');
-             const id = $(this).data('id');
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    type: 'get',
-                    dataType: 'json',
-                    url: '/'+ DASHBOARD_PREFIX + "/show-sub-super-admin/" + id ,
-                    success: function(response) {
-                        if (response.status == 404) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Sorry',
-                                text: response.message,
-                            })
-                        } else {
-                           
-                            const image =  "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
-                            $('#name').val(response.item.name);
-                            $('#username').val(response.item.username);
-                            $('#password').val(response.item.password);
-                            if (response.item.app_id) {
-                                // Clear any previous selection
-                                $('#user_id').val(null).trigger('change');
-
-                                // Prefer server-provided formatted name, then try nested appUser, then fall back
-                                var displayText = response.item.app_user_name || null;
-                                if (!displayText && response.item.appUser) {
-                                    var au = response.item.appUser;
-                                    displayText = (au.name ? au.name : '') + ' - ' + (au.uuid ? au.uuid : '');
-                                }
-                                if (!displayText) displayText = response.item.name || response.item.app_id;
-
-                                var selectedUser = new Option(
-                                    displayText,
-                                    response.item.app_id,
-                                    true,
-                                    true
-                                );
-
-                                $('#user_id').append(selectedUser).trigger('change');
-                            }
-                            $('#img_edit').attr('src', image);
-                            $('.item_id').val(response.item.id);
-                            $('#item_modal_update').modal('show');
+            const id = $(this).data('id');
+            $.ajax({
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                type: 'get', dataType: 'json', url: '/' + DASHBOARD_PREFIX + "/show-sub-super-admin/" + id,
+                success: function (response) {
+                    if (response.status == 404) { Swal.fire({ icon: 'error', title: 'Sorry', text: response.message }); }
+                    else {
+                        const image = "{{ getImagePath('__IMAGE_PATH__') }}".replace('__IMAGE_PATH__', response.item.avatar);
+                        $('#name').val(response.item.name); $('#username').val(response.item.username); $('#password').val(response.item.password);
+                        if (response.item.app_id) {
+                            $('#user_id').val(null).trigger('change');
+                            var displayText = response.item.app_user_name || null;
+                            if (!displayText && response.item.appUser) { var au = response.item.appUser; displayText = (au.name || '') + ' - ' + (au.uuid || ''); }
+                            if (!displayText) displayText = response.item.name || response.item.app_id;
+                            var sel = new Option(displayText, response.item.app_id, true, true);
+                            $('#user_id').append(sel).trigger('change');
                         }
-                        }
-                })
-        });
-
-        $(document).on('click', '.cancel_user_item_model_btn', function () {
-            $('#item_modal_update').modal('hide');
-        });
-
-     
-
-
-                    $('.kick-member-btn').click(function () {
-                        const id = $(this).data('id');
-                        console.log("Make admin clicked, ID:", id);
-                        confirmAction('{{ __("are_you_sure_delete") }}', () => {
-                            showLoader();
-                            $.post('/' + DASHBOARD_PREFIX + '/delete-sub-admin/' + id, {
-                                _token: '{{ csrf_token() }}'
-                            }, function (response) {
-                                Swal.close();
-                                console.log("Make admin response:", response);
-                                if (response.status) {
-                                    showSuccess(response.message, () => {
-                                        location.reload();
-                                    });
-                                } else {
-                                    showError(response.message);
-                                }
-                            }).fail(function (xhr) {
-                                Swal.close();
-                                console.error("Make admin failed", xhr);
-                                const res = xhr.responseJSON;
-                                showError(res?.message ?? '{{ __("failed_make_admin") }}');
-                            });
-                        });
-                    });
-        console.log("Document ready");
-
-        function showLoader() {
-            console.log("Showing loader");
-            Swal.fire({
-                title: 'Loading...',  // تغيير النص ليوضح الرسالة
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
+                        $('#img_edit').attr('src', image); $('.item_id').val(response.item.id);
+                        $('#item_modal_update').modal('show');
+                    }
                 }
             });
-        }
-
-        function showSuccess(message, callback = null) {
-            console.log("Showing success:", message);
-            Swal.fire({
-                icon: 'success',  // استبدال type بـ icon
-                title: message,
-                confirmButtonText: 'OK'
-            }).then(() => {
-                console.log("Success confirmed");
-                if (callback) {
-                    console.log("Running success callback");
-                    callback();
-                }
-            });
-        }
-
-        function showError(message) {
-            console.log("Showing error:", message);
-            Swal.fire({
-                icon: 'error',  // استبدال type بـ icon
-                title: message,
-                confirmButtonText: 'OK'
-            });
-        }
-
-        function confirmAction(message, onConfirm) {
-            console.log("Confirm action:", message);
-            Swal.fire({
-                title: message,
-                icon: 'question',  // استبدال type بـ icon
-                showCancelButton: true,
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'Cancel'
-            }).then(result => {
-                console.log("Confirmation result:", result);
-                console.log("isConfirmed:", result.isConfirmed);
-
-                if (result.value) {
-                    console.log("User confirmed action");
-                    onConfirm();
-                } else {
-                    console.log("User cancelled action");
-                }
-            });
-        }
-
-
-        // قبول الطلب
-        $('.accept-btn').click(function () {
-            const id = $(this).data('id');
-            console.log("Accept clicked, ID:", id);
-            confirmAction('{{ __("are_you_sure_accept") }}', () => {
-                showLoader();
-                $.post(`/admin/agencies/accept_join/${id}`, {
-                    _token: '{{ csrf_token() }}'
-                }, function (response) {
-                    Swal.close();
-                    console.log("Accept response:", response);
-                    if (response.status) {
-                        showSuccess(response.message, () => {
-                            const url = new URL(window.location.href);
-                            url.searchParams.set('tab', 'requests');
-                            window.location.href = url.toString();
-                        });
-                    } else {
-                        showError(response.message);
-                    }
-                }).fail(function (xhr) {
-                    Swal.close();
-                    console.error("Accept failed", xhr);
-                    const res = xhr.responseJSON;
-                    showError(res?.message ?? '{{ __("failed_accept_request") }}');
-                });
-            });
         });
 
-        // رفض الطلب
-        $('.reject-btn').click(function () {
-            const id = $(this).data('id');
-            console.log("Reject clicked, ID:", id);
-            confirmAction('{{ __("are_you_sure_reject") }}', () => {
-                showLoader();
-                $.post(`/admin/agencies/reject_join/${id}`, {
-                    _token: '{{ csrf_token() }}'
-                }, function (response) {
-                    Swal.close();
-                    console.log("Reject response:", response);
-                    if (response.status) {
-                        showSuccess(response.message, () => {
-                            const url = new URL(window.location.href);
-                            url.searchParams.set('tab', 'requests');
-                            window.location.href = url.toString();
-                        });
-                    } else {
-                        showError(response.message);
-                    }
-                }).fail(function (xhr) {
-                    Swal.close();
-                    console.error("Reject failed", xhr);
-                    const res = xhr.responseJSON;
-                    showError(res?.message ?? '{{ __("failed_reject_request") }}');
-                });
-            });
-        });
+        $(document).on('click', '.cancel_user_item_model_btn', function () { $('#item_modal_update').modal('hide'); });
 
-        // ترقية إلى Admin
-        $('.make-admin-btn').click(function () {
+        function showLoader() { Swal.fire({ title: 'Loading...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } }); }
+        function showSuccess(msg, cb) { Swal.fire({ icon: 'success', title: msg, confirmButtonText: 'OK' }).then(() => { if (cb) cb(); }); }
+        function showError(msg) { Swal.fire({ icon: 'error', title: msg, confirmButtonText: 'OK' }); }
+        function confirmAction(msg, onConfirm) { Swal.fire({ title: msg, icon: 'question', showCancelButton: true, confirmButtonText: 'Yes', cancelButtonText: 'Cancel' }).then(r => { if (r.value) onConfirm(); }); }
+
+        $('.kick-member-btn').click(function () {
             const id = $(this).data('id');
-            console.log("Make admin clicked, ID:", id);
-            confirmAction('{{ __("are_you_sure_make_admin") }}', () => {
+            confirmAction('{{ __("are_you_sure_delete") }}', () => {
                 showLoader();
-                $.post(`/admin/agencies/admin/${id}`, {
-                    _token: '{{ csrf_token() }}'
-                }, function (response) {
+                $.post('/' + DASHBOARD_PREFIX + '/delete-sub-admin/' + id, { _token: '{{ csrf_token() }}' }, function (response) {
                     Swal.close();
-                    console.log("Make admin response:", response);
-                    if (response.status) {
-                        showSuccess(response.message, () => {
-                            location.reload();
-                        });
-                    } else {
-                        showError(response.message);
-                    }
-                }).fail(function (xhr) {
-                    Swal.close();
-                    console.error("Make admin failed", xhr);
-                    const res = xhr.responseJSON;
-                    showError(res?.message ?? '{{ __("failed_make_admin") }}');
-                });
+                    if (response.status) { showSuccess(response.message, () => { location.reload(); }); }
+                    else { showError(response.message); }
+                }).fail(function (xhr) { Swal.close(); showError(xhr.responseJSON?.message ?? '{{ __("failed_make_admin") }}'); });
             });
         });
     });
-
 </script>
-

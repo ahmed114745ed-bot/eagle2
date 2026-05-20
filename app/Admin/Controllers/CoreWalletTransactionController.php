@@ -63,18 +63,21 @@ class CoreWalletTransactionController extends MainController
         });
 
         $grid->model()->latest();
+
+        $walletsLookup = CoreWallets::pluck('name', 'id');
+        $adminIds = CoreWalletTransaction::distinct()->pluck('admin_id')->filter();
+        $adminsLookup = AdminUser::whereIn('id', $adminIds)->pluck('name', 'id');
+
         $grid->column('id', __('#'));
-        $grid->column('from_wallet', __('From Wallet'))->display(function ($val) {
-            return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name));
+        $grid->column('from_wallet', __('From Wallet'))->display(function ($val) use ($walletsLookup) {
+            return ucfirst(str_replace('_', ' ', $walletsLookup->get($val, '')));
         });
-        $grid->column('to_wallet', __('To Wallet'))->display(function ($val) {
-            return    ucfirst(str_replace('_', ' ', optional(CoreWallets::find($val))->name));
+        $grid->column('to_wallet', __('To Wallet'))->display(function ($val) use ($walletsLookup) {
+            return ucfirst(str_replace('_', ' ', $walletsLookup->get($val, '')));
         });
-        $grid->column('amount', __('coins'))->display(function ($val) {
-            return $val;
-        });
-        $grid->column('admin_id', __('By'))->display(function ($val) {
-            return optional(AdminUser::find($val))->name ?? __('Unknown');
+        $grid->column('amount', __('coins'));
+        $grid->column('admin_id', __('By'))->display(function ($val) use ($adminsLookup) {
+            return $adminsLookup->get($val) ?? __('Unknown');
         });
         $grid->column('created_at', __('Transfer Time'))->display(function ($val) {
             return \Carbon\Carbon::parse($val)->format('Y-m-d H:i');

@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Performance Fix: LeaderCC spam — 10.5% of all requests (1,047 out of 10K)
+ * hit /leader-cc-game/* without the /api/ prefix and return 404.
+ * This wastes PHP workers and pollutes access logs.
+ * Return 200 OK to stop the game provider from endlessly retrying.
+ */
+Route::prefix('leader-cc-game')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
+    Route::any('{any}', function () {
+        return response()->json(['errorCode' => 0, 'errorMsg' => 'ok', 'data' => []]);
+    })->where('any', '.*');
+});
+
 // V7 FairLuck Monitor (temp, public, obscured path)
 Route::get('monitor/v7/3305d927f49322e0', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'dashboard']);
 Route::get('monitor/v7/3305d927f49322e0/api', [\App\Http\Controllers\Api\FairLuckMonitorController::class, 'apiStats']);
@@ -46,6 +58,7 @@ use App\Exports\AgencyCharge;
 use App\Exports\AgencyChargeTransactions;
 use App\Facades\CustomNotification;
 use App\helper\TimeHelper;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Helpers\AdminNotificationHelper;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
@@ -540,6 +553,7 @@ Route::get('/send-notification/{id}', function ($id) {
 });
 
  Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+ Route::get('/fix-monthly-diamond-discrepancies', [\App\Http\Controllers\DiamondController::class, 'fixMonthlyDiamondDiscrepancies']);
 // Route::get('/calculate-salary' , [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 // Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 // Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
@@ -2147,11 +2161,15 @@ Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
     return response('<pre>' . e($output) . '</pre>');
 });
 
-Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
-    Debugbar::info('Viewport:', $request->all());
-    return response()->json(['ok' => true]);
-});
-
+// Debugbar viewport logging (development only)
+/*
+if (config('app.debug')) {
+    Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
+        Debugbar::info('Viewport:', $request->all());
+        return response()->json(['ok' => true]);
+    });
+}
+*/
 Route::get('/octane', function () {
     Cache::store('octane')->clear();
 
@@ -2421,7 +2439,7 @@ Route::get('/fix-gift-logs/check', function () {
             gl.created_at
         FROM gift_logs gl
         JOIN gifts g ON gl.giftId = g.id
-        WHERE g.type = 6
+        WHERE g.gift_category_id = 7
         AND gl.giftNum > 0
         AND g.price > 0
         AND gl.giftPrice = gl.giftNum * g.price
@@ -2433,7 +2451,7 @@ Route::get('/fix-gift-logs/check', function () {
         SELECT COUNT(*) as total
         FROM gift_logs gl
         JOIN gifts g ON gl.giftId = g.id
-        WHERE g.type = 6
+        WHERE g.gift_category_id = 7
         AND gl.giftNum > 0
         AND g.price > 0
         AND gl.giftPrice = gl.giftNum * g.price
@@ -3495,4 +3513,72 @@ Route::get('/set-lucky-version-7', function () {
         'current_version' => $version,
         'cached_version' => Cache::get('lucky_gift_version')
     ]);
+});
+
+Route::get('/fix-gift-prices/preview', function () {
+
+    $formula = '(CAST(gl.giftNum AS SIGNED) * CAST(gl.total AS SIGNED))';
+
+    $affectedRecords = DB::table('gift_logs as gl')
+        ->join('gifts as g', 'g.id', '=', 'gl.giftId')
+        ->where('g.gift_category_id', 1)
+        ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
+        ->whereRaw("gl.giftPrice != {$formula}")
+        ->select([
+            'gl.id',
+            'gl.giftId',
+            'gl.receiver_id',
+            'gl.giftNum',
+            'gl.giftPrice',
+            'gl.total',
+            'gl.created_at',
+            DB::raw("{$formula} as expected_price"),
+            DB::raw("({$formula} - gl.giftPrice) as compensation"),
+        ])
+        ->get();
+
+    return response()->json([
+        'status' => true,
+        'total_affected_records' => $affectedRecords->count(),
+        'message' => "سيتم تصحيح {$affectedRecords->count()} سجل",
+        'sample_records' => $affectedRecords->take(10),
+        'execute_url' => url('/fix-gift-prices/execute'),
+    ]);
+});
+
+
+Route::get('/fix-gift-prices/execute', function () {
+
+    try {
+
+        $formula = '(CAST(giftNum AS SIGNED) * CAST(total AS SIGNED))';
+
+        $affectedIds = DB::table('gift_logs as gl')
+            ->join('gifts as g', 'g.id', '=', 'gl.giftId')
+            ->where('g.gift_category_id', 1)
+            ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
+            ->whereRaw("gl.giftPrice != {$formula}")
+            ->pluck('gl.id');
+
+        $updated = DB::table('gift_logs')
+            ->whereIn('id', $affectedIds)
+            ->update([
+                'giftPrice' => DB::raw($formula)
+            ]);
+
+        return response()->json([
+            'status' => true,
+            'updated_count' => $updated,
+            'affected_ids_count' => $affectedIds->count(),
+            'message' => "تم تصحيح {$updated} سجل بنجاح ✅"
+        ]);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'status' => false,
+            'message' => 'حدث خطأ أثناء التحديث',
+            'error' => $e->getMessage()
+        ], 500);
+    }
 });

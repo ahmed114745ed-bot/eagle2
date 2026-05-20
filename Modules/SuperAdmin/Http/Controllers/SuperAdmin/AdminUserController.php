@@ -43,6 +43,7 @@ class AdminUserController extends EncorUsersController
         $grid->model()->where(function ($q) use ($authId) {
             $q->where('parent_id', $authId);
         })
+            ->with(['createdBy.profile', 'roles'])
             ->where('is_preview', 0)
             ->where('type', 'sub_super_admin')
             ->whereDoesntHave('roles', function ($query) {

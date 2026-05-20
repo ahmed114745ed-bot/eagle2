@@ -2773,7 +2773,7 @@
                     <div class="card mb-4" style="border: 1px solid #d1fae5; border-radius: 10px; box-shadow: none;">
                         <div class="card-body">
                             <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
-                                  class="form-horizontal" pjax-container="">
+                              class="form-horizontal">
                                 <input type="hidden" name="tab" value="salary">
                                 <div class="filter-container" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px;">
                                     <div class="filter-content">
@@ -3088,7 +3088,7 @@
                 <div class="card mb-4" style="border: 1px solid #ccfbf1; border-radius: 10px; box-shadow: none;">
                     <div class="card-body">
                         <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
-                              class="form-horizontal gift-log-form" pjax-container="">
+                              class="form-horizontal gift-log-form">
                             <input type="hidden" name="tab" value="wallet_logs">
                             <div class="filter-container" style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 10px;">
                                 <div class="filter-content">
@@ -3385,7 +3385,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form"
-                              method="GET" pjax-container>
+                              method="GET">
                             <input type="hidden" name="tab" value="user-agency">
 
                             <input type="hidden" name="user_agency_page"
@@ -3581,7 +3581,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form"
-                              method="GET" pjax-container>
+                              method="GET">
                             <input type="hidden" name="tab" value="user-coins">
                             <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
 
@@ -3953,7 +3953,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form"
-                              method="GET" pjax-container>
+                              method="GET">
                             <input type="hidden" name="tab" value="gift-log">
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
@@ -4123,6 +4123,26 @@
                                     ? (@$giftSLog->gift->name ?? '')
                                     : (@$giftSLog->gift->e_name ?? '');
 
+                                // Get category name
+                                $giftCategoryName = '';
+                                $gift = @$giftSLog->gift;
+                                if ($gift) {
+                                    if (!$gift->relationLoaded('category')) {
+                                        $gift->load('category');
+                                    }
+
+                                    $giftCategory = $gift->category;
+                                    if ($giftCategory && $giftCategory->title) {
+                                        $categoryTitle = $giftCategory->title;
+                                        if (is_array($categoryTitle)) {
+                                            $locale = app()->getLocale();
+                                            $giftCategoryName = trim($categoryTitle[$locale] ?? $categoryTitle['en'] ?? '');
+                                        } else {
+                                            $giftCategoryName = trim($categoryTitle);
+                                        }
+                                    }
+                                }
+
                                     $agency =$giftSLog->agency;
                                     $agencyName = $agency->name ?? '';
                                     $agencyId = $agency->id ?? 0;
@@ -4207,10 +4227,9 @@
                                         {!! handleShowImageWithTypes($giftSLog->gift->id ?? 0, getImagePath($giftSLog->gift->img ?? ''), 30, 30) !!}
                                         <div>
                                             <span>{{ $giftName }}</span><br>
-                                            <span>id: {{ $giftSLog->gift->id ?? 0 }}</span><br>
+                                            <span>{{ __('Gift ID') }}: {{ $giftSLog->gift->id ?? 0 }}</span><br>
                                             <small class="text-muted">
-                                                {{ __('Type') }}
-                                                : {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}<br>
+                                                {{ __('Type') }}: {{ $giftCategoryName ?: '-' }}<br>
                                                 @if(@$giftSLog->gift->pk)
                                                     <br>{{ __('PK') }}
                                                 @endif
@@ -4517,6 +4536,20 @@
             $('#item_modal_update').modal('show');
         });
 
+        // Loading spinner on user edit form submit
+        $('#country_update_form').on('submit', function () {
+            var btn = $(this).find('button[type="submit"]');
+            btn.prop('disabled', true);
+            btn.html('<i class="fas fa-spinner fa-spin" style="font-size: 12px;"></i> {{ __("Saving...") }}');
+        });
+
+        // Loading spinner on level update form submit
+        $('#user_level_update_form').on('submit', function () {
+            var btn = $(this).find('button[type="submit"]');
+            btn.prop('disabled', true);
+            btn.html('<i class="fas fa-spinner fa-spin" style="font-size: 12px;"></i> {{ __("Saving...") }}');
+        });
+
         $(document).on('click', '.cancel_user_item_model_btn', function () {
             $('#item_modal_update').modal('hide');
         });
@@ -4620,8 +4653,94 @@
         }
     }
 
-    // Initialize PJAX
-    $(document).pjax('a[data-pjax]', '#pjax-container');
+    // Initialize PJAX — exclude filter buttons from pjax interception
+    $(document).pjax('a[data-pjax]:not(.btn)', '#pjax-container');
+
+    // Force all .btn links inside forms/tabs to bypass pjax (full page reload)
+    // BUT exclude .nav-link inside gift-log and charge tabs (handled by AJAX sub-tab switcher below)
+    $(document).on('click', '.btn-default, .btn-info, .charge_action', function(e) {
+        if ($(this).is('a') && $(this).attr('href') && $(this).attr('href') !== '#' && !$(this).closest('.tab-btn').length) {
+            e.stopImmediatePropagation();
+            window.location.href = $(this).attr('href');
+            return false;
+        }
+    });
+
+    // ── AJAX Sub-Tab Switcher (sender/receiver in gift-log, receiver/charger in charge) ──
+    // When clicking sub-tabs (.nav-link) inside gift-log-tab or charge-tab, reload just the tab content via AJAX
+    $(document).on('click', '#gift-log-tab .nav-link, #charge-tab .nav-link', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        var $link = $(this);
+        var href = $link.attr('href');
+        if (!href || href === '#') return;
+
+        // Determine which parent tab container to reload
+        var $tabContent = $link.closest('.tab-content');
+        var tabId = $tabContent.attr('id');
+
+        // Update active state on sub-tab pills
+        $link.closest('ul.nav-pills').find('li').removeClass('active');
+        $link.closest('ul.nav-pills').find('.nav-link').removeClass('active');
+        $link.closest('li').addClass('active');
+        $link.addClass('active');
+
+        // Show loading spinner inside the tab
+        var $cardBody = $tabContent.find('.box-body.p-3, .box-body').first().parent();
+        var originalContent = $tabContent.html();
+        $tabContent.prepend('<div id="subtab-loading" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.8);z-index:100;display:flex;align-items:center;justify-content:center;border-radius:14px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--primary-color);"></i></div>');
+        $tabContent.css('position', 'relative');
+
+        // Update URL without reload
+        history.pushState(null, '', window.location.pathname + href);
+
+        // Fetch new content via AJAX
+        $.ajax({
+            url: window.location.pathname + href,
+            type: 'GET',
+            success: function(html) {
+                var $parsed = $('<div>').append($.parseHTML(html, document, true));
+                var $newContent = $parsed.find('#' + tabId);
+                if ($newContent.length) {
+                    $tabContent.html($newContent.html());
+                    $tabContent.css('position', '');
+                    // Re-initialize select2 inside loaded tab if needed
+                    $tabContent.find('#agency_id').each(function() {
+                        if (!$(this).data('select2')) {
+                            $(this).select2({
+                                placeholder: 'Select agency',
+                                allowClear: true,
+                                ajax: {
+                                    url: '/api/search/host-agency',
+                                    dataType: 'json',
+                                    delay: 250,
+                                    data: function(params) { return { q: params.term, page: params.page || 1 }; },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.data.map(function(item) { return { id: item.id, text: item.name }; }),
+                                            pagination: { more: data.next_page_url !== null }
+                                        };
+                                    },
+                                    cache: true
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    // Fallback: remove loading overlay
+                    $tabContent.find('#subtab-loading').remove();
+                    $tabContent.css('position', '');
+                }
+            },
+            error: function() {
+                // Remove loading and show error
+                $tabContent.find('#subtab-loading').remove();
+                $tabContent.css('position', '');
+                Swal.fire({ icon: 'error', title: '{{ __("Failed to load content") }}' });
+            }
+        });
+    });
 
     // PJAX event listeners for loading indicator
     $(document).on('pjax:start', function() {
@@ -4672,9 +4791,21 @@
     });
 
 
+    // Mark the initially loaded tab as already loaded (data is in the page)
+    (function() {
+        var initialTab = '{{ $activeTab }}';
+        var initialEl = document.getElementById(initialTab + '-tab');
+        if (initialEl) initialEl.dataset.loaded = 'true';
+        // Level tab is always fully rendered (no server data needed)
+        var levelEl = document.getElementById('level-tab');
+        if (levelEl) levelEl.dataset.loaded = 'true';
+    })();
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+
+            // Switch tabs visually
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => {
                 c.classList.remove('active');
@@ -4682,18 +4813,75 @@
                 c.style.display = 'none';
             });
             btn.classList.add('active');
-            const target = btn.getAttribute('data-target');
-            const targetEl = document.getElementById(target);
+
+            var target = btn.getAttribute('data-target');
+            var targetEl = document.getElementById(target);
+            var href = btn.getAttribute('href');
+
             if (targetEl) {
                 targetEl.classList.add('active');
                 targetEl.classList.remove('d-none');
                 targetEl.style.display = 'block';
             }
-            const href = btn.getAttribute('href');
+
+            // Update URL without reload
             if (href) {
                 history.pushState(null, '', window.location.pathname + href);
             }
+
+            // If tab content not loaded yet, fetch via AJAX
+            if (targetEl && !targetEl.dataset.loaded) {
+                targetEl.innerHTML = '<div style="text-align:center;padding:60px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--primary-color);"></i><p style="margin-top:12px;color:#94a3b8;font-size:14px;">{{ __("Loading") }}...</p></div>';
+
+                $.ajax({
+                    url: window.location.pathname + href,
+                    type: 'GET',
+                    success: function(html) {
+                        var $parsed = $('<div>').append($.parseHTML(html, document, true));
+                        var $newContent = $parsed.find('#' + target);
+                        if ($newContent.length) {
+                            $(targetEl).html($newContent.html());
+                            targetEl.dataset.loaded = 'true';
+                            // Re-initialize select2 inside loaded tab if needed
+                            $(targetEl).find('#agency_id').each(function() {
+                                if (!$(this).data('select2')) {
+                                    $(this).select2({
+                                        placeholder: 'Select agency',
+                                        allowClear: true,
+                                        ajax: {
+                                            url: '/api/search/host-agency',
+                                            dataType: 'json',
+                                            delay: 250,
+                                            data: function(params) { return { q: params.term, page: params.page || 1 }; },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.data.map(function(item) { return { id: item.id, text: item.name }; }),
+                                                    pagination: { more: data.next_page_url !== null }
+                                                };
+                                            },
+                                            cache: true
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}</p></div>';
+                        }
+                    },
+                    error: function() {
+                        targetEl.innerHTML = '<div style="text-align:center;padding:60px;color:#ef4444;"><i class="fa fa-exclamation-triangle fa-2x"></i><p style="margin-top:12px;">{{ __("Failed to load content") }}. {{ __("Please try again") }}.</p></div>';
+                    }
+                });
+            }
         });
+    });
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var selectedTab = urlParams.get('tab') || 'packs';
+        var tabBtn = document.querySelector('.tab-btn[data-target="' + selectedTab + '-tab"]');
+        if (tabBtn) tabBtn.click();
     });
 
 

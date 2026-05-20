@@ -93,21 +93,13 @@ class EmojiController extends MainController
             $category = EmojiCategory::find($filterType);
         }
 
-        // Header tabs
+        // Header tabs (reuse cached categories from MoveEmojiCategoryAction)
         $grid->header(function () use ($filterType) {
             try {
-                $locale = App::getLocale();
-
                 $tabs = ['all' => __('All')];
-                $categories = EmojiCategory::orderBy('id')->get();
-                foreach ($categories as $cat) {
-                    // Handle both array and JSON string
-                    $titleData = $cat->title;
-                    if (is_string($titleData)) {
-                        $titleData = json_decode($titleData, true) ?? [];
-                    }
-                    $title = $titleData[$locale] ?? $titleData['en'] ?? $cat->id;
-                    $tabs[$cat->id] = $title;
+                $categoryOptions = MoveEmojiCategoryAction::getCategoryOptions();
+                foreach ($categoryOptions as $id => $title) {
+                    $tabs[$id] = $title;
                 }
 
                 $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';

@@ -535,11 +535,7 @@ class UserRepository extends Repository
     {
         //        $authUserId = auth()->id();
         return User::with([
-            'packs',
-            //            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
-            //                ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-            //                ->where('is_used', 1)
-            //                ->with(['ware']),
+            'packs.ware',
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
             'receiverLevel:id,img,level,exp',
             'senderLevel:id,img,level',
@@ -570,7 +566,7 @@ class UserRepository extends Repository
     {
 
         return User::with([
-            'packs',
+            'packs.ware',
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
             'receiverLevel:id,img,level',
             'senderLevel:id,img,level',
@@ -729,16 +725,17 @@ class UserRepository extends Repository
 
     public function nearUsers($userId, $latitude, $longitude)
     {
+        $lat = (float) $latitude;
+        $lng = (float) $longitude;
+
         return  User::query()
             ->with('profile')
-            ->select(
-                'users.*',
-                DB::raw("(6371 * acos(cos(radians(?))
+            ->selectRaw("users.*, (6371 * acos(cos(radians(?))
                 * cos(radians(users.lat))
                 * cos(radians(users.long) - radians(?))
                 + sin(radians(?))
-                * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
-            )->whereNotNull('lat')->whereNotNull('long')
+                * sin(radians(users.lat)))) AS distance", [$lat, $lng, $lat])
+            ->whereNotNull('lat')->whereNotNull('long')
             ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
             ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $userId)])
             ->where('id', '!=', $userId)->orderBy('distance', 'asc')->paginate(10);
@@ -747,24 +744,84 @@ class UserRepository extends Repository
     public function users($userId, $latitude = null, $longitude = null)
     {
         $authUserId = auth()->id();
+        $perPage = request('per_page', 15);
+
+        // Get ignored user IDs directly - much faster than whereDoesntHave
+        $ignoredUserIds = DB::table('profile_user_ignores')
+            ->where('ignore_user_id', $userId)
+            ->pluck('user_id')
+            ->toArray();
+
+        // Get liked user IDs for withExists replacement
+        $likedUserIds = DB::table('profile_user_likes')
+            ->where('liked_user_id', $userId)
+            ->pluck('user_id')
+            ->toArray();
 
         $builder = User::query()
-            ->with('profile')
-            ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
-            ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $userId)])
+            ->with(['profile', 'images', 'chatRoomsAsUser', 'chatRoomsAsUser2'])
             ->where('id', '!=', $userId);
+
+        // Use whereNotIn instead of whereDoesntHave - way faster with index
+        if (!empty($ignoredUserIds)) {
+            $builder->whereNotIn('id', $ignoredUserIds);
+        }
+
         if (($latitude != null) && ($longitude != null)) {
-            $builder = $builder->select(
-                'users.*',
-                DB::raw("(6371 * acos(cos(radians(?))
+            $lat = (float) $latitude;
+            $lng = (float) $longitude;
+
+            // Add distance calculation and filter by location
+            $builder = $builder->selectRaw("users.*, (6371 * acos(cos(radians(?))
                     * cos(radians(users.lat))
                     * cos(radians(users.long) - radians(?))
                     + sin(radians(?))
-                    * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
-            )->whereNotNull('lat')->whereNotNull('long');
+                    * sin(radians(users.lat)))) AS distance", [$lat, $lng, $lat])
+                ->whereNotNull('lat')
+                ->whereNotNull('long')
+                ->orderBy('distance') // Order by proximity instead of random
+                ->limit($perPage * 3); // Get 3x results to ensure variety after filtering
+        } else {
+            // For non-location queries, use ID-based sampling for better performance
+            // Get min and max IDs for random sampling
+            $minId = User::where('id', '!=', $userId)->min('id');
+            $maxId = User::where('id', '!=', $userId)->max('id');
+
+            if ($minId && $maxId) {
+                // Generate random IDs for sampling
+                $randomIds = [];
+                $attempts = 0;
+                $maxAttempts = $perPage * 10; // Try to get enough IDs
+
+                while (count($randomIds) < $perPage * 3 && $attempts < $maxAttempts) {
+                    $randomId = rand($minId, $maxId);
+                    if (!in_array($randomId, $randomIds) && $randomId != $userId && !in_array($randomId, $ignoredUserIds)) {
+                        $randomIds[] = $randomId;
+                    }
+                    $attempts++;
+                }
+
+                if (!empty($randomIds)) {
+                    $builder->whereIn('id', $randomIds);
+                }
+            }
+
+            $builder->limit($perPage * 3);
         }
 
-        $builder->with([
+        // Get users first
+        $users = $builder->get();
+
+        // Add liked_by_exists attribute manually - faster than withExists
+        $users->each(function ($user) use ($likedUserIds) {
+            $user->liked_by_exists = in_array($user->id, $likedUserIds);
+        });
+
+        // Shuffle for variety and take only what we need
+        $users = $users->shuffle()->take($perPage);
+
+        // Lazy load chat rooms only for final users - much more efficient
+        $users->load([
             'chatRoomsAsUser' => function ($q) use ($authUserId) {
                 $q->where('user_id2', $authUserId)
                     ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
@@ -781,7 +838,14 @@ class UserRepository extends Repository
             },
         ]);
 
-        return $builder->inRandomOrder()->paginate(request('per_page'));
+        // Return as paginator for API consistency
+        return new \Illuminate\Pagination\LengthAwarePaginator(
+            $users,
+            $users->count(),
+            $perPage,
+            request('page', 1),
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
     }
 
 

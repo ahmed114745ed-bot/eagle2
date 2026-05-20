@@ -136,6 +136,7 @@ class HomeController extends Controller
     {
 
         $user = $request->user();
+        $user->loadMissing('profile');
 
         try {
             [$level, $expire, $ware, $roomId, $wapel] =   $this->homeService->wapel($user->id, $request->owner_id);
@@ -153,7 +154,7 @@ class HomeController extends Controller
                     'my_msg' => $request->message,
 
                     'name' => $user->name,
-                    'image' => $user->profile->avatar,
+                    'image' => $user->profile?->avatar,
 
                     'VIP' => $level,
                     'check_wapel' => $expire,

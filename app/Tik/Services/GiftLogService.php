@@ -42,8 +42,7 @@ class GiftLogService
         private readonly RoomRepository $repository,
         private readonly UserRepository $UserRepository,
         private readonly GiftLogRepository $giftLogRepository,
-    ) {
-    }
+    ) {}
 
 
     /**
@@ -98,9 +97,17 @@ class GiftLogService
             // validation if this gift vip < user vip then throw Exception
             /** @var User $user*/
             $vip_level = $user->UserVip?->level;
-            if (@$vip_level < $gift->vip_level)
-                throw new \Exception('vip ' . $gift->vip_level . ' to send this gift');
 
+            $existingGiftCount = UserGift::where('user_id', $user->id)
+                ->where('gift_id', $gift->id)
+                ->where(function ($query) {
+                    $query->where('expire', 0)
+                        ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
+                })->first();
+
+            if ((@$vip_level < $gift->vip_level) && ($type !== 'bag' || !$existingGiftCount || $existingGiftCount->quantity < (int)$number)) {
+                throw new \Exception('vip ' . $gift->vip_level . ' to send this gift');
+            }
             // get received users data
             $receivedUsers = $this->UserRepository->getUsers($receiversIds);
 
