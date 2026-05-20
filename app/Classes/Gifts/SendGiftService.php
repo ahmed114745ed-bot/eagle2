@@ -75,7 +75,6 @@ class SendGiftService
         }
 
         $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
-//getGiftLogDatForLuckyGift
         foreach ($receivedUsers as $receivedUser) {
             $cpId = @$cpIds[$receivedUser->id] ?? null;
             $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId, sourceType: $sourceType, appFeatureStatus: $appFeatureStatus);
@@ -408,7 +407,19 @@ class SendGiftService
     public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null, $sourceType = null, $appFeatureStatus = null): array
     {
      
+       $expectedTotal = $gift->price * $number;
 
+        if (abs($totalPrice - $expectedTotal) > 0.01) {
+            Log::warning('Gift price mismatch', [
+                'gift_id' => $gift->id,
+                'expected' => $expectedTotal,
+                'received' => $totalPrice,
+                'gift_price' => $gift->price,
+                'number' => $number,
+                'source_type' => $sourceType,
+            ]);
+            $totalPrice = $expectedTotal;
+        }
         $info['giftId'] = $gift->id;
         $info['roomowner_id'] = $room->uid;
         $info['giftNum'] = $number;
