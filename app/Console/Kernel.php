@@ -220,8 +220,7 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->withoutOverlapping()
             ->name('expire-room-bans')
-            ->appendOutputTo(storage_path('logs/expire-room-bans.log'))
-            ->runInBackground();
+            ->appendOutputTo(storage_path('logs/expire-room-bans.log'));
     }
 
     protected function commands(): void
