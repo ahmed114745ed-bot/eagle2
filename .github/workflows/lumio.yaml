@@ -116,12 +116,19 @@ jobs:
         command_timeout: 5m
         script: |
           cd /var/www/lumio
-          CONTAINER_ID=$(sudo docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
-          if [ -n "$CONTAINER_ID" ]; then
-            echo "Running migrations in existing octa container..."
-            sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force
+          # Run migrations using host code (git-pulled) mounted into a temp container
+          # This ensures deleted/modified migrations reflect the latest code
+          CURRENT_IMAGE=$(sudo docker service inspect lumio-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null || echo "")
+          if [ -n "$CURRENT_IMAGE" ]; then
+            echo "Running migrations with host code in temp container..."
+            sudo docker run --rm \
+              --network app-network \
+              -v /var/www/lumio:/app \
+              -w /app \
+              "$CURRENT_IMAGE" \
+              php artisan migrate --force
           else
-            echo "No octa container found, running migrations directly..."
+            echo "No octa image found, trying direct execution..."
             php artisan migrate --force
           fi
 
