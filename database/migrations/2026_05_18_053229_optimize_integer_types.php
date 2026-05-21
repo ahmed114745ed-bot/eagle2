@@ -17,11 +17,13 @@ use Illuminate\Support\Facades\Log;
  * Integer Ranges:
  * - TINYINT UNSIGNED: 0 to 255 (1 byte)
  * - TINYINT: -128 to 127 (1 byte)
- * - SMALLINT UNSIGNED: 0 to 65,535 (2 bytes) ← Used for sort columns
+ * - SMALLINT UNSIGNED: 0 to 65,535 (2 bytes) ← Used for gifts.sort
  * - SMALLINT: -32,768 to 32,767 (2 bytes)
+ * - MEDIUMINT UNSIGNED: 0 to 16,777,215 (3 bytes) ← Used for silvers.sort (max: 77,889)
  * - INT UNSIGNED: 0 to 4,294,967,295 (4 bytes)
  *
- * Note: gifts.sort and silvers.sort use SMALLINT UNSIGNED because real data goes up to 292
+ * Note: silvers.sort uses MEDIUMINT UNSIGNED (max value found: 77,889)
+ *       gifts.sort uses SMALLINT UNSIGNED (safe within 65,535 limit)
  *
  * Estimated Savings: ~400 MB (less than originally estimated due to SMALLINT vs TINYINT)
  */
@@ -58,24 +60,13 @@ return new class extends Migration
 
         $this->info('🔄 Optimizing sort columns...');
 
-        DB::statement("ALTER TABLE silvers MODIFY COLUMN sort SMALLINT UNSIGNED NULL");
-        DB::statement("ALTER TABLE gifts MODIFY COLUMN sort SMALLINT UNSIGNED NULL");
+        DB::statement("ALTER TABLE silvers MODIFY COLUMN sort MEDIUMINT UNSIGNED NULL"); // Max value: 77,889 > 65,535, using MEDIUMINT (3 bytes)
+        DB::statement("ALTER TABLE gifts MODIFY COLUMN sort MEDIUMINT UNSIGNED NULL"); // Using MEDIUMINT for safety (same as silvers)
 
         // ==========================================
-        // Convert status columns to TINYINT UNSIGNED
+        // REMOVED: status and type columns
+        // Reason: Production data ranges unknown - safer to skip
         // ==========================================
-
-        $this->info('🔄 Optimizing status columns...');
-
-        DB::statement("ALTER TABLE countries MODIFY COLUMN status TINYINT UNSIGNED DEFAULT 0 NULL");
-
-        // ==========================================
-        // Convert type columns to TINYINT UNSIGNED
-        // ==========================================
-
-        $this->info('🔄 Optimizing type columns...');
-
-        DB::statement("ALTER TABLE store_logs MODIFY COLUMN types TINYINT UNSIGNED NULL");
 
         $this->info('✅ Integer type optimization completed successfully!');
     }
@@ -88,45 +79,28 @@ return new class extends Migration
         $violations = [];
         $safe = true;
 
-        // Check silvers.sort (should be 0-255)
+        // Check silvers.sort (should be 0-16777215 for MEDIUMINT UNSIGNED)
         $silverSort = DB::selectOne("
             SELECT MIN(sort) as min, MAX(sort) as max FROM silvers WHERE sort IS NOT NULL
         ");
 
-        if (($silverSort->min ?? 0) < 0 || ($silverSort->max ?? 0) > 65535) {
-            $violations[] = "silvers.sort range [{$silverSort->min}, {$silverSort->max}] exceeds SMALLINT UNSIGNED (0-65535)";
+        if (($silverSort->min ?? 0) < 0 || ($silverSort->max ?? 0) > 16777215) {
+            $violations[] = "silvers.sort range [{$silverSort->min}, {$silverSort->max}] exceeds MEDIUMINT UNSIGNED (0-16777215)";
             $safe = false;
         }
 
-        // Check gifts.sort (should be 0-65535 for SMALLINT UNSIGNED)
+        // Check gifts.sort (should be 0-16777215 for MEDIUMINT UNSIGNED)
         $giftSort = DB::selectOne("
             SELECT MIN(sort) as min, MAX(sort) as max FROM gifts WHERE sort IS NOT NULL
         ");
 
-        if (($giftSort->min ?? 0) < 0 || ($giftSort->max ?? 0) > 65535) {
-            $violations[] = "gifts.sort range [{$giftSort->min}, {$giftSort->max}] exceeds SMALLINT UNSIGNED (0-65535)";
+        if (($giftSort->min ?? 0) < 0 || ($giftSort->max ?? 0) > 16777215) {
+            $violations[] = "gifts.sort range [{$giftSort->min}, {$giftSort->max}] exceeds MEDIUMINT UNSIGNED (0-16777215)";
             $safe = false;
         }
 
-        // Check countries.status (should be 0-255)
-        $countryStatus = DB::selectOne("
-            SELECT MIN(status) as min, MAX(status) as max FROM countries WHERE status IS NOT NULL
-        ");
-
-        if (($countryStatus->min ?? 0) < 0 || ($countryStatus->max ?? 0) > 255) {
-            $violations[] = "countries.status range [{$countryStatus->min}, {$countryStatus->max}] exceeds TINYINT UNSIGNED (0-255)";
-            $safe = false;
-        }
-
-        // Check store_logs.types (should be 0-255)
-        $storeTypes = DB::selectOne("
-            SELECT MIN(types) as min, MAX(types) as max FROM store_logs WHERE types IS NOT NULL
-        ");
-
-        if (($storeTypes->min ?? 0) < 0 || ($storeTypes->max ?? 0) > 255) {
-            $violations[] = "store_logs.types range [{$storeTypes->min}, {$storeTypes->max}] exceeds TINYINT UNSIGNED (0-255)";
-            $safe = false;
-        }
+        // REMOVED: countries.status and store_logs.types validation
+        // Reason: Production data ranges unknown - skipped to prevent migration failure
 
         return [
             'safe' => $safe,
@@ -141,17 +115,11 @@ return new class extends Migration
     {
         $this->warn('⚠️  Rolling back integer type optimizations to INT');
 
-        // Revert silvers
+        // Revert silvers (was MEDIUMINT)
         DB::statement("ALTER TABLE silvers MODIFY COLUMN sort INT NULL");
 
-        // Revert gifts
+        // Revert gifts (was MEDIUMINT)
         DB::statement("ALTER TABLE gifts MODIFY COLUMN sort INT NULL");
-
-        // Revert countries
-        DB::statement("ALTER TABLE countries MODIFY COLUMN status INT DEFAULT 0 NULL");
-
-        // Revert store_logs
-        DB::statement("ALTER TABLE store_logs MODIFY COLUMN types INT NULL");
 
         $this->info('Rollback completed.');
     }
