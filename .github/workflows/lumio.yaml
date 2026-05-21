@@ -118,17 +118,15 @@ jobs:
           cd /var/www/lumio
           # Run migrations using host code (git-pulled) mounted into a temp container
           # This ensures deleted/modified migrations reflect the latest code
-          CURRENT_IMAGE=$(sudo docker service inspect lumio-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}' 2>/dev/null || echo "")
-          if [ -n "$CURRENT_IMAGE" ]; then
-            echo "Running migrations with host code in temp container..."
-            sudo docker run --rm \
-              --network app-network \
-              -v /var/www/lumio:/app \
-              -w /app \
-              "$CURRENT_IMAGE" \
-              php artisan migrate --force
+          CONTAINER_ID=$(sudo docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
+          if [ -n "$CONTAINER_ID" ]; then
+            echo "Syncing migration files from host to container..."
+            sudo docker exec "$CONTAINER_ID" rm -rf /app/database/migrations
+            sudo docker cp /var/www/lumio/database/migrations "$CONTAINER_ID":/app/database/migrations
+            echo "Running migrations in existing octa container..."
+            sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force
           else
-            echo "No octa image found, trying direct execution..."
+            echo "No octa container found, running migrations directly..."
             php artisan migrate --force
           fi
 
