@@ -61,7 +61,7 @@ return new class extends Migration
                 $table->string('nickname', 100)->nullable()->change();
             }
             if (Schema::hasColumn('users', 'name')) {
-                $table->string('name', 100)->nullable()->change();
+                $table->string('name', 120)->nullable()->change(); // Increased from 100 to 120 (max found: 109)
             }
             if (Schema::hasColumn('users', 'email')) {
                 $table->string('email', 150)->nullable()->change();
@@ -90,7 +90,7 @@ return new class extends Migration
 
         Schema::table('rooms', function (Blueprint $table) {
             $table->string('numid', 50)->comment('غرفة')->change();
-            $table->string('room_name', 150)->comment('اسم الغرفة')->change();
+            $table->string('room_name', 250)->comment('اسم الغرفة')->change(); // Increased from 150 to 250 (max found: 243)
             $table->string('room_intro', 500)->default('مرحبا بكم في غرفتي')->comment('إعلان الغرفة')->nullable()->change();
             $table->string('room_pass', 50)->comment('كلمة المرور الغرفة')->nullable()->change();
             $table->string('room_welcome', 500)->default('مرحبا بكم في غرفتي ~ أتمنى أن تستمتع ~')->comment('تحية الغرفة')->nullable()->change();
@@ -137,10 +137,10 @@ return new class extends Migration
             $safe = false;
         }
 
-        // Check users.name (100 limit)
+        // Check users.name (120 limit)
         $maxName = DB::selectOne("SELECT MAX(LENGTH(name)) as max FROM users WHERE name IS NOT NULL")->max ?? 0;
-        if ($maxName > 100) {
-            $violations[] = "users.name max length={$maxName} exceeds proposed limit of 100";
+        if ($maxName > 120) {
+            $violations[] = "users.name max length={$maxName} exceeds proposed limit of 120";
             $safe = false;
         }
 
@@ -155,10 +155,10 @@ return new class extends Migration
 
         $this->info('  Checking rooms table...');
 
-        // Check rooms.room_name (150 limit)
+        // Check rooms.room_name (250 limit)
         $maxRoomName = DB::selectOne("SELECT MAX(LENGTH(room_name)) as max FROM rooms WHERE room_name IS NOT NULL")->max ?? 0;
-        if ($maxRoomName > 150) {
-            $violations[] = "rooms.room_name max length={$maxRoomName} exceeds proposed limit of 150";
+        if ($maxRoomName > 250) {
+            $violations[] = "rooms.room_name max length={$maxRoomName} exceeds proposed limit of 250";
             $safe = false;
         }
 
