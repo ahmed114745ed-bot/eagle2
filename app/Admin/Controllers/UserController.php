@@ -1390,4 +1390,125 @@ class UserController extends MainController
             return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
         });
     }
+
+    /**
+     * Clean up devices with more than 3 accounts
+     * Deletes newest accounts until only 3 remain per device
+     */
+    public function cleanupDuplicateDevices()
+    {
+        DB::beginTransaction();
+
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // Get all device tokens that have more than allowed accounts (active users only)
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->where('is_logout', 0)
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $totalDeleted = 0;
+            $devicesProcessed = 0;
+            $deletedUsers = [];
+            $totalUserAccountsDeleted = 0;
+            $totalTokensDeleted = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // Get all users for this device (active only), ordered by created_at DESC (newest first)
+                $users = User::where('device_token', $deviceToken)
+                    ->where('is_logout', 0)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                // Calculate how many to delete
+                $deleteCount = $userCount - $register_account;
+
+                // Delete the newest accounts (first N records since ordered DESC)
+                $usersToDelete = $users->take($deleteCount);
+
+                foreach ($usersToDelete as $user) {
+                    // 1. Delete from user_accounts (SwitchAccount module)
+                    $userAccountsDeleted = \Modules\SwitchAccount\Entities\UserAccount::where(function($q) use ($user) {
+                        $q->where('parent_user_id', $user->id)
+                          ->orWhere('child_user_id', $user->id);
+                    })->delete();
+                    $totalUserAccountsDeleted += $userAccountsDeleted;
+
+                    // 2. Delete all user tokens (Sanctum)
+                    $tokensDeleted = $user->tokens()->count();
+                    $user->tokens()->delete();
+                    $totalTokensDeleted += $tokensDeleted;
+
+                    // 3. Soft delete the user (same as dashboard)
+                    $user->delete();
+
+                    \Log::info('User deleted in cleanup', [
+                        'user_id' => $user->id,
+                        'name' => $user->name,
+                        'uuid' => $user->uuid,
+                        'device_token' => $deviceToken,
+                        'user_accounts_deleted' => $userAccountsDeleted,
+                        'tokens_deleted' => $tokensDeleted,
+                    ]);
+
+                    $deletedUsers[] = [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'uuid' => $user->uuid,
+                        'device_token' => $deviceToken,
+                        'created_at' => $user->created_at,
+                    ];
+
+                    $totalDeleted++;
+                }
+
+                // 4. Update devices_token_histories count
+                $record = \App\Models\DevicesTokenHistory::where('device_token', $deviceToken)->first();
+                if ($record) {
+                    // Decrement count by number of deleted users
+                    $record->count = max(0, $record->count - $deleteCount);
+                    $record->save();
+                }
+
+                $devicesProcessed++;
+            }
+
+            DB::commit();
+
+            \Log::info('Device cleanup completed', [
+                'devices_processed' => $devicesProcessed,
+                'total_users_deleted' => $totalDeleted,
+                'total_user_accounts_deleted' => $totalUserAccountsDeleted,
+                'total_tokens_deleted' => $totalTokensDeleted,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cleanup completed successfully',
+                'data' => [
+                    'devices_processed' => $devicesProcessed,
+                    'total_users_deleted' => $totalDeleted,
+                    'total_user_accounts_deleted' => $totalUserAccountsDeleted,
+                    'total_tokens_deleted' => $totalTokensDeleted,
+                    'deleted_users' => $deletedUsers,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error during cleanup: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
