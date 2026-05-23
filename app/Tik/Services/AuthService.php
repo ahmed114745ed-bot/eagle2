@@ -801,9 +801,11 @@ class AuthService
         $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
         // Check actual users count in users table (includes both Registration and Login)
+        // Only count active users (is_logout = 0) to avoid counting logged out users
         $actualUsersCount = User::where('device_token', $deviceToken)
             ->where('device_token', '!=', '')
             ->whereNotNull('device_token')
+            ->where('is_logout', 0)
             ->count();
 
         if ($actualUsersCount >= $register_account) {
@@ -838,10 +840,12 @@ class AuthService
         $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
         // Count how many different users are using this device token (excluding current user)
+        // Only count active users (is_logout = 0) to avoid counting logged out users
         $otherUsersCount = User::where('device_token', $deviceToken)
             ->where('device_token', '!=', '')
             ->whereNotNull('device_token')
             ->where('id', '!=', $userId)
+            ->where('is_logout', 0)
             ->count();
 
         if ($otherUsersCount >= $register_account) {
