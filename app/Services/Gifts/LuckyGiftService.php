@@ -162,6 +162,9 @@ class LuckyGiftService
 
             $totalPriceFull = $giftPrice * $number * $receiversCount;
 
+            // Track balance before any cashback wins for accurate logging
+            $balanceBeforeAnyCashback = $user->di;
+
             while ($user->di >= $totalPriceFull && $index > 0) {
 
                 foreach ($receiversIds as $receiverId) {
@@ -217,13 +220,16 @@ class LuckyGiftService
                     $multiplier = 0;
                     $message = null;
 
+                    // FIX: Deduct gift cost FIRST, before adding cashback
+                    $user->di -= $unitPrice;
+
                     if ($result) {
                         $isWinner = (bool) ($result->isWinner ?? false);
                         $multiplier = (float) ($result->multiplier ?? 0);
                         $iterationWin = (float) ($result->profitAmount ?? 0);
 
                         if ($isWinner && $iterationWin > 0) {
-                            $user->enableSaving = false;
+                            // Now add cashback AFTER deduction
                             $user->di += $iterationWin;
 
                             $total_user_win += $iterationWin;
@@ -283,7 +289,6 @@ class LuckyGiftService
                         'wallets_after' => $result?->wallets_after,
                     ];
 
-                    $user->di -= $unitPrice;
                     $total_cashback_percentage += $multiplier;
                 }
 
@@ -291,10 +296,15 @@ class LuckyGiftService
             }
 
             if ($total_user_win > 0) {
+                // FIX: Track balance BEFORE cashback was added (before the loop started)
+                // At this point $user->di already contains the cashback, so we need to calculate
+                // what the balance was before any cashback was added during the loop
+                $balanceBeforeCashbackLog = $balanceBeforeAnyCashback - ($throwNumber * $unitPrice);
+
                 UserCoinLogHelper::logByType(
                     $userId,
                     $total_user_win,
-                    ($user->di - $total_user_win),
+                    $balanceBeforeCashbackLog,
                     UserCoinLogType::CASHBACK,
                     null,
                 );
@@ -355,8 +365,53 @@ class LuckyGiftService
 
             // CRITICAL: Save user balance changes to DB BEFORE returning response
             // This ensures subsequent requests see the updated balance
-            $user->enableSaving = true;
-            $user->save();
+            // Using atomic DB update to avoid Eloquent observer issues
+
+            $initialDi = $user->getOriginal('di');
+            $finalDi = $user->di;
+            $totalChange = $finalDi - $initialDi;
+
+            Log::channel('lucky_gift')->info('💾 Applying balance change', [
+                'user_id' => $userId,
+                'initial_di' => $initialDi,
+                'final_di' => $finalDi,
+                'change' => $totalChange,
+                'total_user_win' => $total_user_win,
+                'throwNumber' => $throwNumber,
+            ]);
+
+            // Atomic update with optimistic locking to prevent race conditions
+            $updated = \DB::table('users')
+                ->where('id', $userId)
+                ->where('di', $initialDi)  // Ensure no concurrent modification
+                ->update([
+                    'di' => $finalDi,
+                    'updated_at' => now(),
+                ]);
+
+            if (!$updated) {
+                $currentDi = \DB::table('users')->where('id', $userId)->value('di');
+                Log::channel('lucky_gift')->error('❌ Balance update failed - concurrent modification detected', [
+                    'user_id' => $userId,
+                    'expected_initial_di' => $initialDi,
+                    'current_di' => $currentDi,
+                    'attempted_final_di' => $finalDi,
+                ]);
+                throw new \Exception('Balance was modified by another request. Please try again.');
+            }
+
+            // Verify the update
+            $verifiedDi = \DB::table('users')->where('id', $userId)->value('di');
+            Log::channel('lucky_gift')->info('✅ Balance updated successfully', [
+                'user_id' => $userId,
+                'new_balance' => $verifiedDi,
+                'change_applied' => $totalChange,
+                'verified' => ($verifiedDi == $finalDi),
+            ]);
+
+            // Sync the Eloquent model to reflect the saved state
+            // This prevents isDirty() from thinking the model still needs saving
+            $user->syncOriginal();
 
             // Dispatch post-processing job ASYNCHRONOUSLY
             // This prevents worker blocking and reduces response time to < 10s
@@ -493,6 +548,10 @@ class LuckyGiftService
         $coinsForApp = $totalPrice * $appPercentage;
         $coinsForOwner = $totalPrice * $roomrPercentage;
 
+        // Track balance before any cashback wins for accurate logging (V1)
+        $balanceBeforeAnyCashbackV1 = $user->di;
+        $totalGiftsSent = 0;
+
         while ($user->di >= $totalPrice && $index > 0) {
             $balanceBeforeIteration = $user->di;
             UserCoinLogHelper::logByType(
@@ -505,6 +564,9 @@ class LuckyGiftService
 
             $appWallet->coins += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
+
+            // FIX: Deduct gift cost FIRST, before calculating/adding cashback
+            $user->di -= $totalPrice;
 
             $iterationTotalWin = 0;
             $iterationPopular = false;
@@ -522,7 +584,7 @@ class LuckyGiftService
                         $cashback_value = $cashback_percentage * $unitPrice;
 
                         if ($cashback_percentage > 0) {
-                            $user->enableSaving = false;
+                            // Now add cashback AFTER deduction
                             $user->di += $cashback_value;
                             $appWallet->coins -= $cashback_value;
 
@@ -563,7 +625,7 @@ class LuckyGiftService
                 'error_message' => '',
             ];
 
-            $user->di -= $totalPrice;
+            $totalGiftsSent++;
             $index--;
             $total_cashback_percentage += $iterationMaxCashback;
         }
@@ -571,11 +633,15 @@ class LuckyGiftService
 
 
         if ($total_user_win > 0) {
+            // FIX: Track balance BEFORE cashback was added (before the loop started)
+            // At this point $user->di already contains the cashback, so we need to calculate
+            // what the balance was before any cashback was added during the loop
+            $balanceBeforeCashbackLogV1 = $balanceBeforeAnyCashbackV1 - ($totalGiftsSent * $totalPrice);
 
             UserCoinLogHelper::logByType(
                 $userId,
                 $total_user_win,
-                ($user->di - $total_user_win),
+                $balanceBeforeCashbackLogV1,
                 UserCoinLogType::CASHBACK,
                 null,
             );
@@ -624,8 +690,47 @@ class LuckyGiftService
 
         // CRITICAL: Save user balance changes to DB BEFORE returning response
         // This ensures subsequent requests see the updated balance
-        $user->enableSaving = true;
-        $user->save();
+        // Using atomic DB update to avoid Eloquent observer issues
+
+        $initialDiV1 = $user->getOriginal('di');
+        $finalDiV1 = $user->di;
+        $totalChangeV1 = $finalDiV1 - $initialDiV1;
+
+        Log::channel('lucky_gift')->info('💾 [V1] Applying balance change', [
+            'user_id' => $userId,
+            'initial_di' => $initialDiV1,
+            'final_di' => $finalDiV1,
+            'change' => $totalChangeV1,
+            'total_user_win' => $total_user_win,
+        ]);
+
+        // Atomic update with optimistic locking
+        $updatedV1 = \DB::table('users')
+            ->where('id', $userId)
+            ->where('di', $initialDiV1)
+            ->update([
+                'di' => $finalDiV1,
+                'updated_at' => now(),
+            ]);
+
+        if (!$updatedV1) {
+            $currentDiV1 = \DB::table('users')->where('id', $userId)->value('di');
+            Log::channel('lucky_gift')->error('❌ [V1] Balance update failed - concurrent modification', [
+                'user_id' => $userId,
+                'expected_initial_di' => $initialDiV1,
+                'current_di' => $currentDiV1,
+            ]);
+            throw new \Exception('Balance was modified by another request. Please try again.');
+        }
+
+        Log::channel('lucky_gift')->info('✅ [V1] Balance updated successfully', [
+            'user_id' => $userId,
+            'new_balance' => $finalDiV1,
+            'change_applied' => $totalChangeV1,
+        ]);
+
+        // Sync the Eloquent model to reflect the saved state
+        $user->syncOriginal();
 
         // Dispatch post-processing job ASYNCHRONOUSLY
         // This prevents worker blocking and reduces response time to < 10s
