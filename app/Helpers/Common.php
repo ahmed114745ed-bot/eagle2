@@ -1693,13 +1693,27 @@ class Common
         try {
 
             $client           = new Client();
-            $url              = 'https://rtc-api.zego.im';
+            //  $url              = 'https://rtc-api.zego.im';
             //   $AppId            = self::getConf('zego_app_id');
-            $AppId            = self::zegoData('zego_app_id');
+            //  $AppId            = self::zegoData('zego_app_id');
+            $AppId = '';
+            $serverSecret = '';
+            if (config('app.env') == 'production') {
+                $url = 'https://rtc-api.zego.im';
+
+                $AppId = self::zegoData('zego_app_id');
+
+                $serverSecret = self::zegoData('zego_server_secret');
+            } else {
+                $url =  'https://engine.udt-stream.com/api/v1/server';
+                $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+
+                $serverSecret = self::zegoData('zego_server_secret');
+            }
             $SignatureNonce   = self::getSignatureNonce();
             $Timestamp        = time();
             //  $str              = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
-            $str              = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+            $str              = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
             $signature        = md5($str);
             $SignatureVersion = '2.0';
             $params           = [
@@ -2256,7 +2270,7 @@ class Common
                     'id_image' => '',
                     'colored_name' => '',
                 ];
-                case UserTypeEnum::SUPER_ADMIN:
+            case UserTypeEnum::SUPER_ADMIN:
                 $superAdmin = $resource->superAdmin;
                 $linkedUser = $superAdmin?->appUser;
                 return [
@@ -2271,7 +2285,7 @@ class Common
                     'colored_name' => '',
                 ];
 
-                case UserTypeEnum::SUB_ADMIN:
+            case UserTypeEnum::SUB_ADMIN:
                 $subAreaManager = $resource->subSuperAdmin;
                 return [
                     'name' => $subAreaManager->name ?? '',
