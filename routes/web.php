@@ -438,7 +438,8 @@ Route::group(
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
 
-        // Cleanup Duplicate Devices - Preview & Run
+        // Cleanup Duplicate Devices
+        Route::get("cleanup-duplicate-devices", [UserController::class, "cleanupDuplicateDevicesPage"])->name('cleanup.duplicate.devices');
         Route::get("cleanup-duplicate-devices/preview", [UserController::class, "cleanupDuplicateDevicesPreview"])->name('cleanup.duplicate.devices.preview');
         Route::post("cleanup-duplicate-devices/run", [UserController::class, "cleanupDuplicateDevicesRun"])->name('cleanup.duplicate.devices.run');
 

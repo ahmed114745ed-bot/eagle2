@@ -123,8 +123,7 @@ class UserController extends MainController
         // Add the second row unconditionally
         $content = $content->row(function ($row) {
             $row->column(12, $this->grid());
-        })->row(view('admin.same_device_users_modal'))
-          ->row(view('admin.cleanup_duplicate_devices_modal'));
+        })->row(view('admin.same_device_users_modal'));
 
         return $content;
     }
@@ -400,9 +399,9 @@ class UserController extends MainController
         // Add Cleanup Duplicate Devices button
         $grid->tools(function ($tools) {
             $tools->append('
-                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#cleanupDevicesModal" style="margin-left:5px;">
+                <a href="/admin/cleanup-duplicate-devices" class="btn btn-warning btn-sm" style="margin-left:5px;">
                     <i class="fa fa-trash"></i> تنظيف الحسابات المكررة
-                </button>
+                </a>
             ');
         });
 
@@ -1616,5 +1615,16 @@ class UserController extends MainController
     {
         // Just call the existing cleanup function
         return $this->cleanupDuplicateDevices();
+    }
+
+    /**
+     * Display the cleanup duplicate devices page
+     */
+    public function cleanupDuplicateDevicesPage(Content $content)
+    {
+        return $content
+            ->title('تنظيف الحسابات المكررة')
+            ->description('إدارة الحسابات المسجلة على نفس الجهاز')
+            ->body(view('admin.cleanup_duplicate_devices_page'));
     }
 }
