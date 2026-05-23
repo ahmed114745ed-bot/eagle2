@@ -39,6 +39,16 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::find($this->userId);
+
+        if (!$user) {
+            \Log::warning('UpdateUserDataWhenSendGift: User not found', [
+                'user_id' => $this->userId,
+                'room_id' => $this->roomId,
+                'gift_id' => $this->giftId
+            ]);
+            return;
+        }
+
         $luckyStatus = Common::getSettingValue('lucky_gifts_action');
         $hostPercentage = 0;
         $receiverFeeRate =null;
@@ -47,7 +57,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
            if (in_array($version, [4])) {
                 $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
             }
-            
+
            $hostPercentage  = $receiverFeeRate ?? getGiftPercentage('host_lucky_gift')  / 10;
         }else {
             $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
@@ -62,7 +72,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                            },
                            'lastPk',
                            'lastPkSession'
-                       ])->first(); 
+                       ])->first();
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
                                       ])->where('id', $this->giftId)->where('enable', 1)->first();

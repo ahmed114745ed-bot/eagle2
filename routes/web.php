@@ -2043,14 +2043,6 @@ Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
 });
 
 // Debugbar viewport logging (development only)
-/*
-if (config('app.debug')) {
-    Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
-        Debugbar::info('Viewport:', $request->all());
-        return response()->json(['ok' => true]);
-    });
-}
-*/
 Route::get('/octane', function () {
     Cache::store('octane')->clear();
 
