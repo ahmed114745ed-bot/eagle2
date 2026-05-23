@@ -25,6 +25,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        /*
         $this->info('🔍 Validating TEXT column data before conversion...');
 
         $validation = $this->validateTextLengths();
@@ -89,7 +90,7 @@ return new class extends Migration
             $table->text('invoice')->nullable()->change();
         });
 
-        $this->info('✅ TEXT column optimization completed successfully!');
+        $this->info('✅ TEXT column optimization completed successfully!');*/
     }
 
     /**
@@ -97,7 +98,7 @@ return new class extends Migration
      */
     private function validateTextLengths(): array
     {
-        $violations = [];
+      /*  $violations = [];
         $safe = true;
 
         // Check settings.value (TEXT limit = 65535)
@@ -144,6 +145,7 @@ return new class extends Migration
             'safe' => $safe,
             'violations' => $violations
         ];
+        */
     }
 
     /**

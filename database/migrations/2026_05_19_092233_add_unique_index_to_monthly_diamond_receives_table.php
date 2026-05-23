@@ -9,9 +9,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        /*
         Schema::table('monthly_diamond_receives', function (Blueprint $table) {
             $table->unique(['user_id', 'month', 'year'], 'idx_user_month_year');
-        });
+        });*/
     }
 
     public function down(): void

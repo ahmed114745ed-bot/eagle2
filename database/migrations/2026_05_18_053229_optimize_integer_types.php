@@ -32,6 +32,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        /*
         $this->info('🔍 Validating integer ranges before conversion...');
 
         $validation = $this->validateIntegerRanges();
@@ -78,6 +79,7 @@ return new class extends Migration
         DB::statement("ALTER TABLE store_logs MODIFY COLUMN types TINYINT UNSIGNED NULL");
 
         $this->info('✅ Integer type optimization completed successfully!');
+        */
     }
 
     /**
@@ -85,6 +87,7 @@ return new class extends Migration
      */
     private function validateIntegerRanges(): array
     {
+        /*
         $violations = [];
         $safe = true;
 
@@ -131,7 +134,7 @@ return new class extends Migration
         return [
             'safe' => $safe,
             'violations' => $violations
-        ];
+        ];*/
     }
 
     /**
