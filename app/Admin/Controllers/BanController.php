@@ -2,15 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Ban;
-use Encore\Admin\Grid;
-use Illuminate\Http\Request;
 use App\Admin\Actions\BanUser;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\RemoveBanUser;
+use App\Admin\Services\UserService;
+use App\Models\Ban;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class BanController extends MainController
@@ -94,6 +95,9 @@ class BanController extends MainController
                 'user:id,name,uuid,phone,country_id',
                 'staff.agency',
                 'user.profile:user_id,avatar',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
@@ -101,38 +105,18 @@ class BanController extends MainController
             ->select($reason, 'user_id', 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
             ->groupBy([$reason, 'user_id', 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id', 'img'])->orderByDesc('created_at');
 
-        $grid->column('user_id', __('User'))->display(function () {
-            $user = $this->user;
-            if (!$user) return '-';
 
-            $name = $user->name;
-            $uuid = $user->uuid;
-            $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = $user->profile->avatar ?? '';
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-
-            $userUrl = admin_url('users/' . $user->id);
-
-            return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                        <div>
-                            <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
-                            <span style='color: var(--uuid-color); font-size: smaller;'>UUID: $uuid</span><br>
-                            <span style='color: var(--phone-color); font-size: smaller;'>📞 $phone</span>
-                        </div>
-                    </div>";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->duration(__('duration'));
         $grid->column('type', __('Type'))->display(function ($type) {
             $types = [
                 'normal' => __('normal'),
-             //   'ip' => __('ip'),
+                //   'ip' => __('ip'),
                 'device' => __('device'),
             ];
 

@@ -87,7 +87,7 @@ class AgentSalaryTransactionController extends Controller
             //   ->whereHas('sender', function ($q2) use ($search) {
             //       $q2->fitterByUuid($search);
             //   });
-            ->with('senderUser','senderShippingAgency','senderAgency','admin');
+            ->with('senderUser','senderShippingAgency','senderAgency','admin','areaManager','subAreaManager','superAdmin','subSuperAdmin','bd');
 
         })->orderByDesc('id')->paginate();
 

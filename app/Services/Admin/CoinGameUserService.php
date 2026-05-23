@@ -2,20 +2,21 @@
 
 namespace App\Services\Admin;
 
-use App\Models\User;
-use Encore\Admin\Grid;
-use App\Models\AllGame;
-use Encore\Admin\Layout\Row;
-use Illuminate\Support\Carbon;
-use App\Models\CoinGameUserAll;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\InfoBox;
-use Illuminate\Support\Facades\DB;
-use App\Admin\Widgets\CustomInfoBox;
-use App\Models\CoinGameUserAggregated;
 use App\Admin\Services\UserGameService;
-use App\Models\CoinGameUserDailyAggregated;
+use App\Admin\Services\UserService;
+use App\Admin\Widgets\CustomInfoBox;
+use App\Models\AllGame;
+use App\Models\CoinGameUserAggregated;
+use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserArchive;
+use App\Models\CoinGameUserDailyAggregated;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\InfoBox;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 
 class CoinGameUserService
@@ -524,14 +525,11 @@ class CoinGameUserService
 
         $userService = $this->userService;
 
-        $grid->column('user_uuid', __('User'))->display(function () use ($userService) {
-            return $userService->adminUserAvatar((object)[
-                'id'     => $this->user_id,
-                'uuid'   => $this->user_uuid,
-                'name'   => $this->user_name,
-                'avatar' => $this->user_avatar,
-            ], withoutLevels: true);
+
+        $grid->column('nameUser', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
 
         foreach (['total_loss', 'total_win', 'app_profit'] as $field) {
@@ -803,7 +801,7 @@ class CoinGameUserService
         return $grid;
     }
 
-    public function buildRoundOrdersGrid($roundId,$userId): Grid
+    public function buildRoundOrdersGrid($roundId, $userId): Grid
     {
         $grid = new Grid(new CoinGameUserAll());
 

@@ -3,11 +3,8 @@
 namespace App\Admin\Controllers;
 
 use App\Models\CoinLog;
-use App\Models\User;
-use App\Models\ShippingAgency;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 
 class CoinLogReportsController extends AdminController
 {
@@ -18,7 +15,7 @@ class CoinLogReportsController extends AdminController
     {
         $grid = new Grid(new CoinLog());
 
-        $grid->model()->orderBy('id', 'desc');
+        $grid->model()->with(['user:id,name', 'shippingAgency:id,name'])->orderBy('id', 'desc');
 
         $grid->filter(function($filter) {
             $filter->disableIdFilter();
@@ -36,11 +33,9 @@ class CoinLogReportsController extends AdminController
 
         $grid->column('model_id', __('owner'))->display(function ($modelId) {
             if ($this->user_type === 'user') {
-                $user = User::find($modelId);
-                return $user ? "{$user->name} ({$user->email})" : '-';
+                return $this->user->name ?? '-';
             } elseif ($this->user_type === 'shipping_agency') {
-                $agency = ShippingAgency::find($modelId);
-                return $agency ? "{$agency->name}" : '-';
+                return $this->shippingAgency->name ?? '-';
             }
             return '-';
         });

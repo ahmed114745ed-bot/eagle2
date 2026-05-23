@@ -1693,13 +1693,27 @@ class Common
         try {
 
             $client           = new Client();
-            $url              = 'https://rtc-api.zego.im';
+            //  $url              = 'https://rtc-api.zego.im';
             //   $AppId            = self::getConf('zego_app_id');
-            $AppId            = self::zegoData('zego_app_id');
+            //  $AppId            = self::zegoData('zego_app_id');
+            $AppId = '';
+            $serverSecret = '';
+            if (config('app.env') == 'production') {
+                $url = 'https://rtc-api.zego.im';
+
+                $AppId = self::zegoData('zego_app_id');
+
+                $serverSecret = self::zegoData('zego_server_secret');
+            } else {
+                $url =  'https://engine.udt-stream.com/api/v1/server';
+                $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+
+                $serverSecret = self::zegoData('zego_server_secret');
+            }
             $SignatureNonce   = self::getSignatureNonce();
             $Timestamp        = time();
             //  $str              = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
-            $str              = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+            $str              = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
             $signature        = md5($str);
             $SignatureVersion = '2.0';
             $params           = [
@@ -2256,6 +2270,34 @@ class Common
                     'id_image' => '',
                     'colored_name' => '',
                 ];
+            case UserTypeEnum::SUPER_ADMIN:
+                $superAdmin = $resource->superAdmin;
+                $linkedUser = $superAdmin?->appUser;
+                return [
+                    'name' => $linkedUser ? ($linkedUser->name . ' (مدير دولة)') : ($superAdmin->name ?? ''),
+                    'image' => $linkedUser?->profile?->avatar ?? ($superAdmin->avatar ?? ''),
+                    'uuid' => $linkedUser->uuid ?? ($superAdmin->id ?? ''),
+                    'id' => $superAdmin->id ?? '',
+                    'type' => 'dash',
+                    'url' => $superAdmin ? url($prefix . "/auth/users/{$superAdmin->id}") : '#',
+                    'image_color' => $linkedUser->color_image ?? null,
+                    'id_image' => $linkedUser?->specialId?->ware?->show_img ?? '',
+                    'colored_name' => '',
+                ];
+
+            case UserTypeEnum::SUB_ADMIN:
+                $subAreaManager = $resource->subSuperAdmin;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
+                    'image_color' => null,
+                    'id_image' => '',
+                    'colored_name' => '',
+                ];
 
             case 'user':
                 $user = $resource->senderUser;
@@ -2581,6 +2623,7 @@ class Common
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
+            'superAdmin.appUser.profile',
             'receiverUser',
             'receiverUser.profile',
             'receiverUser.packs' => function ($q) {
@@ -2928,6 +2971,9 @@ class Common
             return Storage::url($path);
         }
         $pathInfo = pathinfo($path);
+        if (!isset($pathInfo['extension'])) {
+            return Storage::url($path);
+        }
         $versionPath = $pathInfo['dirname'] . '/versions/'
             . $pathInfo['filename'] . '_' . $size . '.'
             . $pathInfo['extension'];

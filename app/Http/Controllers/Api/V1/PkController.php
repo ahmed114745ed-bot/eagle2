@@ -229,6 +229,7 @@ class PkController extends Controller
 
     public function changeBackground(Room $room, int $owner_id, string $image = '')
     {
+        $room->loadMissing('myType');
         $data = [
             "messageContent" => [
                 "message"       => "changeBackground",
@@ -246,6 +247,7 @@ class PkController extends Controller
 
     public function changeBackgroundResponse(Room $room, int $owner_id, string $image = '')
     {
+        $room->loadMissing('myType');
         return [
             "messageContent" => [
                 "message"       => "changeBackground",

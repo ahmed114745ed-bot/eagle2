@@ -104,10 +104,6 @@ class UserController extends MainController
         $type = request('type') ?? 4;
         $agencyId = request('agency_id');
 
-        $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
-            $query->whereDate('join_date', $joinDate);
-        })->paginate(10, ['*'], 'user_agency_page');
-
         $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
@@ -204,7 +200,7 @@ class UserController extends MainController
     public function countries()
     {
         $ops       = [null => __('no country')];
-        $countries = Country::all();
+        $countries = Country::select(['id', 'name', 'e_name'])->get();
         foreach ($countries as $country) {
             $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
         }
@@ -317,7 +313,7 @@ class UserController extends MainController
                 if (! $user) {
                     return __('No User');
                 }
-                return app(UserService::class)->adminUserAvatar($user, false, superadmin_url("users/profile/{$user->id}"));
+                return app(UserService::class)->adminUserCard($user, false, superadmin_url("users/profile/{$user->id}"));
             })->sortable();
 
         $grid->column('agency_id', __('Agency'))
@@ -329,6 +325,7 @@ class UserController extends MainController
 
                 return app(AgencyService::class)->adminAgencyData($agency);
             })->sortable();
+               Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("

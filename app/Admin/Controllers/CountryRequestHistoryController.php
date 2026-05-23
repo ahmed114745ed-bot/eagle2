@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Encore\Admin\Grid;
 use App\Models\Country;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Facades\Admin;
 use App\Admin\Services\UserService;
 use Illuminate\Support\Facades\App;
 use App\Models\ChangeCountryRequest;
@@ -69,9 +70,10 @@ class CountryRequestHistoryController extends MainController
             });
         });
 
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->id(__('ID'));
 
-        $grid->column('name', __('Name'))
+        $grid->column('name', __('user'))
             ->display(function ($name) {
 
                 $user = $this->user;
@@ -79,7 +81,7 @@ class CountryRequestHistoryController extends MainController
                     return __('No User');
                 }
                 $showUrl = url("admin/users/{$user->id}");
-                return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
+                return app(UserService::class)->adminUserCard($user, withoutLevels: true, showUrl: $showUrl);
             });
 
         $grid->column('user_country', __('country user'))->display(function () {

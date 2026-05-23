@@ -101,7 +101,7 @@ class AgencyUserController extends MainController
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()
-            ->with(['profile', 'packs'])
+            ->with(['profile', 'packs', 'agency'])
             ->where('is_host', 1)
             ->where('country_id', auth()->user()->country_id)
             ->withCount('sameDeviceUsers');

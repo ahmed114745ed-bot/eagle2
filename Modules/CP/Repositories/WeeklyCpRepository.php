@@ -61,7 +61,7 @@ class WeeklyCpRepository
     {
        $timezone = getTimezone();
         return GiftLog::whereIn('giftId', $giftIds)
-            ->select(DB::raw('sum(gift_logs.giftNum * gift_logs.giftPrice) as totalGiftNum'), 'cp_id')
+            ->select(DB::raw('sum(gift_logs.giftPrice) as totalGiftNum'), 'cp_id')
             ->groupBy('cp_id')
             ->whereBetween('created_at', [
                 \Carbon\Carbon::parse($weeklyCp->start_date, $timezone)->startOfDay(),

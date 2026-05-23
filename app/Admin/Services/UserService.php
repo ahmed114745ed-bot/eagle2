@@ -255,6 +255,8 @@ class UserService
     {
         if (Super::user()->type == "superadmin") {
             return url("superadmin/users/profile/{$id}");
+        } elseif (Super::user()->type == "areaManager") {
+            return url("areaManager/users/profile/{$id}");
         }
         return url("admin/users/{$id}");
     }

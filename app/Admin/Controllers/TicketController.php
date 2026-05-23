@@ -2,16 +2,17 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UserService;
 use App\Helpers\Common;
+use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Ticket;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin as AdminScript;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin as AdminScript;
 use Illuminate\Support\Facades\Storage;
 
 class TicketController extends MainController
@@ -74,38 +75,19 @@ class TicketController extends MainController
             'user:id,name,uuid,phone',
             'user.agency',
             'user.profile:user_id,avatar',
+            'user.country',
+            'user.senderLevel',
+            'user.receiverLevel',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
         ])->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
 
 
         $grid->id(__('ID_tiket'));
-        // $grid->user_id( __ ('ID'));
-        $grid->column('user_id', __('User Info'))->display(function () {
-            $user = $this->user;
-            if (!$user) return '-';
 
-            $name = $user->name;
-            $uuid = $user->uuid;
-            $phone = $user->phone ?: '-';
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$user->profile->avatar;
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-
-            $userUrl = admin_url('users/' . $user->id);
-
-            return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                        <div>
-                            <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
-                            <span style='color: var(--uuid-color); font-size: smaller;'>UUID: $uuid</span><br>
-                            <span style='color: var(--phone-color); font-size: smaller;'>📞 $phone</span>
-                        </div>
-                    </div>";
+        $grid->column('name', __('User Info'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('contact_num', __('contact'))->display(function ($description) {
             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 20 ? '...' : '');

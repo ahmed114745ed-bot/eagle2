@@ -155,8 +155,12 @@ class MallController extends Controller
             ->with('packs')
             ->get();
 
-        foreach ($expireUserVips as $userVip) {
-            $userVip->packs()->update(['expire' => $userVip->expire]);
+        $expireUpdates = $expireUserVips->groupBy('expire');
+        foreach ($expireUpdates as $expireValue => $vips) {
+            $vipIds = $vips->pluck('id')->toArray();
+            // whereIn() already ignores NULL values, no need for redundant != null check
+            Pack::whereIn('vip_user_id', $vipIds)
+                ->update(['expire' => $expireValue]);
         }
 
         Pack::whereNull('vip_user_id')->where('get_type',1)->delete();

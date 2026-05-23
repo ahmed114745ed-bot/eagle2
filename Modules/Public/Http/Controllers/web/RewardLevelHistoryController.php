@@ -95,8 +95,9 @@ class RewardLevelHistoryController extends MainController
             if (!$user) {
                 return __('No User');
             }
-            return app(UserService::class)->adminUserAvatar($user);
+            return app(UserService::class)->adminUserCard($user);
         });
+           Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('members', __('Rewards'))->display(function () {
             return "<button 

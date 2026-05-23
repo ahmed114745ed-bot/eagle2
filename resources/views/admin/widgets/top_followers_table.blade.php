@@ -1,5 +1,5 @@
 @php
-    $userService = app(\App\Admin\Services\UserSuperAdminService::class);
+    $userService = app(\App\Admin\Services\UserService::class);
 @endphp
 
 <style>
@@ -68,8 +68,8 @@
                         <tr>
                             <td class="text-center fw-bold">{{ $index + 1 }}</td>
                             <td class="avatar-cell">
-                                {!! $userService->adminUserAvatar((object)[
-                                    'id'     => $user->id,
+                                {!! $userService->adminUserCard($user, withoutLevels: true) !!}
+                            </td>
                                     'uuid'   => $user->uuid ,
                                     'name'   => $user->name ,
                                     'avatar' => $user->profile?->avatar ,

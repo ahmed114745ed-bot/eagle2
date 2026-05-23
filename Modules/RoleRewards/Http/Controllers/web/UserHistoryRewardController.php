@@ -21,15 +21,16 @@ class UserHistoryRewardController extends MainController
      *
      * @var string
      */
-     public $permission_name = 'user-reward';
+    public $permission_name = 'user-reward';
 
-    public function index(Content $content )
+    public function index(Content $content)
     {
 
-        return parent::index($content
-            ->header(__('User history rewards'))
-            ->description(__('User history rewards'))
-            ->body($this->grid())
+        return parent::index(
+            $content
+                ->header(__('User history rewards'))
+                ->description(__('User history rewards'))
+                ->body($this->grid())
         );
     }
 
@@ -39,23 +40,24 @@ class UserHistoryRewardController extends MainController
 
         $grid->model()->with([
             'user' => function ($query) {
-                $query->select(['id', 'name', 'uuid'])
-                      ->with([
-                          'profile:id,user_id,avatar',
-                          'packs',
-                      ]);
+                $query->select(['id', 'name', 'uuid', 'sender_level', 'received_level', 'country_id', 'special_id'])
+                    ->with([
+                        'profile:id,user_id,avatar',
+                        'country',
+                        'senderLevel',
+                        'receiverLevel',
+                        'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                    ]);
             }
         ])
-        ->orderByDesc('id');
+            ->orderByDesc('id');
 
         $grid->column('id', __('ID'))->sortable();
 
-        $grid->column('user_id', __('User'))->display(function () {
-            if (! $this->user) {
-                return __('No User');
-            }
-            return app(UserService::class)->adminUserAvatar($this->user, withoutLevels: true);
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('receive_name', __('receive_type'));
 
@@ -64,18 +66,16 @@ class UserHistoryRewardController extends MainController
                 if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
                     $path = $this->reward_value ?? 'achievement.png';
                     $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
-                    return $imgTag ;
+                    return $imgTag;
                 }
                 return $this->reward_value;
             }
 
 
-                $path = $this->reward_img ?? 'coin.png';
-                $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
+            $path = $this->reward_img ?? 'coin.png';
+            $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
 
-                return "<div>{$imgTag}</div><div>{$this->reward_name}</div>";
-
-
+            return "<div>{$imgTag}</div><div>{$this->reward_name}</div>";
         });
 
 

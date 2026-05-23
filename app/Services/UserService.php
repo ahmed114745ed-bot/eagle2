@@ -761,15 +761,22 @@ class UserService
                 return $q->exp == 0;
             });
 
+        // Eager load all sender users with their relations in ONE query (fixes N+1)
+        $senderIds = $data->pluck('sender_id')->filter()->unique()->values()->toArray();
+        $users = User::with(['profile', 'mangerType'])
+            ->whereIn('id', $senderIds)
+            ->get()
+            ->keyBy('id');
+
         $i = $l = 0;
         $achivement      = new UserAchievementService();
 
         foreach ($data as $k => &$v) {
-            $user = User::find($v->sender_id);
+            $user = $users->get($v->sender_id);
             if (!$user) {
                 $v->user_id  = 0;
                 $v->exp      = ceil($v->exp);
-                $v->name     = $user ? $user->name : '';
+                $v->name     = '';
                 $v->avatar   = '';
                 $v->frame    = '';
                 $v->frame_id = 0;
@@ -783,12 +790,12 @@ class UserService
             $i++;
             $v->user_id  = $v->sender_id;
             $v->exp      = ceil($v->exp);
-            $v->name     = $user ? $user->name : '';
-            $v->avatar   = $user && $user->profile ? $user->profile->avatar : '';
-            $v->frame    = $user ? Common::getUserDress($user->id, $user->dress_1, 4, 'img2', true) : '';
-            $v->frame_id = $user ? $user->dress_1 : '';
-            $v->type_user = intval(@$user->type_user) ?: 0;
-            $v->manger_type = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+            $v->name     = $user->name ?? '';
+            $v->avatar   = $user->profile?->avatar ?? '';
+            $v->frame    = Common::getUserDress($user->id, $user->dress_1, 4, 'img2', true) ?: '';
+            $v->frame_id = $user->dress_1 ?: '';
+            $v->type_user = intval($user->type_user) ?: 0;
+            $v->manger_type = $user->mangerType ? new MangerTypeResource($user->mangerType) : null;
             $v->vip = @Common::ovip_center($user);
             $v->has_color_name = Common::hasInPack($user->id, 18, true);
             $v->data_achivement = UserAchievementLevelsResource::collection($achivement->getUserAchievement($user));

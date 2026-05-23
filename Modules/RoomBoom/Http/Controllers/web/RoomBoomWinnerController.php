@@ -24,7 +24,7 @@ class RoomBoomWinnerController extends MainController
             ->body($this->grid()));
     }
 
-    protected function grid()
+    protected function  grid()
     {
         $grid = new Grid(new RoomBoomWinner());
         $grid->model()->with([
@@ -39,19 +39,17 @@ class RoomBoomWinnerController extends MainController
             'user',
             'user.profile',
             'user.country',
+            'user.senderLevel',
+            'user.receiverLevel',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
 
         ]);
 
         $grid->column('id', __('ID'))->sortable();
-        $grid->column('user_id', __('user'))->display(function ($name) {
-            $user = $this->user;
-            if (! $user) {
-                return __('No User');
-            }
-
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+        $grid->column('nameUser', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('room_info', __('Room'))->display(function () {
             $room   = @$this->boom->totalRoomGift->room;
             $name   = $room->room_name ?? 'Unknown Room';

@@ -2,16 +2,18 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserSallary;
+use App\Models\UserTarget;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\UserTarget;
-use App\Models\UserSallary;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Show;
 
 class UserTargetController extends MainController
 {
@@ -77,6 +79,9 @@ class UserTargetController extends MainController
             ->with([
                 'user',
                 'user.profile',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'agency'
 
@@ -98,36 +103,12 @@ class UserTargetController extends MainController
             }, __('UUID'));
         });
         $grid->column('id', __('id'));
-        $grid->column('user_id', __('user'))->display(function ($name) {
-            $name = @$this->user->name ?? '';
-            $uid = @$this->user->uuid;
-            if (request()->filled('_export_')) {
-                return "{$name} (UUID: {$uid})";
-            }
-
-            $path = @$this->user?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->user) ? url("admin/users/{$this->user->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+       
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->user);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
+
 
         $grid->column('user_agency_id', __('agency'))->display(function () {
             $name = @$this->agency->name ?? '';

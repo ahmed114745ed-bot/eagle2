@@ -73,7 +73,12 @@ class AgencyMangerAgencyesController extends MainController
 
         $loggedInUserId = Admin::user()->app_id;
 
-        $grid->model()->where('agency_manger_id', $loggedInUserId);
+        $grid->model()->where('agency_manger_id', $loggedInUserId)
+            ->addSelect(['current_salary_sum' => AgencySallary::selectRaw('COALESCE(SUM(sallary), 0)')
+                ->whereColumn('agency_id', 'agencies.id')
+                ->where('month', now()->month)
+                ->where('year', now()->year)
+            ]);
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
@@ -82,11 +87,8 @@ class AgencyMangerAgencyesController extends MainController
         $grid->column('phone', __('Phone'));
         $grid->column('img', __('Img'))->image('', 30, 30); // Consider resizing images for better performance
         $grid->column('contents', __('contents'));
-        $grid->column('salary', __('Salary'))->display(function () {
-            return AgencySallary::where('agency_id', $this->id)
-                ->where('month', now()->month)
-                ->where('year', now()->year)
-                ->sum('sallary') ?? 0;
+        $grid->column('current_salary_sum', __('Salary'))->display(function () {
+            return $this->current_salary_sum ?? 0;
         });
         $grid->column('target_usd', __('target usd'));
         $grid->column('members', __('members'))->expand(function ($model) {

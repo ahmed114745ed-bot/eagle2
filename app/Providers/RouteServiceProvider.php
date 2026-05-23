@@ -40,6 +40,13 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/utd.php'));
 
+            // ⚠️ TEMPORARY: Load test tokens route (only in non-production)
+            if (config('app.env') !== 'production' && file_exists(base_path('routes/load-test-tokens.php'))) {
+                Route::prefix('api')
+                    ->middleware(['api'])
+                    ->group(base_path('routes/load-test-tokens.php'));
+            }
+
             if (AppFeatureService::isEnable('login')) {
                 Route::prefix('api')
                     ->middleware('api')

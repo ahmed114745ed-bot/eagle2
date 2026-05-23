@@ -427,7 +427,7 @@ class HomeController extends  MainController
             $q->where('country_id', $countryID)
                 ->whereHas('agency', fn($a) => $a->where('country_id', $countryID))
         )
-            ->selectRaw('sender_id, SUM(giftPrice * giftNum) as total_sent')
+            ->selectRaw('sender_id, SUM(giftPrice) as total_sent')
             ->groupBy('sender_id')
             ->orderByDesc('total_sent')
             ->take(10)
@@ -453,7 +453,7 @@ class HomeController extends  MainController
             $q->where('country_id', $countryID)
                 ->whereHas('agency', fn($a) => $a->where('country_id', $countryID))
         )
-            ->selectRaw('receiver_id, SUM(giftPrice * giftNum) as total_received')
+            ->selectRaw('receiver_id, SUM(giftPrice) as total_received')
             ->groupBy('receiver_id')
             ->orderByDesc('total_received')
             ->take(10)
@@ -689,11 +689,11 @@ class HomeController extends  MainController
             $userBaseQuery = User::where('country_id', $countryID);
 
             $stats = [
-                'usersCount' => $userBaseQuery->count(),
-                'newSignUpsToday' => $userBaseQuery->whereDate('created_at', today())->count(),
-                'newSignUpsThisWeek' => $userBaseQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-                'newSignUpsThisMonth' => $userBaseQuery->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
-                'onlineUser' => $userBaseQuery->where('online', 1)->count(),
+                'usersCount' => (clone $userBaseQuery)->count(),
+                'newSignUpsToday' => (clone $userBaseQuery)->whereDate('created_at', today())->count(),
+                'newSignUpsThisWeek' => (clone $userBaseQuery)->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+                'newSignUpsThisMonth' => (clone $userBaseQuery)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count(),
+                'onlineUser' => (clone $userBaseQuery)->where('online', 1)->count(),
             ];
 
             $peakHours = LiveTime::whereHas('user', function ($q) use ($countryID) {
@@ -718,14 +718,14 @@ class HomeController extends  MainController
                 $q->where('country_id', $countryID);
             });
 
-            $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
-            $stats['messagesThisMonth'] = $chatMessageQuery->whereMonth('created_at', now()->month)
+            $stats['messagesToday'] = (clone $chatMessageQuery)->whereDate('created_at', today())->count();
+            $stats['messagesThisMonth'] = (clone $chatMessageQuery)->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)->count();
 
-            $stats['usersWhoSend'] = $chatMessageQuery->distinct('user_id')->count('user_id');
+            $stats['usersWhoSend'] = (clone $chatMessageQuery)->distinct('user_id')->count('user_id');
             $stats['usersWhoNeverSend'] = $stats['usersCount'] - $stats['usersWhoSend'];
 
-            $stats['openConversationsToday'] = $chatMessageQuery->whereDate('created_at', today())
+            $stats['openConversationsToday'] = (clone $chatMessageQuery)->whereDate('created_at', today())
                 ->distinct('chat_room_id')->count('chat_room_id');
 
             $stats['avgConversationDuration'] = ChatMessage::whereHas('user', function ($q) use ($countryID) {
@@ -785,7 +785,7 @@ class HomeController extends  MainController
         $totalGiftsValue = GiftLog::whereHas('sender', fn($q) => $q->where('country_id', $countryID))
             ->when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
-            ->sum(\DB::raw('giftPrice * giftNum'));
+            ->sum(\DB::raw('giftPrice'));
 
         $rate = Common::getCoinsValue('user_coins');
         $totalGiftsUsd = $rate > 0 ? $totalGiftsValue / $rate : 0;
@@ -853,11 +853,16 @@ class HomeController extends  MainController
             ->limit(5)
             ->get();
 
-        $users = $topUsers->map(function ($u) {
-            $user = User::find($u->user_id);
+        $usersMap = User::whereIn('id', $topUsers->pluck('user_id'))
+            ->with('profile')
+            ->get()
+            ->keyBy('id');
+
+        $users = $topUsers->map(function ($u) use ($usersMap) {
+            $user = $usersMap->get($u->user_id);
 
             $defaultImage = asset('images/businessman-icon.jpg');
-            $path = $user->profile?->avatar ?? null;
+            $path = $user?->profile?->avatar ?? null;
             $url = $path ? getImagePath($path) : $defaultImage;
 
             if (!isImageExists($url)) {

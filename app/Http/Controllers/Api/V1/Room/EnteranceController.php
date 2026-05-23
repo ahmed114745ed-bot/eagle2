@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Helpers\Common;
 use App\Models\LiveTime;
 use App\Jobs\ResetCharisma;
+use Illuminate\Support\Facades\Auth;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
 use Illuminate\Http\JsonResponse;
@@ -510,27 +511,30 @@ class EnteranceController extends Controller
         $duration = $request->minutes ?: 5;
         if (!$uid || !$black_id) return Common::apiResponse(0, 'invalid data', null, 422);
         if (!Common::can_kick($black_id)) return Common::apiResponse(0, 'cant kick this user', null, 403);
-        $black_list = @DB::table('rooms')->where('uid', $uid)->first()->room_black;
-        $room_id = @DB::table('rooms')->where('uid', $uid)->first()->id;
-        if ($black_list == null) {
-            $black_list = $black_id . '#' . time() . '#' . ($duration * 60);
-        } else {
-            $list = explode(',', $black_list);
-            $exists = false;
-            foreach ($list as &$item) {
-                $black = explode('#', $item);
-                if ($black[0] == $black_id) {
-                    $item = $black_id . '#' . time() . '#' . ($duration * 60);
-                    $exists = true;
-                }
-            }
-            if (!$exists) {
-                array_push($list, $black_id . '#' . time() . '#' . ($duration * 60));
-            }
 
-            $black_list = implode(',', $list);
+        $room = Room::where('uid', $uid)->first();
+        if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
+
+        $room_id = $room->id;
+
+        // Use new RoomBlacklistRepository with dual-write
+        $blacklistRepo = app(\App\Repositories\RoomBlacklistRepository::class);
+        $durationSeconds = $duration * 60; // Convert minutes to seconds
+
+        // Check if already banned and update, or add new ban
+        if ($blacklistRepo->isBlacklisted($room_id, $black_id)) {
+            // Remove old ban
+            $blacklistRepo->removeBan($room_id, $black_id);
         }
-        $result = DB::table('rooms')->where('uid', $uid)->update(['room_black' => $black_list]);
+
+        // Add new ban with updated duration
+        $result = $blacklistRepo->addBan(
+            $room_id,
+            $black_id,
+            Auth::id(), // banned_by
+            $durationSeconds,
+            'Kicked out for ' . $duration . ' minutes'
+        );
 
         if ($result) {
             //exit the room
@@ -687,7 +691,7 @@ class EnteranceController extends Controller
             //    $this->repo->save ($room);
 
             $room->save();
-            $room = Room::find($room->id);
+            $room = Room::with(['myType', 'backgroundImage', 'background'])->find($room->id);
 
             $request['owner_id'] = $room->uid;
             $is_locked = false;

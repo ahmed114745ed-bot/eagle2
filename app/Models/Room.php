@@ -452,6 +452,23 @@ class Room extends Model
         return $this->hasMany(User::class, 'id', 'room_admin');
     }
 
+    /**
+     * Get administrators from the new normalized table
+     */
+    public function administrators()
+    {
+        return $this->hasMany(\App\Models\RoomAdministrator::class, 'room_id');
+    }
+
+    /**
+     * Get blacklisted users from the new normalized table
+     */
+    public function blacklistedUsers()
+    {
+        return $this->hasMany(\App\Models\RoomBlacklist::class, 'room_id')
+            ->valid();
+    }
+
 
     protected static $microphoneCache = [];
 

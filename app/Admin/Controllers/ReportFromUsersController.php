@@ -47,23 +47,15 @@ class ReportFromUsersController extends AdminController
 
 
         // $grid->column('user_id', __('User id'));
-        $grid->column('user_id', __('User id'))->display(function ($userId) {
-            $user = User::find($userId);
-            if ($user) {
-                return $user->uuid ?? $user->uuid;
-            }
-            return __('User not found');
+        $allUserIds = Report_user::pluck('user_id')->merge(Report_user::pluck('Reporter_id'))->unique()->filter();
+        $usersLookup = User::whereIn('id', $allUserIds)->pluck('uuid', 'id');
+
+        $grid->column('user_id', __('User id'))->display(function ($userId) use ($usersLookup) {
+            return $usersLookup->get($userId) ?? __('User not found');
         });
 
-
-        // $grid->column('Reporter_id', __('Reporter id'));
-
-        $grid->column('Reporter_id', __('Reporter id'))->display(function ($userId) {
-            $user = User::find($userId);
-            if ($user) {
-                return $user->uuid ?? $user->uuid;
-            }
-            return __('User not found');
+        $grid->column('Reporter_id', __('Reporter id'))->display(function ($userId) use ($usersLookup) {
+            return $usersLookup->get($userId) ?? __('User not found');
         });
         $grid->column('image', __('image'))->image('', 200);
 

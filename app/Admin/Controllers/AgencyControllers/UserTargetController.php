@@ -59,7 +59,8 @@ class UserTargetController extends MainController
                     $q->whereHas('user', fn($q) => $q->where('country_id', $countryID))
                         ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
                 }))
-            ->ofAgency()->where('agency_obtain', '>', 0);
+            ->ofAgency()->where('agency_obtain', '>', 0)
+            ->with(['user.profile', 'agency']);
         $grid->id('ID');
         $grid->column('user_id', __('user'))->display(function ($name) {
             $name = @$this->user->name ?? '';
@@ -195,42 +196,31 @@ class UserTargetController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column('withdrawal', __('withdrawal'))->display(function () {
-            $userSalary = UserSallary::query()->where('user_id', $this->user_id)
-                ->where('month', $this->add_month)
+        $salaryLookup = UserSallary::query()
+            ->selectRaw('user_id, target_id, user_agency_id, month, year, cut_amount, sallary - cut_amount AS net_salary')
+            ->get()
+            ->keyBy(fn($s) => "{$s->user_id}_{$s->target_id}_{$s->user_agency_id}_{$s->month}_{$s->year}");
 
-                ->where('year', $this->add_year)
-                ->where('target_id', $this->target_id)
-                ->where('user_agency_id', $this->agency_id)
-                ->value('cut_amount') ?? 0;
-            $userSalary =  truncateAndTrim($userSalary);
+        $grid->column('withdrawal', __('withdrawal'))->display(function () use ($salaryLookup) {
+            $key = "{$this->user_id}_{$this->target_id}_{$this->agency_id}_{$this->add_month}_{$this->add_year}";
+            $userSalary = truncateAndTrim($salaryLookup->get($key)?->cut_amount ?? 0);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
-
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            $image = asset('images/dollar.jpg');
             return "<div style='display: flex; align-items: center; '>
-
                         <span>{$userSalary}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column('net_salary', __('net salary'))->display(function () {
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            $userSalary = UserSallary::query()->where('user_id', $this->user_id)
-                ->where('month', $this->add_month)
-
-                ->where('year', $this->add_year)
-                ->where('target_id', $this->target_id)
-                ->where('user_agency_id', $this->agency_id)
-                ->selectRaw('sallary - cut_amount AS net_salary')
-                ->value('net_salary') ?? 0;
-            $userSalary =  truncateAndTrim($userSalary);
+        $grid->column('net_salary', __('net salary'))->display(function () use ($salaryLookup) {
+            $key = "{$this->user_id}_{$this->target_id}_{$this->agency_id}_{$this->add_month}_{$this->add_year}";
+            $userSalary = truncateAndTrim($salaryLookup->get($key)?->net_salary ?? 0);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
+            $image = asset('images/dollar.jpg');
             return "<div style='display: flex; align-items: center; '>
-
                         <span>{$userSalary}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";

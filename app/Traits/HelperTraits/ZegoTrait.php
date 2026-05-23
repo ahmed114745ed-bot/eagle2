@@ -66,15 +66,28 @@ trait ZegoTrait
     }
     public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
     {
-        
+
         $roomId = $RoomId ?? request()->room_id;
-        $url = 'https://rtc-api.zego.im';
+        // $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
-        $AppId = self::zegoData('zego_app_id');
+        // $AppId = self::zegoData('zego_app_id');
+        $AppId = '';
+        $serverSecret = '';
+        if (config('app.env') == 'production') {
+            $url = 'https://rtc-api.zego.im';
+
+            $AppId = self::zegoData('zego_app_id');
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        } else {
+            $url =  'https://engine.udt-stream.com/api/v1/server';
+            $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        }
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
-        // $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
-        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
@@ -91,7 +104,7 @@ trait ZegoTrait
         ];
         $headers = [];
         try {
-          
+
             $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
 
             if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
@@ -102,7 +115,70 @@ trait ZegoTrait
                     'response' => $response,
                 ]);
             }
-            
+
+            return $response;
+        } catch (\Exception $exception) {
+            Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
+                'action' => $Action,
+                'roomId' => $RoomId,
+                'fromUserId' => $FromUserId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        return null;
+    }
+
+
+    public static function utdStream($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
+    {
+
+        $roomId = $RoomId ?? request()->room_id;
+
+        if (config('app.env') == 'production') {
+            $url = 'https://rtc-api.zego.im';
+
+            $AppId = self::zegoData('zego_app_id');
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        } else {
+            $url =  'https://engine.udt-stream.com/api/v1/server';
+            $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        }
+
+        $SignatureNonce = self::getSignatureNonce();
+        $Timestamp = time();
+        $str = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
+        $signature = md5($str);
+        $SignatureVersion = '2.0';
+        $params = [
+            'Action' => $Action,
+            'RoomId' => $roomId,
+            'FromUserId' => $FromUserId,
+            'MessageContent' => $MessageContent,
+            'AppId' => $AppId,
+            'SignatureNonce' => $SignatureNonce,
+            'Timestamp' => $Timestamp,
+            'Signature' => $signature,
+            'SignatureVersion' => $SignatureVersion,
+            'IsTest' => $IsTest
+        ];
+        $headers = [];
+        try {
+
+            $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
+
+            if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
+                Log::channel('zego')->warning('ZegoTrait::sendToZego failed', [
+                    'action' => $Action,
+                    'roomId' => $roomId,
+                    'fromUserId' => $FromUserId,
+                    'response' => $response,
+                ]);
+            }
+
             return $response;
         } catch (\Exception $exception) {
             Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
@@ -118,13 +194,27 @@ trait ZegoTrait
 
     public static function sendToZego_2($Action, $RoomId, $UserId, $UserName, $MessageContent, $IsTest = 'false')
     {
-        $url = 'https://rtc-api.zego.im';
+        // $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
-        $AppId = self::zegoData('zego_app_id');
+        //$AppId = self::zegoData('zego_app_id');
+        $AppId = '';
+        $serverSecret = '';
+        if (config('app.env') == 'production') {
+            $url = 'https://rtc-api.zego.im';
+
+            $AppId = self::zegoData('zego_app_id');
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        } else {
+            $url =  'https://engine.udt-stream.com/api/v1/server';
+            $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        }
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         //  $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
-        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
@@ -153,7 +243,7 @@ trait ZegoTrait
                     'response' => $response,
                 ]);
             }
-            
+
             return $response;
         } catch (\Exception $exception) {
             Log::channel('zego')->error('ZegoTrait::sendToZego exception', [
@@ -168,14 +258,29 @@ trait ZegoTrait
 
     public static function sendToZego_3($Action, $RoomId, $UserId, $IsTest = 'false')
     {
-        $url = 'https://rtc-api.zego.im';
+        // $url = 'https://rtc-api.zego.im';
 
         // $AppId = self::getConf('zego_app_id');
-        $AppId = self::zegoData('zego_app_id');
+        // $AppId = self::zegoData('zego_app_id');
+
+        $AppId = '';
+        $serverSecret = '';
+        if (config('app.env') == 'production') {
+            $url = 'https://rtc-api.zego.im';
+
+            $AppId = self::zegoData('zego_app_id');
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        } else {
+            $url =  'https://engine.udt-stream.com/api/v1/server';
+            $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        }
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         //  $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
-        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
@@ -191,7 +296,7 @@ trait ZegoTrait
         ];
         $headers = [];
         try {
-           $res = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
+            $res = Http::withHeaders($headers)->acceptJson()->timeout(10)->get($url, $params)->json();
             if ($res === null || (isset($res['Code']) && $res['Code'] != 0)) {
                 Log::channel('zego')->warning('ZegoTrait::sendToZego_3 failed', [
                     'action' => $Action,
@@ -200,7 +305,7 @@ trait ZegoTrait
                     'response' => $res,
                 ]);
             }
-           } catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             Log::channel('zego')->error('ZegoTrait::sendToZego_3 exception', [
                 'action' => $Action,
                 'roomId' => $RoomId,
@@ -214,13 +319,27 @@ trait ZegoTrait
 
     public static function sendToZego_4($Action, $RoomId, $fromUserId, $toUserId, $MessageContent, $IsTest = 'false')
     {
-        $url = 'https://rtc-api.zego.im';
-       // $AppId = self::getConf('zego_app_id');
-        $AppId = self::zegoData('zego_app_id');
+        // $url = 'https://rtc-api.zego.im';
+        // $AppId = self::getConf('zego_app_id');
+        // $AppId = self::zegoData('zego_app_id');
+        $AppId = '';
+        $serverSecret = '';
+        if (config('app.env') == 'production') {
+            $url = 'https://rtc-api.zego.im';
+
+            $AppId = self::zegoData('zego_app_id');
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        } else {
+            $url =  'https://engine.udt-stream.com/api/v1/server';
+            $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+
+            $serverSecret = self::zegoData('zego_server_secret');
+        }
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
-       // $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
-        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        // $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $str              = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
@@ -247,19 +366,18 @@ trait ZegoTrait
                     'toUserId' => $toUserId,
                     'response' => $res,
                 ]);
-                }
-
-            } catch (\Exception $exception) {
-                Log::channel('zego')->error('ZegoTrait::sendToZego_4 exception', [
-                    'action' => $Action,
-                    'roomId' => $RoomId,
-                    'fromUserId' => $fromUserId,
-                    'toUserId' => $toUserId,
-                    'error' => $exception->getMessage(),
-                ]);
             }
+        } catch (\Exception $exception) {
+            Log::channel('zego')->error('ZegoTrait::sendToZego_4 exception', [
+                'action' => $Action,
+                'roomId' => $RoomId,
+                'fromUserId' => $fromUserId,
+                'toUserId' => $toUserId,
+                'error' => $exception->getMessage(),
+            ]);
+        }
 
-        
+
 
         return $res;
     }

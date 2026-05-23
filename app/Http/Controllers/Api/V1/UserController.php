@@ -547,23 +547,11 @@ class UserController extends Controller
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
 
-        $cacheKey = "user_response_{$id}";
-
-        // $response =
-        //     \Cache::remember(
-        //         $cacheKey,
-        //         now()->addMinutes(30),
-        //         function () use ($id) {
-        //             $user = $this->userService->showUser($id);
-        //             return (new UserResource($user))->toArray(request());
-        //         }
-        //     );
-
         $user = $this->userService->showUser($id);
         $response = (new UserResource($user))->toArray($request);
 
         $authUserId = auth()->id();
-        $user = User::with([
+        $user->load([
             'chatRoomsAsUser' => function ($q) use ($authUserId) {
                 $q->where('user_id2', $authUserId)
                     ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
@@ -578,12 +566,11 @@ class UserController extends Controller
                             ->where('status', '<>', 'seen');
                     }]);
             },
-        ])->find($id);
+        ]);
 
         $chatRoom = $user->chatRoomsAsUser->first() ?? $user->chatRoomsAsUser2->first() ?? null;
 
-        $unreadMessagesCount = $chatRoom?->unread_messages ?? 0;
-
+        $unreadMessagesCount = $chatRoom?->unread_messages_count ?? 0;
 
         $response['chat_id'] = $chatRoom->id ?? null;
         $response['unread_messages_count'] = $unreadMessagesCount;
@@ -693,7 +680,12 @@ class UserController extends Controller
         $month  =   \request('month');
         $year  =   \request('year');
 
-        $agency = Agency::query()->with('owner')->where('app_owner_id', $user->id)->withCount('joinRequests')->first();
+        // Use withCount instead of loading full collections (fixes N+1)
+        $agency = Agency::query()
+            ->with(['owner.profile'])
+            ->where('app_owner_id', $user->id)
+            ->withCount(['joinRequests', 'mempers'])
+            ->first();
         if (!$agency) return Common::apiResponse(0, __("api_responses.u_not_owner_agncy"), []);
         $total_host_target = UserSallary::where('user_agency_id', $agency->id);
 
@@ -709,10 +701,10 @@ class UserController extends Controller
             'name'              => $agency->name,
             'image'             => $agency->img,
             'pio'               => $agency->contents,
-            'num_of_hosts'      => $agency->mempers->count(),
+            'num_of_hosts'      => $agency->mempers_count,
             'total_salary'      => $total_host_target,
             'agency_target'     => $agency->getSalary($month, $year),
-            'number_request'              => $agency->joinRequests->count(),
+            'number_request'              => $agency->join_requests_count,
             'owner' => $owner
         ];
         return Common::apiResponse(1, '', $data);
@@ -1480,9 +1472,9 @@ class UserController extends Controller
     {
         $ops = [0 => 'no agency'];
         $app_owner_id = Agency::query()->where('status', 1)->pluck('app_owner_id');
-        $users = User::whereIn('id', $app_owner_id)->get();
-        foreach ($users as $user) {
-            $ops[$user->id] = $user->name;
+        $users = User::whereIn('id', $app_owner_id)->pluck('name', 'id');
+        foreach ($users as $id => $name) {
+            $ops[$id] = $name;
         }
         return $ops;
     }

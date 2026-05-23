@@ -465,7 +465,6 @@ class UserController extends MainController
      */
     protected function grid()
     {
-        // $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $countryID = null;
         if (!empty((array)session('filter_country_id')) || session('filter_country_id'))  $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $grid = new Grid(new User());
@@ -506,15 +505,10 @@ class UserController extends MainController
             });
         }
 
-        $grid->column('name', __('Name'))
-            ->display(function ($name) {
-
-                $user = $this;
-                if (! $user) {
-                    return __('No User');
-                }
-                return app(UserService::class)->adminUserAvatar($user);
-            });
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('agency_id', __('Agency'))
             ->display(function () {

@@ -9,6 +9,8 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
+use Encore\Admin\Facades\Admin;
 use App\Admin\Controllers\MainController;
 
 class ReportUserController extends MainController
@@ -79,11 +81,29 @@ class ReportUserController extends MainController
         $grid = new Grid(new User());
         $countryID = session('filter_country_id');
 
-        $grid->model()->with([
-            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            'profile',
+        $year = request('year');
+        $month = request('month');
 
-        ])->when($countryID, fn($q) => $q->where('country_id', $countryID));
+        $grid->model()->with([
+                'profile',
+                'agency',
+                'country',
+                'userSetting',
+                'senderLevel',
+                'receiverLevel',
+                'monthlyDiamondReceive',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
+            ->when($year && $month, function ($q) use ($year, $month) {
+                $q->withCount([
+                    'reals as reals_count' => fn($q) => $q->whereMonth('created_at', $month)->whereYear('created_at', $year),
+                    'moments as moments_count' => fn($q) => $q->whereMonth('created_at', $month)->whereYear('created_at', $year),
+                ])->withSum(['liveTime as live_hours' => fn($q) => $q->whereMonth('created_at', $month)->whereYear('created_at', $year)], 'hours');
+            }, function ($q) {
+                $q->withCount(['reals', 'moments'])
+                  ->withSum('liveTime', 'hours');
+            })
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID));
 
         $grid->disableRowSelector();
         $grid->filter(function (Grid\Filter $filter) {
@@ -110,35 +130,13 @@ class ReportUserController extends MainController
         if (request('agency_id')) {
 
             $grid->column('id', __('Id'));
-            $grid->column('name', __('user'))->display(function ($name) {
-                $name = @$this->name ?? '';
-                $uid = @$this->uuid ?? '';
+            $grid->column('name', __('user'))->display(function () {
                 if (request()->filled('_export_')) {
-                    return "{$name} (UUID: {$uid})";
+                    return ($this->name ?? '') . " (UUID: " . ($this->uuid ?? '') . ")";
                 }
-                $path = @$this?->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl =  ($this) ? url("admin/users/{$this->id}") : 0;
-                return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
-            });;
+                return app(UserService::class)->adminUserCard($this);
+            });
+            Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
             $grid->column('total_days', __('total_days'))->display(function () {
                 $image = asset('images/day.jpg');
@@ -162,21 +160,21 @@ class ReportUserController extends MainController
                 return "<span style='color:green; font-weight: bold;'>{$days}</span>";
             });
             $grid->column(__('reals_count'))->display(function () {
-                $count = request()->year == null && request()->month == null ? $this->reals()->count() : $this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+                $count = $this->reals_count ?? 0;
                 if (request()->filled('_export_')) {
                     return $count;
                 }
                 return "<span style='color:orange; font-weight: bold;'>{$count}</span>";
             });
             $grid->column(__('moment_count'))->display(function () {
-                $count = request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+                $count = $this->moments_count ?? 0;
                 if (request()->filled('_export_')) {
                     return $count;
                 }
                 return "<span style='color:yellow; font-weight: bold;'>{$count}</span>";
             });
             $grid->column(__('total_hours'))->display(function () {
-                $count =  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
+                $count = $this->live_hours ?? 0;
                 if (request()->filled('_export_')) {
                     return $count;
                 }

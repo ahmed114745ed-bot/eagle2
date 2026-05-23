@@ -88,7 +88,7 @@ class ChatMessageResource extends JsonResource
     public function toArray(Request $request)
     {
         // Get timezone from request header with validation
-        $timeZone = 'UTC';
+        $timeZone = getTimezone(); // Use system timezone as default instead of UTC
         if ($request->hasHeader('tz')) {
             $requestedTimezone = $request->header()['tz'][0];
             // Validate timezone

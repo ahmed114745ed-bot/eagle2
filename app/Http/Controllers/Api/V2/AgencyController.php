@@ -264,6 +264,13 @@ class AgencyController extends Controller
 
         try {
             $agency = $this->agencyService->update($userId, $id, $request);
+
+            // Clear agency cache after update
+            $year = \Carbon\Carbon::now()->year;
+            $month = \Carbon\Carbon::now()->month;
+            Cache::forget("agency_details_{$id}_{$year}_{$month}");
+            Cache::forget("agency_history_{$id}_{$year}_{$month}");
+            Cache::forget("agency_target_{$id}_{$year}_{$month}");
         } catch (\Exception $e) {
 
             return Common::apiResponse(0, $e->getMessage(), null, 500);
@@ -312,10 +319,10 @@ class AgencyController extends Controller
         $list_req = AgencyJoinRequest::where('agency_id', $agency_id)->whereHas('user')->orderByDesc('id');
 
         if ($type == "application") {
-            $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10);
+            $list_req1 = $list_req->where('status', 0)->with(['user.profile', 'user.country'])->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
         } elseif ($type == "record") {
-            $list_req1 = $list_req->where('status', '!=', 0)->with('user', 'admin')->paginate(10);
+            $list_req1 = $list_req->where('status', '!=', 0)->with(['user.profile', 'user.country', 'admin'])->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'record');
         }
 
