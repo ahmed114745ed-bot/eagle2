@@ -25,7 +25,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        /*
         // ==========================================
         // Step 1: Validate Data BEFORE Conversion
         // ==========================================
@@ -62,7 +61,7 @@ return new class extends Migration
                 $table->string('nickname', 100)->nullable()->change();
             }
             if (Schema::hasColumn('users', 'name')) {
-                $table->string('name', 180)->nullable()->change(); // Increased from 100 to 180 to accommodate existing data (max: 163)
+                $table->string('name', 200)->nullable()->change(); // Increased to 200 to accommodate existing data (max: 163)
             }
             if (Schema::hasColumn('users', 'email')) {
                 $table->string('email', 150)->nullable()->change();
@@ -91,7 +90,7 @@ return new class extends Migration
 
         Schema::table('rooms', function (Blueprint $table) {
             $table->string('numid', 50)->comment('غرفة')->change();
-            $table->string('room_name', 350)->comment('اسم الغرفة')->change(); // Increased from 150 to 350 to accommodate existing data (max: 324)
+            $table->string('room_name', 500)->comment('اسم الغرفة')->change(); // Increased to 500 to accommodate existing data (max: 324)
             $table->string('room_intro', 500)->default('مرحبا بكم في غرفتي')->comment('إعلان الغرفة')->nullable()->change();
             $table->string('room_pass', 50)->comment('كلمة المرور الغرفة')->nullable()->change();
             $table->string('room_welcome', 500)->default('مرحبا بكم في غرفتي ~ أتمنى أن تستمتع ~')->comment('تحية الغرفة')->nullable()->change();
@@ -119,7 +118,6 @@ return new class extends Migration
         });
 
         $this->info('✅ VARCHAR length optimization completed successfully!');
-        */
     }
 
     /**
@@ -127,7 +125,6 @@ return new class extends Migration
      */
     private function validateLengths(): array
     {
-        /*
         $violations = [];
         $safe = true;
 
@@ -140,10 +137,10 @@ return new class extends Migration
             $safe = false;
         }
 
-        // Check users.name (180 limit)
+        // Check users.name (200 limit)
         $maxName = DB::selectOne("SELECT MAX(LENGTH(name)) as max FROM users WHERE name IS NOT NULL")->max ?? 0;
-        if ($maxName > 180) {
-            $violations[] = "users.name max length={$maxName} exceeds proposed limit of 180";
+        if ($maxName > 200) {
+            $violations[] = "users.name max length={$maxName} exceeds proposed limit of 200";
             $safe = false;
         }
 
@@ -158,10 +155,10 @@ return new class extends Migration
 
         $this->info('  Checking rooms table...');
 
-        // Check rooms.room_name (350 limit)
+        // Check rooms.room_name (500 limit)
         $maxRoomName = DB::selectOne("SELECT MAX(LENGTH(room_name)) as max FROM rooms WHERE room_name IS NOT NULL")->max ?? 0;
-        if ($maxRoomName > 350) {
-            $violations[] = "rooms.room_name max length={$maxRoomName} exceeds proposed limit of 350";
+        if ($maxRoomName > 500) {
+            $violations[] = "rooms.room_name max length={$maxRoomName} exceeds proposed limit of 500";
             $safe = false;
         }
 
@@ -207,7 +204,7 @@ return new class extends Migration
         return [
             'safe' => $safe,
             'violations' => $violations
-        ];*/
+        ];
     }
 
     /**

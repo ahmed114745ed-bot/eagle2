@@ -39,7 +39,8 @@ class Handler extends ExceptionHandler
 
         if ($request->is('api/*')) {
             if ($e instanceof CValidationException) {
-                return Common::apiResponse(0, $e->getMessage(), null, 422);
+                $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 422;
+                return Common::apiResponse(0, $e->getMessage(), null, $statusCode);
             }elseif ($e instanceof AuthenticationException) {
 
                 return Common::apiResponse (false,'Unauthenticated',[],401);
