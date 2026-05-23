@@ -1512,4 +1512,99 @@ class UserController extends MainController
             ], 500);
         }
     }
+
+    /**
+     * Preview devices with duplicate accounts (PREVIEW ONLY - NO DELETION)
+     * Shows what would be deleted without actually deleting
+     */
+    public function cleanupDuplicateDevicesPreview()
+    {
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // Get all device tokens that have more than allowed accounts
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $previewData = [];
+            $totalToDelete = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // Get ALL users for this device
+                $users = User::where('device_token', $deviceToken)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $deleteCount = $userCount - $register_account;
+                $usersToDelete = $users->take($deleteCount);
+                $usersToKeep = $users->skip($deleteCount);
+
+                $previewData[] = [
+                    'device_token' => $deviceToken,
+                    'total_accounts' => $userCount,
+                    'allowed_accounts' => $register_account,
+                    'to_delete_count' => $deleteCount,
+                    'users_to_delete' => $usersToDelete->map(function($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'phone' => $user->phone,
+                            'email' => $user->email,
+                            'uuid' => $user->uuid,
+                            'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                            'is_logout' => $user->is_logout,
+                            'status' => $user->status,
+                        ];
+                    })->toArray(),
+                    'users_to_keep' => $usersToKeep->map(function($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'phone' => $user->phone,
+                            'email' => $user->email,
+                            'uuid' => $user->uuid,
+                            'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                        ];
+                    })->toArray(),
+                ];
+
+                $totalToDelete += $deleteCount;
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Preview generated successfully (NO DELETION PERFORMED)',
+                'data' => [
+                    'total_devices_affected' => count($previewData),
+                    'total_users_to_delete' => $totalToDelete,
+                    'allowed_accounts_per_device' => $register_account,
+                    'devices' => $previewData,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error during preview: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Execute cleanup of duplicate device accounts (ACTUAL DELETION)
+     * This performs the actual deletion after reviewing the preview
+     */
+    public function cleanupDuplicateDevicesRun()
+    {
+        // Just call the existing cleanup function
+        return $this->cleanupDuplicateDevices();
+    }
 }
