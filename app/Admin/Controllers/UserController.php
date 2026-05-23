@@ -1392,21 +1392,23 @@ class UserController extends MainController
     }
 
     /**
-     * Clean up devices with more than 3 accounts
-     * Deletes newest accounts until only 3 remain per device
+     * Clean up devices with more than allowed accounts
+     * Deletes newest accounts until only allowed number remain per device
+     *
+     * STRICT POLICY: Counts ALL accounts (even logged out ones) to match login restrictions
      */
     public function cleanupDuplicateDevices()
     {
         DB::beginTransaction();
 
         try {
-            $register_account = (int)(Common::getSettingValue('register_account') ?? 2);
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
-            // Get all device tokens that have more than allowed accounts (active users only)
+            // STRICT POLICY: Get all device tokens that have more than allowed accounts (ALL users, not just active)
+            // This matches the strict login policy where we count all accounts
             $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
                 ->whereNotNull('device_token')
                 ->where('device_token', '!=', '')
-                ->where('is_logout', 0)
                 ->groupBy('device_token')
                 ->having('user_count', '>', $register_account)
                 ->get();
@@ -1421,9 +1423,8 @@ class UserController extends MainController
                 $deviceToken = $deviceData->device_token;
                 $userCount = $deviceData->user_count;
 
-                // Get all users for this device (active only), ordered by created_at DESC (newest first)
+                // STRICT POLICY: Get ALL users for this device (including logged out), ordered by created_at DESC (newest first)
                 $users = User::where('device_token', $deviceToken)
-                    ->where('is_logout', 0)
                     ->orderByDesc('created_at')
                     ->get();
 
