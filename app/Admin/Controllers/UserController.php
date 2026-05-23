@@ -1400,7 +1400,7 @@ class UserController extends MainController
         DB::beginTransaction();
 
         try {
-            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 2);
 
             // Get all device tokens that have more than allowed accounts (active users only)
             $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
