@@ -1473,7 +1473,9 @@ class UserController extends MainController
                         'name' => $user->name,
                         'uuid' => $user->uuid,
                         'device_token' => $deviceToken,
-                        'created_at' => $user->created_at,
+                        'created_at' => $user->created_at instanceof \Carbon\Carbon
+                            ? $user->created_at->format('Y-m-d H:i:s')
+                            : $user->created_at,
                     ];
 
                     $totalDeleted++;
@@ -1567,7 +1569,9 @@ class UserController extends MainController
                             'phone' => $user->phone,
                             'email' => $user->email,
                             'uuid' => $user->uuid,
-                            'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
                             'is_logout' => $user->is_logout,
                             'status' => $user->status,
                         ];
@@ -1579,7 +1583,9 @@ class UserController extends MainController
                             'phone' => $user->phone,
                             'email' => $user->email,
                             'uuid' => $user->uuid,
-                            'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
                         ];
                     })->toArray(),
                 ];
