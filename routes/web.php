@@ -438,9 +438,9 @@ Route::group(
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
 
-        // Cleanup Duplicate Devices - Preview & Run
-        Route::get("cleanup-duplicate-devices/preview", [UserController::class, "cleanupDuplicateDevicesPreview"])->name('cleanup.duplicate.devices.preview');
-        Route::post("cleanup-duplicate-devices/run", [UserController::class, "cleanupDuplicateDevicesRun"])->name('cleanup.duplicate.devices.run');
+        // Cleanup Duplicate Devices
+        Route::get("cleanup-duplicate-devices/preview", [UserController::class, "cleanupDuplicateDevicesPreviewPage"])->name('cleanup.duplicate.devices.preview');
+        Route::get("cleanup-duplicate-devices/run", [UserController::class, "cleanupDuplicateDevicesRunPage"])->name('cleanup.duplicate.devices.run');
 
         Route::post("enable-room-boom", [PercentageBoomController::class, "enableRoomBoom"]);
         Route::post("transfer-salary-reliable-shipping-agency", [AppearChargerAgencyController::class, "transferSalary"]);

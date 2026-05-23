@@ -396,6 +396,15 @@ class UserController extends MainController
         $grid->disableExport();
         $grid->disableRowSelector();
 
+        // Add Cleanup Duplicate Devices button
+        $grid->tools(function ($tools) {
+            $tools->append('
+                <a href="/admin/cleanup-duplicate-devices/preview" class="btn btn-warning btn-sm" style="margin-left:5px;">
+                    <i class="fa fa-trash"></i> تنظيف الحسابات المكررة
+                </a>
+            ');
+        });
+
         return $grid;
     }
 
@@ -1465,7 +1474,9 @@ class UserController extends MainController
                         'name' => $user->name,
                         'uuid' => $user->uuid,
                         'device_token' => $deviceToken,
-                        'created_at' => $user->created_at,
+                        'created_at' => $user->created_at instanceof \Carbon\Carbon
+                            ? $user->created_at->format('Y-m-d H:i:s')
+                            : $user->created_at,
                     ];
 
                     $totalDeleted++;
@@ -1518,6 +1529,64 @@ class UserController extends MainController
      * Preview devices with duplicate accounts (PREVIEW ONLY - NO DELETION)
      * Shows what would be deleted without actually deleting
      */
+    public function cleanupDuplicateDevicesPreviewPage(Content $content)
+    {
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // Get all device tokens that have more than allowed accounts
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $previewData = [];
+            $totalToDelete = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // Get ALL users for this device
+                $users = User::where('device_token', $deviceToken)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $deleteCount = $userCount - $register_account;
+                $usersToDelete = $users->take($deleteCount);
+                $usersToKeep = $users->skip($deleteCount);
+
+                $previewData[] = [
+                    'device_token' => $deviceToken,
+                    'total_accounts' => $userCount,
+                    'allowed_accounts' => $register_account,
+                    'to_delete_count' => $deleteCount,
+                    'users_to_delete' => $usersToDelete,
+                    'users_to_keep' => $usersToKeep,
+                ];
+
+                $totalToDelete += $deleteCount;
+            }
+
+            return $content
+                ->title('معاينة الحسابات المكررة')
+                ->description('عرض الحسابات التي سيتم حذفها')
+                ->body(view('admin.cleanup_duplicate_devices_preview', [
+                    'devices' => $previewData,
+                    'total_devices' => count($previewData),
+                    'total_to_delete' => $totalToDelete,
+                    'allowed_accounts' => $register_account,
+                ]));
+
+        } catch (\Exception $e) {
+            return $content
+                ->title('خطأ')
+                ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$e->getMessage()}</div>");
+        }
+    }
+
     public function cleanupDuplicateDevicesPreview()
     {
         try {
@@ -1559,7 +1628,9 @@ class UserController extends MainController
                             'phone' => $user->phone,
                             'email' => $user->email,
                             'uuid' => $user->uuid,
-                            'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
                             'is_logout' => $user->is_logout,
                             'status' => $user->status,
                         ];
@@ -1571,7 +1642,9 @@ class UserController extends MainController
                             'phone' => $user->phone,
                             'email' => $user->email,
                             'uuid' => $user->uuid,
-                            'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
                         ];
                     })->toArray(),
                 ];
@@ -1603,9 +1676,43 @@ class UserController extends MainController
      * Execute cleanup of duplicate device accounts (ACTUAL DELETION)
      * This performs the actual deletion after reviewing the preview
      */
+    public function cleanupDuplicateDevicesRunPage(Content $content)
+    {
+        try {
+            $result = $this->cleanupDuplicateDevices();
+            $data = $result->getData();
+
+            if ($data->status) {
+                return $content
+                    ->title('تم الحذف بنجاح')
+                    ->description('نتائج عملية الحذف')
+                    ->body(view('admin.cleanup_duplicate_devices_run', [
+                        'devices_processed' => $data->data->devices_processed,
+                        'total_users_deleted' => $data->data->total_users_deleted,
+                        'total_user_accounts_deleted' => $data->data->total_user_accounts_deleted,
+                        'total_tokens_deleted' => $data->data->total_tokens_deleted,
+                        'deleted_users' => $data->data->deleted_users,
+                    ]));
+            } else {
+                return $content
+                    ->title('خطأ')
+                    ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$data->message}</div>");
+            }
+
+        } catch (\Exception $e) {
+            return $content
+                ->title('خطأ')
+                ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$e->getMessage()}</div>");
+        }
+    }
+
     public function cleanupDuplicateDevicesRun()
     {
         // Just call the existing cleanup function
         return $this->cleanupDuplicateDevices();
     }
+
+    /**
+     * Display the cleanup duplicate devices page
+     */
 }
