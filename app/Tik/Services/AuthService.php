@@ -800,8 +800,8 @@ class AuthService
     {
         $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
-        // Check actual users count in users table (includes both Registration and Login)
-        // Only count active users (is_logout = 0) to avoid counting logged out users
+        // STRICT POLICY: Count ALL accounts registered on this device (even logged out ones)
+        // This prevents users from bypassing the limit by logging out and registering new accounts
         $actualUsersCount = User::where('device_token', $deviceToken)
             ->where('device_token', '!=', '')
             ->whereNotNull('device_token')
@@ -809,10 +809,11 @@ class AuthService
             ->count();
 
         if ($actualUsersCount >= $register_account) {
-            \Log::warning('Device account limit exceeded - actual users check', [
+            \Log::warning('Device account limit exceeded - registration blocked (STRICT)', [
                 'device_token' => $deviceToken,
-                'actual_users_count' => $actualUsersCount,
-                'limit' => $register_account
+                'total_accounts_count' => $actualUsersCount,
+                'limit' => $register_account,
+                'policy' => 'strict - all accounts counted'
             ]);
             throw new CValidationException(__('max_accounts_reached'));
         }
@@ -831,6 +832,9 @@ class AuthService
      * Check if device has reached the maximum allowed accounts limit
      * Used during login to prevent users from logging in with too many accounts on same device
      *
+     * STRICT POLICY: Counts ALL accounts registered on this device (even logged out ones)
+     * This prevents users from bypassing the limit by creating many accounts
+     *
      * @param int $userId - The user trying to login
      * @param string $deviceToken - The device token
      * @throws CValidationException if limit exceeded
@@ -839,8 +843,8 @@ class AuthService
     {
         $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
-        // Count how many different users are using this device token (excluding current user)
-        // Only count active users (is_logout = 0) to avoid counting logged out users
+        // STRICT POLICY: Count ALL accounts on this device (excluding current user)
+        // Even logged out accounts are counted to prevent abuse
         $otherUsersCount = User::where('device_token', $deviceToken)
             ->where('device_token', '!=', '')
             ->whereNotNull('device_token')
@@ -849,11 +853,12 @@ class AuthService
             ->count();
 
         if ($otherUsersCount >= $register_account) {
-            \Log::warning('Device account limit exceeded on login', [
+            \Log::warning('Device account limit exceeded on login (STRICT)', [
                 'device_token' => $deviceToken,
                 'user_id' => $userId,
-                'other_users_count' => $otherUsersCount,
-                'limit' => $register_account
+                'other_users_total_count' => $otherUsersCount,
+                'limit' => $register_account,
+                'policy' => 'strict - all accounts counted'
             ]);
             throw new CValidationException(__('max_accounts_reached'));
         }
