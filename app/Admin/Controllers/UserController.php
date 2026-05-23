@@ -123,7 +123,8 @@ class UserController extends MainController
         // Add the second row unconditionally
         $content = $content->row(function ($row) {
             $row->column(12, $this->grid());
-        })->row(view('admin.same_device_users_modal'));
+        })->row(view('admin.same_device_users_modal'))
+          ->row(view('admin.cleanup_duplicate_devices_modal'));
 
         return $content;
     }
@@ -395,6 +396,15 @@ class UserController extends MainController
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableRowSelector();
+
+        // Add Cleanup Duplicate Devices button
+        $grid->tools(function ($tools) {
+            $tools->append('
+                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#cleanupDevicesModal" style="margin-left:5px;">
+                    <i class="fa fa-trash"></i> تنظيف الحسابات المكررة
+                </button>
+            ');
+        });
 
         return $grid;
     }
