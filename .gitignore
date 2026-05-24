@@ -9,6 +9,7 @@
 .github
 .phpunit.result.cache
 *.log
+*.md
 docker-compose.override.yml
 Homestead.json
 Homestead.yaml
