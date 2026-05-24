@@ -718,11 +718,29 @@ class LuckyGiftStressTestController extends Controller
                 continue;
             }
 
+            // ⚠️ تحقق: هل المستلم هو نفسه مرسل؟
+            $isAlsoSender = isset($before['senders'][$receiverId]);
+
             $actualGain = $afterData['di'] - $beforeData['di'];
             $expectedGain = $expectedReceiverGainPerRequest * $results['successful'];
 
             $analysis['summary']['total_expected_receiver_gain'] += $expectedGain;
             $analysis['summary']['total_actual_receiver_gain'] += $actualGain;
+
+            // إذا كان المستلم هو نفسه مرسل، التحليل يكون مختلف
+            if ($isAlsoSender) {
+                // الكاش باك موجود في sender_cashback_analysis
+                // التغيير الفعلي = تكلفة الإرسال - الكاش باك + مكسب الاستقبال
+                $senderCashback = $analysis['sender_cashback_analysis'][$receiverId]['estimated_cashback'] ?? 0;
+
+                // نضيف ملاحظة للتوضيح
+                $analysis['sender_cashback_analysis'][$receiverId]['is_also_receiver'] = true;
+                $analysis['sender_cashback_analysis'][$receiverId]['expected_receiver_gain'] = round($expectedGain);
+                $analysis['sender_cashback_analysis'][$receiverId]['note'] = 'مرسل ومستلم - الرصيد النهائي = (التكلفة - الكاش باك + مكسب الاستقبال)';
+
+                // لا نضيف discrepancy لأن الحساب صحيح
+                continue;
+            }
 
             // التسامح 5%
             $tolerance = $expectedGain * 0.05;

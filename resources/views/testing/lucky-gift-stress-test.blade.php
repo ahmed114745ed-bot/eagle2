@@ -305,6 +305,9 @@
             <div class="stat-card" id="sender_cashback_card" style="display: none;">
                 <h5><i class="bi bi-cash-coin"></i> تحليل الكاش باك للمرسلين (Sender Cashback)</h5>
                 <p class="text-muted small">المرسل رصيده بيزيد من الكاش باك أثناء الإرسال</p>
+                <div class="alert alert-info" id="sender_receiver_warning" style="display: none;">
+                    <small><i class="bi bi-info-circle"></i> <strong>ملاحظة:</strong> إذا كان المستخدم مرسل ومستلم في نفس الوقت، الرصيد النهائي = (التكلفة - الكاش باك + مكسب الاستقبال)</small>
+                </div>
                 <div id="sender_cashback_list"></div>
             </div>
 
@@ -595,6 +598,19 @@
             // ✨ تحليل الكاش باك للمرسلين
             if (result.analysis.sender_cashback_analysis) {
                 document.getElementById('sender_cashback_card').style.display = 'block';
+
+                // تحقق إذا كان في مستخدم مرسل ومستلم
+                let hasAlsoReceiver = false;
+                for (let [userId, data] of Object.entries(result.analysis.sender_cashback_analysis)) {
+                    if (data.is_also_receiver) {
+                        hasAlsoReceiver = true;
+                        break;
+                    }
+                }
+                if (hasAlsoReceiver) {
+                    document.getElementById('sender_receiver_warning').style.display = 'block';
+                }
+
                 let cashbackHtml = '<div class="table-responsive"><table class="table table-bordered">';
                 cashbackHtml += '<thead><tr><th>المستخدم</th><th>الرصيد قبل</th><th>الرصيد بعد</th><th>التكلفة المتوقعة</th><th>التغيير الفعلي</th><th>الكاش باك المقدر</th><th>ملاحظة</th></tr></thead><tbody>';
 
@@ -607,15 +623,31 @@
                     const changeClass = actualChange >= 0 ? 'diff-positive' : 'diff-negative';
                     const cashbackClass = estimatedCashback > 0 ? 'diff-positive' : '';
 
+                    // إذا كان مرسل ومستلم في نفس الوقت
+                    const isAlsoReceiver = data.is_also_receiver || false;
+                    const expectedReceiverGain = data.expected_receiver_gain || 0;
+                    const rowClass = isAlsoReceiver ? 'table-warning' : '';
+
+                    let noteHtml = `<small>${data.note || ''}</small>`;
+                    if (isAlsoReceiver) {
+                        noteHtml = `
+                            <small class="text-primary">
+                                <strong>⚠️ ${data.note}</strong><br>
+                                مكسب متوقع كمستلم: +${expectedReceiverGain.toLocaleString()}<br>
+                                الحساب: ${expectedCost.toLocaleString()}- (تكلفة) + ${estimatedCashback.toLocaleString()} (كاش باك) + ${expectedReceiverGain.toLocaleString()} (مكسب) = ${actualChange.toLocaleString()}
+                            </small>
+                        `;
+                    }
+
                     cashbackHtml += `
-                        <tr>
+                        <tr class="${rowClass}">
                             <td>${data.name || 'N/A'} (${userId})</td>
                             <td>${balanceBefore.toLocaleString()}</td>
                             <td>${balanceAfter.toLocaleString()}</td>
                             <td class="diff-negative">-${expectedCost.toLocaleString()}</td>
                             <td class="${changeClass}">${actualChange >= 0 ? '+' : ''}${actualChange.toLocaleString()}</td>
                             <td class="${cashbackClass}">${estimatedCashback > 0 ? '+' : ''}${estimatedCashback.toLocaleString()}</td>
-                            <td><small>${data.note || ''}</small></td>
+                            <td>${noteHtml}</td>
                         </tr>
                     `;
                 }

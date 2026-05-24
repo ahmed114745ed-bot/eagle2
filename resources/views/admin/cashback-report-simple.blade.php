@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>تقرير الكاش باك المفقود</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -273,6 +274,7 @@
                             <th style="background: #fff3cd;">حقه (الضايع)</th>
                             <th>نسبة الفقد</th>
                             <th>الفترة</th>
+                            <th>إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -283,7 +285,7 @@
                                   user.loss_percentage > 25 ? 'badge-warning' : 'badge-success';
 
                 html += `
-                    <tr>
+                    <tr id="row-${user.user_id}">
                         <td><strong>${user.user_id}</strong></td>
                         <td>${user.total_cashback_operations.toLocaleString('ar-EG')}</td>
                         <td>${user.times_missing.toLocaleString('ar-EG')}</td>
@@ -291,6 +293,12 @@
                         <td style="background: #fff3cd;"><strong style="color: #d63384;">${user.his_right.toLocaleString('ar-EG')}</strong></td>
                         <td><span class="badge ${lossClass}">${user.loss_percentage}%</span></td>
                         <td style="font-size: 11px;">${formatDateRange(user.first_cashback_at, user.last_cashback_at)}</td>
+                        <td>
+                            <button class="btn-success" style="font-size: 12px; padding: 8px 16px;"
+                                    onclick="compensateUser(${user.user_id}, ${user.his_right})">
+                                💰 تعويض
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
@@ -328,6 +336,85 @@
                 location.reload();
             } catch (error) {
                 alert('فشل: ' + error.message);
+            }
+        }
+
+        async function compensateUser(userId, amount) {
+            // تأكيد من المستخدم
+            const confirmed = confirm(
+                `هل تريد تعويض المستخدم ${userId}؟\n` +
+                `المبلغ: ${amount.toLocaleString('ar-EG')} دايموند\n\n` +
+                `⚠️ هذا الإجراء لا يمكن التراجع عنه!`
+            );
+
+            if (!confirmed) return;
+
+            // عرض loading
+            const row = document.getElementById(`row-${userId}`);
+            const btn = row.querySelector('button');
+            const originalBtnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ جاري التعويض...';
+
+            try {
+                const response = await fetch('/api/admin/cashback-compensation/user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        amount: amount,
+                        reason: 'تعويض كاش باك مفقود - من صفحة التقرير'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // نجح التعويض
+                    alert(
+                        `✅ تم التعويض بنجاح!\n\n` +
+                        `المستخدم: ${userId}\n` +
+                        `المبلغ: ${amount.toLocaleString('ar-EG')}\n` +
+                        `الرصيد قبل: ${data.data.balance_before.toLocaleString('ar-EG')}\n` +
+                        `الرصيد بعد: ${data.data.balance_after.toLocaleString('ar-EG')}`
+                    );
+
+                    // إخفاء السطر من الجدول
+                    row.style.transition = 'opacity 0.5s';
+                    row.style.opacity = '0';
+                    setTimeout(() => {
+                        row.remove();
+
+                        // إذا الجدول فاضي، إعادة تحميل الصفحة
+                        const remainingRows = document.querySelectorAll('tbody tr').length;
+                        if (remainingRows === 0) {
+                            alert('تم تعويض كل المستخدمين في هذه الصفحة ✅');
+                            loadPage(currentPage);
+                        }
+                    }, 500);
+
+                    // تحديث الـ Summary
+                    if (summary) {
+                        summary.total_affected_users--;
+                        summary.total_missing_cashback -= amount;
+                        renderSummary(summary);
+                    }
+
+                } else {
+                    // فشل التعويض
+                    alert('❌ فشل التعويض: ' + (data.message || 'خطأ غير معروف'));
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnText;
+                }
+
+            } catch (error) {
+                alert('❌ خطأ في الاتصال: ' + error.message);
+                btn.disabled = false;
+                btn.innerHTML = originalBtnText;
             }
         }
 
