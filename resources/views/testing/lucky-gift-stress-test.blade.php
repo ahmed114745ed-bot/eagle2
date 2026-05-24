@@ -555,16 +555,24 @@
                 discrepanciesHtml += '<thead><tr><th>النوع</th><th>المستخدم</th><th>قبل</th><th>بعد</th><th>المتوقع</th><th>الفعلي</th><th>الفرق</th></tr></thead><tbody>';
 
                 result.analysis.discrepancies.forEach(disc => {
-                    const diffClass = disc.difference > 0 ? 'diff-positive' : 'diff-negative';
+                    const before = disc.before || 0;
+                    const after = disc.after || 0;
+                    const expected = disc.expected_deduction || disc.expected_gain || disc.expected || 0;
+                    const actual = disc.actual_deduction || disc.actual_gain || disc.actual || 0;
+                    const difference = disc.difference || 0;
+                    const diffClass = difference > 0 ? 'diff-positive' : 'diff-negative';
+                    const userName = disc.name || disc.message || 'N/A';
+                    const userId = disc.user_id || '-';
+
                     discrepanciesHtml += `
                         <tr>
-                            <td>${disc.type}</td>
-                            <td>${disc.name} (${disc.user_id})</td>
-                            <td>${disc.before.toLocaleString()}</td>
-                            <td>${disc.after.toLocaleString()}</td>
-                            <td>${(disc.expected_deduction || disc.expected_gain || 0).toLocaleString()}</td>
-                            <td>${(disc.actual_deduction || disc.actual_gain || 0).toLocaleString()}</td>
-                            <td class="${diffClass}">${disc.difference.toLocaleString()}</td>
+                            <td>${disc.type || 'N/A'}</td>
+                            <td>${userName} (${userId})</td>
+                            <td>${before.toLocaleString()}</td>
+                            <td>${after.toLocaleString()}</td>
+                            <td>${expected.toLocaleString()}</td>
+                            <td>${actual.toLocaleString()}</td>
+                            <td class="${diffClass}">${difference.toLocaleString()}</td>
                         </tr>
                     `;
                 });
@@ -678,15 +686,17 @@
             html += '<tbody><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الفرق</th></tr>';
 
             for (let [userId, beforeData] of Object.entries(result.before_balances.senders)) {
-                const afterData = result.after_balances.senders[userId];
-                const diff = afterData.di - beforeData.di;
+                const afterData = result.after_balances.senders[userId] || {};
+                const beforeDi = beforeData.di || 0;
+                const afterDi = afterData.di || 0;
+                const diff = afterDi - beforeDi;
                 const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
 
                 html += `
                     <tr>
-                        <td>${beforeData.name} (${userId})</td>
-                        <td>${beforeData.di.toLocaleString()}</td>
-                        <td>${afterData.di.toLocaleString()}</td>
+                        <td>${beforeData.name || 'N/A'} (${userId})</td>
+                        <td>${beforeDi.toLocaleString()}</td>
+                        <td>${afterDi.toLocaleString()}</td>
                         <td class="${diffClass}">${diff.toLocaleString()}</td>
                     </tr>
                 `;
@@ -698,16 +708,18 @@
             html += '<tbody><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الفرق</th></tr>';
 
             for (let [userId, beforeData] of Object.entries(result.before_balances.receivers)) {
-                const afterData = result.after_balances.receivers[userId];
-                const diff = afterData.di - beforeData.di;
+                const afterData = result.after_balances.receivers[userId] || {};
+                const beforeDi = beforeData.di || 0;
+                const afterDi = afterData.di || 0;
+                const diff = afterDi - beforeDi;
                 const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
 
                 html += `
                     <tr>
-                        <td>${beforeData.name} (${userId})</td>
-                        <td>${beforeData.di.toLocaleString()}</td>
-                        <td>${afterData.di.toLocaleString()}</td>
-                        <td class="${diffClass}">+${diff.toLocaleString()}</td>
+                        <td>${beforeData.name || 'N/A'} (${userId})</td>
+                        <td>${beforeDi.toLocaleString()}</td>
+                        <td>${afterDi.toLocaleString()}</td>
+                        <td class="${diffClass}">${diff >= 0 ? '+' : ''}${diff.toLocaleString()}</td>
                     </tr>
                 `;
             }
@@ -719,15 +731,17 @@
                 html += '<tbody>';
 
                 for (let [walletName, beforeData] of Object.entries(result.before_balances.core_wallets)) {
-                    const afterData = result.after_balances.core_wallets[walletName];
-                    const diff = afterData.coins - beforeData.coins;
+                    const afterData = result.after_balances.core_wallets[walletName] || {};
+                    const beforeCoins = beforeData.coins || 0;
+                    const afterCoins = afterData.coins || 0;
+                    const diff = afterCoins - beforeCoins;
                     const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
 
                     html += `
                         <tr>
                             <td>${walletName}</td>
-                            <td>${beforeData.coins.toLocaleString()}</td>
-                            <td>${afterData.coins.toLocaleString()}</td>
+                            <td>${beforeCoins.toLocaleString()}</td>
+                            <td>${afterCoins.toLocaleString()}</td>
                             <td class="${diffClass}">${diff.toLocaleString()}</td>
                         </tr>
                     `;
@@ -738,13 +752,18 @@
             html += '</table></div>';
 
             // الملخص
+            const totalDeduction = (result.analysis.summary.total_actual_deduction || 0).toLocaleString();
+            const totalReceiverGain = (result.analysis.summary.total_actual_receiver_gain || 0).toLocaleString();
+            const appWalletChange = result.analysis.summary.app_wallet_change || 0;
+            const ownerWalletChange = result.analysis.summary.owner_wallet_change || 0;
+
             html += `
                 <div class="mt-3 alert alert-info">
                     <h6>الملخص المالي:</h6>
-                    <p><strong>إجمالي الخصم من المرسلين:</strong> ${result.analysis.summary.total_actual_deduction.toLocaleString()} كوين</p>
-                    <p><strong>إجمالي الزيادة للمستلمين:</strong> ${result.analysis.summary.total_actual_receiver_gain.toLocaleString()} كوين</p>
-                    ${result.analysis.summary.app_wallet_change ? `<p><strong>تغيير App Wallet:</strong> ${result.analysis.summary.app_wallet_change.toLocaleString()} كوين</p>` : ''}
-                    ${result.analysis.summary.owner_wallet_change ? `<p><strong>تغيير Owner Wallet:</strong> ${result.analysis.summary.owner_wallet_change.toLocaleString()} كوين</p>` : ''}
+                    <p><strong>إجمالي الخصم من المرسلين:</strong> ${totalDeduction} كوين</p>
+                    <p><strong>إجمالي الزيادة للمستلمين:</strong> ${totalReceiverGain} كوين</p>
+                    ${appWalletChange ? `<p><strong>تغيير App Wallet:</strong> ${appWalletChange.toLocaleString()} كوين</p>` : ''}
+                    ${ownerWalletChange ? `<p><strong>تغيير Owner Wallet:</strong> ${ownerWalletChange.toLocaleString()} كوين</p>` : ''}
                 </div>
             `;
 
