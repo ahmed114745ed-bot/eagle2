@@ -193,7 +193,7 @@ class RoomRepository extends AbstractRepository
             ->pluck('user_id');
 
         $result = $this->model->withLuckyBoxFlag($user->id)
-            ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'level_id', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
+            ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'level_id', 'room_status', 'room_pass', 'room_admin', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
             ->with([
                 'roomLevel',
                 'backgroundImage:request_background_images.id,owner_room_id,img',
@@ -474,7 +474,6 @@ class RoomRepository extends AbstractRepository
                 'room_status',
                 'room_pass',
                 'room_admin',
-                'room_visitor',
                 'room_black',
                 'room_speak',
                 'room_sound',
@@ -533,7 +532,6 @@ class RoomRepository extends AbstractRepository
                 'room_status',
                 'room_pass',
                 'room_admin',
-                'room_visitor',
                 'room_black',
                 'room_speak',
                 'room_sound',
@@ -593,7 +591,6 @@ class RoomRepository extends AbstractRepository
                 'room_status',
                 'room_pass',
                 'room_admin',
-                'room_visitor',
                 'room_black',
                 'room_speak',
                 'room_sound',

@@ -398,8 +398,14 @@ class RoomRepoService
         }
 
         $roomAdmin   = $room->room_admin ?? '';
-        $roomVisitor = $visitors ?? $room->room_visitor;
-        $roomVisitor = explode(',', $roomVisitor);
+
+        // Use repository to get visitor IDs if not provided in request
+        if (isset($visitors)) {
+            $roomVisitor = explode(',', $visitors);
+        } else {
+            $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+            $roomVisitor = $visitorRepo->getVisitorIds($room->id)->toArray();
+        }
 
         $roomAdmin        = explode(',', $roomAdmin);
         $roomAdminActive  = array_intersect($roomVisitor, $roomAdmin);

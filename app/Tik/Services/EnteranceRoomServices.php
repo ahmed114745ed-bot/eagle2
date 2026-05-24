@@ -96,13 +96,13 @@ class EnteranceRoomServices
 
     private function handleMemberAdded($room, $userId)
     {
-        $visitors = explode(',', $room->room_visitor);
-        if ($visitors[0] == '') $visitors = [];
-        if (!in_array($userId, $visitors)) {
-            $visitors[] = $userId;
-            $visitors = array_unique($visitors);
-            $room->count_room_socket = count($visitors);
-            $room->room_visitor = trim(implode(",", $visitors), ",");
+        // Use repository for visitor operations (includes dual-write to legacy column)
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        if (!$visitorRepo->isVisitor($room->id, $userId)) {
+            $visitorRepo->addVisitor($room->id, $userId);
+
+            // Update count (repository already updates room_visitor column via dual-write)
+            $room->count_room_socket = $visitorRepo->getVisitorCount($room->id);
         }
     }
 
@@ -126,15 +126,16 @@ class EnteranceRoomServices
             Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
         }
 
-        $visitors = explode(',', $room->room_visitor);
-        if (in_array($userId, $visitors)) {
-            $index = array_search($userId, $visitors);
-            unset($visitors[$index]);
-            $room->count_room_socket = count($visitors);
-            $room->room_visitor = trim(implode(",", $visitors), ",");
+        // Use repository for visitor operations (includes dual-write to legacy column)
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        if ($visitorRepo->isVisitor($room->id, $userId)) {
+            $visitorRepo->removeVisitor($room->id, $userId);
+
+            // Update count (repository already updates room_visitor column via dual-write)
+            $room->count_room_socket = $visitorRepo->getVisitorCount($room->id);
         }
 
-        if ($room->uid == $userId->now_room_uid) {
+        if ($room->uid == $user->now_room_uid) {
             $user->now_room_uid = 0;
         }
 
@@ -153,7 +154,7 @@ class EnteranceRoomServices
         $userId = $request->user_account;
 
         /** @var Room $room */
-        $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
+        $room = Room::select(['id', 'uid', 'count_room_socket', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 
         if (!$room || !$user) {
@@ -201,7 +202,7 @@ class EnteranceRoomServices
         $userId = $request->user_account;
 
         /** @var Room $room */
-        $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
+        $room = Room::select(['id', 'uid', 'count_room_socket', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 
         if (!$room || !$user) {

@@ -115,13 +115,13 @@ class LuckyGiftService
                 $room = Room::withoutAppends()
                     ->with('microphones')
                     ->where('uid', $ownerId)
-                    ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                    ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                     ->first();
             } else {
                 $room = Room::withoutAppends()
                     ->with('microphones')
                     ->where('id', $roomId)
-                    ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                    ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                     ->first();
                 $ownerId = $room?->uid;
             }
@@ -497,13 +497,13 @@ class LuckyGiftService
             $room = Room::withoutAppends()
                 ->with('microphones')
                 ->where('uid', $ownerId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
         } else {
             $room = Room::withoutAppends()
                 ->with('microphones')
                 ->where('id', $roomId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
             $ownerId = $room?->uid;
         }
