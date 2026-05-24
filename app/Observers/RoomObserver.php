@@ -136,8 +136,10 @@ class RoomObserver
     public function resetRoomSession($room)
     {
         $owner_in = $room->is_afk;
-        if (!$room->room_visitor && $owner_in != 1) {
 
+        // Check if room has no visitors using relation
+        $room->loadMissing('roomVisitors');
+        if ($room->roomVisitors->isEmpty() && $owner_in != 1) {
             $room->room_speak = null;
         }
     }

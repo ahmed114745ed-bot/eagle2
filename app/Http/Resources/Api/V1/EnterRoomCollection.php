@@ -130,7 +130,7 @@ class EnterRoomCollection extends JsonResource
                     'lang' => '',
                     'phone_code' => ''
                 ],
-            'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
+            'room_visitors_count' => $this->count_room_socket_v2 ?? 1,
             'boxes'               => [],
             'muted_users'         => $this->muted_users,
             'youtube_key'         => configesModel::query()->where("name", "youtube_key")->first()?->value ?? "",

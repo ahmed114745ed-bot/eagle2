@@ -320,18 +320,12 @@ class Room extends Model
 
     public function getCountRoomSocketV2Attribute()
     {
-        $validVisitors = $this->roomVisitors;
+        // Optimize: Use DB count if relation not loaded to avoid N+1 query
+        if (!$this->relationLoaded('roomVisitors')) {
+            return RoomVisitor::where('room_id', $this->id)->count();
+        }
 
-        /*$packCount = $validVisitors
-            ->flatMap(fn ($validVisitor) => $validVisitor?->user?->packs)
-            ->filter(
-                fn ($pack) => $pack->is_used === 1 &&
-                    $pack->type === 17 &&
-                    ($pack->expire === 0 || $pack->expire >= time())
-            )
-            ->count();*/
-
-        return $validVisitors->count();
+        return $this->roomVisitors->count();
     }
 
     public function roomVisitors(): HasMany
@@ -341,7 +335,14 @@ class Room extends Model
 
     public function roomVisitorUsers(): HasManyThrough
     {
-        return $this->hasManyThrough(User::class, RoomVisitor::class, 'room_visitors.room_id', 'id', 'id', 'room_visitors.user_id');
+        return $this->hasManyThrough(
+            User::class,        // Final model
+            RoomVisitor::class, // Intermediate model
+            'room_id',          // Foreign key on room_visitors table
+            'id',               // Foreign key on users table
+            'id',               // Local key on rooms table
+            'user_id'           // Local key on room_visitors table
+        );
     }
 
     public function getRoomVisitorAttribute(): string
@@ -385,9 +386,13 @@ class Room extends Model
 
     public function getVisitorsImages()
     {
-        $visitors = $this->roomVisitorUsers;
+        // Optimize: Check if relation is loaded to avoid N+1 query
+        if (!$this->relationLoaded('roomVisitorUsers')) {
+            // Load the relation with profile if not already loaded
+            $this->load('roomVisitorUsers.profile');
+        }
 
-        return $visitors->pluck('profile.avatar');
+        return $this->roomVisitorUsers->pluck('profile.avatar');
     }
 
     public function background()

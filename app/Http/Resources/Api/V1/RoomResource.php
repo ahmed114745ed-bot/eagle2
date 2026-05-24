@@ -170,9 +170,10 @@ class RoomResource extends JsonResource
 
     protected function visitors()
     {
-        $ids = explode(',', $this->room_visitor);
-        $ids = $this->removeOwner($ids);
-        return UserResource::collection(User::query()->whereIn('id', $ids)->get());
+        // Use roomVisitorUsers relation (HasManyThrough) to avoid N+1 query
+        // Filter out owner if needed
+        $visitors = $this->roomVisitorUsers()->where('users.id', '!=', $this->uid)->get();
+        return UserResource::collection($visitors);
     }
 
     protected function blackList()
