@@ -250,6 +250,17 @@
         <div class="results-container" id="resultsContainer">
             <h3 class="text-center mb-4"><i class="bi bi-clipboard-data"></i> نتائج الاختبار</h3>
 
+            <div class="alert alert-info">
+                <h6><i class="bi bi-clock-history"></i> ملاحظة مهمة عن توقيت البيانات:</h6>
+                <ul class="mb-0 small">
+                    <li><strong>الأرصدة (di):</strong> تتحدث فوراً ✓</li>
+                    <li><strong>الماسات الشهرية:</strong> تتحدث فوراً ✓</li>
+                    <li><strong>سجلات الهدايا (gift_logs):</strong> في Queue - قد تتأخر حتى 5 دقائق ⏰</li>
+                    <li><strong>سجلات الكاش باك (user_coin_logs):</strong> في Queue - قد يتأخر حسب طريقة المعالجة ⏰</li>
+                </ul>
+                <p class="mb-0 mt-2"><small><i class="bi bi-info-circle"></i> تم الانتظار 13 ثانية بعد الاختبار. إذا وجدت فروقات، انتظر دقائق وتحقق من الجداول يدوياً.</small></p>
+            </div>
+
             <div class="stat-card">
                 <h5><i class="bi bi-speedometer2"></i> ملخص الأداء</h5>
                 <div class="row">
@@ -646,6 +657,10 @@
                     ? '<span class="badge badge-success">✓ متطابق</span>'
                     : '<span class="badge badge-warning">✗ غير متطابق</span>';
 
+                const warningHtml = gla.warning
+                    ? `<div class="alert alert-warning mt-2"><small><i class="bi bi-exclamation-triangle"></i> ${gla.warning}</small></div>`
+                    : '';
+
                 let giftLogsHtml = `
                     <table class="table table-bordered">
                         <tr><td><strong>عدد السجلات قبل الاختبار:</strong></td><td>${gla.before_count}</td></tr>
@@ -654,6 +669,8 @@
                         <tr><td><strong>المتوقع (الطلبات الناجحة):</strong></td><td>${gla.expected_records}</td></tr>
                         <tr><td><strong>الحالة:</strong></td><td>${matchBadge}</td></tr>
                     </table>
+                    ${warningHtml}
+                    <p class="text-muted small mt-2"><i class="bi bi-info-circle"></i> ملاحظة: gift_logs في Queue - قد تتأخر السجلات حتى 5 دقائق. تم الانتظار 13 ثانية بعد الاختبار.</p>
                 `;
                 document.getElementById('gift_logs_analysis').innerHTML = giftLogsHtml;
             }
@@ -670,6 +687,10 @@
                         <tr><td><strong>سجلات كاش باك جديدة:</strong></td><td class="diff-positive">+${cla.new_cashback_records}</td></tr>
                         <tr><td colspan="2"><small class="text-muted">${cla.note}</small></td></tr>
                     </table>
+                    <div class="alert alert-warning mt-2">
+                        <small><i class="bi bi-exclamation-triangle"></i> ${cla.warning || 'الكاش باك يُعالج في Queue'}</small>
+                    </div>
+                    <p class="text-muted small mt-2"><i class="bi bi-info-circle"></i> ملاحظة: الكاش باك قد يتأخر حسب طريقة المعالجة. تم الانتظار 13 ثانية بعد الاختبار.</p>
                 `;
                 document.getElementById('coin_logs_analysis').innerHTML = coinLogsHtml;
             }
