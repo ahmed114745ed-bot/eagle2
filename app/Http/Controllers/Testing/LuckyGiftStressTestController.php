@@ -20,9 +20,18 @@ class LuckyGiftStressTestController extends Controller
      */
     public function index()
     {
-        // جلب بيانات لتسهيل الاختبار
-        $gifts = Gift::where('type', 6)->where('enable', 1)->select('id', 'name', 'e_name', 'price')->get();
-        $rooms = Room::select('id', 'uid', 'room_name')->limit(20)->get();
+        // جلب الهدايا من فئة Lucky فقط (type = 6)
+        $gifts = Gift::where('type', 6)
+            ->where('enable', 1)
+            ->select('id', 'name', 'e_name', 'price')
+            ->get();
+
+        // جلب الغرف المتاحة
+        // ملاحظة: معظم الغرف room_type = null، لذا نجلب كل الغرف
+        // يمكن تصفية حسب room_status = 1 (نشطة) أو room_type إذا كانت محددة
+        $rooms = Room::select('id', 'uid', 'room_name', 'room_type')
+            ->limit(20)
+            ->get();
 
         return view('testing.lucky-gift-stress-test', compact('gifts', 'rooms'));
     }
@@ -111,11 +120,23 @@ class LuckyGiftStressTestController extends Controller
         $endTime = microtime(true);
         $duration = round($endTime - $startTime, 2);
 
-        // الانتظار قليلاً لإتمام Jobs
-        sleep(2);
+        Log::channel('lucky_gift')->info('🕐 انتظار معالجة الـ Jobs (gift_logs & cashback في الـ Queue)...');
 
-        // جلب الأرصدة بعد الاختبار
+        // الانتظار لإتمام Jobs في الـ Queue
+        // gift_logs و user_coin_logs في Queue وممكن يتأخروا لحد 5 دقائق
+        // نقرأ الأرصدة فوراً (di & monthly_diamonds تتحدث مباشرة)
+        // ثم ننتظر ونقرأ الـ logs بعد فترة
+
+        // قراءة أولى: الأرصدة والماسات (فورية)
+        sleep(3); // انتظار 3 ثواني للأرصدة
+        $afterBalances_immediate = $this->captureBalances($senderIds, $receiverIds, $room->uid);
+
+        // قراءة ثانية: بعد 10 ثواني لـ gift_logs و coin_logs
+        Log::channel('lucky_gift')->info('⏳ انتظار 10 ثواني إضافية للـ Queue Jobs...');
+        sleep(10);
         $afterBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
+
+        Log::channel('lucky_gift')->info('✅ اكتمل جلب البيانات بعد الاختبار');
 
         // حساب القيم المطلوبة لـ analyzeResults
         $costPerRequest = $gift->price * $request->num * count($receiverIds) * $request->count;
@@ -657,6 +678,29 @@ class LuckyGiftStressTestController extends Controller
             }
         }
 
+        // ✨ تحليل الكاش باك للمرسلين (المرسل رصيده بيزيد من الكاش باك أثناء الإرسال)
+        $analysis['sender_cashback_analysis'] = [];
+        foreach ($before['senders'] as $senderId => $beforeData) {
+            $afterData = $after['senders'][$senderId] ?? null;
+            if (!$afterData) continue;
+
+            $actualChange = $afterData['di'] - $beforeData['di'];
+            $expectedDeduction = $costPerRequest * ($results['successful'] / count($before['senders']));
+
+            // الكاش باك = الفرق بين الخصم المتوقع والفعلي (إذا كان الخصم الفعلي أقل)
+            $estimatedCashback = $expectedDeduction - ($beforeData['di'] - $afterData['di']);
+
+            $analysis['sender_cashback_analysis'][$senderId] = [
+                'name' => $beforeData['name'],
+                'balance_before' => $beforeData['di'],
+                'balance_after' => $afterData['di'],
+                'expected_cost' => round($expectedDeduction),
+                'actual_change' => $actualChange,
+                'estimated_cashback' => round($estimatedCashback > 0 ? $estimatedCashback : 0),
+                'note' => $estimatedCashback > 0 ? 'حصل على كاش باك' : 'لم يحصل على كاش باك',
+            ];
+        }
+
         // تحليل المستلمين
         $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
         $expectedReceiverGainPerRequest = $giftPrice * $num * $receiverFeeRate * $count;
@@ -747,6 +791,7 @@ class LuckyGiftStressTestController extends Controller
             'new_records' => $giftLogsIncrease,
             'expected_records' => $results['successful'], // كل طلب ناجح = سجل هدية
             'match' => $giftLogsIncrease === $results['successful'] ? 'MATCHED ✓' : 'MISMATCH ✗',
+            'warning' => $giftLogsIncrease < $results['successful'] ? 'gift_logs في Queue - قد يتأخر حتى 5 دقائق' : null,
         ];
 
         if ($giftLogsIncrease !== $results['successful']) {
@@ -767,6 +812,7 @@ class LuckyGiftStressTestController extends Controller
             'after_count' => $after['coin_logs_count'] ?? 0,
             'new_cashback_records' => $coinLogsIncrease,
             'note' => 'عدد سجلات الكاش باك (LUCKY_GIFT type)',
+            'warning' => 'الكاش باك يُعالج في Queue - قد يتأخر حسب طريقة المعالجة',
         ];
 
         // إضافة ملخص شامل

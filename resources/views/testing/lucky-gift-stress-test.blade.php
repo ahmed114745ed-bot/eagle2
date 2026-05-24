@@ -250,6 +250,17 @@
         <div class="results-container" id="resultsContainer">
             <h3 class="text-center mb-4"><i class="bi bi-clipboard-data"></i> نتائج الاختبار</h3>
 
+            <div class="alert alert-info">
+                <h6><i class="bi bi-clock-history"></i> ملاحظة مهمة عن توقيت البيانات:</h6>
+                <ul class="mb-0 small">
+                    <li><strong>الأرصدة (di):</strong> تتحدث فوراً ✓</li>
+                    <li><strong>الماسات الشهرية:</strong> تتحدث فوراً ✓</li>
+                    <li><strong>سجلات الهدايا (gift_logs):</strong> في Queue - قد تتأخر حتى 5 دقائق ⏰</li>
+                    <li><strong>سجلات الكاش باك (user_coin_logs):</strong> في Queue - قد يتأخر حسب طريقة المعالجة ⏰</li>
+                </ul>
+                <p class="mb-0 mt-2"><small><i class="bi bi-info-circle"></i> تم الانتظار 13 ثانية بعد الاختبار. إذا وجدت فروقات، انتظر دقائق وتحقق من الجداول يدوياً.</small></p>
+            </div>
+
             <div class="stat-card">
                 <h5><i class="bi bi-speedometer2"></i> ملخص الأداء</h5>
                 <div class="row">
@@ -289,15 +300,30 @@
                 <div id="discrepancies_list"></div>
             </div>
 
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
+
+            <div class="stat-card" id="sender_cashback_card" style="display: none;">
+                <h5><i class="bi bi-cash-coin"></i> تحليل الكاش باك للمرسلين (Sender Cashback)</h5>
+                <p class="text-muted small">المرسل رصيده بيزيد من الكاش باك أثناء الإرسال</p>
+                <div id="sender_cashback_list"></div>
+            </div>
+
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
+
             <div class="stat-card" id="monthly_diamonds_card" style="display: none;">
                 <h5><i class="bi bi-gem"></i> تحليل الماسات الشهرية (monthly_diamond_receives)</h5>
                 <div id="monthly_diamonds_list"></div>
             </div>
 
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
+
+
             <div class="stat-card" id="gift_logs_card" style="display: none;">
                 <h5><i class="bi bi-gift-fill"></i> تحليل سجلات الهدايا (gift_logs)</h5>
                 <div id="gift_logs_analysis"></div>
             </div>
+
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
 
             <div class="stat-card" id="coin_logs_card" style="display: none;">
                 <h5><i class="bi bi-coin"></i> تحليل سجلات الكاش باك (user_coin_logs)</h5>
@@ -540,22 +566,62 @@
                 discrepanciesHtml += '<thead><tr><th>النوع</th><th>المستخدم</th><th>قبل</th><th>بعد</th><th>المتوقع</th><th>الفعلي</th><th>الفرق</th></tr></thead><tbody>';
 
                 result.analysis.discrepancies.forEach(disc => {
-                    const diffClass = disc.difference > 0 ? 'diff-positive' : 'diff-negative';
+                    const before = disc.before || 0;
+                    const after = disc.after || 0;
+                    const expected = disc.expected_deduction || disc.expected_gain || disc.expected || 0;
+                    const actual = disc.actual_deduction || disc.actual_gain || disc.actual || 0;
+                    const difference = disc.difference || 0;
+                    const diffClass = difference > 0 ? 'diff-positive' : 'diff-negative';
+                    const userName = disc.name || disc.message || 'N/A';
+                    const userId = disc.user_id || '-';
+
                     discrepanciesHtml += `
                         <tr>
-                            <td>${disc.type}</td>
-                            <td>${disc.name} (${disc.user_id})</td>
-                            <td>${disc.before.toLocaleString()}</td>
-                            <td>${disc.after.toLocaleString()}</td>
-                            <td>${(disc.expected_deduction || disc.expected_gain || 0).toLocaleString()}</td>
-                            <td>${(disc.actual_deduction || disc.actual_gain || 0).toLocaleString()}</td>
-                            <td class="${diffClass}">${disc.difference.toLocaleString()}</td>
+                            <td>${disc.type || 'N/A'}</td>
+                            <td>${userName} (${userId})</td>
+                            <td>${before.toLocaleString()}</td>
+                            <td>${after.toLocaleString()}</td>
+                            <td>${expected.toLocaleString()}</td>
+                            <td>${actual.toLocaleString()}</td>
+                            <td class="${diffClass}">${difference.toLocaleString()}</td>
                         </tr>
                     `;
                 });
 
                 discrepanciesHtml += '</tbody></table></div>';
                 document.getElementById('discrepancies_list').innerHTML = discrepanciesHtml;
+            }
+
+            // ✨ تحليل الكاش باك للمرسلين
+            if (result.analysis.sender_cashback_analysis) {
+                document.getElementById('sender_cashback_card').style.display = 'block';
+                let cashbackHtml = '<div class="table-responsive"><table class="table table-bordered">';
+                cashbackHtml += '<thead><tr><th>المستخدم</th><th>الرصيد قبل</th><th>الرصيد بعد</th><th>التكلفة المتوقعة</th><th>التغيير الفعلي</th><th>الكاش باك المقدر</th><th>ملاحظة</th></tr></thead><tbody>';
+
+                for (let [userId, data] of Object.entries(result.analysis.sender_cashback_analysis)) {
+                    const balanceBefore = data.balance_before || 0;
+                    const balanceAfter = data.balance_after || 0;
+                    const expectedCost = data.expected_cost || 0;
+                    const actualChange = data.actual_change || 0;
+                    const estimatedCashback = data.estimated_cashback || 0;
+                    const changeClass = actualChange >= 0 ? 'diff-positive' : 'diff-negative';
+                    const cashbackClass = estimatedCashback > 0 ? 'diff-positive' : '';
+
+                    cashbackHtml += `
+                        <tr>
+                            <td>${data.name || 'N/A'} (${userId})</td>
+                            <td>${balanceBefore.toLocaleString()}</td>
+                            <td>${balanceAfter.toLocaleString()}</td>
+                            <td class="diff-negative">-${expectedCost.toLocaleString()}</td>
+                            <td class="${changeClass}">${actualChange >= 0 ? '+' : ''}${actualChange.toLocaleString()}</td>
+                            <td class="${cashbackClass}">${estimatedCashback > 0 ? '+' : ''}${estimatedCashback.toLocaleString()}</td>
+                            <td><small>${data.note || ''}</small></td>
+                        </tr>
+                    `;
+                }
+
+                cashbackHtml += '</tbody></table></div>';
+                document.getElementById('sender_cashback_list').innerHTML = cashbackHtml;
             }
 
             // ✨ تحليل الماسات الشهرية
@@ -565,13 +631,16 @@
                 monthlyHtml += '<thead><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الزيادة</th></tr></thead><tbody>';
 
                 for (let [userId, data] of Object.entries(result.analysis.monthly_diamonds_analysis)) {
-                    const increaseClass = data.increase > 0 ? 'diff-positive' : '';
+                    const before = data.before || 0;
+                    const after = data.after || 0;
+                    const increase = data.increase || 0;
+                    const increaseClass = increase > 0 ? 'diff-positive' : '';
                     monthlyHtml += `
                         <tr>
-                            <td>${data.name} (${userId})</td>
-                            <td>${data.before.toLocaleString()}</td>
-                            <td>${data.after.toLocaleString()}</td>
-                            <td class="${increaseClass}">${data.increase > 0 ? '+' : ''}${data.increase.toLocaleString()}</td>
+                            <td>${data.name || 'N/A'} (${userId})</td>
+                            <td>${before.toLocaleString()}</td>
+                            <td>${after.toLocaleString()}</td>
+                            <td class="${increaseClass}">${increase > 0 ? '+' : ''}${increase.toLocaleString()}</td>
                         </tr>
                     `;
                 }
@@ -588,6 +657,10 @@
                     ? '<span class="badge badge-success">✓ متطابق</span>'
                     : '<span class="badge badge-warning">✗ غير متطابق</span>';
 
+                const warningHtml = gla.warning
+                    ? `<div class="alert alert-warning mt-2"><small><i class="bi bi-exclamation-triangle"></i> ${gla.warning}</small></div>`
+                    : '';
+
                 let giftLogsHtml = `
                     <table class="table table-bordered">
                         <tr><td><strong>عدد السجلات قبل الاختبار:</strong></td><td>${gla.before_count}</td></tr>
@@ -596,6 +669,8 @@
                         <tr><td><strong>المتوقع (الطلبات الناجحة):</strong></td><td>${gla.expected_records}</td></tr>
                         <tr><td><strong>الحالة:</strong></td><td>${matchBadge}</td></tr>
                     </table>
+                    ${warningHtml}
+                    <p class="text-muted small mt-2"><i class="bi bi-info-circle"></i> ملاحظة: gift_logs في Queue - قد تتأخر السجلات حتى 5 دقائق. تم الانتظار 13 ثانية بعد الاختبار.</p>
                 `;
                 document.getElementById('gift_logs_analysis').innerHTML = giftLogsHtml;
             }
@@ -612,6 +687,10 @@
                         <tr><td><strong>سجلات كاش باك جديدة:</strong></td><td class="diff-positive">+${cla.new_cashback_records}</td></tr>
                         <tr><td colspan="2"><small class="text-muted">${cla.note}</small></td></tr>
                     </table>
+                    <div class="alert alert-warning mt-2">
+                        <small><i class="bi bi-exclamation-triangle"></i> ${cla.warning || 'الكاش باك يُعالج في Queue'}</small>
+                    </div>
+                    <p class="text-muted small mt-2"><i class="bi bi-info-circle"></i> ملاحظة: الكاش باك قد يتأخر حسب طريقة المعالجة. تم الانتظار 13 ثانية بعد الاختبار.</p>
                 `;
                 document.getElementById('coin_logs_analysis').innerHTML = coinLogsHtml;
             }
@@ -628,15 +707,17 @@
             html += '<tbody><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الفرق</th></tr>';
 
             for (let [userId, beforeData] of Object.entries(result.before_balances.senders)) {
-                const afterData = result.after_balances.senders[userId];
-                const diff = afterData.di - beforeData.di;
+                const afterData = result.after_balances.senders[userId] || {};
+                const beforeDi = beforeData.di || 0;
+                const afterDi = afterData.di || 0;
+                const diff = afterDi - beforeDi;
                 const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
 
                 html += `
                     <tr>
-                        <td>${beforeData.name} (${userId})</td>
-                        <td>${beforeData.di.toLocaleString()}</td>
-                        <td>${afterData.di.toLocaleString()}</td>
+                        <td>${beforeData.name || 'N/A'} (${userId})</td>
+                        <td>${beforeDi.toLocaleString()}</td>
+                        <td>${afterDi.toLocaleString()}</td>
                         <td class="${diffClass}">${diff.toLocaleString()}</td>
                     </tr>
                 `;
@@ -648,16 +729,18 @@
             html += '<tbody><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الفرق</th></tr>';
 
             for (let [userId, beforeData] of Object.entries(result.before_balances.receivers)) {
-                const afterData = result.after_balances.receivers[userId];
-                const diff = afterData.di - beforeData.di;
+                const afterData = result.after_balances.receivers[userId] || {};
+                const beforeDi = beforeData.di || 0;
+                const afterDi = afterData.di || 0;
+                const diff = afterDi - beforeDi;
                 const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
 
                 html += `
                     <tr>
-                        <td>${beforeData.name} (${userId})</td>
-                        <td>${beforeData.di.toLocaleString()}</td>
-                        <td>${afterData.di.toLocaleString()}</td>
-                        <td class="${diffClass}">+${diff.toLocaleString()}</td>
+                        <td>${beforeData.name || 'N/A'} (${userId})</td>
+                        <td>${beforeDi.toLocaleString()}</td>
+                        <td>${afterDi.toLocaleString()}</td>
+                        <td class="${diffClass}">${diff >= 0 ? '+' : ''}${diff.toLocaleString()}</td>
                     </tr>
                 `;
             }
@@ -669,15 +752,17 @@
                 html += '<tbody>';
 
                 for (let [walletName, beforeData] of Object.entries(result.before_balances.core_wallets)) {
-                    const afterData = result.after_balances.core_wallets[walletName];
-                    const diff = afterData.coins - beforeData.coins;
+                    const afterData = result.after_balances.core_wallets[walletName] || {};
+                    const beforeCoins = beforeData.coins || 0;
+                    const afterCoins = afterData.coins || 0;
+                    const diff = afterCoins - beforeCoins;
                     const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
 
                     html += `
                         <tr>
                             <td>${walletName}</td>
-                            <td>${beforeData.coins.toLocaleString()}</td>
-                            <td>${afterData.coins.toLocaleString()}</td>
+                            <td>${beforeCoins.toLocaleString()}</td>
+                            <td>${afterCoins.toLocaleString()}</td>
                             <td class="${diffClass}">${diff.toLocaleString()}</td>
                         </tr>
                     `;
@@ -688,13 +773,18 @@
             html += '</table></div>';
 
             // الملخص
+            const totalDeduction = (result.analysis.summary.total_actual_deduction || 0).toLocaleString();
+            const totalReceiverGain = (result.analysis.summary.total_actual_receiver_gain || 0).toLocaleString();
+            const appWalletChange = result.analysis.summary.app_wallet_change || 0;
+            const ownerWalletChange = result.analysis.summary.owner_wallet_change || 0;
+
             html += `
                 <div class="mt-3 alert alert-info">
                     <h6>الملخص المالي:</h6>
-                    <p><strong>إجمالي الخصم من المرسلين:</strong> ${result.analysis.summary.total_actual_deduction.toLocaleString()} كوين</p>
-                    <p><strong>إجمالي الزيادة للمستلمين:</strong> ${result.analysis.summary.total_actual_receiver_gain.toLocaleString()} كوين</p>
-                    ${result.analysis.summary.app_wallet_change ? `<p><strong>تغيير App Wallet:</strong> ${result.analysis.summary.app_wallet_change.toLocaleString()} كوين</p>` : ''}
-                    ${result.analysis.summary.owner_wallet_change ? `<p><strong>تغيير Owner Wallet:</strong> ${result.analysis.summary.owner_wallet_change.toLocaleString()} كوين</p>` : ''}
+                    <p><strong>إجمالي الخصم من المرسلين:</strong> ${totalDeduction} كوين</p>
+                    <p><strong>إجمالي الزيادة للمستلمين:</strong> ${totalReceiverGain} كوين</p>
+                    ${appWalletChange ? `<p><strong>تغيير App Wallet:</strong> ${appWalletChange.toLocaleString()} كوين</p>` : ''}
+                    ${ownerWalletChange ? `<p><strong>تغيير Owner Wallet:</strong> ${ownerWalletChange.toLocaleString()} كوين</p>` : ''}
                 </div>
             `;
 
