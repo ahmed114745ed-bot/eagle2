@@ -20,9 +20,18 @@ class LuckyGiftStressTestController extends Controller
      */
     public function index()
     {
-        // جلب بيانات لتسهيل الاختبار
-        $gifts = Gift::where('type', 6)->where('enable', 1)->select('id', 'name', 'e_name', 'price')->get();
-        $rooms = Room::select('id', 'uid', 'room_name')->limit(20)->get();
+        // جلب الهدايا من فئة Lucky فقط (type = 6)
+        $gifts = Gift::where('type', 6)
+            ->where('enable', 1)
+            ->select('id', 'name', 'e_name', 'price')
+            ->get();
+
+        // جلب الغرف المتاحة
+        // ملاحظة: معظم الغرف room_type = null، لذا نجلب كل الغرف
+        // يمكن تصفية حسب room_status = 1 (نشطة) أو room_type إذا كانت محددة
+        $rooms = Room::select('id', 'uid', 'room_name', 'room_type')
+            ->limit(20)
+            ->get();
 
         return view('testing.lucky-gift-stress-test', compact('gifts', 'rooms'));
     }
@@ -87,10 +96,10 @@ class LuckyGiftStressTestController extends Controller
         // حفظ الأرصدة قبل الاختبار
         $beforeBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
 
-        // بدء الاختبار كـ Background Job
+        // بدء الاختبار مباشرة (بدون Background Job)
         $testId = 'test_' . time() . '_' . uniqid();
 
-        Log::channel('lucky_gift')->info('🧪 Queuing Stress Test as Background Job', [
+        Log::channel('lucky_gift')->info('🧪 Starting Direct Stress Test', [
             'test_id' => $testId,
             'senders' => count($senderIds),
             'receivers' => count($receiverIds),
@@ -99,31 +108,57 @@ class LuckyGiftStressTestController extends Controller
             'cost_per_request' => $costPerRequest,
         ]);
 
-        // حفظ الأرصدة قبل الاختبار
-        $beforeBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
-        \Illuminate\Support\Facades\Cache::put("stress_test_{$testId}_before_balances", $beforeBalances, 3600);
+        $startTime = microtime(true);
 
-        // تحضير البيانات للـ Job
-        $testConfig = [
-            'sender_ids' => $senderIds,
-            'receiver_ids' => $receiverIds,
-            'gift_id' => $request->gift_id,
-            'room_id' => $request->room_id,
-            'num' => $request->num,
-            'count' => $request->count,
-            'requests_per_user' => $request->requests_per_user,
-            'concurrent' => $request->concurrent,
-        ];
+        // تشغيل الاختبار مباشرة
+        if ($request->concurrent) {
+            $results = $this->runConcurrentTest($senders, $receiverIds, $request, $testId);
+        } else {
+            $results = $this->runSequentialTest($senders, $receiverIds, $request, $testId);
+        }
 
-        // إطلاق Job في الخلفية
-        \App\Jobs\RunStressTestJob::dispatch($testConfig, $testId)->onQueue('stress-tests');
+        $endTime = microtime(true);
+        $duration = round($endTime - $startTime, 2);
 
-        // إرجاع استجابة فورية
+        // الانتظار قليلاً لإتمام Jobs
+        sleep(2);
+
+        // جلب الأرصدة بعد الاختبار
+        $afterBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
+
+        // حساب القيم المطلوبة لـ analyzeResults
+        $costPerRequest = $gift->price * $request->num * count($receiverIds) * $request->count;
+        $giftPrice = $gift->price;
+        $num = $request->num;
+        $receiverCount = count($receiverIds);
+        $count = $request->count;
+
+        // تحليل النتائج
+        $analysis = $this->analyzeResults(
+            $beforeBalances,
+            $afterBalances,
+            $results,
+            $costPerRequest,
+            $giftPrice,
+            $num,
+            $receiverCount,
+            $count
+        );
+
+        // حفظ التقرير
+        $reportPath = $this->saveReport($testId, $beforeBalances, $afterBalances, $analysis, $results);
+
+        // إرجاع النتائج مباشرة
         return response()->json([
             'success' => true,
             'test_id' => $testId,
-            'message' => 'تم بدء الاختبار في الخلفية. يمكنك متابعة التقدم.',
-            'status_url' => route('stress-test.status', $testId),
+            'message' => 'اكتمل الاختبار بنجاح',
+            'duration' => $duration,
+            'results' => $results,
+            'before_balances' => $beforeBalances,
+            'after_balances' => $afterBalances,
+            'analysis' => $analysis,
+            'report_path' => $reportPath,
         ]);
     }
 
@@ -339,7 +374,7 @@ class LuckyGiftStressTestController extends Controller
                             ->timeout(90)
                             ->connectTimeout(10)
                             ->retry(2, 500) // محاولة مرتين مع تأخير 500ms
-                            ->post(url('/api/v2/send-lucky-gift-combo'), [
+                            ->post(url('/api/gifts/v2/send-lucky-gift-combo'), [
                                 'id' => $request->gift_id,
                                 'owner_id' => $room->uid,
                                 'room_id' => $request->room_id,
@@ -533,6 +568,35 @@ class LuckyGiftStressTestController extends Controller
             ];
         }
 
+        // الماسات الشهرية (monthly_diamond_receives)
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+        $monthlyDiamonds = \App\Models\MonthlyDiamondReceive::whereIn('user_id', $receiverIds)
+            ->where('month', $currentMonth)
+            ->where('year', $currentYear)
+            ->get();
+
+        $balances['monthly_diamonds'] = [];
+        foreach ($monthlyDiamonds as $record) {
+            $balances['monthly_diamonds'][$record->user_id] = [
+                'monthly_diamond_received' => $record->monthly_diamond_received ?? 0,
+            ];
+        }
+
+        // عدد سجلات الهدايا (gift_logs) - آخر 5 دقائق
+        $recentGiftLogs = \App\Models\GiftLog::where('created_at', '>=', now()->subMinutes(5))
+            ->whereIn('sender_id', $senderIds)
+            ->count();
+        $balances['gift_logs_count'] = $recentGiftLogs;
+
+        // عدد سجلات الكوينز (user_coin_logs) للكاش باك - آخر 5 دقائق
+        $allUserIds = array_merge($senderIds, $receiverIds);
+        $recentCoinLogs = \App\Models\UserCoinLog::where('created_at', '>=', now()->subMinutes(5))
+            ->whereIn('user_id', $allUserIds)
+            ->where('type', 'LUCKY_GIFT')
+            ->count();
+        $balances['coin_logs_count'] = $recentCoinLogs;
+
         return $balances;
     }
 
@@ -602,6 +666,29 @@ class LuckyGiftStressTestController extends Controller
             }
         }
 
+        // ✨ تحليل الكاش باك للمرسلين (المرسل رصيده بيزيد من الكاش باك أثناء الإرسال)
+        $analysis['sender_cashback_analysis'] = [];
+        foreach ($before['senders'] as $senderId => $beforeData) {
+            $afterData = $after['senders'][$senderId] ?? null;
+            if (!$afterData) continue;
+
+            $actualChange = $afterData['di'] - $beforeData['di'];
+            $expectedDeduction = $costPerRequest * ($results['successful'] / count($before['senders']));
+
+            // الكاش باك = الفرق بين الخصم المتوقع والفعلي (إذا كان الخصم الفعلي أقل)
+            $estimatedCashback = $expectedDeduction - ($beforeData['di'] - $afterData['di']);
+
+            $analysis['sender_cashback_analysis'][$senderId] = [
+                'name' => $beforeData['name'],
+                'balance_before' => $beforeData['di'],
+                'balance_after' => $afterData['di'],
+                'expected_cost' => round($expectedDeduction),
+                'actual_change' => $actualChange,
+                'estimated_cashback' => round($estimatedCashback > 0 ? $estimatedCashback : 0),
+                'note' => $estimatedCashback > 0 ? 'حصل على كاش باك' : 'لم يحصل على كاش باك',
+            ];
+        }
+
         // تحليل المستلمين
         $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
         $expectedReceiverGainPerRequest = $giftPrice * $num * $receiverFeeRate * $count;
@@ -663,6 +750,63 @@ class LuckyGiftStressTestController extends Controller
                 'max_response_time' => round(max($results['response_times']), 3),
             ];
         }
+
+        // ✨ تحليل الماسات الشهرية (monthly_diamond_receives)
+        $analysis['monthly_diamonds_analysis'] = [];
+        foreach ($before['receivers'] as $receiverId => $beforeData) {
+            $beforeMonthly = $before['monthly_diamonds'][$receiverId]['monthly_diamond_received'] ?? 0;
+            $afterMonthly = $after['monthly_diamonds'][$receiverId]['monthly_diamond_received'] ?? 0;
+            $monthlyIncrease = $afterMonthly - $beforeMonthly;
+
+            $analysis['monthly_diamonds_analysis'][$receiverId] = [
+                'name' => $beforeData['name'],
+                'before' => $beforeMonthly,
+                'after' => $afterMonthly,
+                'increase' => $monthlyIncrease,
+            ];
+
+            // التحقق من وجود فرق
+            if ($monthlyIncrease > 0) {
+                $analysis['summary']['total_monthly_diamonds_increased'] = ($analysis['summary']['total_monthly_diamonds_increased'] ?? 0) + $monthlyIncrease;
+            }
+        }
+
+        // ✨ تحليل سجلات الهدايا (gift_logs)
+        $giftLogsIncrease = ($after['gift_logs_count'] ?? 0) - ($before['gift_logs_count'] ?? 0);
+        $analysis['gift_logs_analysis'] = [
+            'before_count' => $before['gift_logs_count'] ?? 0,
+            'after_count' => $after['gift_logs_count'] ?? 0,
+            'new_records' => $giftLogsIncrease,
+            'expected_records' => $results['successful'], // كل طلب ناجح = سجل هدية
+            'match' => $giftLogsIncrease === $results['successful'] ? 'MATCHED ✓' : 'MISMATCH ✗',
+        ];
+
+        if ($giftLogsIncrease !== $results['successful']) {
+            $analysis['discrepancies'][] = [
+                'type' => 'GIFT_LOGS_COUNT',
+                'expected' => $results['successful'],
+                'actual' => $giftLogsIncrease,
+                'difference' => $giftLogsIncrease - $results['successful'],
+                'message' => 'عدد سجلات الهدايا لا يطابق عدد الطلبات الناجحة',
+            ];
+            $analysis['integrity_check'] = 'WARNING';
+        }
+
+        // ✨ تحليل سجلات الكوينز للكاش باك (user_coin_logs)
+        $coinLogsIncrease = ($after['coin_logs_count'] ?? 0) - ($before['coin_logs_count'] ?? 0);
+        $analysis['coin_logs_analysis'] = [
+            'before_count' => $before['coin_logs_count'] ?? 0,
+            'after_count' => $after['coin_logs_count'] ?? 0,
+            'new_cashback_records' => $coinLogsIncrease,
+            'note' => 'عدد سجلات الكاش باك (LUCKY_GIFT type)',
+        ];
+
+        // إضافة ملخص شامل
+        $analysis['summary']['database_integrity'] = [
+            'gift_logs_matched' => $giftLogsIncrease === $results['successful'],
+            'monthly_diamonds_updated' => ($analysis['summary']['total_monthly_diamonds_increased'] ?? 0) > 0,
+            'cashback_records_created' => $coinLogsIncrease > 0,
+        ];
 
         return $analysis;
     }
