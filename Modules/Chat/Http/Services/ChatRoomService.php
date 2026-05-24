@@ -421,7 +421,7 @@ class ChatRoomService
     {
         $room = Room::where('id', $user2?->now_room_uid)->first();
         // $room = $user2?->nowRoom;
-        $isHideRoom = $room?->owner->getPackWithType(16);
+        $isHideRoom = $room?->owner?->getPackWithType(16);
         $room = !$isHideRoom ? $room : null;
         return [
             'room_owner_id' => $user2?->now_room_uid,
