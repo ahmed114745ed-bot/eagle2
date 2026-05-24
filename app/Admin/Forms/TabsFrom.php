@@ -82,6 +82,15 @@ class TabsFrom extends Form
 
     protected function redirectAfterSaving($resourcesPath, $key)
     {
+        \Log::info('🔀 [TabsFrom] redirectAfterSaving', [
+            'resourcesPath' => $resourcesPath,
+            'key' => $key,
+            'request_uri' => \request()->getUri(),
+            'previous_field' => request(Builder::PREVIOUS_URL_KEY),
+            'session_return_url' => session('return_url'),
+            'after_save' => request('after-save'),
+        ]);
+
         $redirectUrl = session('return_url');
         if ($redirectUrl){
             session()->forget('return_url');
