@@ -365,7 +365,7 @@ class LuckyGiftStressTestController extends Controller
                             ->timeout(90)
                             ->connectTimeout(10)
                             ->retry(2, 500) // محاولة مرتين مع تأخير 500ms
-                            ->post(url('/api/v2/send-lucky-gift-combo'), [
+                            ->post(url('/api/gifts/v2/send-lucky-gift-combo'), [
                                 'id' => $request->gift_id,
                                 'owner_id' => $room->uid,
                                 'room_id' => $request->room_id,
