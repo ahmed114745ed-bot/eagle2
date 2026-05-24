@@ -485,28 +485,30 @@ class LuckyGiftStressTestController extends Controller
 
         // أرصدة المرسلين
         $senders = User::whereIn('id', $senderIds)
-            ->select('id', 'name', 'di', 'total_sender_level', 'sub_sender_level')
+            ->select('id', 'name', 'di', 'total_diamond_send', 'sender_level', 'sub_sender_level')
             ->get();
 
         foreach ($senders as $sender) {
             $balances['senders'][$sender->id] = [
                 'name' => $sender->name,
                 'di' => $sender->di,
-                'total_sender_level' => $sender->total_sender_level ?? 0,
+                'total_diamond_send' => $sender->total_diamond_send ?? 0,
+                'sender_level' => $sender->sender_level ?? 0,
                 'sub_sender_level' => $sender->sub_sender_level ?? 0,
             ];
         }
 
         // أرصدة المستلمين
         $receivers = User::whereIn('id', $receiverIds)
-            ->select('id', 'name', 'di', 'total_receiver_level', 'sub_receiver_level')
+            ->select('id', 'name', 'di', 'total_diamond_received', 'received_level', 'sub_receiver_level')
             ->get();
 
         foreach ($receivers as $receiver) {
             $balances['receivers'][$receiver->id] = [
                 'name' => $receiver->name,
                 'di' => $receiver->di,
-                'total_receiver_level' => $receiver->total_receiver_level ?? 0,
+                'total_diamond_received' => $receiver->total_diamond_received ?? 0,
+                'received_level' => $receiver->received_level ?? 0,
                 'sub_receiver_level' => $receiver->sub_receiver_level ?? 0,
             ];
         }
