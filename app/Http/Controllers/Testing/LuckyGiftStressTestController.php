@@ -21,20 +21,17 @@ class LuckyGiftStressTestController extends Controller
     public function index()
     {
         // جلب الهدايا من فئة Lucky فقط (type = 6)
-        $gifts = Gift::where('type', 6)->where('enable', 1)->select('id', 'name', 'e_name', 'price')->get();
-
-        // جلب الغرف الصوتية فقط
-        // TODO: تحقق من قيمة type_id الصحيحة للغرف الصوتية
-        // عادة: 1 = Audio, 2 = Video, 3 = Multi
-        $rooms = Room::where('type_id', 1) // 1 = Audio Room (Verify this!)
-            ->select('id', 'uid', 'room_name', 'type_id')
-            ->limit(20)
+        $gifts = Gift::where('type', 6)
+            ->where('enable', 1)
+            ->select('id', 'name', 'e_name', 'price')
             ->get();
 
-        // إذا لم تكن هناك غرف، اجلب أي غرف متاحة
-        if ($rooms->isEmpty()) {
-            $rooms = Room::select('id', 'uid', 'room_name', 'type_id')->limit(20)->get();
-        }
+        // جلب الغرف المتاحة
+        // ملاحظة: معظم الغرف room_type = null، لذا نجلب كل الغرف
+        // يمكن تصفية حسب room_status = 1 (نشطة) أو room_type إذا كانت محددة
+        $rooms = Room::select('id', 'uid', 'room_name', 'room_type')
+            ->limit(20)
+            ->get();
 
         return view('testing.lucky-gift-stress-test', compact('gifts', 'rooms'));
     }
