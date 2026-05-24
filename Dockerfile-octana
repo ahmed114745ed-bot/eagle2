@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     ffmpeg \
-    vim \
     libavcodec-extra \
     libpng-dev \
     libonig-dev \
@@ -19,10 +18,8 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    libssl-dev
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    libssl-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN  pecl channel-update pecl.php.net \
@@ -36,55 +33,43 @@ COPY docker/docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/
 COPY docker/docker-php-uploads.ini /usr/local/etc/php/conf.d/
 COPY docker/99-myapp-pm.ini /usr/local/etc/php/conf.d/
 
-
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /app
 
-# Copy application files
+# Copy composer.json first for layer caching
+COPY composer.json /app/
+
+# Download dependencies (cached unless composer.json changes)
+RUN env REDIS_HOST=172.17.0.1 \
+    composer install --no-dev --no-interaction --ignore-platform-reqs --no-scripts
+
+# Now copy the rest of the application
 COPY . /app
 
 # Recreate storage dirs excluded by .dockerignore
 RUN mkdir -p storage/framework/cache storage/framework/data storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
 
+# Re-dump autoloader with app files present
+RUN env REDIS_HOST=172.17.0.1 \
+    composer dump-autoload --optimize --ignore-platform-reqs --no-scripts
+
 # Setup supervisord configuration
 COPY docker/octana-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
-
-
-
-RUN env REDIS_HOST=172.17.0.1 \
-    composer install --no-dev --no-interaction --ignore-platform-reqs   --optimize-autoloader --no-scripts
- 
 
 ENV OCTANE_WORKERS=4
 ENV OCTANE_MAX_REQUESTS=500
 ENV OCTANE_TASK_WORKERS=4
 ENV OCTANE_SERVER="swoole"
 
-
-
 COPY docker/octane.php /app/config/octane.php
-#COPY docker/auth.php   /app/config/auth.php
 
-RUN chmod -R 777 /app/storage
-RUN chmod -R 777 /app/bootstrap
-RUN chmod 777 /app/public/settings.json
+RUN chmod -R 777 /app/storage /app/bootstrap \
+    && chmod 777 /app/public/settings.json
 
-## migrations - will run after deployment
-#RUN REDIS_HOST=172.17.0.1 \
- #   php artisan migrate --force
-#RUN REDIS_HOST=172.17.0.1 \
- #   php artisan optimize:clear
-
-#COPY docker/nginx-octana.conf /etc/nginx/sites-available/default
-#EXPOSE 80
-
-
-# Expose port 9000
 EXPOSE 8000
 
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-

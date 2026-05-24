@@ -9,7 +9,6 @@ RUN apt update && apt install -y \
     git \
     curl \
     ffmpeg \
-    vim \
     libavcodec-extra \
     libpng-dev \
     libonig-dev \
@@ -17,10 +16,8 @@ RUN apt update && apt install -y \
     libicu-dev \
     libzip-dev \
     libjpeg-dev \
-    libfreetype6-dev
-
-# Clear cache
-RUN apt clean && rm -rf /var/lib/apt/lists/*
+    libfreetype6-dev \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-jpeg --with-freetype
@@ -34,11 +31,22 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /app
 
-# Copy application files
+# Copy composer.json first for layer caching
+COPY composer.json /app/
+
+# Download dependencies (cached unless composer.json changes)
+RUN env REDIS_HOST=172.17.0.1 \
+	 composer install --no-dev --no-interaction --ignore-platform-reqs --no-scripts
+
+# Now copy the rest of the application
 COPY . /app
 
 # Recreate storage dirs excluded by .dockerignore
 RUN mkdir -p storage/framework/cache storage/framework/data storage/framework/sessions storage/framework/testing storage/framework/views storage/logs bootstrap/cache
+
+# Re-dump autoloader with app files present
+RUN env REDIS_HOST=172.17.0.1 \
+	 composer dump-autoload --optimize --ignore-platform-reqs --no-scripts
 
 # Copy the crontab file
 COPY docker/cron /etc/cron.d/app-cron
@@ -54,33 +62,8 @@ RUN crontab -u root /etc/cron.d/app-cron
 # Setup supervisord configuration
 COPY docker/jobs-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
 
-
-#RUN sed -i 's/127.0.0.1/172.17.0.1/g' /app/.env
-#RUN sed -i "s|/var/www/tempo/gcp.json|/app/gcp.json|g" /app/.env
-#RUN ls -al
-
-
-
-# Install application dependencies
-
-RUN env REDIS_HOST=172.17.0.1 \
-	 composer install --no-dev --no-interaction --ignore-platform-reqs --optimize-autoloader --no-scripts
-
-
-RUN chmod -R 777 /app/storage
-RUN chmod -R 777 /app/bootstrap
-RUN chmod 777 /app/public/settings.json
-
-# Migrations run at deploy time, not build time (requires DB access)
-# optimize:clear runs at runtime since .env is bind-mounted
-
-#COPY docker/nginx.conf /etc/nginx/sites-available/default
-#EXPOSE 80
-
-
-# Expose port 9000
-#EXPOSE 9000
+RUN chmod -R 777 /app/storage /app/bootstrap \
+    && chmod 777 /app/public/settings.json
 
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
