@@ -3056,4 +3056,13 @@ Route::get('/fix-gift-prices/execute', function () {
 });
 
 // Cashback Report - HTML Page
-Route::get('/cashback-report-simple-page', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'html']);
+Route::middleware(['admin'])->get('/cashback-report-simple-page', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'html']);
+
+// Fix Monthly Diamonds Duplicates (Idempotent - safe to run multiple times)
+Route::prefix('fix-monthly-diamonds')->middleware(['admin'])->group(function () {
+    Route::get('/', function () {
+        return view('admin.fix-monthly-diamonds');
+    })->name('fix-monthly-diamonds.index');
+    Route::get('/stats', [\App\Http\Controllers\FixMonthlyDiamondsController::class, 'stats'])->name('fix-monthly-diamonds.stats');
+    Route::post('/run', [\App\Http\Controllers\FixMonthlyDiamondsController::class, 'fix'])->name('fix-monthly-diamonds.run');
+});

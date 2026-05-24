@@ -183,7 +183,7 @@
             document.getElementById('page-num').textContent = page;
 
             try {
-                const response = await fetch(`/admin/cashback-report-simple?page=${page}`);
+                const response = await fetch(`/api/admin/cashback-report-simple?page=${page}`);
                 const data = await response.json();
 
                 if (data.status === 'success') {
@@ -215,7 +215,7 @@
 
             while (hasMore) {
                 try {
-                    const response = await fetch(`/admin/cashback-report-simple?page=${page}`);
+                    const response = await fetch(`/api/admin/cashback-report-simple?page=${page}`);
                     const data = await response.json();
 
                     if (data.status === 'success') {
@@ -326,12 +326,12 @@
         }
 
         function exportCSV() {
-            window.location.href = '/admin/cashback-report-simple/export';
+            window.location.href = '/api/admin/cashback-report-simple/export';
         }
 
         async function clearCache() {
             try {
-                await fetch('/admin/cashback-report-simple/clear-cache', {method: 'POST'});
+                await fetch('/api/admin/cashback-report-simple/clear-cache', {method: 'POST'});
                 alert('تم مسح الكاش بنجاح');
                 location.reload();
             } catch (error) {
