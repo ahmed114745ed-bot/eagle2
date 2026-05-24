@@ -11,7 +11,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      * Add unique index to monthly_diamond_receives with safety check
-     * Also merges duplicate records for month 5, year 2026
+     * Merges ALL duplicate records across all months/years
      */
     public function up(): void
     {
@@ -23,14 +23,14 @@ return new class extends Migration
             return;
         }
 
-        // Step 1: Merge duplicates for month 5, year 2026
-        $this->log('📊 Step 1: Checking for duplicates in month 5, year 2026...');
-        $duplicatesCount = $this->mergeDuplicatesForMonth(5, 2026);
+        // Step 1: Merge ALL duplicates (not just May 2026)
+        $this->log('📊 Step 1: Checking for duplicates in ALL months...');
+        $totalMerged = $this->mergeAllDuplicates();
 
-        if ($duplicatesCount > 0) {
-            $this->log("✅ Merged {$duplicatesCount} duplicate groups for May 2026");
+        if ($totalMerged > 0) {
+            $this->log("✅ Merged {$totalMerged} duplicate groups across all months");
         } else {
-            $this->log('✅ No duplicates found for May 2026');
+            $this->log('✅ No duplicates found');
         }
 
         // Step 2: Add unique index
@@ -44,9 +44,8 @@ return new class extends Migration
             $this->log('✅ Unique index "idx_user_month_year" added successfully');
         } catch (\Exception $e) {
             if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                $this->log('❌ ERROR: Still have duplicates in other months!', 'error');
-                $this->log('Please run: php artisan migrate:rollback --step=1', 'error');
-                $this->log('Then use the fix route: /fix-monthly-diamonds', 'error');
+                $this->log('❌ ERROR: Still have duplicates after merge!', 'error');
+                $this->log('This should not happen - please check logs', 'error');
                 throw $e;
             }
             throw $e;
@@ -70,6 +69,89 @@ return new class extends Migration
         } else {
             $this->log('⚠️ Unique index "idx_user_month_year" does not exist - skipping', 'warning');
         }
+    }
+
+    /**
+     * Merge ALL duplicate records across all months/years
+     *
+     * @return int Total number of duplicate groups merged
+     */
+    private function mergeAllDuplicates(): int
+    {
+        // Find all duplicates across all months/years
+        $duplicates = DB::table('monthly_diamond_receives')
+            ->select('user_id', 'month', 'year', DB::raw('COUNT(*) as count'))
+            ->groupBy('user_id', 'month', 'year')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        if ($duplicates->isEmpty()) {
+            return 0;
+        }
+
+        $this->log("Found {$duplicates->count()} duplicate groups to merge");
+
+        $mergedCount = 0;
+
+        DB::transaction(function () use ($duplicates, &$mergedCount) {
+            foreach ($duplicates as $duplicate) {
+                // Merge this specific user/month/year group
+                $this->mergeDuplicateGroup($duplicate->user_id, $duplicate->month, $duplicate->year);
+                $mergedCount++;
+
+                // Log progress every 100 groups
+                if ($mergedCount % 100 === 0) {
+                    $this->log("Progress: Merged {$mergedCount} / {$duplicates->count()} groups");
+                }
+            }
+        });
+
+        return $mergedCount;
+    }
+
+    /**
+     * Merge duplicate records for a specific user/month/year
+     *
+     * @param int $userId
+     * @param int $month
+     * @param int $year
+     * @return void
+     */
+    private function mergeDuplicateGroup(int $userId, int $month, int $year): void
+    {
+        // Get all records for this user/month/year
+        $records = DB::table('monthly_diamond_receives')
+            ->where('user_id', $userId)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->orderBy('id')
+            ->get();
+
+        if ($records->count() <= 1) {
+            return;
+        }
+
+        // Calculate totals
+        $totalDiamonds = $records->sum('monthly_diamond_received');
+        $latestRecord = $records->sortByDesc('updated_at')->first();
+        $oldestCreatedAt = $records->min('created_at');
+
+        // Delete all except the latest
+        DB::table('monthly_diamond_receives')
+            ->where('user_id', $userId)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->where('id', '!=', $latestRecord->id)
+            ->delete();
+
+        // Update the remaining record with correct total
+        DB::table('monthly_diamond_receives')
+            ->where('id', $latestRecord->id)
+            ->update([
+                'monthly_diamond_received' => $totalDiamonds,
+                'created_at' => $oldestCreatedAt,
+                'updated_at' => now(),
+            ]);
     }
 
     /**
