@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 return new class extends Migration
 {
@@ -18,34 +19,34 @@ return new class extends Migration
         $indexExists = $this->indexExists('monthly_diamond_receives', 'idx_user_month_year');
 
         if ($indexExists) {
-            $this->command->warn('⚠️ Unique index "idx_user_month_year" already exists - skipping all operations');
+            $this->log('⚠️ Unique index "idx_user_month_year" already exists - skipping all operations', 'warning');
             return;
         }
 
         // Step 1: Merge duplicates for month 5, year 2026
-        $this->command->info('📊 Step 1: Checking for duplicates in month 5, year 2026...');
+        $this->log('📊 Step 1: Checking for duplicates in month 5, year 2026...');
         $duplicatesCount = $this->mergeDuplicatesForMonth(5, 2026);
 
         if ($duplicatesCount > 0) {
-            $this->command->info("✅ Merged {$duplicatesCount} duplicate groups for May 2026");
+            $this->log("✅ Merged {$duplicatesCount} duplicate groups for May 2026");
         } else {
-            $this->command->info('✅ No duplicates found for May 2026');
+            $this->log('✅ No duplicates found for May 2026');
         }
 
         // Step 2: Add unique index
-        $this->command->info('📊 Step 2: Adding unique index...');
+        $this->log('📊 Step 2: Adding unique index...');
 
         try {
             Schema::table('monthly_diamond_receives', function (Blueprint $table) {
                 $table->unique(['user_id', 'month', 'year'], 'idx_user_month_year');
             });
 
-            $this->command->info('✅ Unique index "idx_user_month_year" added successfully');
+            $this->log('✅ Unique index "idx_user_month_year" added successfully');
         } catch (\Exception $e) {
             if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                $this->command->error('❌ ERROR: Still have duplicates in other months!');
-                $this->command->error('Please run: php artisan migrate:rollback --step=1');
-                $this->command->error('Then use the fix route: /fix-monthly-diamonds');
+                $this->log('❌ ERROR: Still have duplicates in other months!', 'error');
+                $this->log('Please run: php artisan migrate:rollback --step=1', 'error');
+                $this->log('Then use the fix route: /fix-monthly-diamonds', 'error');
                 throw $e;
             }
             throw $e;
@@ -65,9 +66,9 @@ return new class extends Migration
                 $table->dropUnique('idx_user_month_year');
             });
 
-            $this->command->info('✅ Unique index "idx_user_month_year" dropped successfully');
+            $this->log('✅ Unique index "idx_user_month_year" dropped successfully');
         } else {
-            $this->command->warn('⚠️ Unique index "idx_user_month_year" does not exist - skipping');
+            $this->log('⚠️ Unique index "idx_user_month_year" does not exist - skipping', 'warning');
         }
     }
 
@@ -149,5 +150,32 @@ return new class extends Migration
     {
         $indexes = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
         return !empty($indexes);
+    }
+
+    /**
+     * Log a message (compatible with both CLI and non-CLI environments)
+     *
+     * @param string $message
+     * @param string $level
+     * @return void
+     */
+    private function log(string $message, string $level = 'info'): void
+    {
+        // Try to output to command if available
+        if (property_exists($this, 'command') && $this->command) {
+            switch ($level) {
+                case 'error':
+                    $this->command->error($message);
+                    break;
+                case 'warning':
+                    $this->command->warn($message);
+                    break;
+                default:
+                    $this->command->info($message);
+            }
+        }
+
+        // Always log to Laravel log for Docker/background environments
+        Log::info("[Migration] {$message}");
     }
 };
