@@ -725,3 +725,30 @@ Route::middleware(['auth:sanctum', 'admin', 'adminIp', 'throttle:3,1'])->get('qu
         'output' => \Artisan::output()
     ]);
 });
+
+// Cashback Report Routes - Simple Version (without Job)
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    // API - Get report data with pagination
+    Route::get('cashback-report-simple', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'index']);
+
+    // Export CSV
+    Route::get('cashback-report-simple/export', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'exportCsv']);
+
+    // Clear cache
+    Route::post('cashback-report-simple/clear-cache', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'clearCache']);
+});
+
+// Cashback Compensation Routes - تعويض المستخدمين
+Route::middleware(['auth:sanctum', 'admin', 'adminIp'])->prefix('admin/cashback-compensation')->group(function () {
+    // معاينة المستخدمين المستحقين للتعويض
+    Route::get('preview', [\App\Http\Controllers\CashbackCompensationController::class, 'preview']);
+
+    // تعويض مستخدم واحد
+    Route::post('user', [\App\Http\Controllers\CashbackCompensationController::class, 'compensateUser']);
+
+    // تعويض مستخدمين محددين
+    Route::post('selected', [\App\Http\Controllers\CashbackCompensationController::class, 'compensateSelected']);
+
+    // تعويض الكل (خطير - يحتاج تأكيد)
+    Route::post('all', [\App\Http\Controllers\CashbackCompensationController::class, 'compensateAll']);
+});
