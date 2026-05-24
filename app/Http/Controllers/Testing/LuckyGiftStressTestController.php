@@ -43,7 +43,7 @@ class LuckyGiftStressTestController extends Controller
             'room_id' => 'required|exists:rooms,id',
             'num' => 'required|integer|min:1|max:100',
             'count' => 'required|integer|min:1|max:10',
-            'requests_per_user' => 'required|integer|min:1|max:20',
+            'requests_per_user' => 'required|integer|min:1|max:5', // حد أقصى 5 للاختبار المباشر
             'concurrent' => 'required|boolean',
         ]);
 

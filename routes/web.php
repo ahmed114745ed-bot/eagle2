@@ -46,7 +46,9 @@ Route::prefix('stress-test/lucky-gift')->name('stress-test.')->group(function ()
     Route::get('/', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'index'])->name('index');
     Route::get('/test', function() { return view('testing.test-route'); })->name('test');
     Route::post('/run', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'runTest'])->name('run');
-    Route::get('/status/{testId}', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'checkStatus'])->name('status');
+    Route::get('/status/{testId}', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'checkStatus'])
+        ->name('status')
+        ->withoutMiddleware([\Illuminate\Routing\Middleware\ThrottleRequests::class]);
     Route::get('/reports', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'reports'])->name('reports');
     Route::get('/reports/{filename}', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'viewReport'])->name('view-report');
 });
