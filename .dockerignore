@@ -8,6 +8,9 @@ vendor
 # Dockerfiles
 Dockerfile*
 
+# Lock file (not maintained on this branch — causes build failures)
+composer.lock
+
 # Storage (logs, cache — 1.5GB+, not needed in build)
 storage/logs
 storage/jobs-logs

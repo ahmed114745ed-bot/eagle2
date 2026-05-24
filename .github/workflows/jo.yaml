@@ -77,8 +77,14 @@ jobs:
           SHA="${{ github.sha }}"
 
           echo "=== Building images ==="
-          sudo docker build -t jo:${SHA} -f Dockerfile-octana .
-          sudo docker build -t jo-job:${SHA} -f Dockerfile-jobs .
+          if ! sudo docker build -t jo:${SHA} -f Dockerfile-octana .; then
+            echo "FATAL: jo-octa build failed"
+            exit 1
+          fi
+          if ! sudo docker build -t jo-job:${SHA} -f Dockerfile-jobs .; then
+            echo "FATAL: jo-job build failed"
+            exit 1
+          fi
 
           echo "=== Deploying jo-octa ==="
           OCTA_OK=false
