@@ -374,7 +374,14 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    displayResults(result);
+                    // إذا كان الاختبار يعمل في الخلفية (Background Job)
+                    if (result.test_id && result.status_url) {
+                        pollTestStatus(result.test_id, result.status_url);
+                    }
+                    // إذا كانت النتائج جاهزة مباشرة
+                    else if (result.results) {
+                        displayResults(result);
+                    }
                 } else {
                     alert('❌ خطأ: ' + (result.message || 'حدث خطأ غير متوقع'));
                     document.getElementById('progressContainer').style.display = 'none';
@@ -397,12 +404,74 @@
             }
         });
 
+        // متابعة حالة الاختبار في الخلفية
+        async function pollTestStatus(testId, statusUrl) {
+            const progressDiv = document.getElementById('progressContainer');
+            const progressText = progressDiv.querySelector('p');
+
+            let attempts = 0;
+            const maxAttempts = 120; // 2 دقيقة (كل ثانية)
+
+            const checkStatus = async () => {
+                try {
+                    const response = await fetch(statusUrl);
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        throw new Error('فشل في الحصول على حالة الاختبار');
+                    }
+
+                    const progress = data.progress;
+
+                    // تحديث رسالة التقدم
+                    if (progress) {
+                        progressText.innerHTML = `<strong>${progress.message}</strong><br>التقدم: ${progress.percentage}%`;
+                    }
+
+                    // إذا اكتمل الاختبار
+                    if (progress && progress.status === 'completed' && data.results) {
+                        clearInterval(pollInterval);
+                        displayResults(data);
+                        return;
+                    }
+
+                    // إذا فشل الاختبار
+                    if (progress && progress.status === 'failed') {
+                        clearInterval(pollInterval);
+                        alert('❌ فشل الاختبار: ' + progress.message);
+                        progressDiv.style.display = 'none';
+                        return;
+                    }
+
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        clearInterval(pollInterval);
+                        alert('⏱️ انتهى وقت الانتظار. قد يكون الاختبار لا يزال يعمل في الخلفية.');
+                        progressDiv.style.display = 'none';
+                    }
+
+                } catch (error) {
+                    console.error('Error polling status:', error);
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        clearInterval(pollInterval);
+                        alert('❌ خطأ في متابعة حالة الاختبار: ' + error.message);
+                        progressDiv.style.display = 'none';
+                    }
+                }
+            };
+
+            // بدء المتابعة كل ثانية
+            const pollInterval = setInterval(checkStatus, 1000);
+            checkStatus(); // تنفيذ أول مرة مباشرة
+        }
+
         function displayResults(result) {
             // ملخص الأداء
-            document.getElementById('total_requests').textContent = result.results.total_requests;
-            document.getElementById('successful_requests').textContent = result.results.successful;
-            document.getElementById('failed_requests').textContent = result.results.failed;
-            document.getElementById('duration').textContent = result.duration + 's';
+            document.getElementById('total_requests').textContent = result.results.total_requests || 0;
+            document.getElementById('successful_requests').textContent = result.results.successful || 0;
+            document.getElementById('failed_requests').textContent = result.results.failed || 0;
+            document.getElementById('duration').textContent = (result.duration || 0) + 's';
 
             // إحصائيات الأداء
             if (result.analysis.performance) {
@@ -416,7 +485,7 @@
             }
 
             // حالة السلامة
-            const integrityStatus = result.analysis.integrity_check;
+            const integrityStatus = result.analysis?.integrity_check || 'UNKNOWN';
             const integrityColor = integrityStatus === 'PASSED' ? 'success' : 'danger';
             const integrityIcon = integrityStatus === 'PASSED' ? 'check-circle-fill' : 'x-circle-fill';
 
