@@ -288,7 +288,7 @@ class AreaManagerController extends MainController
                     return $regionName;
                 }
                 return null;
-            });
+            })->required();
 
         $this->addMapField($form, $id);
 
