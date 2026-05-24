@@ -1698,18 +1698,18 @@ class Common
             //  $AppId            = self::zegoData('zego_app_id');
             $AppId = '';
             $serverSecret = '';
-            if (config('app.env') == 'production') {
+           // if (config('app.env') == 'production') {
                 $url = 'https://rtc-api.zego.im';
 
                 $AppId = self::zegoData('zego_app_id');
 
                 $serverSecret = self::zegoData('zego_server_secret');
-            } else {
-                $url =  'https://engine.udt-stream.com/api/v1/server';
-                $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
+            // } else {
+            //     $url =  'https://engine.udt-stream.com/api/v1/server';
+            //     $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
 
-                $serverSecret = self::zegoData('zego_server_secret');
-            }
+            //     $serverSecret = self::zegoData('zego_server_secret');
+            // }
             $SignatureNonce   = self::getSignatureNonce();
             $Timestamp        = time();
             //  $str              = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;

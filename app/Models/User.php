@@ -543,7 +543,8 @@ class User extends Authenticatable
 
     public function is_in_live()
     {
-        return $this->rooms()->where('room_status', 1)->where('room_visitor', '!=', '')->exists();
+        // Check if user has any active room with visitors
+        return $this->rooms()->where('room_status', 1)->whereHas('roomVisitors')->exists();
     }
 
     public function ips()

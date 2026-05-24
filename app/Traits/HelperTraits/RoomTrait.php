@@ -19,7 +19,7 @@ trait RoomTrait
 {
 
     public static function get_room_users($owner_id,$user_id){
-        $room  =DB::table('rooms')->where(['uid'=>$owner_id])->select('id','microphone','room_visitor')->first();
+        $room = Room::query()->where(['uid'=>$owner_id])->select('id','microphone')->first();
         if(!$room)   return __('room does not exist');
 //        if($owner_id == $user_id)    return __('No operation authority for homeowners');
 
@@ -27,8 +27,13 @@ trait RoomTrait
         foreach ($mic_arr as $k => &$v) {
             if($v == 0 || $v == -1 || $v == $owner_id)   unset($mic_arr[$k]);
         }
-        $vis_arr=$room->room_visitor ? explode(',', $room->room_visitor) : [];
-        if($user_id && !in_array($user_id,$vis_arr))    return __('User is not in this room');
+
+        // Use repository for visitor operations
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        $vis_arr = $visitorRepo->getVisitorIds($room->id)->toArray();
+
+        // Security check: validate user is in room
+        if($user_id && !$visitorRepo->isVisitor($room->id, $user_id))    return __('User is not in this room');
         $sea_user=array();
         $mic_user=User::query ()->whereIn('id',$mic_arr)->with ('profile')->get ();
         foreach ($mic_user as $k => &$v){
@@ -93,7 +98,7 @@ trait RoomTrait
     }
 
     public static function get_room_users_2($owner_id,$user_id){
-        $room = Room::query()->where('uid', $owner_id)->select('id', 'uid', 'room_visitor')->with(['microphones.user.profile'])->first();
+        $room = Room::query()->where('uid', $owner_id)->select('id', 'uid')->with(['microphones.user.profile'])->first();
 
         if(!$room)   return __('room does not exist');
 
@@ -104,9 +109,12 @@ trait RoomTrait
 
         $mic_arr = $room->microphones->whereNotIn('user_id', [0, -1, $owner_id])->pluck('user_id')->filter()->values()->all();
 
+        // Use repository for visitor operations
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        $vis_arr = $visitorRepo->getVisitorIds($room->id)->toArray();
 
-        $vis_arr=$room->room_visitor ? explode(',', $room->room_visitor) : [];
-        if($user_id && !in_array($user_id,$vis_arr))    return __('User is not in this room');
+        // Security check: validate user is in room
+        if($user_id && !$visitorRepo->isVisitor($room->id, $user_id))    return __('User is not in this room');
         $sea_user=array();
 
 //        $mic_user=User::query ()->whereIn('id',$mic_arr)->with ('profile')->get ();
@@ -259,9 +267,14 @@ trait RoomTrait
 
     //exit room - perform action
     public static function quit_hand($uid,$user_id){
-        $Visitor=DB::table('rooms')->where(['uid'=>$uid])->value('room_visitor');
-        $room_visitor=explode(',', $Visitor);
         $room = Room::query ()->where('uid',$uid)->first ();
+        if (!$room) {
+            return '';
+        }
+
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        $room_visitor = $visitorRepo->getVisitorIds($room->id)->toArray();
+
         //homeowner exits room
         if($uid == $user_id){
             if ($room){
@@ -269,9 +282,12 @@ trait RoomTrait
             }
             Room::query ()->where('uid',$uid)->update(['is_afk'=>0]);
         }
-        if( $uid != $user_id && !in_array($user_id, $room_visitor)){
-            return $Visitor;
+
+        // Security check: validate user is in room
+        if( $uid != $user_id && !$visitorRepo->isVisitor($room->id, $user_id)){
+            return implode(',', $room_visitor);
         }
+
         foreach ($room_visitor as $k => &$v) {
             if($user_id == $v){
                 unset($room_visitor[$k]);
@@ -291,18 +307,26 @@ trait RoomTrait
     }
 
     public static function quit_hand_2($uid,$user_id){
-        $Visitor=DB::table('rooms')->where(['uid'=>$uid])->value('room_visitor');
-        $room_visitor=explode(',', $Visitor);
         $room = Room::query ()->where('uid',$uid)->first ();
+        if (!$room) {
+            return '';
+        }
+
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        $room_visitor = $visitorRepo->getVisitorIds($room->id)->toArray();
+
         if($uid == $user_id){
             if ($room){
                 $room->update (['is_afk'=>0]);
             }
             Room::query ()->where('uid',$uid)->update(['is_afk'=>0]);
         }
-        if( $uid != $user_id && !in_array($user_id, $room_visitor)){
-            return $Visitor;
+
+        // Security check: validate user is in room
+        if( $uid != $user_id && !$visitorRepo->isVisitor($room->id, $user_id)){
+            return implode(',', $room_visitor);
         }
+
         foreach ($room_visitor as $k => &$v) {
             if($user_id == $v){
                 unset($room_visitor[$k]);

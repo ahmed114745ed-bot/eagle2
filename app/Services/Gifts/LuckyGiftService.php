@@ -100,30 +100,28 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $firstChunkSize;
 
-        // Acquire lock BEFORE validation to prevent race conditions
-        $lock = $this->acquireUserLock($userId);
-        try {
-            $user->refresh();
-            $userCoins = $user->di;
-            $oldUserCoin = $userCoins;
-            $amountBefore = $user->di;
+        // Refresh user data to get latest balance
+        $user->refresh();
+        $userCoins = $user->di;
+        $oldUserCoin = $userCoins;
+        $amountBefore = $user->di;
 
-            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
-            if ($userCoins < $totalPriceFull) {
-                throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-            }
+        // Validate coins before processing
+        if ($userCoins < $totalPriceFull) {
+            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
+        }
 
             if (isset($ownerId)) {
                 $room = Room::withoutAppends()
                     ->with('microphones')
                     ->where('uid', $ownerId)
-                    ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                    ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                     ->first();
             } else {
                 $room = Room::withoutAppends()
                     ->with('microphones')
                     ->where('id', $roomId)
-                    ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                    ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                     ->first();
                 $ownerId = $room?->uid;
             }
@@ -364,50 +362,55 @@ class LuckyGiftService
             $responseData['total_pk'] = $coinsForReceiver;
 
             // CRITICAL: Save user balance changes to DB BEFORE returning response
-            // This ensures subsequent requests see the updated balance
-            // Using atomic DB update to avoid Eloquent observer issues
+            // Using ATOMIC UPDATE with balance validation to prevent negative balance race condition
 
             $initialDi = $user->getOriginal('di');
             $finalDi = $user->di;
             $totalChange = $finalDi - $initialDi;
 
-            Log::channel('lucky_gift')->info('💾 Applying balance change', [
+            Log::channel('lucky_gift')->info('💾 Applying atomic balance change', [
                 'user_id' => $userId,
                 'initial_di' => $initialDi,
                 'final_di' => $finalDi,
-                'change' => $totalChange,
+                'delta' => $totalChange,
                 'total_user_win' => $total_user_win,
                 'throwNumber' => $throwNumber,
             ]);
 
-            // Atomic update with optimistic locking to prevent race conditions
-            $updated = \DB::table('users')
-                ->where('id', $userId)
-                ->where('di', $initialDi)  // Ensure no concurrent modification
-                ->update([
-                    'di' => $finalDi,
-                    'updated_at' => now(),
-                ]);
+            // ✅ ATOMIC UPDATE with negative balance prevention
+            // Uses WHERE clause to ensure balance never goes negative
+            if ($totalChange != 0) {
+                $affectedRows = \DB::table('users')
+                    ->where('id', $userId)
+                    ->where('di', '>=', abs($totalChange < 0 ? $totalChange : 0)) // Prevent negative balance
+                    ->update([
+                        'di' => \DB::raw("di + ({$totalChange})"),
+                        'updated_at' => now(),
+                    ]);
 
-            if (!$updated) {
-                $currentDi = \DB::table('users')->where('id', $userId)->value('di');
-                Log::channel('lucky_gift')->error('❌ Balance update failed - concurrent modification detected', [
+                if ($affectedRows === 0) {
+                    // Balance was insufficient for the atomic update
+                    $currentDi = \DB::table('users')->where('id', $userId)->value('di');
+                    Log::channel('lucky_gift')->error('❌ Atomic update prevented negative balance', [
+                        'user_id' => $userId,
+                        'current_di' => $currentDi,
+                        'attempted_delta' => $totalChange,
+                        'would_result_in' => $currentDi + $totalChange,
+                    ]);
+                    throw new InvalidArgumentException(__('api_responses.insufficient') . " (Available: {$currentDi})");
+                }
+
+                // Verify the update
+                $verifiedDi = \DB::table('users')->where('id', $userId)->value('di');
+                Log::channel('lucky_gift')->info('✅ Atomic balance updated successfully', [
                     'user_id' => $userId,
-                    'expected_initial_di' => $initialDi,
-                    'current_di' => $currentDi,
-                    'attempted_final_di' => $finalDi,
+                    'delta_applied' => $totalChange,
+                    'new_balance' => $verifiedDi,
                 ]);
-                throw new \Exception('Balance was modified by another request. Please try again.');
-            }
 
-            // Verify the update
-            $verifiedDi = \DB::table('users')->where('id', $userId)->value('di');
-            Log::channel('lucky_gift')->info('✅ Balance updated successfully', [
-                'user_id' => $userId,
-                'new_balance' => $verifiedDi,
-                'change_applied' => $totalChange,
-                'verified' => ($verifiedDi == $finalDi),
-            ]);
+                // Update the in-memory model to reflect DB state
+                $user->di = $verifiedDi;
+            }
 
             // Sync the Eloquent model to reflect the saved state
             // This prevents isDirty() from thinking the model still needs saving
@@ -442,9 +445,6 @@ class LuckyGiftService
             ])->onQueue('gifts');
 
             return $responseData;
-        } finally {
-            $lock->release();
-        }
     }
 
 
@@ -484,28 +484,26 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
-        $lock = $this->acquireUserLock($userId);
-        try {
-            $user->refresh();
-            $userCoins = $user->di;
-            $oldUserCoin = $userCoins;
-            $amountBefore = $user->di;
+        $user->refresh();
+        $userCoins = $user->di;
+        $oldUserCoin = $userCoins;
+        $amountBefore = $user->di;
 
-            if ($userCoins < $totalPrice) {
-                throw new InvalidArgumentException(__('api_responses.insufficient'));
-            }
+        if ($userCoins < $totalPrice) {
+            throw new InvalidArgumentException(__('api_responses.insufficient'));
+        }
 
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
                 ->with('microphones')
                 ->where('uid', $ownerId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
         } else {
             $room = Room::withoutAppends()
                 ->with('microphones')
                 ->where('id', $roomId)
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->selectRaw('id,uid,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
                 ->first();
             $ownerId = $room?->uid;
         }
@@ -689,45 +687,54 @@ class LuckyGiftService
         ];
 
         // CRITICAL: Save user balance changes to DB BEFORE returning response
-        // This ensures subsequent requests see the updated balance
-        // Using atomic DB update to avoid Eloquent observer issues
+        // Using ATOMIC UPDATE with balance validation to prevent negative balance race condition
 
         $initialDiV1 = $user->getOriginal('di');
         $finalDiV1 = $user->di;
         $totalChangeV1 = $finalDiV1 - $initialDiV1;
 
-        Log::channel('lucky_gift')->info('💾 [V1] Applying balance change', [
+        Log::channel('lucky_gift')->info('💾 [V1] Applying atomic balance change', [
             'user_id' => $userId,
             'initial_di' => $initialDiV1,
             'final_di' => $finalDiV1,
-            'change' => $totalChangeV1,
+            'delta' => $totalChangeV1,
             'total_user_win' => $total_user_win,
         ]);
 
-        // Atomic update with optimistic locking
-        $updatedV1 = \DB::table('users')
-            ->where('id', $userId)
-            ->where('di', $initialDiV1)
-            ->update([
-                'di' => $finalDiV1,
-                'updated_at' => now(),
-            ]);
+        // ✅ ATOMIC UPDATE with negative balance prevention
+        // Uses WHERE clause to ensure balance never goes negative
+        if ($totalChangeV1 != 0) {
+            $affectedRowsV1 = \DB::table('users')
+                ->where('id', $userId)
+                ->where('di', '>=', abs($totalChangeV1 < 0 ? $totalChangeV1 : 0)) // Prevent negative balance
+                ->update([
+                    'di' => \DB::raw("di + ({$totalChangeV1})"),
+                    'updated_at' => now(),
+                ]);
 
-        if (!$updatedV1) {
-            $currentDiV1 = \DB::table('users')->where('id', $userId)->value('di');
-            Log::channel('lucky_gift')->error('❌ [V1] Balance update failed - concurrent modification', [
+            if ($affectedRowsV1 === 0) {
+                // Balance was insufficient for the atomic update
+                $currentDiV1 = \DB::table('users')->where('id', $userId)->value('di');
+                Log::channel('lucky_gift')->error('❌ [V1] Atomic update prevented negative balance', [
+                    'user_id' => $userId,
+                    'current_di' => $currentDiV1,
+                    'attempted_delta' => $totalChangeV1,
+                    'would_result_in' => $currentDiV1 + $totalChangeV1,
+                ]);
+                throw new InvalidArgumentException(__('api_responses.insufficient') . " (Available: {$currentDiV1})");
+            }
+
+            // Verify the update
+            $verifiedDiV1 = \DB::table('users')->where('id', $userId)->value('di');
+            Log::channel('lucky_gift')->info('✅ [V1] Atomic balance updated successfully', [
                 'user_id' => $userId,
-                'expected_initial_di' => $initialDiV1,
-                'current_di' => $currentDiV1,
+                'delta_applied' => $totalChangeV1,
+                'new_balance' => $verifiedDiV1,
             ]);
-            throw new \Exception('Balance was modified by another request. Please try again.');
-        }
 
-        Log::channel('lucky_gift')->info('✅ [V1] Balance updated successfully', [
-            'user_id' => $userId,
-            'new_balance' => $finalDiV1,
-            'change_applied' => $totalChangeV1,
-        ]);
+            // Update the in-memory model to reflect DB state
+            $user->di = $verifiedDiV1;
+        }
 
         // Sync the Eloquent model to reflect the saved state
         $user->syncOriginal();
@@ -763,9 +770,6 @@ class LuckyGiftService
         ])->onQueue('gifts');
 
         return $responseData;
-        } finally {
-            $lock->release();
-        }
     }
 
 

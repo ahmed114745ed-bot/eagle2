@@ -491,9 +491,12 @@ class RoomController extends Controller
     public function getRoomUsersDeprecated(Request $request)
     {
         $uid       = $request->owner_id;
-        $roomAdmin = Room::query()->where(['uid' => $uid])->value('room_admin');
+        $room = Room::query()->where(['uid' => $uid])->select('id', 'room_admin')->first();
+        if (!$room) {
+            return Common::apiResponse(0, 'Room not found', null, 404);
+        }
 
-        $roomAdmin = explode(',', $roomAdmin);
+        $roomAdmin = explode(',', $room->room_admin ?? '');
         $admins    = User::with('profile')->whereIn('id', $roomAdmin)->get();
         $admins    = $admins->filter(function ($q) {
             return !Common::hasInPack($q->id, 17, true);
@@ -507,8 +510,9 @@ class RoomController extends Controller
             $admin[$k]['is_admin'] = 1;
         }
 
-        $roomVisitor = DB::table('rooms')->where(['uid' => $uid])->value('room_visitor');
-        $roomVisitor = explode(',', $roomVisitor);
+        // Use repository for visitor operations
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        $roomVisitor = $visitorRepo->getVisitorIds($room->id)->toArray();
 
         $roomVisitor = array_values(array_diff($roomVisitor, $roomAdmin));
         $visitors    = User::query()->with('profile')->whereIn('id', $roomVisitor)->get();
@@ -612,7 +616,7 @@ class RoomController extends Controller
                     $remainTime       = ($endTime - time());
                     $ar['remainTime'] = $remainTime <= 0 ? 0 : (string)$remainTime;
                     if ($ar['remainTime'] <= 0) {
-                        Db::table('time_log')->where(['uid' => $uid, 'muid' => $v])->delete();
+                        Db::table('time_logs')->where(['uid' => $uid, 'muid' => $v])->delete();
                     }
                 }
             }
@@ -634,11 +638,17 @@ class RoomController extends Controller
         $user_id = $request->user_id;
         $phase   = $request->phase;
         if (!$data['owner_id'] || !$user_id) return Common::apiResponse(0, __('Missing data'), null, 422);
-        $room =
-            (array)DB::table('rooms')->where(['uid' => $data['owner_id']])->selectRaw('id,room_visitor,room_admin,microphone,free_mic,mode')->first();
+
+        $room = Room::query()->where(['uid' => $data['owner_id']])->select('id', 'room_admin', 'microphone', 'free_mic', 'mode')->first();
         if (!$room) return Common::apiResponse(0, __('room does not exist'));
-        $vis_arr = !$room['room_visitor'] ? [] : explode(",", $room['room_visitor']);
-        if (!in_array($user_id, $vis_arr) && $data['owner_id'] != $user_id) return Common::apiResponse(0, __('The user is not in this room'), null, 403);
+
+        // Security check: validate user is in room (unless they are the owner)
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        if (!$visitorRepo->isVisitor($room->id, $user_id) && $data['owner_id'] != $user_id) {
+            return Common::apiResponse(0, __('The user is not in this room'), null, 403);
+        }
+
+        $room = $room->toArray();
 
         $position = $data['position']; //mic sequence 0-8
         if ($room['mode'] != '1') {
@@ -655,7 +665,12 @@ class RoomController extends Controller
         $adm_id = $request->user()->id;
         if ($room['free_mic'] == 1 && $adm_id != $data['owner_id']) {
             $adm_arr = $room['room_admin'] ? explode(",", $room['room_admin']) : [$data['owner_id']];
-            if (!in_array($adm_id, $vis_arr)) return Common::apiResponse(0, __('Please enter this room first'), null, 403);
+
+            // FIX: Check if admin is in room using repository
+            if (!$visitorRepo->isVisitor($room['id'], $adm_id)) {
+                return Common::apiResponse(0, __('Please enter this room first'), null, 403);
+            }
+
             if (!in_array($adm_id, $adm_arr)) return Common::apiResponse(0, __('You do not have this permission yet'), null, 408);
         }
 
@@ -1494,10 +1509,16 @@ class RoomController extends Controller
         //        if ($request->user ()->id != $uid){
         //            return Common::apiResponse(0,'not allowed');
         //        }
-        $roomVisitor = DB::table('rooms')->where('uid', $uid)->value('room_visitor');
-        $room        = Room::query()->where('uid', $uid)->first();
-        $vis_arr     = !$roomVisitor ? [] : explode(",", $roomVisitor);
-        if (!in_array($user_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
+        $room = Room::query()->where('uid', $uid)->first();
+        if (!$room) {
+            return Common::apiResponse(0, 'Room not found', null, 404);
+        }
+
+        // Security check: validate user is in room before banning
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        if (!$visitorRepo->isVisitor($room->id, $user_id)) {
+            return Common::apiResponse(0, 'This user is not in this room', null, 404);
+        }
 
 
         $roomSpeak = DB::table('rooms')->where('uid', $uid)->value('room_speak');
@@ -1586,9 +1607,14 @@ class RoomController extends Controller
     {
         $userId = Auth::id();
         if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-        $room = Room::query()->where('uid', $request->owner_id)->where('room_status', 1)->first();
+        $room = Room::query()->where('uid', $request->owner_id)->where('room_status', 1)->with('roomVisitors')->first();
         if (!$room) return Common::apiResponse(0, 'not found', null, 404);
-        if ($userId != $room->uid && $room->room_visitor = '') return Common::apiResponse(0, 'room closed', null, 403);
+
+        // FIXED BUG: was using assignment (=) instead of comparison (==)
+        // Check if room has visitors before allowing PK (unless user is room owner)
+        if ($userId != $room->uid && $room->roomVisitors->isEmpty()) {
+            return Common::apiResponse(0, 'room closed', null, 403);
+        }
         $ex = Pk::query()->where('room_id', $room->id)->where('status', 1)->exists();
         if ($ex) Pk::query()->where('status', 1)->update(['status' => 0]);
         Pk::query()->create([

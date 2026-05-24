@@ -29,16 +29,16 @@ class RoomVisitorRepository
             ]);
 
             // Dual-write: update legacy column
-            $room = Room::find($roomId);
-            if ($room) {
-                $visitors = array_filter(explode(',', $room->room_visitor ?? ''));
+            // $room = Room::find($roomId);
+            // if ($room) {
+            //     $visitors = array_filter(explode(',', $room->room_visitor ?? ''));
 
-                if (!in_array($userId, $visitors)) {
-                    $visitors[] = $userId;
-                    $room->room_visitor = implode(',', $visitors);
-                    $room->save();
-                }
-            }
+            //     if (!in_array($userId, $visitors)) {
+            //         $visitors[] = $userId;
+            //         $room->room_visitor = implode(',', $visitors);
+            //         $room->save();
+            //     }
+            // }
 
             return true;
         });

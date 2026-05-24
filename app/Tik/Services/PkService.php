@@ -25,7 +25,11 @@ class PkService
 
         if (!$room) throw new \Exception('not found');
         if ($userId != $room->uid)  throw new \Exception(__('you don not have permission'));
-        if ($room->room_visitor = '') throw new \Exception(__('room closed'));
+
+        // FIXED BUG: was using assignment (=) instead of comparison (==)
+        // Load relation to check if room has visitors
+        $room->loadMissing('roomVisitors');
+        if ($room->roomVisitors->isEmpty()) throw new \Exception(__('room closed'));
         $ex =  $this->pkRepository->getPk($room->id);
         if ($ex) $ex->update(['status' => 0]);
         $data =

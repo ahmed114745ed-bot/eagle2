@@ -65,7 +65,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
 
         $room =
             Room::withoutAppends()->where(['id' => $this->roomId])
-                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone')
+                ->selectRaw('id,uid,play_num,hot,room_pass,session,microphone')
                 ->with([
                            'owner' => function ($query) {
                                $query->withoutAppends();
