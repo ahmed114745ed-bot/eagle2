@@ -2669,3 +2669,6 @@ Route::get('/fix-gift-prices/execute', function () {
         ], 500);
     }
 });
+
+// Cashback Report - HTML Page
+Route::get('/cashback-report-simple-page', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'html']);
