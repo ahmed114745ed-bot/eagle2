@@ -58,7 +58,7 @@ class UsersJoinedAgencyController extends MainController
             });
         });
 
-        $grid->model()->orderByDesc('id');
+        $grid->model()->orderByDesc('id')->with(['user.profile', 'agency']);
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))
             ->display(function ($name) {

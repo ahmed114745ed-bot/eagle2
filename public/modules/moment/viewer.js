@@ -7,7 +7,7 @@
     const adminUserUrl = cfg.adminUserUrl || '';
     const defaultAvatar = cfg.defaultAvatar || '';
     const storageUrl = cfg.storageUrl || '';
-    const csrf = cfg.csrf || '';
+    const csrf = $('meta[name="csrf-token"]').attr('content') || cfg.csrf || '';
 
     let currentPage = 1;
     let currentSort = 'random'; // الترتيب الافتراضي عشوائي
@@ -22,15 +22,25 @@
     const TRIGGER_THRESHOLD = 3; // التحميل عند الوصول لآخر 3 عناصر
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    // ترجمات See More لأربع لغات
+    // ترجمات See More لجميع اللغات المدعومة
     const seeMoreTexts = {
         ar: { more: 'عرض المزيد', less: 'عرض أقل' },
         en: { more: 'See More', less: 'See Less' },
         fr: { more: 'Voir Plus', less: 'Voir Moins' },
-        es: { more: 'Ver Más', less: 'Ver Menos' }
+        es: { more: 'Ver Más', less: 'Ver Menos' },
+        hi: { more: 'और देखें', less: 'कम देखें' },
+        tr: { more: 'Devamını Gör', less: 'Daha Az Gör' },
+        id: { more: 'Lihat Selengkapnya', less: 'Lihat Lebih Sedikit' }
     };
 
     $(document).ready(function() {
+        // Setup CSRF token for all AJAX requests
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': csrf
+            }
+        });
+
         // اكتشاف اللغة وتطبيق الاتجاه
         detectAndApplyDirection();
 
@@ -139,9 +149,36 @@
         // زر العودة للأعلى
         $('#scrollTopBtn').on('click', scrollToTop);
 
+        // Event delegation for post actions (works with dynamically created elements)
+        $(document).on('click', '[data-action="toggle-menu"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = $(this).data('id');
+            var menu = $('#menu-' + id);
+            $('.post-dropdown').not(menu).hide();
+            menu.toggle();
+        });
+
+        $(document).on('click', '[data-action="delete-moment"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = $(this).data('id');
+            $('.post-dropdown').hide();
+            deleteMoment(id, e);
+        });
+
+        $(document).on('click', '[data-action="edit-moment"]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var id = $(this).data('id');
+            $('.post-dropdown').hide();
+            editMoment(id, e);
+        });
+
         // إغلاق القوائم المنسدلة عند النقر خارجها
         $(document).on('click', function(e) {
             if (!$(e.target).closest('.post-menu').length) {
+                $('.post-dropdown').hide();
                 $('.dropdown-menu').removeClass('show');
             }
         });
@@ -432,18 +469,18 @@
                         </div>
                     </div>
                     <div class="post-menu">
-                        <button class="menu-btn" onclick="toggleMenu(${moment.id}, event)">
+                        <a href="javascript:void(0)" class="menu-btn" data-action="toggle-menu" data-id="${moment.id}">
                             <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                        <div class="dropdown-menu different" id="menu-${moment.id}">
-                            <button class="dropdown-item" onclick="editMoment(${moment.id}, event)">
+                        </a>
+                        <div class="post-dropdown" id="menu-${moment.id}" style="display:none;">
+                            <a href="javascript:void(0)" class="post-dropdown-item" data-action="edit-moment" data-id="${moment.id}">
                                 <i class="fas fa-edit"></i>
                                 <span>${texts.editDesc || 'Edit Description'}</span>
-                            </button>
-                            <button class="dropdown-item delete-item" onclick="deleteMoment(${moment.id}, event)">
+                            </a>
+                            <a href="javascript:void(0)" class="post-dropdown-item delete-item" data-action="delete-moment" data-id="${moment.id}">
                                 <i class="fas fa-trash"></i>
                                 <span>${texts.deleteMoment || 'Delete Moment'}</span>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -1195,11 +1232,15 @@
     }
 
     window.editMoment = function(momentId, event) {
-        if (event) event.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        $('.post-dropdown').hide();
         $('.dropdown-menu').removeClass('show');
 
         const descElement = $(`#desc-${momentId}`);
-        const currentDesc = descElement.text().trim();
+        const currentDesc = descElement.length ? descElement.text().trim() : '';
 
         Swal.fire({
             title: texts.editDesc || 'Edit Description',
@@ -1211,88 +1252,107 @@
             cancelButtonColor: '#65676b',
             confirmButtonText: texts.save || 'Save',
             cancelButtonText: texts.cancel || 'Cancel',
-            inputValidator: (value) => {
-                if (value && value.length > 1000) {
-                    return texts.descTooLong || 'Description is too long (max 1000 characters)';
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                updateMomentDescription(momentId, result.value);
+            preConfirm: function(inputValue) {
+                updateMomentDescription(momentId, inputValue || '');
             }
         });
     };
 
     function updateMomentDescription(momentId, description) {
+        var currentCsrf = $('meta[name="csrf-token"]').attr('content') || csrf;
         $.ajax({
             url: routes.updateDescription.replace(':id', momentId),
             method: 'PUT',
-            data: { description: description, _token: csrf },
+            data: { description: description, _token: currentCsrf },
+            headers: { 'X-CSRF-TOKEN': currentCsrf },
             success: function(response) {
-                if (response.success) {
-                    $(`#desc-${momentId}`).html(escapeHtml(response.description));
-                    const direction = detectTextDirection(response.description);
-                    $(`#desc-${momentId}`).attr('dir', direction).css('text-align', direction === 'rtl' ? 'right' : 'left');
-                    Swal.fire({
-                        icon: 'success',
-                        title: texts.updated || 'Updated',
-                        text: texts.descUpdated || 'Description updated successfully',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                if (response && response.success) {
+                    var descEl = $(`#desc-${momentId}`);
+                    if (descEl.length) {
+                        descEl.find('.description-text').html(escapeHtml(response.description));
+                        var direction = detectTextDirection(response.description);
+                        descEl.attr('dir', direction).css('text-align', direction === 'rtl' ? 'right' : 'left');
+                    }
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'success', title: texts.updated || 'Updated', text: texts.descUpdated || 'Description updated successfully', timer: 1500, showConfirmButton: false });
+                    }
+                } else {
+                    var msg = (response && response.message) ? response.message : 'Update failed';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                    } else {
+                        alert(msg);
+                    }
                 }
             },
             error: function(xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: texts.error || 'Error',
-                    text: xhr.responseJSON?.message || texts.failUpdate || 'Failed to update description'
-                });
+                var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : ('Error ' + xhr.status + ': ' + xhr.statusText);
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                } else {
+                    alert(msg);
+                }
             }
         });
     }
 
     window.deleteMoment = function(momentId, event) {
-        if (event) event.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        $('.post-dropdown').hide();
         $('.dropdown-menu').removeClass('show');
+
+        var currentCsrf = $('meta[name="csrf-token"]').attr('content') || csrf;
+
+        var doDelete = function() {
+            var deleteUrl = routes.deleteMoment.replace(':id', momentId);
+            $.ajax({
+                url: deleteUrl,
+                type: 'DELETE',
+                data: { _token: currentCsrf },
+                headers: { 'X-CSRF-TOKEN': currentCsrf },
+                success: function(response) {
+                    if (response && response.success) {
+                        $(`.moment-post[data-moment-id="${momentId}"]`).fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'success', title: texts.deleted || 'Deleted!', text: texts.momentDeleted || 'Moment deleted successfully', timer: 1500, showConfirmButton: false });
+                        }
+                    } else {
+                        var msg = (response && response.message) ? response.message : 'Delete failed';
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                        } else {
+                            alert(msg);
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : ('Error ' + xhr.status + ': ' + xhr.statusText);
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                    } else {
+                        alert(msg);
+                    }
+                }
+            });
+        };
 
         Swal.fire({
             title: texts.sure || 'Are you sure?',
             text: texts.noRevert || 'You will not be able to revert this!',
+            type: 'warning',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#e4405f',
             cancelButtonColor: '#65676b',
             confirmButtonText: texts.yesDelete || 'Yes, delete it!',
-            cancelButtonText: texts.cancel || 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: routes.deleteMoment.replace(':id', momentId),
-                    type: 'DELETE',
-                    data: { _token: csrf },
-                    success: function(response) {
-                        if (response.success) {
-                            $(`.moment-post[data-moment-id="${momentId}"]`).fadeOut(300, function() {
-                                $(this).remove();
-                            });
-                            Swal.fire({
-                                icon: 'success',
-                                title: texts.deleted || 'Deleted!',
-                                text: texts.momentDeleted || 'Moment deleted successfully',
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: texts.error || 'Error',
-                            text: xhr.responseJSON?.message || texts.failDeleteMoment || 'Failed to delete moment'
-                        });
-                    }
-                });
+            cancelButtonText: texts.cancel || 'Cancel',
+            preConfirm: function() {
+                doDelete();
             }
         });
     };
@@ -1302,44 +1362,60 @@
     };
 
     window.deleteCommentFromModal = function(commentId, momentId, event) {
-        if (event) event.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
 
-        Swal.fire({
-            title: texts.sure || 'Are you sure?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#e4405f',
-            cancelButtonColor: '#65676b',
-            confirmButtonText: texts.yesDelete || 'Yes, delete it!',
-            cancelButtonText: texts.cancel || 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: routes.deleteComment.replace(':id', commentId),
-                    type: 'DELETE',
-                    data: { _token: csrf },
-                    success: function(response) {
-                        if (response.success) {
-                            loadCommentsInModal(momentId);
-                            Swal.fire({
-                                icon: 'success',
-                                title: texts.deleted || 'Deleted!',
-                                text: texts.commentDeleted || 'Comment deleted successfully',
-                                timer: 1200,
-                                showConfirmButton: false
-                            });
+        var doDelete = function() {
+            var currentCsrf = $('meta[name="csrf-token"]').attr('content') || csrf;
+            $.ajax({
+                url: routes.deleteComment.replace(':id', commentId),
+                type: 'DELETE',
+                data: { _token: currentCsrf },
+                headers: { 'X-CSRF-TOKEN': currentCsrf },
+                success: function(response) {
+                    if (response.success) {
+                        loadCommentsInModal(momentId);
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({ icon: 'success', title: texts.deleted || 'Deleted!', text: texts.commentDeleted || 'Comment deleted successfully', timer: 1200, showConfirmButton: false });
                         }
-                    },
-                    error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: texts.error || 'Error',
-                            text: xhr.responseJSON?.message || texts.failDeleteComment || 'Failed to delete comment'
-                        });
                     }
+                },
+                error: function(xhr) {
+                    var msg = xhr.responseJSON?.message || texts.failDeleteComment || 'Failed to delete comment';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'error', title: texts.error || 'Error', text: msg });
+                    } else {
+                        alert('Error: ' + msg);
+                    }
+                    console.error('Delete comment error:', xhr.status, xhr.responseText);
+                }
+            });
+        };
+
+        try {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: texts.sure || 'Are you sure?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e4405f',
+                    cancelButtonColor: '#65676b',
+                    confirmButtonText: texts.yesDelete || 'Yes, delete it!',
+                    cancelButtonText: texts.cancel || 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) doDelete();
                 });
+            } else {
+                if (confirm('Are you sure you want to delete this comment?')) {
+                    doDelete();
+                }
             }
-        });
+        } catch(e) {
+            console.error('deleteComment error:', e);
+            if (confirm('Are you sure?')) doDelete();
+        }
     };
 
     window.clearFilters = function() {

@@ -2,24 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use App\Jobs\SendChargeNotificationJob;
-use App\Models\User;
-use App\Models\Charge;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Setting;
-use App\Helpers\UserCommon;
-use App\Models\UserSallary;
-use App\Enums\UserCoinLogType;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use App\Helpers\UserCoinLogHelper;
-use App\Facades\CustomNotification;
-use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\UsersChargeAction;
+use App\Admin\Services\UserService;
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
+use App\Jobs\SendChargeNotificationJob;
+use App\Models\Charge;
+use App\Models\Setting;
+use App\Models\User;
+use App\Models\UserSallary;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 
 class UsersChargeController extends MainController
 {
@@ -80,38 +76,22 @@ class UsersChargeController extends MainController
 
         $grid->model()
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->select('id', 'name', 'uuid', 'coins', 'di')
-            ->with('profile')
+            ->select('id', 'name', 'uuid', 'coins', 'di', 'country_id', 'sender_level', 'received_level')
+            ->with([
+                'profile',
+                'country',
+                'senderLevel',
+                'receiverLevel',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            ])
             ->orderByDesc('id');
 
         $grid->id(__('ID'));
 
-
-
-        $grid->column('name', trans('owner'))
-            ->display(function ($name) {
-                $uid = @$this->uuid;
-                $path = @$this->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
-
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = $this ? url("admin/users/{$this->id}") : 0;
-                return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        $image
-                        <div>
-                           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                            </a>
-                            <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                        </div>
-                    </div>";
-            });
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('di', __('coins'))->display(function ($coin) {
             $icon = asset('images/coin.jpg');
@@ -124,46 +104,13 @@ class UsersChargeController extends MainController
                 </div>
             ";
         });
-        // $grid->column('di', __('coins'))->display(function ($coin) {
-        //     $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-        //     $coin = (float) $coin;
-        //     return "
-        //         <div style='display: flex; align-items: center; gap: 5px;'>
-        //             <span>" . number_format($coin) . "</span>
-        //             <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-        //         </div>
-        //     ";
-        // });
-        // $grid->column('di', __('coins'))->display(function ($coin) {
-        //     $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
-        //         $setting =   Setting::where('key', 'shipping_coins')->first();
-        //         return $setting?->value;
-        //     });
-
-        //     if ($shippingCoins) {
-        //         $dollars = $this->coins / $shippingCoins;
-        //         $numberFormatDollars = number_format($dollars);
-        //     } else {
-        //         $numberFormatDollars = __('please set agency coins in configs');
-        //     }
-
-        //     $icon = asset('images/coins.jpg');
-        //     return "
-        //         <div style='display: flex; align-items: center; gap: 5px;'>
-        //             <span>" . $numberFormatDollars . "</span>
-        //             <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-        //         </div>
-        //     ";
-        // });
+        
         if (\Encore\Admin\Facades\Admin::user()->can('add-switch-' . $this->permission_name) || \Encore\Admin\Facades\Admin::user()->can('*') || \Encore\Admin\Facades\Admin::user()->can('history-switch-' . $this->permission_name)) {
             $grid->column('actions', __('Actions'))
                 ->display(function () {
 
                     return (new UsersChargeAction())->setUserId($this->id)->render();
-                })
-                ->style('white-space: nowrap; width: 100px;');
+                })->style('white-space: nowrap; width: 100px;');
         }
 
         $grid->disableCreateButton();
@@ -272,46 +219,4 @@ class UsersChargeController extends MainController
         ]);
     }
 
-
-
-    private function createChargeRecord(User $user, $amount, $coins = 0, $usdAmount)
-    {
-        // Use ChargeSnapshotFactory for consistent snapshot creation
-        $snapshot = \App\Services\ChargeSnapshotFactory::create(
-            (float) $usdAmount,
-            'usd',
-            Auth::user(),
-            'app'
-        );
-
-        $charge = new Charge();
-        $charge->charger_id = 1;
-        $charge->charger_type = 'dash';
-        $charge->user_id = $user->id;
-        $charge->agency_id = null;
-        $charge->user_type = 'user';
-        $charge->amount = $coins;
-        $charge->usd = $usdAmount;
-        $charge->balance_before = $user->di - $coins;
-        $charge->reason_en = self::reason;
-
-        // Apply snapshot data from factory
-        $charge->applied_coin_rate = $snapshot['applied_coin_rate'];
-        $charge->total_coins = $snapshot['total_coins'];
-        $charge->transaction_type = 'admin_bulk_charge_single';
-        $charge->rate_source = $snapshot['rate_source'];
-        $charge->base_usd = $snapshot['base_usd'];
-        $charge->base_coins = $snapshot['base_coins'];
-        $charge->bonus_coins = $snapshot['bonus_coins'];
-        $charge->profit_usd = $snapshot['profit_usd'];
-        $charge->profit_coins = $snapshot['profit_coins'];
-        $charge->save();
-
-        //        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
-    }
-
-    private function recentlyCharged(int $userId)
-    {
-        return Charge::where('user_id', $userId)->where('reason_en', self::reason)->exists();
-    }
 }

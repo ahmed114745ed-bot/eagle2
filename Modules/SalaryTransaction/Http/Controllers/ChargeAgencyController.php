@@ -3,12 +3,14 @@
 namespace Modules\SalaryTransaction\Http\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
 use App\Models\ShippingAgency;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Illuminate\Support\Facades\Cache;
 use Modules\SalaryTransaction\Entities\ChargeAgency as EntitiesChargeAgency;
 
@@ -68,6 +70,9 @@ class ChargeAgencyController extends MainController
             ->with([
                 'agency',
                 'agency.owner.profile',
+                'agency.owner.country',
+                'agency.owner.senderLevel',
+                'agency.owner.receiverLevel',
                 'agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ])
             ->when($countryID, fn($q) => $q->whereHas('agency', fn($q) => $q->where('country_id', $countryID)))
@@ -97,31 +102,11 @@ class ChargeAgencyController extends MainController
                     </a>";
         });
 
-        $grid->column('agency.owner.name', trans('owner'))->display(function ($name) {
-            if (!$this->agency) {
-                return;
-            }
-            $name = $this->agency->owner->name ?? '';
-            $uid = @$this->agency->owner->uuid ?? '';
-            $path = @$this->agency->owner->profile?->avatar ?? '';
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = $path ? (getImagePath($path) ?? $defaultImage) : $defaultImage;
 
-            $image = "<img src='" . e($url) . "' onerror=\"this.onerror=null;this.src='" . e($defaultImage) . "'\" style='height:40px !important; width:40px !important; border-radius:50%; object-fit:cover;' alt='' />";
-
-            $showUrl = $this->agency->owner ? url("admin/users/{$this->agency->owner->id}") : '#';
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('name', __('owner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->agency->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('agency.phone', trans('phone'));
         $this->extendGrid($grid);

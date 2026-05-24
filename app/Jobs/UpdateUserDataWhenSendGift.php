@@ -39,6 +39,16 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::find($this->userId);
+
+        if (!$user) {
+            \Log::warning('UpdateUserDataWhenSendGift: User not found', [
+                'user_id' => $this->userId,
+                'room_id' => $this->roomId,
+                'gift_id' => $this->giftId
+            ]);
+            return;
+        }
+
         $luckyStatus = Common::getSettingValue('lucky_gifts_action');
         $hostPercentage = 0;
         $receiverFeeRate =null;
@@ -47,7 +57,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
            if (in_array($version, [4])) {
                 $receiverFeeRate = \App\Models\FairLuckSetting::getReceiverFeeRate();
             }
-            
+
            $hostPercentage  = $receiverFeeRate ?? getGiftPercentage('host_lucky_gift')  / 10;
         }else {
             $hostPercentage = getGiftPercentage('host_lucky_gift') / 10;
@@ -62,10 +72,29 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                            },
                            'lastPk',
                            'lastPkSession'
-                       ])->first(); 
+                       ])->first();
+
+        if (!$room) {
+            \Log::warning('UpdateUserDataWhenSendGift: Room not found', [
+                'user_id' => $this->userId,
+                'room_id' => $this->roomId,
+                'gift_id' => $this->giftId
+            ]);
+            return;
+        }
+
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
                                       ])->where('id', $this->giftId)->where('enable', 1)->first();
+
+        if (!$gift) {
+            \Log::warning('UpdateUserDataWhenSendGift: Gift not found or disabled', [
+                'user_id' => $this->userId,
+                'room_id' => $this->roomId,
+                'gift_id' => $this->giftId
+            ]);
+            return;
+        }
 
         $numberOfGift = $this->number * count($this->receiversIds);
         $totalPrice   = $gift->price * $numberOfGift;
@@ -85,19 +114,28 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $this->updateRoomCoinsToUser($user, $room, $coins);
         $receivedUsers = User::withoutAppends()->with(['agency', 'profile'])->whereIn('id', $receiversIds)->get();
 
+        if ($receivedUsers->isEmpty()) {
+            \Log::warning('UpdateUserDataWhenSendGift: No valid receivers found', [
+                'user_id' => $user->id,
+                'room_id' => $room->id,
+                'receiver_ids' => $receiversIds
+            ]);
+            return;
+        }
+
         $price = $number * ($gift->price * $hostPercentage);
         $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
 
         $cpIds = [];
         if ($cpId != null) {
-     
+
             $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $gift->id, $price);
 
         }
 
         $sendGiftServices = new SendGiftService();
         $pk = (!is_null($room->lastPk) || !is_null($room->lastPkSession)) ? 1 : 0;
-        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds);
+        $sendGiftServices->sendGift3ForLuckyGift($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: $pk, cpIds: $cpIds);
 
     }
 

@@ -45,7 +45,7 @@ class ChangeAgencyMangerController extends MainController
             $filter->expand ();
         });
 
-        $grid->model ()->orderByDesc('id');
+        $grid->model ()->orderByDesc('id')->with('agencyManger');
         $grid->id(__('ID'));
        
         $grid->column('name',trans ('name'));
@@ -115,14 +115,9 @@ class ChangeAgencyMangerController extends MainController
         $form = new Form(new Agency());
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
-            $form->select('agency_manger_id', __('Agency Manger app Id'))->options(function ($value){
-                $ops2 = [];
-                foreach (User::where('is_manger',1)->orWhere('id', $value)->get() as $user){
-                    $ops2[$user->id] = $user->uuid.'_'.$user->name;
-                }
-                return $ops2;
-            });
-    
+            $form->select('agency_manger_id', __('Agency Manger app Id'))->options(
+                User::where('is_manger', 1)->selectRaw("id, CONCAT(uuid, '_', name) as label")->pluck('label', 'id')
+            );
         }
 
         return $form;

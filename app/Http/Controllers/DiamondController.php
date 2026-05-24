@@ -168,4 +168,136 @@ class DiamondController extends Controller
         });
         return 'done!';
     }
+
+    /**
+     * Fix monthly diamonds for users with discrepancies only
+     * Much faster than calculateMonthlyDiamondReceived() because it only processes users with differences
+     */
+    public function fixMonthlyDiamondDiscrepancies(Request $request)
+    {
+        // Use UTC+4 timezone (Cairo/Dubai) instead of getTimezone() which returns UTC
+        $timezone = 'Asia/Dubai'; // UTC+4
+        $date = Carbon::now($timezone);
+        $currentMonth = $date->month;
+        $currentYear = $date->year;
+        $startOfMonth = Carbon::now($timezone)->startOfMonth()->copy()->setTimezone('UTC');
+
+        $processedCount = 0;
+        $updatedCount = 0;
+        $errors = [];
+        $dryRun = $request->get('dry_run', false); // Add dry-run mode for testing
+
+        // Calculate end of month properly
+        $endOfMonth = Carbon::now($timezone)->endOfMonth()->copy()->setTimezone('UTC');
+
+        // Get all users with discrepancies using the same query from the report
+        $usersWithDiscrepancies = DB::select("
+            SELECT
+                u.id AS user_id,
+                u.name,
+                u.agency_id,
+                mdr.monthly_diamond_received AS monthly_table_diamonds,
+                COALESCE(SUM(gl.giftPrice), 0) AS actual_diamonds_from_gifts,
+                (mdr.monthly_diamond_received - COALESCE(SUM(gl.giftPrice), 0)) AS difference
+            FROM users u
+            LEFT JOIN monthly_diamond_receives mdr ON mdr.user_id = u.id
+                AND mdr.month = ?
+                AND mdr.year = ?
+            LEFT JOIN gift_logs gl ON gl.receiver_id = u.id
+                AND gl.created_at >= ?
+                AND gl.created_at < ?
+                AND gl.agency_id = u.agency_id
+            WHERE u.agency_id IS NOT NULL
+            GROUP BY u.id, u.name, u.agency_id, mdr.monthly_diamond_received
+            HAVING difference != 0 OR (mdr.monthly_diamond_received IS NULL AND actual_diamonds_from_gifts > 0)
+        ", [
+            $currentMonth,
+            $currentYear,
+            $startOfMonth->toDateTimeString(),
+            $endOfMonth->toDateTimeString()
+        ]);
+
+        Log::info("Found users with discrepancies", [
+            'count' => count($usersWithDiscrepancies),
+            'month' => $currentMonth,
+            'year' => $currentYear
+        ]);
+
+        foreach ($usersWithDiscrepancies as $userData) {
+            try {
+                $userId = $userData->user_id;
+                $agencyId = $userData->agency_id;
+
+                // Get join date to calculate from correct start date
+                $join = DB::table('users_joined_agencies')
+                    ->where('user_id', $userId)
+                    ->where('agency_id', $agencyId)
+                    ->orderByDesc('join_date')
+                    ->first();
+
+                $startDate = $startOfMonth;
+                if ($join && Carbon::parse($join->join_date, $timezone)->greaterThan($startOfMonth)) {
+                    $startDate = Carbon::parse($join->join_date, $timezone)->setTimezone('UTC');
+                }
+
+                // Calculate correct total from gift_logs
+                $totalReceived = DB::table('gift_logs')
+                    ->where('receiver_id', $userId)
+                    ->where('created_at', '>=', $startDate)
+                    ->where('agency_id', $agencyId)
+                    ->selectRaw('SUM(giftPrice) as total')
+                    ->value('total');
+
+                $correctMonthlyDiamond = $totalReceived ?? 0;
+
+                // Update using uploadMonthlyDiamondReceive (which uses UPSERT)
+                if (!$dryRun) {
+                    uploadMonthlyDiamondReceive($userId, $correctMonthlyDiamond);
+
+                    // Mark salary as updated
+                    DB::table('users')
+                        ->where('id', $userId)
+                        ->update(['salary_is_updated' => 1]);
+
+                    $updatedCount++;
+                }
+
+                $processedCount++;
+
+                Log::info($dryRun ? "DRY RUN - Would fix monthly diamond for user" : "Fixed monthly diamond for user", [
+                    'user_id' => $userId,
+                    'name' => $userData->name,
+                    'old_value' => $userData->monthly_table_diamonds,
+                    'new_value' => $correctMonthlyDiamond,
+                    'difference' => $userData->difference,
+                    'dry_run' => $dryRun
+                ]);
+
+            } catch (\Throwable $e) {
+                $errors[] = [
+                    'user_id' => $userData->user_id ?? 'unknown',
+                    'error' => $e->getMessage()
+                ];
+                Log::error("Failed to fix monthly diamond", [
+                    'user_id' => $userData->user_id ?? 'unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+        }
+
+        $message = $dryRun
+            ? "DRY RUN: سيتم معالجة {$processedCount} مستخدم (لم يتم التحديث فعلياً)"
+            : "تم معالجة {$processedCount} مستخدم - تم التحديث: {$updatedCount}";
+
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'dry_run' => $dryRun,
+            'processed_count' => $processedCount,
+            'updated_count' => $updatedCount,
+            'errors_count' => count($errors),
+            'errors' => $errors
+        ]);
+    }
 }

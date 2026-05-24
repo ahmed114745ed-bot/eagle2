@@ -342,38 +342,34 @@ class EnteranceRoomServices
 
     private function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
     {
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
 
-        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
-
-        if ($event == 'room_login' && !in_array($userId, $visitors)) {
-
-            $visitors[] = $userId;
+        if ($event == 'room_login') {
+            $visitorRepo->addVisitor($room->id, $userId);
         } elseif ($event == 'room_logout') {
-
             UserHandling::calcTime($userId);
             $this->updateMicrophone($room->uid, $userId);
-            $visitors = array_diff($visitors, [$userId]);
+            $visitorRepo->removeVisitor($room->id, $userId);
         }
 
-        return array_values(array_unique($visitors));
+        // Return visitor IDs for backward compatibility
+        return $visitorRepo->getVisitorIds($room->id)->toArray();
     }
 
     private function updateRoomVisitorsBasedOnEvent2($event, $room, $userId)
     {
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
 
-        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
-
-        if ($event == 'room_login' && !in_array($userId, $visitors)) {
-
-            $visitors[] = $userId;
+        if ($event == 'room_login') {
+            $visitorRepo->addVisitor($room->id, $userId);
         } elseif ($event == 'room_logout') {
-
             UserHandling::calcTime($userId);
             $this->updateMicrophone2($room->uid, $userId);
-            $visitors = array_diff($visitors, [$userId]);
+            $visitorRepo->removeVisitor($room->id, $userId);
         }
 
-        return array_values(array_unique($visitors));
+        // Return visitor IDs for backward compatibility
+        return $visitorRepo->getVisitorIds($room->id)->toArray();
     }
 
     private function handleCharismaStatusOnLogout($room, $user, $ownerId)
@@ -740,26 +736,9 @@ class EnteranceRoomServices
 
     private function isUserInTempBlacklist(Room $room, int $userId): bool
     {
-        if (empty($room->room_black)) {
-            return false;
-        }
-
-        $isBlack = explode(',', $room->room_black);
-        foreach ($isBlack as $k => &$v) {
-            $arr = explode("#", $v);
-            $sjc = time() - (int)$arr[1];
-            if ($sjc < (int)$arr[2] && $arr[0] == $userId) {
-                return true;
-            }
-            if ($sjc >= (int)$arr[2]) {
-                unset($isBlack[$k]);
-            }
-        }
-
-        $room->room_black = implode(",", $isBlack);
-        $this->roomRepository->updateRoomBlack($room, $room->room_black);
-
-        return false;
+        // Use new blacklist repository for cleaner, database-level checking
+        $blacklistRepo = app(\App\Repositories\RoomBlacklistRepository::class);
+        return $blacklistRepo->isBlacklisted($room->id, $userId);
     }
 
     private function checkRoomPassword(Room $room, ?string $roomPass, int $ownerId, int $userId)

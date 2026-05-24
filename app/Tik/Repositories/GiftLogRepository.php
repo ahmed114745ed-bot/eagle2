@@ -157,7 +157,7 @@ class GiftLogRepository extends AbstractRepository
 
     public function userGiftInfo($id, $type, $startDate = null, $endDate = null, $perPage = null, $page = null)
     {
-        return $this->model->with('sender', 'receiver', 'gift')
+        return $this->model->with(['sender.profile', 'receiver.profile', 'receiver.specialId.ware', 'gift.category'])
             ->selectRaw('giftId, sender_id, receiver_id, SUM(giftNum * giftPrice) AS total')
             ->when($type == 'sender', fn($q) => $q->where('sender_id', $id)->where('receiver_id', '!=', $id))
             ->when($type == 'receiver', fn($q) => $q->where('receiver_id', $id)->where('sender_id', '!=', $id))

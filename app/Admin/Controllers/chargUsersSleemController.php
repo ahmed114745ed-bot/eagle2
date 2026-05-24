@@ -150,16 +150,11 @@ class chargUsersSleemController extends AdminController
     {
         $form = new Form(new Charge());
         $form->model()->with('user');
-        // $users = User::all();
-        $users = [];
-        foreach (User::get() as $user) {
-            $users[$user->id] = $user->uuid . '_' . $user->name;
-        }
-
-        $form->select('user.id', __('Name'))->options(
-            $users
-
-        )->required();
+        $form->select('user.id', __('Name'))->options(function ($value) {
+            if (!$value) return [];
+            $user = User::find($value);
+            return $user ? [$user->id => $user->uuid . '_' . $user->name] : [];
+        })->ajax('/api/search/users3', 'id', 'name')->required();
 
 
 

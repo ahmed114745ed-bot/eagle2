@@ -44,11 +44,10 @@ class LuckyGiftService
     {
     }
 
-    private function acquireUserLock(int $userId, int $timeoutSeconds = 5): \Illuminate\Contracts\Cache\Lock
+    private function acquireUserLock(int $userId, int $timeoutSeconds = 1): \Illuminate\Contracts\Cache\Lock
     {
          $lock = Cache::lock("lucky_gift_lock:user:{$userId}", $timeoutSeconds);
 
-         // Non-blocking lock - immediate response instead of waiting
          if (!$lock->get()) {
              Log::channel('lucky_gift')->warning('Lock timeout - gift already in progress', [
                  'user_id' => $userId,
@@ -101,18 +100,16 @@ class LuckyGiftService
         $totalPrice = $giftPrice * $numberOfGift;
         $totalPriceFull = $totalPrice * $firstChunkSize;
 
-        // Acquire lock BEFORE validation to prevent race conditions
-        $lock = $this->acquireUserLock($userId);
-        try {
-            $user->refresh();
-            $userCoins = $user->di;
-            $oldUserCoin = $userCoins;
-            $amountBefore = $user->di;
+        // Refresh user data to get latest balance
+        $user->refresh();
+        $userCoins = $user->di;
+        $oldUserCoin = $userCoins;
+        $amountBefore = $user->di;
 
-            // Validate coins AFTER acquiring lock to ensure atomic check-and-deduct
-            if ($userCoins < $totalPriceFull) {
-                throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
-            }
+        // Validate coins before processing
+        if ($userCoins < $totalPriceFull) {
+            throw new InvalidArgumentException(__('api_responses.insufficient') . " (Required: {$totalPriceFull}, Available: {$userCoins})");
+        }
 
             if (isset($ownerId)) {
                 $room = Room::withoutAppends()
@@ -162,6 +159,9 @@ class LuckyGiftService
             $totalWalletsAfter = null;
 
             $totalPriceFull = $giftPrice * $number * $receiversCount;
+
+            // Track balance before any cashback wins for accurate logging
+            $balanceBeforeAnyCashback = $user->di;
 
             while ($user->di >= $totalPriceFull && $index > 0) {
 
@@ -218,13 +218,16 @@ class LuckyGiftService
                     $multiplier = 0;
                     $message = null;
 
+                    // FIX: Deduct gift cost FIRST, before adding cashback
+                    $user->di -= $unitPrice;
+
                     if ($result) {
                         $isWinner = (bool) ($result->isWinner ?? false);
                         $multiplier = (float) ($result->multiplier ?? 0);
                         $iterationWin = (float) ($result->profitAmount ?? 0);
 
                         if ($isWinner && $iterationWin > 0) {
-                            $user->enableSaving = false;
+                            // Now add cashback AFTER deduction
                             $user->di += $iterationWin;
 
                             $total_user_win += $iterationWin;
@@ -284,7 +287,6 @@ class LuckyGiftService
                         'wallets_after' => $result?->wallets_after,
                     ];
 
-                    $user->di -= $unitPrice;
                     $total_cashback_percentage += $multiplier;
                 }
 
@@ -292,10 +294,15 @@ class LuckyGiftService
             }
 
             if ($total_user_win > 0) {
+                // FIX: Track balance BEFORE cashback was added (before the loop started)
+                // At this point $user->di already contains the cashback, so we need to calculate
+                // what the balance was before any cashback was added during the loop
+                $balanceBeforeCashbackLog = $balanceBeforeAnyCashback - ($throwNumber * $unitPrice);
+
                 UserCoinLogHelper::logByType(
                     $userId,
                     $total_user_win,
-                    ($user->di - $total_user_win),
+                    $balanceBeforeCashbackLog,
                     UserCoinLogType::CASHBACK,
                     null,
                 );
@@ -355,9 +362,59 @@ class LuckyGiftService
             $responseData['total_pk'] = $coinsForReceiver;
 
             // CRITICAL: Save user balance changes to DB BEFORE returning response
-            // This ensures subsequent requests see the updated balance
-            $user->enableSaving = true;
-            $user->save();
+            // Using ATOMIC UPDATE with balance validation to prevent negative balance race condition
+
+            $initialDi = $user->getOriginal('di');
+            $finalDi = $user->di;
+            $totalChange = $finalDi - $initialDi;
+
+            Log::channel('lucky_gift')->info('💾 Applying atomic balance change', [
+                'user_id' => $userId,
+                'initial_di' => $initialDi,
+                'final_di' => $finalDi,
+                'delta' => $totalChange,
+                'total_user_win' => $total_user_win,
+                'throwNumber' => $throwNumber,
+            ]);
+
+            // ✅ ATOMIC UPDATE with negative balance prevention
+            // Uses WHERE clause to ensure balance never goes negative
+            if ($totalChange != 0) {
+                $affectedRows = \DB::table('users')
+                    ->where('id', $userId)
+                    ->where('di', '>=', abs($totalChange < 0 ? $totalChange : 0)) // Prevent negative balance
+                    ->update([
+                        'di' => \DB::raw("di + ({$totalChange})"),
+                        'updated_at' => now(),
+                    ]);
+
+                if ($affectedRows === 0) {
+                    // Balance was insufficient for the atomic update
+                    $currentDi = \DB::table('users')->where('id', $userId)->value('di');
+                    Log::channel('lucky_gift')->error('❌ Atomic update prevented negative balance', [
+                        'user_id' => $userId,
+                        'current_di' => $currentDi,
+                        'attempted_delta' => $totalChange,
+                        'would_result_in' => $currentDi + $totalChange,
+                    ]);
+                    throw new InvalidArgumentException(__('api_responses.insufficient') . " (Available: {$currentDi})");
+                }
+
+                // Verify the update
+                $verifiedDi = \DB::table('users')->where('id', $userId)->value('di');
+                Log::channel('lucky_gift')->info('✅ Atomic balance updated successfully', [
+                    'user_id' => $userId,
+                    'delta_applied' => $totalChange,
+                    'new_balance' => $verifiedDi,
+                ]);
+
+                // Update the in-memory model to reflect DB state
+                $user->di = $verifiedDi;
+            }
+
+            // Sync the Eloquent model to reflect the saved state
+            // This prevents isDirty() from thinking the model still needs saving
+            $user->syncOriginal();
 
             // Dispatch post-processing job ASYNCHRONOUSLY
             // This prevents worker blocking and reduces response time to < 10s
@@ -388,9 +445,6 @@ class LuckyGiftService
             ])->onQueue('gifts');
 
             return $responseData;
-        } finally {
-            $lock->release();
-        }
     }
 
 
@@ -430,16 +484,14 @@ class LuckyGiftService
             throw new InvalidArgumentException(__('api_responses.insufficient'));
         }
 
-        $lock = $this->acquireUserLock($userId);
-        try {
-            $user->refresh();
-            $userCoins = $user->di;
-            $oldUserCoin = $userCoins;
-            $amountBefore = $user->di;
+        $user->refresh();
+        $userCoins = $user->di;
+        $oldUserCoin = $userCoins;
+        $amountBefore = $user->di;
 
-            if ($userCoins < $totalPrice) {
-                throw new InvalidArgumentException(__('api_responses.insufficient'));
-            }
+        if ($userCoins < $totalPrice) {
+            throw new InvalidArgumentException(__('api_responses.insufficient'));
+        }
 
         if (isset($ownerId)) {
             $room = Room::withoutAppends()
@@ -494,6 +546,10 @@ class LuckyGiftService
         $coinsForApp = $totalPrice * $appPercentage;
         $coinsForOwner = $totalPrice * $roomrPercentage;
 
+        // Track balance before any cashback wins for accurate logging (V1)
+        $balanceBeforeAnyCashbackV1 = $user->di;
+        $totalGiftsSent = 0;
+
         while ($user->di >= $totalPrice && $index > 0) {
             $balanceBeforeIteration = $user->di;
             UserCoinLogHelper::logByType(
@@ -506,6 +562,9 @@ class LuckyGiftService
 
             $appWallet->coins += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
+
+            // FIX: Deduct gift cost FIRST, before calculating/adding cashback
+            $user->di -= $totalPrice;
 
             $iterationTotalWin = 0;
             $iterationPopular = false;
@@ -523,7 +582,7 @@ class LuckyGiftService
                         $cashback_value = $cashback_percentage * $unitPrice;
 
                         if ($cashback_percentage > 0) {
-                            $user->enableSaving = false;
+                            // Now add cashback AFTER deduction
                             $user->di += $cashback_value;
                             $appWallet->coins -= $cashback_value;
 
@@ -564,7 +623,7 @@ class LuckyGiftService
                 'error_message' => '',
             ];
 
-            $user->di -= $totalPrice;
+            $totalGiftsSent++;
             $index--;
             $total_cashback_percentage += $iterationMaxCashback;
         }
@@ -572,11 +631,15 @@ class LuckyGiftService
 
 
         if ($total_user_win > 0) {
+            // FIX: Track balance BEFORE cashback was added (before the loop started)
+            // At this point $user->di already contains the cashback, so we need to calculate
+            // what the balance was before any cashback was added during the loop
+            $balanceBeforeCashbackLogV1 = $balanceBeforeAnyCashbackV1 - ($totalGiftsSent * $totalPrice);
 
             UserCoinLogHelper::logByType(
                 $userId,
                 $total_user_win,
-                ($user->di - $total_user_win),
+                $balanceBeforeCashbackLogV1,
                 UserCoinLogType::CASHBACK,
                 null,
             );
@@ -624,9 +687,57 @@ class LuckyGiftService
         ];
 
         // CRITICAL: Save user balance changes to DB BEFORE returning response
-        // This ensures subsequent requests see the updated balance
-        $user->enableSaving = true;
-        $user->save();
+        // Using ATOMIC UPDATE with balance validation to prevent negative balance race condition
+
+        $initialDiV1 = $user->getOriginal('di');
+        $finalDiV1 = $user->di;
+        $totalChangeV1 = $finalDiV1 - $initialDiV1;
+
+        Log::channel('lucky_gift')->info('💾 [V1] Applying atomic balance change', [
+            'user_id' => $userId,
+            'initial_di' => $initialDiV1,
+            'final_di' => $finalDiV1,
+            'delta' => $totalChangeV1,
+            'total_user_win' => $total_user_win,
+        ]);
+
+        // ✅ ATOMIC UPDATE with negative balance prevention
+        // Uses WHERE clause to ensure balance never goes negative
+        if ($totalChangeV1 != 0) {
+            $affectedRowsV1 = \DB::table('users')
+                ->where('id', $userId)
+                ->where('di', '>=', abs($totalChangeV1 < 0 ? $totalChangeV1 : 0)) // Prevent negative balance
+                ->update([
+                    'di' => \DB::raw("di + ({$totalChangeV1})"),
+                    'updated_at' => now(),
+                ]);
+
+            if ($affectedRowsV1 === 0) {
+                // Balance was insufficient for the atomic update
+                $currentDiV1 = \DB::table('users')->where('id', $userId)->value('di');
+                Log::channel('lucky_gift')->error('❌ [V1] Atomic update prevented negative balance', [
+                    'user_id' => $userId,
+                    'current_di' => $currentDiV1,
+                    'attempted_delta' => $totalChangeV1,
+                    'would_result_in' => $currentDiV1 + $totalChangeV1,
+                ]);
+                throw new InvalidArgumentException(__('api_responses.insufficient') . " (Available: {$currentDiV1})");
+            }
+
+            // Verify the update
+            $verifiedDiV1 = \DB::table('users')->where('id', $userId)->value('di');
+            Log::channel('lucky_gift')->info('✅ [V1] Atomic balance updated successfully', [
+                'user_id' => $userId,
+                'delta_applied' => $totalChangeV1,
+                'new_balance' => $verifiedDiV1,
+            ]);
+
+            // Update the in-memory model to reflect DB state
+            $user->di = $verifiedDiV1;
+        }
+
+        // Sync the Eloquent model to reflect the saved state
+        $user->syncOriginal();
 
         // Dispatch post-processing job ASYNCHRONOUSLY
         // This prevents worker blocking and reduces response time to < 10s
@@ -659,9 +770,6 @@ class LuckyGiftService
         ])->onQueue('gifts');
 
         return $responseData;
-        } finally {
-            $lock->release();
-        }
     }
 
 

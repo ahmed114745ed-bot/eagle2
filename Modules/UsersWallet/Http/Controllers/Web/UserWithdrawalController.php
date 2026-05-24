@@ -63,8 +63,9 @@ class UserWithdrawalController extends MainController
             return __('No User');
         }
 
-        return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+        return app(UserService::class)->adminUserCard($user, withoutLevels: true);
     });
+    Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
     $grid->column('amount', __('Amount'))->display(function ($value) {
         return number_format($value, 2);

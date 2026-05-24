@@ -472,12 +472,10 @@ class HomeCarouselController extends MainController
 
     protected function ownerOptions($editing = false)
     {
-        return function ($value) use ($editing) {
-            $ops = [];
-            foreach (User::where('id', $value)->whereHas('ownerAudioRoom')->get() as $user) {
-                $ops[$user->id] = $user->id . '_' . $user->name;
-            }
-            return $ops;
+        return function ($value) {
+            if (!$value) return [];
+            $user = User::where('id', $value)->whereHas('ownerAudioRoom')->first();
+            return $user ? [$user->id => $user->id . '_' . $user->name] : [];
         };
     }
 

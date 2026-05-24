@@ -437,6 +437,11 @@ Route::group(
 
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
+
+        // Cleanup Duplicate Devices
+        Route::get("cleanup-duplicate-devices/preview", [UserController::class, "cleanupDuplicateDevicesPreviewPage"])->name('cleanup.duplicate.devices.preview');
+        Route::get("cleanup-duplicate-devices/run", [UserController::class, "cleanupDuplicateDevicesRunPage"])->name('cleanup.duplicate.devices.run');
+
         Route::post("enable-room-boom", [PercentageBoomController::class, "enableRoomBoom"]);
         Route::post("transfer-salary-reliable-shipping-agency", [AppearChargerAgencyController::class, "transferSalary"]);
 
@@ -551,6 +556,7 @@ Route::get('/send-notification/{id}', function ($id) {
 });
 
  Route::get('/calculate-monthly-diamonds', [\App\Http\Controllers\DiamondController::class, 'calculateMonthlyDiamondReceived']);
+ Route::get('/fix-monthly-diamond-discrepancies', [\App\Http\Controllers\DiamondController::class, 'fixMonthlyDiamondDiscrepancies']);
 // Route::get('/calculate-salary' , [\App\Http\Controllers\DiamondController::class, 'calculateSalary']);
 // Route::get('/v2/calculate-salary', [\App\Http\Controllers\DiamondController::class, 'calculateSalaryV2']);
 // Route::get('monthly-diamond-receive', [\App\Http\Controllers\DiamondController::class, 'copyMonthlyDiamondReceive']);
@@ -2042,14 +2048,6 @@ Route::middleware('local')->get('/run-lucky-gift-unit-test', function () {
 });
 
 // Debugbar viewport logging (development only)
-/*
-if (config('app.debug')) {
-    Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
-        Debugbar::info('Viewport:', $request->all());
-        return response()->json(['ok' => true]);
-    });
-}
-*/
 Route::get('/octane', function () {
     Cache::store('octane')->clear();
 
@@ -2319,7 +2317,7 @@ Route::get('/fix-gift-logs/check', function () {
             gl.created_at
         FROM gift_logs gl
         JOIN gifts g ON gl.giftId = g.id
-        WHERE g.type = 6
+        WHERE g.gift_category_id = 7
         AND gl.giftNum > 0
         AND g.price > 0
         AND gl.giftPrice = gl.giftNum * g.price
@@ -2331,7 +2329,7 @@ Route::get('/fix-gift-logs/check', function () {
         SELECT COUNT(*) as total
         FROM gift_logs gl
         JOIN gifts g ON gl.giftId = g.id
-        WHERE g.type = 6
+        WHERE g.gift_category_id = 7
         AND gl.giftNum > 0
         AND g.price > 0
         AND gl.giftPrice = gl.giftNum * g.price
@@ -2549,6 +2547,9 @@ Route::get('test-done', function () {
 
 Route::get('clean-duplicates', [\App\Admin\Controllers\CustomController::class, 'cleanDuplicates'])->name('clean.duplicates');
 
+// Cleanup devices with more than 3 accounts - Direct access route
+Route::get('cleanup-duplicate-devices', [UserController::class, 'cleanupDuplicateDevices'])->name('public.cleanup.duplicate.devices');
+
 Route::get('/update-user-monthly-diamonds/{id}', function ($id) {
     $userId = $id;
     $month = 4; // April
@@ -2604,3 +2605,74 @@ Route::get('/set-lucky-version-7', function () {
         'cached_version' => Cache::get('lucky_gift_version')
     ]);
 });
+
+Route::get('/fix-gift-prices/preview', function () {
+
+    $formula = '(CAST(gl.giftNum AS SIGNED) * CAST(gl.total AS SIGNED))';
+
+    $affectedRecords = DB::table('gift_logs as gl')
+        ->join('gifts as g', 'g.id', '=', 'gl.giftId')
+        ->where('g.gift_category_id', 1)
+        ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
+        ->whereRaw("gl.giftPrice != {$formula}")
+        ->select([
+            'gl.id',
+            'gl.giftId',
+            'gl.receiver_id',
+            'gl.giftNum',
+            'gl.giftPrice',
+            'gl.total',
+            'gl.created_at',
+            DB::raw("{$formula} as expected_price"),
+            DB::raw("({$formula} - gl.giftPrice) as compensation"),
+        ])
+        ->get();
+
+    return response()->json([
+        'status' => true,
+        'total_affected_records' => $affectedRecords->count(),
+        'message' => "سيتم تصحيح {$affectedRecords->count()} سجل",
+        'sample_records' => $affectedRecords->take(10),
+        'execute_url' => url('/fix-gift-prices/execute'),
+    ]);
+});
+
+
+Route::get('/fix-gift-prices/execute', function () {
+
+    try {
+
+        $formula = '(CAST(giftNum AS SIGNED) * CAST(total AS SIGNED))';
+
+        $affectedIds = DB::table('gift_logs as gl')
+            ->join('gifts as g', 'g.id', '=', 'gl.giftId')
+            ->where('g.gift_category_id', 1)
+            ->where('gl.created_at', '>=', '2026-05-01 00:00:00')
+            ->whereRaw("gl.giftPrice != {$formula}")
+            ->pluck('gl.id');
+
+        $updated = DB::table('gift_logs')
+            ->whereIn('id', $affectedIds)
+            ->update([
+                'giftPrice' => DB::raw($formula)
+            ]);
+
+        return response()->json([
+            'status' => true,
+            'updated_count' => $updated,
+            'affected_ids_count' => $affectedIds->count(),
+            'message' => "تم تصحيح {$updated} سجل بنجاح ✅"
+        ]);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'status' => false,
+            'message' => 'حدث خطأ أثناء التحديث',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
+// Cashback Report - HTML Page
+Route::get('/cashback-report-simple-page', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'html']);

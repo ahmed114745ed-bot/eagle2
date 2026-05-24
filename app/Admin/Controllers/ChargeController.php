@@ -2,23 +2,17 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\ShippingAgency;
-use App\Models\User;
-use App\Models\Admin;
-use App\Models\Agency;
+use App\Admin\Actions\ChargeAction2;
+use App\Admin\Services\UserService;
 use App\Models\Charge;
+use App\Models\ShippingAgency;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Setting;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use App\Admin\Actions\ChargeAction;
-use App\Admin\Actions\ChargeAction2;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Request;
-use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Show;
 
 class ChargeController extends MainController
 {
@@ -65,6 +59,9 @@ class ChargeController extends MainController
             ->with([
                 'owner:id,name,uuid',
                 'owner.profile:id,user_id,avatar',
+                'owner.country',
+                'owner.senderLevel',
+                'owner.receiverLevel',
                 'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
         $grid->disableRowSelector();
@@ -118,30 +115,13 @@ class ChargeController extends MainController
             });
 
 
-        $grid->column('owner.name', trans('owner'))
-            ->display(function ($name) {
-                $uid = @$this->owner->uuid;
-                $path = @$this->owner->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
 
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
+        $grid->column('nameUser', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
+        });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
-                return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        $image
-                        <div>
-                           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                            </a>
-                            <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                        </div>
-                    </div>";
-            });
+
         $grid->column('coins', __('coins'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "

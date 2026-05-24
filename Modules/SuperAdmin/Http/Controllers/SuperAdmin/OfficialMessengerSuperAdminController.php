@@ -51,7 +51,7 @@ class OfficialMessengerSuperAdminController extends MainController
         $grid = new Grid(new OfficialMessage);
         $countryID =session('filter_country_id');
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
-        $grid->model()->where('admin_id', $authId)->where('type', 2)->orderByDesc('id');
+        $grid->model()->with(['user.profile'])->where('admin_id', $authId)->where('type', 2)->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

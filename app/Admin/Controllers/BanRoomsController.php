@@ -2,13 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use Encore\Admin\Grid;
-use App\Models\BanRoom;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
 use App\Admin\Actions\BanRoomAction;
 use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
+use App\Models\BanRoom;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 
 
 class BanRoomsController extends MainController
@@ -27,25 +28,8 @@ class BanRoomsController extends MainController
         return parent::index($content
             ->title(trans('Close room'))
             ->body($this->grid()));
-        // ->row(function ($row) {
-        //     $row->column(10, $this->grid());
-        //     $row->column(2, view('admin.grid.users.ban'));
-        // });
     }
 
-
-    /**
-     * Create interface.
-     *
-     * @param Content $content
-     * @return Content
-     */
-    public function create(Content $content)
-    {
-        return parent::create($content
-            ->title(trans('bans'))
-            ->body($this->form()));
-    }
 
 
     /**
@@ -65,16 +49,14 @@ class BanRoomsController extends MainController
                 'room.owner.agency',
                 'room.owner.profile:user_id,avatar',
                 'room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-
+                'room.owner.country',
+                'room.owner.senderLevel',
+                'room.owner.receiverLevel',
                 'staff'
             ])
             ->whereHas('room')
             ->when($countryID, fn($q) => $q->whereHas('room', fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID))))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [now()])
-            // ->select('id','room_id', 'duration', 'staff_id',
-            //     DB::raw('(SELECT MAX(created_at) FROM bans_rooms WHERE bans_rooms.room_id = bans_rooms.room_id) AS created_at')
-            // )
-            // ->groupBy(['room_id', 'duration', 'staff_id'])
             ->orderByDesc('created_at');
         $grid->column('id', __('Id'));
 
@@ -106,32 +88,10 @@ class BanRoomsController extends MainController
 
         $grid->column('room.type', __('room type'));
 
-        $grid->column('user_id', __('owner'))->display(function () {
-            $user = $this->room->owner; // العلاقة مع المستخدم
-            if (!$user) return '-';
-
-            $name = $user->name;
-            $uuid = $user->uuid;
-            $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = $user->profile->avatar ?? '';
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-
-            $userUrl = admin_url('users/' . $user->id);
-
-            return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                        <div>
-                            <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
-                            <span style='color: var(--uuid-color); font-size: smaller;'>UUID: $uuid</span><br>
-                            <span style='color: var(--phone-color); font-size: smaller;'>📞 $phone</span>
-                        </div>
-                    </div>";
+        $grid->column('name', __('owner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->room->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('staff_id', __('staff'))->display(function () {
             if (!$this->staff) return '-';

@@ -133,7 +133,7 @@ return [
     'canNotCharge' => 'You can\'t charge,  your agency down',
     'disabled_version' => 'Kindly delete the application and re-download it from Google Play, than you for understanding',
     "try_again" => 'الرجاء المحاولة مرة أخرى',
-    "gift_in_progress" => 'Processing a previous gift, please wait a moment',
+    "gift_in_progress" => 'Processing',
     'success' => "Done successfully",
     "giftNotFound" => "gift not found",
     "insufficient" => "Insufficient balance, please go to recharge!",

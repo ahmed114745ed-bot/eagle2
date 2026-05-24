@@ -854,11 +854,16 @@ class HomeController extends  MainController
             ->limit(5)
             ->get();
 
-        $users = $topUsers->map(function ($u) {
-            $user = User::find($u->user_id);
+        $usersMap = User::whereIn('id', $topUsers->pluck('user_id'))
+            ->with('profile')
+            ->get()
+            ->keyBy('id');
+
+        $users = $topUsers->map(function ($u) use ($usersMap) {
+            $user = $usersMap->get($u->user_id);
 
             $defaultImage = asset('images/businessman-icon.jpg');
-            $path = $user->profile?->avatar ?? null;
+            $path = $user?->profile?->avatar ?? null;
             $url = $path ? getImagePath($path) : $defaultImage;
 
             if (!isImageExists($url)) {

@@ -24,10 +24,7 @@ use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
 use App\Models\Admin as AdminModel;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\RoomPinAction;
-use App\Admin\Actions\CloseRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Log;
 use Modules\LuckyBox\Entities\BoxUse;
@@ -44,12 +41,6 @@ class LiveRoomController extends MainController
     public function index(Content $content)
     {
         $content = $content->title(trans('live stream'));
-
-        // if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
-        //     $content = $content->row(function (Row $row) {
-        //         $row->column(12, $this->grid2());
-        //     });
-        // }
 
         $grid = $this->grid();
         $content = $content->body($grid);
@@ -343,7 +334,9 @@ class LiveRoomController extends MainController
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
                     'country:id,flag,name,e_name',
-                ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
+                    'senderLevel',
+                    'receiverLevel',
+                ])->select(['id', 'uuid', 'special_id', 'name', 'country_id', 'sender_level', 'received_level',]),
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
@@ -525,10 +518,10 @@ class LiveRoomController extends MainController
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
 
-                    $locale = app()->getLocale(); // 'ar', 'en', etc.
-                    $column = $locale === 'ar' ? 'name' : 'e_name';
+                $locale = app()->getLocale(); // 'ar', 'en', etc.
+                $column = $locale === 'ar' ? 'name' : 'e_name';
 
-                    $countries =\App\Models\Country::query()->pluck($column, 'id');
+                $countries = \App\Models\Country::query()->pluck($column, 'id');
 
 
                 $filter->where(function ($query) {
@@ -548,32 +541,7 @@ class LiveRoomController extends MainController
     {
         $grid->disableRowSelector();
 
-        //        $grid->model()->collection(function (Collection $collection) {
-        //            $allIds = $collection->flatMap(function ($row) {
-        //                return array_filter(explode(',', (string) $row->microphone));
-        //            })->unique()->values()->all();
-        //
-        //            // fetch all needed users once
-        //            $users = collect();
-        //            if (!empty($allIds)) {
-        //                $users = User::select(['id', 'name'])
-        //                ->with('profile:id,user_id,avatar')
-        //                    ->whereIn('id', $allIds)
-        //                    ->get()
-        //                    ->keyBy('id');
-        //            }
-        //
-        //            // attach a ready-to-use collection on each row
-        //            $collection->each(function ($row) use ($users) {
-        //                $ids = array_filter(explode(',', (string) $row->microphone));
-        //                $row->microphone_users = collect($ids)
-        //                    ->map(fn ($id) => $users->get($id))
-        //                    ->filter()
-        //                    ->values();
-        //            });
-        //
-        //            return $collection; // IMPORTANT: return the collection
-        //        });
+       
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
@@ -613,14 +581,11 @@ class LiveRoomController extends MainController
             ";
         });
 
-        $grid->column('owner_id', __('live stream owner'))->display(function ($name) {
-            $user = $this->owner;
-            if (! $user) {
-                return __('No User');
-            }
 
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+        $grid->column('owner_id', __('live stream owner'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('session', __('Gifts'))->display(function () {
             return $this->session  ?? 0;

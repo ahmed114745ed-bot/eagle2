@@ -3,6 +3,7 @@
 namespace Modules\AreaManager\Http\Controllers;
 
 use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
 use App\Enums\Charges\UserTypeEnum;
 use App\Helpers\Common;
 use App\Models\Agency;
@@ -107,7 +108,14 @@ class SuperAdminController extends MainController
         $grid = new Grid(new SuperAdmin());
         $countries = Common::areaCountries();
 
-        $grid->model()->with(['appUser.packs', 'creator', 'country'])
+        $grid->model()->with([
+            'appUser.country',
+            'appUser.senderLevel',
+            'appUser.receiverLevel',
+            'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'creator',
+            'country'
+        ])
             // ->where('parent_id', auth()->id())
             ->whereIn('country_id',  $countries)
             ->orderByDesc('id');
@@ -148,37 +156,11 @@ class SuperAdminController extends MainController
             ";
         });
 
-        $grid->column('appUser.name', __('user'))->display(function ($name) {
-            $user = $this->appUser;
-            if (request()->filled('_export_')) {
-                return $name;
-            }
-            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
 
-            $uid = $user->uuid ?? 'غير معروف';
-            $path = $user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("areaManager/users/{$user->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->appUser);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('country.name', __('country'))->display(function () {
 

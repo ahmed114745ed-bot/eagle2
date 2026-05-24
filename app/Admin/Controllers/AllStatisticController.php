@@ -891,11 +891,14 @@ class AllStatisticController extends MainController
             ->limit(5)
             ->get();
 
-        $users = $topUsers->map(function ($u) {
-            $user = \App\Models\User::find($u->user_id);
+        $userIds = $topUsers->pluck('user_id')->toArray();
+        $usersMap = \App\Models\User::with('profile')->whereIn('id', $userIds)->get()->keyBy('id');
+
+        $users = $topUsers->map(function ($u) use ($usersMap) {
+            $user = $usersMap->get($u->user_id);
 
             $defaultImage = asset('images/businessman-icon.jpg');
-            $path = @$user->profile?->avatar ?? '';
+            $path = $user?->profile?->avatar ?? '';
 
             $url = getImagePath($path) ?? $defaultImage;
 

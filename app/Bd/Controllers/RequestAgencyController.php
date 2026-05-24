@@ -57,7 +57,7 @@ class RequestAgencyController extends AdminController
                     return '';
                 }
 
-                return app(UserService::class)->adminUserAvatar($user);
+                return app(UserService::class)->adminUserCard($user);
             });
 
         $grid->column('name', __('name'));
@@ -102,7 +102,7 @@ class RequestAgencyController extends AdminController
             $grid->column('country', __('country'))->display(fn($v) => $v ?? '-');
         }
 
-        Admin::style('
+        Admin::style(UserService::adminUserCardStyles() . gridStyles() . '
             .grid-table .label-default {
                 background-color: var(--primary-color) !important;
                 color: #fff !important;

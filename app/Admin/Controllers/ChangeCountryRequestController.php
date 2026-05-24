@@ -90,8 +90,9 @@ class ChangeCountryRequestController extends MainController
                     return __('No User');
                 }
                 $showUrl = url("admin/users/{$user->id}");
-                return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
+                return app(UserService::class)->adminUserCard($user, withoutLevels: true, showUrl: $showUrl);
             });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('user_country', __('country user'))->display(function () {
 

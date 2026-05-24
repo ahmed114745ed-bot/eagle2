@@ -6,6 +6,7 @@ use App\Admin\Services\AgencyService;
 use App\Admin\Services\UserService;
 use App\Models\SalaryTrx;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 
@@ -33,19 +34,28 @@ class SallariesHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SalaryTrx);
-        $grid->model()->where('type', request('type'))->orderByDesc('id');
+        $grid->model()->where('type', request('type'))->orderByDesc('id')
+            ->with([
+                'user.profile:id,user_id,avatar',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'agency',
+            ]);
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->id(__('Id'));
         if (request('type') == 0) {
 
-            $grid->column('name', __('Name'))
-                ->display(function ($name) {
+            $grid->column('name', __('user'))
+                ->display(function () {
 
                     $user = $this->user;
                     if (! $user) {
                         return '';
                     }
 
-                    return app(UserService::class)->adminUserAvatar($user);
+                    return app(UserService::class)->adminUserCard($user);
                 });
         } else {
             $grid->column('name', __('Agency'))->display(function ($name) {

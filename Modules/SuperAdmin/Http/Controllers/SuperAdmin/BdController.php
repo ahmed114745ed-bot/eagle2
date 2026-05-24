@@ -100,7 +100,7 @@ class BdController extends MainController
             ->where('country_id', $authSuperAdmin->country_id)
 
             ->where('admin_users.type', 'bd')
-            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'creator'])
+            ->with(['bdSalaries', 'appUser.packs', 'appUser.profile', 'creator', 'country', 'createdBy.profile'])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')

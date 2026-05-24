@@ -3,18 +3,19 @@
 namespace Modules\AgencyApp\Http\Controllers\web;
 
 
-use App\Models\Agency;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Services\AppFeatureService;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Content;
+use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Models\Agency;
+use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Table as WidgetsTable;
 
 class RequestAgencyController extends MainController
@@ -85,13 +86,20 @@ class RequestAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
-        $grid->model()->where('status', 0)
+        $grid->model()->with([
+            'additionalInfo',
+            'owner.profile:user_id,avatar',
+            'owner.country',
+            'owner.senderLevel',
+            'owner.receiverLevel',
+            'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])->where('status', 0)
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
-            $query->where('status', 0);
-        });
+                $query->where('status', 0);
+            });
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -99,31 +107,11 @@ class RequestAgencyController extends MainController
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('owner.name', trans('name'))->display(function ($name) {
-            $uid = @$this->owner->uuid;
-            $path = @$this?->owner->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->owner) ? url("admin/users/{$this->owner->id}") : 0;
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>
-            ";
+        $grid->column('owner.name', __('user'))->display(function () {
+            return app(UserService::class)->adminUserCard($this->owner);
         });
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('name', __('agency'))->display(function () {
             $name = @$this->name ?? '';
@@ -222,7 +210,6 @@ class RequestAgencyController extends MainController
             if (Admin::user()->can('browse-' . 'refuse-agency') || Admin::user()->can('*')) {
                 $actions->add(new RefuseAgencyAction($model->id));
             }
-
         });
         $grid->disableCreateButton();
 

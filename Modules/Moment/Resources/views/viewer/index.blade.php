@@ -1,8 +1,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" media="print"
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print"
       onload="this.media='all'">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" media="print"
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print"
       onload="this.media='all'">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" media="print"
       onload="this.media='all'">
@@ -43,15 +43,15 @@
 
     <div class="users-sidebar">
         <div class="users-sidebar-header">
-            <h3><i class="fas fa-users"></i>{{ __('Users with Moments') }}<span id="usersTotalCount"></span></h3>
+            <h3><i class="fas fa-users"></i> {{ __('moment_viewer.usersWithMoments') }} <span id="usersTotalCount"></span></h3>
         </div>
         <div class="users-search-box">
             <input type="text" id="usersListSearch" class="users-list-search"
-                   placeholder="{{ __('search by name, UUID or ID') ?? 'Search users...' }}">
+                   placeholder="{{ __('moment_viewer.searchUsers') }}">
         </div>
         <div class="users-filter-info" id="usersFilterInfo">
             <button id="clearFilterBtn" class="clear-filter-btn">
-                <i class="fas fa-times"></i> Clear Filter
+                <i class="fas fa-times"></i> {{ __('moment_viewer.clearFilter') }}
             </button>
         </div>
         <div id="usersListContainer" class="users-list-container">
@@ -63,7 +63,7 @@
             <div class="spinner-small"></div>
         </div>
         <div id="usersLoadMore" class="users-load-more">
-            <button id="loadMoreUsersBtn" class="load-more-users-btn">Load More</button>
+            <button id="loadMoreUsersBtn" class="load-more-users-btn">{{ __('moment_viewer.loadMoreUsers') }}</button>
         </div>
     </div>
 </div>
@@ -72,7 +72,6 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     window.MomentViewerConfig = {
@@ -130,7 +129,12 @@
             days: '{{ __('moment_viewer.days') }}',
             hours: '{{ __('moment_viewer.hours') }}',
             minutes: '{{ __('moment_viewer.minutes') }}',
-            now: '{{ __('moment_viewer.now') }}'
+            now: '{{ __('moment_viewer.now') }}',
+            likes: '{{ __('moment_viewer.likes') }}',
+            usersWithMoments: '{{ __('moment_viewer.usersWithMoments') }}',
+            searchUsers: '{{ __('moment_viewer.searchUsers') }}',
+            clearFilter: '{{ __('moment_viewer.clearFilter') }}',
+            loadMoreUsers: '{{ __('moment_viewer.loadMoreUsers') }}'
         }
     };
 </script>

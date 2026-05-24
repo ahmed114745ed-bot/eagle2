@@ -133,6 +133,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 'packageRewards',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('user'))->display(function ($name) {
             if ($this->user_type == 'user') {
@@ -141,7 +142,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 if (!$user) {
                     return __('No User');
                 }
-                return app(UserService::class)->adminUserAvatar($user);
+                return app(UserService::class)->adminUserCard($user);
             }
             $admin = $this->user_type == 'super_admin' ? $this->superAdmin : $this->areaManager;
             $name = @$admin->name ?? '';

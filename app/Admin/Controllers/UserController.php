@@ -308,7 +308,7 @@ class UserController extends MainController
         $permission = $this->permission_name;
 
         // ─── Inject all styles ───
-        Admin::style(UserService::adminUserCardStyles() . $this->gridStyles());
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         // ─── Script for same-device modal ───
         Admin::script("
@@ -396,311 +396,18 @@ class UserController extends MainController
         $grid->disableExport();
         $grid->disableRowSelector();
 
+        // Add Cleanup Duplicate Devices button
+        $grid->tools(function ($tools) {
+            $tools->append('
+                <a href="/admin/cleanup-duplicate-devices/preview" class="btn btn-warning btn-sm" style="margin-left:5px;">
+                    <i class="fa fa-trash"></i> تنظيف الحسابات المكررة
+                </a>
+            ');
+        });
+
         return $grid;
     }
 
-    /**
-     * Modern grid CSS styles for users table
-     */
-    protected function gridStyles(): string
-    {
-        return '
-            /* ═══════════════════════════════════════════
-               USERS GRID — Clean Modern UI
-               ═══════════════════════════════════════════ */
-
-            /* ── Table Styles ── */
-            .grid-table {
-                border-collapse: separate !important;
-                border-spacing: 0 !important;
-            }
-            .grid-table > thead > tr > th {
-                background: #f8fafc !important;
-                color: #475569 !important;
-                font-weight: 700 !important;
-                font-size: 12px !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.8px !important;
-                padding: 14px 16px !important;
-                border-bottom: 2px solid #e2e8f0 !important;
-                white-space: nowrap;
-            }
-            .grid-table > tbody > tr {
-                transition: background 0.2s ease;
-            }
-            .grid-table > tbody > tr > td {
-                padding: 12px 16px !important;
-                vertical-align: middle !important;
-                border-bottom: 1px solid #f1f5f9 !important;
-            }
-            .grid-table > tbody > tr:nth-child(even) > td {
-                background: #fafbfd;
-            }
-            .grid-table > tbody > tr:hover > td {
-                background: #f0f4ff !important;
-            }
-
-            /* ── ID Badge ── */
-            .ug-id-badge {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                min-width: 44px;
-                padding: 4px 10px;
-                background: #eef2ff;
-                color: #4338ca;
-                font-weight: 700;
-                font-size: 12px;
-                border-radius: 6px;
-                letter-spacing: 0.3px;
-                border: 1px solid #c7d2fe;
-            }
-
-            /* ── Coins ── */
-            .ug-coins {
-                display: inline-flex;
-                align-items: center;
-                gap: 4px;
-                padding: 6px 14px;
-                background: #fffbeb;
-                border: 1px solid #fde68a;
-                border-radius: 20px;
-                font-size: 13px;
-            }
-
-            /* ── No Agency Label ── */
-            .ug-no-agency {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                color: #94a3b8;
-                font-size: 12px;
-                font-style: italic;
-            }
-
-            /* ── Agency Card Enhancement ── */
-            .ug-agency-card {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 8px 12px;
-                border-radius: 10px;
-                background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
-                border: 1px solid #e8ecf3;
-                text-decoration: none;
-                color: inherit;
-                transition: all 0.25s ease;
-            }
-            .ug-agency-card:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 15px rgba(0,0,0,0.07);
-                border-color: #667eea;
-                text-decoration: none;
-                color: inherit;
-            }
-            .ug-agency-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 10px;
-                object-fit: cover;
-                border: 2px solid #e0e5f0;
-            }
-            .ug-agency-card:hover .ug-agency-avatar {
-                border-color: #667eea;
-            }
-            .ug-agency-name {
-                font-weight: 600;
-                font-size: 13px;
-                color: #1e293b;
-            }
-            .ug-agency-id {
-                font-size: 11px;
-                color: #94a3b8;
-                font-family: monospace;
-            }
-
-            /* ── Device Button ── */
-            .ug-device-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 7px 16px;
-                border-radius: 20px;
-                border: none;
-                font-weight: 700;
-                font-size: 13px;
-                cursor: pointer;
-                transition: all 0.25s ease;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            }
-            .ug-device-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-            }
-            .ug-device-ok {
-                background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-                color: #065f46;
-            }
-            .ug-device-ok:hover {
-                background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
-            }
-            .ug-device-warn {
-                background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-                color: #92400e;
-            }
-            .ug-device-warn:hover {
-                background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
-            }
-            .ug-device-count {
-                font-size: 14px;
-                font-weight: 800;
-            }
-
-            /* ── Version Chips ── */
-            .ug-versions {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-            .ug-version-chip {
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                padding: 4px 10px;
-                background: #f1f5f9;
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
-                font-size: 11px;
-                color: #475569;
-                font-weight: 600;
-                font-family: monospace;
-                white-space: nowrap;
-                transition: all 0.2s;
-            }
-            .ug-version-chip:hover {
-                background: #e2e8f0;
-                border-color: #cbd5e1;
-            }
-
-            /* ── Action Buttons ── */
-            .grid-row-actions .btn {
-                border-radius: 8px !important;
-                margin: 1px !important;
-                padding: 4px 8px !important;
-                font-size: 12px !important;
-                transition: all 0.2s !important;
-            }
-            .grid-row-actions .btn:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-            }
-
-            /* ── Pagination ── */
-            .box-footer .pagination > li > a,
-            .box-footer .pagination > li > span {
-                border-radius: 8px !important;
-                margin: 0 2px !important;
-                border: 1px solid #e2e8f0 !important;
-                color: #475569;
-                font-weight: 600;
-                transition: all 0.2s;
-            }
-            .box-footer .pagination > .active > a,
-            .box-footer .pagination > .active > span {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                border-color: transparent !important;
-                color: #fff !important;
-            }
-            .box-footer .pagination > li > a:hover {
-                background: #f1f5f9 !important;
-                border-color: #667eea !important;
-                color: #667eea !important;
-            }
-
-            /* ── Quick Search ── */
-            .quick-search .form-control {
-                border-radius: 10px !important;
-                border: 2px solid #e2e8f0 !important;
-                padding: 8px 16px !important;
-                transition: border-color 0.3s;
-            }
-            .quick-search .form-control:focus {
-                border-color: #667eea !important;
-                box-shadow: 0 0 0 3px rgba(102,126,234,0.15) !important;
-            }
-
-            /* ── Modal Styles ── */
-            .modal-dialog {
-                max-width: 90%;
-            }
-            .modal-content {
-                border: none !important;
-                border-radius: 16px !important;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.2) !important;
-                overflow: hidden;
-            }
-            .modal-header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                color: #fff !important;
-                border-bottom: none !important;
-                padding: 18px 24px !important;
-            }
-            .modal-header .modal-title {
-                color: #fff !important;
-                font-weight: 700 !important;
-            }
-            .modal-header .close {
-                color: #fff !important;
-                opacity: 0.8 !important;
-                text-shadow: none !important;
-                font-size: 28px !important;
-            }
-            .modal-header .close:hover {
-                opacity: 1 !important;
-            }
-            .modal-body {
-                max-height: 70vh !important;
-                overflow-y: auto !important;
-                padding: 24px !important;
-            }
-
-            /* ── Loader ── */
-            .ug-loader {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 40px;
-                gap: 12px;
-                color: #667eea;
-            }
-            .ug-loader p {
-                color: #94a3b8;
-                font-size: 14px;
-                margin: 0;
-            }
-
-            /* ── Responsive ── */
-            @media (max-width: 1200px) {
-                .auc-name { max-width: 120px; }
-            }
-
-            /* ── Smooth Scrollbar ── */
-            .modal-body::-webkit-scrollbar { width: 6px; }
-            .modal-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
-            .modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-            .modal-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-            /* ── Button Circle ── */
-            .btn-circle {
-                width: 30px;
-                height: 30px;
-                font-size: 15px;
-                border-radius: 50%;
-                text-align: center;
-            }
-        ';
-    }
 
     public function stop_charge(Request $request)
     {
@@ -869,19 +576,25 @@ class UserController extends MainController
                 $giftType = request('gift_type', 'receiver');
                 $start = request('start_at');
                 $end = request('end_at');
-                $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
-                $agencyId = request('agency_id', $agency_id);
+                // Only default agency_id on initial load (no date filter)
+                // When user submits filter form, only filter by agency if explicitly selected
+                if ($start || $end) {
+                    $agencyId = request()->filled('agency_id') ? request('agency_id') : null;
+                } else {
+                    $agency_id = $giftType === 'receiver' ? $user->agency_id : null;
+                    $agencyId = request('agency_id', $agency_id);
+                }
 
-                // Convert empty string or "0" to null to ensure filter doesn't apply with falsy values
+                // Convert empty string or "0" to null
                 if ($agencyId === '' || $agencyId === '0' || $agencyId === 0) {
                     $agencyId = null;
                 }
 
                 $timezone = Common::timeZone();
 
-                // Convert dates to UTC for database query
-                $startUtc = $start && $end ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
-                $endUtc = $start && $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
+                // Convert dates to UTC for database query (support single date too)
+                $startUtc = $start ? Carbon::parse($start, $timezone)->startOfDay()->utc() : null;
+                $endUtc = $end ? Carbon::parse($end, $timezone)->endOfDay()->utc() : null;
 
                 $giftBaseQuery = GiftLog::query()
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
@@ -895,7 +608,8 @@ class UserController extends MainController
                     ->with([
                         'receiver:id,name,uuid,special_id',
                         'sender:id,name,uuid,special_id',
-                        'gift:id,name,price,e_name,img,type',
+                        'gift:id,name,price,e_name,img,type,gift_category_id',
+                        'gift.category:id,title',
                         'room:id,room_name,room_cover',
                         'agency:id,name',
                     ])
@@ -1004,7 +718,7 @@ class UserController extends MainController
     public function countries()
     {
         $ops = [null => __('no country')];
-        $countries = Country::all();
+        $countries = Country::select('id', 'name', 'e_name')->get();
         foreach ($countries as $country) {
             $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
         }
@@ -1679,4 +1393,319 @@ class UserController extends MainController
             return response()->json(['status' => true, 'message' => __('dashboard.successful')]);
         });
     }
+
+    /**
+     * Clean up devices with more than allowed accounts
+     * Deletes newest accounts until only allowed number remain per device
+     *
+     * STRICT POLICY: Counts ALL accounts (even logged out ones) to match login restrictions
+     */
+    public function cleanupDuplicateDevices()
+    {
+        DB::beginTransaction();
+
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // STRICT POLICY: Get all device tokens that have more than allowed accounts (ALL users, not just active)
+            // This matches the strict login policy where we count all accounts
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $totalDeleted = 0;
+            $devicesProcessed = 0;
+            $deletedUsers = [];
+            $totalUserAccountsDeleted = 0;
+            $totalTokensDeleted = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // STRICT POLICY: Get ALL users for this device (including logged out), ordered by created_at DESC (newest first)
+                $users = User::where('device_token', $deviceToken)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                // Calculate how many to delete
+                $deleteCount = $userCount - $register_account;
+
+                // Delete the newest accounts (first N records since ordered DESC)
+                $usersToDelete = $users->take($deleteCount);
+
+                foreach ($usersToDelete as $user) {
+                    // 1. Delete from user_accounts (SwitchAccount module)
+                    $userAccountsDeleted = \Modules\SwitchAccount\Entities\UserAccount::where(function($q) use ($user) {
+                        $q->where('parent_user_id', $user->id)
+                          ->orWhere('child_user_id', $user->id);
+                    })->delete();
+                    $totalUserAccountsDeleted += $userAccountsDeleted;
+
+                    // 2. Delete all user tokens (Sanctum)
+                    $tokensDeleted = $user->tokens()->count();
+                    $user->tokens()->delete();
+                    $totalTokensDeleted += $tokensDeleted;
+
+                    // 3. Soft delete the user (same as dashboard)
+                    $user->delete();
+
+                    \Log::info('User deleted in cleanup', [
+                        'user_id' => $user->id,
+                        'name' => $user->name,
+                        'uuid' => $user->uuid,
+                        'device_token' => $deviceToken,
+                        'user_accounts_deleted' => $userAccountsDeleted,
+                        'tokens_deleted' => $tokensDeleted,
+                    ]);
+
+                    $deletedUsers[] = [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'uuid' => $user->uuid,
+                        'device_token' => $deviceToken,
+                        'created_at' => $user->created_at instanceof \Carbon\Carbon
+                            ? $user->created_at->format('Y-m-d H:i:s')
+                            : $user->created_at,
+                    ];
+
+                    $totalDeleted++;
+                }
+
+                // 4. Update devices_token_histories count
+                $record = \App\Models\DevicesTokenHistory::where('device_token', $deviceToken)->first();
+                if ($record) {
+                    // Decrement count by number of deleted users
+                    $record->count = max(0, $record->count - $deleteCount);
+                    $record->save();
+                }
+
+                $devicesProcessed++;
+            }
+
+            DB::commit();
+
+            \Log::info('Device cleanup completed', [
+                'devices_processed' => $devicesProcessed,
+                'total_users_deleted' => $totalDeleted,
+                'total_user_accounts_deleted' => $totalUserAccountsDeleted,
+                'total_tokens_deleted' => $totalTokensDeleted,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cleanup completed successfully',
+                'data' => [
+                    'devices_processed' => $devicesProcessed,
+                    'total_users_deleted' => $totalDeleted,
+                    'total_user_accounts_deleted' => $totalUserAccountsDeleted,
+                    'total_tokens_deleted' => $totalTokensDeleted,
+                    'deleted_users' => $deletedUsers,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Error during cleanup: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Preview devices with duplicate accounts (PREVIEW ONLY - NO DELETION)
+     * Shows what would be deleted without actually deleting
+     */
+    public function cleanupDuplicateDevicesPreviewPage(Content $content)
+    {
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // Get all device tokens that have more than allowed accounts
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $previewData = [];
+            $totalToDelete = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // Get ALL users for this device
+                $users = User::where('device_token', $deviceToken)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $deleteCount = $userCount - $register_account;
+                $usersToDelete = $users->take($deleteCount);
+                $usersToKeep = $users->skip($deleteCount);
+
+                $previewData[] = [
+                    'device_token' => $deviceToken,
+                    'total_accounts' => $userCount,
+                    'allowed_accounts' => $register_account,
+                    'to_delete_count' => $deleteCount,
+                    'users_to_delete' => $usersToDelete,
+                    'users_to_keep' => $usersToKeep,
+                ];
+
+                $totalToDelete += $deleteCount;
+            }
+
+            return $content
+                ->title('معاينة الحسابات المكررة')
+                ->description('عرض الحسابات التي سيتم حذفها')
+                ->body(view('admin.cleanup_duplicate_devices_preview', [
+                    'devices' => $previewData,
+                    'total_devices' => count($previewData),
+                    'total_to_delete' => $totalToDelete,
+                    'allowed_accounts' => $register_account,
+                ]));
+
+        } catch (\Exception $e) {
+            return $content
+                ->title('خطأ')
+                ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$e->getMessage()}</div>");
+        }
+    }
+
+    public function cleanupDuplicateDevicesPreview()
+    {
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // Get all device tokens that have more than allowed accounts
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $previewData = [];
+            $totalToDelete = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // Get ALL users for this device
+                $users = User::where('device_token', $deviceToken)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $deleteCount = $userCount - $register_account;
+                $usersToDelete = $users->take($deleteCount);
+                $usersToKeep = $users->skip($deleteCount);
+
+                $previewData[] = [
+                    'device_token' => $deviceToken,
+                    'total_accounts' => $userCount,
+                    'allowed_accounts' => $register_account,
+                    'to_delete_count' => $deleteCount,
+                    'users_to_delete' => $usersToDelete->map(function($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'phone' => $user->phone,
+                            'email' => $user->email,
+                            'uuid' => $user->uuid,
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
+                            'is_logout' => $user->is_logout,
+                            'status' => $user->status,
+                        ];
+                    })->toArray(),
+                    'users_to_keep' => $usersToKeep->map(function($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'phone' => $user->phone,
+                            'email' => $user->email,
+                            'uuid' => $user->uuid,
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
+                        ];
+                    })->toArray(),
+                ];
+
+                $totalToDelete += $deleteCount;
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Preview generated successfully (NO DELETION PERFORMED)',
+                'data' => [
+                    'total_devices_affected' => count($previewData),
+                    'total_users_to_delete' => $totalToDelete,
+                    'allowed_accounts_per_device' => $register_account,
+                    'devices' => $previewData,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error during preview: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Execute cleanup of duplicate device accounts (ACTUAL DELETION)
+     * This performs the actual deletion after reviewing the preview
+     */
+    public function cleanupDuplicateDevicesRunPage(Content $content)
+    {
+        try {
+            $result = $this->cleanupDuplicateDevices();
+            $data = $result->getData();
+
+            if ($data->status) {
+                return $content
+                    ->title('تم الحذف بنجاح')
+                    ->description('نتائج عملية الحذف')
+                    ->body(view('admin.cleanup_duplicate_devices_run', [
+                        'devices_processed' => $data->data->devices_processed,
+                        'total_users_deleted' => $data->data->total_users_deleted,
+                        'total_user_accounts_deleted' => $data->data->total_user_accounts_deleted,
+                        'total_tokens_deleted' => $data->data->total_tokens_deleted,
+                        'deleted_users' => $data->data->deleted_users,
+                    ]));
+            } else {
+                return $content
+                    ->title('خطأ')
+                    ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$data->message}</div>");
+            }
+
+        } catch (\Exception $e) {
+            return $content
+                ->title('خطأ')
+                ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$e->getMessage()}</div>");
+        }
+    }
+
+    public function cleanupDuplicateDevicesRun()
+    {
+        // Just call the existing cleanup function
+        return $this->cleanupDuplicateDevices();
+    }
+
+    /**
+     * Display the cleanup duplicate devices page
+     */
 }

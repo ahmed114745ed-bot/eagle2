@@ -139,9 +139,9 @@ class DedicateRewardHistoryController extends AdminController
                 if (!$user) {
                     return __('No User');
                 }
-                return app(UserService::class)->adminUserAvatar($user);
+                return app(UserService::class)->adminUserCard($user);
             });
-
+        Admin::style(UserService::adminUserCardStyles() . gridStyles());
 
         $grid->column('gift_id', __('gifts'))->display(function () {
             if ($this->reward->type == "ware") {
@@ -165,7 +165,7 @@ class DedicateRewardHistoryController extends AdminController
                 $vips = $this->reward->vip;
                 $path = $vips->img ?? '';
             } elseif ($this->reward->type == 'badge') {
-                $path = @$this->reward->badge?->images?->firstWhere('language', app()->getLocale())?->image?? '';
+                $path = @$this->reward->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } else {

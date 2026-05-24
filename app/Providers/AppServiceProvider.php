@@ -74,9 +74,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        if (config('app.env') === 'production') {
-            URL::forceScheme('https');
-        }
+        URL::forceScheme('https');
 
         Form::extend('image', Image::class);
         Form::extend('imagePath', ImagePath::class);
@@ -110,6 +108,16 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Detect N+1 queries: log violations instead of throwing exceptions
+        \Illuminate\Database\Eloquent\Model::preventLazyLoading(!$this->app->isProduction());
+
+        // In non-production, log lazy loading violations instead of crashing
+        if (!$this->app->isProduction()) {
+            \Illuminate\Database\Eloquent\Model::handleLazyLoadingViolationUsing(function ($model, $relation) {
+                \Illuminate\Support\Facades\Log::warning("N+1 Query Detected: Lazy loading [{$relation}] on model [" . get_class($model) . "]");
+            });
+        }
+
         // Override admin.pjax middleware for Swoole/Octane compatibility
         $this->overridePjaxMiddleware();
 
