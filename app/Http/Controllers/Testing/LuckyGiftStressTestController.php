@@ -117,13 +117,23 @@ class LuckyGiftStressTestController extends Controller
         // جلب الأرصدة بعد الاختبار
         $afterBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
 
+        // حساب القيم المطلوبة لـ analyzeResults
+        $costPerRequest = $gift->price * $request->num * count($receiverIds) * $request->count;
+        $giftPrice = $gift->price;
+        $num = $request->num;
+        $receiverCount = count($receiverIds);
+        $count = $request->count;
+
         // تحليل النتائج
         $analysis = $this->analyzeResults(
             $beforeBalances,
             $afterBalances,
             $results,
-            $testId,
-            $duration
+            $costPerRequest,
+            $giftPrice,
+            $num,
+            $receiverCount,
+            $count
         );
 
         // حفظ التقرير
