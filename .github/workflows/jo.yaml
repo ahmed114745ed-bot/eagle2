@@ -60,73 +60,73 @@ jobs:
             sudo docker exec "$CONTAINER_ID" php /app/artisan migrate --force || echo "Migration warning (non-fatal)"
           fi
 
-  deploy-app:
+  deploy:
     runs-on: [self-hosted]
     needs: [hub, migrate]
     steps:
-    - name: Build and deploy app
+    - name: Build and deploy all services
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.156.128"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 20m
+        command_timeout: 25m
         script: |
           cd /var/www/jo
-          sudo docker build -t jo:${{ github.sha }} -f Dockerfile-octana .
+          SHA="${{ github.sha }}"
+
+          echo "=== Building images ==="
+          sudo docker build -t jo:${SHA} -f Dockerfile-octana .
+          sudo docker build -t jo-job:${SHA} -f Dockerfile-jobs .
+
+          echo "=== Deploying jo-octa ==="
+          OCTA_OK=false
           for attempt in 1 2 3; do
             echo "Attempt $attempt: updating jo-octa..."
             if sudo docker service update \
-              --image jo:${{ github.sha }} \
+              --image jo:${SHA} \
               --update-order start-first \
               --update-parallelism 1 \
               --update-delay 10s \
               --update-failure-action rollback \
               jo-octa; then
+              OCTA_OK=true
               break
             fi
-            [ "$attempt" -eq 3 ] && exit 1
+            [ "$attempt" -eq 3 ] && echo "WARNING: jo-octa update failed after 3 attempts — old service still running"
             sleep 15
           done
-          sleep 10
-          CONTAINER_ID=$(sudo docker ps --filter "name=jo-octa.1" --format "{{.ID}}" | head -n 1)
-          if [ -n "$CONTAINER_ID" ]; then
-            sudo docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "WhatsApp token skipped (non-fatal)"
+
+          if [ "$OCTA_OK" = true ]; then
+            sleep 5
+            CONTAINER_ID=$(sudo docker ps --filter "name=jo-octa.1" --format "{{.ID}}" | head -n 1)
+            if [ -n "$CONTAINER_ID" ]; then
+              sudo docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "WhatsApp token skipped (non-fatal)"
+            fi
           fi
 
-  deploy-job:
-    runs-on: [self-hosted]
-    needs: [hub, migrate]
-    steps:
-    - name: Build and deploy job workers
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.156.128"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 20m
-        script: |
-          cd /var/www/jo
-          sudo docker build -t jo-job:${{ github.sha }} -f Dockerfile-jobs .
+          echo "=== Deploying jo-job ==="
           for attempt in 1 2 3; do
             echo "Attempt $attempt: updating jo-job..."
             if sudo docker service update \
-              --image jo-job:${{ github.sha }} \
+              --image jo-job:${SHA} \
               --update-parallelism 1 \
               --update-delay 10s \
               --update-failure-action rollback \
               jo-job; then
               break
             fi
-            [ "$attempt" -eq 3 ] && exit 1
+            [ "$attempt" -eq 3 ] && echo "WARNING: jo-job update failed after 3 attempts — old service still running"
             sleep 15
           done
 
+          echo "=== Deploy complete ==="
+          sudo docker service ls
+
   cleanup:
     runs-on: [self-hosted]
-    needs: [deploy-app, deploy-job]
+    needs: [deploy]
     if: always()
     steps:
     - name: Cleanup old images and build cache
@@ -158,5 +158,4 @@ jobs:
 
           sudo docker image prune -f 2>/dev/null || true
           sudo docker builder prune --all -f 2>/dev/null || true
-          sudo docker system prune -f 2>/dev/null || true
           echo "Disk: $(df -h / | awk 'NR==2{print $5}')"

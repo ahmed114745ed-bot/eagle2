@@ -1,8 +1,31 @@
 # Git
 .git
 .github
-# Composers
+
+# Vendors (rebuilt inside container)
 vendor
+
+# Dockerfiles
 Dockerfile*
-Dockerfile-jobs
-composer.lock
+
+# Storage (logs, cache — 1.5GB+, not needed in build)
+storage/logs
+storage/jobs-logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+
+# Tests & docs
+tests
+docs
+.claude
+
+# IDE & OS
+.idea
+.vscode
+*.swp
+.DS_Store
+Thumbs.db
+
+# Node (not used in backend)
+node_modules
