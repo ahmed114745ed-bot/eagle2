@@ -18,10 +18,8 @@ RUN apt update && apt install -y \
     libjpeg-dev \
     libfreetype6-dev \
     libwebp-dev \
-    ffmpeg
-
-# Clear cache
-RUN apt clean && rm -rf /var/lib/apt/lists/*
+    ffmpeg \
+    && apt clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -35,7 +33,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /app
 
-# Copy application files
+# Copy composer files first for layer caching
+COPY composer.json composer.lock /app/
+
+# Install dependencies (cached unless composer.json/lock change)
+RUN env REDIS_HOST=172.17.0.1 \
+	 composer install --no-dev --optimize-autoloader
+
+# Now copy the rest of the application
 COPY . /app
 
 # Copy the crontab file
@@ -52,35 +57,11 @@ RUN crontab -u root /etc/cron.d/app-cron
 # Setup supervisord configuration
 COPY docker/jobs-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
 
+RUN chmod -R 777 /app/storage /app/bootstrap \
+    && chmod 777 /app/public/settings.json
 
-#RUN sed -i 's/127.0.0.1/172.17.0.1/g' /app/.env
-#RUN sed -i "s|/var/www/tempo/gcp.json|/app/gcp.json|g" /app/.env
-#RUN ls -al
-
-
-
-# Install application dependencies
-
-RUN env REDIS_HOST=172.17.0.1 \
-	 composer install --no-dev --optimize-autoloader    
-
-
-RUN chmod -R 777 /app/storage
-RUN chmod -R 777 /app/bootstrap
-RUN chmod 777 /app/public/settings.json
-
-RUN REDIS_HOST=172.17.0.1 \
-    php artisan migrate --force
 RUN REDIS_HOST=172.17.0.1 \
     php artisan optimize:clear
 
-#COPY docker/nginx.conf /etc/nginx/sites-available/default
-#EXPOSE 80
-
-
-# Expose port 9000
-#EXPOSE 9000
-
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
