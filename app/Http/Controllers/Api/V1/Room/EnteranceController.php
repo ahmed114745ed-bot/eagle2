@@ -202,18 +202,22 @@ class EnteranceController extends Controller
 
     protected function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
     {
-        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
 
-        if ($event == 'room_login' && !in_array($userId, $visitors)) {
-
-            $visitors[] = $userId;
+        if ($event == 'room_login') {
+            if (!$visitorRepo->isVisitor($room->id, $userId)) {
+                $visitorRepo->addVisitor($room->id, $userId);
+            }
         } elseif ($event == 'room_logout') {
             UserHandling::calcTime($userId);
             $this->updateMicrophone($room->uid, $userId);
-            $visitors = array_diff($visitors, [$userId]);
+            if ($visitorRepo->isVisitor($room->id, $userId)) {
+                $visitorRepo->removeVisitor($room->id, $userId);
+            }
         }
 
-        return array_values(array_unique($visitors));
+        // Return visitor IDs for backward compatibility
+        return $visitorRepo->getVisitorIds($room->id)->toArray();
     }
 
     protected function handleCharismaStatusOnLogout($room, $user, $ownerId)
@@ -297,9 +301,11 @@ class EnteranceController extends Controller
         if (!$ownerId) return Common::apiResponse(false, __('room not found'));
         $room = Room::withoutAppends()->where('uid', $ownerId)->first();
         if (!$room) return Common::apiResponse(false, __('room not found'));
-        $roomVisitors = $room->room_visitor;
 
-        $usersIds = explode(',', $roomVisitors);
+        // Use repository to get visitor IDs (avoid N+1 query issue)
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        $usersIds = $visitorRepo->getVisitorIds($room->id)->toArray();
+
         $users = User::withoutAppends()->with([
             'packs' => function ($query) {
                 return $query->whereIn('type', [5, 18]);
@@ -404,20 +410,21 @@ class EnteranceController extends Controller
         $room->save();
     }
 
+    /**
+     * @deprecated This method is not used anymore. Visitor management moved to RoomVisitorRepository
+     */
     private function updateRoomVisitor($user_id, $owner_id, Room $room)
     {
         if ($user_id == $owner_id) {
             $room->room_status = 1;
             //            $room->save();
         }
-        $room->count_room_socket += 1;
-        $visitors = explode(',', $room->room_visitor);
-        if ($visitors[0] == '') $visitors = [];
-        if (!in_array($user_id, $visitors)) {
-            $visitors[] = $user_id;
-            $visitors = array_unique($visitors);
-            $visitors = trim(implode(",", $visitors), ",");
-            $room->room_visitor = $visitors;
+
+        // Use repository for visitor operations (includes dual-write to legacy column)
+        $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+        if (!$visitorRepo->isVisitor($room->id, $user_id)) {
+            $visitorRepo->addVisitor($room->id, $user_id);
+            $room->count_room_socket = $visitorRepo->getVisitorCount($room->id);
         }
         $room->save();
     }

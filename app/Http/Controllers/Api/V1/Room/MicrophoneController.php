@@ -377,10 +377,16 @@ class MicrophoneController extends Controller
 
             $room = Room::query()->where('uid', $request->owner_id)->first();
             if (!$room) return Common::apiResponse(0, __('api_responses.room_not_found'), null, 404);
-            $room_admin = explode(',', $room->room_admin);
-            $room_visitor = explode(',', $room->room_visitor);
 
-            if (!in_array($muted_user->id, $room_visitor) && !in_array($muted_user->id, $room_admin) && $request->owner_id  !==  $muter_user->id) {
+            $room_admin = explode(',', $room->room_admin);
+
+            // Use repository for visitor operations
+            $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
+            $isVisitor = $visitorRepo->isVisitor($room->id, $muted_user->id);
+            $isAdmin = in_array($muted_user->id, $room_admin);
+            $isOwner = $request->owner_id === $muter_user->id;
+
+            if (!$isVisitor && !$isAdmin && !$isOwner) {
                 return Common::apiResponse(0, __('api_responses.u_not_in_room'), null, 404);
             }
 
@@ -467,8 +473,13 @@ class MicrophoneController extends Controller
 
 
 
-            // case 3 : muter is user
-            if (in_array($muter_user->id, $room_visitor)) {
+            // case 3 : muter is user (visitor)
+            // Check if muter is a regular visitor (not owner, not admin)
+            $isMuterVisitor = $visitorRepo->isVisitor($room->id, $muter_user->id) &&
+                              !in_array($muter_user->id, $room_admin) &&
+                              $request->owner_id !== $muter_user->id;
+
+            if ($isMuterVisitor) {
                 //########## case 2 - 1 : muter will mute host
                 // TODO: can't mute host
 
@@ -539,8 +550,11 @@ class MicrophoneController extends Controller
 
             $room = Room::query()->where('uid', $request->owner_id)->first();
             if (!$room) return Common::apiResponse(0, __('api_responses.room_not_found'), null, 404);
+
             $room_admin = explode(',', $room->room_admin);
-            $room_visitor = explode(',', $room->room_visitor);
+
+            // Initialize repository for visitor operations
+            $visitorRepo = app(\App\Repositories\RoomVisitorRepository::class);
 
             $in_room = EnteredRoom::query()
                 ->where('ruid', $request->input('owner_id'))
@@ -628,8 +642,13 @@ class MicrophoneController extends Controller
 
 
 
-            // case 3 : muter is user
-            if (in_array($muter_user->id, $room_visitor)) {
+            // case 3 : muter is user (visitor)
+            // Check if muter is a regular visitor (not owner, not admin)
+            $isMuterVisitor = $visitorRepo->isVisitor($room->id, $muter_user->id) &&
+                              !in_array($muter_user->id, $room_admin) &&
+                              $request->owner_id !== $muter_user->id;
+
+            if ($isMuterVisitor) {
                 //########## case 2 - 1 : muter will mute host
                 // TODO: can't mute host
 

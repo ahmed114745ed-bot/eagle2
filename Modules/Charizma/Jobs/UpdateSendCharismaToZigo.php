@@ -45,7 +45,7 @@ class UpdateSendCharismaToZigo implements ShouldQueue
     public function handle()
     {
         $room = Room::where(['id' => $this->roomId])
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+            ->selectRaw('id,uid,play_num,hot,room_pass,session,microphone,charizma_status')
             ->first();
 
         if (!$room) {
