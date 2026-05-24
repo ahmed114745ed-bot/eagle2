@@ -289,6 +289,21 @@
                 <div id="discrepancies_list"></div>
             </div>
 
+            <div class="stat-card" id="monthly_diamonds_card" style="display: none;">
+                <h5><i class="bi bi-gem"></i> تحليل الماسات الشهرية (monthly_diamond_receives)</h5>
+                <div id="monthly_diamonds_list"></div>
+            </div>
+
+            <div class="stat-card" id="gift_logs_card" style="display: none;">
+                <h5><i class="bi bi-gift-fill"></i> تحليل سجلات الهدايا (gift_logs)</h5>
+                <div id="gift_logs_analysis"></div>
+            </div>
+
+            <div class="stat-card" id="coin_logs_card" style="display: none;">
+                <h5><i class="bi bi-coin"></i> تحليل سجلات الكاش باك (user_coin_logs)</h5>
+                <div id="coin_logs_analysis"></div>
+            </div>
+
             <div class="text-center mt-4">
                 <button class="btn btn-secondary" onclick="location.reload()">
                     <i class="bi bi-arrow-clockwise"></i> اختبار جديد
@@ -541,6 +556,64 @@
 
                 discrepanciesHtml += '</tbody></table></div>';
                 document.getElementById('discrepancies_list').innerHTML = discrepanciesHtml;
+            }
+
+            // ✨ تحليل الماسات الشهرية
+            if (result.analysis.monthly_diamonds_analysis) {
+                document.getElementById('monthly_diamonds_card').style.display = 'block';
+                let monthlyHtml = '<div class="table-responsive"><table class="table table-bordered">';
+                monthlyHtml += '<thead><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الزيادة</th></tr></thead><tbody>';
+
+                for (let [userId, data] of Object.entries(result.analysis.monthly_diamonds_analysis)) {
+                    const increaseClass = data.increase > 0 ? 'diff-positive' : '';
+                    monthlyHtml += `
+                        <tr>
+                            <td>${data.name} (${userId})</td>
+                            <td>${data.before.toLocaleString()}</td>
+                            <td>${data.after.toLocaleString()}</td>
+                            <td class="${increaseClass}">${data.increase > 0 ? '+' : ''}${data.increase.toLocaleString()}</td>
+                        </tr>
+                    `;
+                }
+
+                monthlyHtml += '</tbody></table></div>';
+                document.getElementById('monthly_diamonds_list').innerHTML = monthlyHtml;
+            }
+
+            // ✨ تحليل سجلات الهدايا
+            if (result.analysis.gift_logs_analysis) {
+                document.getElementById('gift_logs_card').style.display = 'block';
+                const gla = result.analysis.gift_logs_analysis;
+                const matchBadge = gla.match.includes('MATCHED')
+                    ? '<span class="badge badge-success">✓ متطابق</span>'
+                    : '<span class="badge badge-warning">✗ غير متطابق</span>';
+
+                let giftLogsHtml = `
+                    <table class="table table-bordered">
+                        <tr><td><strong>عدد السجلات قبل الاختبار:</strong></td><td>${gla.before_count}</td></tr>
+                        <tr><td><strong>عدد السجلات بعد الاختبار:</strong></td><td>${gla.after_count}</td></tr>
+                        <tr><td><strong>سجلات جديدة:</strong></td><td class="diff-positive">+${gla.new_records}</td></tr>
+                        <tr><td><strong>المتوقع (الطلبات الناجحة):</strong></td><td>${gla.expected_records}</td></tr>
+                        <tr><td><strong>الحالة:</strong></td><td>${matchBadge}</td></tr>
+                    </table>
+                `;
+                document.getElementById('gift_logs_analysis').innerHTML = giftLogsHtml;
+            }
+
+            // ✨ تحليل سجلات الكاش باك
+            if (result.analysis.coin_logs_analysis) {
+                document.getElementById('coin_logs_card').style.display = 'block';
+                const cla = result.analysis.coin_logs_analysis;
+
+                let coinLogsHtml = `
+                    <table class="table table-bordered">
+                        <tr><td><strong>عدد السجلات قبل الاختبار:</strong></td><td>${cla.before_count}</td></tr>
+                        <tr><td><strong>عدد السجلات بعد الاختبار:</strong></td><td>${cla.after_count}</td></tr>
+                        <tr><td><strong>سجلات كاش باك جديدة:</strong></td><td class="diff-positive">+${cla.new_cashback_records}</td></tr>
+                        <tr><td colspan="2"><small class="text-muted">${cla.note}</small></td></tr>
+                    </table>
+                `;
+                document.getElementById('coin_logs_analysis').innerHTML = coinLogsHtml;
             }
 
             // إظهار النتائج

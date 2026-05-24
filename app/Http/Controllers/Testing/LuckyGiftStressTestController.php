@@ -559,6 +559,35 @@ class LuckyGiftStressTestController extends Controller
             ];
         }
 
+        // الماسات الشهرية (monthly_diamond_receives)
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+        $monthlyDiamonds = \App\Models\MonthlyDiamondReceive::whereIn('user_id', $receiverIds)
+            ->where('month', $currentMonth)
+            ->where('year', $currentYear)
+            ->get();
+
+        $balances['monthly_diamonds'] = [];
+        foreach ($monthlyDiamonds as $record) {
+            $balances['monthly_diamonds'][$record->user_id] = [
+                'monthly_diamond_received' => $record->monthly_diamond_received ?? 0,
+            ];
+        }
+
+        // عدد سجلات الهدايا (gift_logs) - آخر 5 دقائق
+        $recentGiftLogs = \App\Models\GiftLog::where('created_at', '>=', now()->subMinutes(5))
+            ->whereIn('sender_id', $senderIds)
+            ->count();
+        $balances['gift_logs_count'] = $recentGiftLogs;
+
+        // عدد سجلات الكوينز (user_coin_logs) للكاش باك - آخر 5 دقائق
+        $allUserIds = array_merge($senderIds, $receiverIds);
+        $recentCoinLogs = \App\Models\UserCoinLog::where('created_at', '>=', now()->subMinutes(5))
+            ->whereIn('user_id', $allUserIds)
+            ->where('type', 'LUCKY_GIFT')
+            ->count();
+        $balances['coin_logs_count'] = $recentCoinLogs;
+
         return $balances;
     }
 
@@ -689,6 +718,63 @@ class LuckyGiftStressTestController extends Controller
                 'max_response_time' => round(max($results['response_times']), 3),
             ];
         }
+
+        // ✨ تحليل الماسات الشهرية (monthly_diamond_receives)
+        $analysis['monthly_diamonds_analysis'] = [];
+        foreach ($before['receivers'] as $receiverId => $beforeData) {
+            $beforeMonthly = $before['monthly_diamonds'][$receiverId]['monthly_diamond_received'] ?? 0;
+            $afterMonthly = $after['monthly_diamonds'][$receiverId]['monthly_diamond_received'] ?? 0;
+            $monthlyIncrease = $afterMonthly - $beforeMonthly;
+
+            $analysis['monthly_diamonds_analysis'][$receiverId] = [
+                'name' => $beforeData['name'],
+                'before' => $beforeMonthly,
+                'after' => $afterMonthly,
+                'increase' => $monthlyIncrease,
+            ];
+
+            // التحقق من وجود فرق
+            if ($monthlyIncrease > 0) {
+                $analysis['summary']['total_monthly_diamonds_increased'] = ($analysis['summary']['total_monthly_diamonds_increased'] ?? 0) + $monthlyIncrease;
+            }
+        }
+
+        // ✨ تحليل سجلات الهدايا (gift_logs)
+        $giftLogsIncrease = ($after['gift_logs_count'] ?? 0) - ($before['gift_logs_count'] ?? 0);
+        $analysis['gift_logs_analysis'] = [
+            'before_count' => $before['gift_logs_count'] ?? 0,
+            'after_count' => $after['gift_logs_count'] ?? 0,
+            'new_records' => $giftLogsIncrease,
+            'expected_records' => $results['successful'], // كل طلب ناجح = سجل هدية
+            'match' => $giftLogsIncrease === $results['successful'] ? 'MATCHED ✓' : 'MISMATCH ✗',
+        ];
+
+        if ($giftLogsIncrease !== $results['successful']) {
+            $analysis['discrepancies'][] = [
+                'type' => 'GIFT_LOGS_COUNT',
+                'expected' => $results['successful'],
+                'actual' => $giftLogsIncrease,
+                'difference' => $giftLogsIncrease - $results['successful'],
+                'message' => 'عدد سجلات الهدايا لا يطابق عدد الطلبات الناجحة',
+            ];
+            $analysis['integrity_check'] = 'WARNING';
+        }
+
+        // ✨ تحليل سجلات الكوينز للكاش باك (user_coin_logs)
+        $coinLogsIncrease = ($after['coin_logs_count'] ?? 0) - ($before['coin_logs_count'] ?? 0);
+        $analysis['coin_logs_analysis'] = [
+            'before_count' => $before['coin_logs_count'] ?? 0,
+            'after_count' => $after['coin_logs_count'] ?? 0,
+            'new_cashback_records' => $coinLogsIncrease,
+            'note' => 'عدد سجلات الكاش باك (LUCKY_GIFT type)',
+        ];
+
+        // إضافة ملخص شامل
+        $analysis['summary']['database_integrity'] = [
+            'gift_logs_matched' => $giftLogsIncrease === $results['successful'],
+            'monthly_diamonds_updated' => ($analysis['summary']['total_monthly_diamonds_increased'] ?? 0) > 0,
+            'cashback_records_created' => $coinLogsIncrease > 0,
+        ];
 
         return $analysis;
     }
