@@ -475,7 +475,7 @@ class GiftController extends MainController
         $form->text('name', __('name'));
 
 
-        $selectedCategoryId = request('type') ?? $model?->gift_category_id;
+        $selectedCategoryId = request()->route('type') ?? $model?->gift_category_id;
         $categories = $selectedCategoryId
             ? GiftCategory::query()->whereKey($selectedCategoryId)->get()
             : collect();

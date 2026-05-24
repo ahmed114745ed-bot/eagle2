@@ -20,7 +20,7 @@ $placeholderVIP = __('Less than 256');
 
     <input type="hidden"
        name="gift_category_id"
-       value="{{ request('type') ?? $currentCategoryId }}">
+       value="{{ request()->route('type') ?? $currentCategoryId }}">
 </div>
 
 <div id="extra_fields_container"></div> {{-- dynamic fields container --}}
