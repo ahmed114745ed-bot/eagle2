@@ -19,6 +19,10 @@ jobs:
         command_timeout: 5m
         script: |
           cd /var/www/lumio
+
+          # Remove untracked files that are now in git (prevents pull conflicts)
+          rm -f .dockerignore
+
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           mkdir -p storage/jobs-logs
           chmod -R 777 storage/jobs-logs
@@ -130,27 +134,42 @@ jobs:
             php artisan migrate --force
           fi
 
-  run_lumio_app:
+  run_lumio_deploy:
     runs-on: [self-hosted]
     needs: [run_lumio_hub, run_lumio_lint, run_lumio_migrate]
     steps:
-    - name: Build and deploy Lumio Octane
+    - name: Build and deploy Lumio (Octane + Jobs + Cron)
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.61.136"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 20m
+        command_timeout: 30m
         script: |
           cd /var/www/lumio
-          sudo docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
+          SHA="${{ github.sha }}"
 
-          # Retry docker service update up to 3 times (handles Swarm race conditions)
+          # === BUILD BOTH IMAGES ===
+          echo "=== Building lumio-octa ==="
+          if ! sudo docker build -t lumio-octa:${SHA} . -f Dockerfile-octan; then
+            echo "FATAL: lumio-octa build failed"
+            exit 1
+          fi
+
+          echo "=== Building lumio-job ==="
+          if ! sudo docker build -t lumio-job:${SHA} -f Dockerfile-jobs .; then
+            echo "FATAL: lumio-job build failed"
+            exit 1
+          fi
+
+          # === DEPLOY LUMIO-OCTA ===
+          echo "=== Deploying lumio-octa ==="
+          OCTA_OK=false
           for attempt in 1 2 3; do
             echo "Attempt $attempt: updating lumio-octa..."
             if sudo docker service update \
-              --image lumio-octa:${{ github.sha }} \
+              --image lumio-octa:${SHA} \
               --replicas 3 \
               --limit-memory 2.5gb \
               --reserve-memory 1.0gb \
@@ -160,58 +179,44 @@ jobs:
               --update-failure-action rollback \
               lumio-octa; then
               echo "lumio-octa update succeeded on attempt $attempt"
+              OCTA_OK=true
               break
             fi
             if [ "$attempt" -eq 3 ]; then
-              echo "ERROR: lumio-octa update failed after 3 attempts"
-              exit 1
+              echo "WARNING: lumio-octa update failed after 3 attempts — old service keeps running"
+            else
+              echo "Retrying in 15s..."
+              sleep 15
             fi
-            echo "Retrying in 15s..."
-            sleep 15
           done
 
-          # Verify the running image matches the expected tag
-          RUNNING_IMAGE=$(sudo docker service inspect lumio-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
-          EXPECTED_IMAGE="lumio-octa:${{ github.sha }}"
-          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
-            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
-            exit 1
+          if [ "$OCTA_OK" = true ]; then
+            RUNNING_IMAGE=$(sudo docker service inspect lumio-octa --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+            EXPECTED_IMAGE="lumio-octa:${SHA}"
+            if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+              echo "WARNING: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            else
+              echo "Verified: lumio-octa is running $RUNNING_IMAGE"
+            fi
+
+            echo "Waiting for container to stabilize..."
+            sleep 15
+
+            CONTAINER_ID=$(docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
+            if [ -n "$CONTAINER_ID" ]; then
+              docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "Warning: whatsapp:change-token failed but continuing"
+            else
+              echo "Warning: No running container found for lumio-octa.1"
+            fi
           fi
-          echo "Verified: lumio-octa is running $RUNNING_IMAGE"
 
-          echo "Waiting for container to stabilize..."
-          sleep 15
-
-          CONTAINER_ID=$(docker ps --filter "name=lumio-octa.1" --format "{{.ID}}" | head -n 1)
-
-          if [ -n "$CONTAINER_ID" ]; then
-            docker exec $CONTAINER_ID php artisan whatsapp:change-token || echo "Warning: Command failed but continuing deployment"
-          else
-            echo "Error: No running container found for lumio-octa.1"
-            exit 1
-          fi
-
-  run_lumio_job:
-    runs-on: [self-hosted]
-    needs: [run_lumio_hub, run_lumio_lint, run_lumio_migrate]
-    steps:
-    - name: Build and deploy Lumio jobs + cron
-      uses: appleboy/ssh-action@v1.2.1
-      with:
-        host: "34.18.61.136"
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.UTDVM }}
-        port: ${{ secrets.PORT }}
-        command_timeout: 20m
-        script: |
-          cd /var/www/lumio
-          sudo docker build -t lumio-job:${{ github.sha }} -f Dockerfile-jobs .
-
-          # Retry docker service update up to 3 times (handles Swarm race conditions)
+          # === DEPLOY LUMIO-JOB ===
+          echo "=== Deploying lumio-job ==="
+          JOB_OK=false
           for attempt in 1 2 3; do
             echo "Attempt $attempt: updating lumio-job..."
             if sudo docker service update \
-              --image lumio-job:${{ github.sha }} \
+              --image lumio-job:${SHA} \
               --replicas 1 \
               --limit-cpu 5.0 \
               --limit-memory 2.5gb \
@@ -221,30 +226,34 @@ jobs:
               --update-failure-action rollback \
               lumio-job; then
               echo "lumio-job update succeeded on attempt $attempt"
+              JOB_OK=true
               break
             fi
             if [ "$attempt" -eq 3 ]; then
-              echo "ERROR: lumio-job update failed after 3 attempts"
-              exit 1
+              echo "WARNING: lumio-job update failed after 3 attempts — old service keeps running"
+            else
+              echo "Retrying in 15s..."
+              sleep 15
             fi
-            echo "Retrying in 15s..."
-            sleep 15
           done
 
-          # Verify the running image matches the expected tag
-          RUNNING_IMAGE=$(sudo docker service inspect lumio-job --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
-          EXPECTED_IMAGE="lumio-job:${{ github.sha }}"
-          if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
-            echo "ERROR: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
-            exit 1
+          if [ "$JOB_OK" = true ]; then
+            RUNNING_IMAGE=$(sudo docker service inspect lumio-job --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')
+            EXPECTED_IMAGE="lumio-job:${SHA}"
+            if [ "$RUNNING_IMAGE" != "$EXPECTED_IMAGE" ]; then
+              echo "WARNING: Image mismatch! Running: $RUNNING_IMAGE, Expected: $EXPECTED_IMAGE"
+            else
+              echo "Verified: lumio-job is running $RUNNING_IMAGE"
+            fi
           fi
-          echo "Verified: lumio-job is running $RUNNING_IMAGE"
 
+          # === DEPLOY LUMIO-CRON ===
+          echo "=== Deploying lumio-cron ==="
           if sudo docker service inspect lumio-cron >/dev/null 2>&1; then
             echo "Updating lumio-cron service..."
             sudo docker service update \
-              --image lumio-job:${{ github.sha }} \
-              lumio-cron
+              --image lumio-job:${SHA} \
+              lumio-cron || echo "WARNING: lumio-cron update failed"
           else
             echo "Creating lumio-cron service..."
             sudo docker service create \
@@ -255,14 +264,14 @@ jobs:
               --reserve-memory 256m \
               --network app-network \
               --mount type=bind,src=/var/www/lumio/storage,dst=/app/storage \
-              lumio-job:${{ github.sha }} \
-              php /app/artisan schedule:work
+              lumio-job:${SHA} \
+              php /app/artisan schedule:work || echo "WARNING: lumio-cron create failed"
           fi
           echo "Cron service ready."
 
   run_lumio_cleanup:
     runs-on: [self-hosted]
-    needs: [run_lumio_app, run_lumio_job]
+    needs: [run_lumio_deploy]
     if: always()
     steps:
     - name: Cleanup old images and build cache

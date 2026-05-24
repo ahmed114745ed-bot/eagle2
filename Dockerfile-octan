@@ -8,7 +8,6 @@ RUN apt update && apt install -y \
     git \
     curl \
     ffmpeg \
-    vim \
     libavcodec-extra \
     libpng-dev \
     libonig-dev \
@@ -37,40 +36,35 @@ COPY docker/docker-php-ext-opcache.ini /usr/local/etc/php/conf.d/
 COPY docker/docker-php-uploads.ini /usr/local/etc/php/conf.d/
 COPY docker/99-myapp-pm.ini /usr/local/etc/php/conf.d/
 
-
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /app
 
+# Layer caching: install dependencies before copying app code
+COPY composer.json /app/
+RUN env REDIS_HOST=172.17.0.1 \
+    composer install --no-dev --no-interaction --ignore-platform-reqs --no-scripts
+
+RUN env REDIS_HOST=172.17.0.1 \
+    composer require laravel/octane --no-interaction --ignore-platform-reqs --no-scripts
+
 # Copy application files
 COPY . /app
 
-
-
-# Setup supervisord configuration
-COPY docker/octana-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
-
-
+# Rebuild autoload with full app code
+RUN env REDIS_HOST=172.17.0.1 \
+    composer dump-autoload --optimize --ignore-platform-reqs
 
 RUN env REDIS_HOST=172.17.0.1 \
-    composer install --no-dev --no-interaction --ignore-platform-reqs   #--optimize-autoloader --no-scripts
- 
-
-RUN env REDIS_HOST=172.17.0.1 \
-    composer require laravel/octane   --no-interaction --ignore-platform-reqs
-
-RUN env REDIS_HOST=172.17.0.1 \ 
     php artisan octane:install --server=swoole
- 
 
 ENV OCTANE_WORKERS=6
 ENV OCTANE_MAX_REQUESTS=500
 ENV OCTANE_TASK_WORKERS=4
 
 ENV OCTANE_SERVER="swoole"
-
 
 RUN sed -i "/^OCTANE_/d" .env && sed -i "/^SESSION_DRIVER/d" .env && sed -i "/^LOG_LEVEL/d" .env && printf "%s\n" \
 "OCTANE_WORKERS=${OCTANE_WORKERS}" \
@@ -81,25 +75,18 @@ RUN sed -i "/^OCTANE_/d" .env && sed -i "/^SESSION_DRIVER/d" .env && sed -i "/^L
 "LOG_LEVEL=error" \
 >> .env
 
-
+# Setup supervisord configuration
+COPY docker/octana-supervisor.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY docker/octane.php /app/config/octane.php
-#COPY docker/auth.php   /app/config/auth.php
 
-RUN cat .env
-
-RUN chmod -R 777 /app/storage
-RUN chmod -R 777 /app/bootstrap
+RUN chmod -R 777 /app/storage /app/bootstrap
 RUN chmod 777 /app/public/settings.json
 
 # NOTE: Migrations run via CI/CD step (run_lumio_migrate), NOT during build.
 # This prevents race conditions when both Dockerfiles build in parallel.
 RUN REDIS_HOST=172.17.0.1 \
     php artisan optimize:clear
-
-#COPY docker/nginx-octana.conf /etc/nginx/sites-available/default
-#EXPOSE 80
-
 
 # Expose port 9000
 EXPOSE 8000

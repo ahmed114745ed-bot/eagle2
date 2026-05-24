@@ -1,0 +1,23 @@
+# Git
+.git
+.github
+
+# Composers
+vendor
+composer.lock
+
+# Dockerfiles
+Dockerfile*
+
+# Storage (keep framework dirs - Laravel needs them for package:discover)
+storage/logs/*
+storage/jobs-logs/*
+
+# Dev/test
+tests
+.claude
+.idea
+.vscode
+*.swp
+*.swo
+node_modules
