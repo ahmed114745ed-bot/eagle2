@@ -275,7 +275,7 @@ class User extends Authenticatable
         return $this->monthlyDiamondReceive()
             ->where('month', $month)
             ->where('year', $year)
-            ->value('monthly_diamond_received') ?? 0;
+            ->sum('monthly_diamond_received') ?? 0;
     }
 
     public function setMonthlyDiamondReceivedAttribute($value)
