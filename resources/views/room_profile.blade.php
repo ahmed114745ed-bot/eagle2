@@ -45,16 +45,16 @@
                         <span class="status-pill inactive">{{ __('Inactive') }}</span>
                     @endif
 
-                    @if($room->is_popular)
+                    @if($room->is_popular == 1)
                         <span class="feature-tag popular"><i class="fas fa-fire"></i> {{ __('Popular') }}</span>
                     @endif
-                    @if($room->is_top)
+                    @if($room->is_top == 1)
                         <span class="feature-tag top"><i class="fas fa-arrow-up"></i> {{ __('Top') }}</span>
                     @endif
-                    @if($room->is_recommended)
+                    @if($room->is_recommended == 1)
                         <span class="feature-tag recommended"><i class="fas fa-star"></i> {{ __('Recommended') }}</span>
                     @endif
-                    @if($room->secret_chat)
+                    @if($room->secret_chat == 1)
                         <span class="feature-tag secret"><i class="fas fa-lock"></i> {{ __('Secret Chat') }}</span>
                     @endif
                     @if($room->is_live)
@@ -168,19 +168,19 @@
                         <label style="margin-bottom:10px;display:block;">{{ __('Features') }}</label>
                         <div style="display:flex;flex-wrap:wrap;gap:16px;">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="is_popular" name="is_popular" {{ $room->is_popular ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="is_popular" name="is_popular" {{ $room->is_popular == 1 ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="is_popular">{{ __('Popular') }}</label>
                             </div>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="is_top" name="is_top" {{ $room->is_top ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="is_top" name="is_top" {{ $room->is_top == 1 ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="is_top">{{ __('Top') }}</label>
                             </div>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="is_recommended" name="is_recommended" {{ $room->is_recommended ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="is_recommended" name="is_recommended" {{ $room->is_recommended == 1 ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="is_recommended">{{ __('Recommended') }}</label>
                             </div>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="secret_chat" name="secret_chat" {{ $room->secret_chat ? 'checked' : '' }}>
+                                <input type="checkbox" class="custom-control-input" id="secret_chat" name="secret_chat" {{ $room->secret_chat == 1 ? 'checked' : '' }}>
                                 <label class="custom-control-label" for="secret_chat">{{ __('Secret Chat') }}</label>
                             </div>
                         </div>

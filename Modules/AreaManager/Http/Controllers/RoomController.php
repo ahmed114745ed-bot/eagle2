@@ -355,7 +355,7 @@ class RoomController extends MainController
         // ✅ ترتيب الغرف
         $orderSql = [];
         if ($makeRoomsTop == 1) {
-            $orderSql[] = 'is_top DESC';
+            $orderSql[] = '(is_top = 1) DESC';
         }
         $orderSql[] = 'status_priority DESC';
         $orderSql[] = 'pin DESC';
@@ -943,7 +943,7 @@ class RoomController extends MainController
         $form->display(__('ID'));
         $form->text('numid', __('numid'));
         $form->switch('room_status', __('room status'))->options(Common::getSwitchStates());
-        $form->switch('top_room', __('top room'))->options(Common::getSwitchStates());
+        $form->switch('is_top', __('top room (API sort)'))->options(Common::getSwitchStates());
         $form->switch('pin', __('pin'))->options(Common::getSwitchStates());
         $form->text('max_admin', __('max admin'));
         $form->text('room_name', __('room name'));
