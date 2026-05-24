@@ -1,12 +1,12 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'], // Restrict to relevant paths
-    'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Define methods explicitly
-    'allowed_origins' => ['https://event.utdsoftware.com','https://event-test.utdsoftware.com'], // Specify frontend origin
+    'paths' => ['*'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => ['*'],
     'allowed_origins_patterns' => [],
-    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-Localization', '*'], // Limit headers
+    'allowed_headers' => ['*'],
     'exposed_headers' => [],
-    'max_age' => 3600, // Cache the preflight response
-    'supports_credentials' => true, // Allow credentials
+    'max_age' => 0,
+    'supports_credentials' => true,
 ];

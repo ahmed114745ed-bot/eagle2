@@ -56,10 +56,6 @@ return [
         RequestReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
             ...Octane::prepareApplicationForNextRequest(),
-            FlushAuthenticationState::class,  // ⭐ مهم جداً لحل مشكلة "غير مصدق"
-            FlushSessionState::class,
-            FlushLocaleState::class,
-            FlushQueuedCookies::class,
         ],
 
         RequestTerminated::class => [
@@ -107,11 +103,6 @@ return [
     */
 
     'flush' => [
-        'auth',
-        'auth.driver',
-        'session',
-        'session.store',
-        'request',
     ],
 
     /*

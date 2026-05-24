@@ -116,4 +116,23 @@ return [
         // 'App\Models\User',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Swoole Options
+    |--------------------------------------------------------------------------
+    |
+    | Configure Swoole-specific server options here. The log_level is set
+    | to ERROR (5) to suppress harmless "Unsupported SSL request" warnings
+    | that occur when clients attempt HTTPS on the plain HTTP port.
+    |
+    | Log Levels: 0=DEBUG, 1=TRACE, 2=INFO, 3=NOTICE, 4=WARNING, 5=ERROR
+    |
+    */
+
+    'swoole' => [
+        'options' => [
+            'log_level' => env('SWOOLE_LOG_LEVEL', 5),
+        ],
+    ],
+
 ];
