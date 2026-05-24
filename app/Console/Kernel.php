@@ -122,9 +122,9 @@ class Kernel extends ConsoleKernel
         //     ->runInBackground();
 
 
-        $schedule->command('app:update-gift-rankings')
-            ->everyThirtySeconds()
-            ->runInBackground();
+        // $schedule->command('app:update-gift-rankings')
+        //     ->everyThirtySeconds()
+        //     ->runInBackground();
 
         $schedule->command('weekly-cp-winner')
             ->weekly()
