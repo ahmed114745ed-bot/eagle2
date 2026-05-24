@@ -289,15 +289,30 @@
                 <div id="discrepancies_list"></div>
             </div>
 
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
+
+            <div class="stat-card" id="sender_cashback_card" style="display: none;">
+                <h5><i class="bi bi-cash-coin"></i> تحليل الكاش باك للمرسلين (Sender Cashback)</h5>
+                <p class="text-muted small">المرسل رصيده بيزيد من الكاش باك أثناء الإرسال</p>
+                <div id="sender_cashback_list"></div>
+            </div>
+
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
+
             <div class="stat-card" id="monthly_diamonds_card" style="display: none;">
                 <h5><i class="bi bi-gem"></i> تحليل الماسات الشهرية (monthly_diamond_receives)</h5>
                 <div id="monthly_diamonds_list"></div>
             </div>
 
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
+
+
             <div class="stat-card" id="gift_logs_card" style="display: none;">
                 <h5><i class="bi bi-gift-fill"></i> تحليل سجلات الهدايا (gift_logs)</h5>
                 <div id="gift_logs_analysis"></div>
             </div>
+
+            <hr style="border: 2px solid #667eea; margin: 30px 0;">
 
             <div class="stat-card" id="coin_logs_card" style="display: none;">
                 <h5><i class="bi bi-coin"></i> تحليل سجلات الكاش باك (user_coin_logs)</h5>
@@ -558,6 +573,38 @@
                 document.getElementById('discrepancies_list').innerHTML = discrepanciesHtml;
             }
 
+            // ✨ تحليل الكاش باك للمرسلين
+            if (result.analysis.sender_cashback_analysis) {
+                document.getElementById('sender_cashback_card').style.display = 'block';
+                let cashbackHtml = '<div class="table-responsive"><table class="table table-bordered">';
+                cashbackHtml += '<thead><tr><th>المستخدم</th><th>الرصيد قبل</th><th>الرصيد بعد</th><th>التكلفة المتوقعة</th><th>التغيير الفعلي</th><th>الكاش باك المقدر</th><th>ملاحظة</th></tr></thead><tbody>';
+
+                for (let [userId, data] of Object.entries(result.analysis.sender_cashback_analysis)) {
+                    const balanceBefore = data.balance_before || 0;
+                    const balanceAfter = data.balance_after || 0;
+                    const expectedCost = data.expected_cost || 0;
+                    const actualChange = data.actual_change || 0;
+                    const estimatedCashback = data.estimated_cashback || 0;
+                    const changeClass = actualChange >= 0 ? 'diff-positive' : 'diff-negative';
+                    const cashbackClass = estimatedCashback > 0 ? 'diff-positive' : '';
+
+                    cashbackHtml += `
+                        <tr>
+                            <td>${data.name || 'N/A'} (${userId})</td>
+                            <td>${balanceBefore.toLocaleString()}</td>
+                            <td>${balanceAfter.toLocaleString()}</td>
+                            <td class="diff-negative">-${expectedCost.toLocaleString()}</td>
+                            <td class="${changeClass}">${actualChange >= 0 ? '+' : ''}${actualChange.toLocaleString()}</td>
+                            <td class="${cashbackClass}">${estimatedCashback > 0 ? '+' : ''}${estimatedCashback.toLocaleString()}</td>
+                            <td><small>${data.note || ''}</small></td>
+                        </tr>
+                    `;
+                }
+
+                cashbackHtml += '</tbody></table></div>';
+                document.getElementById('sender_cashback_list').innerHTML = cashbackHtml;
+            }
+
             // ✨ تحليل الماسات الشهرية
             if (result.analysis.monthly_diamonds_analysis) {
                 document.getElementById('monthly_diamonds_card').style.display = 'block';
@@ -565,13 +612,16 @@
                 monthlyHtml += '<thead><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الزيادة</th></tr></thead><tbody>';
 
                 for (let [userId, data] of Object.entries(result.analysis.monthly_diamonds_analysis)) {
-                    const increaseClass = data.increase > 0 ? 'diff-positive' : '';
+                    const before = data.before || 0;
+                    const after = data.after || 0;
+                    const increase = data.increase || 0;
+                    const increaseClass = increase > 0 ? 'diff-positive' : '';
                     monthlyHtml += `
                         <tr>
-                            <td>${data.name} (${userId})</td>
-                            <td>${data.before.toLocaleString()}</td>
-                            <td>${data.after.toLocaleString()}</td>
-                            <td class="${increaseClass}">${data.increase > 0 ? '+' : ''}${data.increase.toLocaleString()}</td>
+                            <td>${data.name || 'N/A'} (${userId})</td>
+                            <td>${before.toLocaleString()}</td>
+                            <td>${after.toLocaleString()}</td>
+                            <td class="${increaseClass}">${increase > 0 ? '+' : ''}${increase.toLocaleString()}</td>
                         </tr>
                     `;
                 }

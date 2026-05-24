@@ -20,9 +20,21 @@ class LuckyGiftStressTestController extends Controller
      */
     public function index()
     {
-        // جلب بيانات لتسهيل الاختبار
+        // جلب الهدايا من فئة Lucky فقط (type = 6)
         $gifts = Gift::where('type', 6)->where('enable', 1)->select('id', 'name', 'e_name', 'price')->get();
-        $rooms = Room::select('id', 'uid', 'room_name')->limit(20)->get();
+
+        // جلب الغرف الصوتية فقط
+        // TODO: تحقق من قيمة type_id الصحيحة للغرف الصوتية
+        // عادة: 1 = Audio, 2 = Video, 3 = Multi
+        $rooms = Room::where('type_id', 1) // 1 = Audio Room (Verify this!)
+            ->select('id', 'uid', 'room_name', 'type_id')
+            ->limit(20)
+            ->get();
+
+        // إذا لم تكن هناك غرف، اجلب أي غرف متاحة
+        if ($rooms->isEmpty()) {
+            $rooms = Room::select('id', 'uid', 'room_name', 'type_id')->limit(20)->get();
+        }
 
         return view('testing.lucky-gift-stress-test', compact('gifts', 'rooms'));
     }
@@ -655,6 +667,29 @@ class LuckyGiftStressTestController extends Controller
                 ];
                 $analysis['integrity_check'] = 'FAILED';
             }
+        }
+
+        // ✨ تحليل الكاش باك للمرسلين (المرسل رصيده بيزيد من الكاش باك أثناء الإرسال)
+        $analysis['sender_cashback_analysis'] = [];
+        foreach ($before['senders'] as $senderId => $beforeData) {
+            $afterData = $after['senders'][$senderId] ?? null;
+            if (!$afterData) continue;
+
+            $actualChange = $afterData['di'] - $beforeData['di'];
+            $expectedDeduction = $costPerRequest * ($results['successful'] / count($before['senders']));
+
+            // الكاش باك = الفرق بين الخصم المتوقع والفعلي (إذا كان الخصم الفعلي أقل)
+            $estimatedCashback = $expectedDeduction - ($beforeData['di'] - $afterData['di']);
+
+            $analysis['sender_cashback_analysis'][$senderId] = [
+                'name' => $beforeData['name'],
+                'balance_before' => $beforeData['di'],
+                'balance_after' => $afterData['di'],
+                'expected_cost' => round($expectedDeduction),
+                'actual_change' => $actualChange,
+                'estimated_cashback' => round($estimatedCashback > 0 ? $estimatedCashback : 0),
+                'note' => $estimatedCashback > 0 ? 'حصل على كاش باك' : 'لم يحصل على كاش باك',
+            ];
         }
 
         // تحليل المستلمين
