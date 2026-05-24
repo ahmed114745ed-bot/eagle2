@@ -727,7 +727,7 @@ Route::middleware(['auth:sanctum', 'admin', 'adminIp', 'throttle:3,1'])->get('qu
 });
 
 // Cashback Report Routes - Simple Version (without Job)
-Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+Route::middleware(['admin'])->prefix('admin')->group(function () {
     // API - Get report data with pagination
     Route::get('cashback-report-simple', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'index']);
 
@@ -739,7 +739,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 });
 
 // Cashback Compensation Routes - تعويض المستخدمين
-Route::middleware(['auth:sanctum', 'admin', 'adminIp'])->prefix('admin/cashback-compensation')->group(function () {
+Route::middleware(['admin', 'adminIp'])->prefix('admin/cashback-compensation')->group(function () {
     // معاينة المستخدمين المستحقين للتعويض
     Route::get('preview', [\App\Http\Controllers\CashbackCompensationController::class, 'preview']);
 
