@@ -659,10 +659,15 @@ class GiftController extends MainController
             }
         });
 
-        $form->saved(function (Form $form) {
-            $url = url('admin/gifts?filter=' . $form->model()->gift_category_id);
+         $form->saved(function (Form $form) {
+            $url = url('admin/gifts/' . $form->model()->id);
             return redirect()->to($url);
         });
+
+        // $form->saved(function (Form $form) {
+        //     $url = url('admin/gifts?filter=' . $form->model()->gift_category_id);
+        //     return redirect()->to($url);
+        // });
         return $form;
     }
 
