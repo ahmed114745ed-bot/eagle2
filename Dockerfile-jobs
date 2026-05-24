@@ -36,12 +36,16 @@ WORKDIR /app
 # Copy composer.json first for layer caching
 COPY composer.json /app/
 
-# Install dependencies (cached unless composer.json/lock change)
+# Download dependencies without scripts/autoloader (app files not present yet)
 RUN env REDIS_HOST=172.17.0.1 \
-	 composer install --no-dev --optimize-autoloader
+	 composer install --no-dev --no-scripts --no-autoloader
 
 # Now copy the rest of the application
 COPY . /app
+
+# Generate autoloader and run post-install scripts (app files now present)
+RUN env REDIS_HOST=172.17.0.1 \
+	 composer dump-autoload --optimize
 
 # Copy the crontab file
 COPY docker/cron /etc/cron.d/app-cron
