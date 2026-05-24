@@ -41,6 +41,16 @@ Route::get('/duplicate-cleanup/trigger', function () {
     ]);
 });
 
+// Lucky Gift Stress Test - Race Condition Testing
+Route::prefix('stress-test/lucky-gift')->name('stress-test.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'index'])->name('index');
+    Route::get('/test', function() { return view('testing.test-route'); })->name('test');
+    Route::post('/run', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'runTest'])->name('run');
+    Route::get('/status/{testId}', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'checkStatus'])->name('status');
+    Route::get('/reports', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'reports'])->name('reports');
+    Route::get('/reports/{filename}', [\App\Http\Controllers\Testing\LuckyGiftStressTestController::class, 'viewReport'])->name('view-report');
+});
+
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\BdController;

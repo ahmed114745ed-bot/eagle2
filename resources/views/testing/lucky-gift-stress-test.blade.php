@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>اختبار ضغط Lucky Gift - Race Condition Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .test-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        .header h1 {
+            color: #667eea;
+            font-weight: bold;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .btn-test {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 40px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .btn-test:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .results-container {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stat-card h5 {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .badge-success {
+            background-color: #28a745;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+        }
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .error-item {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .balance-table {
+            font-size: 14px;
+        }
+        .balance-table td {
+            padding: 8px;
+        }
+        .diff-positive {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .diff-negative {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1><i class="bi bi-lightning-charge-fill"></i> اختبار ضغط Lucky Gift</h1>
+            <p class="text-muted">اختبار Race Conditions والتحقق من سلامة الأرصدة تحت الضغط</p>
+        </div>
+
+        <form id="testForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">معرفات المرسلين (Sender IDs) <i class="bi bi-person-fill text-primary"></i></label>
+                        <input type="text" class="form-control" id="sender_ids" name="sender_ids"
+                               placeholder="مثال: 1,2,3,4,5" required>
+                        <small class="text-muted">افصل بينها بفاصلة</small>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">معرفات المستلمين (Receiver IDs) <i class="bi bi-people-fill text-success"></i></label>
+                        <input type="text" class="form-control" id="receiver_ids" name="receiver_ids"
+                               placeholder="مثال: 10,11,12" required>
+                        <small class="text-muted">افصل بينها بفاصلة</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">الهدية <i class="bi bi-gift-fill text-danger"></i></label>
+                        <select class="form-select" id="gift_id" name="gift_id" required>
+                            <option value="">اختر الهدية...</option>
+                            @foreach($gifts as $gift)
+                                <option value="{{ $gift->id }}" data-price="{{ $gift->price }}">
+                                    {{ $gift->name ?? $gift->e_name }} ({{ $gift->price }} كوين)
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">الغرفة <i class="bi bi-house-door-fill text-info"></i></label>
+                        <select class="form-select" id="room_id" name="room_id" required>
+                            <option value="">اختر الغرفة...</option>
+                            @foreach($rooms as $room)
+                                <option value="{{ $room->id }}">
+                                    {{ $room->room_name ?? 'غرفة #' . $room->id }} (Owner: {{ $room->uid }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">عدد الهدايا (num)</label>
+                        <input type="number" class="form-control" id="num" name="num" value="1" min="1" max="100" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">عدد المرات (count)</label>
+                        <input type="number" class="form-control" id="count" name="count" value="1" min="1" max="10" required>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">عدد الطلبات لكل مرسل</label>
+                        <input type="number" class="form-control" id="requests_per_user" name="requests_per_user"
+                               value="5" min="1" max="20" required>
+                        <small class="text-muted">كل مرسل سيرسل هذا العدد من الطلبات (حد أقصى: 20)</small>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="form-label">نوع الاختبار</label>
+                        <select class="form-select" id="concurrent" name="concurrent" required>
+                            <option value="1">متزامن (Concurrent) - اختبار Race Conditions ⚡</option>
+                            <option value="0">تسلسلي (Sequential) - للمقارنة</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <strong><i class="bi bi-info-circle-fill"></i> التكلفة المتوقعة:</strong>
+                        <span id="expected_cost">قم بتحديد البيانات أولاً</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-warning">
+                        <strong><i class="bi bi-exclamation-triangle-fill"></i> تحذير:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>الاختبار المتزامن قد يستغرق وقتاً طويلاً (30-120 ثانية)</li>
+                            <li>يُنصح بالبدء بعدد صغير من الطلبات (5-10) للاختبار</li>
+                            <li>تأكد من تشغيل Queue Workers قبل البدء</li>
+                            <li>في حالة الفشل، قلل عدد الطلبات أو استخدم الاختبار التسلسلي</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-test">
+                    <i class="bi bi-play-fill"></i> بدء الاختبار
+                </button>
+                <a href="{{ route('stress-test.reports') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-file-earmark-text"></i> عرض التقارير السابقة
+                </a>
+            </div>
+        </form>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="text-center">
+                <div class="loading-spinner"></div>
+                <p class="mt-3"><strong>جاري تنفيذ الاختبار...</strong></p>
+                <p class="text-muted">يرجى الانتظار، قد يستغرق هذا عدة ثوانٍ</p>
+            </div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <h3 class="text-center mb-4"><i class="bi bi-clipboard-data"></i> نتائج الاختبار</h3>
+
+            <div class="stat-card">
+                <h5><i class="bi bi-speedometer2"></i> ملخص الأداء</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <p><strong>إجمالي الطلبات:</strong> <span id="total_requests" class="badge bg-primary">0</span></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>نجح:</strong> <span id="successful_requests" class="badge badge-success">0</span></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>فشل:</strong> <span id="failed_requests" class="badge badge-danger">0</span></p>
+                    </div>
+                    <div class="col-md-3">
+                        <p><strong>الوقت:</strong> <span id="duration" class="badge bg-info">0s</span></p>
+                    </div>
+                </div>
+                <div id="performance_stats"></div>
+            </div>
+
+            <div class="stat-card">
+                <h5><i class="bi bi-shield-check"></i> التحقق من السلامة (Integrity Check)</h5>
+                <div id="integrity_status"></div>
+            </div>
+
+            <div class="stat-card">
+                <h5><i class="bi bi-wallet2"></i> تحليل الأرصدة</h5>
+                <div id="balance_analysis"></div>
+            </div>
+
+            <div class="stat-card" id="errors_card" style="display: none;">
+                <h5><i class="bi bi-exclamation-triangle-fill"></i> الأخطاء</h5>
+                <div id="errors_list"></div>
+            </div>
+
+            <div class="stat-card" id="discrepancies_card" style="display: none;">
+                <h5><i class="bi bi-bug-fill"></i> الفروقات المكتشفة</h5>
+                <div id="discrepancies_list"></div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-secondary" onclick="location.reload()">
+                    <i class="bi bi-arrow-clockwise"></i> اختبار جديد
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // حساب التكلفة المتوقعة
+        function calculateExpectedCost() {
+            const giftSelect = document.getElementById('gift_id');
+            const selectedOption = giftSelect.options[giftSelect.selectedIndex];
+            const giftPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+
+            const num = parseInt(document.getElementById('num').value) || 0;
+            const count = parseInt(document.getElementById('count').value) || 0;
+            const requestsPerUser = parseInt(document.getElementById('requests_per_user').value) || 0;
+
+            const senderIds = document.getElementById('sender_ids').value.split(',').filter(id => id.trim());
+            const receiverIds = document.getElementById('receiver_ids').value.split(',').filter(id => id.trim());
+
+            const costPerRequest = giftPrice * num * receiverIds.length * count;
+            const totalCostPerSender = costPerRequest * requestsPerUser;
+            const totalCost = totalCostPerSender * senderIds.length;
+
+            document.getElementById('expected_cost').innerHTML = `
+                <strong>لكل طلب:</strong> ${costPerRequest.toLocaleString()} كوين |
+                <strong>لكل مرسل:</strong> ${totalCostPerSender.toLocaleString()} كوين |
+                <strong>الإجمالي:</strong> ${totalCost.toLocaleString()} كوين
+            `;
+        }
+
+        // تحديث التكلفة عند تغيير أي حقل
+        ['gift_id', 'num', 'count', 'requests_per_user', 'sender_ids', 'receiver_ids'].forEach(id => {
+            document.getElementById(id).addEventListener('change', calculateExpectedCost);
+            document.getElementById(id).addEventListener('input', calculateExpectedCost);
+        });
+
+        // إرسال النموذج
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            // التحقق من إجمالي الطلبات
+            const senderIds = data.sender_ids.split(',').filter(id => id.trim());
+            const totalRequests = senderIds.length * parseInt(data.requests_per_user);
+
+            if (totalRequests > 100) {
+                if (!confirm(`⚠️ تحذير: سيتم إرسال ${totalRequests} طلب! هذا قد يستغرق وقتاً طويلاً ويسبب ضغطاً على السيرفر.\n\nهل تريد المتابعة؟`)) {
+                    return;
+                }
+            }
+
+            // إخفاء النتائج وإظهار التحميل
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('progressContainer').style.display = 'block';
+
+            // إنشاء AbortController للتحكم في timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 دقائق
+
+            try {
+                const response = await fetch('{{ route("stress-test.run") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(data),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result);
+                } else {
+                    alert('❌ خطأ: ' + (result.message || 'حدث خطأ غير متوقع'));
+                    document.getElementById('progressContainer').style.display = 'none';
+                }
+            } catch (error) {
+                clearTimeout(timeoutId);
+
+                let errorMessage = 'خطأ في الاتصال';
+
+                if (error.name === 'AbortError') {
+                    errorMessage = '⏱️ انتهى الوقت المسموح (3 دقائق). حاول تقليل عدد الطلبات أو استخدم الاختبار التسلسلي.';
+                } else if (error.message.includes('ERR_CONNECTION')) {
+                    errorMessage = '🔌 فشل الاتصال بالسيرفر. قد يكون السيرفر تحت ضغط كبير.\n\nحلول مقترحة:\n1. قلل عدد الطلبات (جرب 5-10)\n2. استخدم الاختبار التسلسلي بدلاً من المتزامن\n3. تأكد من تشغيل السيرفر بشكل صحيح';
+                } else {
+                    errorMessage = error.message;
+                }
+
+                alert('❌ ' + errorMessage);
+                document.getElementById('progressContainer').style.display = 'none';
+            }
+        });
+
+        function displayResults(result) {
+            // ملخص الأداء
+            document.getElementById('total_requests').textContent = result.results.total_requests;
+            document.getElementById('successful_requests').textContent = result.results.successful;
+            document.getElementById('failed_requests').textContent = result.results.failed;
+            document.getElementById('duration').textContent = result.duration + 's';
+
+            // إحصائيات الأداء
+            if (result.analysis.performance) {
+                document.getElementById('performance_stats').innerHTML = `
+                    <div class="mt-3">
+                        <p><strong>متوسط زمن الاستجابة:</strong> ${result.analysis.performance.avg_response_time}s</p>
+                        <p><strong>أسرع طلب:</strong> ${result.analysis.performance.min_response_time}s</p>
+                        <p><strong>أبطأ طلب:</strong> ${result.analysis.performance.max_response_time}s</p>
+                    </div>
+                `;
+            }
+
+            // حالة السلامة
+            const integrityStatus = result.analysis.integrity_check;
+            const integrityColor = integrityStatus === 'PASSED' ? 'success' : 'danger';
+            const integrityIcon = integrityStatus === 'PASSED' ? 'check-circle-fill' : 'x-circle-fill';
+
+            document.getElementById('integrity_status').innerHTML = `
+                <div class="alert alert-${integrityColor}">
+                    <h4><i class="bi bi-${integrityIcon}"></i> ${integrityStatus}</h4>
+                    ${integrityStatus === 'PASSED' ?
+                        '<p>جميع الأرصدة متطابقة ولا توجد مشاكل ✓</p>' :
+                        '<p class="mb-0">تم اكتشاف مشاكل في الأرصدة! راجع التفاصيل أدناه.</p>'
+                    }
+                </div>
+            `;
+
+            // تحليل الأرصدة
+            displayBalanceAnalysis(result);
+
+            // الأخطاء
+            if (result.results.errors && result.results.errors.length > 0) {
+                document.getElementById('errors_card').style.display = 'block';
+                let errorsHtml = '';
+                result.results.errors.forEach((error, index) => {
+                    errorsHtml += `
+                        <div class="error-item">
+                            <strong>خطأ #${index + 1}:</strong> ${JSON.stringify(error)}
+                        </div>
+                    `;
+                });
+                document.getElementById('errors_list').innerHTML = errorsHtml;
+            }
+
+            // الفروقات
+            if (result.analysis.discrepancies && result.analysis.discrepancies.length > 0) {
+                document.getElementById('discrepancies_card').style.display = 'block';
+                let discrepanciesHtml = '<div class="table-responsive"><table class="table table-bordered">';
+                discrepanciesHtml += '<thead><tr><th>النوع</th><th>المستخدم</th><th>قبل</th><th>بعد</th><th>المتوقع</th><th>الفعلي</th><th>الفرق</th></tr></thead><tbody>';
+
+                result.analysis.discrepancies.forEach(disc => {
+                    const diffClass = disc.difference > 0 ? 'diff-positive' : 'diff-negative';
+                    discrepanciesHtml += `
+                        <tr>
+                            <td>${disc.type}</td>
+                            <td>${disc.name} (${disc.user_id})</td>
+                            <td>${disc.before.toLocaleString()}</td>
+                            <td>${disc.after.toLocaleString()}</td>
+                            <td>${(disc.expected_deduction || disc.expected_gain || 0).toLocaleString()}</td>
+                            <td>${(disc.actual_deduction || disc.actual_gain || 0).toLocaleString()}</td>
+                            <td class="${diffClass}">${disc.difference.toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+
+                discrepanciesHtml += '</tbody></table></div>';
+                document.getElementById('discrepancies_list').innerHTML = discrepanciesHtml;
+            }
+
+            // إظهار النتائج
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+
+        function displayBalanceAnalysis(result) {
+            let html = '<div class="table-responsive"><table class="table balance-table table-bordered">';
+
+            // المرسلين
+            html += '<thead class="table-primary"><tr><th colspan="4">المرسلين (Senders)</th></tr></thead>';
+            html += '<tbody><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الفرق</th></tr>';
+
+            for (let [userId, beforeData] of Object.entries(result.before_balances.senders)) {
+                const afterData = result.after_balances.senders[userId];
+                const diff = afterData.di - beforeData.di;
+                const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
+
+                html += `
+                    <tr>
+                        <td>${beforeData.name} (${userId})</td>
+                        <td>${beforeData.di.toLocaleString()}</td>
+                        <td>${afterData.di.toLocaleString()}</td>
+                        <td class="${diffClass}">${diff.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+            html += '</tbody>';
+
+            // المستلمين
+            html += '<thead class="table-success"><tr><th colspan="4">المستلمين (Receivers)</th></tr></thead>';
+            html += '<tbody><tr><th>المستخدم</th><th>قبل</th><th>بعد</th><th>الفرق</th></tr>';
+
+            for (let [userId, beforeData] of Object.entries(result.before_balances.receivers)) {
+                const afterData = result.after_balances.receivers[userId];
+                const diff = afterData.di - beforeData.di;
+                const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
+
+                html += `
+                    <tr>
+                        <td>${beforeData.name} (${userId})</td>
+                        <td>${beforeData.di.toLocaleString()}</td>
+                        <td>${afterData.di.toLocaleString()}</td>
+                        <td class="${diffClass}">+${diff.toLocaleString()}</td>
+                    </tr>
+                `;
+            }
+            html += '</tbody>';
+
+            // المحافظ المركزية
+            if (result.before_balances.core_wallets) {
+                html += '<thead class="table-warning"><tr><th colspan="4">المحافظ المركزية (Core Wallets)</th></tr></thead>';
+                html += '<tbody>';
+
+                for (let [walletName, beforeData] of Object.entries(result.before_balances.core_wallets)) {
+                    const afterData = result.after_balances.core_wallets[walletName];
+                    const diff = afterData.coins - beforeData.coins;
+                    const diffClass = diff >= 0 ? 'diff-positive' : 'diff-negative';
+
+                    html += `
+                        <tr>
+                            <td>${walletName}</td>
+                            <td>${beforeData.coins.toLocaleString()}</td>
+                            <td>${afterData.coins.toLocaleString()}</td>
+                            <td class="${diffClass}">${diff.toLocaleString()}</td>
+                        </tr>
+                    `;
+                }
+                html += '</tbody>';
+            }
+
+            html += '</table></div>';
+
+            // الملخص
+            html += `
+                <div class="mt-3 alert alert-info">
+                    <h6>الملخص المالي:</h6>
+                    <p><strong>إجمالي الخصم من المرسلين:</strong> ${result.analysis.summary.total_actual_deduction.toLocaleString()} كوين</p>
+                    <p><strong>إجمالي الزيادة للمستلمين:</strong> ${result.analysis.summary.total_actual_receiver_gain.toLocaleString()} كوين</p>
+                    ${result.analysis.summary.app_wallet_change ? `<p><strong>تغيير App Wallet:</strong> ${result.analysis.summary.app_wallet_change.toLocaleString()} كوين</p>` : ''}
+                    ${result.analysis.summary.owner_wallet_change ? `<p><strong>تغيير Owner Wallet:</strong> ${result.analysis.summary.owner_wallet_change.toLocaleString()} كوين</p>` : ''}
+                </div>
+            `;
+
+            document.getElementById('balance_analysis').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
