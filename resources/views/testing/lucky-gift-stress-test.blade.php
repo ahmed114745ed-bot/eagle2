@@ -349,10 +349,11 @@
             // إخفاء النتائج وإظهار التحميل
             document.getElementById('resultsContainer').style.display = 'none';
             document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressContainer').querySelector('p').innerHTML = '<strong>جاري تنفيذ الاختبار...</strong><br>يرجى الانتظار، هذا قد يستغرق عدة دقائق حسب عدد الطلبات.';
 
             // إنشاء AbortController للتحكم في timeout
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 دقائق
+            const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 دقائق
 
             try {
                 const response = await fetch('{{ route("stress-test.run") }}', {
@@ -374,13 +375,14 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // إذا كان الاختبار يعمل في الخلفية (Background Job)
-                    if (result.test_id && result.status_url) {
-                        pollTestStatus(result.test_id, result.status_url);
-                    }
-                    // إذا كانت النتائج جاهزة مباشرة
-                    else if (result.results) {
+                    // النتائج جاهزة مباشرة
+                    if (result.results) {
+                        document.getElementById('progressContainer').style.display = 'none';
                         displayResults(result);
+                    }
+                    // إذا كان الاختبار يعمل في الخلفية (لن يحدث الآن)
+                    else if (result.test_id && result.status_url) {
+                        pollTestStatus(result.test_id, result.status_url);
                     }
                 } else {
                     alert('❌ خطأ: ' + (result.message || 'حدث خطأ غير متوقع'));
@@ -392,7 +394,7 @@
                 let errorMessage = 'خطأ في الاتصال';
 
                 if (error.name === 'AbortError') {
-                    errorMessage = '⏱️ انتهى الوقت المسموح (3 دقائق). حاول تقليل عدد الطلبات أو استخدم الاختبار التسلسلي.';
+                    errorMessage = '⏱️ انتهى الوقت المسموح (10 دقائق). حاول تقليل عدد الطلبات أو استخدم الاختبار التسلسلي.';
                 } else if (error.message.includes('ERR_CONNECTION')) {
                     errorMessage = '🔌 فشل الاتصال بالسيرفر. قد يكون السيرفر تحت ضغط كبير.\n\nحلول مقترحة:\n1. قلل عدد الطلبات (جرب 5-10)\n2. استخدم الاختبار التسلسلي بدلاً من المتزامن\n3. تأكد من تشغيل السيرفر بشكل صحيح';
                 } else {

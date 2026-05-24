@@ -87,10 +87,10 @@ class LuckyGiftStressTestController extends Controller
         // حفظ الأرصدة قبل الاختبار
         $beforeBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
 
-        // بدء الاختبار كـ Background Job
+        // بدء الاختبار مباشرة (بدون Background Job)
         $testId = 'test_' . time() . '_' . uniqid();
 
-        Log::channel('lucky_gift')->info('🧪 Queuing Stress Test as Background Job', [
+        Log::channel('lucky_gift')->info('🧪 Starting Direct Stress Test', [
             'test_id' => $testId,
             'senders' => count($senderIds),
             'receivers' => count($receiverIds),
@@ -99,31 +99,47 @@ class LuckyGiftStressTestController extends Controller
             'cost_per_request' => $costPerRequest,
         ]);
 
-        // حفظ الأرصدة قبل الاختبار
-        $beforeBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
-        \Illuminate\Support\Facades\Cache::put("stress_test_{$testId}_before_balances", $beforeBalances, 3600);
+        $startTime = microtime(true);
 
-        // تحضير البيانات للـ Job
-        $testConfig = [
-            'sender_ids' => $senderIds,
-            'receiver_ids' => $receiverIds,
-            'gift_id' => $request->gift_id,
-            'room_id' => $request->room_id,
-            'num' => $request->num,
-            'count' => $request->count,
-            'requests_per_user' => $request->requests_per_user,
-            'concurrent' => $request->concurrent,
-        ];
+        // تشغيل الاختبار مباشرة
+        if ($request->concurrent) {
+            $results = $this->runConcurrentTest($senders, $receiverIds, $request, $testId);
+        } else {
+            $results = $this->runSequentialTest($senders, $receiverIds, $request, $testId);
+        }
 
-        // إطلاق Job في الخلفية
-        \App\Jobs\RunStressTestJob::dispatch($testConfig, $testId)->onQueue('stress-tests');
+        $endTime = microtime(true);
+        $duration = round($endTime - $startTime, 2);
 
-        // إرجاع استجابة فورية
+        // الانتظار قليلاً لإتمام Jobs
+        sleep(2);
+
+        // جلب الأرصدة بعد الاختبار
+        $afterBalances = $this->captureBalances($senderIds, $receiverIds, $room->uid);
+
+        // تحليل النتائج
+        $analysis = $this->analyzeResults(
+            $beforeBalances,
+            $afterBalances,
+            $results,
+            $testId,
+            $duration
+        );
+
+        // حفظ التقرير
+        $reportPath = $this->saveReport($testId, $beforeBalances, $afterBalances, $analysis, $results);
+
+        // إرجاع النتائج مباشرة
         return response()->json([
             'success' => true,
             'test_id' => $testId,
-            'message' => 'تم بدء الاختبار في الخلفية. يمكنك متابعة التقدم.',
-            'status_url' => route('stress-test.status', $testId),
+            'message' => 'اكتمل الاختبار بنجاح',
+            'duration' => $duration,
+            'results' => $results,
+            'before_balances' => $beforeBalances,
+            'after_balances' => $afterBalances,
+            'analysis' => $analysis,
+            'report_path' => $reportPath,
         ]);
     }
 
