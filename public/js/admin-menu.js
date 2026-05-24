@@ -814,20 +814,22 @@ console.log('✅ sidebar js loaded');
     })();
 })();
 
+// Debugbar screen tracking removed (2026-05-24)
+// Reason: Production app was making 547 requests/day to /__debugbar/screen (404 errors)
 // if (window.APP_ENV !== 'production') {
-    window.addEventListener('load', function () {
-        fetch('/__debugbar/screen', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document
-                    .querySelector('meta[name="csrf-token"]')
-                    ?.getAttribute('content')
-            },
-            body: JSON.stringify({
-                width: window.innerWidth,
-                height: window.innerHeight
-            })
-        });
-    });
+//     window.addEventListener('load', function () {
+//         fetch('/__debugbar/screen', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRF-TOKEN': document
+//                     .querySelector('meta[name="csrf-token"]')
+//                     ?.getAttribute('content')
+//             },
+//             body: JSON.stringify({
+//                 width: window.innerWidth,
+//                 height: window.innerHeight
+//             })
+//         });
+//     });
 // }
