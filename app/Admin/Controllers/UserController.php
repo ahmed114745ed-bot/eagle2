@@ -396,6 +396,15 @@ class UserController extends MainController
         $grid->disableExport();
         $grid->disableRowSelector();
 
+        // Add Cleanup Duplicate Devices button
+        $grid->tools(function ($tools) {
+            $tools->append('
+                <a href="/admin/cleanup-duplicate-devices/preview" class="btn btn-warning btn-sm" style="margin-left:5px;">
+                    <i class="fa fa-trash"></i> تنظيف الحسابات المكررة
+                </a>
+            ');
+        });
+
         return $grid;
     }
 
@@ -1392,8 +1401,10 @@ class UserController extends MainController
     }
 
     /**
-     * Clean up devices with more than 3 accounts
-     * Deletes newest accounts until only 3 remain per device
+     * Clean up devices with more than allowed accounts
+     * Deletes newest accounts until only allowed number remain per device
+     *
+     * STRICT POLICY: Counts ALL accounts (even logged out ones) to match login restrictions
      */
     public function cleanupDuplicateDevices()
     {
@@ -1402,11 +1413,11 @@ class UserController extends MainController
         try {
             $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
 
-            // Get all device tokens that have more than allowed accounts (active users only)
+            // STRICT POLICY: Get all device tokens that have more than allowed accounts (ALL users, not just active)
+            // This matches the strict login policy where we count all accounts
             $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
                 ->whereNotNull('device_token')
                 ->where('device_token', '!=', '')
-                ->where('is_logout', 0)
                 ->groupBy('device_token')
                 ->having('user_count', '>', $register_account)
                 ->get();
@@ -1421,9 +1432,8 @@ class UserController extends MainController
                 $deviceToken = $deviceData->device_token;
                 $userCount = $deviceData->user_count;
 
-                // Get all users for this device (active only), ordered by created_at DESC (newest first)
+                // STRICT POLICY: Get ALL users for this device (including logged out), ordered by created_at DESC (newest first)
                 $users = User::where('device_token', $deviceToken)
-                    ->where('is_logout', 0)
                     ->orderByDesc('created_at')
                     ->get();
 
@@ -1463,7 +1473,9 @@ class UserController extends MainController
                         'name' => $user->name,
                         'uuid' => $user->uuid,
                         'device_token' => $deviceToken,
-                        'created_at' => $user->created_at,
+                        'created_at' => $user->created_at instanceof \Carbon\Carbon
+                            ? $user->created_at->format('Y-m-d H:i:s')
+                            : $user->created_at,
                     ];
 
                     $totalDeleted++;
@@ -1511,4 +1523,195 @@ class UserController extends MainController
             ], 500);
         }
     }
+
+    /**
+     * Preview devices with duplicate accounts (PREVIEW ONLY - NO DELETION)
+     * Shows what would be deleted without actually deleting
+     */
+    public function cleanupDuplicateDevicesPreviewPage(Content $content)
+    {
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // Get all device tokens that have more than allowed accounts
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $previewData = [];
+            $totalToDelete = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // Get ALL users for this device
+                $users = User::where('device_token', $deviceToken)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $deleteCount = $userCount - $register_account;
+                $usersToDelete = $users->take($deleteCount);
+                $usersToKeep = $users->skip($deleteCount);
+
+                $previewData[] = [
+                    'device_token' => $deviceToken,
+                    'total_accounts' => $userCount,
+                    'allowed_accounts' => $register_account,
+                    'to_delete_count' => $deleteCount,
+                    'users_to_delete' => $usersToDelete,
+                    'users_to_keep' => $usersToKeep,
+                ];
+
+                $totalToDelete += $deleteCount;
+            }
+
+            return $content
+                ->title('معاينة الحسابات المكررة')
+                ->description('عرض الحسابات التي سيتم حذفها')
+                ->body(view('admin.cleanup_duplicate_devices_preview', [
+                    'devices' => $previewData,
+                    'total_devices' => count($previewData),
+                    'total_to_delete' => $totalToDelete,
+                    'allowed_accounts' => $register_account,
+                ]));
+
+        } catch (\Exception $e) {
+            return $content
+                ->title('خطأ')
+                ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$e->getMessage()}</div>");
+        }
+    }
+
+    public function cleanupDuplicateDevicesPreview()
+    {
+        try {
+            $register_account = (int)(Common::getSettingValue('register_account') ?? 3);
+
+            // Get all device tokens that have more than allowed accounts
+            $deviceTokens = User::select('device_token', DB::raw('COUNT(*) as user_count'))
+                ->whereNotNull('device_token')
+                ->where('device_token', '!=', '')
+                ->groupBy('device_token')
+                ->having('user_count', '>', $register_account)
+                ->get();
+
+            $previewData = [];
+            $totalToDelete = 0;
+
+            foreach ($deviceTokens as $deviceData) {
+                $deviceToken = $deviceData->device_token;
+                $userCount = $deviceData->user_count;
+
+                // Get ALL users for this device
+                $users = User::where('device_token', $deviceToken)
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $deleteCount = $userCount - $register_account;
+                $usersToDelete = $users->take($deleteCount);
+                $usersToKeep = $users->skip($deleteCount);
+
+                $previewData[] = [
+                    'device_token' => $deviceToken,
+                    'total_accounts' => $userCount,
+                    'allowed_accounts' => $register_account,
+                    'to_delete_count' => $deleteCount,
+                    'users_to_delete' => $usersToDelete->map(function($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'phone' => $user->phone,
+                            'email' => $user->email,
+                            'uuid' => $user->uuid,
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
+                            'is_logout' => $user->is_logout,
+                            'status' => $user->status,
+                        ];
+                    })->toArray(),
+                    'users_to_keep' => $usersToKeep->map(function($user) {
+                        return [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'phone' => $user->phone,
+                            'email' => $user->email,
+                            'uuid' => $user->uuid,
+                            'created_at' => $user->created_at instanceof \Carbon\Carbon
+                                ? $user->created_at->format('Y-m-d H:i:s')
+                                : $user->created_at,
+                        ];
+                    })->toArray(),
+                ];
+
+                $totalToDelete += $deleteCount;
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Preview generated successfully (NO DELETION PERFORMED)',
+                'data' => [
+                    'total_devices_affected' => count($previewData),
+                    'total_users_to_delete' => $totalToDelete,
+                    'allowed_accounts_per_device' => $register_account,
+                    'devices' => $previewData,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error during preview: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Execute cleanup of duplicate device accounts (ACTUAL DELETION)
+     * This performs the actual deletion after reviewing the preview
+     */
+    public function cleanupDuplicateDevicesRunPage(Content $content)
+    {
+        try {
+            $result = $this->cleanupDuplicateDevices();
+            $data = $result->getData();
+
+            if ($data->status) {
+                return $content
+                    ->title('تم الحذف بنجاح')
+                    ->description('نتائج عملية الحذف')
+                    ->body(view('admin.cleanup_duplicate_devices_run', [
+                        'devices_processed' => $data->data->devices_processed,
+                        'total_users_deleted' => $data->data->total_users_deleted,
+                        'total_user_accounts_deleted' => $data->data->total_user_accounts_deleted,
+                        'total_tokens_deleted' => $data->data->total_tokens_deleted,
+                        'deleted_users' => $data->data->deleted_users,
+                    ]));
+            } else {
+                return $content
+                    ->title('خطأ')
+                    ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$data->message}</div>");
+            }
+
+        } catch (\Exception $e) {
+            return $content
+                ->title('خطأ')
+                ->body("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle'></i> {$e->getMessage()}</div>");
+        }
+    }
+
+    public function cleanupDuplicateDevicesRun()
+    {
+        // Just call the existing cleanup function
+        return $this->cleanupDuplicateDevices();
+    }
+
+    /**
+     * Display the cleanup duplicate devices page
+     */
 }
