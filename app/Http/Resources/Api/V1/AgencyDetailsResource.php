@@ -33,7 +33,12 @@ class AgencyDetailsResource extends JsonResource
         $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->take(3)->get();
         $heroGiftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, sender_id")
-            ->with('sender')->groupBy('sender_id')->whereHas('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
+            ->with('sender')->groupBy('sender_id')->whereHas('sender')
+            ->whereBetween('created_at', [
+                Carbon::create($year, $month, 1)->startOfMonth(),
+                Carbon::create($year, $month, 1)->endOfMonth(),
+            ])
+            ->orderByDesc('exp')->get();
         $admin = $this->admins()->take(3)->get();
 
 

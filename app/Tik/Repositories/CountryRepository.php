@@ -5,6 +5,7 @@ namespace App\Tik\Repositories;
 use App\Helpers\Common;
 use App\Models\Country;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class CountryRepository extends AbstractRepository
 {
@@ -26,43 +27,51 @@ class CountryRepository extends AbstractRepository
 
     public function getCountriesWithSupporters()
     {
-        return $this->model->query()
-            ->select('id', 'name', 'e_name', 'flag', 'language', 'phone_code', 'iso')
-            ->where('status', 1)
-            ->with([
-                'supporters' => function ($q) {
-                    $q->orderByDesc('total_sent')->take(3);
-                },
-                'supporters.sender:id,name,uuid',
-                'supporters.sender.profile:id,user_id,avatar'
-            ])
-            ->get();
+        return Cache::remember(
+            'countries_with_supporters',
+            300, // 5 minutes cache
+            fn() => $this->model->query()
+                ->select('id', 'name', 'e_name', 'flag', 'language', 'phone_code', 'iso')
+                ->where('status', 1)
+                ->with([
+                    'supporters' => function ($q) {
+                        $q->orderByDesc('total_sent')->take(3);
+                    },
+                    'supporters.sender:id,name,uuid',
+                    'supporters.sender.profile:id,user_id,avatar'
+                ])
+                ->get()
+        );
     }
 
     public function orderByHotAndSupporters($categoryId): Collection|array
     {
-        return $this->model->query()
-            ->when($categoryId, function ($q) use ($categoryId) {
-                $q->where('country_category_id', $categoryId);
-            })
-            ->select('id', 'name', 'e_name', 'flag', 'language', 'phone_code', 'iso')
-            ->where('status', 1)
-            ->withCount(['rooms as hot_rooms_count' => function ($q) {
-                $q->whereNotNull('hour_hot')
-                    ->orWhere('hour_hot', '!=', '');
-            }])
-            ->orderByDesc('hot_rooms_count')
-            ->with([
-                'supporters' => function ($q) {
-                    $q->orderByDesc('total_sent')->take(3);
-                },
-                'supporters.sender:id,name,uuid',
-                'supporters.sender.profile:id,user_id,avatar'
-            ])
-            ->withCount(['rooms as total_rooms' => function ($q) {
-                $q->where('status', 1);
-            }])
-            ->get();
+        return Cache::remember(
+            "countries_hot_supporters_{$categoryId}",
+            300, // 5 minutes cache
+            fn() => $this->model->query()
+                ->when($categoryId, function ($q) use ($categoryId) {
+                    $q->where('country_category_id', $categoryId);
+                })
+                ->select('id', 'name', 'e_name', 'flag', 'language', 'phone_code', 'iso')
+                ->where('status', 1)
+                ->withCount(['rooms as hot_rooms_count' => function ($q) {
+                    $q->whereNotNull('hour_hot')
+                        ->orWhere('hour_hot', '!=', '');
+                }])
+                ->orderByDesc('hot_rooms_count')
+                ->with([
+                    'supporters' => function ($q) {
+                        $q->orderByDesc('total_sent')->take(3);
+                    },
+                    'supporters.sender:id,name,uuid',
+                    'supporters.sender.profile:id,user_id,avatar'
+                ])
+                ->withCount(['rooms as total_rooms' => function ($q) {
+                    $q->where('status', 1);
+                }])
+                ->get()
+        );
     }
     public function countryGet()
     {
