@@ -222,17 +222,19 @@ class SearchRepository implements SearchRepositoryInterface
             return [];
         }
 
+        $escapedKeywords = addslashes($keywords);
+
         $users = User::query()
             ->select([
                 '*',
                 DB::raw("
             CASE
-                WHEN special_id = '{$keywords}' THEN 1000
-                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
-                WHEN uuid = '{$keywords}' THEN 800
-                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
-                WHEN special_id LIKE '%{$keywords}%' THEN 600
-                WHEN uuid LIKE '%{$keywords}%' THEN 500
+                WHEN uuid = '{$escapedKeywords}' THEN 1000
+                WHEN special_id = '{$escapedKeywords}' THEN 999
+                WHEN uuid LIKE '{$escapedKeywords}%' THEN 800 - LENGTH(uuid)
+                WHEN special_id LIKE '{$escapedKeywords}%' THEN 700 - LENGTH(special_id)
+                WHEN uuid LIKE '%{$escapedKeywords}%' THEN 500 - LOCATE('{$escapedKeywords}', uuid)
+                WHEN special_id LIKE '%{$escapedKeywords}%' THEN 400 - LOCATE('{$escapedKeywords}', special_id)
                 ELSE 0
             END AS total_score
         ")
@@ -253,6 +255,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->where('status', 1)
             ->having('total_score', '>', 0)
             ->orderByDesc('total_score')
+            ->orderByRaw("CAST(uuid AS UNSIGNED)")
             ->take(10)
             ->get();
         //            ->paginate(10, ['*'], 'page', $page);
