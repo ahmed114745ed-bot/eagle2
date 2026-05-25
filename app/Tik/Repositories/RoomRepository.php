@@ -259,14 +259,14 @@ class RoomRepository extends AbstractRepository
                     $q->select('id', 'name', 'uuid', 'country_id', 'agency_id', 'special_id')
                       ->with([
                           'enabledMedals:id,achievement_level_id,user_id,is_enable',
-                          'agency:id,name,logo',
+                          'agency:id,name,img',
                           'agency.owner:id,name',
                           'country:id,name,img',
                           'color_image:id,user_id,image',
                           'specialId:id,ware_id',
-                          'specialId.ware:id,img,img_gif',
+                          'specialId.ware:id,show_img',
                           'eligiblePacks:id,user_id,ware_id',
-                          'eligiblePacks.ware:id,img,img_gif',
+                          'eligiblePacks.ware:id,show_img',
                           'profile:user_id,avatar,frame',
                           'medals' => fn($q) => $q->select('id','user_id','achievement_level_id')
                                                    ->with('achievementLevel:id,achievement_id,icon')
