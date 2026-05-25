@@ -93,8 +93,8 @@ class CashbackCompensationController extends Controller
                 $amount,
                 $balanceBefore,
                 UserCoinLogType::COMPENSATION,
-                null,
-                $reason
+                $reason,  // item_name
+                0  // helper_amount
             );
 
             DB::commit();
@@ -206,8 +206,8 @@ class CashbackCompensationController extends Controller
                         $amount,
                         $balanceBefore,
                         UserCoinLogType::COMPENSATION,
-                        null,
-                        $reason
+                        $reason,  // item_name
+                        0  // helper_amount
                     );
 
                     DB::commit();
