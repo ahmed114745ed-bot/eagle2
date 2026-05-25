@@ -124,17 +124,20 @@ class HomeCarousel extends Model
      */
     protected static function clearHomeCarouselsCache(): void
     {
-        // Clear all cached carousel variations
-        $patterns = ['home_carousels_*'];
-        foreach ($patterns as $pattern) {
-            $keys = Cache::getRedis()->keys($pattern);
+        try {
+            $redis = Cache::getStore()->getRedis();
+            $prefix = config('database.redis.options.prefix', '');
+            $pattern = 'home_carousels_*';
+
+            $keys = $redis->keys($prefix . $pattern);
             if (!empty($keys)) {
                 foreach ($keys as $key) {
-                    // Remove prefix if needed
-                    $cleanKey = str_replace(config('database.redis.options.prefix'), '', $key);
+                    $cleanKey = str_replace($prefix, '', $key);
                     Cache::forget($cleanKey);
                 }
             }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to clear home carousels cache: ' . $e->getMessage());
         }
     }
 

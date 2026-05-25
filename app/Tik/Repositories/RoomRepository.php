@@ -244,7 +244,7 @@ class RoomRepository extends AbstractRepository
         $result = $this->model->withLuckyBoxFlag($user->id)
             ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'level_id', 'room_status', 'room_pass', 'room_admin', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
             ->with([
-                'roomLevel:id,name,level',
+                'roomLevel:id,name_en,name_ar,level,img',
                 'backgroundImage:id,owner_room_id,img',
                 'defaultBackground:id,img',
                 'lastPk:id,room_id',
