@@ -92,7 +92,7 @@ class CashbackCompensationController extends Controller
                 $userId,
                 $amount,
                 $balanceBefore,
-                UserCoinLogType::ADMIN_ADD,
+                UserCoinLogType::COMPENSATION,
                 null,
                 $reason
             );
@@ -205,7 +205,7 @@ class CashbackCompensationController extends Controller
                         $userId,
                         $amount,
                         $balanceBefore,
-                        UserCoinLogType::ADMIN_ADD,
+                        UserCoinLogType::COMPENSATION,
                         null,
                         $reason
                     );
@@ -335,7 +335,7 @@ class CashbackCompensationController extends Controller
                         $userId,
                         $amount,
                         $balanceBefore,
-                        UserCoinLogType::ADMIN_ADD,
+                        UserCoinLogType::COMPENSATION,
                         null,
                         $reason
                     );
