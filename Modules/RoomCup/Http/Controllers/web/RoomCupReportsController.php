@@ -33,7 +33,7 @@ class RoomCupReportsController extends MainController
             ->with([
                 'gift:id,current_total,room_id',
                 'gift.room:id,id,room_name,room_cover,uid',
-                'user:id,id,name,uuid,special_id,country_id,sender_level,receiver_level',
+                'user:id,id,name,uuid,special_id,country_id,sender_level,received_level',
                 'user.packs:id,user_id,type,is_used,target_id,expire',
                 'user.packs.ware:id',
                 'user.profile:id,user_id,avatar',
@@ -49,7 +49,7 @@ class RoomCupReportsController extends MainController
             ])
             ->orderBy('created_at', 'desc');
 
-         $grid->column('user_id', __('user'))->display(function () {
+        $grid->column('user_id', __('user'))->display(function () {
             return app(UserService::class)->adminUserCard($this->user);
         });
         Admin::style(UserService::adminUserCardStyles() . gridStyles());
