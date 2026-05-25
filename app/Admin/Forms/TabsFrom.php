@@ -12,6 +12,65 @@ use Symfony\Component\HttpFoundation\Response;
 class TabsFrom extends Form
 {
 
+    /**
+     * Override ajaxResponse to prevent AJAX response when we have a custom redirect URL
+     * This ensures proper redirect to gift category page after save
+     */
+    protected function ajaxResponse($message = '')
+    {
+        // If we have a return_url in session, skip AJAX response and use redirect instead
+        if (session('return_url')) {
+            return null;
+        }
+
+        // Otherwise, use parent AJAX response
+        return parent::ajaxResponse($message);
+    }
+
+    public function store()
+    {
+        $data = \request()->all();
+
+        // Handle validation errors.
+        if ($validationMessages = $this->validationMessages($data)) {
+            return back()->withInput()->withErrors($validationMessages);
+        }
+
+        if (($response = $this->prepare($data)) instanceof Response) {
+            return $response;
+        }
+
+        DB::transaction(function () {
+            $inserts = $this->prepareInsert($this->updates);
+
+            foreach ($inserts as $column => $value) {
+                $this->model->setAttribute($column, $value);
+            }
+
+            $this->model->save();
+
+            $this->updateRelation($this->relations);
+        });
+
+        if (($result = $this->callSaved()) instanceof Response) {
+            return $result;
+        }
+
+        // Skip AJAX response and go directly to redirect for gift creation
+        if ($response = $this->ajaxResponse(trans('admin.save_succeeded'))) {
+            return $response;
+        }
+
+        return $this->redirectAfterStore();
+    }
+
+    protected function redirectAfterStore()
+    {
+        $resourcesPath = $this->resource(-1);
+
+        return $this->redirectAfterSaving($resourcesPath, $this->model->getKey());
+    }
+
     public function update($id, $data = null)
     {
         $data = ($data) ?: request()->all();
