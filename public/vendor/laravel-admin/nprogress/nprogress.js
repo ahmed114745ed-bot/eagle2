@@ -220,7 +220,7 @@
     if (NProgress.isRendered()) return document.getElementById('nprogress');
 
     addClass(document.documentElement, 'nprogress-busy');
-    
+
     var progress = document.createElement('div');
     progress.id = 'nprogress';
     progress.innerHTML = Settings.template;
@@ -229,7 +229,7 @@
         perc     = fromStart ? '-100' : toBarPerc(NProgress.status || 0),
         parent   = document.querySelector(Settings.parent),
         spinner;
-    
+
     css(bar, {
       transition: 'all 0 linear',
       transform: 'translate3d(' + perc + '%,0,0)'
@@ -240,11 +240,13 @@
       spinner && removeElement(spinner);
     }
 
-    if (parent != document.body) {
+    if (parent && parent != document.body) {
       addClass(parent, 'nprogress-custom-parent');
     }
 
-    parent.appendChild(progress);
+    if (parent) {
+      parent.appendChild(progress);
+    }
     return progress;
   };
 
@@ -254,7 +256,10 @@
 
   NProgress.remove = function() {
     removeClass(document.documentElement, 'nprogress-busy');
-    removeClass(document.querySelector(Settings.parent), 'nprogress-custom-parent');
+    var parent = document.querySelector(Settings.parent);
+    if (parent) {
+      removeClass(parent, 'nprogress-custom-parent');
+    }
     var progress = document.getElementById('nprogress');
     progress && removeElement(progress);
   };
@@ -427,10 +432,12 @@
    */
 
   function addClass(element, name) {
+    if (!element) return;
+
     var oldList = classList(element),
         newList = oldList + name;
 
-    if (hasClass(oldList, name)) return; 
+    if (hasClass(oldList, name)) return;
 
     // Trim the opening space.
     element.className = newList.substring(1);
@@ -441,6 +448,8 @@
    */
 
   function removeClass(element, name) {
+    if (!element) return;
+
     var oldList = classList(element),
         newList;
 
