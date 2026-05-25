@@ -107,6 +107,11 @@ return [
     */
 
     'flush' => [
+        'auth',
+        'auth.driver',
+        'session',
+        'session.store',
+        'request',
     ],
 
     /*
