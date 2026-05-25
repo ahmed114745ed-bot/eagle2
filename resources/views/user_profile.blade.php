@@ -3565,7 +3565,6 @@
             </div>
         </div>
     </div>
-</div>
 
     <div class="tab-content {{ $activeTab == 'user-coins' ? '' : 'd-none' }}" id="user-coins-tab">
         <div class="card" style="border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden;">
