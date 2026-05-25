@@ -222,21 +222,18 @@ class SearchRepository implements SearchRepositoryInterface
             return [];
         }
 
+        $bindings = array_fill(0, 8, $keywords);
+
         $users = User::query()
-            ->select([
-                '*',
-                DB::raw("
-            CASE
-                WHEN special_id = '{$keywords}' THEN 1000
-                WHEN special_id LIKE '{$keywords}%' THEN 900 - LENGTH(special_id)
-                WHEN uuid = '{$keywords}' THEN 800
-                WHEN uuid LIKE '{$keywords}%' THEN 700 - LENGTH(uuid)
-                WHEN special_id LIKE '%{$keywords}%' THEN 600
-                WHEN uuid LIKE '%{$keywords}%' THEN 500
+            ->selectRaw("*, CASE
+                WHEN uuid = ? THEN 10000
+                WHEN special_id = ? THEN 9500
+                WHEN uuid LIKE CONCAT(?, '%') THEN 8000 - LENGTH(uuid) * 100
+                WHEN special_id LIKE CONCAT(?, '%') THEN 7000 - LENGTH(special_id) * 100
+                WHEN uuid LIKE CONCAT('%', ?, '%') THEN 5000 - LOCATE(?, uuid) * 100 - LENGTH(uuid)
+                WHEN special_id LIKE CONCAT('%', ?, '%') THEN 4000 - LOCATE(?, special_id) * 100 - LENGTH(special_id)
                 ELSE 0
-            END AS total_score
-        ")
-            ])
+            END AS total_score", $bindings)
             ->with([
                 'profile:id,user_id,avatar',
                 'color_image',
@@ -253,6 +250,7 @@ class SearchRepository implements SearchRepositoryInterface
             ->where('status', 1)
             ->having('total_score', '>', 0)
             ->orderByDesc('total_score')
+            ->orderByRaw("CAST(uuid AS UNSIGNED)")
             ->take(10)
             ->get();
         //            ->paginate(10, ['*'], 'page', $page);
