@@ -108,26 +108,41 @@ class CompensateCashbackLossJob implements ShouldQueue
                 try {
                     DB::beginTransaction();
 
-                    // جلب الرصيد الحالي
-                    $currentBalance = DB::table('users')
+                    // جلب المستخدم مع قفل
+                    $dbUser = DB::table('users')
                         ->where('id', $user->user_id)
-                        ->value('diamonds') ?? 0;
+                        ->lockForUpdate()
+                        ->first();
 
-                    // إضافة سجل التعويض في user_coin_logs
-                    DB::table('user_coin_logs')->insert([
-                        'user_id' => $user->user_id,
-                        'type' => 'compensation',
-                        'sub_type' => 'cashback_loss_refund',
-                        'amount' => $user->compensation_amount,
-                        'amount_before' => $currentBalance,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                    if (!$dbUser) {
+                        throw new \Exception('المستخدم غير موجود');
+                    }
+
+                    $balanceBefore = $dbUser->di;
+                    $balanceAfter = $balanceBefore + $user->compensation_amount;
 
                     // تحديث رصيد المستخدم
-                    DB::table('users')
+                    $updated = DB::table('users')
                         ->where('id', $user->user_id)
-                        ->increment('diamonds', $user->compensation_amount);
+                        ->where('di', $balanceBefore)  // Optimistic locking
+                        ->update([
+                            'di' => $balanceAfter,
+                            'updated_at' => now(),
+                        ]);
+
+                    if (!$updated) {
+                        throw new \Exception('فشل التحديث - تم تعديل الرصيد من طلب آخر');
+                    }
+
+                    // تسجيل في user_coin_logs باستخدام Helper
+                    \App\Helpers\UserCoinLogHelper::logByType(
+                        $user->user_id,
+                        $user->compensation_amount,
+                        $balanceBefore,
+                        \App\Enums\UserCoinLogType::COMPENSATION,
+                        'Cashback Loss Refund',  // item_name
+                        0  // helper_amount
+                    );
 
                     DB::commit();
                     $processedUsers++;
