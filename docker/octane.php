@@ -56,6 +56,10 @@ return [
         RequestReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
             ...Octane::prepareApplicationForNextRequest(),
+            FlushAuthenticationState::class,
+            FlushSessionState::class,
+            FlushLocaleState::class,
+            FlushQueuedCookies::class,
         ],
 
         RequestTerminated::class => [
