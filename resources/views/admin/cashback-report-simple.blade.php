@@ -142,6 +142,7 @@
 
         <div class="controls">
             <button class="btn-success" onclick="exportCSV()">📥 تصدير CSV كامل</button>
+            <button class="btn-primary" onclick="compensateAll()">💰 تعويض الكل (جماعي)</button>
             <button class="btn-secondary" onclick="clearCache()">🗑️ مسح الكاش</button>
             <span class="page-info">صفحة <span id="current-page">1</span></span>
         </div>
@@ -437,6 +438,75 @@
 
         function scrollToTop() {
             window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        async function compensateAll() {
+            // التأكيد من المستخدم
+            const confirmed = confirm(
+                `⚠️ تحذير: تعويض جماعي لكل المستخدمين!\n\n` +
+                `إجمالي المستخدمين: ${summary?.total_affected_users || '؟'}\n` +
+                `إجمالي المبلغ: ${summary?.total_missing_cashback?.toLocaleString('ar-EG') || '؟'} ماسة\n\n` +
+                `هل أنت متأكد من تعويض الكل؟\n` +
+                `⚠️ هذا الإجراء لا يمكن التراجع عنه!`
+            );
+
+            if (!confirmed) return;
+
+            // تأكيد نهائي
+            const finalConfirm = confirm(
+                `⚠️ تأكيد نهائي!\n\n` +
+                `سيتم تعويض ${summary?.total_affected_users || '؟'} مستخدم\n` +
+                `بمبلغ إجمالي ${summary?.total_missing_cashback?.toLocaleString('ar-EG') || '؟'} ماسة\n\n` +
+                `هل أنت متأكد 100%؟`
+            );
+
+            if (!finalConfirm) return;
+
+            // عرض loading
+            showLoading();
+            document.querySelector('.loading p').textContent = 'جاري تعويض كل المستخدمين... قد يستغرق بضع دقائق';
+
+            try {
+                const response = await fetch('/cashback-report-compensate-all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        confirm: true,
+                        reason: 'تعويض جماعي - من صفحة التقرير',
+                        min_amount: 0
+                    })
+                });
+
+                const data = await response.json();
+                hideLoading();
+
+                if (data.status === 'success') {
+                    // نجح التعويض
+                    alert(
+                        `✅ تم التعويض الجماعي بنجاح!\n\n` +
+                        `إجمالي المستخدمين: ${data.message}\n` +
+                        `نجح: ${data.results?.success || 0}\n` +
+                        `فشل: ${data.results?.failed || 0}\n` +
+                        `إجمالي المبلغ المدفوع: ${data.results?.total_compensated?.toLocaleString('ar-EG') || 0} ماسة`
+                    );
+
+                    // إعادة تحميل الصفحة
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+
+                } else {
+                    alert('❌ فشل التعويض الجماعي: ' + (data.message || 'خطأ غير معروف'));
+                }
+
+            } catch (error) {
+                hideLoading();
+                alert('❌ خطأ في الاتصال: ' + error.message);
+            }
         }
     </script>
 </body>
