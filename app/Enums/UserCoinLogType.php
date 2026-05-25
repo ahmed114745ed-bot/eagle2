@@ -44,6 +44,7 @@ enum UserCoinLogType: string
     case HOST_LEVEL = 'host_level';
     case GIFT_RANKING = 'gift-ranking';
     case LEVEL_INTERVAL = 'level_interval';
+    case COMPENSATION = 'compensation';
 
     public function meta(): array
     {
@@ -249,6 +250,11 @@ enum UserCoinLogType: string
             self::GIFT_RANKING => [
                 'sub_type' => 'gift-ranking',
                 'item_name' => 'gift-ranking',
+                'queue_job' => null,
+            ],
+            self::COMPENSATION => [
+                'sub_type' => 'cashback_loss_refund',
+                'item_name' => 'compensation',
                 'queue_job' => null,
             ],
         };

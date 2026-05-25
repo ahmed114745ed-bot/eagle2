@@ -58,6 +58,13 @@ class CashbackReportControllerSimple extends Controller
                     MIN(created_at) AS first_cashback_at,
                     MAX(created_at) AS last_cashback_at
                 FROM cashback_issues
+                WHERE user_id NOT IN (
+                    -- استبعاد المستخدمين اللي اتعوضوا قبل كده
+                    SELECT DISTINCT user_id
+                    FROM user_coin_logs
+                    WHERE type = 'compensation'
+                        AND sub_type = 'cashback_loss_refund'
+                )
                 GROUP BY user_id
                 HAVING his_right > 0
                 ORDER BY his_right DESC
@@ -123,6 +130,13 @@ class CashbackReportControllerSimple extends Controller
                         ) AS total_missing
                     FROM all_logs
                     WHERE type = 'cashback'
+                        AND user_id NOT IN (
+                            -- استبعاد المستخدمين اللي اتعوضوا
+                            SELECT DISTINCT user_id
+                            FROM user_coin_logs
+                            WHERE type = 'compensation'
+                                AND sub_type = 'cashback_loss_refund'
+                        )
                     GROUP BY user_id
                     HAVING total_missing > 0
                 )
@@ -271,5 +285,37 @@ class CashbackReportControllerSimple extends Controller
             'status' => 'success',
             'message' => 'تم مسح الكاش بنجاح',
         ]);
+    }
+
+    /**
+     * تعويض كل المستخدمين المتضررين
+     */
+    public function compensateAll(Request $request)
+    {
+        try {
+            $startDate = $request->get('start_date');
+            $endDate = $request->get('end_date');
+
+            // تشغيل الـ Job في الخلفية
+            \App\Jobs\CompensateCashbackLossJob::dispatch($startDate, $endDate);
+
+            // مسح الكاش
+            Cache::forget('cashback_summary');
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم بدء عملية التعويض في الخلفية. سيتم إشعارك عند الانتهاء.',
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to start compensation job', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'فشل بدء عملية التعويض: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

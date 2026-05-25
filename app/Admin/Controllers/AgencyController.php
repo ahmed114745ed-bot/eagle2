@@ -283,8 +283,10 @@ class AgencyController extends MainController
             ->whereHas($rel)
             ->with($rel)
             ->where('agency_id', $agencyId)
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+            ->whereBetween('created_at', [
+                Carbon::create($year, $month, 1)->startOfMonth(),
+                Carbon::create($year, $month, 1)->endOfMonth(),
+            ])
             ->selectRaw("SUM(giftPrice) as exp, $keywords")
             ->groupBy($keywords)
             ->havingRaw("exp > 0")
@@ -294,7 +296,12 @@ class AgencyController extends MainController
 
     public function rateAgency($agencyId, $month, $year)
     {
-        $agencyTarget = UserSallary::where('user_agency_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
+        $agencyTarget = UserSallary::where('user_agency_id', $agencyId)
+            ->whereBetween('created_at', [
+                Carbon::create($year, $month, 1)->startOfMonth(),
+                Carbon::create($year, $month, 1)->endOfMonth(),
+            ])
+            ->sum('agency_sallary');
         $minValue = Target::where('usd', '<', $agencyTarget)->orderBy('usd', 'desc')->first();
         $rate = (@$minValue->agency_share / 100) * @$agencyTarget;
         return [$agencyTarget, $rate];

@@ -350,7 +350,7 @@ class LiveRoomController extends MainController
 
         $orderSql = [];
         if ($makeRoomsTop == 1) {
-            $orderSql[] = 'is_top DESC';
+            $orderSql[] = '(is_top = 1) DESC';
         }
         $orderSql[] = 'status_priority DESC';
         $orderSql[] = 'pin DESC';
@@ -786,7 +786,7 @@ class LiveRoomController extends MainController
         }
         $form->select('uid', __('owner room'))->options($this->ownerOptions())->ajax('/api/search/users8', 'id', 'name')->rules('required');
         $form->switch('room_status', __('room status'))->options(Common::getSwitchStates());
-        $form->switch('top_room', __('top room'))->options(Common::getSwitchStates());
+        $form->switch('is_top', __('top room (API sort)'))->options(Common::getSwitchStates());
         $form->switch('pin', __('pin'))->options(Common::getSwitchStates());
         $form->text('max_admin', __('max admin'));
         $form->text('room_name', __('room name'))->rules('required');

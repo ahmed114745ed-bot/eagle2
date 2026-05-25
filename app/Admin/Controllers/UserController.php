@@ -704,8 +704,8 @@ class UserController extends MainController
             'permission'
         );
 
-        // For AJAX tab requests, return only the rendered view (no admin layout)
-        if (request()->ajax() && request()->has('tab')) {
+        // For AJAX tab requests (not PJAX), return only the rendered view (no admin layout)
+        if (request()->ajax() && request()->has('tab') && !request()->header('X-PJAX')) {
             return view('user_profile', $data)->render();
         }
 
