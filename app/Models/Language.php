@@ -17,7 +17,8 @@ class Language extends Model
     {
         parent::boot();
 
-        static::saved(function () {
+        static::saved(function ($language) {
+            Cache::forget("language_enabled_{$language->code}");
             Cache::put(
                 'languages',
                 self::where('is_enabled', true)
@@ -26,7 +27,8 @@ class Language extends Model
             );
         });
 
-        static::deleted(function () {
+        static::deleted(function ($language) {
+            Cache::forget("language_enabled_{$language->code}");
             Cache::put(
                 'languages',
                 self::where('is_enabled', true)

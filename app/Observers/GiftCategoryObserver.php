@@ -59,13 +59,14 @@ class GiftCategoryObserver
     {
         try {
             Cache::tags(['gift_categories', 'admin_data'])->flush();
-            
-            // Force opcache clear if available (for Octane)
-            if (function_exists('opcache_reset')) {
-                opcache_reset();
-            }
         } catch (\Exception $e) {
-            \Log::warning('Failed to clear cache in GiftCategoryObserver: ' . $e->getMessage());
+            \Log::warning('Failed to clear tagged cache in GiftCategoryObserver: ' . $e->getMessage());
+        }
+
+        Cache::forget('gift_categories:api');
+
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
         }
     }
 }

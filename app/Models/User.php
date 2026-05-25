@@ -2089,7 +2089,14 @@ class User extends Authenticatable
             }
         });
 
+        static::updated(function (User $user) {
+            \Cache::forget("data_user_{$user->id}");
+            \Cache::forget("user_rooms_{$user->id}");
+        });
+
         static::deleted(function (User $user) {
+            \Cache::forget("data_user_{$user->id}");
+            \Cache::forget("user_rooms_{$user->id}");
             if ($user->agency_id) {
                 clearAgencyCache($user->agency_id);
             }

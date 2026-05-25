@@ -20,6 +20,9 @@ class VipObserver
     protected function refreshVipCache(): void
     {
         Cache::forget('vips');
+        Cache::forget('vips_data');
+        Cache::forget('levels_chunks');
+        Cache::forget('room_levels_all');
         Cache::rememberForever('vips', fn () => Vip::all());
     }
 }

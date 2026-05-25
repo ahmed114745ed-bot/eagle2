@@ -74,7 +74,11 @@ class Country extends Model
         parent::boot();
 
         static::saved(function ($country) {
-      
+            \Cache::forget('filter_countries_list');
+        });
+
+        static::deleted(function ($country) {
+            \Cache::forget('filter_countries_list');
         });
     }
 

@@ -34,6 +34,9 @@ class PinToTopController extends Controller
 
         $response = $this->pinToTopService->store($user->id, $request->user_id);
 
+        // Clear cached chat rooms so pinned order refreshes
+        \Cache::forget("chat_rooms_{$user->id}");
+
         return response()->json($response, $response['status']);
     }
 
@@ -43,6 +46,9 @@ class PinToTopController extends Controller
 
         $user = $request->user();
         $response = $this->pinToTopService->removePinFromTop($user->id, $id);
+
+        // Clear cached chat rooms so pinned order refreshes
+        \Cache::forget("chat_rooms_{$user->id}");
 
         return response()->json($response, $response['status']);
     }

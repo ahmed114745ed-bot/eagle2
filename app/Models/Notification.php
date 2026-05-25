@@ -28,25 +28,13 @@ class Notification extends Model
         });
 
         self::saved(function ($notification) {
-            $languages = ['ar', 'en', 'tr', 'hi'];
-
-            // foreach ($languages as $code) {
-            //     NotificationTranslation::updateOrCreate(
-            //         [
-            //             'notification_id' => $notification->id,
-            //             'language' => $code
-            //         ],
-            //         [
-            //             'title'   => request()->input("title_{$code}"),
-            //             'message' => request()->input("message_{$code}")
-            //         ]
-            //     );
-            // }
             Cache::put($notification->key, $notification->translations->toArray());
+            Cache::forget("notification_{$notification->key}");
         });
 
         self::deleted(function ($notification) {
             Cache::forget($notification->key);
+            Cache::forget("notification_{$notification->key}");
         });
     }
 

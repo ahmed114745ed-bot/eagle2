@@ -10,7 +10,21 @@ use Illuminate\Support\Facades\Log;
 
 class Milestone extends Model
 {
+    use TimestampsWithTimezone;
+
     protected $fillable = ['name','slug' , 'description', 'is_active'];
+
+    protected static function booted(): void
+    {
+        static::saved(function ($milestone) {
+            \Cache::forget('milestone_area_manager');
+            \Cache::forget('milestone_super_admin');
+        });
+        static::deleted(function ($milestone) {
+            \Cache::forget('milestone_area_manager');
+            \Cache::forget('milestone_super_admin');
+        });
+    }
 
 
 

@@ -129,6 +129,10 @@ class ChatMessagesController extends Controller
 
         $response = $this->messageService->handleMessage($request, $message, $user, $user2, $chatRoom);
 
+        // Clear cached chat rooms for both users so the list reflects the new message
+        \Cache::forget("chat_rooms_{$user->id}");
+        \Cache::forget("chat_rooms_{$user2->id}");
+
         //add status for message
         if ($totalDistinctUsers >= 2) {
             $chatRoom->type = 'friend';
@@ -182,6 +186,16 @@ class ChatMessagesController extends Controller
             return response()->json($response, 404);
         }
 
+        // Clear cached chat rooms for both users
+        $msg = \Modules\Chat\Entities\ChatMessage::find($request->message_id);
+        if ($msg) {
+            $chatRoom = \Modules\Chat\Entities\ChatRoom::find($msg->chat_room_id);
+            if ($chatRoom) {
+                \Cache::forget("chat_rooms_{$chatRoom->user_id}");
+                \Cache::forget("chat_rooms_{$chatRoom->user_id2}");
+            }
+        }
+
         return new ChatMessageResource($response);
     }
 
@@ -192,6 +206,16 @@ class ChatMessagesController extends Controller
 
         if ($response['status'] !== 200) {
             return response()->json($response, $response['status']);
+        }
+
+        // Clear cached chat rooms for both users
+        $firstMsg = \Modules\Chat\Entities\ChatMessage::find($request->id[0]);
+        if ($firstMsg) {
+            $chatRoom = \Modules\Chat\Entities\ChatRoom::find($firstMsg->chat_room_id);
+            if ($chatRoom) {
+                \Cache::forget("chat_rooms_{$chatRoom->user_id}");
+                \Cache::forget("chat_rooms_{$chatRoom->user_id2}");
+            }
         }
 
         return response()->json($response);
@@ -205,6 +229,9 @@ class ChatMessagesController extends Controller
         if ($response['status'] !== 200) {
             return response()->json($response, $response['status']);
         }
+
+        // Clear cached chat rooms for the current user
+        \Cache::forget("chat_rooms_{$request->user()->id}");
 
         return response()->json($response);
     }
