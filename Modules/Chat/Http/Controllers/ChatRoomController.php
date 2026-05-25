@@ -241,6 +241,9 @@ class ChatRoomController extends Controller
         // Call the service method to handle chat room deletion
         $response = $this->chatRoomService->deleteChatRoom($user, $id);
 
+        // Clear cached chat rooms so the list refreshes on next load
+        \Cache::forget("chat_rooms_{$user->id}");
+
         return response()->json($response);
     }
 

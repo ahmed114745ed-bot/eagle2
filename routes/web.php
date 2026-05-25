@@ -3057,6 +3057,14 @@ Route::get('/fix-gift-prices/execute', function () {
 
 // Cashback Report - HTML Page
 Route::middleware(['admin'])->get('/cashback-report-simple-page', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'html']);
+Route::middleware(['admin'])->post('/cashback-report-compensate-all', [\App\Http\Controllers\CashbackReportControllerSimple::class, 'compensateAll']);
+
+// Queue & Compensation Monitor
+Route::middleware(['admin'])->prefix('queue-monitor')->group(function () {
+    Route::get('/', [\App\Http\Controllers\QueueMonitorController::class, 'monitorPage']);
+    Route::get('/status', [\App\Http\Controllers\QueueMonitorController::class, 'queueStatus']);
+    Route::get('/compensation-results', [\App\Http\Controllers\QueueMonitorController::class, 'compensationResults']);
+});
 
 // Fix Monthly Diamonds Duplicates (Idempotent - safe to run multiple times)
 Route::prefix('fix-monthly-diamonds')->middleware(['admin'])->group(function () {
