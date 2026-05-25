@@ -936,8 +936,13 @@ function disable() {
 
 // Add the state property to jQuery's event object so we can use it in
 // $(window).bind('popstate')
-if ( $.inArray('state', $.event.props) < 0 )
+if ($.event.addProp) {
+  // jQuery 3.x+
+  $.event.addProp('state')
+} else if ($.event.props && $.inArray('state', $.event.props) < 0) {
+  // jQuery 1.x - 2.x
   $.event.props.push('state')
+}
 
 // Is pjax supported by this browser?
 $.support.pjax =
