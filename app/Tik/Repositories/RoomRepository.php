@@ -253,7 +253,7 @@ class RoomRepository extends AbstractRepository
                 'myClass:id,room_id',
                 'roomCategory:id,type',
                 'myType:id,room_id',
-                'roomVisitors:id,rid,uid',
+                'roomVisitors:id,room_id,user_id',
                 'boxUse:id,room_id,start_at,end_at',
                 'owner' => function($q) {
                     $q->select('id', 'name', 'uuid', 'country_id', 'agency_id', 'special_id')
