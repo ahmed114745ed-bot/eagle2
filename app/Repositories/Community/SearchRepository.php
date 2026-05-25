@@ -222,23 +222,18 @@ class SearchRepository implements SearchRepositoryInterface
             return [];
         }
 
-        $escapedKeywords = addslashes($keywords);
+        $bindings = array_fill(0, 8, $keywords);
 
         $users = User::query()
-            ->select([
-                '*',
-                DB::raw("
-            CASE
-                WHEN uuid = '{$escapedKeywords}' THEN 1000
-                WHEN special_id = '{$escapedKeywords}' THEN 999
-                WHEN uuid LIKE '{$escapedKeywords}%' THEN 800 - LENGTH(uuid)
-                WHEN special_id LIKE '{$escapedKeywords}%' THEN 700 - LENGTH(special_id)
-                WHEN uuid LIKE '%{$escapedKeywords}%' THEN 500 - LOCATE('{$escapedKeywords}', uuid)
-                WHEN special_id LIKE '%{$escapedKeywords}%' THEN 400 - LOCATE('{$escapedKeywords}', special_id)
+            ->selectRaw("*, CASE
+                WHEN uuid = ? THEN 10000
+                WHEN special_id = ? THEN 9500
+                WHEN uuid LIKE CONCAT(?, '%') THEN 8000 - LENGTH(uuid) * 100
+                WHEN special_id LIKE CONCAT(?, '%') THEN 7000 - LENGTH(special_id) * 100
+                WHEN uuid LIKE CONCAT('%', ?, '%') THEN 5000 - LOCATE(?, uuid) * 100 - LENGTH(uuid)
+                WHEN special_id LIKE CONCAT('%', ?, '%') THEN 4000 - LOCATE(?, special_id) * 100 - LENGTH(special_id)
                 ELSE 0
-            END AS total_score
-        ")
-            ])
+            END AS total_score", $bindings)
             ->with([
                 'profile:id,user_id,avatar',
                 'color_image',
