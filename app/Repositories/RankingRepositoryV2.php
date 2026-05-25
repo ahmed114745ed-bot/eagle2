@@ -17,6 +17,7 @@ use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
 use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
@@ -139,17 +140,21 @@ class RankingRepositoryV2
 
     public function getGiftLogs($class, $rel, $type, $limit, $keywords)
     {
-        $query = GiftLog::query()->whereHas($rel)
-            ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
-            ->when($class != 3, fn($q) => $q->with($rel));
+        $cacheKey = "gift_rankings_{$class}_{$rel}_{$type}_{$limit}_{$keywords}";
 
-        $this->applyDateFilters($query, $type);
+        return Cache::remember($cacheKey, 300, function () use ($class, $rel, $type, $limit, $keywords) {
+            $query = GiftLog::query()->whereHas($rel)
+                ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
+                ->when($class != 3, fn($q) => $q->with($rel));
 
-        return $query->selectRaw("sum(giftPrice) as exp, $keywords")
-            ->groupBy($keywords)->orderByRaw("exp desc")
-            ->limit($limit)->get()->reject(function ($q) {
-                return $q->exp == 0;
-            });
+            $this->applyDateFilters($query, $type);
+
+            return $query->selectRaw("sum(giftPrice) as exp, $keywords")
+                ->groupBy($keywords)->orderByRaw("exp desc")
+                ->limit($limit)->get()->reject(function ($q) {
+                    return $q->exp == 0;
+                });
+        });
     }
 
     private function rankerRelations(string $role): array
@@ -245,18 +250,22 @@ class RankingRepositoryV2
 
     public function getGiftLogsV2($class, $rel, $type, $limit, $keywords)
     {
-        $query = GiftLog::query()->whereHas($rel)
-            ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
-            ->when($class != 3, fn($q) => $q->with($rel));
+        $cacheKey = "gift_rankings_v2_{$class}_{$rel}_{$type}_{$limit}_{$keywords}";
 
-        $this->applyDateFiltersV2($query, $type);
+        return Cache::remember($cacheKey, 300, function () use ($class, $rel, $type, $limit, $keywords) {
+            $query = GiftLog::query()->whereHas($rel)
+                ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
+                ->when($class != 3, fn($q) => $q->with($rel));
 
-        return $query->selectRaw("SUM(giftPrice) as exp, $keywords")
-            ->groupBy($keywords)
-            ->havingRaw('SUM(giftPrice) > 0')
-            ->orderByDesc('exp')
-            ->limit($limit)
-            ->get();
+            $this->applyDateFiltersV2($query, $type);
+
+            return $query->selectRaw("SUM(giftPrice) as exp, $keywords")
+                ->groupBy($keywords)
+                ->havingRaw('SUM(giftPrice) > 0')
+                ->orderByDesc('exp')
+                ->limit($limit)
+                ->get();
+        });
     }
 
     public function getGiftLogsForRoomOwnerId($class, $rel, $type, $limit, $room_id, $keywords)

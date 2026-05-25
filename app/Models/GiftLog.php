@@ -8,6 +8,7 @@ use Modules\Moment\Entities\Moment;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 class GiftLog extends Model
 {
@@ -16,6 +17,38 @@ class GiftLog extends Model
     protected $table = 'gift_logs';
 
     protected $guarded = [];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Clear gift rankings cache when gift_logs are created or deleted
+        static::created(function () {
+            self::clearGiftRankingsCache();
+        });
+
+        static::deleted(function () {
+            self::clearGiftRankingsCache();
+        });
+    }
+
+    /**
+     * Clear all gift rankings cache
+     */
+    protected static function clearGiftRankingsCache(): void
+    {
+        // Clear all cached gift ranking variations
+        $patterns = ['gift_rankings_*', 'room_ranking_*'];
+        foreach ($patterns as $pattern) {
+            $keys = Cache::getRedis()->keys($pattern);
+            if (!empty($keys)) {
+                foreach ($keys as $key) {
+                    $cleanKey = str_replace(config('database.redis.options.prefix'), '', $key);
+                    Cache::forget($cleanKey);
+                }
+            }
+        }
+    }
 
     public function gift()
     {
