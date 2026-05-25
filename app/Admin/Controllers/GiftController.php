@@ -96,6 +96,11 @@ class GiftController extends MainController
      */
     public function create(Content $content)
     {
+        // Store the previous URL for redirect after save (similar to edit method)
+        if (url()->previous() != url()) {
+            session(['return_url' => url()->previous()]);
+        }
+
         return parent::create($content
             ->title(trans('Gifts'))
             ->body($this->form()));
@@ -659,10 +664,6 @@ class GiftController extends MainController
             }
         });
 
-        $form->saved(function (Form $form) {
-            $url = url('admin/gifts?filter=' . $form->model()->gift_category_id);
-            return redirect()->to($url);
-        });
         return $form;
     }
 
