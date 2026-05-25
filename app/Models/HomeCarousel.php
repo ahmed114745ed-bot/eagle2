@@ -7,6 +7,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Events\Entities\GeneralRole;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Cache;
 
 class HomeCarousel extends Model
 {
@@ -107,6 +108,37 @@ class HomeCarousel extends Model
                 }
             }
         });
+
+        // Clear home_carousels cache when created, updated, or deleted
+        static::saved(function () {
+            self::clearHomeCarouselsCache();
+        });
+
+        static::deleted(function () {
+            self::clearHomeCarouselsCache();
+        });
+    }
+
+    /**
+     * Clear all home_carousels cache
+     */
+    protected static function clearHomeCarouselsCache(): void
+    {
+        try {
+            $redis = Cache::getStore()->getRedis();
+            $prefix = config('database.redis.options.prefix', '');
+            $pattern = 'home_carousels_*';
+
+            $keys = $redis->keys($prefix . $pattern);
+            if (!empty($keys)) {
+                foreach ($keys as $key) {
+                    $cleanKey = str_replace($prefix, '', $key);
+                    Cache::forget($cleanKey);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to clear home carousels cache: ' . $e->getMessage());
+        }
     }
 
 

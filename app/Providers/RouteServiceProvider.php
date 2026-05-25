@@ -95,7 +95,37 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('lucky-gift', function (Request $request) {
-            return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
+            return Limit::perMinute(20)
+                ->by(optional($request->user())->id ?: $request->ip())
+                ->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'status' => 0,
+                        'message' => __('Too many gift requests. Please slow down.'),
+                    ], 429, $headers);
+                });
+        });
+
+        RateLimiter::for('game-balance', function (Request $request) {
+            return Limit::perMinute(100)
+                ->by($request->input('uid') ?: $request->ip())
+                ->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'errorCode' => 429,
+                        'errorMsg' => 'Too many balance requests. Please slow down.',
+                        'data' => []
+                    ], 429, $headers);
+                });
+        });
+
+        RateLimiter::for('zego-room-count', function (Request $request) {
+            return Limit::perMinute(60)
+                ->by($request->input('room_id') ?: $request->ip())
+                ->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'status' => 0,
+                        'message' => 'Too many room count update requests.',
+                    ], 429, $headers);
+                });
         });
     }
 }

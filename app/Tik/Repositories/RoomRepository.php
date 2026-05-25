@@ -14,6 +14,7 @@ use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\NowRoomResource;
 use phpDocumentor\Reflection\PseudoTypes\True_;
 use App\Http\Resources\Api\V1\NowRoomUserResource;
+use Illuminate\Support\Facades\Cache;
 
 /** @property Room $model*/
 class RoomRepository extends AbstractRepository
@@ -21,6 +22,36 @@ class RoomRepository extends AbstractRepository
     public function __construct()
     {
         parent::__construct(new Room);
+    }
+
+    /**
+     * Clear all rooms cache when any room is updated
+     */
+    protected function clearRoomsCache(): void
+    {
+        Cache::tags(['rooms'])->flush();
+    }
+
+    /**
+     * Override create to clear cache
+     */
+    public function create(array $data): mixed
+    {
+        $room = parent::create($data);
+        $this->clearRoomsCache();
+        return $room;
+    }
+
+    /**
+     * Override delete to clear cache
+     */
+    public function delete(int $id)
+    {
+        $result = parent::delete($id);
+        if ($result) {
+            $this->clearRoomsCache();
+        }
+        return $result;
     }
 
     public function findRoomUser($userId, $withoutAppends = true)
@@ -134,6 +165,7 @@ class RoomRepository extends AbstractRepository
     public function updateRoom($room)
     {
         $room->update();
+        $this->clearRoomsCache();
     }
 
     public function createPrivetMessage($fromUserId, $toUserId, $message, $price)
@@ -162,17 +194,22 @@ class RoomRepository extends AbstractRepository
     public function updateMicRoom($room, $mic)
     {
         $room->microphone = $mic;
-        return $room->save();
+        $result = $room->save();
+        $this->clearRoomsCache();
+        return $result;
     }
 
     public function updateRoomStatus($userId, $isAvailable)
     {
-        return $this->model->query()->where('uid', $userId)->update(['room_status' => $isAvailable ? 2 : 1]);
+        $result = $this->model->query()->where('uid', $userId)->update(['room_status' => $isAvailable ? 2 : 1]);
+        $this->clearRoomsCache();
+        return $result;
     }
 
     public function updateRoomUser($room)
     {
         $room->save();
+        $this->clearRoomsCache();
         return true;
     }
 
@@ -182,7 +219,19 @@ class RoomRepository extends AbstractRepository
         $user = $req?->user();
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
 
-        $blockedUserIds = Pack::query()
+        // Cache key based on user, type, filter, country, and page
+        $cacheKey = sprintf(
+            'rooms_list_%s_%s_%s_%s_%s_%s',
+            $user->id ?? 'guest',
+            $roomType,
+            $req->filter ?? 'none',
+            $req->country_id ?? 'all',
+            $req->page ?? 1,
+            md5(json_encode($ids))
+        );
+
+        return Cache::tags(['rooms'])->remember($cacheKey, 120, function () use ($req, $roomType, $user, $topRooms, $ids) {
+            $blockedUserIds = Pack::query()
             ->select('user_id')
             ->where('type', 16)
             ->where('is_used', 1)
@@ -195,29 +244,35 @@ class RoomRepository extends AbstractRepository
         $result = $this->model->withLuckyBoxFlag($user->id)
             ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'level_id', 'room_status', 'room_pass', 'room_admin', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
             ->with([
-                'roomLevel',
+                'roomLevel:id,name_en,name_ar,level,img',
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'defaultBackground:id,img',
                 'lastPk:id,room_id',
                 'background:id,img',
-                'roomVisitorUsers' => fn($q) => $q->with('profile')->limit(5),
-                'myClass',
+                'roomVisitorUsers' => fn($q) => $q->select('users.id')->with('profile:user_id,avatar')->limit(5),
+                'myClass:id,room_id',
                 'roomCategory:id,type',
-                'myType',
-                'roomVisitors',
-                'boxUse',
-                'owner.agency.owner',
-                'owner' => [
-                    'enabledMedals',
-                    'agency',
-                    //                    'enabledMedals:id,achievement_level_id,user_id,is_enable',
-                    'country',
-                    'color_image',
-                    'specialId.ware',
-                    'eligiblePacks.ware',
-                    'profile',
-                    'medals.achievementLevel.achievement'
-                ],
+                'myType:id,room_id',
+                'roomVisitors:id,rid,uid',
+                'boxUse:id,room_id,start_at,end_at',
+                'owner' => function($q) {
+                    $q->select('id', 'name', 'uuid', 'country_id', 'agency_id', 'special_id')
+                      ->with([
+                          'enabledMedals:id,achievement_level_id,user_id,is_enable',
+                          'agency:id,name,logo',
+                          'agency.owner:id,name',
+                          'country:id,name,img',
+                          'color_image:id,user_id,image',
+                          'specialId:id,ware_id',
+                          'specialId.ware:id,img,img_gif',
+                          'eligiblePacks:id,user_id,ware_id',
+                          'eligiblePacks.ware:id,img,img_gif',
+                          'profile:user_id,avatar,frame',
+                          'medals' => fn($q) => $q->select('id','user_id','achievement_level_id')
+                                                   ->with('achievementLevel:id,achievement_id,icon')
+                                                   ->with('achievementLevel.achievement:id,name')
+                      ]);
+                },
             ])
             ->withCount('roomVisitors')
             ->whereHas('owner')
@@ -340,6 +395,7 @@ class RoomRepository extends AbstractRepository
         })->when($roomType == 'live', function ($q) {
             $q->whereIn('type', ['single_live', 'multi_live']);
         })->paginate(10);
+        }); // End of cache closure
     }
 
 
@@ -552,7 +608,7 @@ class RoomRepository extends AbstractRepository
                 'created_at'
             ])
             ->with([
-                'roomLevel',
+                'roomLevel:id,name_en,name_ar,level,img',
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'lastPk:id,room_id',
                 'background:id,img',

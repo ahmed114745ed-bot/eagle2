@@ -9,6 +9,28 @@ class Region extends Model
 {
     protected $fillable = ['name', 'manager_id'];
 
+    /**
+     * Validation rules for creating/updating regions
+     */
+    public static function validationRules(): array
+    {
+        return [
+            'name' => 'required|string|min:2|max:255|unique:regions,name',
+            'manager_id' => 'required|exists:area_managers,id',
+        ];
+    }
+
+    /**
+     * Validation rules for updating (excluding unique check on same record)
+     */
+    public static function updateValidationRules(int $id): array
+    {
+        return [
+            'name' => 'required|string|min:2|max:255|unique:regions,name,' . $id,
+            'manager_id' => 'required|exists:area_managers,id',
+        ];
+    }
+
     public function manager(): BelongsTo
     {
         return $this->belongsTo(AreaManager::class, 'manager_id');
