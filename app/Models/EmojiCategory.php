@@ -17,4 +17,10 @@ class EmojiCategory extends Model
         'order_column_name' => 'sort',
         'sort_when_creating' => true,
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => \Cache::forget('emoji_categories'));
+        static::deleted(fn () => \Cache::forget('emoji_categories'));
+    }
 }

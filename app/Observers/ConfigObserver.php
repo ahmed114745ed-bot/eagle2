@@ -23,6 +23,10 @@ class ConfigObserver
     {
         Cache::forget('all_configs');
 
+        foreach (['en', 'ar'] as $code) {
+            Cache::forget("badges_{$code}");
+        }
+
         CacheHelper::cacheConfig();
     }
 }

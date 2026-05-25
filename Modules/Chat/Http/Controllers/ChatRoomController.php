@@ -126,6 +126,10 @@ class ChatRoomController extends Controller
         $user = $request->user();
         $checkRoom = $this->chatRoomService->getOrCreateChatRoom($user, $request->user_id);
 
+        // Clear cached chat rooms for both users so the list refreshes
+        \Cache::forget("chat_rooms_{$user->id}");
+        \Cache::forget("chat_rooms_{$request->user_id}");
+
         // Update user's current room chat
 
         $user->current_room_chat = $checkRoom->id;
@@ -241,8 +245,9 @@ class ChatRoomController extends Controller
         // Call the service method to handle chat room deletion
         $response = $this->chatRoomService->deleteChatRoom($user, $id);
 
-        // Clear cached chat rooms so the list refreshes on next load
+        // Clear cached chat rooms for both users so the list refreshes
         \Cache::forget("chat_rooms_{$user->id}");
+        \Cache::forget("chat_rooms_{$id}");
 
         return response()->json($response);
     }
@@ -254,6 +259,10 @@ class ChatRoomController extends Controller
         ]);
 
         $response = $this->chatRoomService->acceptRequest($request);
+
+        // Clear cached chat rooms for both users so the list refreshes
+        \Cache::forget("chat_rooms_{$request->user()->id}");
+        \Cache::forget("chat_rooms_{$request->user_id}");
 
         return response()->json($response);
 
