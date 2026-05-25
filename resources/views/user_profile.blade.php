@@ -3743,13 +3743,12 @@
 
                         @if($usersCoins)
                             <div class="pagination-container">
-                                {{ $usersCoins->appends([
+                                {{ $usersCoins->appends(array_filter([
                                     'tab' => 'user-coins',
-                                    'pack_page' => $packs?->currentPage(),
-                                    'salary_page' => $salaries?->currentPage(),
-                                    'gift_page' => $giftSLogs?->currentPage(),
-                                    'coins_page' => $usersCoins?->currentPage(),
-                                ])->links('vendor.pagination.bootstrap-4') }}
+                                    'from_date' => request('from_date'),
+                                    'to_date' => request('to_date'),
+                                    'sub_type' => request('sub_type'),
+                                ]))->links('vendor.pagination.bootstrap-4') }}
                             </div>
                         @endif
                     </div>
