@@ -262,7 +262,7 @@ class RoomRepository extends AbstractRepository
                           'agency:id,name,img',
                           'agency.owner:id,name',
                           'country:id,name,flag',
-                          'color_image:id,user_id,image',
+                          'color_image:id,image',
                           'specialId:id,ware_id',
                           'specialId.ware:id,img,img_gif',
                           'eligiblePacks:id,user_id,ware_id',

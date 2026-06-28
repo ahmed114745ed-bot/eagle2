@@ -10,14 +10,22 @@ class FirebaseNotificationService
 
     public function __construct()
     {
+        $credentialsPath = config('services.firebase.credentials');
+        if (!$credentialsPath || !file_exists($credentialsPath)) {
+            $this->messaging = null;
+            return;
+        }
         $firebase = (new Factory)
-            ->withServiceAccount(config('services.firebase.credentials'));
+            ->withServiceAccount($credentialsPath);
 
         $this->messaging = $firebase->createMessaging();
     }
 
     public function sendNotification($deviceToken, $title, $body)
     {
+        if (!$this->messaging) {
+            return null;
+        }
         $message = [
             'token' => $deviceToken,
             'notification' => [
