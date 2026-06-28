@@ -1108,7 +1108,11 @@ class Common
 
     public static function subscribeToTopic(array $registrationTokens, string $topic)
     {
-        $factory = (new Factory)->withServiceAccount(base_path(config('app.fileName')));
+        $credentialsFilePath = base_path(config('app.fileName'));
+        if (!file_exists($credentialsFilePath)) {
+            return null;
+        }
+        $factory = (new Factory)->withServiceAccount($credentialsFilePath);
         $messaging = $factory->createMessaging();
 
 
@@ -1426,14 +1430,21 @@ class Common
 
     public static function fireBaseFactory()
     {
+        $credentialsFilePath = storage_path('app/credentials/firebase_credentials.json');
+        if (!file_exists($credentialsFilePath)) {
+            return null;
+        }
         return (new Factory)
-            ->withServiceAccount(storage_path('app/credentials/firebase_credentials.json'))
+            ->withServiceAccount($credentialsFilePath)
             ->withDatabaseUri('https://yay-chat-c2333-default-rtdb.firebaseio.com');
     }
 
     public static function fireBaseDatabase($path, $obj, $type = 'set')
     {
         $factory = self::fireBaseFactory();
+        if (!$factory) {
+            return null;
+        }
         $database = $factory->createDatabase();
         if ($type == 'set') {
             $database->getReference($path)->set($obj);
@@ -2977,9 +2988,11 @@ class Common
         $versionPath = $pathInfo['dirname'] . '/versions/'
             . $pathInfo['filename'] . '_' . $size . '.'
             . $pathInfo['extension'];
-        // Check if exists, fallback to original
-        if (Storage::exists($versionPath)) {
-            return Storage::url($versionPath);
+        try {
+            if (Storage::exists($versionPath)) {
+                return Storage::url($versionPath);
+            }
+        } catch (\Throwable $e) {
         }
         return Storage::url($path);
     }

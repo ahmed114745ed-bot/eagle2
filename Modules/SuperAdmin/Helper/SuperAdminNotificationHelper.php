@@ -99,6 +99,9 @@ class SuperAdminNotificationHelper
     {
         $projectId = env('FIREBASE_PROJECT_NAME');
         $firebaseConfigPath = storage_path('app/credentials/firebase_credentials.json');
+        if (!file_exists($firebaseConfigPath)) {
+            return null;
+        }
         $client = new Google_Client();
         $client->setAuthConfig($firebaseConfigPath);
 

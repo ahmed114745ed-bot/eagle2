@@ -71,6 +71,9 @@ class AdminNotificationHelper
 
         $client = new Google_Client();
         $firebaseConfigPath = storage_path('app/credentials/firebase_credentials.json');
+        if (!file_exists($firebaseConfigPath)) {
+            return null;
+        }
         $client->setAuthConfig($firebaseConfigPath);
 
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');

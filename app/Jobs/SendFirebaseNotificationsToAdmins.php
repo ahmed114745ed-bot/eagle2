@@ -36,6 +36,9 @@ class SendFirebaseNotificationsToAdmins implements ShouldQueue
 
         $projectId = env('FIREBASE_PROJECT_NAME');
         $firebaseConfigPath = storage_path('app/credentials/firebase_credentials.json');
+        if (!file_exists($firebaseConfigPath)) {
+            return;
+        }
         $client = new Google_Client();
         $client->setAuthConfig($firebaseConfigPath);
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');

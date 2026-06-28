@@ -15,7 +15,9 @@ class FirebaseValidate
     public static function validateIdToken($idToken)
     {
         $credentialPath = storage_path('app/credentials/firebase_credentials.json');
-
+        if (!file_exists($credentialPath)) {
+            throw new \Exception('Firebase credentials file not found');
+        }
         $factory = (new Factory())->withServiceAccount($credentialPath);
         $auth = $factory->createAuth();
         $verifiedIdToken = $auth->verifyIdToken($idToken);
