@@ -80,10 +80,16 @@ class AppServiceProvider extends ServiceProvider
         Form::extend('imagePath', ImagePath::class);
 
         if ($this->app->isLocal()) {
-            //            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
-            $this->app->register(TelescopeServiceProvider::class);
-            $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
+            if (class_exists(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class)) {
+                $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+            }
+            if (class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+                $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+                $this->app->register(TelescopeServiceProvider::class);
+            }
+            if (class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
+                $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
+            }
         }
 
         $this->app->bind(RoomRepoInterface::class, RoomRepo::class);

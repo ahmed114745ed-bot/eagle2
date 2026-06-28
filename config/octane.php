@@ -87,6 +87,39 @@ return [
             // Fix: Disconnect idle DB connections after each request to prevent connection leak
             \App\Listeners\DisconnectIdleDbConnections::class,
         ],
+
+        \Laravel\Octane\Events\RequestReceived::class => [
+            // ...
+        ],
+
+        \Laravel\Octane\Events\TaskReceived::class => [
+            // ...
+        ],
+
+        \Laravel\Octane\Events\TaskTerminated::class => [
+            \Laravel\Octane\Listeners\DisconnectFromDatabases::class,
+        ],
+
+        \Laravel\Octane\Events\TickReceived::class => [
+            \Laravel\Octane\Listeners\DisconnectFromDatabases::class,
+        ],
+
+        \Laravel\Octane\Events\TickTerminated::class => [
+            // ...
+        ],
+
+        \Laravel\Octane\Events\WorkerErrorOccurred::class => [
+            \Laravel\Octane\Listeners\ReportException::class,
+            \Laravel\Octane\Listeners\StopWorkerIfNecessary::class,
+        ],
+
+        \Laravel\Octane\Events\WorkerStarting::class => [
+            // ...
+        ],
+
+        \Laravel\Octane\Events\WorkerStopping::class => [
+            // ...
+        ],
     ],
 
     /*
