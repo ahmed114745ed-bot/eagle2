@@ -64,27 +64,14 @@ trait ZegoTrait
 
         return null;
     }
-    public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
+    public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = null)
     {
 
         $roomId = $RoomId ?? request()->room_id;
-        // $url = 'https://rtc-api.zego.im';
-        // $AppId = self::getConf('zego_app_id');
-        // $AppId = self::zegoData('zego_app_id');
-        $AppId = '';
-        $serverSecret = '';
-       // if (config('app.env') == 'production') {
-            $url = 'https://rtc-api.zego.im';
-
-            $AppId = self::zegoData('zego_app_id');
-
-            $serverSecret = self::zegoData('zego_server_secret');
-        // } else {
-        //     $url =  'https://engine.udt-stream.com/api/v1/server';
-        //     $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
-
-        //     $serverSecret = self::zegoData('zego_server_secret');
-        // }
+        $IsTest = $IsTest ?? (app()->environment('production') ? 'false' : 'true');
+        $url = 'https://rtc-api.zego.im';
+        $AppId = self::zegoData('zego_app_id');
+        $serverSecret = self::zegoData('zego_server_secret');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         $str = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
@@ -130,24 +117,14 @@ trait ZegoTrait
     }
 
 
-    public static function utdStream($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
+    public static function utdStream($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = null)
     {
 
         $roomId = $RoomId ?? request()->room_id;
-
-       // if (config('app.env') == 'production') {
-            $url = 'https://rtc-api.zego.im';
-
-            $AppId = self::zegoData('zego_app_id');
-
-            $serverSecret = self::zegoData('zego_server_secret');
-        // } else {
-        //     $url =  'https://engine.udt-stream.com/api/v1/server';
-        //     $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
-
-        //     $serverSecret = self::zegoData('zego_server_secret');
-        // }
-
+        $IsTest = $IsTest ?? (app()->environment('production') ? 'false' : 'true');
+        $url = 'https://rtc-api.zego.im';
+        $AppId = self::zegoData('zego_app_id');
+        $serverSecret = self::zegoData('zego_server_secret');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         $str = $AppId . $SignatureNonce . $serverSecret . $Timestamp;
@@ -192,25 +169,12 @@ trait ZegoTrait
         return null;
     }
 
-    public static function sendToZego_2($Action, $RoomId, $UserId, $UserName, $MessageContent, $IsTest = 'false')
+    public static function sendToZego_2($Action, $RoomId, $UserId, $UserName, $MessageContent, $IsTest = null)
     {
-        // $url = 'https://rtc-api.zego.im';
-        // $AppId = self::getConf('zego_app_id');
-        //$AppId = self::zegoData('zego_app_id');
-        $AppId = '';
-        $serverSecret = '';
-        //if (config('app.env') == 'production') {
-            $url = 'https://rtc-api.zego.im';
-
-            $AppId = self::zegoData('zego_app_id');
-
-            $serverSecret = self::zegoData('zego_server_secret');
-        // } else {
-        //     $url =  'https://engine.udt-stream.com/api/v1/server';
-        //     $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
-
-        //     $serverSecret = self::zegoData('zego_server_secret');
-        // }
+        $IsTest = $IsTest ?? (app()->environment('production') ? 'false' : 'true');
+        $url = 'https://rtc-api.zego.im';
+        $AppId = self::zegoData('zego_app_id');
+        $serverSecret = self::zegoData('zego_server_secret');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         //  $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
@@ -256,27 +220,12 @@ trait ZegoTrait
         return;
     }
 
-    public static function sendToZego_3($Action, $RoomId, $UserId, $IsTest = 'false')
+    public static function sendToZego_3($Action, $RoomId, $UserId, $IsTest = null)
     {
-        // $url = 'https://rtc-api.zego.im';
-
-        // $AppId = self::getConf('zego_app_id');
-        // $AppId = self::zegoData('zego_app_id');
-
-        $AppId = '';
-        $serverSecret = '';
-      //  if (config('app.env') == 'production') {
-            $url = 'https://rtc-api.zego.im';
-
-            $AppId = self::zegoData('zego_app_id');
-
-            $serverSecret = self::zegoData('zego_server_secret');
-        // } else {
-        //     $url =  'https://engine.udt-stream.com/api/v1/server';
-        //     $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
-
-        //     $serverSecret = self::zegoData('zego_server_secret');
-        // }
+        $IsTest = $IsTest ?? (app()->environment('production') ? 'false' : 'true');
+        $url = 'https://rtc-api.zego.im';
+        $AppId = self::zegoData('zego_app_id');
+        $serverSecret = self::zegoData('zego_server_secret');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         //  $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
@@ -317,25 +266,12 @@ trait ZegoTrait
         return $res;
     }
 
-    public static function sendToZego_4($Action, $RoomId, $fromUserId, $toUserId, $MessageContent, $IsTest = 'false')
+    public static function sendToZego_4($Action, $RoomId, $fromUserId, $toUserId, $MessageContent, $IsTest = null)
     {
-        // $url = 'https://rtc-api.zego.im';
-        // $AppId = self::getConf('zego_app_id');
-        // $AppId = self::zegoData('zego_app_id');
-        $AppId = '';
-        $serverSecret = '';
-       //// if (config('app.env') == 'production') {
-            $url = 'https://rtc-api.zego.im';
-
-            $AppId = self::zegoData('zego_app_id');
-
-            $serverSecret = self::zegoData('zego_server_secret');
-        // } else {
-        //     $url =  'https://engine.udt-stream.com/api/v1/server';
-        //     $AppId = Common::getConfig('utd_stream_server_secret') ?? '';
-
-        //     $serverSecret = self::zegoData('zego_server_secret');
-        // }
+        $IsTest = $IsTest ?? (app()->environment('production') ? 'false' : 'true');
+        $url = 'https://rtc-api.zego.im';
+        $AppId = self::zegoData('zego_app_id');
+        $serverSecret = self::zegoData('zego_server_secret');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         // $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
