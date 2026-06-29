@@ -95,9 +95,10 @@ class DedicateWareController extends MainController
         $typeSpecial = false;
 
         $grid = new Grid(new Ware);
+        $grid->paginate(15);
         $grid->model()->orderByDesc('created_at');
 
-        $grid->model()->where('type',  $type)->whereIn('get_type', [4,6])->where('type', '!=', 25);
+        $grid->model()->where('type', $type)->whereIn('get_type', [4, 6]);
 
         $grid->id('ID');
         $grid->column('name', __('name'));
@@ -154,7 +155,6 @@ class DedicateWareController extends MainController
         }
         if (Admin::user()->can('gift-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
-
                 return (new \App\Admin\Actions\WareDedicateAction($this->id))->render();
             });
         }
