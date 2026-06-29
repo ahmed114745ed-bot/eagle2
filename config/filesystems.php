@@ -54,7 +54,7 @@ return [
 
         'admin' => [
             'driver' => 'gcs',
-//            'root' => storage_path('app/public'),
+            'root' => storage_path('app/public'),
 
             'key_file_path' => env('GOOGLE_CLOUD_KEY_FILE', base_path('service-account.json')), // optional: /path/to/service-account.json
             'key_file' => [], // optional: Array of data that substitutes the .json file (see below)
